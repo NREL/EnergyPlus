@@ -653,7 +653,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
         // now initialize simulation variables for "heat pump off"
         this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
@@ -709,7 +709,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
             this->SourceSideWaterOutletTemp = this->SourceSideWaterInletTemp;
@@ -723,7 +723,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
     }
 

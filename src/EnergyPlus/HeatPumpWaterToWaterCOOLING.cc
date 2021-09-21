@@ -677,7 +677,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
         // now initialize simulation variables for "heat pump off"
         this->QLoad = 0.0;
@@ -742,7 +742,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             this->QLoad = 0.0;
             this->QSource = 0.0;
@@ -761,7 +761,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
     }
 

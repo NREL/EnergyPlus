@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_EQ(1, criteriaCheckIndex1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_EQ(2, criteriaCheckIndex2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -302,7 +302,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_EQ(3, criteriaCheckIndex3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -334,7 +334,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -348,7 +348,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -362,7 +362,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -375,7 +375,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -388,7 +388,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -403,7 +403,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 }

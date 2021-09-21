@@ -1319,9 +1319,9 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
             Real64 THeatRecSetPoint(0.0); // tests set point node for proper set point value
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->HRLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPointHi;
                 } else {
                     assert(false);
@@ -1854,7 +1854,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     // flow resolver will not shut down the branch
     if (MyLoad >= 0 || !RunFlag) {
         if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
         }
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -1960,7 +1960,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                                                     this->CondMassFlowIndex,
                                                     this->CDLoopNum,
                                                     this->CDLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->CondMassFlowRate);
 
         if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1981,7 +1981,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(this->CWLoopNum)
                      .LoopSide(this->CWLoopSideNum)
@@ -1994,7 +1994,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             } else { // use plant loop overall setpoint
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
             }
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(this->CWLoopNum)
                      .LoopSide(this->CWLoopSideNum)
@@ -2043,7 +2043,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     if (this->ChillerCapFT < 0) {
         if (this->ChillerCapFTError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::iFlowLock::Unlocked &&
+            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
             !state.dataGlobal->WarmupFlag) {
             ++this->ChillerCapFTError;
             ShowWarningError(state, "CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
@@ -2053,7 +2053,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                                      EvapOutletTempSetPoint,
                                      condInletTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::iFlowLock::Unlocked &&
+        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
                    !state.dataGlobal->WarmupFlag) {
             ++this->ChillerCapFTError;
             ShowRecurringWarningErrorAtEnd(state,
@@ -2082,10 +2082,10 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 TempLoad = this->EvapMassFlowRate * Cp *
                            (state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint);
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 TempLoad =
                     this->EvapMassFlowRate * Cp *
                     (state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi);
@@ -2149,10 +2149,10 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 EvapDeltaTemp =
                     state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 EvapDeltaTemp =
                     state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
             } else {
@@ -2178,9 +2178,9 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             // Should we recalculate this with the corrected setpoint?
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 }
             }
@@ -2343,7 +2343,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     this->ChillerEIRFT = CurveManager::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
     if (this->ChillerEIRFT < 0.0) {
         if (this->ChillerEIRFTError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::iFlowLock::Unlocked &&
+            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
             !state.dataGlobal->WarmupFlag) {
             ++this->ChillerEIRFTError;
             ShowWarningError(state, "CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
@@ -2353,7 +2353,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                                      this->EvapOutletTemp,
                                      condInletTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::iFlowLock::Unlocked &&
+        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
                    !state.dataGlobal->WarmupFlag) {
             ++this->ChillerEIRFTError;
             ShowRecurringWarningErrorAtEnd(state,
@@ -2369,14 +2369,14 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     this->ChillerEIRFPLR = CurveManager::CurveValue(state, this->ChillerEIRFPLRIndex, PartLoadRat);
     if (this->ChillerEIRFPLR < 0.0) {
         if (this->ChillerEIRFPLRError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::iFlowLock::Unlocked &&
+            state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
             !state.dataGlobal->WarmupFlag) {
             ++this->ChillerEIRFPLRError;
             ShowWarningError(state, "CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
             ShowContinueError(state, format(" Chiller EIR as a function of PLR curve output is negative ({:.3R}).", this->ChillerEIRFPLR));
             ShowContinueError(state, format(" Negative value occurs using a part-load ratio of {:.3R}.", PartLoadRat));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::iFlowLock::Unlocked &&
+        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
                    !state.dataGlobal->WarmupFlag) {
             ++this->ChillerEIRFPLRError;
             ShowRecurringWarningErrorAtEnd(state,
@@ -2495,9 +2495,9 @@ void ElectricEIRChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->HRLoopNum).LoopDemandCalcScheme);
 
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPointHi;
             } else {
                 assert(false);

@@ -585,10 +585,10 @@ void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boi
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && this->ModulatedFlowSetToLoop) {
         // fix for clumsy old input that worked because loop setpoint was spread.
         //  could be removed with transition, testing , model change, period of being obsolete.
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint =
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
-        } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
+        } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
             state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo =
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
         }
@@ -833,7 +833,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // Initialize the delta temperature to zero
     Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         // Either set the flow to the Constant value or calculate the flow for the variable volume
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp
@@ -852,9 +852,9 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
             // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
             // Then find the flow rate and outlet temp
 
-            if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint - state.dataLoopNodes->Node(BoilerInletNode).Temp;
-            } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
+            } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
                 BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo - state.dataLoopNodes->Node(BoilerInletNode).Temp;
             }
 

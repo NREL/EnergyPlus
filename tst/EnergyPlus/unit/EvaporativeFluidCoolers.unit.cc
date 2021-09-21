@@ -127,7 +127,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.05;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;

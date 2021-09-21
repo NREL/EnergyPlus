@@ -1570,7 +1570,7 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
     // Only pass pressure if we aren't doing a pressure simulation
     switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
-    case DataPlant::iPressSimType::NoPressure:
+    case DataPlant::PressSimType::NoPressure:
         state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
         break;
     default:

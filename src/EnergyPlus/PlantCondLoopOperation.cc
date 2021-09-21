@@ -1311,7 +1311,7 @@ void FindCompSPInput(EnergyPlusData &state,
     Real64 OffPeakCHWTemp;
     int CompNumA;
     int CompNumN;
-    iCtrlType CompOpType; // 1=cooling, 2=dual(or other)
+    CtrlType CompOpType; // 1=cooling, 2=dual(or other)
 
     SchemeNameFound = true;
 
@@ -1425,7 +1425,7 @@ void FindCompSPInput(EnergyPlusData &state,
                     {
                         auto const controlType(state.dataIPShortCut->cAlphaArgs(CompNumA + 1));
                         if (controlType == "COOLING") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::CoolingOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = CtrlType::CoolingOp;
                         } else if (controlType == "HEATING") {
                             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                                 ShowSevereError(state,
@@ -1433,9 +1433,9 @@ void FindCompSPInput(EnergyPlusData &state,
                                                     state.dataIPShortCut->cAlphaArgs(1) + " in thermal energy storage control");
                                 ErrorsFound = true;
                             }
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::HeatingOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = CtrlType::HeatingOp;
                         } else if (controlType == "DUAL") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::DualOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = CtrlType::DualOp;
                         }
                     }
 
@@ -1461,19 +1461,19 @@ void FindCompSPInput(EnergyPlusData &state,
                                               "Equipment Operation Mode can only be 'DUAL' for " + state.dataIPShortCut->cAlphaArgs(CompNumA - 3) +
                                                   " objects.");
 
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::DualOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = CtrlType::DualOp;
                         }
 
                         // This block forces CompOpType to be either Cooling if explicitly provided, all other cases = Dual
                         switch (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum) {
-                        case iCtrlType::DualOp:
-                            CompOpType = iCtrlType::CoolingOp;
+                        case CtrlType::DualOp:
+                            CompOpType = CtrlType::CoolingOp;
                             break;
-                        case iCtrlType::CoolingOp:
-                            CompOpType = iCtrlType::HeatingOp;
+                        case CtrlType::CoolingOp:
+                            CompOpType = CtrlType::HeatingOp;
                             break;
-                        case iCtrlType::HeatingOp:
-                            CompOpType = iCtrlType::CoolingOp;
+                        case CtrlType::HeatingOp:
+                            CompOpType = CtrlType::CoolingOp;
                             break;
                         default:
                             assert(false);
@@ -1494,7 +1494,7 @@ void FindCompSPInput(EnergyPlusData &state,
                     // check that setpoint node has valid setpoint managers or EMS
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             if (state.dataLoopNodes
                                     ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
                                     .TempSetPoint == SensedNodeFlagValue) {
@@ -1544,9 +1544,9 @@ void FindCompSPInput(EnergyPlusData &state,
                                     }
                                 }
                             }
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum ==
-                                iCtrlType::CoolingOp) {
+                                CtrlType::CoolingOp) {
                                 if (state.dataLoopNodes
                                         ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
                                         .TempSetPointHi == SensedNodeFlagValue) {
@@ -1601,7 +1601,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     }
                                 }
                             } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum ==
-                                       iCtrlType::HeatingOp) {
+                                       CtrlType::HeatingOp) {
                                 if (state.dataLoopNodes
                                         ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
                                         .TempSetPointLo == SensedNodeFlagValue) {
@@ -1660,7 +1660,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     }
                                 }
                             } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum ==
-                                       iCtrlType::DualOp) {
+                                       CtrlType::DualOp) {
                                 if ((state.dataLoopNodes
                                          ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
                                          .TempSetPointHi == SensedNodeFlagValue) ||
@@ -2343,7 +2343,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
         // OPTIMAL DISTRIBUTION SCHEME
         switch (this_loop.LoadDistribution) {
-        case DataPlant::iLoadingScheme::Optimal:
+        case DataPlant::LoadingScheme::Optimal:
             // step 1: load all machines to optimal PLR
             numAvail = 0;
             for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -2426,7 +2426,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // SEQUENTIALLOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::Sequential:
+        case DataPlant::LoadingScheme::Sequential:
 
             // step 1: Load machines in list order
             for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -2461,7 +2461,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // UNIFORMLOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::Uniform:
+        case DataPlant::LoadingScheme::Uniform:
 
             // step 1: distribute load equally to all available machines
             numAvail = 0;
@@ -2529,7 +2529,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // UNIFORMPLR LOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::UniformPLR:
+        case DataPlant::LoadingScheme::UniformPLR:
             // Get total plant capacity and remove last component from list if load is less
             // than plant capacity at min PLR
             PlantCapacity = 0.0;
@@ -2633,7 +2633,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::SequentialUniformPLR:
+        case DataPlant::LoadingScheme::SequentialUniformPLR:
 
             PlantCapacity = 0.0;
             PlantPLR = 0.0;
@@ -2848,11 +2848,11 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
             {
                 auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
-                if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::WetBulb) {
+                if (SELECT_CASE_var1 == DataPlant::FreeCoolControlMode::WetBulb) {
                     Tsensor = state.dataEnvrn->OutWetBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::DryBulb) {
+                } else if (SELECT_CASE_var1 == DataPlant::FreeCoolControlMode::DryBulb) {
                     Tsensor = state.dataEnvrn->OutDryBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
+                } else if (SELECT_CASE_var1 == DataPlant::FreeCoolControlMode::Loop) {
                     ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                     if (ControlNodeNum > 0) {
                         Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
@@ -2877,11 +2877,11 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
             {
                 auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
-                if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::WetBulb) {
+                if (SELECT_CASE_var1 == DataPlant::FreeCoolControlMode::WetBulb) {
                     Tsensor = state.dataEnvrn->OutWetBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::DryBulb) {
+                } else if (SELECT_CASE_var1 == DataPlant::FreeCoolControlMode::DryBulb) {
                     Tsensor = state.dataEnvrn->OutDryBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
+                } else if (SELECT_CASE_var1 == DataPlant::FreeCoolControlMode::Loop) {
                     ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                     if (ControlNodeNum > 0) {
                         Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
@@ -3014,15 +3014,14 @@ void FindCompSPLoad(EnergyPlusData &state,
 
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-            if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::CoolingOp) {
+        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+            if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CtrlType::CoolingOp) {
                 TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
-            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum ==
-                       iCtrlType::HeatingOp) {
+            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CtrlType::HeatingOp) {
                 TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
-            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::DualOp) {
+            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CtrlType::DualOp) {
                 CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointHi - TempIn);
                 CurrentDemandForHeatingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointLo - TempIn);
                 if ((CurrentDemandForCoolingOp < 0.0) && (CurrentDemandForHeatingOp <= 0.0)) { // cooling
@@ -3052,7 +3051,7 @@ void FindCompSPLoad(EnergyPlusData &state,
         this_component.EquipDemand = CompDemand;
 
         // set MyLoad and runflag
-        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::CoolingOp) {
+        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CtrlType::CoolingOp) {
             if (CompDemand < (-LoopDemandTol)) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3060,7 +3059,7 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::HeatingOp) {
+        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CtrlType::HeatingOp) {
             if (CompDemand > LoopDemandTol) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3068,7 +3067,7 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::DualOp) {
+        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CtrlType::DualOp) {
             if (CompDemand > LoopDemandTol || CompDemand < (-LoopDemandTol)) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;

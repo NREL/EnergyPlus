@@ -397,7 +397,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
-                              DataPlant::iCommonPipeType const CommonPipeType)
+                              DataPlant::CommonPipeType const CommonPipeType)
 {
 
     // SUBROUTINE INFORMATION:
@@ -460,7 +460,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     // update the temperatures and flow rates
     auto &flow_demand_to_supply_tol(convergence.PlantFlowDemandToSupplyTolValue);
     auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
-    if (CommonPipeType == DataPlant::iCommonPipeType::Single || CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
+    if (CommonPipeType == DataPlant::CommonPipeType::Single || CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
         // update the temperature
         UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
         state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
@@ -696,7 +696,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
 }
 
 void UpdateCommonPipe(
-    EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, DataPlant::iCommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+    EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -825,10 +825,10 @@ void UpdateCommonPipe(
         }
     }
     // Common Pipe Simulation
-    if (CommonPipeType == DataPlant::iCommonPipeType::Single) {
+    if (CommonPipeType == DataPlant::CommonPipeType::Single) {
         ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
         // 2-way (controlled) common pipe simulation
-    } else if (CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
+    } else if (CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
 
         ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
         MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
@@ -1248,11 +1248,11 @@ void SetupCommonPipes(EnergyPlusData &state)
 
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
-            if (SELECT_CASE_var == DataPlant::iCommonPipeType::No) {
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::No;
+            if (SELECT_CASE_var == DataPlant::CommonPipeType::No) {
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::No;
 
-            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::Single) { // Uncontrolled ('single') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::Single;
+            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::Single) { // Uncontrolled ('single') common pipe
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::Single;
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
@@ -1283,8 +1283,8 @@ void SetupCommonPipes(EnergyPlusData &state)
                     ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                 }
 
-            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
+            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::TwoWay;
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Primary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,

@@ -1545,7 +1545,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
 
     // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
     // condenser side outlet temperature.
-    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = false;
         this->QEvaporator = std::abs(MyLoad);
         // limit by max capacity
@@ -1566,10 +1566,10 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
             // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 } else {
@@ -1592,9 +1592,9 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                      this->CWCompNum);
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     }
                 }
@@ -1642,7 +1642,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
 
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
@@ -1654,7 +1654,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                     } else {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     }
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
@@ -1790,7 +1790,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                              state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                              state.dataPlnt->PlantLoop(GenLoopSideNum).FluidIndex,
                                                              RoutineName);
-            if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+            if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
                 if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
                     GenMassFlowRate = this->GenMassFlowRateMax;
                 } else { // LeavingSetpointModulated

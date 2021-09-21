@@ -103,20 +103,20 @@ namespace PlantUtilities {
 
     void CheckForRunawayPlantTemps(EnergyPlusData &state, int LoopNum, int LoopSideNum);
 
-    void SetAllFlowLocks(EnergyPlusData &state, DataPlant::iFlowLock Value);
+    void SetAllFlowLocks(EnergyPlusData &state, DataPlant::FlowLock Value);
 
     void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
     void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                     int LoopNum,                           // component's loop index
-                                     int LoopSide,                          // component's loop side number
-                                     int BranchNum,                         // Component's branch number
-                                     int CompNum,                           // Component's comp number
-                                     int &UniqueCriteriaCheckIndex,         // An integer given to this particular check
-                                     int ConnectedLoopNum,                  // Component's interconnected loop number
-                                     int ConnectedLoopSide,                 // Component's interconnected loop side number
-                                     DataPlant::iCriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
-                                     Real64 CriteriaValue                   // The value of the criteria check to evaluate
+                                     int LoopNum,                          // component's loop index
+                                     int LoopSide,                         // component's loop side number
+                                     int BranchNum,                        // Component's branch number
+                                     int CompNum,                          // Component's comp number
+                                     int &UniqueCriteriaCheckIndex,        // An integer given to this particular check
+                                     int ConnectedLoopNum,                 // Component's interconnected loop number
+                                     int ConnectedLoopSide,                // Component's interconnected loop side number
+                                     DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                     Real64 CriteriaValue                  // The value of the criteria check to evaluate
     );
 
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,

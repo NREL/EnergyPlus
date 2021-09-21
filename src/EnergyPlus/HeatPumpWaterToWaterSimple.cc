@@ -915,7 +915,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum, // IS THIS RIGHT?
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
         // Set flows if the heat pump is running
     } else { // the heat pump must run
@@ -970,7 +970,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
             return;
         }
@@ -982,7 +982,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
     }
 

@@ -1887,9 +1887,9 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // This requires that the plant flow resolver carefully set the min/max avail limits on
     //  air side components to ensure they request within bounds.
     if (LockPlantFlows) {
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Locked);
+        SetAllFlowLocks(state, DataPlant::FlowLock::Locked);
     } else {
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
+        SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
     }
     ResetAllPlantInterConnectFlags(state);
 

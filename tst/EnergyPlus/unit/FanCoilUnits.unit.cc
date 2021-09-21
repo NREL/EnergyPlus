@@ -1011,7 +1011,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
@@ -1021,7 +1021,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
@@ -1067,7 +1067,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
               state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
     FirstHVACIteration = false;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.2;
     // Simulate with flow lock on and locked flow > demand flow; bypass extra flow
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1086,7 +1086,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     // normal heating, no flow lock, heating capacity exceeded
     QZnReq = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(4420.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
@@ -1096,7 +1096,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     // Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
     QZnReq = 80.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     // FC hits the 80 W target load
     EXPECT_NEAR(80.0, QUnitOut, 1.0);
@@ -1108,7 +1108,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
               state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
     // Coil Off Capacity Test #2 - lock plant flow after previous call
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp =
         25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
     state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
@@ -1124,7 +1124,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
               state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
     // Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     // FC hits the 80 W target load
     EXPECT_NEAR(80.0, QUnitOut, 1.0);
@@ -1391,7 +1391,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 1;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 0;
@@ -1734,7 +1734,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
@@ -1744,7 +1744,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
@@ -1790,7 +1790,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
               state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
 
     FirstHVACIteration = false;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.2;
     // cooling simulation with flow lock on and locked flow > flow that meets load; bypass extra flow
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1811,7 +1811,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     // normal cooling, no flow lock, cooling capacity exceeded
     QZnReq = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal

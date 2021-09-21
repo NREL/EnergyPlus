@@ -1740,7 +1740,7 @@ namespace SteamBaseboardRadiator {
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::HeatTransferRate,
+                                    DataPlant::CriteriaType::HeatTransferRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
@@ -1751,7 +1751,7 @@ namespace SteamBaseboardRadiator {
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::MassFlowRate,
+                                    DataPlant::CriteriaType::MassFlowRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate);
 
         PullCompInterconnectTrigger(state,
@@ -1762,7 +1762,7 @@ namespace SteamBaseboardRadiator {
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::Temperature,
+                                    DataPlant::CriteriaType::Temperature,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp);
     }
 

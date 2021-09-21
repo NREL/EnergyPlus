@@ -5719,8 +5719,8 @@ void DefineScheduledTESSetPointManager::calculate(EnergyPlusData &state)
     CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
 
     // CtrlType bug
-    //        if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of chiller
-    if (this->CompOpType == DataPlant::iCtrlType::HeatingOp) { // this is some sort of chiller
+    //        if (this->CompOpType == DataPlant::CtrlType::CoolingOp) { // this is some sort of chiller
+    if (this->CompOpType == DataPlant::CtrlType::HeatingOp) { // this is some sort of chiller
         if (CurSchValOnPeak >= OnVal) {
             this->SetPt = this->NonChargeCHWTemp;
         } else if (CurSchValCharge < OnVal) {
@@ -5729,8 +5729,8 @@ void DefineScheduledTESSetPointManager::calculate(EnergyPlusData &state)
             this->SetPt = this->ChargeCHWTemp;
         }
         // CtrlType Bug
-        //        } else if (this->CompOpType == DataPlant::iCtrlType::DualOp) { // this is some sort of ice storage system
-    } else if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of ice storage system
+        //        } else if (this->CompOpType == DataPlant::CtrlType::DualOp) { // this is some sort of ice storage system
+    } else if (this->CompOpType == DataPlant::CtrlType::CoolingOp) { // this is some sort of ice storage system
         this->SetPt = this->NonChargeCHWTemp;
     }
 }
@@ -9117,7 +9117,7 @@ void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
                                   int const SchedPtrCharge,
                                   Real64 NonChargeCHWTemp,
                                   Real64 ChargeCHWTemp,
-                                  DataPlant::iCtrlType const &CompOpType,
+                                  DataPlant::CtrlType const &CompOpType,
                                   int const ControlNodeNum)
 {
     // SUBROUTINE INFORMATION:

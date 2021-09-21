@@ -1944,7 +1944,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::HeatTransferRate,
+                                    DataPlant::CriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
@@ -1955,7 +1955,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::MassFlowRate,
+                                    DataPlant::CriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
         PullCompInterconnectTrigger(state,
@@ -1966,7 +1966,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::Temperature,
+                                    DataPlant::CriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
 

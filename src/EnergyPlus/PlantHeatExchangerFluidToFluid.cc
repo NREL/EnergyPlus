@@ -857,11 +857,11 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
         } else { // don't rely on sizing, use loop setpoints
             // loop supply side
-            if (state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp =
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPoint;
             } else if (state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme ==
-                       DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                       DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp =
                     (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPointHi +
                      state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPointLo) /
@@ -873,11 +873,11 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp;
         } else { // don't rely on sizing, use loop setpoints
             // loop demand side
-            if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp =
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPoint;
             } else if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme ==
-                       DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                       DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp =
                     (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPointHi +
                      state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPointLo) /
@@ -2374,13 +2374,13 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                 auto const SELECT_CASE_var(this->ControlSignalTemp);
                 if (SELECT_CASE_var == iCtrlTemp::WetBulbTemperature) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                        DataPlant::iFreeCoolControlMode::WetBulb;
+                        DataPlant::FreeCoolControlMode::WetBulb;
                 } else if (SELECT_CASE_var == iCtrlTemp::DryBulbTemperature) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                        DataPlant::iFreeCoolControlMode::DryBulb;
+                        DataPlant::FreeCoolControlMode::DryBulb;
                 } else if (SELECT_CASE_var == iCtrlTemp::LoopTemperature) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                        DataPlant::iFreeCoolControlMode::Loop;
+                        DataPlant::FreeCoolControlMode::Loop;
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
                         this->OtherCompDemandSideLoop.inletNodeNum;
                 }

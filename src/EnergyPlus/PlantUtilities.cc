@@ -196,7 +196,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
     }
 
     // Set loop flow rate
-    if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
+    if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
         if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
             state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
@@ -279,7 +279,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
             }
         }
-    } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
+    } else if (loop_side.FlowLock == DataPlant::FlowLock::Locked) {
         state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         CompFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
     } else {
@@ -336,7 +336,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     if (LoopNum > 0 && LoopSideNum > 0 && (!ResetMode)) {
         if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
             if ((std::abs(MdotOldRequest - a_node.MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) &&
-                (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked)) {
+                (loop_side.FlowLock == DataPlant::FlowLock::Unlocked)) {
                 loop_side.SimLoopSideNeeded = true;
             }
         }
@@ -345,7 +345,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
 
     if (LoopNum > 0 && LoopSideNum > 0) {
         auto const &branch(loop_side.Branch(BranchNum));
-        if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
             if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                 a_node.MassFlowRate = CompFlow;
             } else { // bound the flow by Min/Max available across entire branch
@@ -382,7 +382,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
                 }
             }
 
-        } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
+        } else if (loop_side.FlowLock == DataPlant::FlowLock::Locked) {
 
             CompFlow = a_node.MassFlowRate;
             // do not change requested flow rate either
@@ -830,7 +830,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int con
     }
 }
 
-void SetAllFlowLocks(EnergyPlusData &state, DataPlant::iFlowLock const Value)
+void SetAllFlowLocks(EnergyPlusData &state, DataPlant::FlowLock const Value)
 {
 
     // SUBROUTINE INFORMATION:
@@ -874,15 +874,15 @@ void ResetAllPlantInterConnectFlags(EnergyPlusData &state)
 }
 
 void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                 int const LoopNum,                           // component's loop index
-                                 int const LoopSide,                          // component's loop side number
-                                 int const BranchNum,                         // Component's branch number
-                                 int const CompNum,                           // Component's comp number
-                                 int &UniqueCriteriaCheckIndex,               // An integer given to this particular check
-                                 int const ConnectedLoopNum,                  // Component's interconnected loop number
-                                 int const ConnectedLoopSide,                 // Component's interconnected loop side number
-                                 DataPlant::iCriteriaType const CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
-                                 Real64 const CriteriaValue                   // The value of the criteria check to evaluate
+                                 int const LoopNum,                          // component's loop index
+                                 int const LoopSide,                         // component's loop side number
+                                 int const BranchNum,                        // Component's branch number
+                                 int const CompNum,                          // Component's comp number
+                                 int &UniqueCriteriaCheckIndex,              // An integer given to this particular check
+                                 int const ConnectedLoopNum,                 // Component's interconnected loop number
+                                 int const ConnectedLoopSide,                // Component's interconnected loop side number
+                                 DataPlant::CriteriaType const CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                 Real64 const CriteriaValue                  // The value of the criteria check to evaluate
 )
 {
 
@@ -953,17 +953,17 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
         // Initialize, then check if we are out of range
         {
             auto const SELECT_CASE_var(CriteriaType);
-            if (SELECT_CASE_var == DataPlant::iCriteriaType::MassFlowRate) {
+            if (SELECT_CASE_var == DataPlant::CriteriaType::MassFlowRate) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_MassFlowRate) {
                     state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                 }
 
-            } else if (SELECT_CASE_var == DataPlant::iCriteriaType::Temperature) {
+            } else if (SELECT_CASE_var == DataPlant::CriteriaType::Temperature) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_Temperature) {
                     state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                 }
 
-            } else if (SELECT_CASE_var == DataPlant::iCriteriaType::HeatTransferRate) {
+            } else if (SELECT_CASE_var == DataPlant::CriteriaType::HeatTransferRate) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_HeatTransferRate) {
                     state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                 }
@@ -1468,7 +1468,7 @@ void SafeCopyPlantNode(EnergyPlusData &state,
     // Only pass pressure if we aren't doing a pressure simulation
     if (present(LoopNum)) {
         switch (state.dataPlnt->PlantLoop(LoopNum).PressureSimType) {
-        case DataPlant::iPressSimType::NoPressure:
+        case DataPlant::PressSimType::NoPressure:
             state.dataLoopNodes->Node(OutletNodeNum).Press = state.dataLoopNodes->Node(InletNodeNum).Press;
         default:
             // Don't do anything

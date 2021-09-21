@@ -1719,7 +1719,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
@@ -1729,7 +1729,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Unlocked;
 
     state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;

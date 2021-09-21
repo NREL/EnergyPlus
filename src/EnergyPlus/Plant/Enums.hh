@@ -71,8 +71,8 @@ int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop f
 enum OpSchemeType
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
-    UnknownStatusOpSchemeType = -2,
-    NoControlOpSchemeType = -1,         // Scheme Type placeholder for items such as pipes
+    UnknownStatusOpSchemeType = -1,
+    NoControlOpSchemeType = 0,          // Scheme Type placeholder for items such as pipes
     HeatingRBOpSchemeType = 1,          // Scheme Type for Heating Load Range Based Operation
     CoolingRBOpSchemeType = 2,          // Scheme Type for Cooling  Load Range Based Operation
     WetBulbRBOpSchemeType = 3,          // Scheme Type for Wet bulb range based Operation
@@ -205,99 +205,99 @@ int const HowMet_ByNominalCapHiOutLimit(55);               // MaxLoad, MinLoad, 
 int const HowMet_ByNominalCapFreeCoolCntrl(56);            // HowMet_ByNominalCap with free cool shutdown
 int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl(57); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
 
-enum class iLoadingScheme
+enum class LoadingScheme
 {
-    Unassigned,
-    Optimal,              // Optimal Load Distribution Scheme
-    Sequential,           // Sequential Load Distribution Scheme
-    Uniform,              // Uniform Load Distribution Scheme
-    UniformPLR,           // Uniform PLR Load Distribution Scheme
-    SequentialUniformPLR, // Sequential Uniform PLR Load Distribution Scheme
+    Unassigned = -1,
+    Optimal = 0,              // Optimal Load Distribution Scheme
+    Sequential = 1,           // Sequential Load Distribution Scheme
+    Uniform = 2,              // Uniform Load Distribution Scheme
+    UniformPLR = 3,           // Uniform PLR Load Distribution Scheme
+    SequentialUniformPLR = 4, // Sequential Uniform PLR Load Distribution Scheme
 };
 
 enum class FlowMode
 {
-    Unassigned,
-    Constant,
-    NotModulated,
-    LeavingSetpointModulated,
+    Unassigned = -1,
+    Constant = 0,
+    NotModulated = 1,
+    LeavingSetpointModulated = 2,
 };
 
 enum class CondenserType
 {
-    Unassigned,
-    AirCooled,
-    WaterCooled,
-    EvapCooled,
+    Unassigned = -1,
+    AirCooled = 0,
+    WaterCooled = 1,
+    EvapCooled = 2,
 };
 
 // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
-enum class iCriteriaType
+enum class CriteriaType
 {
-    MassFlowRate,
-    Temperature,
-    HeatTransferRate,
+    MassFlowRate = -1,
+    Temperature = 0,
+    HeatTransferRate = 1,
 };
 
-enum class iFreeCoolControlMode
+enum class FreeCoolControlMode
 {
-    Unassigned,
-    WetBulb, // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
-    DryBulb, // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
-    Loop,    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
+    Unassigned = -1,
+    WetBulb = 0, // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
+    DryBulb = 1, // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
+    Loop = 2,    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
 };
 
-enum class iLoopDemandCalcScheme
+enum class LoopDemandCalcScheme
 {
-    Unassigned,
-    SingleSetPoint,       // Uses a single temp setpoint to calculate loop demand
-    DualSetPointDeadBand, // Uses a dual temp setpoint with a deadband between the high
+    Unassigned = -1,
+    SingleSetPoint = 0,       // Uses a single temp setpoint to calculate loop demand
+    DualSetPointDeadBand = 1, // Uses a dual temp setpoint with a deadband between the high
 };
 
-enum class iCommonPipeType
+enum class CommonPipeType
 {
-    No,
-    Single,
-    TwoWay,
+    No = -1,
+    Single = 0,
+    TwoWay = 1,
 };
 
-enum class iFlowLock
+enum class FlowLock
 {
-    PumpQuery, // Used to ask the pumps for their min/max avail based on no constraints
-    Unlocked,  // components request flow
-    Locked,    // components take their inlet flow
+    PumpQuery = -1, // Used to ask the pumps for their min/max avail based on no constraints
+    Unlocked = 0,   // components request flow
+    Locked = 1,     // components take their inlet flow
 };
 
-enum class iPressureCall
+enum class PressureCall
 {
-    Init,
-    Calc,
-    Update,
+    Init = -1,
+    Calc = 0,
+    Update = 1,
 };
 
-enum class iPressSimType
+enum class PressSimType
 {
-    NoPressure,          // Nothing for that particular loop
-    PumpPowerCorrection, // Only updating the pump power
-    FlowCorrection,      // Update pump flow rate based on pump curve
-    FlowSimulation,      // Full pressure network simulation
+    NoPressure = -1,         // Nothing for that particular loop
+    PumpPowerCorrection = 0, // Only updating the pump power
+    FlowCorrection = 1,      // Update pump flow rate based on pump curve
+    FlowSimulation = 2,      // Full pressure network simulation
 };
 
-enum class iCtrlType
+enum class CtrlType
 {
-    Unassigned,
-    HeatingOp, // Constant for Heating Operation
-    CoolingOp, // Constant for Cooling Operation
-    DualOp,    // Constant for Cooling or Heating Operation
+    Unassigned = -1,
+    HeatingOp = 0, // Constant for Heating Operation
+    CoolingOp = 1, // Constant for Cooling Operation
+    DualOp = 2,    // Constant for Cooling or Heating Operation
 };
 
 // branch loop type for absorption chillerheater models
 enum class BrLoopType
 {
-    Chiller,
-    Heater,
-    Condenser,
-    NoMatch
+    Chiller = -1,
+    Heater = 0,
+    Condenser = 1,
+    NoMatch = 2
 };
 
 } // namespace EnergyPlus::DataPlant

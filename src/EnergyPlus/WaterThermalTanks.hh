@@ -449,7 +449,7 @@ namespace WaterThermalTanks {
         Real64 OnCycParaLoad;                                         // Rate for on-cycle parasitic load (W)
         std::string OnCycParaFuelType;                                // Fuel type for on-cycle parasitic load
         Real64 OnCycParaFracToTank;                                   // Fraction of on-cycle parasitic energy ending up in tank (W)
-        DataPlant::iFlowLock UseCurrentFlowLock;                      // current flow lock setting on use side
+        DataPlant::FlowLock UseCurrentFlowLock;                       // current flow lock setting on use side
         int UseInletNode;                                             // Inlet node on the use side; colder water returning to a hottank
         Real64 UseInletTemp;                                          // Use side inlet temperature (C)
         int UseOutletNode;                                            // Outlet node on the use side; hot tank water
@@ -615,7 +615,7 @@ namespace WaterThermalTanks {
               OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(ControlTypeEnum::Cycle),
               MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0), Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0),
               SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0), IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0),
-              OnCycParaLoad(0.0), OnCycParaFracToTank(0.0), UseCurrentFlowLock(DataPlant::iFlowLock::Unlocked), UseInletNode(0), UseInletTemp(0.0),
+              OnCycParaLoad(0.0), OnCycParaFracToTank(0.0), UseCurrentFlowLock(DataPlant::FlowLock::Unlocked), UseInletNode(0), UseInletTemp(0.0),
               UseOutletNode(0), UseOutletTemp(0.0), UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0),
               SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0), UseDesignVolFlowRateWasAutoSized(false),
               UseBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), UseSidePlantSizNum(0), UseSideSeries(true),

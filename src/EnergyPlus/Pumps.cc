@@ -188,7 +188,7 @@ void SimPumps(EnergyPlusData &state,
     InitializePumps(state, PumpNum);
 
     // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).FlowLock == DataPlant::iFlowLock::PumpQuery) {
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).FlowLock == DataPlant::FlowLock::PumpQuery) {
         SetupPumpMinMaxFlows(state, LoopNum, PumpNum);
         return;
     }
@@ -1785,7 +1785,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
                         // Resolve the new mass flow rate based on current pressure characteristics
                         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureSimType ==
-                                DataPlant::iPressSimType::FlowCorrection &&
+                                DataPlant::PressSimType::FlowCorrection &&
                             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
 
                             state.dataPumps->PumpMassFlowRate =
@@ -1806,7 +1806,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
 
                         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureSimType ==
-                                DataPlant::iPressSimType::FlowCorrection &&
+                                DataPlant::PressSimType::FlowCorrection &&
                             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
 
                             GetRequiredMassFlowRate(state,
@@ -1836,7 +1836,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
             if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
                 if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                     state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureSimType ==
-                        DataPlant::iPressSimType::FlowCorrection &&
+                        DataPlant::PressSimType::FlowCorrection &&
                     state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
                     state.dataPumps->PumpMassFlowRate =
                         ResolveLoopFlowVsPressure(state,
@@ -2532,7 +2532,7 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
     // Calculate maximum and minimum mass flow rate associated with maximun and minimum RPM
     if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
-            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureSimType == DataPlant::iPressSimType::FlowCorrection &&
+            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureSimType == DataPlant::PressSimType::FlowCorrection &&
             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
             state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM =
                 ResolveLoopFlowVsPressure(state,

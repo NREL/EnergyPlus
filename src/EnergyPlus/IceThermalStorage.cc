@@ -211,9 +211,9 @@ namespace IceThermalStorage {
         Real64 TempIn = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
         {
             auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
             } else {
                 assert(false);
@@ -332,9 +332,9 @@ namespace IceThermalStorage {
         Real64 TempSetPt(0.0);                                     // Setpoint temperature defined by loop controls [C]
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->PlantLoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPointHi;
             } else {
                 assert(false);
@@ -348,7 +348,7 @@ namespace IceThermalStorage {
         this->MassFlowRate = state.dataLoopNodes->Node(NodeNumIn).MassFlowRate;
 
         // if two-way common pipe and no mass flow and tank is not full, then use design flow rate
-        if ((state.dataPlnt->PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) &&
+        if ((state.dataPlnt->PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
             (std::abs(this->MassFlowRate) < DataBranchAirLoopPlant::MassFlowTolerance) && (this->IceFracRemaining < TankChargeToler)) {
             this->MassFlowRate = this->DesignMassFlowRate;
         }
@@ -1371,7 +1371,7 @@ namespace IceThermalStorage {
                                                this->PlantBranchNum,
                                                this->PlantCompNum);
 
-            if ((state.dataPlnt->PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) &&
+            if ((state.dataPlnt->PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->PlantLoopSideNum == DataPlant::SupplySide)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (CompNum = 1;
@@ -1446,7 +1446,7 @@ namespace IceThermalStorage {
                                                this->LoopSideNum,
                                                this->BranchNum,
                                                this->CompNum);
-            if ((state.dataPlnt->PlantLoop(this->LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) &&
+            if ((state.dataPlnt->PlantLoop(this->LoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->LoopSideNum == DataPlant::SupplySide)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (int compNum = 1;
@@ -1541,9 +1541,9 @@ namespace IceThermalStorage {
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
         {
             auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
@@ -1576,9 +1576,9 @@ namespace IceThermalStorage {
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
         {
             auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
@@ -1723,9 +1723,9 @@ namespace IceThermalStorage {
 
         {
             auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
@@ -1820,9 +1820,9 @@ namespace IceThermalStorage {
         Real64 ITSOutletTemp_loc = 0.0;
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
             } else {
                 assert(false);

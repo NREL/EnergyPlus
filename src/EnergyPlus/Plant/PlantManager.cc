@@ -183,7 +183,7 @@ void ManagePlantLoops(EnergyPlusData &state,
     int CurntMinPlantSubIterations;
 
     if (std::any_of(state.dataPlnt->PlantLoop.begin(), state.dataPlnt->PlantLoop.end(), [](DataPlant::PlantLoopData const &e) {
-            return (e.CommonPipeType == DataPlant::iCommonPipeType::Single) || (e.CommonPipeType == DataPlant::iCommonPipeType::TwoWay);
+            return (e.CommonPipeType == DataPlant::CommonPipeType::Single) || (e.CommonPipeType == DataPlant::CommonPipeType::TwoWay);
         })) {
         CurntMinPlantSubIterations = max(7, state.dataConvergeParams->MinPlantSubIterations);
     } else {
@@ -502,27 +502,27 @@ void GetPlantLoopData(EnergyPlusData &state)
         // Load the load distribution scheme.
         LoadingScheme = Alpha(14);
         if (UtilityRoutines::SameString(LoadingScheme, "Optimal")) {
-            this_loop.LoadDistribution = DataPlant::iLoadingScheme::Optimal;
+            this_loop.LoadDistribution = DataPlant::LoadingScheme::Optimal;
         } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialLoad")) {
-            this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
+            this_loop.LoadDistribution = DataPlant::LoadingScheme::Sequential;
         } else if (UtilityRoutines::SameString(LoadingScheme, "UniformLoad")) {
-            this_loop.LoadDistribution = DataPlant::iLoadingScheme::Uniform;
+            this_loop.LoadDistribution = DataPlant::LoadingScheme::Uniform;
         } else if (UtilityRoutines::SameString(LoadingScheme, "UniformPLR")) {
-            this_loop.LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
+            this_loop.LoadDistribution = DataPlant::LoadingScheme::UniformPLR;
         } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
-            this_loop.LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
+            this_loop.LoadDistribution = DataPlant::LoadingScheme::SequentialUniformPLR;
         } else {
             ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
             ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
             ShowContinueError(state, "Will default to SequentialLoad."); // TODO rename point
-            this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
+            this_loop.LoadDistribution = DataPlant::LoadingScheme::Sequential;
         }
 
         // When dual setpoint is allowed in condenser loop modify this code.
         if (this_loop.TypeOfLoop == LoopType::Plant) {
             // Get the Loop Demand Calculation Scheme
             if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {
-                this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+                this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
             } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
                 if (this_loop.FluidType == DataLoopNode::NodeFluidType::Steam) {
                     ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
@@ -531,30 +531,30 @@ void GetPlantLoopData(EnergyPlusData &state)
                                           state.dataIPShortCut->cAlphaFieldNames(2) + "= Steam");
                     ShowContinueError(state,
                                       "Will reset " + state.dataIPShortCut->cAlphaFieldNames(16) + " = SingleSetPoint and simulation will continue.");
-                    this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+                    this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
                 } else {
-                    this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
+                    this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
                 }
             } else if (UtilityRoutines::SameString(Alpha(16), "")) {
-                this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+                this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
             } else {
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                 ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
                 ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
-                this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+                this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
             }
         } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
-            this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+            this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
         }
 
         // When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
         if (this_loop.TypeOfLoop == LoopType::Plant) {
             if (UtilityRoutines::SameString(Alpha(17), "CommonPipe")) {
-                this_loop.CommonPipeType = DataPlant::iCommonPipeType::Single;
+                this_loop.CommonPipeType = DataPlant::CommonPipeType::Single;
             } else if (UtilityRoutines::SameString(Alpha(17), "TwoWayCommonPipe")) {
-                this_loop.CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
+                this_loop.CommonPipeType = DataPlant::CommonPipeType::TwoWay;
             } else if (UtilityRoutines::SameString(Alpha(17), "None") || state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
+                this_loop.CommonPipeType = DataPlant::CommonPipeType::No;
             } else {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
@@ -562,10 +562,10 @@ void GetPlantLoopData(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
-            this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
+            this_loop.CommonPipeType = DataPlant::CommonPipeType::No;
         }
 
-        if (this_loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
+        if (this_loop.CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
             if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(state,
@@ -596,29 +596,29 @@ void GetPlantLoopData(EnergyPlusData &state)
             MatchedPressureString = false;
 
             // Check all types
-            if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)))) {
-                this_loop.PressureSimType = DataPlant::iPressSimType::NoPressure;
+            if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::PressSimType::NoPressure)))) {
+                this_loop.PressureSimType = DataPlant::PressSimType::NoPressure;
                 MatchedPressureString = true;
             } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex),
-                                                   format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)))) {
-                this_loop.PressureSimType = DataPlant::iPressSimType::PumpPowerCorrection;
+                                                   format("{}", cPressureSimType(DataPlant::PressSimType::PumpPowerCorrection)))) {
+                this_loop.PressureSimType = DataPlant::PressSimType::PumpPowerCorrection;
                 MatchedPressureString = true;
             } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex),
-                                                   format("{}", cPressureSimType(DataPlant::iPressSimType::FlowSimulation)))) {
-                this_loop.PressureSimType = DataPlant::iPressSimType::FlowSimulation;
+                                                   format("{}", cPressureSimType(DataPlant::PressSimType::FlowSimulation)))) {
+                this_loop.PressureSimType = DataPlant::PressSimType::FlowSimulation;
                 MatchedPressureString = true;
             } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex),
-                                                   format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)))) {
-                this_loop.PressureSimType = DataPlant::iPressSimType::FlowCorrection;
+                                                   format("{}", cPressureSimType(DataPlant::PressSimType::FlowCorrection)))) {
+                this_loop.PressureSimType = DataPlant::PressSimType::FlowCorrection;
                 MatchedPressureString = true;
             }
 
             // If we found a match, check to make sure it is one of the valid
             // ones for this phase of pressure implementation
             if (MatchedPressureString) {
-                if ((this_loop.PressureSimType == DataPlant::iPressSimType::NoPressure) ||
-                    (this_loop.PressureSimType == DataPlant::iPressSimType::PumpPowerCorrection) ||
-                    (this_loop.PressureSimType == DataPlant::iPressSimType::FlowCorrection)) {
+                if ((this_loop.PressureSimType == DataPlant::PressSimType::NoPressure) ||
+                    (this_loop.PressureSimType == DataPlant::PressSimType::PumpPowerCorrection) ||
+                    (this_loop.PressureSimType == DataPlant::PressSimType::FlowCorrection)) {
                     // We are OK here, move on
                 } else {
                     // We have an erroneous input, alert user
@@ -626,9 +626,9 @@ void GetPlantLoopData(EnergyPlusData &state)
                     ShowContinueError(
                         state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
                     ShowContinueError(state, "Currently only options are: ");
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)));
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)));
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)));
+                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::PressSimType::NoPressure)));
+                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::PressSimType::PumpPowerCorrection)));
+                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::PressSimType::FlowCorrection)));
                     ErrorsFound = true;
                 }
             }
@@ -636,7 +636,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             // if we made it this far and didn't get a match, check for blank
             if (!MatchedPressureString) {
                 if (Alpha(PressSimAlphaIndex).empty()) {
-                    this_loop.PressureSimType = DataPlant::iPressSimType::NoPressure;
+                    this_loop.PressureSimType = DataPlant::PressSimType::NoPressure;
                     break;
                 }
             }
@@ -1631,12 +1631,12 @@ void GetPlantInput(EnergyPlusData &state)
         // a nice little spot to report out bad pump/common-pipe configurations
         bool const ThisSideHasPumps = (plantLoop.LoopSide(1).TotalPumps > 0);
         bool const OtherSideHasPumps = (plantLoop.LoopSide(2).TotalPumps > 0);
-        if ((plantLoop.CommonPipeType != DataPlant::iCommonPipeType::No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
+        if ((plantLoop.CommonPipeType != DataPlant::CommonPipeType::No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
             ShowSevereError(state, "Input Error: Common Pipe configurations must have pumps on both sides of loop");
             ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
             ShowContinueError(state, "Make sure both demand and supply sides have a pump");
             ErrorsFound = true;
-        } else if ((plantLoop.CommonPipeType == DataPlant::iCommonPipeType::No) && ThisSideHasPumps && OtherSideHasPumps) {
+        } else if ((plantLoop.CommonPipeType == DataPlant::CommonPipeType::No) && ThisSideHasPumps && OtherSideHasPumps) {
             ShowSevereError(state, "Input Error: Pumps on both loop sides must utilize a common pipe");
             ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
             ShowContinueError(state, "Add common pipe or remove one loop side pump");
@@ -2183,7 +2183,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     //*****************************************************************
     if (!state.dataPlnt->PlantFirstSizeCompleted) {
 
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
+        SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
         FinishSizingFlag = false;
         state.dataPlnt->PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
         state.dataPlnt->PlantFirstSizesOkayToReport = false;
@@ -2335,7 +2335,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 // check if setpoints being placed on node properly
-                if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
@@ -2473,10 +2473,10 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
 
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         LoopSetPointTemp = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
 
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         // Get the range of setpoints
                         LoopSetPointTemperatureHi = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
                         LoopSetPointTemperatureLo = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
@@ -2484,7 +2484,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
                     }
                 }
 
-                if ((state.dataPlnt->PlantLoop(LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) && (LoopSideNum == DemandSide) &&
+                if ((state.dataPlnt->PlantLoop(LoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) && (LoopSideNum == DemandSide) &&
                     (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).InletNodeSetPt)) { // get a second setpoint for secondaryLoop
                     // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
                     // we want to initialize the demand side of the loop using that setpoint
@@ -2513,7 +2513,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
                         e.PumpHeatToFluid = 0.0;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowRequest = 0.0;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TimeElapsed = 0.0;
-                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::FlowLock::Unlocked;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.TemperatureHistory = 0.0;
@@ -2648,7 +2648,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
 
         // Update supply side hi-lo setpoints for dual SP control
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             LoopSetPointTempHi = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
             LoopSetPointTempLo = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
             LoopSetPointTempHi = min(LoopMaxTemp, LoopSetPointTempHi);
@@ -2660,7 +2660,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
         }
 
         // update demand side loop setpoint in plant data structure
-        if (state.dataPlnt->PlantLoop(LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) { // get a second setpoint for secondaryLoop
+        if (state.dataPlnt->PlantLoop(LoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) { // get a second setpoint for secondaryLoop
             // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
             // we want to initialize the demand side of the loop using that setpoint
             if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).InletNodeSetPt) {
@@ -2686,7 +2686,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
             }
         } else { // no secondary loop, so use supply side loop SP on demand side too.
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
-            if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointHi = LoopSetPointTempHi;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointLo = LoopSetPointTempLo;
             }

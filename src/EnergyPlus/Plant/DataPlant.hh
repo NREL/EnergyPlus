@@ -92,16 +92,16 @@ namespace DataPlant {
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
-    constexpr std::string_view cPressureSimType(DataPlant::iPressSimType const &d)
+    constexpr std::string_view cPressureSimType(DataPlant::PressSimType const &d)
     {
         switch (d) {
-        case DataPlant::iPressSimType::NoPressure:
+        case DataPlant::PressSimType::NoPressure:
             return "NONE";
-        case DataPlant::iPressSimType::PumpPowerCorrection:
+        case DataPlant::PressSimType::PumpPowerCorrection:
             return "PUMPPOWERCORRECTION";
-        case DataPlant::iPressSimType::FlowCorrection:
+        case DataPlant::PressSimType::FlowCorrection:
             return "LOOPFLOWCORRECTION";
-        case DataPlant::iPressSimType::FlowSimulation:
+        case DataPlant::PressSimType::FlowSimulation:
             return "PRESSURESIMULATION";
         default:
             assert(false);

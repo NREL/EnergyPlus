@@ -979,12 +979,12 @@ namespace SetPointManager {
         int CtrlNodeNum;
         Real64 NonChargeCHWTemp;
         Real64 ChargeCHWTemp;
-        DataPlant::iCtrlType CompOpType;
+        DataPlant::CtrlType CompOpType;
         Real64 SetPt;
 
         // Default Constructor
         DefineScheduledTESSetPointManager()
-            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::iCtrlType::Unassigned),
+            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::CtrlType::Unassigned),
               SetPt(0.0)
         {
         }
@@ -1028,7 +1028,7 @@ namespace SetPointManager {
                                       int SchedPtrCharge,
                                       Real64 NonChargeCHWTemp,
                                       Real64 ChargeCHWTemp,
-                                      DataPlant::iCtrlType const &CompOpType,
+                                      DataPlant::CtrlType const &CompOpType,
                                       int ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);

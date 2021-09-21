@@ -938,9 +938,9 @@ namespace PlantChillers {
                     Real64 THeatRecSetPoint(0.0);
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->HRLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPointHi;
                         }
                     }
@@ -991,10 +991,10 @@ namespace PlantChillers {
             //  could be removed with transition, testing , model change, period of being obsolete.
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
                         state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
                         state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
@@ -1395,7 +1395,7 @@ namespace PlantChillers {
         if (MyLoad >= 0.0 || !RunFlag) {
             // call for zero flow before leaving
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -1457,7 +1457,7 @@ namespace PlantChillers {
                                                         this->CondMassFlowIndex,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->CondMassFlowRate);
             if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
         }
@@ -1593,7 +1593,7 @@ namespace PlantChillers {
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = !(state.dataPlnt->PlantLoop(this->CWLoopNum)
                                              .LoopSide(this->CWLoopSideNum)
                                              .Branch(this->CWLoopSideNum)
@@ -1638,10 +1638,10 @@ namespace PlantChillers {
                 Real64 EvapDeltaTemp(0.0);
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         EvapDeltaTemp =
                             state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                         state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     }
@@ -1665,9 +1665,9 @@ namespace PlantChillers {
                                                          this->CWCompNum);
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }
@@ -1740,7 +1740,7 @@ namespace PlantChillers {
                 Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -1753,7 +1753,7 @@ namespace PlantChillers {
                             TempEvapOutSetPoint =
                                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -1993,9 +1993,9 @@ namespace PlantChillers {
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->HRLoopNum).LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     THeatRecSetPoint = state.dataLoopNodes->Node(this->HeatRecSetPointNodeNum).TempSetPointHi;
                 }
             }
@@ -2208,10 +2208,10 @@ namespace PlantChillers {
                     this->ModulatedFlowSetToLoop = true;
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
                                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
                                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                         }
@@ -3568,7 +3568,7 @@ namespace PlantChillers {
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -3667,7 +3667,7 @@ namespace PlantChillers {
                                                         this->CondMassFlowIndex,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->CondMassFlowRate);
             if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
         }
@@ -3744,7 +3744,7 @@ namespace PlantChillers {
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
             Real64 FRAC;
@@ -3784,10 +3784,10 @@ namespace PlantChillers {
                 Real64 EvapDeltaTemp(0.0);
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         EvapDeltaTemp =
                             state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                         state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     }
@@ -3810,9 +3810,9 @@ namespace PlantChillers {
                                                          this->CWCompNum);
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }
@@ -3889,7 +3889,7 @@ namespace PlantChillers {
 
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -3902,7 +3902,7 @@ namespace PlantChillers {
                             TempEvapOutSetPoint =
                                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -5680,7 +5680,7 @@ namespace PlantChillers {
         // flow resolver will not shut down the branch
         if (MyLoad >= 0.0 || !RunFlag) {
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -5778,7 +5778,7 @@ namespace PlantChillers {
                                                         this->CondMassFlowIndex,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->CondMassFlowRate);
 
             if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
@@ -5848,7 +5848,7 @@ namespace PlantChillers {
                                                            RoutineName);
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
             Real64 FRAC;
@@ -5884,10 +5884,10 @@ namespace PlantChillers {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         EvapDeltaTemp =
                             state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         EvapDeltaTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                         state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     }
@@ -5910,9 +5910,9 @@ namespace PlantChillers {
                                                          this->CWCompNum);
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }
@@ -5978,7 +5978,7 @@ namespace PlantChillers {
             } else { // No subcooling in this case.No recalculation required.Still need to check chiller low temp limit
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -5991,7 +5991,7 @@ namespace PlantChillers {
                             TempEvapOutSetPoint =
                                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -7376,7 +7376,7 @@ namespace PlantChillers {
 
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                     (state.dataPlnt->PlantLoop(this->CWLoopNum)
                          .LoopSide(this->CWLoopSideNum)
@@ -7388,7 +7388,7 @@ namespace PlantChillers {
                 } else {
                     TempEvapOutSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                     (state.dataPlnt->PlantLoop(this->CWLoopNum)
                          .LoopSide(this->CWLoopSideNum)
@@ -7426,7 +7426,7 @@ namespace PlantChillers {
             // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
             // flow resolver will not shut down the branch
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -7557,7 +7557,7 @@ namespace PlantChillers {
                                                         this->CondMassFlowIndex,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->CondMassFlowRate);
 
             if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
@@ -7572,7 +7572,7 @@ namespace PlantChillers {
                                                     state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                     RoutineName);
 
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = std::abs(MyLoad);
             this->Power = std::abs(MyLoad) / COP;
@@ -7605,10 +7605,10 @@ namespace PlantChillers {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         EvapDeltaTemp = std::abs(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                                  state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint);
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         EvapDeltaTemp = std::abs(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                                  state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi);
                     }
@@ -7631,9 +7631,9 @@ namespace PlantChillers {
                                                          this->CWCompNum);
                     {
                         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }

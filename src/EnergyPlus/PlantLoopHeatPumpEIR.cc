@@ -122,14 +122,14 @@ Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state
     auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
     auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
     auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
-    if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+    if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
         if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
             // there will be a valid set-point on outlet
             return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
         } else { // use plant loop overall set-point
             return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
         }
-    } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+    } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
         if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
             // there will be a valid set-point on outlet
             return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
@@ -186,7 +186,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                                     this->condMassFlowRateTriggerIndex,
                                                     this->sourceSideLocation.loopNum,
                                                     this->sourceSideLocation.loopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->sourceSideMassFlowRate);
         // Set flows if the heat pump is running
     } else { // the heat pump must run
@@ -239,7 +239,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                                     this->condMassFlowRateTriggerIndex,
                                                     this->sourceSideLocation.loopNum,
                                                     this->sourceSideLocation.loopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->sourceSideMassFlowRate);
     }
 }

@@ -477,7 +477,7 @@ namespace PlantValves {
 
         if (state.dataGlobal->KickOffSimulation) return;
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             Tin = this->InletTemp;
             Tset = this->SetPointTemp;
             Ts2 = this->Stream2SourceTemp;
@@ -492,7 +492,7 @@ namespace PlantValves {
                 }
             }
         } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
-                   DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
+                   DataPlant::FlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
                 this->FlowDivFract = state.dataLoopNodes->Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {
