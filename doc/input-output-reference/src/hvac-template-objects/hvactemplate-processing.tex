@@ -75,6 +75,10 @@ The command line interface located in the EnergyPlus root directory (energyplus.
   -nb --no\_backup : Do no create backup files
   
   It is not possible to comment sections of code in JSON formatted files.  Therefore, the output expanded files do not have the ability to retain the HVACTemplate objects used to create the current document.  If the original file were to be overwritten, then all template data would be lost.  In an attempt to provide and additional layer of backups, the -nb option is set to False by default which means two files will be created: one with HVACTemplate objects, and one with all other objects.  With these files, the original input file can be created, or specific objects can be copied and pasted.
+  
+\item
+  -o --output\_directory : Specify output directory.  If not provided, then input file directory is used.
+
 \item
   -ns --no\_schema : Skip schema validation checks for pyExpandObjects.  Note, this does not skip other schema validation operations within EnergyPlus itself.
   
