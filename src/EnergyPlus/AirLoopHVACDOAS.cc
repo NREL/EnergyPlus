@@ -78,6 +78,7 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -617,6 +618,11 @@ namespace AirLoopHVACDOAS {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
+                        if (state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] == nullptr) {
+                            UnitarySystems::UnitarySys thisSys;
+                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] =
+                                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                        }
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
                                 .compPointer[CompNum]
@@ -637,6 +643,11 @@ namespace AirLoopHVACDOAS {
                             HVACDXHeatPumpSystem::GetHeatingCoilOutletNodeNum(
                                 state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
+                        if (state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] == nullptr) {
+                            UnitarySystems::UnitarySys thisSys;
+                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] =
+                                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                        }
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
                                 .compPointer[CompNum]
