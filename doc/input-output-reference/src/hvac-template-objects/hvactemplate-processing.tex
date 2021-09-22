@@ -22,9 +22,7 @@
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \item
-  The preprocessor program, pyExpandObjects, reads your epJSON file, verifies it meets the current schema requirements, and converts all the HVACTemplate objects into other EnergyPlus objects.
-\item
-  The pyExpandObjects program writes one to three new files.  
+  The preprocessor program, pyExpandObjects, must be run manually.  The program reads your epJSON file, verifies it meets the current schema requirements, and converts all the HVACTemplate objects into other EnergyPlus objects.  One to three new files are written.
   \begin{enumerate}
   \item
     A renamed file with the naming format "<original-file-name>\_expanded.epJSON". This “expanded” file may be used as a standard EnergyPlus epJSON file.  Note, the HVACTemplate objects will be completely removed from the expanded file, so ensure to save a copy of the original file before deleting anything!
@@ -33,9 +31,11 @@
   \item
     Optional - A file with the name "<original-file-name>\_base.epJSON" which has all the HVACTemplate objects removed.
   \end{enumerate}
-  \item
-    The EnergyPlus simulation may now be run with the "expanded" file as the target.
-  \item
+
+\item
+    The EnergyPlus command line tool or EP-Launch may now be used to run the "expanded" file.
+
+\item
     If there are error messages from EnergyPlus, they will refer to the contents of the expanded file. Specific objects referred to in error messages may exist in the original epJSON, but they may be objects created by pyExpandObjects and only exist in the expanded file. Remember that the "<original-file-name>\_expanded.epJSON", "<original-file-name>\_hvac\_templates.epJSON", and "<original-file-name>\_base.epJSON" files will be overwritten everytime the original epJSON is run using EP-Launch or RunEPlus.bat.  Also note, the "<original-file-name>\_hvac\_templates.epJSON" and "<original-file-name>\_base.epJSON" files can be merged to recreate the original epJSON file.
 \end{enumerate}
 
@@ -135,7 +135,7 @@ No command line arguments are available for this tool.
 
 \subsubsection*{epJSON - pyExpandObjects}
 
-The following command line arguments may be provided to control the prorgram outputs.
+The command line interface for this tool provides optional arguments to enable various features of the simulation package.
 
 \begin{itemize}
 
