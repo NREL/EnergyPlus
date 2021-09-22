@@ -1344,13 +1344,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Kitchen Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     Kitchen Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -4231,7 +4224,7 @@
     WaterUse,                !- End-Use Subcategory
     9.598E-5,                !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Kitchen Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Kitchen Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Kitchen,                 !- Zone Name

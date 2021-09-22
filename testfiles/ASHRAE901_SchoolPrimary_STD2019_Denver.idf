@@ -2172,13 +2172,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Bath_ZN_1_FLR_1 SHW_default Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Bath_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2198,13 +2191,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Kitchen_ZN_1_FLR_1 SHW_default Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Kitchen_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Name
@@ -18002,7 +17988,7 @@
     WaterUse,                !- End-Use Subcategory
     2.63889e-07,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Bath_ZN_1_FLR_1 SHW_default Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Bath_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Bath_ZN_1_FLR_1,         !- Zone Name
@@ -18014,7 +18000,7 @@
     WaterUse,                !- End-Use Subcategory
     0.00010515,              !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Kitchen_ZN_1_FLR_1 SHW_default Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Kitchen_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name

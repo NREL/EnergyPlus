@@ -27452,7 +27452,7 @@
     ,                        !- End-Use Subcategory
     7.1e-005,                !- Peak Flow Rate {m3/s}
     LaundryRoom_SWH_Sch,     !- Flow Rate Fraction Schedule Name
-    Laundry Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Laundry Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     LaundryRoomFlr1,         !- Zone Name
@@ -28589,13 +28589,6 @@
 
   Schedule:Compact,
     Laundry Water Equipment Hot Supply Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
-    Laundry Water Equipment Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2

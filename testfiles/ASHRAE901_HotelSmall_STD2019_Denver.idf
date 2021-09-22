@@ -1762,20 +1762,6 @@
     Until: 24:00,0.20;       !- Field 3
 
   Schedule:Compact,
-    SHW Shower Temp Sched,   !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
-    SHW Laundry Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,82.22;      !- Field 3
-
-  Schedule:Compact,
     PlantOnSched,            !- Name
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -28248,7 +28234,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom101,            !- Zone Name
@@ -28260,7 +28246,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom102,            !- Zone Name
@@ -28272,7 +28258,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom103,            !- Zone Name
@@ -28284,7 +28270,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom104,            !- Zone Name
@@ -28296,7 +28282,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom105,            !- Zone Name
@@ -28308,7 +28294,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom201,            !- Zone Name
@@ -28320,7 +28306,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom202_205,        !- Zone Name
@@ -28332,7 +28318,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom202_205,        !- Zone Name
@@ -28344,7 +28330,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom202_205,        !- Zone Name
@@ -28356,7 +28342,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom202_205,        !- Zone Name
@@ -28368,7 +28354,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom206_208,        !- Zone Name
@@ -28380,7 +28366,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom206_208,        !- Zone Name
@@ -28392,7 +28378,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom206_208,        !- Zone Name
@@ -28404,7 +28390,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom209_212,        !- Zone Name
@@ -28416,7 +28402,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom209_212,        !- Zone Name
@@ -28428,7 +28414,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom209_212,        !- Zone Name
@@ -28440,7 +28426,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom209_212,        !- Zone Name
@@ -28452,7 +28438,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom213,            !- Zone Name
@@ -28464,7 +28450,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom214,            !- Zone Name
@@ -28476,7 +28462,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom215_218,        !- Zone Name
@@ -28488,7 +28474,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom215_218,        !- Zone Name
@@ -28500,7 +28486,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom215_218,        !- Zone Name
@@ -28512,7 +28498,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom215_218,        !- Zone Name
@@ -28524,7 +28510,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom219,            !- Zone Name
@@ -28536,7 +28522,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom220_223,        !- Zone Name
@@ -28548,7 +28534,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom220_223,        !- Zone Name
@@ -28560,7 +28546,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom220_223,        !- Zone Name
@@ -28572,7 +28558,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom220_223,        !- Zone Name
@@ -28584,7 +28570,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom224,            !- Zone Name
@@ -28596,7 +28582,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom301,            !- Zone Name
@@ -28608,7 +28594,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom302_305,        !- Zone Name
@@ -28620,7 +28606,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom302_305,        !- Zone Name
@@ -28632,7 +28618,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom302_305,        !- Zone Name
@@ -28644,7 +28630,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom302_305,        !- Zone Name
@@ -28656,7 +28642,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom306_308,        !- Zone Name
@@ -28668,7 +28654,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom306_308,        !- Zone Name
@@ -28680,7 +28666,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom306_308,        !- Zone Name
@@ -28692,7 +28678,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom309_312,        !- Zone Name
@@ -28704,7 +28690,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom309_312,        !- Zone Name
@@ -28716,7 +28702,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom309_312,        !- Zone Name
@@ -28728,7 +28714,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom309_312,        !- Zone Name
@@ -28740,7 +28726,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom313,            !- Zone Name
@@ -28752,7 +28738,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom314,            !- Zone Name
@@ -28764,7 +28750,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom315_318,        !- Zone Name
@@ -28776,7 +28762,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom315_318,        !- Zone Name
@@ -28788,7 +28774,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom315_318,        !- Zone Name
@@ -28800,7 +28786,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom315_318,        !- Zone Name
@@ -28812,7 +28798,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom319,            !- Zone Name
@@ -28824,7 +28810,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom320_323,        !- Zone Name
@@ -28836,7 +28822,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom320_323,        !- Zone Name
@@ -28848,7 +28834,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom320_323,        !- Zone Name
@@ -28860,7 +28846,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom320_323,        !- Zone Name
@@ -28872,7 +28858,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom324,            !- Zone Name
@@ -28884,7 +28870,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom401,            !- Zone Name
@@ -28896,7 +28882,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom402_405,        !- Zone Name
@@ -28908,7 +28894,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom402_405,        !- Zone Name
@@ -28920,7 +28906,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom402_405,        !- Zone Name
@@ -28932,7 +28918,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom402_405,        !- Zone Name
@@ -28944,7 +28930,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom406_408,        !- Zone Name
@@ -28956,7 +28942,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom406_408,        !- Zone Name
@@ -28968,7 +28954,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom406_408,        !- Zone Name
@@ -28980,7 +28966,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom409_412,        !- Zone Name
@@ -28992,7 +28978,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom409_412,        !- Zone Name
@@ -29004,7 +28990,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom409_412,        !- Zone Name
@@ -29016,7 +29002,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom409_412,        !- Zone Name
@@ -29028,7 +29014,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom413,            !- Zone Name
@@ -29040,7 +29026,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     AlwaysOff,               !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom414,            !- Zone Name
@@ -29052,7 +29038,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom415_418,        !- Zone Name
@@ -29064,7 +29050,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom415_418,        !- Zone Name
@@ -29076,7 +29062,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom415_418,        !- Zone Name
@@ -29088,7 +29074,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom415_418,        !- Zone Name
@@ -29100,7 +29086,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom419,            !- Zone Name
@@ -29112,7 +29098,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom420_423,        !- Zone Name
@@ -29124,7 +29110,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom420_423,        !- Zone Name
@@ -29136,7 +29122,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom420_423,        !- Zone Name
@@ -29148,7 +29134,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom420_423,        !- Zone Name
@@ -29160,7 +29146,7 @@
     WaterUse,                !- End-Use Subcategory
     2.337e-06,               !- Peak Flow Rate {m3/s}
     GuestRoom_SHW_Sch,       !- Flow Rate Fraction Schedule Name
-    SHW Shower Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     GuestRoom424,            !- Zone Name
@@ -29172,7 +29158,7 @@
     WaterUse,                !- End-Use Subcategory
     1.2933e-04,              !- Peak Flow Rate {m3/s}
     LaundryRoom_SHW_Sch,     !- Flow Rate Fraction Schedule Name
-    SHW Laundry Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     LaundryRoomFlr1,         !- Zone Name

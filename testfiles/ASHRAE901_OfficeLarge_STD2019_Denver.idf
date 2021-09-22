@@ -1463,13 +1463,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Core_bottom sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     Core_bottom sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1491,13 +1484,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Core_mid sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     Core_mid sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1517,13 +1503,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Core_top sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     Core_top sub catHot Supply Temp Sched,  !- Name
@@ -15791,7 +15770,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66667e-05,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Core_bottom sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Core_bottom sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Core_bottom,             !- Zone Name
@@ -15803,7 +15782,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66667e-05,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Core_mid sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Core_mid sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Core_mid,                !- Zone Name
@@ -15815,7 +15794,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66667e-05,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Core_top sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Core_top sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Core_top,                !- Zone Name
