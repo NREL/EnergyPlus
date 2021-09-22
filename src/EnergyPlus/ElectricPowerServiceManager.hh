@@ -83,14 +83,14 @@ enum class GeneratorType
     Num
 };
 
-constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypeUC{"Generator:InternalCombustionEngine",
-                                                                                             "Generator:CombustionTurbine",
-                                                                                             "Generator:MicroTurbine",
-                                                                                             "Generator:Photovoltaic",
-                                                                                             "Generator:PVWatts",
-                                                                                             "Generator:FuelCell",
-                                                                                             "Generator:MicroCHP",
-                                                                                             "Generator:WindTurbine"};
+constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypes{"Generator:InternalCombustionEngine",
+                                                                                            "Generator:CombustionTurbine",
+                                                                                            "Generator:MicroTurbine",
+                                                                                            "Generator:Photovoltaic",
+                                                                                            "Generator:PVWatts",
+                                                                                            "Generator:FuelCell",
+                                                                                            "Generator:MicroCHP",
+                                                                                            "Generator:WindTurbine"};
 
 enum class ThermalLossDestination : int
 {
@@ -557,21 +557,20 @@ public: // Method
 
     void reinitAtBeginEnvironment();
 
-public:                              // data // might make this class a friend of ElectPowerLoadCenter?
-    std::string name;                // user identifier
-    std::string typeOfName;          // equipment type
-    GeneratorType compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+public:                          // data // might make this class a friend of ElectPowerLoadCenter?
+    std::string name;            // user identifier
+    std::string typeOfName;      // equipment type
+    GeneratorType generatorType; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
     DataPlant::PlantEquipmentType compPlantType{DataPlant::PlantEquipmentType::Invalid}; // numeric designator for plant component, in DataPlant
     std::string compPlantName;                                                           // name of plant component if heat recovery
-    GeneratorType generatorType;
-    int generatorIndex;              // index in generator model data struct
-    Real64 maxPowerOut;              // Maximum Power Output (W)
-    std::string availSched;          // Operation Schedule.
-    int availSchedPtr;               // pointer to operation schedule
-    Real64 powerRequestThisTimestep; // Current Demand on Equipment (W)
-    bool onThisTimestep;             // Indicator whether Generator on
-    Real64 eMSPowerRequest;          // EMS actuator for current demand on equipment (W)
-    bool eMSRequestOn;               // EMS actuating On if true.
+    int generatorIndex;                                                                  // index in generator model data struct
+    Real64 maxPowerOut;                                                                  // Maximum Power Output (W)
+    std::string availSched;                                                              // Operation Schedule.
+    int availSchedPtr;                                                                   // pointer to operation schedule
+    Real64 powerRequestThisTimestep;                                                     // Current Demand on Equipment (W)
+    bool onThisTimestep;                                                                 // Indicator whether Generator on
+    Real64 eMSPowerRequest;                                                              // EMS actuator for current demand on equipment (W)
+    bool eMSRequestOn;                                                                   // EMS actuating On if true.
     bool plantInfoFound;
     PlantLocation cogenLocation;
     Real64 nominalThermElectRatio; // Cogen: nominal ratio of thermal to elect production

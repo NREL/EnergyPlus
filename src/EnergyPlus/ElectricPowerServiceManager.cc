@@ -528,10 +528,10 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
     for (auto &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
             for (auto &g : lc->elecGenCntrlObj) {
-                if (g->compGenTypeOf_Num == GeneratorType::PV) {
+                if (g->generatorType == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
-                if (g->compGenTypeOf_Num == GeneratorType::WindTurbine) {
+                if (g->generatorType == GeneratorType::WindTurbine) {
                     windTotalCapacity_ += g->maxPowerOut;
                 }
             }
@@ -2142,11 +2142,10 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantType(DataPlant::PlantEquipmentType::Invalid), generatorType(GeneratorType::Unassigned),
-      generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0),
-      eMSRequestOn(false), plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0),
-      dCElectProdRate(0.0), electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr),
-      errCountNegElectProd_(0)
+    : generatorType(GeneratorType::Unassigned), compPlantType(DataPlant::PlantEquipmentType::Invalid), generatorIndex(0), maxPowerOut(0.0),
+      availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false), plantInfoFound(false),
+      cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0), electricityProd(0.0),
+      electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr), errCountNegElectProd_(0)
 {
 
     static constexpr std::string_view routineName = "GeneratorController constructor ";
@@ -2154,38 +2153,33 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     name = objectName;
     typeOfName = objectType;
 
-    switch (getEnumerationValue(GeneratorTypeUC, objectType)) {
+    switch (getEnumerationValue(GeneratorTypes, objectType)) {
     case 0: { //"Generator:InternalCombustionEngine"
         generatorType = GeneratorType::ICEngine;
-        compGenTypeOf_Num = GeneratorType::ICEngine;
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
         compPlantName = name;
         break;
     }
     case 1: { // "Generator:CombustionTurbine"
         generatorType = GeneratorType::CombTurbine;
-        compGenTypeOf_Num = GeneratorType::CombTurbine;
         compPlantType = DataPlant::PlantEquipmentType::Generator_CTurbine;
         compPlantName = name;
         break;
     }
     case 2: { // "Generator:MicroTurbine"
         generatorType = GeneratorType::Microturbine;
-        compGenTypeOf_Num = GeneratorType::Microturbine;
         compPlantType = DataPlant::PlantEquipmentType::Generator_MicroTurbine;
         compPlantName = name;
         break;
     }
     case 3: { // "Generator:Photovoltaic"
         generatorType = GeneratorType::PV;
-        compGenTypeOf_Num = GeneratorType::PV;
         compPlantType = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
         compPlantName = name;
         break;
     }
     case 4: { // "Generator:PVWatts"
         generatorType = GeneratorType::PVWatts;
-        compGenTypeOf_Num = GeneratorType::PVWatts;
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
         int ObjNum =
@@ -2200,7 +2194,6 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     }
     case 5: { // "Generator:FuelCell"
         generatorType = GeneratorType::FuelCell;
-        compGenTypeOf_Num = GeneratorType::FuelCell;
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantType = DataPlant::PlantEquipmentType::Generator_FCExhaust;
@@ -2211,14 +2204,12 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     }
     case 6: { // "Generator:MicroCHP"
         generatorType = GeneratorType::MicroCHP;
-        compGenTypeOf_Num = GeneratorType::MicroCHP;
         compPlantType = DataPlant::PlantEquipmentType::Generator_MicroCHP;
         compPlantName = name;
         break;
     }
     case 7: { // "Generator:WindTurbine"
         generatorType = GeneratorType::WindTurbine;
-        compGenTypeOf_Num = GeneratorType::WindTurbine;
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
         break;
     }
