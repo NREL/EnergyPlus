@@ -19017,7 +19017,9 @@ namespace UnitarySystems {
                 }
             }
         } else {
-            ShowSevereError(state, "setupAllOutputVar: Developer error. Should never get here. Remove when confortable that UnitarySys::allocateUnitarySys is working as expected.");
+            ShowSevereError(state,
+                            "setupAllOutputVar: Developer error. Should never get here. Remove when confortable that UnitarySys::allocateUnitarySys "
+                            "is working as expected.");
             ShowFatalError(state, "setupAllOutputVar: Developer error. Conflict in number of UnitarySystems.");
         }
         state.dataUnitarySystems->reportVariablesAreSetup = true;
