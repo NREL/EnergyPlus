@@ -644,8 +644,8 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     // open a new file eplusout.dfs for saving the daylight factors
     if (state.dataDaylightingManager->CreateDFSReportFile) {
         InputOutputFile &dfs = state.files.dfs.ensure_open(state, "CalcDayltgCoefficients", state.files.outputControl.dfs);
-        print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
-        print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
+        print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight enclosures.");
+        print(dfs, "{}\n", "MonthAndDay,Enclosure Name,Zone Name,Window Name,Window State");
         print(dfs,
               "{}\n",
               "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,"
@@ -682,23 +682,26 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                     if (ISlatAngle == 1) {
                         // base window without shades, screens, or blinds
                         print(state.files.dfs,
-                              "{},{},{},Base Window\n",
+                              "{},{},{},{},Base Window\n",
                               state.dataEnvrn->CurMnDy,
+                              state.dataViewFactor->EnclSolInfo(enclNum).Name,
                               state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
                               state.dataSurface->Surface(windowSurfNum).Name);
                     } else if (ISlatAngle == 2 && ISA == 2) {
                         // window shade or blind with fixed slat angle
                         print(state.files.dfs,
-                              "{},{},{},Blind or Slat Applied\n",
+                              "{},{},{},{},Blind or Slat Applied\n",
                               state.dataEnvrn->CurMnDy,
+                              state.dataViewFactor->EnclSolInfo(enclNum).Name,
                               state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
                               state.dataSurface->Surface(windowSurfNum).Name);
                     } else {
                         // blind with variable slat angle
                         SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
                         print(state.files.dfs,
-                              "{},{},{},{:.1R}\n",
+                              "{},{},{},{},{:.1R}\n",
                               state.dataEnvrn->CurMnDy,
+                              state.dataViewFactor->EnclSolInfo(enclNum).Name,
                               state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
                               state.dataSurface->Surface(windowSurfNum).Name,
                               SlatAngle);

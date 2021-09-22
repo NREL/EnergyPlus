@@ -2226,12 +2226,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     std::string eiooutput = delimited_string(
         {
-            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
-            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
-            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
-            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
-            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
-            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
+            "! <Enclosure/Window Adjacency Daylighting Counts>, Enclosure Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent "
+            "Enclosures",
+            "Enclosure/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
+            "Enclosure/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
+            "! <Enclosure/Window Adjacency Daylighting Matrix>, Enclosure Name, Number of Adjacent Enclosures with Windows,Adjacent Enclosure Names "
+            "- 1st 100 (max)",
+            "Enclosure/Window Adjacency Daylighting Matrix, WEST ZONE,0",
+            "Enclosure/Window Adjacency Daylighting Matrix, EAST ZONE,0",
         },
         delim);
 
@@ -2278,23 +2280,23 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     eiooutput = delimited_string(
         {
-            "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
-            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            "! <Sky Daylight Factors>, MonthAndDay, Daylighting Control Name, Enclosure Name, Window Name, Reference Point, Daylight Factor",
+            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
         },
         delim);
 
@@ -2303,11 +2305,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     std::string const dfsoutput = delimited_string(
         {
 
-            "This file contains daylight factors for all exterior windows of daylight zones.",
-            "MonthAndDay,Zone Name,Window Name,Window State",
+            "This file contains daylight factors for all exterior windows of daylight enclosures.",
+            "MonthAndDay,Enclosure Name,Zone Name,Window Name,Window State",
             "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight "
             "Factor for Overcast Sky",
-            "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
+            "01/21,WEST ZONE,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
             "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
@@ -2332,7 +2334,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
             "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-            "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
+            "01/21,EAST ZONE,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
             "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
             "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
