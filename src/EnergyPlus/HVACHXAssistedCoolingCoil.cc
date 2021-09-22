@@ -1186,7 +1186,7 @@ namespace HVACHXAssistedCoolingCoil {
                     // CoolCompPartLoadRatio = CoolingCycRatio * double(CompOn);
                     //    // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                     //    this->m_CoolingSpeedRatio = 0.0;
-                    mCoolingSpeedRatio = 0.0;
+                    mCoolingSpeedRatio = 1.0;
                     CoilPLR = PartLoadRatio * double(CompOp);
                 }
 
