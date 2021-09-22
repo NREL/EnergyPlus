@@ -483,12 +483,11 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
       0,                       !- Nuclear High Level Emission Factor {g/MJ}
       ,                        !- Nuclear High Level Emission Factor Schedule Name
       0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
-
     )IDF";
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataPollutionModule->FuelType.FuelTypeNames.allocate(12);
+    state->dataPollutionModule->FuelType.FuelTypeNames.allocate(10);
     state->dataPollutionModule->GetInputFlagPollution = true;
     SetupPollutionMeterReporting(*state);
 
@@ -530,10 +529,14 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         EXPECT_EQ(format("Site:Environmental Impact {} Nuclear Low Level Waste Volume", fuelTypeNames[i]),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 17).VarName);
     }
+
+    // Variables specific to the Electricity fuel type
     EXPECT_EQ("Site:Environmental Impact Purchased Electricity Source Energy",
               state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 1).VarName);
     EXPECT_EQ("Site:Environmental Impact Surplus Sold Electricity Source",
               state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 2).VarName);
+
+    // Variables always setup for total carbon equivalent
     EXPECT_EQ("Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass",
               state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 3).VarName);
     EXPECT_EQ("Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass",
