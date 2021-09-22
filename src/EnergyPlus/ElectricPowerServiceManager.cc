@@ -1043,7 +1043,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                     errorsFound = true;
                     ShowSevereError(state, std::string{routineName} + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
                     ShowContinueError(state, "ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
-                    ShowContinueError(state, "\"" + generatorController->name + "\" is of type " + generatorController->typeOfName);
+                    ShowContinueError(state,
+                                      format("\"{}\" is of type {}",
+                                             generatorController->name,
+                                             GeneratorTypes[static_cast<int>(generatorController->generatorType)]));
                 } else {
                     totalDCCapacity += generatorController->pvwattsGenerator->getDCSystemCapacity();
 
@@ -2151,7 +2154,6 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     static constexpr std::string_view routineName = "GeneratorController constructor ";
 
     name = objectName;
-    typeOfName = objectType;
 
     switch (getEnumerationValue(GeneratorTypes, objectType)) {
     case 0: { //"Generator:InternalCombustionEngine"
@@ -2419,15 +2421,19 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     // check if generator production has gone wrong and is negative, reset to zero and warn
     if (electricPowerOutput < 0.0) {
         if (errCountNegElectProd_ == 0) {
-            ShowWarningMessage(state, typeOfName + " named " + name + " is producing negative electric power, check generator inputs.");
+            ShowWarningMessage(state,
+                               format("{} named {} is producing negative electric power, check generator inputs.",
+                                      GeneratorTypes[static_cast<int>(generatorType)],
+                                      name));
             ShowContinueError(state, format("Electric power production rate ={:.4R}", electricPowerOutput));
             ShowContinueError(state, "The power will be set to zero, and the simulation continues... ");
         }
-        ShowRecurringWarningErrorAtEnd(state,
-                                       typeOfName + " named " + name + " is producing negative electric power ",
-                                       errCountNegElectProd_,
-                                       electricPowerOutput,
-                                       electricPowerOutput);
+        ShowRecurringWarningErrorAtEnd(
+            state,
+            format("{} named {} is producing negative electric power ", GeneratorTypes[static_cast<int>(generatorType)], name),
+            errCountNegElectProd_,
+            electricPowerOutput,
+            electricPowerOutput);
         electricPowerOutput = 0.0;
     }
 }

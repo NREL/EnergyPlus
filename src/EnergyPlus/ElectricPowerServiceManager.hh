@@ -559,7 +559,6 @@ public: // Method
 
 public:                          // data // might make this class a friend of ElectPowerLoadCenter?
     std::string name;            // user identifier
-    std::string typeOfName;      // equipment type
     GeneratorType generatorType; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
     DataPlant::PlantEquipmentType compPlantType{DataPlant::PlantEquipmentType::Invalid}; // numeric designator for plant component, in DataPlant
     std::string compPlantName;                                                           // name of plant component if heat recovery
