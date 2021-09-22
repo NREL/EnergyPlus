@@ -96,7 +96,6 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -3017,7 +3016,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     using HWBaseboardRadiator::SimHWBaseboard;
     using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
     using LowTempRadiantSystem::SimLowTempRadiantSystem;
-    using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
     using PurchasedAirManager::SimPurchasedAir;
     using RefrigeratedCase::SimAirChillerSet;
     using ReturnAirPathManager::SimReturnAirPath;

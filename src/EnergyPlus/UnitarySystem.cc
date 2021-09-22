@@ -3417,6 +3417,40 @@ namespace UnitarySystems {
             this->m_HeatRecActive = true;
         }
 
+        int mixerIndex = 0;
+        errFlag = false;
+        if (!input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty()) {
+            this->OAMixerIndex = MixedAir::GetOAMixerIndex(state, input_data.oa_mixer_name);
+            ValidateComponent(state, input_data.oa_mixer_type, input_data.oa_mixer_name, errFlag, cCurrentModuleObject);
+            if (errFlag) {
+                ShowContinueError(state, "specified in " + cCurrentModuleObject + " = \"" + input_data.oa_mixer_name + "\".");
+                errorsFound = true;
+            } else {
+                this->OAMixerExists = true;
+                bool errFlag = false;
+                // OANodeNums = outside air mixer node numbers, OANodeNums(4) = outside air mixer mixed air node
+                Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(state, input_data.oa_mixer_name, errFlag);
+                if (errFlag) {
+                    ShowContinueError(state, "that was specified in " + cCurrentModuleObject + " = " + input_data.oa_mixer_name);
+                    ShowContinueError(state, "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
+                    errorsFound = true;
+                } else {
+                    this->m_OAMixerNodes[0] = OANodeNums(1); // inlet
+                    this->m_OAMixerNodes[1] = OANodeNums(2); // relief
+                    this->m_OAMixerNodes[2] = OANodeNums(3); // return
+                    this->m_OAMixerNodes[3] = OANodeNums(4); // mixed
+                }
+            }
+        } else if (input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty() ||
+                   !input_data.oa_mixer_type.empty() && input_data.oa_mixer_name.empty()) {
+            ShowSevereError(state, "Missing one of " + cCurrentModuleObject + " Outdoor Air Mixer inputs.");
+            ShowContinueError(state, "..OutdoorAir:Mixer type = " + original_input_specs.oa_mixer_type);
+            ShowContinueError(state, "..OutdoorAir:Mixer name = " + original_input_specs.oa_mixer_name);
+            errorsFound = true;
+        }
+        this->m_HeatConvTol = input_data.heat_conv_tol;
+        this->m_CoolConvTol = input_data.cool_conv_tol;
+
         // Early calls to ATMixer don't have enough info to pass GetInput. Need to get the data next time through.
         if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
             return;
@@ -3562,40 +3596,6 @@ namespace UnitarySystems {
         bool ZoneInletNodeFound = false;
         bool ZoneExhaustNodeFound = false;
         bool InducedNodeFound = false;
-
-        int mixerIndex = 0;
-        errFlag = false;
-        if (!input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty()) {
-            this->OAMixerIndex = MixedAir::GetOAMixerIndex(state, input_data.oa_mixer_name);
-            ValidateComponent(state, input_data.oa_mixer_type, input_data.oa_mixer_name, errFlag, cCurrentModuleObject);
-            if (errFlag) {
-                ShowContinueError(state, "specified in " + cCurrentModuleObject + " = \"" + input_data.oa_mixer_name + "\".");
-                errorsFound = true;
-            } else {
-                this->OAMixerExists = true;
-                bool errFlag = false;
-                // OANodeNums = outside air mixer node numbers, OANodeNums(4) = outside air mixer mixed air node
-                Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(state, original_input_specs.oa_mixer_name, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, "that was specified in " + cCurrentModuleObject + " = " + original_input_specs.oa_mixer_name);
-                    ShowContinueError(state, "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
-                    errorsFound = true;
-                } else {
-                    this->m_OAMixerNodes[0] = OANodeNums(1); // inlet
-                    this->m_OAMixerNodes[1] = OANodeNums(2); // relief
-                    this->m_OAMixerNodes[2] = OANodeNums(3); // return
-                    this->m_OAMixerNodes[3] = OANodeNums(4); // mixed
-                }
-            }
-        } else if (input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty() ||
-                   !input_data.oa_mixer_type.empty() && input_data.oa_mixer_name.empty()) {
-            ShowSevereError(state, "Missing one of " + cCurrentModuleObject + " Outdoor Air Mixer inputs.");
-            ShowContinueError(state, "..OutdoorAir:Mixer type = " + original_input_specs.oa_mixer_type);
-            ShowContinueError(state, "..OutdoorAir:Mixer name = " + original_input_specs.oa_mixer_name);
-            errorsFound = true;
-        }
-        this->m_HeatConvTol = input_data.heat_conv_tol;
-        this->m_CoolConvTol = input_data.cool_conv_tol;
 
         // Get AirTerminal mixer data
         SingleDuct::GetATMixer(state,
@@ -7611,16 +7611,6 @@ namespace UnitarySystems {
                     original_input_specs.fan_placement = ip->getAlphaFieldValue(fields, objectSchemaProps, "fan_placement");
                     original_input_specs.supply_air_fan_operating_mode_schedule_name =
                         ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_fan_operating_mode_schedule_name");
-                    if (getPTUnitType < 3) {
-                        original_input_specs.control_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "capacity_control_method");
-                        if (original_input_specs.control_type.empty() || original_input_specs.control_type == "NONE") {
-                            original_input_specs.control_type = "LOAD";
-                        }
-                        original_input_specs.minimum_supply_air_temperature =
-                            ip->getRealFieldValue(fields, objectSchemaProps, "minimum_supply_air_temperature_in_cooling_mode");
-                        original_input_specs.maximum_supply_air_temperature =
-                            ip->getRealFieldValue(fields, objectSchemaProps, "maximum_supply_air_temperature_in_heating_mode");
-                    }
                     if (getPTUnitType > 1) {
                         // conflict here between how UnitarySystem handled max supp heater temp and PTUnits, need to keep separate
                         original_input_specs.maximum_supply_air_temperature =
@@ -7648,6 +7638,16 @@ namespace UnitarySystems {
                                 ip->getAlphaFieldValue(fields, objectSchemaProps, "heat_pump_coil_water_flow_mode");
                             original_input_specs.control_type = "LOAD";
                         }
+                    }
+                    if (getPTUnitType < 3) {
+                        original_input_specs.control_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "capacity_control_method");
+                        if (original_input_specs.control_type.empty() || original_input_specs.control_type == "NONE") {
+                            original_input_specs.control_type = "LOAD";
+                        }
+                        original_input_specs.minimum_supply_air_temperature =
+                            ip->getRealFieldValue(fields, objectSchemaProps, "minimum_supply_air_temperature_in_cooling_mode");
+                        original_input_specs.maximum_supply_air_temperature =
+                            ip->getRealFieldValue(fields, objectSchemaProps, "maximum_supply_air_temperature_in_heating_mode");
                     }
                     // is this correct? unit test failure. If PTAC input is missing?
                     // PTACDrawAirfromReturnNodeAndPlenum_Test

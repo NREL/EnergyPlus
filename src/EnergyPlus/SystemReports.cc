@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -78,7 +79,6 @@
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -4398,10 +4398,6 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
     using HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode;
     using HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode;
     using HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode;
-    using PackagedTerminalHeatPump::GetPTUnitMixedAirNode;
-    using PackagedTerminalHeatPump::GetPTUnitOutAirNode;
-    using PackagedTerminalHeatPump::GetPTUnitReturnAirNode;
-    using PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode;
     using PurchasedAirManager::GetPurchasedAirMixedAirHumRat;
     using PurchasedAirManager::GetPurchasedAirMixedAirTemp;
     using PurchasedAirManager::GetPurchasedAirOutAirMassFlow;
