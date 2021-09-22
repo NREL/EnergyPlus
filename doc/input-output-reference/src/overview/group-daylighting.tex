@@ -16,9 +16,9 @@ When this object is used, daylighting illuminance levels are calculated and then
 
 The name of the Daylighting:Controls object.
 
-\paragraph{Field: Zone name}\label{daylightingcontrols-field-zone-name}
+\paragraph{Field: Zone or Space Name}\label{daylightingcontrols-field-zone-name}
 
-The name of the zone to which the following daylighting-related input applies.
+The name of the \hyperref[zone]{Zone} or \hyperref[space]{Space} to which the following daylighting-related input applies. If a zone name is specified, the zone must lie completely within a single solar enclosure.
 
 \paragraph{Field: Daylighting Method}\label{field-Daylighting Method}
 
@@ -144,9 +144,9 @@ This set of fields is used together and can be repeated an unlimited number of t
 
 The \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint} name should be specified that is used for determining the daylighting control sensor location.
 
-\paragraph{Field: Fraction of Zone Controlled by Reference Point <x>}\label{field-fraction-of-zone-controlled-by-reference-point-x}
+\paragraph{Field: Fraction of Lights Controlled by Reference Point <x>}\label{field-fraction-of-lights-controlled-by-reference-point-x}
 
-The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the named \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}. If the sum of the fractions are less than 1.0, the remaining portion is assumed to have no lighting control.
+The fraction of the zone or space's electric lighting is controlled by the daylight illuminance at the named \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}. If the sum of the fractions are less than 1.0, the remaining portion is assumed to have no lighting control.
 
 \paragraph{Field: Illuminance Setpoint at Reference Point <x>}\label{field-illuminance-setpoint-at-reference-point-x}
 
@@ -164,9 +164,9 @@ When the DElight Daylighting Method is used, there may be up to a maximum of 100
 
 The name of the Daylighting:ReferencePoint object.
 
-\paragraph{Field: Zone name}\label{daylightingreferencepoint-field-zone-name}
+\paragraph{Field: Zone or Space Name}\label{daylightingreferencepoint-field-zone-name}
 
-The name of the zone in which the reference point is located.
+The name of the \hyperref[zone]{Zone} or \hyperref[space]{Space} in which the reference point is located.
 
 \paragraph{Fields: (X,Y,Z) Coordinate of Reference Point}\label{fields-xyz-of-reference-point}
 
@@ -187,7 +187,7 @@ An IDF example:
 
   Daylighting:Controls,
     West Zone_DaylCtrl,      !- Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -200,12 +200,12 @@ An IDF example:
     20.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     West Zone_DaylRefPt1,    !- Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or Space Name
     3.048,                   !- X-Coordinate of Reference Point {m}
     3.048,                   !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
@@ -218,7 +218,7 @@ Following are some guidelines for preparing EnergyPlus input to model the effect
 
 \subsubsection{Use of Window Multipliers}\label{use-of-window-multipliers}
 
-If an exterior wall in a daylit zone has a number of identical windows, the windows should be entered separately rather than using a window multiplier (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}). Using a multiplier would give an incorrect illuminance calculation since individual windows would not be positioned correctly on the wall.
+If an exterior wall in a daylit enclosure has a number of identical windows, the windows should be entered separately rather than using a window multiplier (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}). Using a multiplier would give an incorrect illuminance calculation since individual windows would not be positioned correctly on the wall.
 
 \subsubsection{Use of Zone Multipliers}\label{use-of-zone-multipliers}
 
@@ -246,7 +246,7 @@ Sometimes a representative room cannot be found. Figure~\ref{fig:rooms-a-b-c-and
 
 \subsubsection{Multiple Lighting Zones}\label{multiple-lighting-zones}
 
-The SplitFlux daylighting calculation allows a thermal zone to be divided into multiple independently-controlled lighting zones. (See the fields: Daylighting Reference Point Name, Fraction of Zone Controlled by Reference Point, and Illuminance Setpoint at Reference Point.) An example is shown in Figure~\ref{fig:two-independently-controlled-lighting-zones}, where a relatively deep thermal zone has two lighting zones of equal area.
+The daylighting control calculation allows a thermal zone or space to be divided into multiple independently-controlled lighting zones. (See the fields: Daylighting Reference Point Name, Fraction of Lights Controlled by Reference Point, and Illuminance Setpoint at Reference Point.) An example is shown in Figure~\ref{fig:two-independently-controlled-lighting-zones}, where a relatively deep thermal zone has two lighting zones of equal area.
 
 \begin{figure}[hbtp] % fig 58
 \centering
@@ -412,22 +412,6 @@ Daylighting:DELight:ComplexFenestration,
       0.0;            !- Fenestration Rotation {deg}
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-006}
-
-In addition to the daylighting-specific outputs for DElight listed below, two ASCII text files are created during an EnergyPlus run that includes DElight analysis.~ Following completion of an EnergyPlus run, these files are given names that consist of the project name appended with DElight.in and DElight.out.~ The format of these files is described in the Output Details and Examples document.
-
-Zone,Average,Daylighting Reference Point Illuminance {[}lux{]}
-
-Zone,Average,Daylighting Lighting Power Multiplier {[]}
-
-\paragraph{Daylighting Reference Point Illuminance {[}lux{]}}\label{daylighting-reference-point-illuminance-lux}
-
-The total daylight illuminance at a DElight reference point from all of the exterior windows in a daylit zone.
-
-\paragraph{Daylighting Lighting Power Multiplier {[]}}\label{daylighting-lighting-power-multiplier}
-
-The amount by which the overhead electric lighting power in a zone is multiplied due to usage of DElight calculated daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
-
 \subsubsection{Outputs}\label{outputs-1-004}
 
 The following daylighting-specific outputs are available for Daylighting:Controls:
@@ -517,7 +501,7 @@ The number of hours when the calculated daylight illuminance at the first refere
 
 \paragraph{Daylighting Lighting Power Multiplier {[]}}\label{daylighting-lighting-power-multiplier-1}
 
-The amount by which the overhead electric lighting power in a zone is multiplied due to usage of daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
+The amount by which the overhead electric lighting power in a space or zone is multiplied due to usage of daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
 
 \subsection{Output:IlluminanceMap}\label{outputilluminancemap}
 
@@ -531,7 +515,7 @@ The name of the map object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-2-000}
 
-Reference to a zone with \hyperref[daylightingcontrols-000]{Daylighting:Controls}.
+Reference to a zone with \hyperref[daylightingcontrols-000]{Daylighting:Controls}. The zone must lie completely within a single solar enclosure.
 
 \paragraph{Field: Z Height}\label{field-z-height}
 

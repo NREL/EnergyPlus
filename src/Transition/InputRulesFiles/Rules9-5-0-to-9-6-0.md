@@ -93,7 +93,7 @@ and Floor:Interzone:**
 
 **For ZoneProperty:UserViewFactors:BySurfaceName:**
 
-* Field name "zone_or_zonelist_name" was changed to "space_or_spacelist_name".
+* Field name "zone_or_zonelist_name" was changed to "zone_or_zonelist_or_space_or_spacelist_name".
 * The contents of this field do not need to change, because pre-v9.6 input files have no Spaces, so
 default spaces will be created with the same names as the zone names. 
 
@@ -147,7 +147,7 @@ and Floor:Interzone:**
 **For ZoneProperty:UserViewFactors:BySurfaceName:**
 
 * No transition required. 
-* Field name "Zone or ZoneList Name" changed to "Space or SpaceList Name".
+* Field name "Zone or ZoneList Name" changed to "Zone or ZoneList or Space or SpaceList Name".
 * The contents of this field do no need to change, because pre-v9.6 input files have no Spaces, so
 default spaces will be created with the same names as the zone names. 
 

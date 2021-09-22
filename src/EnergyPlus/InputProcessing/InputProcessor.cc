@@ -275,7 +275,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
             }
         } else {
-            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
+            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath);
         }
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());

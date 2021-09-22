@@ -67,7 +67,7 @@ namespace DataViewFactorInformation {
         std::string Name;                    // Enclosure name
         std::vector<std::string> spaceNames; // Space names which are part of this enclosure
         std::vector<int> spaceNums;          // Spaces which are part of this enclosure
-        int NumOfSurfaces;                   // Number of surfaces in the enclosure
+        int NumOfSurfaces = 0;               // Number of surfaces in the enclosure
         Array2D<Real64> F;                   // View Factors: F(i,j) = from surface j to surface i (counter-intuitive, but optimized for performance)
         Array2D<Real64> ScriptF;             // Hottel's Script F //Tuned Transposed
         Array1D<Real64> Area;                // Surface area
@@ -78,16 +78,12 @@ namespace DataViewFactorInformation {
         Array1D<Real64> Fp;                  // F' (Oppenheim surface resistance used in Carroll method)
         Array1D_int SurfacePtr;              // Surface number for surfaces in this enclosure
         std::vector<int> SurfaceReportNums;  // Enclosure surface numbers for reporting view factors in old order (sub-surfaces follow base surfaces)
-        Real64 FloorArea;                    // Floor area of zone(s) in enclosure
-        Real64 ExtWindowArea;                // Exterior window area
-        Real64 TotalSurfArea;                // Total surface area
+        Real64 FloorArea = 0.0;              // Floor area of zone(s) in enclosure
+        Real64 ExtWindowArea = 0.0;          // Exterior window area
+        Real64 TotalSurfArea = 0.0;          // Total surface area
         Array1D<Real64> SolAbsorptance;      // Surface solar absorptance
-        int TotalEnclosureDaylRefPoints;     // Total number of daylighting reference points in enclosure
-
-        // Default Constructor
-        EnclosureViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
-        {
-        }
+        int TotalEnclosureDaylRefPoints = 0; // Total number of daylighting reference points in enclosure
+        bool HasInterZoneWindow = false;     // Interzone Window(s) present in this zone
     };
 
 } // namespace DataViewFactorInformation
