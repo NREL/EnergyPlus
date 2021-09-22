@@ -845,8 +845,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     //// get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataUnitarySystems->unitarySys[0].UnitType);    // zoneHVAC equipment type
-    //EXPECT_EQ("COIL:HEATING:FUEL", state->dataUnitarySystems->unitarySys[0].ACHeatCoilType);                    // PTAC heating coil type
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataUnitarySystems->unitarySys[0].UnitType); // zoneHVAC equipment type
+    // EXPECT_EQ("COIL:HEATING:FUEL", state->dataUnitarySystems->unitarySys[0].ACHeatCoilType);                    // PTAC heating coil type
     // TODO: fix this
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num, Coil_HeatingGasOrOtherFuel); // gas heating coil type
 
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanOpModeSchedPtr).CurrentValue = 1.0; // unit is always on
     state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0;  // unit is always available
-    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0;  // fan is always available
 
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
@@ -1238,8 +1238,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataUnitarySystems->unitarySys[0].m_FanOpMode = ContFanCycCoil;
 
     state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanOpModeSchedPtr).CurrentValue = 1.0; // unit is always on
-    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0; // unit is always available
-    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0;  // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0;  // fan is always available
 
     // initialize mass flow rates
     //		state->dataLoopNodes->Node( PTUnit( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;

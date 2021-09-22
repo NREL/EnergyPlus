@@ -229,7 +229,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr = 1;
     state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr = 1;
     state->dataUnitarySystems->unitarySys[0].m_FanPlace = UnitarySystems::UnitarySys::FanPlace::BlowThru;
-    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode =
+        DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
     state->dataUnitarySystems->CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
     state->dataUnitarySystems->CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
 
