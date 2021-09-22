@@ -1180,12 +1180,14 @@ namespace HVACHXAssistedCoolingCoil {
                         //        this->m_CoolingSpeedRatio = 1.0;
                         mCoolingSpeedRatio = 1.0;
                     }
+                    CoilPLR = 1.0;
                 } else {
                     //    this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
                     // CoolCompPartLoadRatio = CoolingCycRatio * double(CompOn);
                     //    // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                     //    this->m_CoolingSpeedRatio = 0.0;
                     mCoolingSpeedRatio = 0.0;
+                    CoilPLR = PartLoadRatio * double(CompOp);
                 }
 
                 // state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
