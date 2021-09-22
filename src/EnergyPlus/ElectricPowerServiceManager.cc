@@ -2153,27 +2153,37 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     name = objectName;
     typeOfName = objectType;
-    if (UtilityRoutines::SameString(objectType, "Generator:InternalCombustionEngine")) {
+
+    switch (getEnumerationValue(GeneratorTypeUC, objectType)) {
+    case 0: { //"Generator:InternalCombustionEngine"
         generatorType = GeneratorType::ICEngine;
         compGenTypeOf_Num = GeneratorType::ICEngine;
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:CombustionTurbine")) {
+        break;
+    }
+    case 1: { // "Generator:CombustionTurbine"
         generatorType = GeneratorType::CombTurbine;
         compGenTypeOf_Num = GeneratorType::CombTurbine;
         compPlantType = DataPlant::PlantEquipmentType::Generator_CTurbine;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:MicroTurbine")) {
+        break;
+    }
+    case 2: { // "Generator:MicroTurbine"
         generatorType = GeneratorType::Microturbine;
         compGenTypeOf_Num = GeneratorType::Microturbine;
         compPlantType = DataPlant::PlantEquipmentType::Generator_MicroTurbine;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:Photovoltaic")) {
+        break;
+    }
+    case 3: { // "Generator:Photovoltaic"
         generatorType = GeneratorType::PV;
         compGenTypeOf_Num = GeneratorType::PV;
         compPlantType = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
+        break;
+    }
+    case 4: { // "Generator:PVWatts"
         generatorType = GeneratorType::PVWatts;
         compGenTypeOf_Num = GeneratorType::PVWatts;
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
@@ -2186,7 +2196,9 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         }
         pvwattsGenerator = PVWatts::PVWattsGenerator::createFromIdfObj(state, ObjNum);
         pvwattsGenerator->setupOutputVariables(state);
-    } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
+        break;
+    }
+    case 5: { // "Generator:FuelCell"
         generatorType = GeneratorType::FuelCell;
         compGenTypeOf_Num = GeneratorType::FuelCell;
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
@@ -2195,18 +2207,26 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->ExhaustHX.Name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
+        break;
+    }
+    case 6: { // "Generator:MicroCHP"
         generatorType = GeneratorType::MicroCHP;
         compGenTypeOf_Num = GeneratorType::MicroCHP;
         compPlantType = DataPlant::PlantEquipmentType::Generator_MicroCHP;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
+        break;
+    }
+    case 7: { // "Generator:WindTurbine"
         generatorType = GeneratorType::WindTurbine;
         compGenTypeOf_Num = GeneratorType::WindTurbine;
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
-    } else {
+        break;
+    }
+    default: {
         ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
         ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);
+        break;
+    }
     }
 
     availSched = availSchedName;
@@ -2398,7 +2418,8 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::Unassigned: {
+    case GeneratorType::Unassigned:
+    case GeneratorType::Num: {
         // do nothing
         break;
     }

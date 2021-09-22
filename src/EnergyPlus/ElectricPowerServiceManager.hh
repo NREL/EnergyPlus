@@ -69,16 +69,9 @@
 
 namespace EnergyPlus {
 
-enum class ThermalLossDestination : int
-{
-    heatLossNotDetermined = 0,
-    zoneGains,    // device thermal losses are added to a zone as internal gains
-    lostToOutside // device thermal losses have no destination
-};
-
 enum class GeneratorType
 {
-    Unassigned,
+    Unassigned = -1,
     ICEngine,
     CombTurbine,
     PV,
@@ -86,7 +79,24 @@ enum class GeneratorType
     MicroCHP,
     Microturbine,
     WindTurbine,
-    PVWatts
+    PVWatts,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypeUC{"Generator:InternalCombustionEngine",
+                                                                                             "Generator:CombustionTurbine",
+                                                                                             "Generator:MicroTurbine",
+                                                                                             "Generator:Photovoltaic",
+                                                                                             "Generator:PVWatts",
+                                                                                             "Generator:FuelCell",
+                                                                                             "Generator:MicroCHP",
+                                                                                             "Generator:WindTurbine"};
+
+enum class ThermalLossDestination : int
+{
+    heatLossNotDetermined = 0,
+    zoneGains,    // device thermal losses are added to a zone as internal gains
+    lostToOutside // device thermal losses have no destination
 };
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
