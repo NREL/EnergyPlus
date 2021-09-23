@@ -134,6 +134,12 @@ Actuators are available for overriding the autosize values related to supply air
   An actuator called ``AirLoopHVAC:UnitaryHeatPump:WaterToAir'' is available with control type ``Autosized Supply Air Flow Rate.''
 \end{itemize}
 
+An actuator called ``Coil Speed Control'' is available with control type ``Unitary System DX Coil Speed Value''. This actuator is only available for the `AirLoopHVAC:UnitarySystem` or `AirLoopHVAC:UnitaryHeatPump:AirToAir:Multispeed` object, referencing multispeed DX coils.
+
+The EMS override coil speed value, “Unitary System DX Coil Speed Value”, is a continuous number below maximum coil speed level allowed. With any EMS override coil speed value, if the input value is a integer, the speed level is set as the exact speed value input, with the cycling or speed ratio = 1.0. Otherwise, if the floating point part is greater than zero, the speed level is calculated as the closest integer greater than the EMS speed value, and the cycling/speed ratio is set as the floating point part of the EMS speed value. For example, if EMS overrides coil speed value = 1.2, the speed level number is set as 2 with a speed ratio at 0.2.
+
+It should be noted that if there's no cooling or heating or moisture load presented at any time step, the coil will shut off the coil regardless of the EMS speed setting. If the Outside Dry Bulb Temperature is lower than the minimum outdoor operating temperature for heat pump compressor, the coil will also shut off regardless the EMS speed setting.
+
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airTerminalsingleductconstantvolumenoreheat}
 
 An actuator called ``AirTerminal:SingleDuct:ConstantVolume:NoReheat'' is available with a control type called ``Mass Flow Rate.''~ This actuator is available in models that use the single duct constant volume no reheat air terminal. The units are kg/s. This actuator is used to control the mass flow rate. Normally, the flow rate of single duct constant volume no reheat air terminals is fixed by the input, sizing results or OA requirement for DOA system, but this actuator provides a way to override the flow with Erl programs.

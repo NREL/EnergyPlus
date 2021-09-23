@@ -1589,7 +1589,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
-    Real64 refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
+    Real64 refPtIllum = state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
@@ -1604,7 +1604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win2ConstNum);
     transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
-    refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
+    refPtIllum = state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
 }
 

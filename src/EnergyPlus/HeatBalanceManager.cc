@@ -3383,6 +3383,9 @@ namespace HeatBalanceManager {
         } // TotScreensEQL loop
 
         // Window Blind Materials
+        if ((state.dataHeatBal->TotBlindsEQL == 0) && (state.dataHeatBal->TotBlinds == 0)) {
+            state.dataSurface->actualMaxSlatAngs = 1; // first slot is used for shades
+        }
 
         if (state.dataHeatBal->TotBlinds > 0) {
             state.dataHeatBal->Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
@@ -4479,6 +4482,8 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
         state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalUBeforeAdjusted.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->CoeffAdjRatio.dimension(state.dataHeatBal->TotConstructs, 1.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
         state.dataConstruction->Construct.allocate(state.dataHeatBal->TotConstructs);
@@ -5540,6 +5545,7 @@ namespace HeatBalanceManager {
                 }
 
                 // List of spaces
+                thisSpaceList.numListSpaces = 0;
                 auto extensibles = objectFields.find("spaces");
                 auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
@@ -5549,9 +5555,10 @@ namespace HeatBalanceManager {
                         int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                         if (thisSpaceNum > 0) {
                             thisSpaceList.spaces.emplace_back(thisSpaceNum);
+                            ++thisSpaceList.numListSpaces;
                         } else {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
-                            ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
+                            ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
                             ErrorsFound = true;
                         }
                         thisSpaceList.maxSpaceNameLength = max(thisSpaceList.maxSpaceNameLength, len(thisSpaceName));
@@ -5852,6 +5859,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
             state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
             state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
         }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
@@ -7338,6 +7346,8 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
             for (int i = (state.dataHeatBal->TotConstructs - NGlSys + 1); i <= state.dataHeatBal->TotConstructs; ++i) {
@@ -8034,7 +8044,10 @@ namespace HeatBalanceManager {
                 thisConstruct.IsUsedCTF = false;
 
                 // Air Exchange Method
-                std::string const airMethod = fields.at("air_exchange_method").get<std::string>();
+                std::string airMethod = "None";
+                if (fields.find("air_exchange_method") != fields.end()) {
+                    airMethod = fields.at("air_exchange_method").get<std::string>();
+                }
                 if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
@@ -8149,8 +8162,19 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
-                    // Automatic Surface Multipliers: Do not use representative surfaces
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                        int repSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                        if (repSurfNum != SurfNum) {
+                            // Do not use representative surfaces
+
+                            // remove surface from representative constituent list
+                            auto &vec = state.dataSurface->Surface(repSurfNum).ConstituentSurfaceNums;
+                            vec.erase(std::remove(vec.begin(), vec.end(), SurfNum), vec.end());
+
+                            // reset representative surface number
+                            state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                        }
+                    }
                 }
 
                 // Assign construction number
@@ -8458,6 +8482,8 @@ namespace HeatBalanceManager {
         state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs + NumNewConst) = 1.0;
 
         NumNewConst = state.dataHeatBal->TotConstructs;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {

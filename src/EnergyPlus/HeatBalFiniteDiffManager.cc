@@ -1500,7 +1500,6 @@ namespace HeatBalFiniteDiffManager {
             Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
             state.dataHeatBalFiniteDiffMgr->QHeatOutFlux(Surf) = QNetSurfFromOutside;
 
         } else if (surface_ExtBoundCond <= 0) { // regular outside conditions
@@ -1657,7 +1656,6 @@ namespace HeatBalFiniteDiffManager {
 
             // Same sign convention as CTFs
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
 
             // Report all outside BC heat fluxes
             state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
@@ -2173,11 +2171,11 @@ namespace HeatBalFiniteDiffManager {
 
         // Set the internal conditions to local variables
         Real64 const NetLWRadToSurfFD(
-            state.dataHeatBalSurf->SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
+            state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(Surf)); // Net interior long wavelength radiation to surface from other surfaces
         Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
         Real64 const SurfQdotRadHVACInPerAreaFD(
-            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(Surf));              // Total current radiant heat flux at a surface
-        Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
+            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(Surf));                        // Total current radiant heat flux at a surface
+        Real64 const QRadThermInFD(state.dataHeatBal->SurfQdotRadIntGainsInPerArea(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
@@ -2305,8 +2303,6 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
         //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
         state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf) = QNetSurfInside;
-        //  QFluxZoneToInSurf(Surf) = QNetSurfInside
-        state.dataHeatBalSurf->SurfOpaqInsFaceCond(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
     // todo - function not used

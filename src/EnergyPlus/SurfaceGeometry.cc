@@ -88,6 +88,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 namespace EnergyPlus {
 
@@ -392,7 +393,6 @@ namespace SurfaceGeometry {
 
         for (auto &e : state.dataHeatBal->Zone) {
             e.ExtWindowArea = 0.0;
-            e.HasInterZoneWindow = false;
             e.HasWindow = false;
             e.ExtGrossWallArea = 0.0;
             e.ExtNetWallArea = 0.0;
@@ -465,27 +465,22 @@ namespace SurfaceGeometry {
 
             } else { // For Windows
 
-                if ((state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) &&
-                    (state.dataSurface->Surface(SurfNum).BaseSurf != SurfNum)) { // Interzone window present
-                    state.dataHeatBal->Zone(ZoneNum).HasInterZoneWindow = true;
-                } else {
-                    if (((state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
-                         (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
-                        (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
-                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
-                        state.dataHeatBal->space(spaceNum).extWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
-                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea_Multiplied =
-                            state.dataHeatBal->Zone(ZoneNum).ExtWindowArea +
-                            state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
-                                state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-                        if (DetailedWWR) {
-                            print(state.files.debug,
-                                  "{},Window,{:.2R},{:.1R}\n",
-                                  state.dataSurface->Surface(SurfNum).Name,
-                                  state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
-                                      state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier,
-                                  state.dataSurface->Surface(SurfNum).Tilt);
-                        }
+                if (((state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
+                     (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
+                    (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
+                    state.dataHeatBal->Zone(ZoneNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                    state.dataHeatBal->space(spaceNum).extWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                    state.dataHeatBal->Zone(ZoneNum).ExtWindowArea_Multiplied =
+                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea +
+                        state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
+                            state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+                    if (DetailedWWR) {
+                        print(state.files.debug,
+                              "{},Window,{:.2R},{:.1R}\n",
+                              state.dataSurface->Surface(SurfNum).Name,
+                              state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
+                                  state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier,
+                              state.dataSurface->Surface(SurfNum).Tilt);
                     }
                 }
             }
@@ -1886,22 +1881,24 @@ namespace SurfaceGeometry {
                         // Check that matching interzone surface has construction with reversed layers
                         if (Found != SurfNum) { // Interzone surface
                             // Make sure different zones too (CR 4110)
-                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataSurface->Surface(Found).Zone) {
+                            if (state.dataSurface->Surface(SurfNum).spaceNum == state.dataSurface->Surface(Found).spaceNum) {
                                 ++ErrCount2;
                                 if (ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
+                                                     std::string{RoutineName} + "CAUTION -- Interspace surfaces are occuring in the same space(s).");
                                     ShowContinueError(
                                         state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + "CAUTION -- Interzone surfaces are usually in different zones");
+                                                     std::string{RoutineName} + "CAUTION -- Interspace surfaces are usually in different spaces");
                                     ShowContinueError(state,
                                                       "Surface=" + state.dataSurface->Surface(SurfNum).Name +
+                                                          ", Space=" + state.dataHeatBal->space(state.dataSurface->Surface(SurfNum).spaceNum).Name +
                                                           ", Zone=" + state.dataSurface->Surface(SurfNum).ZoneName);
                                     ShowContinueError(state,
                                                       "Surface=" + state.dataSurface->Surface(Found).Name +
+                                                          ", Space=" + state.dataHeatBal->space(state.dataSurface->Surface(Found).spaceNum).Name +
                                                           ", Zone=" + state.dataSurface->Surface(Found).ZoneName);
                                 }
                             }
@@ -2817,10 +2814,15 @@ namespace SurfaceGeometry {
                 int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
                 int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; surfNum++) {
+                    auto &surface(state.dataSurface->Surface(surfNum));
                     // Conditions where surface always needs to be unique
-                    bool forceUniqueSurface = state.dataSurface->Surface(surfNum).HasShadeControl ||
-                                              state.dataSurface->SurfWinAirflowSource(surfNum) ||
-                                              state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction).SourceSinkPresent;
+                    bool forceUniqueSurface =
+                        surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) ||
+                        state.dataConstruction->Construct(surface.Construction).SourceSinkPresent || surface.Class == SurfaceClass::TDD_Dome ||
+                        (surface.Class == SurfaceClass::Window && (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
+                                                                   state.dataSurface->SurfWinWindowModelType(surfNum) != Window5DetailedModel ||
+                                                                   state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
+                                                                   state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
                     if (!forceUniqueSurface) {
                         state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
                     }
@@ -2842,6 +2844,10 @@ namespace SurfaceGeometry {
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
+            if (thisSurf.BaseSurf != surfNum) {
+                // Set space for subsurfaces
+                thisSurf.spaceNum = state.dataSurface->Surface(thisSurf.BaseSurf).spaceNum;
+            }
             if (thisSurf.spaceNum > 0) {
                 state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithSpace = true;
             } else {
@@ -2866,6 +2872,7 @@ namespace SurfaceGeometry {
                     assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaceIndexes.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).isRemainderSpace = true;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
                 }
@@ -7064,7 +7071,7 @@ namespace SurfaceGeometry {
                     state.dataSurface->IntMassObjects(Item).spaceListActive = false;
                     state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
                 } else if (SLItem > 0) {
-                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).spaces.size());
+                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
                     NumIntMassSurfaces += numOfSpaces;
                     state.dataSurface->IntMassObjects(Item).numOfSpaces = numOfSpaces;
                     state.dataSurface->IntMassObjects(Item).spaceListActive = true;
@@ -13308,6 +13315,8 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
+            state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
 
@@ -13560,6 +13569,8 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
@@ -15009,7 +15020,7 @@ namespace SurfaceGeometry {
             assert(state.dataViewFactor->NumOfSolarEnclosures <= int(Enclosures.size()));
         }
 
-        // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
+        // TODO MJW: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 if (state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst == -1) { // initial value
@@ -15020,10 +15031,6 @@ namespace SurfaceGeometry {
                 }
                 state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast =
                     max(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast, state.dataHeatBal->space(spaceNum).radiantEnclosureNum);
-                // TODO: For daylighting, set the zone solar enclosure number to the first space's number
-                if (state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure == 0) {
-                    state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
-                }
             }
             assert(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst != -1);
             assert(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast != -1);
