@@ -787,7 +787,7 @@ namespace SZVAVModel {
 
         } else {
 
-            // Step 2: Load is greater then allowed in region 1, determine boundary load for region 3
+            // Step 2: Load is greater than allowed in region 1, determine boundary load for region 3
             // only difference in this calculation is using maxAirMassFlow instead of minAirMassFlow, just use the ratio to adjust previous
             // calculation
             boundaryLoadMet *= maxAirMassFlow / minAirMassFlow;

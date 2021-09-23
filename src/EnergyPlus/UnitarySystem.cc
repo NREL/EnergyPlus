@@ -121,33 +121,34 @@ namespace UnitarySystems {
                               Real64 &sysOutputProvided,
                               Real64 &latOutputProvided)
     {
-        simulateSys(state,
-                    Name,
-                    FirstHVACIteration,
-                    AirLoopNum,
-                    CompIndex,
-                    HeatActive,
-                    CoolActive,
-                    ZoneOAUnitNum,
-                    OAUCoilOutTemp,
-                    ZoneEquipment,
-                    sysOutputProvided,
-                    latOutputProvided);
-    }
+    //    // this is the same call now and can be removed
+    //    simulateSys(state,
+    //                Name,
+    //                FirstHVACIteration,
+    //                AirLoopNum,
+    //                CompIndex,
+    //                HeatActive,
+    //                CoolActive,
+    //                ZoneOAUnitNum,
+    //                OAUCoilOutTemp,
+    //                ZoneEquipment,
+    //                sysOutputProvided,
+    //                latOutputProvided);
+    //}
 
-    void UnitarySys::simulateSys(EnergyPlusData &state,
-                                 std::string_view Name,
-                                 bool const FirstHVACIteration,
-                                 int const &AirLoopNum,
-                                 int &CompIndex,
-                                 bool &HeatActive,
-                                 bool &CoolActive,
-                                 int const ZoneOAUnitNum,
-                                 Real64 const OAUCoilOutTemp,
-                                 bool const ZoneEquipment,
-                                 Real64 &sysOutputProvided,
-                                 Real64 &latOutputProvided)
-    {
+    //void UnitarySys::simulateSys(EnergyPlusData &state,
+    //                             std::string_view Name,
+    //                             bool const FirstHVACIteration,
+    //                             int const &AirLoopNum,
+    //                             int &CompIndex,
+    //                             bool &HeatActive,
+    //                             bool &CoolActive,
+    //                             int const ZoneOAUnitNum,
+    //                             Real64 const OAUCoilOutTemp,
+    //                             bool const ZoneEquipment,
+    //                             Real64 &sysOutputProvided,
+    //                             Real64 &latOutputProvided)
+    //{
         int CompOn = 0;
 
         // Obtains and Allocates system related parameters from input file
@@ -1778,7 +1779,9 @@ namespace UnitarySystems {
                 // CoilSystem does not size the cooling coil (#8761)
                 switch (this->m_sysType) {
                 case SysType::Unitary:
+                case SysType::PackagedAC:
                 case SysType::PackagedHP:
+                case SysType::PackagedWSHP:
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
                     break;
@@ -1826,7 +1829,7 @@ namespace UnitarySystems {
         if (this->OAMixerExists) {
             if (state.dataSize->CurZoneEqNum > 0) {
                 CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
-                if (this->m_CoolOutAirVolFlow == DataSizing::AutoSize || this->m_HeatOutAirVolFlow != DataSizing::AutoSize) {
+                if (this->m_CoolOutAirVolFlow == DataSizing::AutoSize || this->m_HeatOutAirVolFlow == DataSizing::AutoSize) {
                     CheckZoneSizing(state, this->UnitType, this->Name);
                 }
                 // initialize OA flow for sizing other inputs (e.g., capacity)
@@ -10736,7 +10739,7 @@ namespace UnitarySystems {
                 if (SELECT_CASE_var == DataHVACGlobals::SingleHeatingSetPoint) {
                     state.dataUnitarySystems->CoolingLoad = false;
                     // No heating load and constant fan pushes zone below heating set point
-                    if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt < 0.0 &&
+                    if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt <= 0.0 &&
                         SensOutputOff - state.dataUnitarySystems->QToHeatSetPt < -DataHVACGlobals::SmallLoad) {
                         state.dataUnitarySystems->HeatingLoad = true;
                         state.dataUnitarySystems->CoolingLoad = false;
@@ -11191,6 +11194,7 @@ namespace UnitarySystems {
             } else { // No Moisture Load
 
                 if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
+                    // this needs to be corrected to include UseCompressorOnFlow
                     if (this->m_MultiOrVarSpeedHeatCoil) {
                         state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
@@ -11199,6 +11203,7 @@ namespace UnitarySystems {
                         state.dataUnitarySystems->CompOnFlowRatio = 1.0;
                     }
                 } else {
+                    // this needs to be corrected to include UseCompressorOnFlow
                     if (this->m_MultiOrVarSpeedCoolCoil) {
                         state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;

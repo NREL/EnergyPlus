@@ -1406,7 +1406,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
-    thisSys.getUnitarySystemInput(*state, "SPACE1-1 Heat Pump", false, 0);
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 Heat Pump", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTHP

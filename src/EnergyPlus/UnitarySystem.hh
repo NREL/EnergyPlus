@@ -885,19 +885,19 @@ namespace UnitarySystems {
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        void simulateSys(EnergyPlusData &state,
-                         std::string_view Name,
-                         bool const firstHVACIteration,
-                         int const &AirLoopNum,
-                         int &CompIndex,
-                         bool &HeatActive,
-                         bool &CoolActive,
-                         int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                         Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                         bool const ZoneEquipment,    // TRUE if called as zone equipment
-                         Real64 &sysOutputProvided,   // sensible output at supply air node
-                         Real64 &latOutputProvided    // latent output at supply air node
-        );
+        //void simulateSys(EnergyPlusData &state,
+        //                 std::string_view Name,
+        //                 bool const firstHVACIteration,
+        //                 int const &AirLoopNum,
+        //                 int &CompIndex,
+        //                 bool &HeatActive,
+        //                 bool &CoolActive,
+        //                 int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+        //                 Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+        //                 bool const ZoneEquipment,    // TRUE if called as zone equipment
+        //                 Real64 &sysOutputProvided,   // sensible output at supply air node
+        //                 Real64 &latOutputProvided    // latent output at supply air node
+        //);
 
         void calcUnitarySystemToLoad(EnergyPlusData &state,
                                      int const AirLoopNum,          // index to air loop
