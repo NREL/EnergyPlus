@@ -8519,15 +8519,15 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(ZoneLoop).TotVisHeatGain = state.dataHeatBal->ZnRpt(ZoneLoop).LtsVisGain;
             state.dataHeatBal->ZnRpt(ZoneLoop).TotVisHeatGainRate = state.dataHeatBal->ZnRpt(ZoneLoop).LtsVisGainRate;
 
-            SumInternalRadiationGainsByTypes(state, ZoneLoop, TradIntGainTypes, state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGainRate);
+            state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGainRate = SumInternalRadiationGainsByTypes(state, ZoneLoop, TradIntGainTypes);
             state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGain =
                 state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            SumInternalConvectionGainsByTypes(state, ZoneLoop, TradIntGainTypes, state.dataHeatBal->ZnRpt(ZoneLoop).TotConvectiveGainRate);
+            state.dataHeatBal->ZnRpt(ZoneLoop).TotConvectiveGainRate = SumInternalConvectionGainsByTypes(state, ZoneLoop, TradIntGainTypes);
             state.dataHeatBal->ZnRpt(ZoneLoop).TotConvectiveGain =
                 state.dataHeatBal->ZnRpt(ZoneLoop).TotConvectiveGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            SumInternalLatentGainsByTypes(state, ZoneLoop, TradIntGainTypes, state.dataHeatBal->ZnRpt(ZoneLoop).TotLatentGainRate);
+            state.dataHeatBal->ZnRpt(ZoneLoop).TotLatentGainRate = SumInternalLatentGainsByTypes(state, ZoneLoop, TradIntGainTypes);
             state.dataHeatBal->ZnRpt(ZoneLoop).TotLatentGain =
                 state.dataHeatBal->ZnRpt(ZoneLoop).TotLatentGainRate * state.dataGlobal->TimeStepZoneSec;
 
