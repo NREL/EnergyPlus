@@ -571,39 +571,39 @@ class EnergyPlusWorkflowIP(BaseEPLaunchWorkflow1):
             )
         return response
 
-
-class EnergyPlusWorkflowSIByAPI(BaseEPLaunchWorkflow1):
-
-    def name(self):
-        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH} SI (Call via API)"
-
-    def context(self):
-        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
-
-    def description(self):
-        return "Run EnergyPlus by API with SI unit system"
-
-    def uses_weather(self):
-        return True
-
-    def get_file_types(self):
-        return ["*.idf", "*.imf", "*.epJSON"]
-
-    def get_output_suffixes(self):
-        return EPlusRunManager.eplus_suffixes()
-
-    def get_extra_data(self):
-        return {"Hey, it's extra": "data"}
-
-    def get_interface_columns(self):
-        return [ColumnNames.Errors, ColumnNames.Warnings, ColumnNames.Runtime, ColumnNames.Version]
-
-    def main(self, run_directory, file_name, args):
-        response = EPlusRunManager.run_energyplus(self, False, run_directory, file_name, args, True)
-        if type(response) is not EPLaunchWorkflowResponse1:
-            response = EPLaunchWorkflowResponse1(
-                success=False,
-                message='Current workflow run_energyplus function did not respond properly',
-                column_data=None
-            )
-        return response
+#
+# class EnergyPlusWorkflowSIByAPI(BaseEPLaunchWorkflow1):
+#
+#     def name(self):
+#         return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH} SI (Call via API)"
+#
+#     def context(self):
+#         return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
+#
+#     def description(self):
+#         return "Run EnergyPlus by API with SI unit system"
+#
+#     def uses_weather(self):
+#         return True
+#
+#     def get_file_types(self):
+#         return ["*.idf", "*.imf", "*.epJSON"]
+#
+#     def get_output_suffixes(self):
+#         return EPlusRunManager.eplus_suffixes()
+#
+#     def get_extra_data(self):
+#         return {"Hey, it's extra": "data"}
+#
+#     def get_interface_columns(self):
+#         return [ColumnNames.Errors, ColumnNames.Warnings, ColumnNames.Runtime, ColumnNames.Version]
+#
+#     def main(self, run_directory, file_name, args):
+#         response = EPlusRunManager.run_energyplus(self, False, run_directory, file_name, args, True)
+#         if type(response) is not EPLaunchWorkflowResponse1:
+#             response = EPLaunchWorkflowResponse1(
+#                 success=False,
+#                 message='Current workflow run_energyplus function did not respond properly',
+#                 column_data=None
+#             )
+#         return response
