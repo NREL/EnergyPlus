@@ -819,6 +819,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     // Initialize heat exchanger model
 
     static constexpr std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
+    static constexpr std::string_view RoutineNameSTWNoColon("InitSteamToWaterHeatExchanger");
 
     this->oneTimeInit(state); // plant setup
 
@@ -847,14 +848,14 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                                    DataGlobalConstants::InitConvTemp,
                                                                    1.0,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                   RoutineNameNoColon);
+                                                                   RoutineNameSTWNoColon);
 
             Real64 StartEnthSteam = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                           DataGlobalConstants::InitConvTemp,
                                                                           1.0,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                          RoutineNameNoColon);
+                                                                          RoutineNameSTWNoColon);
 
             this->DemandSideLoop.MassFlowRateMax = rhoSteam * this->DemandSideLoop.DesignVolumeFlowRate;
 
