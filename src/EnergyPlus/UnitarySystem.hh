@@ -885,7 +885,7 @@ namespace UnitarySystems {
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        //void simulateSys(EnergyPlusData &state,
+        // void simulateSys(EnergyPlusData &state,
         //                 std::string_view Name,
         //                 bool const firstHVACIteration,
         //                 int const &AirLoopNum,

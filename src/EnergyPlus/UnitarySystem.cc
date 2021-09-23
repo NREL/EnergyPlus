@@ -121,34 +121,34 @@ namespace UnitarySystems {
                               Real64 &sysOutputProvided,
                               Real64 &latOutputProvided)
     {
-    //    // this is the same call now and can be removed
-    //    simulateSys(state,
-    //                Name,
-    //                FirstHVACIteration,
-    //                AirLoopNum,
-    //                CompIndex,
-    //                HeatActive,
-    //                CoolActive,
-    //                ZoneOAUnitNum,
-    //                OAUCoilOutTemp,
-    //                ZoneEquipment,
-    //                sysOutputProvided,
-    //                latOutputProvided);
-    //}
+        //    // this is the same call now and can be removed
+        //    simulateSys(state,
+        //                Name,
+        //                FirstHVACIteration,
+        //                AirLoopNum,
+        //                CompIndex,
+        //                HeatActive,
+        //                CoolActive,
+        //                ZoneOAUnitNum,
+        //                OAUCoilOutTemp,
+        //                ZoneEquipment,
+        //                sysOutputProvided,
+        //                latOutputProvided);
+        //}
 
-    //void UnitarySys::simulateSys(EnergyPlusData &state,
-    //                             std::string_view Name,
-    //                             bool const FirstHVACIteration,
-    //                             int const &AirLoopNum,
-    //                             int &CompIndex,
-    //                             bool &HeatActive,
-    //                             bool &CoolActive,
-    //                             int const ZoneOAUnitNum,
-    //                             Real64 const OAUCoilOutTemp,
-    //                             bool const ZoneEquipment,
-    //                             Real64 &sysOutputProvided,
-    //                             Real64 &latOutputProvided)
-    //{
+        // void UnitarySys::simulateSys(EnergyPlusData &state,
+        //                             std::string_view Name,
+        //                             bool const FirstHVACIteration,
+        //                             int const &AirLoopNum,
+        //                             int &CompIndex,
+        //                             bool &HeatActive,
+        //                             bool &CoolActive,
+        //                             int const ZoneOAUnitNum,
+        //                             Real64 const OAUCoilOutTemp,
+        //                             bool const ZoneEquipment,
+        //                             Real64 &sysOutputProvided,
+        //                             Real64 &latOutputProvided)
+        //{
         int CompOn = 0;
 
         // Obtains and Allocates system related parameters from input file
