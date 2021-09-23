@@ -121,37 +121,36 @@ namespace UnitarySystems {
                               Real64 &sysOutputProvided,
                               Real64 &latOutputProvided)
     {
-        //    // this is the same call now and can be removed
-        //    simulateSys(state,
-        //                Name,
-        //                FirstHVACIteration,
-        //                AirLoopNum,
-        //                CompIndex,
-        //                HeatActive,
-        //                CoolActive,
-        //                ZoneOAUnitNum,
-        //                OAUCoilOutTemp,
-        //                ZoneEquipment,
-        //                sysOutputProvided,
-        //                latOutputProvided);
-        //}
+        simulateSys(state,
+                    Name,
+                    FirstHVACIteration,
+                    AirLoopNum,
+                    CompIndex,
+                    HeatActive,
+                    CoolActive,
+                    ZoneOAUnitNum,
+                    OAUCoilOutTemp,
+                    ZoneEquipment,
+                    sysOutputProvided,
+                    latOutputProvided);
+    }
 
-        // void UnitarySys::simulateSys(EnergyPlusData &state,
-        //                             std::string_view Name,
-        //                             bool const FirstHVACIteration,
-        //                             int const &AirLoopNum,
-        //                             int &CompIndex,
-        //                             bool &HeatActive,
-        //                             bool &CoolActive,
-        //                             int const ZoneOAUnitNum,
-        //                             Real64 const OAUCoilOutTemp,
-        //                             bool const ZoneEquipment,
-        //                             Real64 &sysOutputProvided,
-        //                             Real64 &latOutputProvided)
-        //{
+    void UnitarySys::simulateSys(EnergyPlusData &state,
+                                 std::string_view Name,
+                                 bool const FirstHVACIteration,
+                                 int const &AirLoopNum,
+                                 int &CompIndex,
+                                 bool &HeatActive,
+                                 bool &CoolActive,
+                                 int const ZoneOAUnitNum,
+                                 Real64 const OAUCoilOutTemp,
+                                 bool const ZoneEquipment,
+                                 Real64 &sysOutputProvided,
+                                 Real64 &latOutputProvided)
+    {
         int CompOn = 0;
 
-        // Obtains and Allocates system related parameters from input file
+        // Obtains and Allocates unitary system related parameters from input file
         if (this->m_ThisSysInputShouldBeGotten) {
             // Get the unitary system input
             getUnitarySystemInput(state, Name, ZoneEquipment, ZoneOAUnitNum);
@@ -241,7 +240,6 @@ namespace UnitarySystems {
         if (AirLoopNum > 0 && this->m_ControlType != ControlType::Setpoint) {
             state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = tempMassFlowRateMaxAvail;
         }
-        state.dataSize->ZoneEqDXCoil = false;
     }
 
     DesignSpecMSHP *DesignSpecMSHP::factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName)
@@ -1680,6 +1678,26 @@ namespace UnitarySystems {
             }
         }
 
+        // zone equipment that have OA mixers will need to know the OA flow rate to size coil inlet conditions
+        bool SizingDesRunThisZone = false;
+        if (this->OAMixerExists) {
+            if (state.dataSize->CurZoneEqNum > 0) {
+                CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
+                if (this->m_CoolOutAirVolFlow == DataSizing::AutoSize || this->m_HeatOutAirVolFlow == DataSizing::AutoSize) {
+                    CheckZoneSizing(state, this->UnitType, this->Name);
+                }
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (this->m_CoolOutAirVolFlow == DataSizing::AutoSize) {
+                    EqSizing.OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                } else {
+                    EqSizing.OAVolFlow = this->m_CoolOutAirVolFlow;
+                }
+                if (this->m_HeatOutAirVolFlow != DataSizing::AutoSize) {
+                    EqSizing.OAVolFlow = max(EqSizing.OAVolFlow, this->m_HeatOutAirVolFlow);
+                }
+            }
+        }
+
         PrintFlag = false;
         // STEP 1: find the DataSizing::AutoSized cooling air flow rate and capacity
         if (this->m_CoolCoilExists) {
@@ -1824,24 +1842,6 @@ namespace UnitarySystems {
             state.dataSize->DataIsDXCoil = false;
             state.dataSize->DataTotCapCurveIndex = 0;
             state.dataSize->DataFlowUsedForSizing = 0.0;
-        }
-        bool SizingDesRunThisZone = false;
-        if (this->OAMixerExists) {
-            if (state.dataSize->CurZoneEqNum > 0) {
-                CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
-                if (this->m_CoolOutAirVolFlow == DataSizing::AutoSize || this->m_HeatOutAirVolFlow == DataSizing::AutoSize) {
-                    CheckZoneSizing(state, this->UnitType, this->Name);
-                }
-                // initialize OA flow for sizing other inputs (e.g., capacity)
-                if (this->m_CoolOutAirVolFlow == DataSizing::AutoSize) {
-                    EqSizing.OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
-                } else {
-                    EqSizing.OAVolFlow = this->m_CoolOutAirVolFlow;
-                }
-                if (this->m_HeatOutAirVolFlow != DataSizing::AutoSize) {
-                    EqSizing.OAVolFlow = max(EqSizing.OAVolFlow, this->m_HeatOutAirVolFlow);
-                }
-            }
         }
 
         // STEP 2: find the DataSizing::AutoSized heating air flow rate and capacity
@@ -1993,10 +1993,24 @@ namespace UnitarySystems {
             state.dataSize->DXCoolCap = EqSizing.DesHeatingLoad;
         }
 
-        // TODO: decide which parent objects will report
-        if (this->m_OKToPrintSizing && this->m_sysType == SysType::Unitary) PrintFlag = true;
+        // Some parent objects report sizing, some do not
+        // other cases below will toggle on or off specific reports based on system type
+        if (this->m_OKToPrintSizing) {
+            switch (this->m_sysType) {
+            case SysType::Unitary:
+            case SysType::PackagedAC:
+            case SysType::PackagedHP:
+            case SysType::PackagedWSHP:
+                PrintFlag = true;
+                break;
+            case SysType::CoilCoolingDX:
+            case SysType::CoilCoolingWater:
+                break;
+            }
+        }
         // STEP 5: report system parameters (e.g., air flow rates, capacities, etc.)
         if (this->m_FanExists) {
+            if (this->m_sysType >= SysType::PackagedAC) PrintFlag = false;
 
             EqSizing.SystemAirFlow = true;
             EqSizing.AirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
@@ -2015,6 +2029,8 @@ namespace UnitarySystems {
 
             state.dataSize->DataEMSOverrideON = false;
             EqSizing.SystemAirFlow = false;
+
+            if (this->m_sysType >= SysType::PackagedAC) PrintFlag = true;
         }
 
         // not sure what to do if UnitarySystem has only 1 coil type and flow needs to occur when present coil is off
@@ -2024,7 +2040,6 @@ namespace UnitarySystems {
         } else if (this->m_CoolCoilExists && !this->m_HeatCoilExists) {
             if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
-        if (this->m_sysType >= SysType::PackagedHP) PrintFlag = true;
         if (this->m_HeatCoilExists) {
 
             SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
@@ -2843,6 +2858,9 @@ namespace UnitarySystems {
             this->m_LatLoadLoss = 0.0;
         }
 
+        if (this->m_sysType >= SysType::PackagedAC) {
+            PrintFlag = false;
+        }
         if (this->m_CoolCoilExists) {
 
             SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
@@ -2989,7 +3007,9 @@ namespace UnitarySystems {
             state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
         }
 
-        if (this->m_sysType >= SysType::PackagedWSHP) PrintFlag = true;
+        if (this->m_sysType >= SysType::PackagedWSHP) {
+            PrintFlag = true;
+        }
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
 
@@ -3004,13 +3024,15 @@ namespace UnitarySystems {
             this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(state, TempSize, ErrFound);
         }
 
-        if (this->m_sysType >= SysType::PackagedHP) PrintFlag = false;
+        if (this->m_sysType >= SysType::PackagedHP) {
+            PrintFlag = false;
+        }
 
         if (this->m_SuppCoilExists) {
 
             switch (this->m_sysType) {
             case SysType::PackagedHP:
-                if (this->m_HVACSizingIndex == 0) EqSizing.HeatingCapacity = false; // ensure PTHP supplemental heating coil sizes to load
+                if (this->m_HVACSizingIndex <= 0) EqSizing.HeatingCapacity = false; // ensure PTHP supplemental heating coil sizes to load
                 break;
             }
             SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
@@ -3121,6 +3143,9 @@ namespace UnitarySystems {
         } else {
             this->ControlZoneMassFlowFrac = 1.0;
         }
+
+        // should only report for those that allow SZVAV inputs, e.g., control type == CCMASHRAE
+        PrintFlag = true;
 
         if (this->m_ControlType == ControlType::CCMASHRAE) {
 
@@ -6982,7 +7007,17 @@ namespace UnitarySystems {
         // someone may use a default other than what we intended, allow it to be used
         // so if this field is blank, and the input field is included, read the default, otherwise use 80
         // if (!lNumericBlanks(iDesignMaxOutletTempNumericNum) && NumNumbers > (iDesignMaxOutletTempNumericNum - 1)) {
-        this->DesignMaxOutletTemp = loc_DesignMaxOutletTemp;
+        if (this->m_sysType == SysType::Unitary) {
+            // UnitarySystem has a single field for max outlet temp
+            this->DesignMaxOutletTemp = loc_DesignMaxOutletTemp;
+        } else {
+            // PTHP has a field for max outlet temp for supplmental heater and max outlet temp for SZVAV
+            if (this->m_ControlType == ControlType::CCMASHRAE) {
+                this->DesignMaxOutletTemp = loc_DesignMaxOutletTemp;
+            } else {
+                this->DesignMaxOutletTemp = input_data.maximum_supply_air_temperature_from_supplemental_heater;
+            }
+        }
         if (this->DesignMaxOutletTemp == DataSizing::AutoSize) this->m_RequestAutoSize = true;
         //}
 
@@ -7615,8 +7650,7 @@ namespace UnitarySystems {
                     original_input_specs.supply_air_fan_operating_mode_schedule_name =
                         ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_fan_operating_mode_schedule_name");
                     if (getPTUnitType > 1) {
-                        // conflict here between how UnitarySystem handled max supp heater temp and PTUnits, need to keep separate
-                        original_input_specs.maximum_supply_air_temperature =
+                        original_input_specs.maximum_supply_air_temperature_from_supplemental_heater =
                             ip->getRealFieldValue(fields, objectSchemaProps, "maximum_supply_air_temperature_from_supplemental_heater");
                         original_input_specs.supplemental_heating_coil_object_type =
                             ip->getAlphaFieldValue(fields, objectSchemaProps, "supplemental_heating_coil_object_type");
@@ -7654,12 +7688,12 @@ namespace UnitarySystems {
                     }
                     // is this correct? unit test failure. If PTAC input is missing?
                     // PTACDrawAirfromReturnNodeAndPlenum_Test
-                    if (fields.find("minimum_supply_air_temperature_in_cooling_mode") == fields.end()) { // not input
-                        original_input_specs.minimum_supply_air_temperature = -99.0;
-                    }
-                    if (fields.find("maximum_supply_air_temperature_in_heating_mode") == fields.end()) { // not input
-                        original_input_specs.maximum_supply_air_temperature = 80.0;
-                    }
+                    //if (fields.find("minimum_supply_air_temperature_in_cooling_mode") == fields.end()) { // not input
+                    //    original_input_specs.minimum_supply_air_temperature = -99.0;
+                    //}
+                    //if (fields.find("maximum_supply_air_temperature_in_heating_mode") == fields.end()) { // not input
+                    //    original_input_specs.maximum_supply_air_temperature = 50.0;
+                    //}
                     // need to check all defaults past field 18 for PTAC
 
                     original_input_specs.avail_manager_list_name =
@@ -15672,6 +15706,15 @@ namespace UnitarySystems {
                 this->m_LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
             }
         }
+        // Issue 9093.
+        // PTHP reports these differently, seems this is correct. Can't change this now, need an issue to resolve
+        //state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
+        //state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
+        //state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOutNoATM));
+        //state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOutNoATM));
+        //state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
+        //state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
+
         this->m_TotHeatEnergy = m_TotHeatEnergyRate * ReportingConstant;
         this->m_TotCoolEnergy = m_TotCoolEnergyRate * ReportingConstant;
         this->m_SensHeatEnergy = m_SensHeatEnergyRate * ReportingConstant;

@@ -111,6 +111,7 @@ namespace UnitarySystems {
         Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation = -999.0;
         Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation = -999.0;
         Real64 maximum_supply_air_temperature = 80.0;
+        Real64 maximum_supply_air_temperature_from_supplemental_heater = 50.0;
         Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation = 21.0;
         std::string outdoor_dry_bulb_temperature_sensor_node_name;
         std::string heat_pump_coil_water_flow_mode;
@@ -885,19 +886,19 @@ namespace UnitarySystems {
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        // void simulateSys(EnergyPlusData &state,
-        //                 std::string_view Name,
-        //                 bool const firstHVACIteration,
-        //                 int const &AirLoopNum,
-        //                 int &CompIndex,
-        //                 bool &HeatActive,
-        //                 bool &CoolActive,
-        //                 int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-        //                 Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-        //                 bool const ZoneEquipment,    // TRUE if called as zone equipment
-        //                 Real64 &sysOutputProvided,   // sensible output at supply air node
-        //                 Real64 &latOutputProvided    // latent output at supply air node
-        //);
+        void simulateSys(EnergyPlusData &state,
+                         std::string_view Name,
+                         bool const firstHVACIteration,
+                         int const &AirLoopNum,
+                         int &CompIndex,
+                         bool &HeatActive,
+                         bool &CoolActive,
+                         int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+                         Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                         bool const ZoneEquipment,    // TRUE if called as zone equipment
+                         Real64 &sysOutputProvided,   // sensible output at supply air node
+                         Real64 &latOutputProvided    // latent output at supply air node
+        );
 
         void calcUnitarySystemToLoad(EnergyPlusData &state,
                                      int const AirLoopNum,          // index to air loop
