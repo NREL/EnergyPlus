@@ -443,20 +443,27 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
 
     // Do any daylighting reference points on layer for zone
     if (state.dataDaylightingData->TotRefPoints > 0) {
-        for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-            auto curcolorno = ColorNo::DaylSensor1;
+        // TODO MJW: Keep zone loop for now to maintain order
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+                auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+                if (thisDaylightControl.zoneIndex != zoneNum) continue;
+                // TODO MJW: Post an issue to fix duplicate ref points in dxf files, but leave this off for now
+                // if (DELight && thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::DElightDaylighting) continue;
+                auto curcolorno = ColorNo::DaylSensor1;
 
-            for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-                print<FormatSyntax::FMT>(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
-                print<check_syntax(Format_709)>(of,
-                                                Format_709,
-                                                normalizeName(state.dataHeatBal->Zone(zones).Name),
-                                                state.dataSurfColor->DXFcolorno(static_cast<int>(curcolorno)),
-                                                state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
-                                                state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
-                                                state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
-                                                0.2);
-                curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
+                for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {
+                    print<FormatSyntax::FMT>(of, "999\n{}:{}:{}\n", thisDaylightControl.ZoneName, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
+                    print<check_syntax(Format_709)>(of,
+                                                    Format_709,
+                                                    normalizeName(thisDaylightControl.ZoneName),
+                                                    state.dataSurfColor->DXFcolorno(static_cast<int>(curcolorno)),
+                                                    thisDaylightControl.DaylRefPtAbsCoord(1, refpt),
+                                                    thisDaylightControl.DaylRefPtAbsCoord(2, refpt),
+                                                    thisDaylightControl.DaylRefPtAbsCoord(3, refpt),
+                                                    0.2);
+                    curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
+                }
             }
         }
     }
@@ -877,7 +884,7 @@ void DXFOut(EnergyPlusData &state,
         const auto curcolorno = ColorNo::DaylSensor1;
 
         for (int mapnum = 1; mapnum <= state.dataDaylightingData->TotIllumMaps; ++mapnum) {
-            if (state.dataDaylightingData->IllumMapCalc(mapnum).Zone != zones) continue;
+            if (state.dataDaylightingData->IllumMapCalc(mapnum).zoneIndex != zones) continue;
             for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
                 print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));
                 print(dxffile,

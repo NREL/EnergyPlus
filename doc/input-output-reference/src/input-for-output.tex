@@ -427,28 +427,24 @@ The cumulative meter outputs (\hyperref[outputmetercumulative-and-outputmetercum
 
 Meter names applicable for the simulation are shown on the Variable Dictionary Report contained in the \textbf{eplusout.mdd} file described in the Output Details and Examples document.
 
-Meter names are of three forms:
+Meter names are one of six forms:
 
 \begin{itemize}
-\tightlist
 \item
-  \textless{}ResourceType\textgreater{}:\textless{}name\textgreater{}
+  \textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}
+\item
+  \textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}
+\item
+  \textless{}EndUseSubcategory\textgreater{}:\textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}
 \end{itemize}
-
-Or
-
+The following forms apply only for GroupType = Zone or SpaceType:
 \begin{itemize}
-\tightlist
 \item
-  \textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}name\textgreater{}
-\end{itemize}
-
-Or
-
-\begin{itemize}
-\tightlist
+  \textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}:\textless{}name\textgreater{}
 \item
-  \textless{}EndUseSubcategory\textgreater{}:\textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}name\textgreater{}.
+  \textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}:\textless{}name\textgreater{}
+\item
+  \textless{}EndUseSubcategory\textgreater{}:\textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}:\textless{}name\textgreater{}
 \end{itemize}
 
 The user requests reporting by either specifying the full name above (without Units) or a ``wildcard'' representation of that name (to obtain all meters of a type). For example, entering ``Electricity:*'' for the meter name will report on all the Electricity: meters (Electricity:Facility, Electricity:Building, Electricity:Zone:Resistive Zone, Electricity:Zone:East Zone, Electricity:North Zone in the example above). Both the resource types and end-use types are set within the program by the developers. End-use subcategories are user-defined and are an input field for certain objects.
@@ -466,7 +462,7 @@ Output:Meter,Electricity:Facility;
 Output:Meter,Electricity:Building;
 Output:Meter,Electricity:Zone:South Zone;
 Output:Meter,Electricity:Zone:East Zone;
-Output:Meter,Electricity:North Zone;
+Output:Meter,Electricity:SpaceType:Office;
 \end{lstlisting}
 
 From a three zone file that had no HVAC electricity (i.e., had only electric equipment or lighting equipment in an uncontrolled three zone building).
@@ -577,31 +573,32 @@ HeatRecoveryForHeating \tabularnewline
 \bottomrule
 \end{longtable}
 
-Specific meter types are then used for grouping the fuel type meters:
+Specific meter types are then used for grouping the resource type meters:
 
 % table 40
 \begin{longtable}[c]{@{}l@{}}
-\caption{Overall Meter Types \label{table:overall-meter-types}} \tabularnewline
+\caption{Meter Group Types \label{table:overall-meter-types}} \tabularnewline
 \toprule
-Meters \tabularnewline
+Groups \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Overall Meter Types} \tabularnewline
+\caption[]{Meter Group Types} \tabularnewline
 \toprule
-Meters \tabularnewline
+Groups \tabularnewline
 \midrule
 \endhead
 
 Facility \tabularnewline
 Building \tabularnewline
 Zone \tabularnewline
+SpaceType \tabularnewline
 HVAC \tabularnewline
 Plant \tabularnewline
 \bottomrule
 \end{longtable}
 
-Facility meters contain all the energy of a fuel type. Building meters contain the sum of each zone's energy. HVAC meters contain the energy from the air and zone HVAC system components. Plant meters contain the energy from the plant equipment.
+Facility meters contain all the energy of a fuel type. Building meters contain the sum of each zone's energy. Zone and SpaceType meters are overlapping components of the Building meters. HVAC meters contain the energy from the air and zone HVAC system components. Plant meters contain the energy from the plant equipment.
 
 Thus, the following relationships should be observed:
 
@@ -610,7 +607,7 @@ Facility = \sum {\left( {Building + HVAC + Plant + Exterior} \right)}
 \end{equation}
 
 \begin{equation}
-Building = \sum\limits_1^{NumberOfZones} {Zone}
+Building = \sum\limits_1^{NumberOfZones} {Zone} = \sum\limits_1^{NumberOfSpaceTypes} {SpaceType}
 \end{equation}
 
 There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always positive, (2) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always positive, and (3) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative.

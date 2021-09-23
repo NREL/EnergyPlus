@@ -96,6 +96,9 @@ namespace DaylightingDevices {
 
     void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum); // Daylighting shelf object number
 
+    void adjustViewFactorsWithShelf(
+        EnergyPlusData &state, Real64 &viewFactorToShelf, Real64 &viewFactorToSky, Real64 &viewFactorToGround, int WinSurf, int ShelfNum);
+
     void FigureTDDZoneGains(EnergyPlusData &state);
 
 } // namespace DaylightingDevices
