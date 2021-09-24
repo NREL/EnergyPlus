@@ -97,9 +97,9 @@ void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompInde
     int MixerNum; // The Mixer that you are currently loading input into
 
     // Obtains and Allocates Mixer related parameters from input file
-    if (state.dataMixerComponent->SimAirMixerInputFlag) { // First time subroutine has been entered
+    if (state.dataMixerComponent->GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
         GetMixerInput(state);
-        state.dataMixerComponent->SimAirMixerInputFlag = false;
+        state.dataMixerComponent->GetZoneMixerIndexInputFlag = false;
     }
 
     // Find the correct MixerNumber

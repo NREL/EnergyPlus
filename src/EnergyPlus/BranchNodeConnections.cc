@@ -252,6 +252,50 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
     }
 }
 
+void OverrideNodeConnectionStream(EnergyPlusData &state,
+                                  int const NodeNumber,              // Number for this Node
+                                  std::string const &NodeName,       // Name of this Node
+                                  std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                  std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
+                                  std::string const &ConnectionType, // Connection Type for this Node (must be valid)
+                                  NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                                  bool const IsParent,                                 // True when node is a parent node
+                                  bool &errFlag // Will be True if errors already detected or if errors found here
+)
+{
+    // PURPOSE:
+    // This subroutine modifies an existing node connection in the Node Connection data structure.  This
+    // structure is intended to help with HVAC diagramming as well as validation of nodes. This function
+    // is a based on RegisterNodeConnection.
+
+    static constexpr std::string_view RoutineName("ModifyNodeConnectionStream: ");
+
+    if (!IsValidConnectionType(ConnectionType)) {
+        ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
+        ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+        errFlag = true;
+    }
+
+    int Found = 0;
+    for (int Count = 1; Count <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Count) {
+        if (state.dataBranchNodeConnections->NodeConnections(Count).NodeNumber != NodeNumber) continue;
+        if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectType, ObjectType)) continue;
+        if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectName, ObjectName)) continue;
+        if (state.dataBranchNodeConnections->NodeConnections(Count).ConnectionType != ConnectionType) continue;
+        if ((state.dataBranchNodeConnections->NodeConnections(Count).ObjectIsParent != IsParent)) continue;
+        Found = Count;
+        break;
+    }
+
+    if (Found > 0) {
+        state.dataBranchNodeConnections->NodeConnections(Found).FluidStream = FluidStream;
+    } else {
+        ShowSevereError(state, format("{}{}", RoutineName, "Existing node connection not found."));
+        ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+        errFlag = true;
+    }
+}
+
 bool IsValidConnectionType(std::string_view ConnectionType)
 {
 

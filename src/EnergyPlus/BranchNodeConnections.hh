@@ -90,6 +90,17 @@ namespace BranchNodeConnections {
                                     bool &errFlag                                  // Will be True if errors already detected or if errors found here
     );
 
+    void OverrideNodeConnectionStream(EnergyPlusData &state,
+                                      int NodeNumber,                    // Number for this Node
+                                      std::string const &NodeName,       // Name of this Node
+                                      std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                      std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
+                                      std::string const &ConnectionType, // Connection Type for this Node (must be valid)
+                                      NodeInputManager::compFluidStream FluidStream, // Count on Fluid Streams
+                                      bool IsParent,                                 // True when node is a parent node
+                                      bool &errFlag // Will be True if errors already detected or if errors found here
+    );
+
     bool IsValidConnectionType(std::string_view ConnectionType);
 
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);

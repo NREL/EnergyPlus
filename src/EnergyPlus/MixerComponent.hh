@@ -157,7 +157,6 @@ struct MixerComponentData : BaseGlobalStruct
     int NumMixers = 0;
     int LoopInletNode = 0;
     int LoopOutletNode = 0;
-    bool SimAirMixerInputFlag = true;
     bool GetZoneMixerIndexInputFlag = true;
     Array1D_bool CheckEquipName;
     EPVector<MixerComponent::MixerConditions> MixerCond;
@@ -168,7 +167,6 @@ struct MixerComponentData : BaseGlobalStruct
         this->LoopInletNode = 0;
         this->LoopOutletNode = 0;
         this->GetZoneMixerIndexInputFlag = true;
-        this->SimAirMixerInputFlag = true;
         this->CheckEquipName.deallocate();
         this->MixerCond.deallocate();
     }

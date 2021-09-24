@@ -391,6 +391,22 @@ namespace HVACSingleDuctInduc {
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + " = " + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
                 ErrorsFound = true;
+            } else {
+                // Reset fluid stream number for induce air node on the zone mixer
+                static constexpr std::string_view zoneMixerObjType = "AirloopHVAC:ZoneMixer";
+                int const coolingCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(
+                    state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil, ErrorsFound);
+                if (coolingCoilOutletNodeNum > 0) {
+                    BranchNodeConnections::OverrideNodeConnectionStream(state,
+                                                                        coolingCoilOutletNodeNum,
+                                                                        state.dataLoopNodes->NodeID(coolingCoilOutletNodeNum),
+                                                                        static_cast<std::string>(zoneMixerObjType),
+                                                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName,
+                                                                        DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
+                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                        ObjectIsNotParent,
+                                                                        ErrorsFound);
+                }
             }
 
             // Add heating coil to component sets array
