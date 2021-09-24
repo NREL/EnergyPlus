@@ -356,7 +356,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     GetZoneAirLoopEquipment(*state);
     UnitarySystems::UnitarySys thisSys;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
-    bool firstHVACIteration = false;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -376,8 +375,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     Real64 HVACInletMassFlowRate(0.0);
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
     int ZoneNum(1);
@@ -729,11 +726,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
     Real64 ATMixerOutletMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
@@ -1086,11 +1080,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     Real64 HVACInletMassFlowRate(0.0);
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
@@ -1522,11 +1513,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
     Real64 ATMixerOutletMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({

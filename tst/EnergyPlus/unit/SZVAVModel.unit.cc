@@ -283,12 +283,6 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     int AirLoopNum = 1;
     Real64 PLR = 0.0;
     int CompressorOnFlag = 1;
-    bool ErrorsFound(false);
-    Real64 HVACInletMassFlowRate(0.0);
-    Real64 PrimaryAirMassFlowRate(0.0);
-    Real64 LatOutputProvided(0.0);
-    Real64 QUnitOut(0.0);
-    int ZoneNum(1);
     state->dataGlobal->BeginEnvrnFlag = true;
 
     auto &SZVAVModel(thisUnit);
@@ -372,7 +366,6 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     EXPECT_LT(state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp, state->dataLoopNodes->Node(1).Temp);       // active cooling
 
     AirMassFlow = state->dataLoopNodes->Node(thisUnit.AirOutNode).MassFlowRate;
-    Real64 saveLastAirFlow = AirMassFlow;
     MinHumRat = min(state->dataLoopNodes->Node(thisUnit.AirOutNode).HumRat, state->dataLoopNodes->Node(thisUnit.AirInNode).HumRat);
     OutletTemp = state->dataLoopNodes->Node(thisUnit.AirOutNode).Temp;
     InletTemp = state->dataLoopNodes->Node(thisUnit.AirInNode).Temp;

@@ -456,6 +456,8 @@ namespace UnitarySystems {
             case SysType::PackagedWSHP:
                 thisObjectType = DataZoneEquipment::PkgTermHPWaterToAir_Num;
                 break;
+            default:
+                break;
             }
             if (this->m_ZoneCompFlag) {
                 state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).AvailManagerListName =
@@ -2005,6 +2007,7 @@ namespace UnitarySystems {
                 break;
             case SysType::CoilCoolingDX:
             case SysType::CoilCoolingWater:
+            default:
                 break;
             }
         }
@@ -3031,8 +3034,16 @@ namespace UnitarySystems {
         if (this->m_SuppCoilExists) {
 
             switch (this->m_sysType) {
+            case SysType::Unitary:
+            case SysType::CoilCoolingDX:
+            case SysType::CoilCoolingWater:
+            case SysType::PackagedAC:
+                break;
             case SysType::PackagedHP:
                 if (this->m_HVACSizingIndex <= 0) EqSizing.HeatingCapacity = false; // ensure PTHP supplemental heating coil sizes to load
+                break;
+            case SysType::PackagedWSHP:
+            default:
                 break;
             }
             SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
@@ -3445,7 +3456,6 @@ namespace UnitarySystems {
             this->m_HeatRecActive = true;
         }
 
-        int mixerIndex = 0;
         errFlag = false;
         if (!input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty()) {
             this->OAMixerIndex = MixedAir::GetOAMixerIndex(state, input_data.oa_mixer_name);
@@ -3469,8 +3479,8 @@ namespace UnitarySystems {
                     this->m_OAMixerNodes[3] = OANodeNums(4); // mixed
                 }
             }
-        } else if (input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty() ||
-                   !input_data.oa_mixer_type.empty() && input_data.oa_mixer_name.empty()) {
+        } else if ((input_data.oa_mixer_type.empty() && !input_data.oa_mixer_name.empty()) ||
+                   (!input_data.oa_mixer_type.empty() && input_data.oa_mixer_name.empty())) {
             ShowSevereError(state, "Missing one of " + cCurrentModuleObject + " Outdoor Air Mixer inputs.");
             ShowContinueError(state, "..OutdoorAir:Mixer type = " + original_input_specs.oa_mixer_type);
             ShowContinueError(state, "..OutdoorAir:Mixer name = " + original_input_specs.oa_mixer_name);
@@ -7688,10 +7698,10 @@ namespace UnitarySystems {
                     }
                     // is this correct? unit test failure. If PTAC input is missing?
                     // PTACDrawAirfromReturnNodeAndPlenum_Test
-                    //if (fields.find("minimum_supply_air_temperature_in_cooling_mode") == fields.end()) { // not input
+                    // if (fields.find("minimum_supply_air_temperature_in_cooling_mode") == fields.end()) { // not input
                     //    original_input_specs.minimum_supply_air_temperature = -99.0;
                     //}
-                    //if (fields.find("maximum_supply_air_temperature_in_heating_mode") == fields.end()) { // not input
+                    // if (fields.find("maximum_supply_air_temperature_in_heating_mode") == fields.end()) { // not input
                     //    original_input_specs.maximum_supply_air_temperature = 50.0;
                     //}
                     // need to check all defaults past field 18 for PTAC
@@ -7908,7 +7918,6 @@ namespace UnitarySystems {
 
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
-        int numZoneUnitary = 0;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
@@ -11390,7 +11399,6 @@ namespace UnitarySystems {
         // Calculate the air flow rate based on initializations.
 
         Real64 AverageUnitMassFlow = 0.0; // average supply air mass flow rate over time step
-        Real64 AverageOAMassFlow = 0.0;
         bool FanOn = false;
 
         state.dataUnitarySystems->m_runTimeFraction1 = 0.0;
@@ -11461,7 +11469,7 @@ namespace UnitarySystems {
 
             state.dataLoopNodes->Node(this->m_OAMixerNodes[0]).MassFlowRate = AverageOAMassFlow;
             state.dataLoopNodes->Node(this->m_OAMixerNodes[0]).MassFlowRateMaxAvail = AverageOAMassFlow;
-            // don't need to set relief node, delete then when working
+            // don't need to set relief node, delete them when working
             state.dataLoopNodes->Node(this->m_OAMixerNodes[1]).MassFlowRate = AverageOAMassFlow;
             state.dataLoopNodes->Node(this->m_OAMixerNodes[1]).MassFlowRateMaxAvail = AverageOAMassFlow;
         }
@@ -15708,12 +15716,12 @@ namespace UnitarySystems {
         }
         // Issue 9093.
         // PTHP reports these differently, seems this is correct. Can't change this now, need an issue to resolve
-        //state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
-        //state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
-        //state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOutNoATM));
-        //state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOutNoATM));
-        //state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
-        //state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
+        // state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
+        // state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
+        // state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOutNoATM));
+        // state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOutNoATM));
+        // state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
+        // state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
 
         this->m_TotHeatEnergy = m_TotHeatEnergyRate * ReportingConstant;
         this->m_TotCoolEnergy = m_TotCoolEnergyRate * ReportingConstant;
