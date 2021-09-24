@@ -377,7 +377,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     Real64 SecondaryAirMassFlowRate(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({

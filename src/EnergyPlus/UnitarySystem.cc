@@ -441,7 +441,8 @@ namespace UnitarySystems {
             state.dataUnitarySystems->myOneTimeFlag = false;
         }
 
-        if (this->m_IsZoneEquipment && !state.dataHVACGlobal->ZoneComp.empty()) {
+        // only access for zone equipment, UnitaySystem does not yet have input for Availability Manager List Name
+        if (this->m_IsZoneEquipment && this->m_sysType > SysType::CoilCoolingWater && !state.dataHVACGlobal->ZoneComp.empty()) {
             // need to move to better location and save thisObjectIndex and thisObjectType in struct
             // this->m_EquipCompNum is by parent type, not total UnitarySystems
             // e.g., PTAC = 1,2,3; PTHP = 1,2; PTWSHP = 1,2,3,4; UnitarySystems = 9 total
@@ -541,65 +542,72 @@ namespace UnitarySystems {
         }
 
         if (this->m_MyFanFlag) {
-            std::string FanType = ""; // used in warning messages
-            std::string FanName = ""; // used in warning messages
-            if (this->m_ActualFanVolFlowRate != DataSizing::AutoSize) {
-                if (this->m_ActualFanVolFlowRate > 0.0) {
-                    this->m_HeatingFanSpeedRatio = this->m_MaxHeatAirVolFlow / this->m_ActualFanVolFlowRate;
-                    this->m_CoolingFanSpeedRatio = this->m_MaxCoolAirVolFlow / this->m_ActualFanVolFlowRate;
-                    this->m_NoHeatCoolSpeedRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
-                    if (this->m_FanExists && !this->m_MultiOrVarSpeedHeatCoil && !this->m_MultiOrVarSpeedCoolCoil) {
-                        bool fanHasPowerSpeedRatioCurve = false;
-                        if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            if (state.dataHVACFan->fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0)
-                                fanHasPowerSpeedRatioCurve = true;
-                            FanType = "Fan:SystemModel";
-                            FanName = this->m_FanName;
-                        } else {
-                            if (Fans::GetFanSpeedRatioCurveIndex(state, FanType, FanName, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
-                        }
-                        if (fanHasPowerSpeedRatioCurve) {
+            if (!state.dataGlobal->SysSizingCalc) {
+                std::string FanType = ""; // used in warning messages
+                std::string FanName = ""; // used in warning messages
+                if (this->m_ActualFanVolFlowRate != DataSizing::AutoSize) {
+                    if (this->m_ActualFanVolFlowRate > 0.0) {
+                        this->m_HeatingFanSpeedRatio = this->m_MaxHeatAirVolFlow / this->m_ActualFanVolFlowRate;
+                        this->m_CoolingFanSpeedRatio = this->m_MaxCoolAirVolFlow / this->m_ActualFanVolFlowRate;
+                        this->m_NoHeatCoolSpeedRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
+                        if (this->m_FanExists && !this->m_MultiOrVarSpeedHeatCoil && !this->m_MultiOrVarSpeedCoolCoil) {
+                            bool fanHasPowerSpeedRatioCurve = false;
+                            if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                                if (state.dataHVACFan->fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0)
+                                    fanHasPowerSpeedRatioCurve = true;
+                                FanType = "Fan:SystemModel";
+                                FanName = this->m_FanName;
+                            } else {
+                                if (Fans::GetFanSpeedRatioCurveIndex(state, FanType, FanName, this->m_FanIndex) > 0)
+                                    fanHasPowerSpeedRatioCurve = true;
+                            }
+                            if (fanHasPowerSpeedRatioCurve) {
 
-                            if (this->m_ActualFanVolFlowRate == this->m_MaxHeatAirVolFlow &&
-                                this->m_ActualFanVolFlowRate == this->m_MaxCoolAirVolFlow &&
-                                this->m_ActualFanVolFlowRate == this->m_MaxNoCoolHeatAirVolFlow) {
-                                ShowWarningError(state, this->UnitType + " \"" + this->Name + "\"");
-                                ShowContinueError(state, "...For fan type and name = " + FanType + " \"" + FanName + "\"");
-                                ShowContinueError(state,
-                                                  "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the "
-                                                  "same as the unitary system volumetric flow rate.");
-                                ShowContinueError(state,
-                                                  format("...Fan volumetric flow rate            = {:.5R} m3/s.", this->m_ActualFanVolFlowRate));
-                                ShowContinueError(state, format("...Unitary system volumetric flow rate = {:.5R} m3/s.", this->m_MaxHeatAirVolFlow));
+                                if (this->m_ActualFanVolFlowRate == this->m_MaxHeatAirVolFlow &&
+                                    this->m_ActualFanVolFlowRate == this->m_MaxCoolAirVolFlow &&
+                                    this->m_ActualFanVolFlowRate == this->m_MaxNoCoolHeatAirVolFlow) {
+                                    ShowWarningError(state, this->UnitType + " \"" + this->Name + "\"");
+                                    ShowContinueError(state, "...For fan type and name = " + FanType + " \"" + FanName + "\"");
+                                    ShowContinueError(
+                                        state,
+                                        "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the "
+                                        "same as the unitary system volumetric flow rate.");
+                                    ShowContinueError(state,
+                                                      format("...Fan volumetric flow rate            = {:.5R} m3/s.", this->m_ActualFanVolFlowRate));
+                                    ShowContinueError(state,
+                                                      format("...Unitary system volumetric flow rate = {:.5R} m3/s.", this->m_MaxHeatAirVolFlow));
+                                }
                             }
+                        }
+                        if (this->m_MultiOrVarSpeedHeatCoil || this->m_MultiOrVarSpeedCoolCoil) {
+                            if (this->m_MultiOrVarSpeedCoolCoil) {
+                                int NumSpeeds = this->m_NumOfSpeedCooling;
+                                if (this->m_MSCoolingSpeedRatio.empty()) this->m_MSCoolingSpeedRatio.resize(NumSpeeds + 1);
+                                if (this->m_CoolVolumeFlowRate.empty()) this->m_CoolVolumeFlowRate.resize(NumSpeeds + 1);
+                                for (int Iter = 1; Iter <= NumSpeeds; ++Iter) {
+                                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_ActualFanVolFlowRate;
+                                }
+                            }
+                            if (this->m_MultiOrVarSpeedHeatCoil) {
+                                int NumSpeeds = this->m_NumOfSpeedHeating;
+                                if (this->m_MSHeatingSpeedRatio.empty()) this->m_MSHeatingSpeedRatio.resize(NumSpeeds + 1);
+                                if (this->m_HeatVolumeFlowRate.empty()) this->m_HeatVolumeFlowRate.resize(NumSpeeds + 1);
+                                for (int Iter = 1; Iter <= NumSpeeds; ++Iter) {
+                                    this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_ActualFanVolFlowRate;
+                                }
+                            }
+                            this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
                         }
                     }
-                    if (this->m_MultiOrVarSpeedHeatCoil || this->m_MultiOrVarSpeedCoolCoil) {
-                        if (this->m_MultiOrVarSpeedCoolCoil) {
-                            int NumSpeeds = this->m_NumOfSpeedCooling;
-                            if (this->m_MSCoolingSpeedRatio.empty()) this->m_MSCoolingSpeedRatio.resize(NumSpeeds);
-                            for (int Iter = 1; Iter <= NumSpeeds; ++Iter) {
-                                this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_ActualFanVolFlowRate;
-                            }
+                    this->m_MyFanFlag = false;
+                } else {
+                    if (this->m_FanExists) {
+                        if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                            this->m_ActualFanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
+                        } else {
+                            this->m_ActualFanVolFlowRate =
+                                Fans::GetFanDesignVolumeFlowRate(state, blankString, blankString, errorsFound, this->m_FanIndex);
                         }
-                        if (this->m_MultiOrVarSpeedHeatCoil) {
-                            int NumSpeeds = this->m_NumOfSpeedHeating;
-                            if (this->m_MSHeatingSpeedRatio.empty()) this->m_MSHeatingSpeedRatio.resize(NumSpeeds);
-                            for (int Iter = 1; Iter <= NumSpeeds; ++Iter) {
-                                this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_ActualFanVolFlowRate;
-                            }
-                        }
-                        this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
-                    }
-                }
-                this->m_MyFanFlag = false;
-            } else {
-                if (this->m_FanExists) {
-                    if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        this->m_ActualFanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
-                    } else {
-                        this->m_ActualFanVolFlowRate =
-                            Fans::GetFanDesignVolumeFlowRate(state, blankString, blankString, errorsFound, this->m_FanIndex);
                     }
                 }
             }
@@ -1972,6 +1980,7 @@ namespace UnitarySystems {
             state.dataSize->DataIsDXCoil = false;
             state.dataSize->DataTotCapCurveIndex = 0;
             state.dataSize->DataFlowUsedForSizing = 0.0;
+            if (this->m_sysType == SysType::PackagedAC) EqSizing.HeatingCapacity = false;
         }
 
         // STEP 3: use the greater of cooling and heating air flow rates for system flow
@@ -2861,8 +2870,13 @@ namespace UnitarySystems {
             this->m_LatLoadLoss = 0.0;
         }
 
-        if (this->m_sysType >= SysType::PackagedAC) {
+        switch (this->m_sysType) {
+        case SysType::PackagedAC:
+        case SysType::PackagedHP:
             PrintFlag = false;
+            break;
+        default:
+            break;
         }
         if (this->m_CoolCoilExists) {
 
@@ -3236,6 +3250,9 @@ namespace UnitarySystems {
         sysNum = getUnitarySystemIndex(state, thisObjectName);
         this->m_UnitarySysNum = sysNum;
 
+        if (ZoneEquipment) {
+            this->m_IsZoneEquipment = true;
+        }
         std::string loc_AirInNodeName = input_data.air_inlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag) {
             this->AirInNode = NodeInputManager::GetOnlySingleNode(state,
@@ -3881,7 +3898,6 @@ namespace UnitarySystems {
             } else if (ZoneEquipmentFound) {
                 this->m_OKToPrintSizing = true;
                 this->m_ThisSysInputShouldBeGotten = false;
-                this->m_IsZoneEquipment = true;
             } else if (OASysFound) {
                 this->m_OKToPrintSizing = true;
                 this->m_ThisSysInputShouldBeGotten = false;
@@ -7423,6 +7439,17 @@ namespace UnitarySystems {
                 }
             }
         }
+        // zone coils are now simulated before sizing is complete
+        if (this->m_MultiOrVarSpeedCoolCoil) {
+            this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+            this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+            this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling + 1);
+        }
+        if (this->m_MultiOrVarSpeedHeatCoil) {
+            this->m_HeatVolumeFlowRate.resize(this->m_NumOfSpeedHeating + 1);
+            this->m_HeatMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+            this->m_MSHeatingSpeedRatio.resize(this->m_NumOfSpeedHeating + 1);
+        }
 
         // check for specific input requirements for ASHRAE90.1 model
         if (this->m_ControlType == ControlType::CCMASHRAE) {
@@ -7918,6 +7945,7 @@ namespace UnitarySystems {
 
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
+        int zoneUnitaryNum = 0;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
@@ -8163,6 +8191,10 @@ namespace UnitarySystems {
 
                 if (sysNum == -1) {
                     ++thisSys.m_UnitarySysNum;
+                    if (ZoneEquipment) {
+                        ++zoneUnitaryNum;
+                        thisSys.m_EquipCompNum = zoneUnitaryNum;
+                    }
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
                 } else {

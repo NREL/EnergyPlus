@@ -578,10 +578,6 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_NEAR(state->dataFans->Fan(1).MaxAirFlowRate, maxCoilAirFlow, 0.000001);
     EXPECT_NEAR(state->dataFans->Fan(1).MaxAirFlowRate, max(thisSys.m_MaxCoolAirVolFlow, thisSys.m_MaxHeatAirVolFlow), 0.000001);
 
-    // Initialize the packaged terminal heat pump
-    Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
-    Real64 ZoneLoad(0.0);          // cooling or heating needed by zone [watts]
-
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
     thisSys.initUnitarySystems(*state, 0, firstHVACIteration, 0, 0.0);
@@ -619,11 +615,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     bool FirstHVACIteration(false);
     Real64 HVACInletMassFlowRate(0.0);
     Real64 PrimaryAirMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(0);
 
     std::string const idf_objects = delimited_string({
@@ -968,11 +961,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
     Real64 HVACInletMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(0);
 
     std::string const idf_objects = delimited_string({
