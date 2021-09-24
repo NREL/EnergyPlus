@@ -2284,7 +2284,9 @@ DO iBox = 1,lastBox !counter just to leave if stuck in loop
     IF (dumpDetails) THEN
       WRITE(UNIT=30, FMT="(A,A)") "Processing dangling origin box: ",box(originBoxOfDangling)%objName
     END IF
-    CALL OrganizeDanglingSubDiagram(originBoxOfDangling)
+    ! Treat dangling origins like any other to support air loops with no return
+    ! CALL OrganizeDanglingSubDiagram(originBoxOfDangling)
+    CALL OrganizeSubDiagram(originBoxOfDangling)
     CALL RowColIntoXY(lastSubDiagram)
   ELSE
     EXIT
@@ -2496,16 +2498,11 @@ DO
       CALL AssignBoxToGrid(curBox)
       nextBox = getFirstDescendantOf(curBox)
       IF (nextBox .EQ. 0) THEN
-        errorFoundInDrawing = .TRUE.
         IF (dumpDetails) THEN
-          WRITE(UNIT=30, FMT="(A)")  "Error: No node connection found after the following object: " // TRIM(box(curBox)%ObjName)
+          WRITE(UNIT=30, FMT="(A)")  "OrganizeSubDiagram: No node connection found after the following object, continuing: " // TRIM(box(curBox)%ObjName)
         END IF
-        lastErrorMessage = 'Error: No node connection found after the following object: ' // box(curBox)%ObjName
-        CALL LocateSubDiagrams
-        CALL InterSubDiagramLinks
-        CALL LocateConnectors
-        CALL WriteSVG
-        STOP
+        subDiagram(lastSubDiagram)%FinalBox = curBox
+        CYCLE
       END IF
       IF (nextBox .EQ. originBox) THEN
         subDiagram(lastSubDiagram)%FinalBox = curBox
@@ -2517,6 +2514,9 @@ DO
       END IF
       CALL pushBoxOnStack(nextBox)
     CASE (flagSplitter)
+      IF (dumpDetails) THEN
+        WRITE(UNIT=30, FMT="(A)")  "OrganizeSubDiagram: Box=" // TRIM(box(curBox)%ObjName) // " is a splitter."
+      END IF
       CALL AssignBoxToGrid(curBox)
       ! for splitters must make the top descendant
       ! the next box but for the rest, need to
@@ -3855,7 +3855,7 @@ INTEGER :: iDiagram
 DO iDiagram = 1, lastSubDiagram
   originBox = subDiagram(iDiagram)%RootBox
   endBox = subDiagram(iDiagram)%FinalBox
-  IF ((endBox .GT.0) .AND. (originBox .NE. endBox)) THEN
+  IF ((endBox .GT.0) .AND. (originBox .NE. endBox) .AND. (getFirstDescendantOf(endBox) .GT. 0)) THEN
     subDiagram(iDiagram)%drawBridge = .TRUE.
     ! make sure no direct line is drawn
     !CALL eraseConnection(originBox,endBox)
