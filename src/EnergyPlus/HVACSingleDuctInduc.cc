@@ -323,7 +323,7 @@ namespace HVACSingleDuctInduc {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                           NodeInputManager::compFluidStream::Secondary,
                                                                                            ObjectIsParent,
                                                                                            cAlphaFields(4));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode = GetOnlySingleNode(state,

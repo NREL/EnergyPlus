@@ -2162,7 +2162,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                                  AlphArray(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::compFluidStream::Secondary,
                                                                                  ObjectIsNotParent);
             state.dataMixedAir->OAMixer(OutAirNum).RelNode = GetOnlySingleNode(state,
                                                                                AlphArray(4),
@@ -2171,7 +2171,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::NodeConnectionType::ReliefAir,
-                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                               NodeInputManager::compFluidStream::Tertiary,
                                                                                ObjectIsNotParent);
             state.dataMixedAir->OAMixer(OutAirNum).RetNode = GetOnlySingleNode(state,
                                                                                AlphArray(5),

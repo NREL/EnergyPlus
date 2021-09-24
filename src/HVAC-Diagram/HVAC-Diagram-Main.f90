@@ -563,13 +563,6 @@ DO WHILE (status /= eof)
         ELSE
           bndContZoneInlet(lastBndContZoneInlet)%isDefinedSDSysCool = .FALSE.
         END IF
-! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>
-      CASE ('CONTROLLED ZONE EXHAUST')
-        CALL incrementContZoneExhaust
-        bndContZoneExhaust(lastBndContZoneExhaust)%ZoneName = words(3)
-        bndContZoneExhaust(lastBndContZoneExhaust)%ExhaustNodeID = words(4)
-        !set node number
-        bndContZoneExhaust(lastBndContZoneExhaust)%ExhaustNodeNum = LookupNodeNumber(words(4))
 ! <Controlled Zone Return>,<Return Node Count>,<Controlled Zone Name>,<Return Air Node Name>,<Airloop Number>
       CASE ('CONTROLLED ZONE RETURN')
         CALL incrementContZoneReturn
@@ -578,6 +571,13 @@ DO WHILE (status /= eof)
         bndContZoneReturn(lastBndContZoneReturn)%AirloopNum = ConvertTextToInteger(words(5))
         !set node number
         bndContZoneReturn(lastBndContZoneReturn)%ReturnNodeNum = LookupNodeNumber(words(4))
+! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>
+      CASE ('CONTROLLED ZONE EXHAUST')
+        CALL incrementContZoneExhaust
+        bndContZoneExhaust(lastBndContZoneExhaust)%ZoneName = words(3)
+        bndContZoneExhaust(lastBndContZoneExhaust)%ExhaustNodeID = words(4)
+        !set node number
+        bndContZoneExhaust(lastBndContZoneExhaust)%ExhaustNodeNum = LookupNodeNumber(words(4))
 ! not used
       CASE ('#AIRLOOPHVACS')
       CASE ('#BRANCH LISTS')
@@ -909,7 +909,7 @@ DO iNodeConnect = 1, lastBndNodeConnect
           EXIT
         END IF
       END DO
-      !now look through the Controlled Zone Inlet to match up the zoneexhaust node
+      !now look through the Controlled Zone Inlet to match up the zonereturn node
       !with the inlet of some type of zone equipment
       curZoneName = bndNodeConnect(iNodeConnect)%ObjectID
       !For return nodes, set the fluid stream value = to airloopnum
@@ -997,6 +997,9 @@ DO kContZoneInlet = 1, lastBndContZoneInlet
             IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. bndNodeConnect(foundZoneInletNodeConnect)%NodeNum) THEN
               IF (bndNodeConnect(jNodeConnect)%ConnectTypeNum .EQ. NodeConnect_Inlet) THEN
                 isUniqueInlet = .FALSE.
+                IF (dumpDetails) THEN
+                  WRITE(UNIT=30, FMT="(A)") "    SetZoneInletsOutlets: Zone inlet node is not unique inlet: " // TRIM(bndNodeConnect(foundZoneInletNodeConnect)%NodeID)
+                END IF
               END IF
             END IF
           END IF
@@ -1045,6 +1048,9 @@ DO iNodeConnect = 1, lastBndNodeConnect
       !with the inlet of some type of zone equipment
       curExhaustNode = bndNodeConnect(iNodeConnect)%NodeNum
       foundEquipInletNodeConnect = 0
+      IF (dumpDetails) THEN
+        WRITE(UNIT=30, FMT="(A)") "    SetZoneInletsOutlets: Working on zone exhaust node: " // TRIM(bndNodeConnect(iNodeConnect)%NodeID)
+      END IF
       DO jNodeConnect = 1, lastBndNodeConnect
         IF (bndNodeConnect(jNodeConnect)%isParent) THEN
           IF (bndNodeConnect(jNodeConnect)%ConnectTypeNum .EQ. NodeConnect_Inlet) THEN
@@ -1057,6 +1063,21 @@ DO iNodeConnect = 1, lastBndNodeConnect
         END IF
       END DO
       IF (foundEquipInletNodeConnect .GT. 0) THEN
+        !First the zone outlet
+        !Create a new fluid stream value for this nodeConnection
+        nextFluidStream = nextFluidStream + 1
+        CALL incrementNodeConnection
+        bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
+        bndNodeConnect(lastBndNodeConnect)%NodeID = bndNodeConnect(iNodeConnect)%NodeID
+        bndNodeConnect(lastBndNodeConnect)%ObjectType = bndNodeConnect(iNodeConnect)%ObjectType
+        bndNodeConnect(lastBndNodeConnect)%ObjectID = bndNodeConnect(iNodeConnect)%ObjectID
+        bndNodeConnect(lastBndNodeConnect)%ConnectType = 'Outlet'
+        bndNodeConnect(lastBndNodeConnect)%FluidStream = nextFluidStream
+        bndNodeConnect(lastBndNodeConnect)%NodeNum = bndNodeConnect(iNodeConnect)%NodeNum
+        bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = NodeConnect_Outlet
+        bndNodeConnect(lastBndNodeConnect)%isOutlet = .TRUE.
+        bndNodeConnect(lastBndNodeConnect)%isExamined = .TRUE.
+
         !now that the equipment has been found scan for this equipment type but look for its
         !outlet node which will be the inlet node for the current zone
         foundEquipOutletNodeConnect = 0
@@ -1081,6 +1102,9 @@ DO iNodeConnect = 1, lastBndNodeConnect
               IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. bndNodeConnect(foundEquipOutletNodeConnect)%NodeNum) THEN
                 IF (bndNodeConnect(jNodeConnect)%ConnectTypeNum .EQ. NodeConnect_Inlet) THEN
                   isUniqueInlet = .FALSE.
+                  IF (dumpDetails) THEN
+                    WRITE(UNIT=30, FMT="(A)") "    SetZoneInletsOutlets: Zone inlet node is not unique inlet: " // TRIM(bndNodeConnect(foundZoneInletNodeConnect)%NodeID)
+                  END IF
                 END IF
               END IF
             END IF
@@ -1088,29 +1112,16 @@ DO iNodeConnect = 1, lastBndNodeConnect
           IF (isUniqueInlet) THEN
             !Now we have found the inlet and outlets for the zone equipment that serves the zone
             !create new items in the nodeConnect array that reflect this specific flow through the
-            !zone.  Create a new fluid stream value for this nodeConnection
-            nextFluidStream = nextFluidStream + 1
+            !zone.  
             !I'm messing with the nodeConnect array in a DO loop that examines the array. This
             !is usually not a good idea but I checked the CVF language reference manual (Sep 99) and
             !on page 7-19 it says that I can change the "terminal" value of a DO loop without causing
             !a problem.
             !
-            !First the zone outlet
-            CALL incrementNodeConnection
-            bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
-            bndNodeConnect(lastBndNodeConnect)%NodeID = bndNodeConnect(iNodeConnect)%NodeID
-            bndNodeConnect(lastBndNodeConnect)%ObjectType = bndNodeConnect(iNodeConnect)%ObjectType
-            bndNodeConnect(lastBndNodeConnect)%ObjectID = bndNodeConnect(iNodeConnect)%ObjectID
-            bndNodeConnect(lastBndNodeConnect)%ConnectType = 'Outlet'
-            bndNodeConnect(lastBndNodeConnect)%FluidStream = nextFluidStream
-            bndNodeConnect(lastBndNodeConnect)%NodeNum = bndNodeConnect(iNodeConnect)%NodeNum
-            bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = NodeConnect_Outlet
-            bndNodeConnect(lastBndNodeConnect)%isOutlet = .TRUE.
             ! to address CR6789 flags exhaust bndNodeConnects that have matching inlet so that ones
             ! that don't are not used in the Find Subdiagram Origins routine
             bndNodeConnect(lastBndNodeConnect)%isMatchedExhaust = .TRUE.
-            bndNodeConnect(lastBndNodeConnect)%isExamined = .TRUE.
-            !Next the zone inlet
+            !The zone inlet
             CALL incrementNodeConnection
             bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
             bndNodeConnect(lastBndNodeConnect)%NodeID = bndNodeConnect(foundEquipOutletNodeConnect)%NodeID
@@ -1130,6 +1141,8 @@ DO iNodeConnect = 1, lastBndNodeConnect
           END IF
           lastErrorMessage = "Equipment not found with outlet from equipment: " // TRIM(curEquipInlet%ObjectID)
         END IF
+          ! With no matching outlet, this node is not an origin node
+        bndNode(curExhaustNode)%mayUseAsOrigin = .FALSE.
       ELSE ! from (curEquip .GT. 0)
         PRINT "(A)","    ERROR: Equipment not found with inlet from node: " // TRIM(bndNode(curExhaustNode)%id)
         IF (dumpDetails) THEN
@@ -2176,7 +2189,7 @@ DO iContZoneExhaust = 1, lastBndContZoneExhaust
         IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. nodeForOrigin) THEN
           box(bndNodeConnect(jNodeConnect)%BoxNum)%isOrigin = .TRUE.
           IF (dumpDetails) THEN
-            WRITE(UNIT=30, FMT="(A,A,A,I4,A,I4,A)") " Found zone equipment origin: " , TRIM(box(bndNodeConnect(jNodeConnect)%BoxNum)%ObjName),"(", &
+            WRITE(UNIT=30, FMT="(A,A,A,I4,A,I4,A)") " Found possible zone equipment origin: " , TRIM(box(bndNodeConnect(jNodeConnect)%BoxNum)%ObjName),"(", &
                           bndNodeConnect(jNodeConnect)%BoxNum," <- ",jNodeConnect,")"
           END IF
         END IF
