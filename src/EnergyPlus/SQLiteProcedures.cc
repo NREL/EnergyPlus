@@ -991,14 +991,14 @@ void SQLite::initializeDaylightMapTables()
 {
     const std::string daylightMapsTableSQL = "CREATE TABLE DaylightMaps ( "
                                              "MapNumber INTEGER PRIMARY KEY, MapName TEXT, "
-                                             "Environment TEXT, Zone INTEGER, ReferencePt1 TEXT, ReferencePt2 TEXT, Z REAL, "
+                                             "Environment TEXT, Zone INTEGER, ReferencePts TEXT, Z REAL, "
                                              "FOREIGN KEY(Zone) REFERENCES Zones(ZoneIndex) "
                                              "ON DELETE CASCADE ON UPDATE CASCADE "
                                              ");";
 
     sqliteExecuteCommand(daylightMapsTableSQL);
 
-    const std::string daylightMapTitleInsertSQL = "INSERT INTO DaylightMaps VALUES(?,?,?,?,?,?,?);";
+    const std::string daylightMapTitleInsertSQL = "INSERT INTO DaylightMaps VALUES(?,?,?,?,?,?);";
 
     sqlitePrepareStatement(m_daylightMapTitleInsertStmt, daylightMapTitleInsertSQL);
 
