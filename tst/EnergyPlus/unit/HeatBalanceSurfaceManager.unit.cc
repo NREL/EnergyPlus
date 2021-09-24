@@ -355,11 +355,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     UpdateThermalHistories(*state); // First check to see if it is calculating the user location temperature properly
 
     EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTempUserLoc(1));
-    EXPECT_EQ(0.0, state->dataHeatBalSurf->TuserHist(1, 3));
+    EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfTuserHist(1, 3));
 
     UpdateThermalHistories(*state);
 
-    EXPECT_EQ(12.5, state->dataHeatBalSurf->TuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
+    EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfAirRefT)
