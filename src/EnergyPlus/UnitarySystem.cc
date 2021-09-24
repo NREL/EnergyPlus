@@ -7439,7 +7439,7 @@ namespace UnitarySystems {
                 }
             }
         }
-        // zone coils are now simulated before sizing is complete
+        // zone coils are now simulated before sizing is complete, data will not be available but array is allocated
         if (this->m_MultiOrVarSpeedCoolCoil) {
             this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
             this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
@@ -7447,7 +7447,7 @@ namespace UnitarySystems {
         }
         if (this->m_MultiOrVarSpeedHeatCoil) {
             this->m_HeatVolumeFlowRate.resize(this->m_NumOfSpeedHeating + 1);
-            this->m_HeatMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+            this->m_HeatMassFlowRate.resize(this->m_NumOfSpeedHeating + 1);
             this->m_MSHeatingSpeedRatio.resize(this->m_NumOfSpeedHeating + 1);
         }
 
