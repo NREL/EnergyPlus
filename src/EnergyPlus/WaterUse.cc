@@ -1117,8 +1117,8 @@ namespace WaterUse {
                 // There is no hot water
                 this->HotMassFlowRate = 0.0;
 
-            } else if ((this->ColdTemp - this->HotTemp) > EPSILON) {
-                // Special case for HotTemp < ColdTemp, due to bad user input (could happen in a plant loop accidentally)
+            } else if (this->ColdTemp > (this->HotTemp + EPSILON)) { //(HWCWTempDiff > EPSILON) {
+                // Cold temp is hotter than the hot water temp; bad user input
                 TempDiff = this->ColdTemp - this->HotTemp;
                 this->HotMassFlowRate = 0;
                 if (!state.dataGlobal->WarmupFlag) {
@@ -1147,7 +1147,7 @@ namespace WaterUse {
                             TempDiff);
                     }
                 }
-            } else if ((this->TargetTemp - this->HotTemp) > EPSILON) {
+            } else if (this->TargetTemp > (this->HotTemp + EPSILON)) {
                 // Target temp is hotter than the hot water temp; can't meet target temperature
                 this->HotMassFlowRate = this->TotalMassFlowRate;
                 TempDiff = this->TargetTemp - this->HotTemp;
