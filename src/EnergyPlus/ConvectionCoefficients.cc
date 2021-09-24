@@ -256,6 +256,11 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     continue; // skip surfaces that are not associated with this zone
                 }
             }
+            auto &surface(Surface(SurfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (SurfNum != repSurfNum) continue;
+            }
 
             int algoNum;
             bool standardAlgo;
@@ -325,6 +330,11 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         for (int SurfNum = Zone(ZoneNum).WindowSurfaceFirst; SurfNum <= Zone(ZoneNum).WindowSurfaceLast; ++SurfNum) {
+            auto &surface(Surface(SurfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (SurfNum != repSurfNum) continue;
+            }
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                 state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
                     state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);

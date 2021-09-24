@@ -62,12 +62,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -297,26 +297,90 @@ namespace HVACMultiSpeedHeatPump {
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
         SaveMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 &&
-            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
-            // for cycling fan, cooling load, check whether furnace can meet load with compressor off
-            CompOp = Off;
-            ControlMSHPOutput(state,
-                              MSHeatPumpNum,
-                              FirstHVACIteration,
-                              CompOp,
-                              OpMode,
-                              QZnReq,
-                              ZoneNum,
-                              SpeedNum,
-                              SpeedRatio,
-                              PartLoadFrac,
-                              OnOffAirFlowRatio,
-                              SupHeaterLoad);
-            if (SpeedNum == MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling && SpeedRatio == 1.0) {
-                // compressor on (reset inlet air mass flow rate to starting value)
-                state.dataLoopNodes->Node(InletNode).MassFlowRate = SaveMassFlowRate;
-                CompOp = On;
+        if (MSHeatPump(MSHeatPumpNum).EMSOverrideCoilSpeedNumOn) {
+            Real64 SpeedVal = MSHeatPump(MSHeatPumpNum).EMSOverrideCoilSpeedNumValue;
+
+            if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 &&
+                state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
+                CompOp = Off;
+                ControlMSHPOutputEMS(state,
+                                     MSHeatPumpNum,
+                                     FirstHVACIteration,
+                                     CompOp,
+                                     OpMode,
+                                     QZnReq,
+                                     SpeedVal,
+                                     SpeedNum,
+                                     SpeedRatio,
+                                     PartLoadFrac,
+                                     OnOffAirFlowRatio,
+                                     SupHeaterLoad);
+                if (ceil(SpeedVal) == MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling && SpeedRatio == 1.0) {
+                    state.dataLoopNodes->Node(InletNode).MassFlowRate = SaveMassFlowRate;
+                    CompOp = On;
+                    ControlMSHPOutputEMS(state,
+                                         MSHeatPumpNum,
+                                         FirstHVACIteration,
+                                         CompOp,
+                                         OpMode,
+                                         QZnReq,
+                                         SpeedVal,
+                                         SpeedNum,
+                                         SpeedRatio,
+                                         PartLoadFrac,
+                                         OnOffAirFlowRatio,
+                                         SupHeaterLoad);
+                }
+            } else {
+                ControlMSHPOutputEMS(state,
+                                     MSHeatPumpNum,
+                                     FirstHVACIteration,
+                                     CompOp,
+                                     OpMode,
+                                     QZnReq,
+                                     SpeedVal,
+                                     SpeedNum,
+                                     SpeedRatio,
+                                     PartLoadFrac,
+                                     OnOffAirFlowRatio,
+                                     SupHeaterLoad);
+            }
+        } else {
+            if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 &&
+                state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
+                // for cycling fan, cooling load, check whether furnace can meet load with compressor off
+                CompOp = Off;
+                ControlMSHPOutput(state,
+                                  MSHeatPumpNum,
+                                  FirstHVACIteration,
+                                  CompOp,
+                                  OpMode,
+                                  QZnReq,
+                                  ZoneNum,
+                                  SpeedNum,
+                                  SpeedRatio,
+                                  PartLoadFrac,
+                                  OnOffAirFlowRatio,
+                                  SupHeaterLoad);
+                if (SpeedNum == MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling && SpeedRatio == 1.0) {
+                    // compressor on (reset inlet air mass flow rate to starting value)
+                    state.dataLoopNodes->Node(InletNode).MassFlowRate = SaveMassFlowRate;
+                    CompOp = On;
+                    ControlMSHPOutput(state,
+                                      MSHeatPumpNum,
+                                      FirstHVACIteration,
+                                      CompOp,
+                                      OpMode,
+                                      QZnReq,
+                                      ZoneNum,
+                                      SpeedNum,
+                                      SpeedRatio,
+                                      PartLoadFrac,
+                                      OnOffAirFlowRatio,
+                                      SupHeaterLoad);
+                }
+            } else {
+                // compressor on
                 ControlMSHPOutput(state,
                                   MSHeatPumpNum,
                                   FirstHVACIteration,
@@ -330,20 +394,6 @@ namespace HVACMultiSpeedHeatPump {
                                   OnOffAirFlowRatio,
                                   SupHeaterLoad);
             }
-        } else {
-            // compressor on
-            ControlMSHPOutput(state,
-                              MSHeatPumpNum,
-                              FirstHVACIteration,
-                              CompOp,
-                              OpMode,
-                              QZnReq,
-                              ZoneNum,
-                              SpeedNum,
-                              SpeedRatio,
-                              PartLoadFrac,
-                              OnOffAirFlowRatio,
-                              SupHeaterLoad);
         }
 
         if (MSHeatPump(MSHeatPumpNum).HeatCoilType != MultiSpeedHeatingCoil) {
@@ -1792,6 +1842,17 @@ namespace HVACMultiSpeedHeatPump {
                                     MSHeatPump(MSHPNum).Name);
             }
         }
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+            for (int coilNUM = 1; coilNUM <= int(state.dataHVACMultiSpdHP->MSHeatPump.size()); ++coilNUM) {
+                SetupEMSActuator(state,
+                                 "Coil Speed Control",
+                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).Name,
+                                 "Unitary System DX Coil Speed Value",
+                                 "[]",
+                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumOn,
+                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumValue);
+            }
+        }
     }
 
     //******************************************************************************
@@ -2955,6 +3016,178 @@ namespace HVACMultiSpeedHeatPump {
     }
 
     //******************************************************************************
+
+    void ControlMSHPOutputEMS(EnergyPlusData &state,
+                              int const MSHeatPumpNum,       // Unit index of engine driven heat pump
+                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                              int const CompOp,              // compressor operation; 1=on, 0=off
+                              int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                              Real64 const QZnReq,           // cooling or heating output needed by zone [W]
+                              Real64 const SpeedVal,         // continuous speed value
+                              int &SpeedNum,                 // discrete speed level
+                              Real64 &SpeedRatio,            // unit speed ratio for DX coils
+                              Real64 &PartLoadFrac,          // unit part load fraction
+                              Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 &SupHeaterLoad          // Supplemental heater load [W]
+
+    )
+    {
+        OnOffAirFlowRatio = 0.0;
+        SupHeaterLoad = 0.0;
+
+        auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
+
+        // Get EMS output
+        SpeedNum = ceil(SpeedVal);
+        bool useMaxedSpeed = false;
+        std::string useMaxedSpeedCoilName;
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
+            if (SpeedNum > MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating) {
+                SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
+                useMaxedSpeed = true;
+                useMaxedSpeedCoilName = MSHeatPump(MSHeatPumpNum).DXHeatCoilName;
+            }
+        } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
+            if (SpeedNum > MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling) {
+                SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
+                useMaxedSpeed = true;
+                useMaxedSpeedCoilName = MSHeatPump(MSHeatPumpNum).DXCoolCoilName;
+            }
+        }
+        if (useMaxedSpeed) {
+            MSHeatPump(MSHeatPumpNum).CoilSpeedErrIndex++;
+            ShowRecurringWarningErrorAtEnd(state,
+                                           "Wrong coil speed EMS override value, for unit=\"" + useMaxedSpeedCoilName +
+                                               "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
+                                           MSHeatPump(MSHeatPumpNum).CoilSpeedErrIndex,
+                                           SpeedVal,
+                                           SpeedVal,
+                                           _,
+                                           "",
+                                           "");
+        }
+        // Calculate TempOutput
+        Real64 TempOutput = 0.0; // unit output when iteration limit exceeded [W]
+
+        if (SpeedNum == 1) {
+            SpeedRatio = 0.0;
+            if (useMaxedSpeed || floor(SpeedVal) == SpeedVal) {
+                PartLoadFrac = 1;
+            } else {
+                PartLoadFrac = SpeedVal - floor(SpeedVal);
+            }
+            CalcMSHeatPump(state,
+                           MSHeatPumpNum,
+                           FirstHVACIteration,
+                           CompOp,
+                           SpeedNum,
+                           SpeedRatio,
+                           PartLoadFrac,
+                           TempOutput,
+                           QZnReq,
+                           OnOffAirFlowRatio,
+                           SupHeaterLoad);
+        } else {
+            PartLoadFrac = 0.0;
+            if (useMaxedSpeed || floor(SpeedVal) == SpeedVal) {
+                SpeedRatio = 1;
+            } else {
+                SpeedRatio = SpeedVal - floor(SpeedVal);
+            }
+            CalcMSHeatPump(state,
+                           MSHeatPumpNum,
+                           FirstHVACIteration,
+                           CompOp,
+                           SpeedNum,
+                           SpeedRatio,
+                           PartLoadFrac,
+                           TempOutput,
+                           QZnReq,
+                           OnOffAirFlowRatio,
+                           SupHeaterLoad);
+        }
+
+        ControlMSHPSupHeater(state,
+                             MSHeatPumpNum,
+                             FirstHVACIteration,
+                             CompOp,
+                             OpMode,
+                             QZnReq,
+                             TempOutput,
+                             SpeedNum,
+                             SpeedRatio,
+                             PartLoadFrac,
+                             OnOffAirFlowRatio,
+                             SupHeaterLoad);
+        state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHeatPumpNum).CycRatio = PartLoadFrac;
+        state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHeatPumpNum).SpeedRatio = SpeedRatio;
+        state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHeatPumpNum).SpeedNum = SpeedNum;
+    }
+
+    void ControlMSHPSupHeater(EnergyPlusData &state,
+                              int const MSHeatPumpNum,       // Unit index of engine driven heat pump
+                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                              int const CompOp,              // compressor operation; 1=on, 0=off
+                              int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                              Real64 const QZnReq,           // cooling or heating output needed by zone [W]
+                              int const EMSOutput,           // unit full output when compressor is operating [W]vvvv
+                              int const SpeedNum,            // Speed number
+                              Real64 SpeedRatio,             // unit speed ratio for DX coils
+                              Real64 PartLoadFrac,           // unit part load fraction
+                              Real64 OnOffAirFlowRatio,      // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 &SupHeaterLoad          // Supplemental heater load [W]
+
+    )
+    {
+        // if the DX heating coil cannot meet the load, trim with supplemental heater
+        // occurs with constant fan mode when compressor is on or off
+        // occurs with cycling fan mode when compressor PLR is equal to 1
+        auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
+
+        if ((QZnReq > SmallLoad && QZnReq > EMSOutput)) {
+            Real64 TempOutput;
+            if (state.dataEnvrn->OutDryBulbTemp <= MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp) {
+                SupHeaterLoad = QZnReq - EMSOutput;
+            } else {
+                SupHeaterLoad = 0.0;
+            }
+            CalcMSHeatPump(state,
+                           MSHeatPumpNum,
+                           FirstHVACIteration,
+                           CompOp,
+                           SpeedNum,
+                           SpeedRatio,
+                           PartLoadFrac,
+                           TempOutput,
+                           QZnReq,
+                           OnOffAirFlowRatio,
+                           SupHeaterLoad);
+        }
+
+        // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
+        if (state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp > MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp &&
+            SupHeaterLoad > 0.0) {
+
+            //   If the supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
+            SupHeaterLoad = 0.0;
+            Real64 QCoilActual; // coil load actually delivered returned to calling component
+            CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, OpMode, QCoilActual);
+
+            //   If the outlet temperature is below the maximum supplemental heater supply air temperature, reduce the load passed to
+            //   the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
+            //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
+            //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
+            if (state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp < MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp) {
+                Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).HumRat);
+                SupHeaterLoad =
+                    state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirInletNodeNum).MassFlowRate * CpAir *
+                    (MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp - state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp);
+
+            } else {
+                SupHeaterLoad = 0.0;
+            }
+        }
+    }
 
     void ControlMSHPOutput(EnergyPlusData &state,
                            int const MSHeatPumpNum,       // Unit index of engine driven heat pump

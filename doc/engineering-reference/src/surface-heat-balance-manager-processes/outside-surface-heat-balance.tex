@@ -645,6 +645,8 @@ The adaptive convection algorithm implemented in EnergyPlus for the outside face
 \bottomrule
 \end{longtable}}
 
+One slight difference in the Adaptive Convection Algorithm is the calculation of the perimeter used in the various components of the model.  In the TARP Algorithm, the perimeter is calculated by making an assumption that the surface is rectangular in shape.  However, when the Adaptive Convection Algorithm is utilized, a slightly more sophisticated perimeter calculation that is better able to handle non-rectangular surfaces is employed.  This slight difference in the perimeter calculation can result in differences between the TARP Algorithm and the Adaptive Convection Algorithm even when the options for the surface classifications noted above match the TARP Algorithm details.
+
 \paragraph{Outside Face Surface Classification}\label{outside-face-surface-classification}
 
 During an initial setup phase, all the heat transfer surfaces in the input file are analyzed in groups to determine appropriate values for geometry scales used in many of the convection correlations.~ Eight separate groups are assembled for nominally vertical exterior surfaces for eight bins of azimuth: north, northeast, east, southeast, south, southwest, west, northwest.~ Surfaces with the same range of azimuth are grouped together and analyzed for overall geometry parameters.~ A ninth group is assembled for nominally horizontal exterior surfaces for a roof bin that is also analyzed for geometry.~ These geometry routines find bounds and limits of all the surfaces in the group and then model geometric parameters from these limits.
