@@ -595,14 +595,15 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     // DIFF - comments for PTHP Variable Speed coil sizing
     // #6028 child components not sizing correctly on air flow rate
-    // VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and
-    // HeatingAirVolFlow
-    // EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).SystemAirFlow);
+    // VS coils set SystemAirFlow to true and AirVolFlow to a value.
+    // all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and HeatingAirVolFlow
+    // UnitarySystem now tracks the way PT units sized coils, which method is correct is for another day
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(1).SystemAirFlow);
     EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).AirVolFlow, state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate, 0.000001);
-    EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).CoolingAirFlow);
-    EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).HeatingAirFlow);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(1).CoolingAirFlow);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(1).HeatingAirFlow);
     EXPECT_EQ(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, thisSys.m_MaxCoolAirVolFlow);
-    EXPECT_EQ(state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow, thisSys.m_MaxHeatAirVolFlow);
+    EXPECT_LT(state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow, thisSys.m_MaxHeatAirVolFlow);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate,
               max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));

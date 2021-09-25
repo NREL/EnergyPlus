@@ -2052,44 +2052,106 @@ namespace UnitarySystems {
         } else if (this->m_CoolCoilExists && !this->m_HeatCoilExists) {
             if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
-        if (this->m_HeatCoilExists) {
 
-            SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
-            if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
-                this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
+        // PT Units report sizing for cooling then heating, UnitarySystem reverses that order
+        // temporarily reverse reporting for PT units so eio diffs are cleaner, remove later
+        if (this->m_sysType >= SysType::PackagedAC) {
+
+            if (this->m_CoolCoilExists) {
+
+                // PT unit sizing difference (eio reporting of design size only), might be right way to do this
+                if (this->m_sysType >= SysType::PackagedAC && this->m_MaxCoolAirVolFlow >= 0.0) {
+                    EqSizing.CoolingCapacity = false;
+                    EqSizing.HeatingCapacity = false;
+                    EqSizing.CoolingAirFlow = false;
+                    //                    EqSizing.CoolingAirVolFlow = 0.0;
+                    EqSizing.HeatingAirFlow = false;
+                    //                    EqSizing.HeatingAirVolFlow = 0.0;
+                }
+                if (this->m_MaxCoolAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
+                    this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
+                }
+                state.dataSize->DataEMSOverrideON = this->m_MaxCoolAirVolFlowEMSOverrideOn;
+                state.dataSize->DataEMSOverride = this->m_MaxCoolAirVolFlowEMSOverrideValue;
+                TempSize = this->m_MaxCoolAirVolFlow;
+                bool errorsFound = false;
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "Cooling Supply Air Flow Rate [m3/s]";
+                if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                this->m_MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                state.dataSize->DataEMSOverrideON = false;
+                state.dataSize->DataConstantUsedForSizing = 0.0;
             }
-            FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
-            state.dataSize->DataEMSOverrideON = this->m_MaxHeatAirVolFlowEMSOverrideOn;
-            state.dataSize->DataEMSOverride = this->m_MaxHeatAirVolFlowEMSOverrideValue;
-            TempSize = this->m_MaxHeatAirVolFlow;
-            // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
-            SizingString = "Heating Supply Air Flow Rate [m3/s]";
-            bool errorsFound = false;
-            HeatingAirFlowSizer sizingHeatingAirFlow;
-            sizingHeatingAirFlow.overrideSizingString(SizingString);
-            sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->m_MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
-            state.dataSize->DataEMSOverrideON = false;
-            state.dataSize->DataConstantUsedForSizing = 0.0;
-        }
 
-        if (this->m_CoolCoilExists) {
+            if (this->m_HeatCoilExists) {
 
-            if (this->m_MaxCoolAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
-                this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
+                // PT unit sizing difference (eio reporting of design size only), might be right way to do this
+                if (this->m_sysType >= SysType::PackagedAC && this->m_MaxHeatAirVolFlow >= 0.0) {
+                    EqSizing.HeatingCapacity = false;
+                    EqSizing.HeatingAirFlow = false;
+                    EqSizing.HeatingAirVolFlow = 0.0;
+                }
+                SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+                if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
+                    this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
+                }
+                FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
+                state.dataSize->DataEMSOverrideON = this->m_MaxHeatAirVolFlowEMSOverrideOn;
+                state.dataSize->DataEMSOverride = this->m_MaxHeatAirVolFlowEMSOverrideValue;
+                TempSize = this->m_MaxHeatAirVolFlow;
+                // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
+                SizingString = "Heating Supply Air Flow Rate [m3/s]";
+                bool errorsFound = false;
+                HeatingAirFlowSizer sizingHeatingAirFlow;
+                sizingHeatingAirFlow.overrideSizingString(SizingString);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                this->m_MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
+                state.dataSize->DataEMSOverrideON = false;
+                state.dataSize->DataConstantUsedForSizing = 0.0;
             }
-            state.dataSize->DataEMSOverrideON = this->m_MaxCoolAirVolFlowEMSOverrideOn;
-            state.dataSize->DataEMSOverride = this->m_MaxCoolAirVolFlowEMSOverrideValue;
-            TempSize = this->m_MaxCoolAirVolFlow;
-            bool errorsFound = false;
-            CoolingAirFlowSizer sizingCoolingAirFlow;
-            std::string stringOverride = "Cooling Supply Air Flow Rate [m3/s]";
-            if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
-            sizingCoolingAirFlow.overrideSizingString(stringOverride);
-            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->m_MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-            state.dataSize->DataEMSOverrideON = false;
-            state.dataSize->DataConstantUsedForSizing = 0.0;
+        } else {
+
+            if (this->m_HeatCoilExists) {
+
+                SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+                if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
+                    this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
+                }
+                FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
+                state.dataSize->DataEMSOverrideON = this->m_MaxHeatAirVolFlowEMSOverrideOn;
+                state.dataSize->DataEMSOverride = this->m_MaxHeatAirVolFlowEMSOverrideValue;
+                TempSize = this->m_MaxHeatAirVolFlow;
+                // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
+                SizingString = "Heating Supply Air Flow Rate [m3/s]";
+                bool errorsFound = false;
+                HeatingAirFlowSizer sizingHeatingAirFlow;
+                sizingHeatingAirFlow.overrideSizingString(SizingString);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                this->m_MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
+                state.dataSize->DataEMSOverrideON = false;
+                state.dataSize->DataConstantUsedForSizing = 0.0;
+            }
+
+            if (this->m_CoolCoilExists) {
+
+                if (this->m_MaxCoolAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
+                    this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
+                }
+                state.dataSize->DataEMSOverrideON = this->m_MaxCoolAirVolFlowEMSOverrideOn;
+                state.dataSize->DataEMSOverride = this->m_MaxCoolAirVolFlowEMSOverrideValue;
+                TempSize = this->m_MaxCoolAirVolFlow;
+                bool errorsFound = false;
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "Cooling Supply Air Flow Rate [m3/s]";
+                if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                this->m_MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                state.dataSize->DataEMSOverrideON = false;
+                state.dataSize->DataConstantUsedForSizing = 0.0;
+            }
         }
 
         // If not set, set DesignFanVolFlowRate as greater of cooling and heating to make sure this value > 0.
