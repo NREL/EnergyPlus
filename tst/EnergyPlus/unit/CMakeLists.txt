@@ -82,6 +82,7 @@ set(test_src
     DataSurfaces.unit.cc
     DataSystemVariables.unit.cc
     DataZoneEquipment.unit.cc
+    DaylightingDevices.unit.cc
     DaylightingManager.unit.cc
     DElightManager.unit.cc
     DemandResponse.unit.cc
