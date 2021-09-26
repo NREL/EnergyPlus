@@ -1591,7 +1591,8 @@ namespace UnitarySystems {
         } else if (state.dataSize->CurZoneEqNum > 0) {
             select_EqSizing = &state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
             state.dataSize->ZoneEqUnitarySys = true;
-            if (this->m_IsDXCoil) state.dataSize->ZoneEqDXCoil = true;
+            // UnitarySystem never set this flag. Probably should for zone equipment.
+            if (this->m_sysType >= SysType::PackagedAC && this->m_IsDXCoil) state.dataSize->ZoneEqDXCoil = true;
 
         } else {
             assert(false);
@@ -1717,7 +1718,7 @@ namespace UnitarySystems {
             // might want to rethink this method. Tries to find the larger of cooling or heating capcity
             // however, if there is no heating coil the cooling air flow rate is used, not the main flow rate
             // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
-            if (this->UnitType == "AirLoopHVAC:UnitarySystem") state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
+            if (this->m_sysType == SysType::Unitary) state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
             bool errorsFound = false;
             if ((CoolingSAFlowMethod == DataSizing::SupplyAirFlowRate) || (CoolingSAFlowMethod == DataSizing::None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -3124,7 +3125,6 @@ namespace UnitarySystems {
             }
             SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
 
-            PrintFlag = false;
             TempSize = this->m_DesignSuppHeatingCapacity;
             SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
             if (TempSize == DataSizing::AutoSize) {
