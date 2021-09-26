@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -799,6 +800,218 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
     EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
     EXPECT_NEAR(0.109, state->dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
+}
+
+TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
+{
+    // issue #6920
+    std::string const idf_objects = delimited_string({
+
+        "  Schedule:Compact, AVAILSCHED, FRACTION, Through: 12/31, For: Alldays, Until: 24:00,1.00; ",
+
+        "  CoilSystem:Cooling:DX,",
+        "    DX Cooling Coil System,          !- Name",
+        "    AvailSched,                      !- Availability Schedule Name",
+        "    DX Cooling Coil Air Inlet Node,  !- DX Cooling Coil System Inlet Node Name",
+        "    Heating Coil Air Inlet Node,     !- DX Cooling Coil System Outlet Node Name",
+        "    Heating Coil Air Inlet Node,     !- DX Cooling Coil System Sensor Node Name",
+        "    Coil:Cooling:DX,                 !- Cooling Coil Object Type",
+        "    DX Cooling Coil,                 !- Cooling Coil Name",
+        "    CoolReheat,                      !- Dehumidification Control Type",
+        "    Yes,                             !- Run on Sensible Load",
+        "    Yes,                             !- Run on Latent Load",
+        "    No;                              !- Use Outdoor Air DX Cooling Coil",
+
+        "  Coil:Cooling:DX,",
+        "    DX Cooling Coil,                 !- Name",
+        "    DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name",
+        "    Heating Coil Air Inlet Node,     !- Evaporator Outlet Node Name",
+        "    ,                                !- Availability Schedule Name",
+        "    ,                                !- Condenser Zone Name",
+        "    DX Cool Cooling Coil Condenser Inlet,        !- Condenser Inlet Node Name",
+        "    DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name",
+        "    DX Cool Cooling Coil Performance,            !- Performance Object Name",
+        "    ,                                !- Condensate Collection Water Storage Tank Name",
+        "    ;                                !- Evaporative Condenser Supply Water Storage Tank Name",
+
+        "  Coil:Cooling:DX:CurveFit:Performance,",
+        "    DX Cool Cooling Coil Performance,  !- Name",
+        "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ,                        !- Unit Internal Static Air Pressure {Pa}",
+        "    ,                        !- Capacity Control Method",
+        "    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}",
+        "    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name",
+        "    Electricity,             !- Compressor Fuel Type",
+        "    DX Cool Cooling Coil Operating Mode,  !- Base Operating Mode",
+        "    ,                        !- Alternative Operating Mode 1",
+        "    ;                        !- Alternative Operating Mode 1",
+
+        "  Coil:Cooling:DX:CurveFit:OperatingMode,",
+        "    DX Cool Cooling Coil Operating Mode,  !- Name",
+        "    15000,                   !- Rated Gross Total Cooling Capacity {W}",
+        "    0.8,                     !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    ,                        !- Rated Condenser Air Flow Rate {m3/s}",
+        "    0,                       !- Maximum Cycling Rate {cycles/hr}",
+        "    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "    0,                       !- Latent Capacity Time Constant {s}",
+        "    0,                       !- Nominal Time for Condensate Removal to Begin {s}",
+        "    ,                        !- Apply Latent Degradation to Speeds Greater than 1",
+        "    AirCooled,               !- Condenser Type",
+        "    0,                       !- Nominal Evaporative Condenser Pump Power {W}",
+        "    2,                       !- Nominal Speed Number",
+        "    DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name",
+        "    DX Cool Cooling Coil Speed 2 Performance;  !- Speed 1 Name",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    DX Cool Cooling Coil Speed 1 Performance,  !- Name",
+        "    0.5,                     !- Gross Total Cooling Capacity Fraction",
+        "    0.5,                     !- Evaporator Air Flow Rate Fraction",
+        "    0.5,                     !- Condenser Air Flow Rate Fraction",
+        "    0.77,                    !- Gross Sensible Heat Ratio",
+        "    4.17,                    !- Gross Cooling COP {W/W}",
+        "    1.0,                     !- Active Fraction of Coil Face Area",
+        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    0.5,                     !- Evaporative Condenser Pump Power Fraction",
+        "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
+        "    CAPFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name",
+        "    1Pow,  !- Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    EIRFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name",
+        "    PLFCurve,  !- Part Load Fraction Correlation Curve Name",
+        "    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "    ,                        !- Waste Heat Modifier Function of Temperature Curve Name",
+        "    ,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+        "    ;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    DX Cool Cooling Coil Speed 2 Performance,  !- Name",
+        "    1.0,                     !- Gross Total Cooling Capacity Fraction",
+        "    1.0,                     !- Evaporator Air Flow Rate Fraction",
+        "    1.0,                     !- Condenser Air Flow Rate Fraction",
+        "    0.77,                    !- Gross Sensible Heat Ratio",
+        "    4.17,                    !- Gross Cooling COP {W/W}",
+        "    1.0,                     !- Active Fraction of Coil Face Area",
+        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    1.0,                     !- Evaporative Condenser Pump Power Fraction",
+        "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
+        "    CAPFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name",
+        "    1Pow,  !- Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    EIRFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name",
+        "    PLFCurve,  !- Part Load Fraction Correlation Curve Name",
+        "    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "    ,                        !- Waste Heat Modifier Function of Temperature Curve Name",
+        "    ,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+        "    ;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
+
+        "Curve:Quadratic, PLFCurve, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
+        "Curve:Cubic, CAPFF, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless; ",
+        "Curve:Cubic, EIRFF, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless; ",
+        "Curve:Biquadratic, 1Cap, 0.483, 0.0305, 0.0000458, 0.00511, -1.50E-04, -1.28E-04, 8.89, 21.67, 12.78, 51.67, , , Temperature, Temperature, "
+        "Dimensionless; ",
+        "Curve:Biquadratic, 1Pow, 1.33, -0.034, 0.00094, -0.0086, 0.00077, -0.000972, 8.89, 21.7, 12.8, 51.7, , , Temperature, Temperature, "
+        "Dimensionless; ",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    std::string compName = "DX COOLING COIL SYSTEM";
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+
+    bool FirstHVACIteration = true;
+    bool HXUnitOn = false;
+    int InletNode = 1;
+    int ControlNode = 2; // same as outlet node number
+    int condensserNode = 3;
+    int airLoopNum = 1;
+
+    bool zoneEquipment = true;
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
+    // call again to get the rest of the input when sysNum > -1
+    UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
+
+    EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
+    EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
+    EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
+    EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::CoilDX_Cooling);
+    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+
+    // set up outdoor environment
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0196;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 27.0932;
+    state->dataLoopNodes->Node(condensserNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(condensserNode).HumRat = state->dataEnvrn->OutHumRat;
+
+    // set up inputs to test coil control
+    thisSys->m_DesiredOutletTemp = 20.0;
+    thisSys->m_DesiredOutletHumRat = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataLoopNodes->Node(InletNode).MassFlowRate = 0.8 * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(InletNode).Temp = 24.0;
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.012143698;
+    state->dataLoopNodes->Node(InletNode).Enthalpy = 55029.3778; // conditions at 65 % RH
+    state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
+    Real64 RHControlHumRat = 0.01; // humrat at 24C, 60% RH
+    state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
+    state->dataLoopNodes->Node(ControlNode).HumRat = 0.008;
+
+    // test sensible control
+    int CompOn = 1;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    // run init to size system
+    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    // system meets temperature set point
+    Real64 outTemp1 = state->dataLoopNodes->Node(ControlNode).Temp;
+    Real64 outHumRat1 = state->dataLoopNodes->Node(ControlNode).HumRat;
+    EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
+    // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
+    EXPECT_GT(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax);
+    // sensible load met by compressor speed 3
+    EXPECT_EQ(1, thisSys->m_CoolingSpeedNum);
+
+    // test latent control
+    thisSys->m_DesiredOutletHumRat = RHControlHumRat;
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+
+    Real64 outTemp2 = state->dataLoopNodes->Node(ControlNode).Temp;
+    Real64 outHumRat2 = state->dataLoopNodes->Node(ControlNode).HumRat;
+    // system over cools past temperature set point
+    EXPECT_LT(outTemp2, thisSys->m_DesiredOutletTemp);
+    EXPECT_LT(outTemp2, outTemp1);
+    EXPECT_LT(outHumRat2, outHumRat1);
+    // system does meet humidity ratio set point
+    EXPECT_NEAR(outHumRat2, state->dataLoopNodes->Node(ControlNode).HumRatMax, 0.001);
+    // latent load needed to increase compressor speed to speed 2
+    EXPECT_EQ(2, thisSys->m_CoolingSpeedNum);
 }
 
 } // namespace EnergyPlus
