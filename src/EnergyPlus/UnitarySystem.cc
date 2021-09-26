@@ -13268,9 +13268,8 @@ namespace UnitarySystems {
                                                                                                       singleMode);
                             if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
                         }
-                        Real64 outHumRat = state.dataLoopNodes->Node(OutletNode).HumRat;
-
-                        if (outHumRat < DesOutHumRat) {
+                        // make sure outlet HumRat is below set point before calling SolveRoot
+                        if (state.dataLoopNodes->Node(OutletNode).HumRat < DesOutHumRat) {
                             std::array<Real64, 8> Par2 = {
                                 double(this->m_CoolingCoilIndex),
                                 DesOutHumRat,
