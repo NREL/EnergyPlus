@@ -247,11 +247,11 @@ namespace DataDaylighting {
         Array2D<Real64> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
-        Array1D_bool MapRefPtInBounds;     // True when coordinates are in bounds of zone coordinates
-        Array1D<Real64> DaylIllumAtMapPt;  // Daylight illuminance at illuminance map points (lux)
+        Array1D_bool MapRefPtInBounds;    // True when coordinates are in bounds of zone coordinates
+        Array1D<Real64> DaylIllumAtMapPt; // Daylight illuminance at illuminance map points (lux)
         // following Hr - report avg hr
-        Array1D<Real64> DaylIllumAtMapPtHr;      // Daylight illuminance at illuminance map points (lux)
-        Array3D<Real64> IllumFromWinAtMapPt;     // (Number of Zones, 2, Total Map Reference Points)
+        Array1D<Real64> DaylIllumAtMapPtHr;  // Daylight illuminance at illuminance map points (lux)
+        Array3D<Real64> IllumFromWinAtMapPt; // (Number of Zones, 2, Total Map Reference Points)
         // Arguments (dimensions) for Dayl---Sky are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
