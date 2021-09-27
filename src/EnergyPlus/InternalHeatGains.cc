@@ -6660,7 +6660,7 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->space(spaceNum).Name);
                 // Not applicable for space until space has it's own air temeratures
-                // SetupOutputVariable(state,
+                // Setup Output Variable(state,
                 //                    "Space ITE Adjusted Return Air Temperature",
                 //                    OutputProcessor::Unit::W,
                 //                    state.dataHeatBal->spaceRpt(spaceNum).ITEAdjReturnTemp,
