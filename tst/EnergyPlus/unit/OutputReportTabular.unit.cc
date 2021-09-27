@@ -107,12 +107,12 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
 
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq"));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
@@ -7516,7 +7516,6 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
-
     // Create one wall and one window with each azimuth from expectedAzimuthToCards
     // Azimuth & Cardinal entries happen in two separate blocks,
     // so test both to increase coverage and make sure both are correct
@@ -7630,6 +7629,8 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
+    state->dataHeatBal->NominalUBeforeAdjusted.allocate(1);
+    state->dataHeatBal->NominalUBeforeAdjusted(1) = 0.2;
 
     state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
@@ -8236,7 +8237,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     bool isKoppen = false;
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8245,7 +8246,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8254,7 +8255,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
     parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8263,7 +8264,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
     parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
@@ -8606,8 +8607,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8628,8 +8629,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8650,8 +8651,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8673,8 +8674,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8697,8 +8698,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -10047,4 +10048,85 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_W
     GetInputOutputTableSummaryReports(*state);
 
     EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
+{
+    // Test for #8921
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    std::string const idf_objects = delimited_string({
+
+        "Output:Table:Monthly,",
+        "  MONTHLY EXAMPLE,                        !- Name",
+        "  ,                                       !- Digits After Decimal",
+        "  Electricity:Facility,                   !- Variable or Meter Name 1",
+        "  SumOrAverage,                           !- Aggregation Type for Variable or Meter 1",
+        "  Electricity:Facility,                   !- Variable or Meter Name 2",
+        "  Maximum,                                !- Aggregation Type for Variable or Meter 2",
+        "  Electricity:Facility,                   !- Variable or Meter Name 3",
+        "  Minimum,                                !- Aggregation Type for Variable or Meter 3",
+        "  Electricity:Facility,                   !- Variable or Meter Name 4",
+        "  ValueWhenMaximumOrMinimum,              !- Aggregation Type for Variable or Meter 4",
+        "  Electricity:Facility,                   !- Variable or Meter Name 5",
+        "  HoursNonZero,                           !- Aggregation Type for Variable or Meter 5",
+        "  Electricity:Facility,                   !- Variable or Meter Name 6",
+        "  HoursZero,                              !- Aggregation Type for Variable or Meter 6",
+        "  Electricity:Facility,                   !- Variable or Meter Name 7",
+        "  HoursPositive,                          !- Aggregation Type for Variable or Meter 7",
+        "  Electricity:Facility,                   !- Variable or Meter Name 8",
+        "  HoursNonPositive,                       !- Aggregation Type for Variable or Meter 8",
+        "  Electricity:Facility,                   !- Variable or Meter Name 9",
+        "  HoursNegative,                          !- Aggregation Type for Variable or Meter 9",
+        "  Electricity:Facility,                   !- Variable or Meter Name 10",
+        "  HoursNonNegative,                       !- Aggregation Type for Variable or Meter 10",
+        "  Electricity:Facility,                   !- Variable or Meter Name 11",
+        "  SumOrAverageDuringHoursShown,           !- Aggregation Type for Variable or Meter 11",
+        "  Electricity:Facility,                   !- Variable or Meter Name 12",
+        "  MaximumDuringHoursShown,                !- Aggregation Type for Variable or Meter 12",
+        "  Electricity:Facility,                   !- Variable or Meter Name 13",
+        "  MinimumDuringHoursShown;                !- Aggregation Type for Variable or Meter 13",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "Electricity:Facility";
+
+    // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
+    state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+
+    OutputReportTabular::GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    OutputReportTabular::InitializeTabularMonthly(*state);
+
+    OutputReportTabular::WriteMonthlyTables(*state);
+
+    auto columnHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // 13 agg types for the same variable requested above + the {TIMESTAMP} ones (but distinct, so counts as 1)
+    EXPECT_EQ(14, columnHeaders.size());
+
+    auto missingBracesHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%"
+             AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // Should be none!
+    for (auto &col : missingBracesHeaders) {
+        std::string colHeader = col[0];
+        EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
+    }
 }

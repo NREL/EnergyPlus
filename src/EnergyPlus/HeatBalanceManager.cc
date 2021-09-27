@@ -363,6 +363,12 @@ namespace HeatBalanceManager {
         // following is done to "get internal heat gains" input so that lights are gotten before
         // daylighting input
         ManageInternalHeatGains(state, true);
+
+        // following is done so that people are gotten before for thermal comfort calculations
+        // Setup Kiva instances
+        if (state.dataHeatBal->AnyKiva) {
+            state.dataSurfaceGeometry->kivaManager.setupKivaInstances(state);
+        }
     }
 
     void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound)
@@ -3401,6 +3407,9 @@ namespace HeatBalanceManager {
         } // TotScreensEQL loop
 
         // Window Blind Materials
+        if ((state.dataHeatBal->TotBlindsEQL == 0) && (state.dataHeatBal->TotBlinds == 0)) {
+            state.dataSurface->actualMaxSlatAngs = 1; // first slot is used for shades
+        }
 
         if (state.dataHeatBal->TotBlinds > 0) {
             state.dataHeatBal->Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
@@ -4497,6 +4506,8 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
         state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalUBeforeAdjusted.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->CoeffAdjRatio.dimension(state.dataHeatBal->TotConstructs, 1.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
         state.dataConstruction->Construct.allocate(state.dataHeatBal->TotConstructs);
@@ -4668,7 +4679,7 @@ namespace HeatBalanceManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                std::string construction_name{UtilityRoutines::MakeUPPERCase(AsString(fields.at("construction_name")))};
+                std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>())};
                 int source_after_layer_number{fields.at("thermal_source_present_after_layer_number")};
                 int calculation_after_layer_number{fields.at("temperature_calculation_requested_after_layer_number")};
                 int ctf_dimensions{fields.at("dimensions_for_the_ctf_calculation")};
@@ -4708,7 +4719,7 @@ namespace HeatBalanceManager {
                 thisConstruct.SourceAfterLayer = source_after_layer_number;
                 thisConstruct.TempAfterLayer = calculation_after_layer_number;
                 thisConstruct.SolutionDimensions = ctf_dimensions;
-                thisConstruct.ThicknessPerpend = tube_spacing / 2.0;
+                thisConstruct.ThicknessPerpend = thisConstruct.setThicknessPerpendicular(state, tube_spacing);
                 thisConstruct.userTemperatureLocationPerpendicular =
                     thisConstruct.setUserTemperatureLocationPerpendicular(state, calculation_position);
 
@@ -5558,6 +5569,7 @@ namespace HeatBalanceManager {
                 }
 
                 // List of spaces
+                thisSpaceList.numListSpaces = 0;
                 auto extensibles = objectFields.find("spaces");
                 auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
@@ -5567,9 +5579,10 @@ namespace HeatBalanceManager {
                         int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                         if (thisSpaceNum > 0) {
                             thisSpaceList.spaces.emplace_back(thisSpaceNum);
+                            ++thisSpaceList.numListSpaces;
                         } else {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
-                            ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
+                            ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
                             ErrorsFound = true;
                         }
                         thisSpaceList.maxSpaceNameLength = max(thisSpaceList.maxSpaceNameLength, len(thisSpaceName));
@@ -5870,6 +5883,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
             state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
             state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
         }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
@@ -5948,11 +5962,12 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
@@ -7355,6 +7370,8 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
             for (int i = (state.dataHeatBal->TotConstructs - NGlSys + 1); i <= state.dataHeatBal->TotConstructs; ++i) {
@@ -8051,11 +8068,14 @@ namespace HeatBalanceManager {
                 thisConstruct.IsUsedCTF = false;
 
                 // Air Exchange Method
-                std::string const airMethod = fields.at("air_exchange_method");
+                std::string airMethod = "None";
+                if (fields.find("air_exchange_method") != fields.end()) {
+                    airMethod = fields.at("air_exchange_method").get<std::string>();
+                }
                 if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
-                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour").get<Real64>();
                     } else {
                         if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
                                 state, cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
@@ -8063,7 +8083,7 @@ namespace HeatBalanceManager {
                         }
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
-                        const std::string &schedName = fields.at("simple_mixing_schedule_name");
+                        const std::string &schedName = fields.at("simple_mixing_schedule_name").get<std::string>();
                         thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(state,
@@ -8166,8 +8186,19 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
-                    // Automatic Surface Multipliers: Do not use representative surfaces
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                        int repSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                        if (repSurfNum != SurfNum) {
+                            // Do not use representative surfaces
+
+                            // remove surface from representative constituent list
+                            auto &vec = state.dataSurface->Surface(repSurfNum).ConstituentSurfaceNums;
+                            vec.erase(std::remove(vec.begin(), vec.end(), SurfNum), vec.end());
+
+                            // reset representative surface number
+                            state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                        }
+                    }
                 }
 
                 // Assign construction number
@@ -8475,6 +8506,8 @@ namespace HeatBalanceManager {
         state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs + NumNewConst) = 1.0;
 
         NumNewConst = state.dataHeatBal->TotConstructs;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {

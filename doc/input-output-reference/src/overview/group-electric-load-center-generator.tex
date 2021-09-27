@@ -843,15 +843,6 @@ output.
 
 Default: 0.96
 
-\subsubsection{Outputs Description}\label{outputs-description-electricloadcenterinverterpvwatts}
-
-\begin{itemize}
-\item
-  HVAC,Average,Inverter Produced AC Electricity Rate {[}W{]}
-\item
-  HVAC,Sum,Inverter Produced AC Electricity Energy {[}J{]}
-\end{itemize}
-
 \subsubsection{Outputs}\label{outputs-3-005}
 
 Each inverter can report the following seven output variables.
@@ -888,7 +879,7 @@ Each inverter can report the following seven output variables.
 
 This is the efficiency with which DC power is converted to AC power by the inverter.
 
-\paragraph{Inverter DC Input Elecric Power {[}W{]}}\label{inverter-dc-input-elecric-power-w}
+\paragraph{Inverter DC Input Electricity Rate {[}W{]}}\label{inverter-dc-input-electricity-rate-w}
 
 \paragraph{Inverter DC Input Electricity Energy {[}J{]}}\label{inverter-dc-input-electric-energy-j}
 
@@ -1067,11 +1058,11 @@ This field contains the fraction of storage losses that enter the zone as long-w
 
 \paragraph{Field: Nominal Energetic Efficiency for Charging}\label{field-nominal-energetic-efficiency-for-charging}
 
-This field contains the charging efficiency. This is the energetic efficiency of storing electrical energy in the storage device. A value of 1.0 means the device does not lose any energy when charging.
+This field contains the charging efficiency. This is the energetic efficiency of storing electrical energy in the storage device. A value of 1.0 means the device does not lose any energy when charging. The value for this field must be between 0.001 and 1.0.
 
 \paragraph{Field: Nominal Discharging Energetic Efficiency}\label{field-nominal-discharging-energetic-efficiency}
 
-This field contains the discharging efficiency. This is the energetic efficiency of drawing electrical energy from the storage device. A value of 1.0 means the device does not lose any energy when drawing power.
+This field contains the discharging efficiency. This is the energetic efficiency of drawing electrical energy from the storage device. A value of 1.0 means the device does not lose any energy when drawing power. The value for this field must be between 0.001 and 1.0.
 
 \paragraph{Field: Maximum Storage Capacity}\label{field-maximum-storage-capacity}
 
@@ -1822,9 +1813,9 @@ The output variables that are available for the IC engine generator are:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Lube Heat Recovery Rate {[}W{]}
 \item
@@ -1861,9 +1852,9 @@ The output variables that are available for the IC engine generator are:
   HVAC,Average,Generator \textless{}Fuel Type\textgreater{} Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w}
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j}
 
 These outputs are the electric power output from the electric generator. Energy is metered on Cogeneration:ElectricityProduced, ElectricityProduced:Plant, and ElectricityProduced:Facility.
 
@@ -2142,9 +2133,9 @@ The output variables that are available for the combustion turbine generator are
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   Zone,Meter,ElectricityProduced:Facility {[}J{]}
 \item
@@ -2450,9 +2441,9 @@ The output variables that are available for the microturbine generator are:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator LHV Basis Electric Efficiency {[}-{]}
 \item
@@ -2511,11 +2502,11 @@ If exhaust air calculations are performed:
   HVAC,Average,Generator Exhaust Air Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-1}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-1}
 
 This output variable is the average electric power produced by the generator in Watts for the timestep being reported. This is the net electric power produced, accounting for ancillary electric power consumed during generator operation.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-1}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-1}
 
 This output variable is the electric energy produced by the generator in Joules for the timestep being reported. This output is also added to a meter with Resource Type = ElectricityProduced, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). This is the net electric energy produced, accounting for ancillary electric consumption during generator operation.
 
@@ -2557,7 +2548,7 @@ This output variable is the average ancillary electric power consumed by the gen
 
 \paragraph{Generator Ancillary Electricity Energy {[}J{]}}\label{generator-ancillary-electric-energy-j}
 
-This output variable is the ancillary electric energy consumption for the generator in Joules for the timestep being reported. This energy consumption is already deducted from the output variable Generator Produced Electricity Energy ( net electric energy produced by the generator). This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
+This output variable is the ancillary electric energy consumption for the generator in Joules for the timestep being reported. This energy consumption is already deducted from the output variable Generator Produced AC Electricity Energy ( net electric energy produced by the generator). This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
 
 \paragraph{Generator Produced Thermal Rate {[}W{]}}\label{generator-produced-thermal-rate-w-1}
 
@@ -2839,9 +2830,9 @@ Generator:MicroCHP:NonNormalizedParameters,
 \item
   HVAC,Sum,Generator Cool Down Mode Time {[}s{]}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Electric Efficiency {[]}
 \item
@@ -2908,11 +2899,11 @@ This report is the amount of time the generator spent in Normal Operating mode i
 
 This report is the amount of time the generator spent in Cool Down mode in seconds.
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-2}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-2}
 
 This report is the net electrical power produced by the generator in watts.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-2}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-2}
 
 This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
@@ -3076,9 +3067,13 @@ The following output variables are available for the fuel cell model.
 
 \begin{itemize}
 \item
-  Output:Variable,*,Generator Produced Electricity Rate,hourly; !- HVAC Average {[}W{]}
+  Output:Variable,*,Generator Produced AC Electricity Rate,hourly; !- HVAC Average {[}W{]}
 \item
-  Output:Variable,*,Generator Produced Electricity Energy,hourly; !- HVAC Sum {[}J{]}
+  Output:Variable,*,Generator Produced AC Electricity Energy,hourly; !- HVAC Sum {[}J{]}
+\item
+  Output:Variable,*,Generator Produced DC Electricity Rate,hourly; !- HVAC Average {[}W{]}
+\item
+  Output:Variable,*,Generator Produced DC Electricity Energy,hourly; !- HVAC Sum {[}J{]}
 \item
   Output:Variable,*,Generator Produced Thermal Rate,hourly; !- HVAC Average {[}W{]}
 \item
@@ -3101,13 +3096,21 @@ The following output variables are available for the fuel cell model.
   Output:Variable,*,FuelCell Radiation Heat Loss Rate to Zone,hourly; !- HVAC Average {[}W{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-3}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-ac-electric-power-w-3}
 
-This report is the net electrical power produced by the generator in watts.
+This report is the net electrical AC power produced by the generator in watts.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-3}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-ac-electric-energy-j-3}
 
-This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
+This report is the net electrical AC energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
+
+\paragraph{Generator Produced DC Electricity Rate {[}W{]}}\label{generator-produced-dc-electric-power-w-3}
+
+This report is the net electrical DC power produced by the generator in watts.
+
+\paragraph{Generator Produced DC Electricity Energy {[}J{]}}\label{generator-produced-dc-electric-energy-j-3}
+
+This report is the net electrical DC energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
 \paragraph{Generator Produced Thermal Rate {[}W{]}}\label{generator-produced-thermal-rate-w-3}
 
@@ -4420,7 +4423,7 @@ Convective heat gains to zone from gas compressor, if any, that provides fuel at
 
 \subsection{Photovoltaic Generators}\label{photovoltaic-generators}
 
-EnergyPlus offers different options for predicting the electricity produced by solar electric photovoltaic (PV) panels. The three different options are Simple , Equivalent One-Diode and Sandia and the choice will determine the mathematical models used to determine energy production. The first allows the user to input an arbitrary efficiency. The other two models use empirical relationships to predict PV operating performance based on many environmental variables such as cell temperature. The PV models can be used with either normal PV modules or as part of a hybrid photovoltaic/thermal (PVT) flat plat collector.
+EnergyPlus offers different options for predicting the electricity produced by solar electric photovoltaic (PV) panels. The three different options are Simple, Equivalent One-Diode and Sandia; and the choice will determine the mathematical models used to calculate energy productions. The first allows the user to input an arbitrary efficiency. The other two models use empirical relationships to predict PV operating performance based on many environmental variables such as cell temperature. The PV models can be used with either normal PV modules or as part of a hybrid photovoltaic/thermal (PVT) flat plat collector.
 
 The generator is connected to an Electric Load Center. The PV models refer to surface input objects defined elsewhere in the input file. This object describes an array that is attached to a surface object in order to describe its orientation and to access results of the solar insolation calculations. These can be either Heat Transfer or Shading objects (see Surfaces). This will define the orientation of the solar panel for the detailed models and also the area for the simple model. The exposure of that surface to incident solar radiation is calculated using the full set of models in EnergyPlus that are used to account for solar thermal loads arising from building windows and walls. Therefore the incident solar radiation is calculated to include the effects of shading and reflections from other surfaces declared in the input file. In addition to the output variables associated with PV models, there are numerous related output variables available for the surfaces including: `Surface Outside Face Sunlit Area', `Surface Outside Face Sunlit Fraction', `Surface Outside Face Incident Solar Radiation Rate per Area', `Surface Outside Face Incident Beam Solar Radiation Rate per Area', `Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area', `Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area', `Surface Outside Face Beam Solar Incident Angle Cosine Value', `Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area', `Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area', `Surface Outside Face Incident Beam To Beam Reflected From Surfaces Solar Radiation Rate per Area', `Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area', and 'Surface Outside Face Incident Beam To Diffuse Ground Reflected Solar Radiation Rate per Area. Note that it is possible to define a PV array area that doesn't conform to the surface area (i.e. model a PV array area that is larger or smaller than what is available on the surface) so it is the users responsibility to not over-specify area when determining how many modules will fit onto a surface. However this type of input is allowed.
 
@@ -4660,7 +4663,7 @@ This field is the active area of the PV module in m\(^{2}\).
 
 \subsubsection{Field: Transmittance Absorptance Product}\label{field-transmittance-absorptance-product}
 
-This field indicates the transmittance-absorptance product at normal incidence angles for the PV modules. If the ta product is positive, that value will be used for all angles of incidence. If the value specified is negative, then the magnitude of the given value will be used for normal incidence and the IAM modifier correlation will be used for all other angles.
+This field indicates the transmittance-absorptance product at normal incidence angles for the PV modules. If the $ta$ product is positive, that value will be used for all angles of incidence. If the value specified is negative, then the magnitude of the given value will be used for normal incidence and the IAM modifier correlation will be used for all other angles.
 
 \subsubsection{Field: Semiconductor Bandgap}\label{field-semiconductor-bandgap}
 
@@ -5102,8 +5105,7 @@ the array. Required if Array Geometry Type is \texttt{Surface}. Shading
 will be calculated for this surface regardless of whether the array has
 1- or 2-axis tracking.
 
-\paragraph{Field: Ground Coverage
-Ratio}\label{field-ground-coverage-ratio}
+\paragraph{Field: Ground Coverage Ratio}\label{field-ground-coverage-ratio}
 
 The ground coverage ratio (GCR) applies only to arrays with one-axis
 tracking, and is the ratio of module surface area to the area of the
@@ -5324,9 +5326,9 @@ Generator:WindTurbine,
 
 \begin{itemize}
 \item
-  HVAC,Average, Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average, Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum, Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average, Generator Turbine Local Wind Speed {[}m/s{]}
 \item
@@ -5345,11 +5347,11 @@ Generator:WindTurbine,
   HVAC,Average, Generator Turbine Attack Angle {[}deg{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-4}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-4}
 
 This report is the electric power that the wind turbine system produces.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-4}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-4}
 
 This report is the electric energy that the wind turbine system produces.
 

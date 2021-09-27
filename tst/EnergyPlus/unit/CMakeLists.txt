@@ -82,6 +82,7 @@ set(test_src
     DataSurfaces.unit.cc
     DataSystemVariables.unit.cc
     DataZoneEquipment.unit.cc
+    DaylightingDevices.unit.cc
     DaylightingManager.unit.cc
     DElightManager.unit.cc
     DemandResponse.unit.cc
@@ -234,6 +235,7 @@ set(test_src
     WaterThermalTanks.unit.cc
     WaterToAirHeatPump.unit.cc
     WaterToAirHeatPumpSimple.unit.cc
+    WaterUse.unit.cc
     WeatherManager.unit.cc
     WinCalcEngine.unit.cc
     WindowAC.unit.cc

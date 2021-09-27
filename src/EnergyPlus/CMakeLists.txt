@@ -278,6 +278,7 @@ set(SRC
     FluidCoolers.hh
     FluidProperties.cc
     FluidProperties.hh
+    FromChars.hh
     FuelCellElectricGenerator.cc
     FuelCellElectricGenerator.hh
     Furnaces.cc
@@ -386,6 +387,8 @@ set(SRC
     IceThermalStorage.hh
     IndoorIceRink.cc
     IndoorIceRink.hh
+    InputProcessing/CsvParser.cc
+    InputProcessing/CsvParser.hh
     InputProcessing/DataStorage.hh
     InputProcessing/EmbeddedEpJSONSchema.hh
     "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
@@ -748,7 +751,7 @@ endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
 add_dependencies(energyplusparser GenerateEmbeddedEpJSONSchema)
-target_link_libraries(energyplusparser PUBLIC re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -766,6 +769,7 @@ add_library(energypluslib STATIC ${SRC})
 target_link_libraries(
   energypluslib
   PUBLIC fmt::fmt
+         ModernJSON
          objexx
          sqlite
          bcvtb

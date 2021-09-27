@@ -80,11 +80,18 @@ namespace ResultsFramework {
     using OutputProcessor::RealVariableType;
 
     // trim string
-    std::string trim(std::string str)
+    std::string trim(std::string_view const s)
     {
-        str.erase(str.begin(), find_if(str.begin(), str.end(), [](char &ch) -> bool { return !isspace(ch); }));
-        str.erase(find_if(str.rbegin(), str.rend(), [](char &ch) -> bool { return !isspace(ch); }).base(), str.end());
-        return str;
+        if (s.empty()) {
+            return std::string{};
+        }
+        auto const first = s.find_first_not_of(' ');
+        auto const last = s.find_last_not_of(' ');
+        if ((first == std::string::npos) || (last == std::string::npos)) {
+            return std::string{};
+        } else {
+            return std::string{s.substr(first, last - first + 1)};
+        }
     }
 
     // Class SimInfo
@@ -93,7 +100,7 @@ namespace ResultsFramework {
         ProgramVersion = programVersion;
     }
 
-    std::string SimInfo::getProgramVersion()
+    std::string SimInfo::getProgramVersion() const
     {
         return ProgramVersion;
     }
@@ -368,9 +375,8 @@ namespace ResultsFramework {
         return variableMap.at(lastVarID);
     }
 
-    void DataFrame::newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin)
+    void DataFrame::newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin)
     {
-        char buffer[100];
         if (curMin > 0) {
             hourOfDay -= 1;
         }
@@ -378,16 +384,10 @@ namespace ResultsFramework {
             curMin = 0;
             hourOfDay += 1;
         }
-        int cx = snprintf(buffer, 100, "%02d/%02d %02d:%02d:00", month, dayOfMonth, hourOfDay, curMin);
 
         // future start of ISO 8601 datetime output
-        // int cx = snprintf(buffer, 100, "YYYY-%02d/%02dT%02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
-
-        if (cx < 0 || cx > 100) {
-            ShowWarningMessage(state, "Failed to convert datetime when adding new output row. Skipping row.");
-            return;
-        }
-        TS.emplace_back(buffer);
+        // fmt::format("YYYY-{:02d}/{:02d}T{:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin);
+        TS.emplace_back(fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin));
     }
 
     //    void DataFrame::newRow(const std::string &ts)
@@ -525,105 +525,89 @@ namespace ResultsFramework {
         return root;
     }
 
-    void DataFrame::writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack)
+    void DataFrame::writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack)
     {
 
         json root = getJSON();
         if (ReportFrequency == "Detailed-HVAC") {
-            if (outputJSON && jsonOutputStreams.json_TSstream_HVAC) {
-                *(jsonOutputStreams.json_TSstream_HVAC) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSHvacJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_TSstream_HVAC) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_TSstream_HVAC));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSHvacCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_TSstream_HVAC) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream_HVAC));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSHvacMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Detailed-Zone") {
-            if (outputJSON && jsonOutputStreams.json_TSstream_Zone) {
-                *(jsonOutputStreams.json_TSstream_Zone) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSZoneJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_TSstream_Zone) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_TSstream_Zone));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSZoneCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_TSstream_Zone) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream_Zone));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSZoneMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "TimeStep") {
-            if (outputJSON && jsonOutputStreams.json_TSstream) {
-                *(jsonOutputStreams.json_TSstream) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_TSstream) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_TSstream));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_TSstream) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Daily") {
-            if (outputJSON && jsonOutputStreams.json_DYstream) {
-                *(jsonOutputStreams.json_DYstream) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputDYJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_DYstream) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_DYstream));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputDYCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_DYstream) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_DYstream));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputDYMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Hourly") {
-            if (outputJSON && jsonOutputStreams.json_HRstream) {
-                *(jsonOutputStreams.json_HRstream) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputHRJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_HRstream) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_HRstream));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputHRCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_HRstream) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_HRstream));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputHRMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Monthly") {
-            if (outputJSON && jsonOutputStreams.json_MNstream) {
-                *(jsonOutputStreams.json_MNstream) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputMNJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_MNstream) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_MNstream));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputMNCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_MNstream) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_MNstream));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputMNMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "RunPeriod") {
-            if (outputJSON && jsonOutputStreams.json_SMstream) {
-                *(jsonOutputStreams.json_SMstream) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputSMJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_SMstream) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_SMstream));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputSMCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_SMstream) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_SMstream));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputSMMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Yearly") {
-            if (outputJSON && jsonOutputStreams.json_YRstream) {
-                *(jsonOutputStreams.json_YRstream) << std::setw(4) << root << std::endl;
+            if (outputJSON) {
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputYRJsonFilePath, root);
             }
-            if (outputCBOR && jsonOutputStreams.cbor_YRstream) {
-                std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_YRstream));
+            if (outputCBOR) {
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputYRCborFilePath, root);
             }
-            if (outputMsgPack && jsonOutputStreams.msgpack_YRstream) {
-                std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_YRstream));
+            if (outputMsgPack) {
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputYRMsgPackFilePath, root);
             }
         }
     }
@@ -857,14 +841,14 @@ namespace ResultsFramework {
     {
         outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
 
-        print(outputFile, "{}", "Date/Time,");
+        print<FormatSyntax::FMT>(outputFile, "{}", "Date/Time,");
         std::string sep;
         for (auto it = outputVariables.begin(); it != outputVariables.end(); ++it) {
             if (!outputVariableIndices[std::distance(outputVariables.begin(), it)]) continue;
-            print(outputFile, "{}{}", sep, *it);
+            print<FormatSyntax::FMT>(outputFile, "{}{}", sep, *it);
             if (sep.empty()) sep = ",";
         }
-        print(outputFile, "{}", '\n');
+        print<FormatSyntax::FMT>(outputFile, "{}", '\n');
 
         for (auto &item : outputs) {
             std::string datetime = item.first;
@@ -873,7 +857,7 @@ namespace ResultsFramework {
             } else {
                 convertToMonth(state, datetime);
             }
-            print(outputFile, " {},", datetime);
+            print<FormatSyntax::FMT>(outputFile, " {},", datetime);
             item.second.erase(std::remove_if(item.second.begin(),
                                              item.second.end(),
                                              [&](const std::string &d) {
@@ -886,8 +870,9 @@ namespace ResultsFramework {
             if (result != item.second.rend()) {
                 last = (result + 1).base();
             }
-            print(item.second.begin(), last, outputFile, ",");
-            print(outputFile, "{}{}", *last, '\n');
+
+            print<FormatSyntax::FMT>(outputFile, "{},", fmt::join(item.second.begin(), last, ","));
+            print<FormatSyntax::FMT>(outputFile, "{}\n", *last);
         }
 
         outputFile.close();
@@ -1159,7 +1144,7 @@ namespace ResultsFramework {
             // nothing to do; meters are not reported at this frequency
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'TimeStep'
-            for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptTS || EnergyMeters(Loop).RptTSFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).TSRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptTSFO);
@@ -1178,7 +1163,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Hourly: // at 'Hourly'
-            for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptHR || EnergyMeters(Loop).RptHRFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).HRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptHRFO);
@@ -1197,7 +1182,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Daily: // at 'Daily'
-            for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptDY || EnergyMeters(Loop).RptDYFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptDYFO);
@@ -1216,7 +1201,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Monthly: // at 'Monthly'
-            for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptMN || EnergyMeters(Loop).RptMNFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptMNFO);
@@ -1235,7 +1220,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Simulation: // at 'RunPeriod'/'SM'
-            for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptSM || EnergyMeters(Loop).RptSMFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptSMFO);
@@ -1254,7 +1239,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Yearly: // at 'Yearly'
-            for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptYR || EnergyMeters(Loop).RptYRFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).YRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptYRFO);
@@ -1399,53 +1384,52 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams)
+    void ResultsFramework::writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths)
     {
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            RIDetailedZoneTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIDetailedZoneTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            RIDetailedHVACTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIDetailedHVACTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            RITimestepTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RITimestepTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            RIHourlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIHourlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            RIDailyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIDailyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            RIMonthlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIMonthlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            RIRunPeriodTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIRunPeriodTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            RIYearlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIYearlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
     }
 
-    void ResultsFramework::writeReport(JsonOutputStreams &jsonOutputStreams)
+    void ResultsFramework::writeReport(JsonOutputFilePaths &jsonOutputFilePaths)
     {
-        json root, outputVars, rdd, meterVars, meterData;
-        json rddvals = json::array();
+        json root, outputVars, meterVars, meterData;
         root = {{"SimulationResults", {{"Simulation", SimulationInformation.getJSON()}}}};
 
         // output variables
@@ -1482,11 +1466,7 @@ namespace ResultsFramework {
         }
 
         // output dictionary
-        for (size_t i = 0; i < RDD.size(); i++) {
-            rddvals.push_back(RDD[i]);
-        }
-        rdd = {{"Description", "Dictionary containing output variables that may be requested"}, {"Variables", rddvals}};
-        outputVars["OutputDictionary"] = rdd;
+        outputVars["OutputDictionary"] = {{"Description", "Dictionary containing output variables that may be requested"}, {"Variables", RDD}};
 
         // meter variables
 
@@ -1539,35 +1519,22 @@ namespace ResultsFramework {
             meterData["Yearly"] = YRMeters.getJSON();
         }
 
-        json mdd;
-        json mddvals = json::array();
-
         // -- meter dictionary
-        for (size_t i = 0; i < MDD.size(); i++) {
-            mddvals.push_back(MDD[i]);
-        }
-        mdd = {{"Description", "Dictionary containing meter variables that may be requested"}, {"Meters", mddvals}};
-
-        meterVars["MeterDictionary"] = mdd;
+        meterVars["MeterDictionary"] = {{"Description", "Dictionary containing meter variables that may be requested"}, {"Meters", MDD}};
 
         root["OutputVariables"] = outputVars;
         root["MeterVariables"] = meterVars;
         root["MeterData"] = meterData;
         root["TabularReports"] = TabularReportsCollection.getJSON();
 
-        if (outputJSON && jsonOutputStreams.json_stream) {
-            auto const dumped_json = root.dump(4, ' ', false, json::error_handler_t::replace);
-            std::copy(dumped_json.begin(), dumped_json.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.json_stream));
+        if (outputJSON) {
+            FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputJsonFilePath, root);
         }
-        if (outputCBOR && jsonOutputStreams.cbor_stream) {
-            json::to_cbor(root, *jsonOutputStreams.cbor_stream);
-            //            std::vector<uint8_t> v_cbor = json::to_cbor(root);
-            //            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*json.cbor_stream));
+        if (outputCBOR) {
+            FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputCborFilePath, root);
         }
-        if (outputMsgPack && jsonOutputStreams.msgpack_stream) {
-            json::to_msgpack(root, *jsonOutputStreams.msgpack_stream);
-            //            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-            //            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*json.msgpack_stream));
+        if (outputMsgPack) {
+            FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputMsgPackFilePath, root);
         }
     }
 

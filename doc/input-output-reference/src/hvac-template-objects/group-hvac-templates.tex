@@ -424,7 +424,7 @@ This field specifies the zone humidistat relative humidity setpoint for humidifi
 
 The input must be either \emph{None, Flow/Zone}, \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{None} means there is no outdoor air provided by this system. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{None.}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object referenced in the Design Specification Outdoor Air Object Name field below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object referenced in the Design Specification Outdoor Air Object Name field below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person}
 
@@ -440,7 +440,7 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-001}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the outdoor air requirements and schedule for this system. The outdoor air flow rate may also be affected by the next two fields, Demand Controlled Ventilation Type and Outdoor Air Economizer Type. If this field is blank, this system will have no outdoor air, and all outdoor air control and heat recovery options will be ignored..
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the outdoor air requirements and schedule for this system. The outdoor air flow rate may also be affected by the next two fields, Demand Controlled Ventilation Type and Outdoor Air Economizer Type. If this field is blank, this system will have no outdoor air, and all outdoor air control and heat recovery options will be ignored..
 
 \paragraph{Field: Demand Controlled Ventilation Type}\label{field-demand-controlled-ventilation-type}
 
@@ -557,7 +557,7 @@ Enter the name of an \hyperref[hvactemplatesystemdedicatedoutdoorair]{HVACTempla
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person-1}
 
@@ -573,7 +573,7 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-1-000}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when Outdoor Air Method * = DetailedSpecification*.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when Outdoor Air Method * = DetailedSpecification*.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-000}
 
@@ -631,7 +631,7 @@ This input is the zone level cooling sizing ratio. The zone design cooling air f
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person-2}
 
@@ -722,7 +722,7 @@ The temperature difference between heating design supply air temperature and zon
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-2-000}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-1}
 
@@ -870,7 +870,7 @@ This input is the zone level cooling sizing ratio. The zone design cooling air f
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person-3}
 
@@ -989,7 +989,7 @@ The temperature difference between heating design supply air temperature and zon
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-3-000}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-2}
 
@@ -1116,7 +1116,7 @@ This input is the zone level cooling sizing ratio. The zone design cooling air f
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person-4}
 
@@ -1275,7 +1275,7 @@ The temperature difference between heating design supply air temperature and zon
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-4}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-3}
 
@@ -1405,7 +1405,7 @@ This input is the zone level cooling sizing ratio. The zone design cooling air f
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person-5}
 
@@ -1575,7 +1575,7 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-5}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-4}
 
@@ -1711,7 +1711,7 @@ This numeric field defines the outdoor air volumetric air flow rate in cubic met
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 \paragraph{Field: Outdoor Air Flow Rate per Person}\label{field-outdoor-air-flow-rate-per-person-6}
 
@@ -1727,7 +1727,7 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-6}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-5}
 
@@ -2003,7 +2003,7 @@ The temperature difference between heating design supply air temperature and zon
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-7}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-6}
 
@@ -2091,7 +2091,7 @@ The name of a schedule that determines the value of the minimum air flow fractio
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name for Sizing and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name for Sizing and Design Specification Zone Air Distribution Object Name fields below.
 
 If the air handler serving this zone serves more than one zone, the total outdoor air flow for the system is the sum of the zone outdoor air flows if the system outdoor air flow is autosized. Since the zones share a single outdoor air source, the amount of outdoor air actually delivered to the zone is based on the fraction of supply air delivered to the zone to the total supply air from the system.
 
@@ -2159,7 +2159,7 @@ This field specifies the maximum allowable supply air temperature (°C) leaving 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name for Control}\label{field-design-specification-outdoor-air-object-name-for-control}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero (in the specified \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object), then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object).
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero (in the specified \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object), then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object).
 
 Note that this field is used only for specifying the design outdoor air flow rate used for controlling the terminal unit air flow rate. The field \emph{Design Specification Outdoor Air Object Name for Sizing} (see below) is used to specify the design outdoor air flow rate.
 
@@ -2220,7 +2220,7 @@ The temperature difference between heating design supply air temperature and zon
 
 \paragraph{Field: Design Specification Outdoor Air Object Name for Sizing}\label{field-design-specification-outdoor-air-object-name-for-sizing}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field \emph{Design Specification Outdoor Air Object Name for Sizing} (see above) is used to actively control the VAV terminal air flow rate.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field \emph{Design Specification Outdoor Air Object Name for Sizing} (see above) is used to actively control the VAV terminal air flow rate.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-7}
 
@@ -2348,7 +2348,7 @@ For parallel PIUs, this field specifies the fraction of the primary air flow at 
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 If the air handler serving this zone serves more than one zone, the total outdoor air flow for the system is the sum of the zone outdoor air flows if the system outdoor air flow is autosized. Since the zones share a single outdoor air source, the amount of outdoor air actually delivered to the zone is based on the fraction of supply air delivered to the zone to the total supply air from the system.
 
@@ -2456,7 +2456,7 @@ This is the operating schedule for the zone PIU fan. For a parallel PIU, the zon
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-8}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-8}
 
@@ -2542,7 +2542,7 @@ The minimum flow rate to the zone while the system is operating, specified as a 
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name for Sizing and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name for Sizing and Design Specification Zone Air Distribution Object Name fields below.
 
 If the air handler serving this zone serves more than one zone, the total outdoor air flow for the system is the sum of the zone outdoor air flows if the system outdoor air flow is autosized. Since the zones share a single outdoor air source, the amount of outdoor air actually delivered to the zone is based on the fraction of supply air delivered to the zone to the total supply air from the system.
 
@@ -2560,7 +2560,7 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name for Sizing}\label{field-design-specification-outdoor-air-object-name-for-sizing-1}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field \emph{Design Specification Outdoor Air Object Name for Sizing} (see above) is used to actively control the VAV terminal air flow rate.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field \emph{Design Specification Outdoor Air Object Name for Sizing} (see above) is used to actively control the VAV terminal air flow rate.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-9}
 
@@ -2716,7 +2716,7 @@ This input is the zone level cooling sizing ratio. The zone design cooling air f
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 If the air handler serving this zone serves more than one zone, the total outdoor air flow for the system is the sum of the zone outdoor air flows if the system outdoor air flow is autosized. Since the zones share a single outdoor air source, the amount of outdoor air actually delivered to the zone is based on the fraction of supply air delivered to the zone to the total supply air from the system.
 
@@ -2734,7 +2734,7 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name-9}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-10}
 
@@ -2893,7 +2893,7 @@ The minimum flow rate to the zone while the system is operating, specified as a 
 
 The input must be either \emph{Flow/Zone}, or \emph{Flow/Person}, \emph{Flow/Area}, \emph{Sum}, \emph{Maximum or DetailedSpecification}. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow} as the zone design outdoor air flow rate. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the maximum occupancy to calculate a zone design outdoor air flow rate. \emph{Flow/Area} means the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} to calculated a zone design outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be added to obtain the zone design outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area} and \emph{Outdoor Air Flow per Zone} will be used for the zone design outdoor air flow rate. The default is \emph{Flow/Person}.
 
-\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
+\emph{DetailedSpecification} means that the outdoor air specifications will be taken from a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object and optional \hyperref[designspecificationzoneairdistribution]{DesignSpecification:ZoneAirDistribution} object. These objects are referenced in the Design Specification Outdoor Air Object Name and Design Specification Zone Air Distribution Object Name fields below.
 
 If the air handler serving this zone serves more than one zone, the total outdoor air flow for the system is the sum of the zone outdoor air flows if the system outdoor air flow is autosized. Since the zones share a single outdoor air source, the amount of outdoor air actually delivered to the zone is based on the fraction of supply air delivered to the zone to the total supply air from the system.
 
@@ -2911,7 +2911,7 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 \paragraph{Field: Design Specification Outdoor Air Object Name for Sizing}\label{field-design-specification-outdoor-air-object-name-for-sizing-2}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field \emph{Design Specification Outdoor Air Object Name for Control} (see below) is used to actively control the VAV terminal air flow rate.
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object which specifies the design outdoor air flow rate for the zone. This field is used only when \emph{Outdoor Air Method = DetailedSpecification}. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field \emph{Design Specification Outdoor Air Object Name for Control} (see below) is used to actively control the VAV terminal air flow rate.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name-11}
 
@@ -2919,7 +2919,7 @@ This alpha field specifies the name of a \hyperref[designspecificationzoneairdis
 
 \paragraph{Field: Design Specification Outdoor Air Object Name for Control}\label{field-design-specification-outdoor-air-object-name-for-control-1}
 
-This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person (in the specified \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object) is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object).
+This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person (in the specified \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object) is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object).
 
 Note that this field is used only for specifying the design outdoor air flow rate used for controlling the terminal unit air flow rate. The field \emph{Design Specification Outdoor Air Object Name for Sizing} (see above) is used to specify the design outdoor air flow rate.
 

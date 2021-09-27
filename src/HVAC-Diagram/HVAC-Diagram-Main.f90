@@ -587,6 +587,7 @@ DO WHILE (status /= eof)
       CASE ('CONDENSER LOOP CONNECTOR BRANCHES','COND LOOP CONNECTOR BRANCHES')
       CASE ('CONDENSER LOOP CONNECTOR NODES','COND LOOP CONNECTOR NODES')
       CASE ('CONTROLLED ZONE')
+      CASE ('CONTROLLED ZONE RETURN')
       CASE ('COOLED ZONE INFO')
       CASE ('DUAL DUCT DAMPER')
       CASE ('HEATED ZONE INFO')
@@ -3830,14 +3831,14 @@ OPEN (UNIT=20, FILE="eplusout.svg", ACTION="WRITE")
 WRITE(UNIT=20, FMT="(A)") '<?xml version="1.0"?>'
 IF (canvasMaximumX .LT. 2500)   canvasMaximumX = 2500
 IF (canvasMaximumY .LT. 1500)   canvasMaximumY = 1500
-WRITE(UNIT=20, FMT="(A,I6,2X,I6,A)") '<svg width="250mm" height="200mm" viewBox="0 0 ',canvasMaximumX, canvasMaximumY,'"'
+WRITE(UNIT=20, FMT="(A,I0,1X,I0,A)") '<svg width="250mm" height="200mm" viewBox="0 0 ',canvasMaximumX, canvasMaximumY,'"'
 WRITE(UNIT=20, FMT="(A)") '     xmlns="http://www.w3.org/2000/svg"'
 WRITE(UNIT=20, FMT="(A)") '     xmlns:xlink="http://www.w3.org/1999/xlink"'
 WRITE(UNIT=20, FMT="(A)") '     xmlns:ev="http://www.w3.org/2001/xml-events">'
 ! set the font size
-WRITE(UNIT=20, FMT="(A)") '<g font-family="Verdana" font-size="8" >'
+WRITE(UNIT=20, FMT="(A)") '<g font-family="Verdana" font-size="8">'
 IF (errorFoundInDrawing) THEN
-  WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A,A)") &
+  WRITE(UNIT=20, FMT="(A,I0,A,I0,A,A,A)") &
          '  <text x="',1, &
          '" y="',1, &
          '">', &
@@ -3858,14 +3859,14 @@ END DO
 CALL colorizeBoxes
 DO iBox = 1, lastBox
   IF (box(iBox)%isAssigned) THEN
-    WRITE(UNIT=20, FMT="(A,I6,A,I6,A,I6,A,I6,A,A,A,I6)") &
+    WRITE(UNIT=20, FMT="(A,I0,A,I0,A,I0,A,I0,A,A,A,I0)") &
          '  <rect x="',box(iBox)%xUpperLeft, &
          '" y="',      box(iBox)%yUpperLeft, &
          '" width="',  box(iBox)%xLowerRight - box(iBox)%xUpperLeft, &
          '" height="', box(iBox)%yLowerRight - box(iBox)%yUpperLeft, &
-         '" style = "fill:', &
+         '" style="fill:', &
          TRIM(toColor(box(iBox)%colorToUse)%ColorName), &
-         '; stroke: Black;"/>',ibox
+         '; stroke: black;"/>',ibox
     !
     ! Enhancement on September 2005 by J. Glazer
     !
@@ -3874,7 +3875,7 @@ DO iBox = 1, lastBox
     !
     IF (LEN_TRIM(box(iBox)%ObjName) .LE. maxSplit) THEN
       ! Draw the box name for single line of text
-      WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A,A)") &
+      WRITE(UNIT=20, FMT="(A,I0,A,I0,A,A,A)") &
          '  <text x="',box(iBox)%xUpperLeft + 2, &
          '" y="',      box(iBox)%yLowerRight - 7, &
          '">', &
@@ -3889,12 +3890,12 @@ DO iBox = 1, lastBox
       ELSEIF (splitLong .GE. maxSplit) THEN
         splitLong = maxSplit
       END IF
-      WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A)") &
+      WRITE(UNIT=20, FMT="(A,I0,A,I0,A,A)") &
          '  <text  x="',box(iBox)%xUpperLeft + 2, &
          '" y="',      box(iBox)%yLowerRight - 12, &
          '">', &
          TRIM(box(iBox)%ObjName(1:splitLong))
-      WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A,A)") &
+      WRITE(UNIT=20, FMT="(A,I0,A,I0,A,A,A)") &
          '  <tspan x="',box(iBox)%xUpperLeft + 2, &
          '" y="',      box(iBox)%yLowerRight - 4, &
          '">', &
@@ -3954,7 +3955,7 @@ DO iBox = 1, lastBox
 END DO
 !write unused boxes
 unusedY = unusedY +  2 * boxHeight
-WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A,A)") &
+WRITE(UNIT=20, FMT="(A,I0,A,I0,A,A,A)") &
          '  <text x="',boxWidth, &
          '" y="',      unusedY, &
          '">', &
@@ -3963,7 +3964,7 @@ WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A,A)") &
 unusedY = unusedY + boxHeight
 DO iBox = 1, lastBox
   IF ((.NOT. box(iBox)%isAssigned) .AND. (LEN_TRIM(box(iBox)%ObjName) .GT. 0)) THEN
-    WRITE(UNIT=20, FMT="(A,I6,A,I6,A,A,A)") &
+    WRITE(UNIT=20, FMT="(A,I0,A,I0,A,A,A)") &
          '  <text x="',boxWidth + 20, &
          '" y="',      unusedY, &
          '">', &
@@ -3973,7 +3974,7 @@ DO iBox = 1, lastBox
   END IF
 END DO
 unusedY = unusedY + boxHeight
-WRITE(UNIT=20, FMT="(A,I6,A,I6,A)") &
+WRITE(UNIT=20, FMT="(A,I0,A,I0,A)") &
          '  <text x="',boxWidth, &
          '" y="',      unusedY, &
          '">', &
@@ -4026,19 +4027,19 @@ LOGICAL, INTENT(IN) :: isBlack
 
           ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 IF (isBlack) THEN
-  WRITE(UNIT=fileHandle, FMT="(A,I6,A,I6,A,I6,A,I6,A)") &
+  WRITE(UNIT=fileHandle, FMT="(A,I0,A,I0,A,I0,A,I0,A)") &
          '  <line x1="',startX, &
          '" y1="',      startY, &
          '" x2="',      endX, &
          '" y2="',      endY, &
-         '" style = "stroke: Black;"/>'
+         '" style="stroke:black;"/>'
 ELSE
-  WRITE(UNIT=fileHandle, FMT="(A,I6,A,I6,A,I6,A,I6,A)") &
+  WRITE(UNIT=fileHandle, FMT="(A,I0,A,I0,A,I0,A,I0,A)") &
          '  <line x1="',startX, &
          '" y1="',      startY, &
          '" x2="',      endX, &
          '" y2="',      endY, &
-         '" style = "stroke:silver  ;"/>'    !honeydew  linen        lightyellow
+         '" style="stroke:silver;"/>'    !honeydew  linen        lightyellow
 END IF
 END SUBROUTINE WriteLineSegmentSVG
 

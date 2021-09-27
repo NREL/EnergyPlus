@@ -323,10 +323,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
     // Formats
-    static constexpr fmt::string_view Header(
+    static constexpr std::string_view Header(
         "! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon "
         "Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
-    static constexpr fmt::string_view Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
+    static constexpr std::string_view Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &TStatObjects = state.dataZoneCtrls->TStatObjects;
@@ -6746,7 +6746,6 @@ void CalcZoneSums(EnergyPlusData &state,
                 if (Zone(ZoneNum).NoHeatToReturnAir) {
                     SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                     state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
-                    state.dataSurface->SurfWinHeatTransfer(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                     if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
                         state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
                         state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
@@ -6757,7 +6756,7 @@ void CalcZoneSums(EnergyPlusData &state,
                             state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                     state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
-                        state.dataSurface->SurfWinHeatTransfer(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
             }
 

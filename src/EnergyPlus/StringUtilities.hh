@@ -48,15 +48,51 @@
 #ifndef StringUtilities_hh_INCLUDED
 #define StringUtilities_hh_INCLUDED
 
+#include <EnergyPlus/FromChars.hh>
 #include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
+#include <fast_float/fast_float.h>
 #include <sstream>
+#include <type_traits>
 
 namespace EnergyPlus {
-inline std::stringstream stringReader(std::string str)
+inline std::stringstream stringReader(std::string_view str)
 {
-    std::stringstream result{std::move(str)};
-    result.imbue(std::locale("C"));
+    std::stringstream result{str.data()};
+    // result.imbue(std::locale("C"));
     return result;
+}
+
+template <class T, typename = std::enable_if_t<std::is_same_v<T, double> || std::is_same_v<T, int>>>
+bool readListItem(std::string_view input, size_t &index, T &param)
+{
+    if (index >= input.size()) return false;
+
+    input.remove_prefix(index);
+
+    auto first_comma = input.find_first_not_of(',');
+    if (first_comma != std::string_view::npos) {
+        input.remove_prefix(first_comma);
+    }
+
+    auto first_char = input.find_first_not_of(' ');
+    if (first_char != std::string_view::npos) {
+        input.remove_prefix(first_char);
+    }
+
+    FromChars::from_chars_result result{};
+    if constexpr (std::is_same_v<T, int>) {
+        result = FromChars::from_chars(input.data(), input.data() + input.size(), param);
+    } else if constexpr (std::is_same_v<T, double>) {
+        auto fast_float_result = fast_float::from_chars(input.data(), input.data() + input.size(), param);
+        result.ptr = fast_float_result.ptr;
+        result.ec = fast_float_result.ec;
+    }
+    if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
+        return false;
+    }
+    size_t pos = result.ptr - input.data();
+    index += (pos + first_comma + first_char);
+    return true;
 }
 
 template <typename Param> bool readListItem(std::istream &stream, Param &&param)
@@ -76,20 +112,58 @@ template <typename Param> bool readListItem(std::istream &stream, Param &&param)
     return !stream.fail();
 }
 
-template <typename Param> bool readItem(std::string input, Param &&param)
+template <typename Param> bool readItem(std::string_view input, Param &&param)
 {
-    auto stream = stringReader(std::move(input));
+    auto stream = stringReader(input);
     stream >> param;
     return !stream.fail() && stream.eof();
 }
 
-template <typename... Param> bool readList(std::string input, Param &&... param)
+inline auto nth_occurrence(std::string_view input_str, std::string_view search_str, std::size_t Nth)
 {
-    // to do make this a C++17 fold expression when possible
+    if (Nth == 0) return std::string_view::npos;
+    std::string_view::size_type pos = 0;
+    size_t cnt{};
 
-    auto reader = stringReader(std::move(input));
-    (void)std::initializer_list<bool>{readListItem(reader, std::forward<Param>(param))...};
-    return !reader.fail();
+    do {
+        pos = input_str.find(search_str, pos);
+        if (pos == std::string_view::npos) {
+            return std::string_view::npos;
+        }
+        ++cnt;
+        ++pos;
+    } while (cnt != Nth);
+
+    return pos;
+}
+
+inline auto nth_occurrence(std::string_view input_str, char const search_char, std::size_t Nth)
+{
+    if (Nth == 0) return std::string_view::npos;
+    std::string_view::size_type pos = 0;
+    size_t cnt{};
+
+    do {
+        pos = input_str.find(search_char, pos);
+        if (pos == std::string_view::npos) {
+            return std::string_view::npos;
+        }
+        ++cnt;
+        ++pos;
+    } while (cnt != Nth);
+
+    return pos;
+}
+
+template <typename... Param> bool readList(std::string_view input, Param &&... param)
+{
+    if constexpr (std::conjunction_v<std::is_same<double &, Param>...> || std::conjunction_v<std::is_same<int &, Param>...>) {
+        size_t index = 0;
+        return ((readListItem(input, index, param)), ...);
+    } else {
+        auto reader = stringReader(input);
+        return ((readListItem(reader, param)), ...);
+    }
 }
 
 } // namespace EnergyPlus

@@ -66,7 +66,6 @@
 
 using namespace EnergyPlus;
 using namespace HVACStandAloneERV;
-using namespace ObjexxFCL;
 using namespace DataHeatBalance;
 using namespace DataHVACGlobals;
 using namespace DataZoneEquipment;

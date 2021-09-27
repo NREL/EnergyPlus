@@ -1215,7 +1215,7 @@ namespace HeatBalFiniteDiffManager {
         auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
 
         // Formats
-        static constexpr fmt::string_view Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
+        static constexpr std::string_view Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
 
         print(state.files.eio,
               "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
@@ -1253,7 +1253,7 @@ namespace HeatBalFiniteDiffManager {
                 if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
                 if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
 
-                static constexpr fmt::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
+                static constexpr std::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
                       Format_700,
                       state.dataConstruction->Construct(ThisNum).Name,
@@ -1263,7 +1263,7 @@ namespace HeatBalFiniteDiffManager {
                       ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour);
 
                 for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
-                    static constexpr fmt::string_view Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
+                    static constexpr std::string_view Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
                     print(state.files.eio,
                           Format_701,
                           ConstructFD(ThisNum).Name(Layer),
@@ -1505,7 +1505,6 @@ namespace HeatBalFiniteDiffManager {
             Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
             state.dataHeatBalFiniteDiffMgr->QHeatOutFlux(Surf) = QNetSurfFromOutside;
 
         } else if (surface_ExtBoundCond <= 0) { // regular outside conditions
@@ -1662,7 +1661,6 @@ namespace HeatBalFiniteDiffManager {
 
             // Same sign convention as CTFs
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
 
             // Report all outside BC heat fluxes
             state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
@@ -2176,19 +2174,11 @@ namespace HeatBalFiniteDiffManager {
 
         // Set the internal conditions to local variables
         Real64 const NetLWRadToSurfFD(
-            state.dataHeatBalSurf->SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
+            state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(Surf)); // Net interior long wavelength radiation to surface from other surfaces
         Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
-        Real64 const QHtRadSysSurfFD(state.dataHeatBalFanSys->QHTRadSysSurf(
-            Surf)); // Current radiant heat flux at a surface due to the presence of high temperature radiant heaters
-        Real64 const QHWBaseboardSurfFD(state.dataHeatBalFanSys->QHWBaseboardSurf(
-            Surf)); // Current radiant heat flux at a surface due to the presence of hot water baseboard heaters
-        Real64 const QSteamBaseboardSurfFD(state.dataHeatBalFanSys->QSteamBaseboardSurf(
-            Surf)); // Current radiant heat flux at a surface due to the presence of steam baseboard heaters
-        Real64 const QElecBaseboardSurfFD(state.dataHeatBalFanSys->QElecBaseboardSurf(
-            Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
-        Real64 const QCoolingPanelSurfFD(
-            state.dataHeatBalFanSys->QCoolingPanelSurf(Surf)); // Current radiant heat flux at a surface due to the presence of simple cooling panels
-        Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
+        Real64 const SurfQdotRadHVACInPerAreaFD(
+            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(Surf));                        // Total current radiant heat flux at a surface
+        Real64 const QRadThermInFD(state.dataHeatBal->SurfQdotRadIntGainsInPerArea(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
@@ -2198,8 +2188,7 @@ namespace HeatBalFiniteDiffManager {
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
         auto TDT_i(TDT(i));
-        Real64 const QFac(NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD +
-                          QRadThermInFD + QCoolingPanelSurfFD);
+        Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
         if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(state.dataMaterial->Material(MatLay));
@@ -2316,8 +2305,6 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
         //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
         state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf) = QNetSurfInside;
-        //  QFluxZoneToInSurf(Surf) = QNetSurfInside
-        state.dataHeatBalSurf->SurfOpaqInsFaceCond(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
     // todo - function not used

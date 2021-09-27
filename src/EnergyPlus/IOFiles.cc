@@ -54,9 +54,9 @@
 #include "InputProcessing/InputProcessor.hh"
 #include "UtilityRoutines.hh"
 
-#include "nlohmann/json.hpp"
 #include <algorithm>
 #include <fmt/format.h>
+#include <memory>
 #include <stdexcept>
 
 namespace EnergyPlus {
@@ -100,6 +100,34 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
     }
 }
 
+std::string InputFile::readFile()
+{
+    std::string result(file_size, '\0');
+    is->read(result.data(), file_size);
+    return result;
+}
+
+nlohmann::json InputFile::readJSON()
+{
+    auto const ext = FileSystem::getFileType(filePath);
+    switch (ext) {
+    case FileSystem::FileTypes::EpJSON:
+    case FileSystem::FileTypes::JSON:
+    case FileSystem::FileTypes::GLHE:
+        return nlohmann::json::parse(*is, nullptr, true, true);
+    case FileSystem::FileTypes::CBOR:
+        return nlohmann::json::from_cbor(*is);
+    case FileSystem::FileTypes::MsgPack:
+        return nlohmann::json::from_msgpack(*is);
+    case FileSystem::FileTypes::UBJSON:
+        return nlohmann::json::from_ubjson(*is);
+    case FileSystem::FileTypes::BSON:
+        return nlohmann::json::from_bson(*is);
+    default:
+        throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+    }
+}
+
 InputFile::InputFile(fs::path FilePath) : filePath(std::move(FilePath))
 {
 }
@@ -111,8 +139,9 @@ std::ostream::pos_type InputFile::position() const noexcept
 
 void InputFile::open(bool, bool)
 {
-    is = std::unique_ptr<std::istream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::binary));
-    is->imbue(std::locale("C"));
+    file_size = fs::file_size(filePath);
+    is = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
+    // is->imbue(std::locale("C"));
 }
 
 std::string InputFile::error_state_to_string() const
@@ -213,7 +242,7 @@ void InputOutputFile::del()
 
 void InputOutputFile::open_as_stringstream()
 {
-    os = std::unique_ptr<std::iostream>(new std::stringstream());
+    os = std::make_unique<std::stringstream>();
 }
 
 void InputOutputFile::flush()
@@ -252,12 +281,12 @@ void InputOutputFile::open(const bool forAppend, bool output_to_file)
         }
     }();
     if (!output_to_file) {
-        os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
-        os->imbue(std::locale("C"));
+        os = std::make_unique<std::iostream>(nullptr);
+        // os->imbue(std::locale("C"));
         print_to_dev_null = true;
     } else {
-        os = std::unique_ptr<std::iostream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
-        os->imbue(std::locale("C"));
+        os = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode);
+        // os->imbue(std::locale("C"));
         print_to_dev_null = false;
     }
 }
@@ -435,361 +464,6 @@ void IOFiles::flushAll()
     if (err_stream) {
         err_stream->flush();
     }
-    if (json.json_stream) {
-        json.json_stream->flush();
-    }
-    if (json.json_TSstream_Zone) {
-        json.json_TSstream_Zone->flush();
-    }
-    if (json.json_TSstream_HVAC) {
-        json.json_TSstream_HVAC->flush();
-    }
-    if (json.json_TSstream) {
-        json.json_TSstream->flush();
-    }
-    if (json.json_HRstream) {
-        json.json_HRstream->flush();
-    }
-    if (json.json_MNstream) {
-        json.json_MNstream->flush();
-    }
-    if (json.json_DYstream) {
-        json.json_DYstream->flush();
-    }
-    if (json.json_SMstream) {
-        json.json_SMstream->flush();
-    }
-    if (json.json_YRstream) {
-        json.json_YRstream->flush();
-    }
-    if (json.cbor_stream) {
-        json.cbor_stream->flush();
-    }
-    if (json.cbor_TSstream_Zone) {
-        json.cbor_TSstream_Zone->flush();
-    }
-    if (json.cbor_TSstream_HVAC) {
-        json.cbor_TSstream_HVAC->flush();
-    }
-    if (json.cbor_TSstream) {
-        json.cbor_TSstream->flush();
-    }
-    if (json.cbor_HRstream) {
-        json.cbor_HRstream->flush();
-    }
-    if (json.cbor_MNstream) {
-        json.cbor_MNstream->flush();
-    }
-    if (json.cbor_DYstream) {
-        json.cbor_DYstream->flush();
-    }
-    if (json.cbor_SMstream) {
-        json.cbor_SMstream->flush();
-    }
-    if (json.cbor_YRstream) {
-        json.cbor_YRstream->flush();
-    }
-    if (json.msgpack_stream) {
-        json.msgpack_stream->flush();
-    }
-    if (json.msgpack_TSstream_Zone) {
-        json.msgpack_TSstream_Zone->flush();
-    }
-    if (json.msgpack_TSstream_HVAC) {
-        json.msgpack_TSstream_HVAC->flush();
-    }
-    if (json.msgpack_TSstream) {
-        json.msgpack_TSstream->flush();
-    }
-    if (json.msgpack_HRstream) {
-        json.msgpack_HRstream->flush();
-    }
-    if (json.msgpack_MNstream) {
-        json.msgpack_MNstream->flush();
-    }
-    if (json.msgpack_DYstream) {
-        json.msgpack_DYstream->flush();
-    }
-    if (json.msgpack_SMstream) {
-        json.msgpack_SMstream->flush();
-    }
-    if (json.msgpack_YRstream) {
-        json.msgpack_YRstream->flush();
-    }
-}
-
-using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
-
-class custom_arg_formatter : public arg_formatter
-{
-public:
-    explicit custom_arg_formatter(fmt::format_context &ctx, fmt::format_parse_context *parse_ctx = nullptr, fmt::format_specs *spec = nullptr)
-        : arg_formatter(ctx, parse_ctx, spec)
-
-    {
-    }
-
-    using arg_formatter::operator();
-
-    static constexpr bool should_be_fixed_output(const Real64 value)
-    {
-        return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
-    }
-
-    static bool fixed_will_fit(const Real64 value, const int places)
-    {
-        if (value < 1.0 && value > -1.0) {
-            return true;
-        } else {
-            return static_cast<int>(std::log10(std::abs(value))) < places;
-        }
-    }
-
-    static std::string zero_pad_exponent(std::string str)
-    {
-        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
-        if (str.size() > 3) {
-            if (!std::isdigit(str[str.size() - 3])) {
-                // wants a 0 inserted
-                str.insert(str.size() - 2, "0");
-            }
-        }
-        return str;
-    }
-
-    static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
-    {
-        std::string str;
-
-        struct string_ref
-        {
-            std::reference_wrapper<std::string> ref;
-            std::back_insert_iterator<std::string> begin()
-            {
-                return std::back_inserter(ref.get());
-            }
-
-            using value_type = std::string::value_type;
-            using iterator = std::back_insert_iterator<std::string>;
-        };
-
-        fmt::internal::basic_writer<string_ref> bw(string_ref{str});
-        bw.write(value, specs);
-        return str;
-    }
-
-    iterator write_string(const std::string &str)
-    {
-        // write one character at a time to avoid any spec formatting from {fmt}
-        // which may truncate our output otherwise
-        std::for_each(std::begin(str), std::end(str), [&](const char c) { writer().write(c); });
-        return out();
-    }
-
-    iterator operator()(Real64 const value)
-    {
-        if (specs()) {
-            const auto next_float = [](const Real64 value) {
-                if (std::signbit(value)) {
-                    if (value == -0.0) {
-                        return value;
-                    } else {
-                        return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
-                    }
-                } else {
-                    if (value == 0.0) {
-                        return value;
-                    } else {
-                        return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
-                    }
-                }
-            };
-
-            // matches Fortran's 'E' format
-            if (specs()->type == 'Z') {
-                // The Fortran 'G' format insists on a leading 0, even though
-                // that actually means losing data
-                specs()->type = 'E';
-
-                // 0 pad the end
-                specs()->alt = true;
-
-                bool initialPrecisionWas1 = false;
-                if (specs()->precision > 1) {
-                    // reduce the precision to get rounding behavior
-                    --specs()->precision;
-                } else {
-                    // We need AT LEAST one in precision so we capture a '.' below
-                    initialPrecisionWas1 = true;
-                    specs()->precision = 1;
-                    ++specs()->width;
-                }
-
-                // multiply by 10 to get the exponent we want
-                auto str = write_to_string(value * 10, *specs());
-
-                // we need "space" to insert our leading 0
-                if (str.front() != ' ') {
-                    str.insert(str.begin(), ' ');
-                }
-
-                auto begin = std::find(std::begin(str), std::end(str), '.');
-                if (initialPrecisionWas1) {
-                    // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
-                    // and this is why we manually increased the specs()->width by one above
-                    str.erase(std::next(begin));
-                }
-                // if (begin != std::end(str)) {
-                // ' -1.2345E15'
-                //     ^
-                std::swap(*begin, *std::prev(begin));
-                // ' -.12345E15'
-                //     ^
-                std::advance(begin, -2);
-                // ' -.12345E15'
-                //   ^
-                if (*begin != ' ') {
-                    // found a sign
-                    std::swap(*begin, *std::prev(begin));
-                    // '- .12345E15'
-                    //   ^
-                }
-                // '-0.12345E15'
-                //   ^
-                *begin = '0';
-                return write_string(str);
-            } else if (specs()->type == 'S') {
-                // matches Fortran's 'G', but stripped of whitespace
-                specs()->type = 'N';
-                return write_string(stripped(write_to_string(value, *specs())));
-            } else if (specs()->type == 'N') {
-                // matches Fortran's 'G' format
-
-                if (specs()->width == 0 && specs()->precision == -1) {
-                    return write_string(format("{:20N}", value));
-                } else if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
-                    specs()->type = 'F';
-
-                    // account for alignment with E formatted
-                    specs()->width -= 4;
-                    if (value == 0.0) {
-                        --specs()->precision;
-                    } else if (value < 1.0 && value > -1.0) {
-                        // No adjustment necessary
-                    } else if (specs()->precision == -1) {
-                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(value)));
-                        specs()->precision = specs()->width - (order_of_magnitude + 2);
-                    } else {
-                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(value)));
-                        specs()->precision -= (order_of_magnitude + 1);
-                    }
-
-                    // if precision adjustment would result in negative, make it 0 to get rounding
-                    // and adjust spacing
-                    if (specs()->precision <= 0) {
-                        specs()->width -= 1;
-                        specs()->precision = 0;
-                    }
-
-                    (*this)(value);
-
-                    // When precision hit 0, add . to match Fortran formatting
-                    if (specs()->precision == 0) {
-                        write_string(".");
-                    }
-
-                    // write the last 4 chars
-                    return write_string("    ");
-                } else {
-                    // The Fortran 'G' format insists on a leading 0, even though
-                    // that actually means losing data
-                    specs()->type = 'Z';
-                    return (*this)(value);
-                }
-            } else if (specs()->type == 'R') { // matches RoundSigDigits() behavior
-                // push the value up a tad to get the same rounding behavior as Objexx
-                const auto fixed_output = should_be_fixed_output(value);
-
-                if (fixed_output) {
-                    specs()->type = 'F';
-
-                    if (value > 100000.0) {
-                        const auto digits10 = static_cast<int>(std::log10(value));
-                        // we cannot represent this value to the require precision, truncate the floating
-                        // point portion
-                        if (digits10 + specs()->precision >= std::numeric_limits<decltype(value)>::max_digits10) {
-                            specs()->precision = 0;
-                            // add '.' to match old RoundSigDigits
-                            const auto str = write_to_string(value, *specs()) + '.';
-                            return write_string(str);
-                        } else {
-                            return (*this)(value);
-                        }
-                    } else {
-                        if (value == 0.0 || value == -0.0) {
-                            return (*this)(0.0);
-                        } else {
-                            // nudge up to next rounded value
-                            return (*this)(next_float(next_float(next_float(value))));
-                        }
-                    }
-                } else {
-                    specs()->type = 'E';
-                    return write_string(zero_pad_exponent(write_to_string(next_float(value), *specs())));
-                }
-            } else if (specs()->type == 'T') { // matches TrimSigDigits behavior
-                const auto fixed_output = should_be_fixed_output(value);
-
-                if (fixed_output) {
-                    const auto magnitude = std::pow(10, specs()->precision);
-                    const auto adjusted = (value * magnitude) + 0.0001;
-                    const auto truncated = std::trunc(adjusted) / magnitude;
-                    specs()->type = 'F';
-                    return (*this)(truncated);
-                } else {
-                    specs()->type = 'E';
-                    specs()->precision += 2;
-
-                    // write the `E` formatted float to a std::string
-                    auto str = zero_pad_exponent(write_to_string(value, *specs()));
-
-                    // Erase last 2 numbers to truncate the value
-                    const auto E_itr = std::find(begin(str), end(str), 'E');
-                    if (E_itr != str.end()) {
-                        str.erase(std::prev(E_itr, 2), E_itr);
-                    }
-
-                    return write_string(str);
-                }
-            }
-        }
-        return arg_formatter::operator()(value);
-    }
-}; // namespace EnergyPlus
-
-void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
-{
-    //    assert(os.good());
-    fmt::memory_buffer buffer;
-    try {
-        // Pass custom argument formatter as a template arg to vformat_to.
-        fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
-    } catch (const fmt::format_error &) {
-        throw FatalError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
-    }
-    os.write(buffer.data(), buffer.size());
-}
-
-std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count)
-{
-    fmt::memory_buffer buffer;
-    try {
-        // Pass custom argument formatter as a template arg to vformat_to.
-        fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
-    } catch (const fmt::format_error &) {
-        throw FatalError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
-    }
-    return fmt::to_string(buffer);
 }
 
 } // namespace EnergyPlus

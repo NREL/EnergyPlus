@@ -740,10 +740,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
 
             // The IR radiance of this window's "exterior" surround is the IR radiance
             // from surfaces and high-temp radiant sources in the adjacent zone
-            outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) +
-                    state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNumAdj) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) +
-                    state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj) +
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
+            outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNumAdj) +
+                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNumAdj);
 
         } else { // Exterior window (ExtBoundCond = 0)
                  // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -794,10 +792,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     SurfOutsideEmiss = LWAbsOut;
     // Indoor mean radiant temperature.
     // IR incident on window from zone surfaces and high-temp radiant sources
-    rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
-           state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
-           state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) +
-           state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+    rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) +
+           state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum);
     TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
     NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
@@ -847,10 +843,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // Window heat gain (or loss) is calculated here
     state.dataSurface->SurfWinHeatGain(SurfNum) =
         state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
-    state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
     state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
-    // store for component reporting
-    state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
     state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
     state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
     state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
@@ -861,8 +854,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
         // Interior shade exists
         state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
     }
-    // Advanced report variable (DisplayAdvancedReportVariables)
-    state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 }
 
 void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)

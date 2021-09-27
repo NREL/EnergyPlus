@@ -76,7 +76,6 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
