@@ -1773,7 +1773,7 @@ namespace DataPlant {
                     goto components_end; // don't do any more components on this branch
                     break;
                 }
-                default:
+                default: // demand, etc.
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                 }
 
@@ -1974,7 +1974,7 @@ namespace DataPlant {
                 switch (this_comp.CurOpSchemeType) {
                 case (HeatingRBOpSchemeType):
                 case (CoolingRBOpSchemeType): { //~ load range based
-                    break;
+                    break;                      // Don't do anything for load based components
                 }
 
                 default: {
