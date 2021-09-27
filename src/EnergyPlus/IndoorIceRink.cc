@@ -388,8 +388,6 @@ namespace IceRink {
 
     void IceRinkData::initialize(EnergyPlusData &state)
     {
-        auto &Node(state.dataLoopNodes->Node);
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
         static constexpr std::string_view RoutineName("initialize");
