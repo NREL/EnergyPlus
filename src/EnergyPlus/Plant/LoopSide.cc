@@ -232,9 +232,9 @@ namespace DataPlant {
             auto &this_component(this->Branch(firstBranchIndex).Comp(CompIndex));
 
             {
-                auto const SELECT_CASE_var(this_component.CurOpSchemeType);
-
-                if ((SELECT_CASE_var >= DataPlant::LoadRangeBasedMin) && (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
+                switch (this_component.CurOpSchemeType) {
+                case (HeatingRBOpSchemeType):
+                case (CoolingRBOpSchemeType): { //~ load range based
                     if (EncounteredNonLRBAfterLRB) {
                         // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
                         ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
@@ -244,26 +244,31 @@ namespace DataPlant {
                     } else {
                         EncounteredLRB = true;
                     }
-
-                } else if (SELECT_CASE_var == DataPlant::PumpOpSchemeType) { //~ pump
+                    break;
+                }
+                case (DataPlant::PumpOpSchemeType): { //~ pump
                     // For now this is just a placeholder, because I think pumps will be available anywhere,
                     //  and they won't affect the load distribution
-
-                } else if (SELECT_CASE_var == DataPlant::NoControlOpSchemeType) { //~ Such as pipes
+                    break;
+                }
+                case (DataPlant::NoControlOpSchemeType): { //~ Such as pipes
                     // For now this is just a placeholder, because these components shouldn't cause a problem anywhere...
-
-                } else if (SELECT_CASE_var ==
-                           DataPlant::UnknownStatusOpSchemeType) { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
+                    break;
+                }
+                case (DataPlant::UnknownStatusOpSchemeType): { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
                     // throw fatal
                     ShowSevereError(state,
                                     "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
                     ShowFatalError(state, "ValidateFlowControlPaths: developer notice, Inlet path validation loop");
-                } else { //~ Other control type
+                    break;
+                }
+                default: { //~ Other control type
                     if (EncounteredLRB) {
                         EncounteredNonLRBAfterLRB = true;
                     } else {
                         // For now don't do anything, but we'll see...
                     }
+                }
                 }
             }
         }
@@ -294,10 +299,9 @@ namespace DataPlant {
                     auto &this_component(this->Branch(BranchIndex).Comp(CompIndex));
 
                     {
-                        auto const SELECT_CASE_var(this_component.CurOpSchemeType);
-
-                        if ((SELECT_CASE_var >= DataPlant::LoadRangeBasedMin) &&
-                            (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
+                        switch (this_component.CurOpSchemeType) {
+                        case (HeatingRBOpSchemeType):
+                        case (CoolingRBOpSchemeType): { //~ load range based
                             if (EncounteredNonLRBAfterLRB) {
                                 // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
                                 ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
@@ -307,26 +311,33 @@ namespace DataPlant {
                             } else {
                                 EncounteredLRB = true;
                             }
+                            break;
+                        }
 
-                        } else if (SELECT_CASE_var == DataPlant::NoControlOpSchemeType) { //~ Such as pipes
+                        case (DataPlant::NoControlOpSchemeType): { //~ Such as pipes
                             // For now this is just a placeholder, because these components shouldn't cause a problem anywhere...
-
-                        } else if (SELECT_CASE_var == DataPlant::PumpOpSchemeType) { //~ pump
+                            break;
+                        }
+                        case (DataPlant::PumpOpSchemeType): { //~ pump
                             // For now this is just a placeholder, because I think pumps will be available anywhere,
                             //  and they won't affect the load distribution
-
-                        } else if (SELECT_CASE_var == DataPlant::UnknownStatusOpSchemeType) { //~ Uninitialized, this should be sufficient place to
-                                                                                              // catch for this on other branches
+                            break;
+                        }
+                        case (DataPlant::UnknownStatusOpSchemeType): { //~ Uninitialized, this should be sufficient place to
+                                                                       // catch for this on other branches
                             // throw fatal error
                             ShowSevereError(
                                 state, "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
                             ShowFatalError(state, "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop");
-                        } else { //~ Other control type
+                            break;
+                        }
+                        default: { //~ Other control type
                             if (EncounteredLRB) {
                                 EncounteredNonLRBAfterLRB = true;
                             } else {
                                 // For now don't do anything, but we'll see...
                             }
+                        }
                         }
                     }
 
@@ -1756,13 +1767,14 @@ namespace DataPlant {
                                                                         LoadDistributionWasPerformed);
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
+                case (HeatingRBOpSchemeType):
+                case (CoolingRBOpSchemeType): { //~ load range based
+                    EncounteredLRBObjDuringPass1 = true;
+                    goto components_end; // don't do any more components on this branch
+                    break;
+                }
                 default:
-                    if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
-                        EncounteredLRBObjDuringPass1 = true;
-                        goto components_end; // don't do any more components on this branch
-                    } else {                 // demand, , etc.
-                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
-                    }
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                 }
 
                 // Update loop demand as needed for changes this component may have made
@@ -1825,22 +1837,25 @@ namespace DataPlant {
                         SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
-                default:
-                    if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
-                        if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
-                            PlantCondLoopOperation::ManagePlantLoadDistribution(state,
-                                                                                this->myLoopNum,
-                                                                                this->myLoopSideNum,
-                                                                                BranchCounter,
-                                                                                CompCounter,
-                                                                                LoadToLoopSetPoint,
-                                                                                LoadToLoopSetPointThatWasntMet,
-                                                                                FirstHVACIteration,
-                                                                                LoopShutDownFlag,
-                                                                                LoadDistributionWasPerformed);
-                        }
-                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
+                case (HeatingRBOpSchemeType):
+                case (CoolingRBOpSchemeType): {          //~ load range based
+                    if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
+                        PlantCondLoopOperation::ManagePlantLoadDistribution(state,
+                                                                            this->myLoopNum,
+                                                                            this->myLoopSideNum,
+                                                                            BranchCounter,
+                                                                            CompCounter,
+                                                                            LoadToLoopSetPoint,
+                                                                            LoadToLoopSetPointThatWasntMet,
+                                                                            FirstHVACIteration,
+                                                                            LoopShutDownFlag,
+                                                                            LoadDistributionWasPerformed);
                     }
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
+                    break;
+                }
+                default:
+                    break;
                 }
 
                 //~ If we didn't EXIT early, we must have simulated, so update array
@@ -1888,12 +1903,14 @@ namespace DataPlant {
                         SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
+                case (HeatingRBOpSchemeType):
+                case (CoolingRBOpSchemeType): { //~ load range based
+                    ShowFatalError(state, "Encountered Load Based Object after other components, invalid.");
+                    break;
+                }
                 default:
-                    if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
-                        ShowFatalError(state, "Encountered Load Based Object after other components, invalid.");
-                    } else { //~ Typical control equipment
-                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
-                    }
+                    //~ Typical control equipment
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                 }
 
                 //~ If we didn't EXIT early, we must have simulated, so update array
@@ -1938,8 +1955,6 @@ namespace DataPlant {
         //    Therefore they are not included
 
         // Using/Aliasing
-        using DataPlant::LoadRangeBasedMax;
-        using DataPlant::LoadRangeBasedMin;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1956,13 +1971,18 @@ namespace DataPlant {
 
         if (this->FlowLock == DataPlant::FlowLock::Unlocked) {
             {
-                auto const SELECT_CASE_var(this_comp.CurOpSchemeType);
-                if ((SELECT_CASE_var >= LoadRangeBasedMin) && (SELECT_CASE_var <= LoadRangeBasedMax)) {
-                    // Don't do anything for load based components
-                } else {
+                switch (this_comp.CurOpSchemeType) {
+                case (HeatingRBOpSchemeType):
+                case (CoolingRBOpSchemeType): { //~ load range based
+                    break;
+                }
+
+                default: {
                     // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
                     ComponentMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
                     // make sure components like economizers use the mass flow request
+                    break;
+                }
                 }
             }
 
@@ -1970,15 +1990,17 @@ namespace DataPlant {
 
             // For locked flow just use the mass flow rate
             {
-                auto const SELECT_CASE_var(this_comp.CurOpSchemeType);
-                if ((SELECT_CASE_var >= LoadRangeBasedMin) && (SELECT_CASE_var <= LoadRangeBasedMax)) {
-                    // Don't do anything for load based components
-                } else {
+                switch (this_comp.CurOpSchemeType) {
+                case (HeatingRBOpSchemeType):
+                case (CoolingRBOpSchemeType): { //~ load range based
+                    break;                      // Don't do anything for load based components
+                }
+                default: {
                     // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
                     ComponentMassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 }
+                }
             }
-
         } else { // flow pump query? problem?
         }
 

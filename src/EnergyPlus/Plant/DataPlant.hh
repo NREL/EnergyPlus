@@ -75,9 +75,6 @@ namespace DataPlant {
     // Using/Aliasing
     using DataLoopNode::SensedNodeFlagValue;
 
-    constexpr int LoadRangeBasedMin(0);
-    constexpr int LoadRangeBasedMax(2);
-
     // Criteria percentage limits for determining re-simulation of connected loop sides
     constexpr Real64 CriteriaDelta_MassFlowRate(0.001);
     constexpr Real64 CriteriaDelta_Temperature(0.010);

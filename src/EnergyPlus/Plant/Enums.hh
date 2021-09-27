@@ -71,8 +71,8 @@ int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop f
 enum OpSchemeType
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
-    UnknownStatusOpSchemeType = -2,
-    NoControlOpSchemeType = -1,          // Scheme Type placeholder for items such as pipes
+    UnknownStatusOpSchemeType = -1,
+    NoControlOpSchemeType = 0,          // Scheme Type placeholder for items such as pipes
     HeatingRBOpSchemeType = 1,          // Scheme Type for Heating Load Range Based Operation
     CoolingRBOpSchemeType = 2,          // Scheme Type for Cooling  Load Range Based Operation
     WetBulbRBOpSchemeType = 3,          // Scheme Type for Wet bulb range based Operation
@@ -267,14 +267,14 @@ enum class FlowLock
 {
     Unassigned = -1,
     PumpQuery, // Used to ask the pumps for their min/max avail based on no constraints
-    Unlocked,   // components request flow
-    Locked,     // components take their inlet flow
+    Unlocked,  // components request flow
+    Locked,    // components take their inlet flow
 };
 
 enum class PressureCall
 {
     Unassigned = -1,
-    Init ,
+    Init,
     Calc,
     Update,
 };
@@ -282,7 +282,7 @@ enum class PressureCall
 enum class PressSimType
 {
     Unassigned = -1,
-    NoPressure,         // Nothing for that particular loop
+    NoPressure,          // Nothing for that particular loop
     PumpPowerCorrection, // Only updating the pump power
     FlowCorrection,      // Update pump flow rate based on pump curve
     FlowSimulation,      // Full pressure network simulation

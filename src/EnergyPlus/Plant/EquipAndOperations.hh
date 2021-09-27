@@ -126,29 +126,30 @@ struct EquipOpList
 struct OperationData
 {
     // Members
-    std::string Name;               // The name of each item in the list
-    std::string TypeOf;             // The 'keyWord' identifying each item in the list
-    int OpSchemeType;               // Op scheme type (from keyword)
-    std::string Sched;              // The name of the schedule associated with the list
-    int SchedPtr;                   // ALLOCATABLE to the schedule (for valid schedules)
-    bool Available;                 // TRUE = designated component or operation scheme available
-    int NumEquipLists;              // number of equipment lists
-    int CurListPtr;                 // points to the current equipment list
-    Array1D<EquipOpList> EquipList; // Component type list
-    int EquipListNumForLastStage;   // points to the equipment list with the highest upper limit
-    std::string ReferenceNodeName;  // DELTA CTRL ONLY--for calculation of delta Temp
-    int ReferenceNodeNumber;        // DELTA CTRL ONLY--for calculation of delta Temp
-    int ErlSimProgramMngr;          // EMS:ProgramManager to always run when this model is called
-    int ErlInitProgramMngr;         // EMS:ProgramManager to run when this model is initialized and setup
-    int initPluginLocation;         // If Python Plugins are used to init this, this defines the location in the plugin structure
-    int simPluginLocation;          // If Python Plugins are used to simulate this, this defines the location in the plugin structure
-    Real64 EMSIntVarLoopDemandRate; // EMS internal variable for loop-level demand rate, neg cooling [W]
+    std::string Name;                     // The name of each item in the list
+    std::string TypeOf;                   // The 'keyWord' identifying each item in the list
+    DataPlant::OpSchemeType OpSchemeType; // Op scheme type (from keyword)
+    std::string Sched;                    // The name of the schedule associated with the list
+    int SchedPtr;                         // ALLOCATABLE to the schedule (for valid schedules)
+    bool Available;                       // TRUE = designated component or operation scheme available
+    int NumEquipLists;                    // number of equipment lists
+    int CurListPtr;                       // points to the current equipment list
+    Array1D<EquipOpList> EquipList;       // Component type list
+    int EquipListNumForLastStage;         // points to the equipment list with the highest upper limit
+    std::string ReferenceNodeName;        // DELTA CTRL ONLY--for calculation of delta Temp
+    int ReferenceNodeNumber;              // DELTA CTRL ONLY--for calculation of delta Temp
+    int ErlSimProgramMngr;                // EMS:ProgramManager to always run when this model is called
+    int ErlInitProgramMngr;               // EMS:ProgramManager to run when this model is initialized and setup
+    int initPluginLocation;               // If Python Plugins are used to init this, this defines the location in the plugin structure
+    int simPluginLocation;                // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+    Real64 EMSIntVarLoopDemandRate;       // EMS internal variable for loop-level demand rate, neg cooling [W]
     bool MyEnvrnFlag;
 
     // Default Constructor
     OperationData()
-        : OpSchemeType(0), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0), ReferenceNodeNumber(0),
-          ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
+        : OpSchemeType(DataPlant::OpSchemeType::UnknownStatusOpSchemeType), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0),
+          EquipListNumForLastStage(0), ReferenceNodeNumber(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1),
+          simPluginLocation(-1), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
     {
     }
 };
