@@ -60,89 +60,61 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
 struct EnergyPlusData;
 
 namespace IceRink {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // System types:
-    extern int const DirectSystem;
-    extern int const IndirectSystem;
-    extern std::string const cDRink;
-    extern std::string const cIRink;
+    enum class SystemType {Direct, Indirect};
+    enum class FluidType {CaCl2 [[maybe_unused]], E6};
+    enum class ControlType {SurfaceTemp, BrineOutletTemp};
 
-    // Fluid types in indirect refrigeration system
-    extern int const CaCl2;
-    extern int const EG;
-
-    // Control types:
-    extern int const SurfaceTempControl;
-    extern int const BrineOutletTempControl;
-
-    // Operating Mode:
-    extern int NotOperating; // Parameter for use with OperatingMode variable, set for not operating
-    extern int CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
-
-    extern int NumOfRinks;
-    extern int NumOfResurfacers;
-
-    struct coefficients
+    struct Coefficients
     {
-        Real64 Ca;
-        Real64 Cb;
-        Real64 Cc;
-
-        Real64 Cd;
-        Real64 Ce;
-        Real64 Cf;
-
-        Real64 Cg;
-        Real64 Ch;
-        Real64 Ci;
-        Real64 Cj;
-        Real64 Cl;
-        Real64 Ck;
-
-        Real64 Area;
-
-        int NoOfResurfEvents;
+        Real64 Ca = 0.0;
+        Real64 Cb = 0.0;
+        Real64 Cc = 0.0;
+        Real64 Cd = 0.0;
+        Real64 Ce = 0.0;
+        Real64 Cf = 0.0;
+        Real64 Cg = 0.0;
+        Real64 Ch = 0.0;
+        Real64 Ci = 0.0;
+        Real64 Cj = 0.0;
+        Real64 Cl = 0.0;
+        Real64 Ck = 0.0;
+        Real64 Area = 0.0;
     };
 
     struct IceRinkData : PlantComponent
     {
-        struct coefficients coeffs;
+        Coefficients coeffs;
         std::string Name; // User identifier
-        int RinkType_Num;
+        int RinkType_Num = DataPlant::TypeOf_IceRink;
         std::string SchedName;               // availability schedule
-        int SchedPtr;                        // index to schedule
+        int SchedPtr = 0;                        // index to schedule
         std::string ZoneName;                // Name of zone the system is present
-        int ZonePtr;                         // Pointer to the zone in which the floor radiant system is present
+        int ZonePtr = 0;                         // Pointer to the zone in which the floor radiant system is present
         std::string SurfaceName;             // surface name of rink
-        int SurfacePtr;                      // index to surface array
-        int PeopleHeatGainSchedPtr;          // People schedule index
-        std::string PeopleHeatGainSchedName; // Name of people heat gain schedule
+        int SurfacePtr = 0;                      // index to surface array
+        int PeopleHeatGainSchedPtr = 0;          // People schedule index
         std::string PeopleSchedName;         // Name of people schedule
-        int PeopleSchedPtr;                  // People schedule index
-        Real64 PeopleHeatGain;               // Current heat gain from people
-        Real64 NumOfPeople;
-        Real64 TotalPeopleHG;
+        int PeopleSchedPtr = 0;                  // People schedule index
+        Real64 PeopleHeatGain = 0.0;               // Current heat gain from people
+        Real64 NumOfPeople = 0.0;
         Real64 MaxNumOfPeople; // Number of people in the rink as defined by user input
         Real64 FloodWaterTemp;
         Real64 IceTemp;
-        int NumOfSurfaces;         // Total number of surfaces in the ice rink arena
+        int NumOfSurfaces = 0;         // Total number of surfaces in the ice rink arena
         Real64 DesignMassFlowRate; // Design flow rate through the rink HX [kg/s]
         
         Real64 hrstofreeze;  // Desired hours to freeze the water of the ice rink
         Real64 deltatemp;    // Design delta T for heat exchanger
         Real64 maxmdot;      // maximum mass flowrate
-        int ControlStrategy; // Control strategy for the ice rink (BOTC or STC)
+        ControlType ControlStrategy = ControlType::BrineOutletTemp; // Control strategy for the ice rink (BOTC or STC)
 
         // Rink geometry details
         Real64 LengthRink;
         Real64 WidthRink;
-        // Real64 DepthRink;
         Real64 WaterTemp; // water temperature before freezing to ice rink
         Real64 IceThickness;
         Real64 TubeLength;       // Length of the piping used in the floor radiant system
@@ -151,110 +123,88 @@ namespace IceRink {
         Real64 TotalSurfaceArea; // Surface area of the rink
 
         // loop topology variables
-        int LoopNum;
-        int LoopSide;
-        int BranchNum;
-        int CompNum;
+        int LoopNum = 0;
+        int LoopSide = 0;
+        int BranchNum = 0;
+        int CompNum = 0;
 
         std::string RefrigInNode;     // Inlet node for the cold refrigerant entring the floor radiant system
-        std::string RefrigOutNode;    // Outlet node for the hot refrigerant exiting the floor radiant system
-        int InNode;                   // Refrigerant inlet node number
-        int OutNode;                  // Refrigerant outlet node number
-        int RefrigSetptSchedPtr;      // Pointer to set point temperature of refrigerant outlet
-        int IceSetptSchedPtr;         // Pointer to set point temperature of ice surface
-        Real64 RefrigSetptTemp;       // Set point temperature for refrigerant outlet
-        Real64 IceSetptTemp;          // Set point temperature for ice surface
-        std::string RefrigSetptSched; // Set point schedule name for BOTC
+        int InNode = 0;                   // Refrigerant inlet node number
+        int OutNode = 0;                  // Refrigerant outlet node number
+        int IceSetptSchedPtr = 0;         // Pointer to set point temperature of ice surface
         std::string IceSetptSched;    // Set point schedule name for STC
 
         // Data specific to direct systems
-        int RefrigIndex; // Index to refrigerant properties used in direct system
+        int RefrigIndex = 0; // Index to refrigerant properties used in direct system
 
         // Data specific to indirect systems
-        int GlycolIndex; // Index to secondary refrigerant used in indirect system
-        int RefrigType;
+        int GlycolIndex = 0; // Index to secondary refrigerant used in indirect system
         Real64 RefrigConc;
 
-        bool MyFlag;
-        bool MyEnvrnFlag;
-        Real64 IceTemperature;
-        Real64 Tsurfin1;      // inside surface temperature in previous timestep.
-        Real64 Tsurfin2;      // inside surface temperature in current timestep.
-        Real64 Qsource2;      // Q used to report data after calling heat balance. This is used to find any irregularities.
-        Real64 Qsetpoint;     // Required Q to bring the inside surface temperature to ice setpoint.
-        Real64 Qsrcmax;       // maximum Q to freeze water. This is used to calculate the design load and maximum mass flowrate.
-        Real64 Qsrcmax2;     // maximum Q based on CTFs
-        Real64 Tsrc;          // Source Temperature. Only used to track simulation results.
-        Real64 Effectiveness; // effectiveness of HX
-        Real64 ReqMassFlow;   // Required mass flowarate
-        Real64 CpRefrig;      // Specific heat of refrigerant
-        Real64 RhoWater;      // density of water
-        Real64 CpWater;       // Specific heat of water
-        Real64 Qfusion;       // Enthalpy of water transformation to ice
-        Real64 Q;             // Final Q to be reported to EnergyPlus - using eqn. from low radiant temp system
-        Real64 Q2;            // using eqn. 16
-        Real64 Q3;            // using eqn. 11
-        Real64 SecInHour = 3600; 
-        Real64 Increments = 0.1667; 
-        Real64 TRefigOutCheck;     // Outlet temperature of refrigerant
-        Real64 RefrigTempIn;       // Inlet temperature of refrigerant
-        Real64 RefrigMassFlow;     // Refrigerant mass flow rate
-        Real64 PastRefrigMassFlow; // to keep track of previous mass flow rate
-        Real64 LoadMet;
-        Real64 COP; // hardwired COP. This will be changed later. default is 2.5
-        Real64 IceSetPointTemp; //Ice rink setpoint
-        Real64 operation; //used to determine whether the ice rink is ON or OFF. 1: ON; 0: OFF
-        Real64 circuits;
-        Real64 HXSpacing;
-        Real64 DesignSetPoint;
-        Real64 Timestep=6; //timesteps in an hours
-        Real64 ResurfWaterTemp; // in C and from ASHRAE - 60 default
-        Real64 InitialWaterTemp;
-        Real64 ResurfTank; // in m3 - 0.55m3 default is from ASHRAE capacity range 
-        Real64 QResurface;
-        Real64 HeatingWater;
-        Real64 MassflowTest;
+        bool MyFlag = true;
+        bool MyEnvrnFlag = true;
+        Real64 IceTemperature = 0.0;
+        Real64 Tsurfin1 = 0.0;      // inside surface temperature in previous timestep.
+        Real64 Qsource2 = 0.0;      // Q used to report data after calling heat balance. This is used to find any irregularities.
+        Real64 Qsetpoint = 0.0;     // Required Q to bring the inside surface temperature to ice setpoint.
+        Real64 Qsrcmax = 0.0;       // maximum Q to freeze water. This is used to calculate the design load and maximum mass flowrate.
+        Real64 Qsrcmax2 = 0.0;     // maximum Q based on CTFs
+        Real64 Tsrc = 0.0;          // Source Temperature. Only used to track simulation results.
+        Real64 Effectiveness = 0.0; // effectiveness of HX
+        Real64 ReqMassFlow = 0.0;   // Required mass flowarate
+        Real64 CpRefrig = 0.0;      // Specific heat of refrigerant
+        Real64 RhoWater = 0.0;      // density of water
+        Real64 CpWater = 0.0;       // Specific heat of water
+        Real64 Q = 0.0;             // Final Q to be reported to EnergyPlus - using eqn. from low radiant temp system
+        Real64 Q2 = 0.0;            // using eqn. 16
+        Real64 Q3 = 0.0;            // using eqn. 11
+        Real64 TRefigOutCheck = 0.0;     // Outlet temperature of refrigerant
+        Real64 RefrigTempIn = 0.0;       // Inlet temperature of refrigerant
+        Real64 RefrigMassFlow = 0.0;     // Refrigerant mass flow rate
+        Real64 PastRefrigMassFlow = 0.0; // to keep track of previous mass flow rate
+        Real64 LoadMet = 0.0;
+        Real64 COP = 0.0; // hardwired COP. This will be changed later. default is 2.5
+        Real64 IceSetPointTemp = 0.0; //Ice rink setpoint
+        Real64 operation = 0.0; //used to determine whether the ice rink is ON or OFF. 1: ON; 0: OFF
+        Real64 circuits = 0.0;
+        Real64 HXSpacing = 0.0;
+        Real64 DesignSetPoint = 0.0;
+        Real64 ResurfWaterTemp = 0.0; // in C and from ASHRAE - 60 default
+        Real64 InitialWaterTemp = 0.0;
+        Real64 ResurfTank = 0.0; // in m3 - 0.55m3 default is from ASHRAE capacity range
+        Real64 QResurface = 0.0;
+        Real64 HeatingWater = 0.0;
+        Real64 MassflowTest = 0.0;
 
-        Real64 FreezingLoad;
+        Real64 FreezingLoad = 0.0;
 
         // ReportData
-        Real64 RefrigInletTemp;  // Refrigerant inlet temperature
-        Real64 RefrigOutletTemp; // Refrigerant outlet temperature
-        Real64 CoolPower;        // Cooling sent to rink floor in Watts
-        Real64 CoolEnergy;       // Cooling sent to rink floor in Joules
+        Real64 RefrigInletTemp = 0.0;  // Refrigerant inlet temperature
+        Real64 CoolPower = 0.0;        // Cooling sent to rink floor in Watts
+        Real64 CoolEnergy = 0.0;       // Cooling sent to rink floor in Joules
 
         // Members
         std::string NameR; // Resurfacer Name
-        int CompIndex;
-        int WaterIndex;
+        int CompIndex = 0;
+        int WaterIndex = 0;
         std::string ResurfacingSchedName;
-        int ResurfacingSchedPtr;
-        int ResurfaceON;
-        
+        int ResurfacingSchedPtr = 0;
+        int ResurfaceON; // TODO: Should be bool?
+
+        Real64 InletTemp;
+        Real64 OutletTemp;
+        Real64 FlowRate;
 
         // Report Data
-        Real64 ResurfacingHeatLoad;
-        Real64 QResurfacing;
-        Real64 EHeatingWater;
-        Real64 NoOfResurfEvents;
-        Real64 ResurfacingWaterTemp;
-        Real64 InitWaterTemp;
-        Real64 TankCapacity;
-
-        // Function
-
-        // Default Constructor
-        IceRinkData()
-            : RinkType_Num(97), CompIndex(0), WaterIndex(0), ResurfacingSchedPtr(0), NoOfResurfEvents(0), ResurfacingWaterTemp(0.0),
-              InitWaterTemp(0.0), TankCapacity(0.0), QResurfacing(0.0), EHeatingWater(0.0), ResurfacingHeatLoad(0.0)
-        {
-        }
-        //void SimIceRink(EnergyPlusData &state, bool FirstHVACIteration);
+        Real64 ResurfacingHeatLoad = 0.0;
+        Real64 EHeatingWater = 0.0;
+        Real64 ResurfacingWaterTemp = 0.0;
+        Real64 TankCapacity = 0.0;
 
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void initialize(EnergyPlusData &state);
 
@@ -262,34 +212,34 @@ namespace IceRink {
 
         Real64 IceRinkFreezing(EnergyPlusData &state);
 
-        Real64 calcEffectiveness(EnergyPlusData &state, Real64 const Temperature, Real64 const RefrigMassFlow);
+        Real64 calcEffectiveness(EnergyPlusData &state, Real64 Temperature, Real64 lRefrigMassFlow) const;
 
-        void calculateIceRink(EnergyPlusData &state, Real64 &LoadMet, bool is_test);
+        void calculateIceRink(EnergyPlusData &state, Real64 &LoadMet);
 
-        //void update();
-
-        void report(EnergyPlusData &state, bool RunFlag);
+        void report(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    // Object Data:
-    extern Array1D<IceRinkData> Rink;
-
-    // Functions:
-
-    //void clear_state();
-
     void GetIndoorIceRink(EnergyPlusData &state);
-
 
 } // namespace IceRink
 
 struct IceRinkData : BaseGlobalStruct
 {
+    Array1D<IceRink::IceRinkData> Rink;
+    int NumOfRinks = 0;
+    int NumOfResurfacers = 0;
+    bool FirstTimeInit = true;
+    bool GetInput = true;
+    Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step for a particular radiant surface
+    Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     void clear_state() override
     {
+        *this = IceRinkData();
     }
 };
 } // namespace EnergyPlus
