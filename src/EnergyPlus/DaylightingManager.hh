@@ -130,9 +130,7 @@ namespace DaylightingManager {
         Vector3<Real64> &VIEWVC2,                 // Virtual view vector in absolute coordinate system
         bool &Rectangle,                          // True if window is rectangular
         bool &Triangle,                           // True if window is triangular
-        Optional_int_const MapNum = _,
-        //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
-        Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
+        Optional_int_const MapNum = _);
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
         EnergyPlusData &state,
@@ -177,9 +175,7 @@ namespace DaylightingManager {
         bool const Triangle,
         Real64 &TVISIntWin,     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
-        Optional_int_const MapNum = _,
-        //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
-        Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
+        Optional_int_const MapNum = _);
 
     void InitializeCFSDaylighting(EnergyPlusData &state,
                                   int const daylightCtrlNum,       // Current daylighting control number
@@ -282,8 +278,7 @@ namespace DaylightingManager {
         DataDaylighting::iCalledFor const CalledFrom,  // indicate  which type of routine called this routine
         Real64 &TVISIntWin,                            // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk,                        // Visible transmittance of int win at COSBIntWin for sun
-        Optional_int_const MapNum = _,
-        Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
+        Optional_int_const MapNum = _);
 
     void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
                                                 int const daylightCtrlNum, // Current daylighting control number
@@ -420,8 +415,7 @@ namespace DaylightingManager {
                                                 int const NumEl,                              // Total number of window elements
                                                 Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for
                                                 DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
-                                                Optional_int_const MapNum = _,
-                                                Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
+                                                Optional_int_const MapNum = _);
 
     Real64 DayltgSkyLuminance(EnergyPlusData &state,
                               int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast

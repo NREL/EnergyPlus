@@ -1250,9 +1250,6 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
     Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
-    // Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
-    // Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
-    Real64 MapWindowSolidAngAtRefPtWtd;
     auto &MySunIsUpFlag(state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag);
     int WinEl; // window elements counter
 
@@ -1294,7 +1291,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 
     numRefPts = state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints;
 
-    state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPt = 0.0;  // Daylight illuminance at reference points (lux)
+    state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPt = 0.0; // Daylight illuminance at reference points (lux)
     state.dataDaylightingData->IllumMapCalc(mapNum).IllumFromWinAtMapPt = 0.0;
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
         state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSky = 0.0;
@@ -1321,9 +1318,6 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
         //           -------------
         // ---------- WINDOW LOOP ----------
         //           -------------
-
-        // MapWindowSolidAngAtRefPt = 0.0; //Inactive
-        MapWindowSolidAngAtRefPtWtd = 0.0;
 
         for (loopwin = 1; loopwin <= thisEnclDaylight.NumOfDayltgExtWins; ++loopwin) {
 
@@ -1361,8 +1355,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                      VIEWVC2,
                                                      is_Rectangle,
                                                      is_Triangle,
-                                                     mapNum,
-                                                     MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
+                                                     mapNum);
             //           ---------------------
             // ---------- WINDOW ELEMENT LOOP ----------
             //           ---------------------
@@ -1422,8 +1415,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                 is_Triangle,
                                                                 TVISIntWin,
                                                                 TVISIntWinDisk,
-                                                                mapNum,
-                                                                MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
+                                                                mapNum);
                     //           -------------------
                     // ---------- SUN POSITION LOOP ----------
                     //           -------------------
@@ -1470,8 +1462,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                      DataDaylighting::iCalledFor::MapPoint,
                                                                      TVISIntWin,
                                                                      TVISIntWinDisk,
-                                                                     mapNum,
-                                                                     MapWindowSolidAngAtRefPtWtd);
+                                                                     mapNum);
                         } // End of hourly sun position loop, IHR
                     } else {
                         if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
@@ -1522,8 +1513,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                  DataDaylighting::iCalledFor::MapPoint,
                                                                  TVISIntWin,
                                                                  TVISIntWinDisk,
-                                                                 mapNum,
-                                                                 MapWindowSolidAngAtRefPtWtd);
+                                                                 mapNum);
                     }
                 } // End of window Y-element loop, IY
             }     // End of window X-element loop, IX
@@ -1580,9 +1570,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     Vector3<Real64> &VIEWVC2,                 // Virtual view vector in absolute coordinate system
     bool &is_Rectangle,                       // True if window is rectangular
     bool &is_Triangle,                        // True if window is triangular
-    Optional_int_const MapNum,
-    // Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
-    Optional<Real64> MapWindowSolidAngAtRefPtWtd)
+    Optional_int_const MapNum)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
@@ -1948,11 +1936,6 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         // and solid angle weighted by glare position factor
         state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPt(iRefPoint) = 0.0;
         state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) = 0.0;
-    } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
-        // Initialize solid angle subtended by window wrt ref pt
-        // and solid angle weighted by glare position factor
-        //            if ( MapWindowSolidAngAtRefPt.present() ) MapWindowSolidAngAtRefPt = 0.0; //Inactive
-        MapWindowSolidAngAtRefPtWtd = 0.0;
     }
     // Area of window element
     if (is_Rectangle) {
@@ -2006,9 +1989,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     bool const is_Triangle,
     Real64 &TVISIntWin,     // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 &TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
-    Optional_int_const MapNum,
-    //        Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
-    Optional<Real64> MapWindowSolidAngAtRefPtWtd)
+    Optional_int_const MapNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3101,8 +3082,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     DataDaylighting::iCalledFor const CalledFrom,  // indicate  which type of routine called this routine
     Real64 &TVISIntWin,                            // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 &TVISIntWinDisk,                        // Visible transmittance of int win at COSBIntWin for sun
-    Optional_int_const MapNum,
-    Optional<Real64 const> MapWindowSolidAngAtRefPtWtd)
+    Optional_int_const MapNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3226,7 +3206,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         DayltgDirectIllumComplexFenestration(state, IWin, WinEl, iHour, iRefPoint, CalledFrom, MapNum);
         // Call direct sun component only once since calculation is done for entire window
         if (WinEl == (NWX * NWY)) {
-            DayltgDirectSunDiskComplexFenestration(state, IWin2, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd);
+            DayltgDirectSunDiskComplexFenestration(state, IWin2, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum);
         }
         return;
     }
@@ -3556,47 +3536,41 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         state.dataDaylightingManager->EDIRSUdisk(iHour, 2) = RAYCOS(3) * TVISS * TransBmBmMult(1) * ObTransDisk;
                     }
 
-                    // Glare from solar disk
+                    if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
+                        // Glare from solar disk
 
-                    // Position factor for sun (note that AZVIEW is wrt y-axis and THSUN is wrt
-                    // x-axis of absolute coordinate system.
-                    XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - state.dataDaylightingManager->THSUN) + 0.001);
-                    YR = std::tan(state.dataDaylightingManager->PHSUN + 0.001);
-                    POSFAC = DayltgGlarePositionFactor(XR, YR);
+                        // Position factor for sun (note that AZVIEW is wrt y-axis and THSUN is wrt
+                        // x-axis of absolute coordinate system.
+                        XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - state.dataDaylightingManager->THSUN) + 0.001);
+                        YR = std::tan(state.dataDaylightingManager->PHSUN + 0.001);
+                        POSFAC = DayltgGlarePositionFactor(XR, YR);
 
-                    {
-                        auto const SELECT_CASE_var(CalledFrom);
+                        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint);
 
-                        if (SELECT_CASE_var == DataDaylighting::iCalledFor::RefPoint) {
-                            WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint);
-                        } else if (SELECT_CASE_var == DataDaylighting::iCalledFor::MapPoint) {
-                            WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd;
-                        }
-                    }
+                        if (POSFAC != 0.0 && WindowSolidAngleDaylightPoint > 0.000001) {
+                            // Increment window luminance.  Luminance of solar disk (cd/m2)
+                            // is 1.47*10^4*(direct normal solar illuminance) for direct normal solar
+                            // illuminance in lux (lumens/m2). For purposes of calculating daylight factors
+                            // direct normal solar illuminance = 1.0.
+                            // Solid angle subtended by sun is 0.000068 steradians
 
-                    if (POSFAC != 0.0 && WindowSolidAngleDaylightPoint > 0.000001) {
-                        // Increment window luminance.  Luminance of solar disk (cd/m2)
-                        // is 1.47*10^4*(direct normal solar illuminance) for direct normal solar
-                        // illuminance in lux (lumens/m2). For purposes of calculating daylight factors
-                        // direct normal solar illuminance = 1.0.
-                        // Solid angle subtended by sun is 0.000068 steradians
+                            XAVWL = 14700.0 * std::sqrt(0.000068 * POSFAC) * double(NWX * NWY) / std::pow(WindowSolidAngleDaylightPoint, 0.8);
+                            state.dataDaylightingManager->AVWLSUdisk(iHour, 1) = XAVWL * TVISS * ObTransDisk; // Bare window
 
-                        XAVWL = 14700.0 * std::sqrt(0.000068 * POSFAC) * double(NWX * NWY) / std::pow(WindowSolidAngleDaylightPoint, 0.8);
-                        state.dataDaylightingManager->AVWLSUdisk(iHour, 1) = XAVWL * TVISS * ObTransDisk; // Bare window
-
-                        if (ANY_BLIND(ShType)) {
-                            for (JB = 1; JB <= MaxSlatAngs; ++JB) {
-                                // IF (.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-                                state.dataDaylightingManager->AVWLSUdisk(iHour, JB + 1) = XAVWL * TVISS * TransBmBmMult(JB) * ObTransDisk;
-                                if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
+                            if (ANY_BLIND(ShType)) {
+                                for (JB = 1; JB <= MaxSlatAngs; ++JB) {
+                                    // IF (.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
+                                    state.dataDaylightingManager->AVWLSUdisk(iHour, JB + 1) = XAVWL * TVISS * TransBmBmMult(JB) * ObTransDisk;
+                                    if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
+                                }
+                            } else if (ShType == WinShadingType::ExtScreen) {
+                                state.dataDaylightingManager->AVWLSUdisk(iHour, 2) = XAVWL * TVISS * TransBmBmMult(1) * ObTransDisk;
                             }
-                        } else if (ShType == WinShadingType::ExtScreen) {
-                            state.dataDaylightingManager->AVWLSUdisk(iHour, 2) = XAVWL * TVISS * TransBmBmMult(1) * ObTransDisk;
-                        }
-                    } // Position Factor
-                }     // Beam avoids all obstructions
-            }         // Beam passes thru window
-        }             // Sun on front side
+                        } // Position Factor
+                    }
+                } // Beam avoids all obstructions
+            }     // Beam passes thru window
+        }         // Sun on front side
 
         // Beam solar reaching reference point after beam-beam (specular) reflection from
         // an exterior surface
@@ -4010,7 +3984,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, JSH, ISky, iMapPoint, loopwin) =
                     (state.dataDaylightingManager->EDIRSK(iHour, JSH, ISky) + state.dataDaylightingManager->EINTSK(iHour, JSH, ISky)) /
                     state.dataDaylightingManager->GILSK(iHour, ISky);
-                    (DataGlobalConstants::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
+                (DataGlobalConstants::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
             } else {
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, JSH, ISky, iMapPoint, loopwin) = 0.0;
             }
@@ -8756,8 +8730,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
                                             int const NumEl,                              // Total number of window elements
                                             Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for
                                             DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
-                                            Optional_int_const MapNum,
-                                            Optional<Real64 const> MapWindowSolidAngAtRefPtWtd)
+                                            Optional_int_const MapNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -8798,7 +8771,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
         if (SELECT_CASE_var == DataDaylighting::iCalledFor::RefPoint) {
             WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(iWin).SolidAngAtRefPtWtd(iRefPoint);
         } else if (SELECT_CASE_var == DataDaylighting::iCalledFor::MapPoint) {
-            WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd;
+            WindowSolidAngleDaylightPoint = 0.0;
         } else {
             assert(false); // Bad CalledFrom argument
         }
@@ -9479,7 +9452,6 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
             for (IL = 1; IL <= NREFPT; ++IL) {
                 //              Determine if illuminance contribution is from bare or shaded window
                 daylight_illum(IL) += VTMULT * thisMap.IllumFromWinAtMapPt(loop, IS, IL);
- //               BACLUM(IL) += VTMULT * thisMap.BackLumFromWinAtMapPt(loop, IS, IL);
             }
         } // End of second window loop
 
