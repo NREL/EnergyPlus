@@ -622,164 +622,167 @@ namespace UnitarySystems {
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
-        if (this->m_MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
-            if (this->m_HeatRecActive) {
-                state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::TypeOf_UnitarySysRecovery,
-                                                        this->m_HRLoopNum,
-                                                        this->m_HRLoopSideNum,
-                                                        this->m_HRBranchNum,
-                                                        this->m_HRCompNum,
-                                                        state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
-                    ShowFatalError(state, "InitUnitarySystems: Program terminated for previous conditions.");
+        if (this->m_MyPlantScanFlag) {
+            if (!state.dataGlobal->SysSizingCalc && allocated(state.dataPlnt->PlantLoop)) {
+                if (this->m_HeatRecActive) {
+                    state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
+                    PlantUtilities::ScanPlantLoopsForObject(state,
+                                                            this->Name,
+                                                            DataPlant::TypeOf_UnitarySysRecovery,
+                                                            this->m_HRLoopNum,
+                                                            this->m_HRLoopSideNum,
+                                                            this->m_HRBranchNum,
+                                                            this->m_HRCompNum,
+                                                            state.dataUnitarySystems->initUnitarySystemsErrFlag,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _);
+                    if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
+                        ShowFatalError(state, "InitUnitarySystems: Program terminated for previous conditions.");
+                    }
                 }
-            }
-            int TypeOfCoilWaterCooling = 0;
-            std::string CoolingCoilType = "";
-            std::string CoolingCoilName = "";
-            if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
-                this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed ||
-                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
-                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
-                    TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterCooling;
-                    CoolingCoilType = "Coil:Cooling:Water";
-                    CoolingCoilName = this->m_CoolingCoilName;
-                } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
-                    TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
-                    CoolingCoilType = "Coil:Cooling:Water:DetailedGeometry";
-                    CoolingCoilName = this->m_CoolingCoilName;
-                } else {
-                    TypeOfCoilWaterCooling =
-                        HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
-                                                                        DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num),
-                                                                        this->m_CoolingCoilName,
-                                                                        state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                                        true);
-                    if (TypeOfCoilWaterCooling == DataHVACGlobals::Coil_CoolingWater) {
+                int TypeOfCoilWaterCooling = 0;
+                std::string CoolingCoilType = "";
+                std::string CoolingCoilName = "";
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+                    this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed ||
+                    this->m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
+                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
                         TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterCooling;
                         CoolingCoilType = "Coil:Cooling:Water";
-                    } else if (TypeOfCoilWaterCooling == DataHVACGlobals::Coil_CoolingWaterDetailed) {
+                        CoolingCoilName = this->m_CoolingCoilName;
+                    } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
                         TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
                         CoolingCoilType = "Coil:Cooling:Water:DetailedGeometry";
+                        CoolingCoilName = this->m_CoolingCoilName;
+                    } else {
+                        TypeOfCoilWaterCooling =
+                            HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
+                                                                            DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num),
+                                                                            this->m_CoolingCoilName,
+                                                                            state.dataUnitarySystems->initUnitarySystemsErrFlag,
+                                                                            true);
+                        if (TypeOfCoilWaterCooling == DataHVACGlobals::Coil_CoolingWater) {
+                            TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterCooling;
+                            CoolingCoilType = "Coil:Cooling:Water";
+                        } else if (TypeOfCoilWaterCooling == DataHVACGlobals::Coil_CoolingWaterDetailed) {
+                            TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+                            CoolingCoilType = "Coil:Cooling:Water:DetailedGeometry";
+                        }
+                        CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
+                                                                                     DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num),
+                                                                                     this->m_CoolingCoilName,
+                                                                                     state.dataUnitarySystems->initUnitarySystemsErrFlag);
                     }
-                    CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
-                                                                                 DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num),
-                                                                                 this->m_CoolingCoilName,
-                                                                                 state.dataUnitarySystems->initUnitarySystemsErrFlag);
-                }
-                state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        CoolingCoilName,
-                                                        TypeOfCoilWaterCooling,
-                                                        this->CoolCoilLoopNum,
-                                                        this->CoolCoilLoopSide,
-                                                        this->CoolCoilBranchNum,
-                                                        this->CoolCoilCompNum,
-                                                        state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
-                    ShowFatalError(state, "InitUnitarySystem: Program terminated for previous conditions.");
-                }
-                this->MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(
-                    state, CoolingCoilType, CoolingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
+                    state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
+                    PlantUtilities::ScanPlantLoopsForObject(state,
+                                                            CoolingCoilName,
+                                                            TypeOfCoilWaterCooling,
+                                                            this->CoolCoilLoopNum,
+                                                            this->CoolCoilLoopSide,
+                                                            this->CoolCoilBranchNum,
+                                                            this->CoolCoilCompNum,
+                                                            state.dataUnitarySystems->initUnitarySystemsErrFlag,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _);
+                    if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
+                        ShowFatalError(state, "InitUnitarySystem: Program terminated for previous conditions.");
+                    }
+                    this->MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(
+                        state, CoolingCoilType, CoolingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
-                if (this->MaxCoolCoilFluidFlow > 0.0) {
-                    Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
-                                                                   state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidIndex,
-                                                                   routineName);
-                    this->MaxCoolCoilFluidFlow *= rho;
-                }
-                // fill outlet node for coil
-                this->CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->CoolCoilLoopNum)
-                                                       .LoopSide(this->CoolCoilLoopSide)
-                                                       .Branch(this->CoolCoilBranchNum)
-                                                       .Comp(this->CoolCoilCompNum)
-                                                       .NodeNumOut;
-            }
-            int TypeOfCoilWaterHeating = 0;
-            std::string HeatingCoilType = "";
-            if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater ||
-                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
-                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-                    TypeOfCoilWaterHeating = DataPlant::TypeOf_CoilWaterSimpleHeating;
-                    HeatingCoilType = "Coil:Heating:Water";
-                    WaterCoils::SetCoilDesFlow(state,
-                                               DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num),
-                                               this->m_HeatingCoilName,
-                                               this->m_MaxHeatAirVolFlow,
-                                               state.dataUnitarySystems->initUnitarySystemsErrorsFound);
-                } else {
-                    TypeOfCoilWaterHeating = DataPlant::TypeOf_CoilSteamAirHeating;
-                    HeatingCoilType = "Coil:Heating:Steam";
-                }
-                state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->m_HeatingCoilName,
-                                                        TypeOfCoilWaterHeating,
-                                                        this->HeatCoilLoopNum,
-                                                        this->HeatCoilLoopSide,
-                                                        this->HeatCoilBranchNum,
-                                                        this->HeatCoilCompNum,
-                                                        state.dataUnitarySystems->initUnitarySystemsErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
-                    ShowFatalError(state, "InitUnitarySystem: Program terminated for previous conditions.");
-                }
-                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-                    this->MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(
-                        state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
-
-                    if (this->MaxHeatCoilFluidFlow > 0.0) {
+                    if (this->MaxCoolCoilFluidFlow > 0.0) {
                         Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                       state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
-                                                                       DataGlobalConstants::HWInitConvTemp,
-                                                                       state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidName,
+                                                                       DataGlobalConstants::CWInitConvTemp,
+                                                                       state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidIndex,
                                                                        routineName);
-                        this->MaxHeatCoilFluidFlow =
-                            WaterCoils::GetCoilMaxWaterFlowRate(
-                                state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound) *
-                            rho;
+                        this->MaxCoolCoilFluidFlow *= rho;
                     }
-                } else {
-                    this->MaxHeatCoilFluidFlow =
-                        SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_HeatingCoilIndex, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
-                    if (this->MaxHeatCoilFluidFlow > 0.0) {
-                        int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        Real64 TempSteamIn = 100.0;
-                        Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, routineName);
-                        this->MaxHeatCoilFluidFlow *= SteamDensity;
-                    }
+                    // fill outlet node for coil
+                    this->CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->CoolCoilLoopNum)
+                                                           .LoopSide(this->CoolCoilLoopSide)
+                                                           .Branch(this->CoolCoilBranchNum)
+                                                           .Comp(this->CoolCoilCompNum)
+                                                           .NodeNumOut;
                 }
-                // fill outlet node for coil
-                this->HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->HeatCoilLoopNum)
-                                                       .LoopSide(this->HeatCoilLoopSide)
-                                                       .Branch(this->HeatCoilBranchNum)
-                                                       .Comp(this->HeatCoilCompNum)
-                                                       .NodeNumOut;
+                int TypeOfCoilWaterHeating = 0;
+                std::string HeatingCoilType = "";
+                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater ||
+                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                    if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                        TypeOfCoilWaterHeating = DataPlant::TypeOf_CoilWaterSimpleHeating;
+                        HeatingCoilType = "Coil:Heating:Water";
+                        WaterCoils::SetCoilDesFlow(state,
+                                                   DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num),
+                                                   this->m_HeatingCoilName,
+                                                   this->m_MaxHeatAirVolFlow,
+                                                   state.dataUnitarySystems->initUnitarySystemsErrorsFound);
+                    } else {
+                        TypeOfCoilWaterHeating = DataPlant::TypeOf_CoilSteamAirHeating;
+                        HeatingCoilType = "Coil:Heating:Steam";
+                    }
+                    state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
+                    PlantUtilities::ScanPlantLoopsForObject(state,
+                                                            this->m_HeatingCoilName,
+                                                            TypeOfCoilWaterHeating,
+                                                            this->HeatCoilLoopNum,
+                                                            this->HeatCoilLoopSide,
+                                                            this->HeatCoilBranchNum,
+                                                            this->HeatCoilCompNum,
+                                                            state.dataUnitarySystems->initUnitarySystemsErrFlag,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            _);
+                    if (state.dataUnitarySystems->initUnitarySystemsErrFlag) {
+                        ShowFatalError(state, "InitUnitarySystem: Program terminated for previous conditions.");
+                    }
+                    if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                        this->MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(
+                            state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
+
+                        if (this->MaxHeatCoilFluidFlow > 0.0) {
+                            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                                           state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
+                                                                           DataGlobalConstants::HWInitConvTemp,
+                                                                           state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                           routineName);
+                            this->MaxHeatCoilFluidFlow =
+                                WaterCoils::GetCoilMaxWaterFlowRate(
+                                    state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound) *
+                                rho;
+                        }
+                    } else {
+                        this->MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(
+                            state, this->m_HeatingCoilIndex, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
+                        if (this->MaxHeatCoilFluidFlow > 0.0) {
+                            int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            Real64 TempSteamIn = 100.0;
+                            Real64 SteamDensity =
+                                FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, routineName);
+                            this->MaxHeatCoilFluidFlow *= SteamDensity;
+                        }
+                    }
+                    // fill outlet node for coil
+                    this->HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->HeatCoilLoopNum)
+                                                           .LoopSide(this->HeatCoilLoopSide)
+                                                           .Branch(this->HeatCoilBranchNum)
+                                                           .Comp(this->HeatCoilCompNum)
+                                                           .NodeNumOut;
+                }
+
+                this->m_MyPlantScanFlag = false;
+
+            } else if (this->m_MyPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
+                this->m_MyPlantScanFlag = false;
             }
-
-            this->m_MyPlantScanFlag = false;
-
-        } else if (this->m_MyPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
-            this->m_MyPlantScanFlag = false;
         }
 
         // Scan Supplemental hot water and steam heating coil plant components for one time initializations
@@ -1804,7 +1807,7 @@ namespace UnitarySystems {
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 // this probably needs to be more specific. Letting heating coil size itself if user has scalable sizing
-                if (this->m_HVACSizingIndex == 0) state.dataSize->DXCoolCap = CoolCapAtPeak;
+                if (this->m_HVACSizingIndex <= 0) state.dataSize->DXCoolCap = CoolCapAtPeak;
                 // CoilSystem does not size the cooling coil (#8761)
                 switch (this->m_sysType) {
                 case SysType::Unitary:
@@ -1947,9 +1950,9 @@ namespace UnitarySystems {
                 if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
-            } else if (this->m_DesignHeatingCapacity != DataSizing::AutoSize) {
-                EqSizing.HeatingCapacity = true;
-                EqSizing.DesHeatingLoad = this->m_DesignHeatingCapacity;
+                //} else if (this->m_DesignHeatingCapacity != DataSizing::AutoSize) {
+                //    EqSizing.HeatingCapacity = true;
+                //    EqSizing.DesHeatingLoad = this->m_DesignHeatingCapacity;
             } else {
                 if (!HardSizeNoDesRun &&
                     (HeatingSAFlowMethod != DataSizing::FlowPerHeatingCapacity && this->m_DesignHeatingCapacity != DataSizing::AutoSize)) {
@@ -1974,7 +1977,7 @@ namespace UnitarySystems {
                     }
                 } else {
                     // something seems missing here based on multiple conditional if above
-                    // HeatCapAtPeak = this->m_DesignHeatingCapacity;
+                    if (this->m_DesignHeatingCapacity != DataSizing::AutoSize) HeatCapAtPeak = this->m_DesignHeatingCapacity;
                 }
             }
             //            if ( ! UnitarySystem( UnitarySysNum ).CoolCoilExists )DXCoolCap = HeatCapAtPeak;
@@ -2015,8 +2018,6 @@ namespace UnitarySystems {
             case SysType::PackagedWSHP:
                 PrintFlag = true;
                 break;
-            case SysType::CoilCoolingDX:
-            case SysType::CoilCoolingWater:
             default:
                 break;
             }
@@ -2852,6 +2853,15 @@ namespace UnitarySystems {
         }
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
 
+            // pass air flow rate to water coil
+            if (state.dataSize->CurZoneEqNum > 0) {
+                WaterCoils::SetCoilDesFlow(state,
+                                           DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num),
+                                           this->m_HeatingCoilName,
+                                           this->m_MaxHeatAirVolFlow,
+                                           state.dataUnitarySystems->initUnitarySystemsErrorsFound);
+            }
+
             if (this->m_NumOfSpeedHeating > 0) {
                 if (this->m_HeatVolumeFlowRate.empty()) this->m_HeatVolumeFlowRate.resize(this->m_NumOfSpeedHeating + 1);
                 if (this->m_HeatMassFlowRate.empty()) this->m_HeatMassFlowRate.resize(this->m_NumOfSpeedHeating + 1);
@@ -3112,11 +3122,6 @@ namespace UnitarySystems {
         if (this->m_SuppCoilExists) {
 
             switch (this->m_sysType) {
-            case SysType::Unitary:
-            case SysType::CoilCoolingDX:
-            case SysType::CoilCoolingWater:
-            case SysType::PackagedAC:
-                break;
             case SysType::PackagedWSHP:
             case SysType::PackagedHP:
                 if (this->m_HVACSizingIndex <= 0) EqSizing.HeatingCapacity = false; // ensure PTHP supplemental heating coil sizes to load
@@ -3130,6 +3135,7 @@ namespace UnitarySystems {
             SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
             if (TempSize == DataSizing::AutoSize) {
                 IsAutoSize = true;
+                if (this->m_sysType == SysType::Unitary) PrintFlag = false;
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
