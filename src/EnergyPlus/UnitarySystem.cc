@@ -2052,6 +2052,7 @@ namespace UnitarySystems {
             if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_MaxCoolAirVolFlow = EqSizing.HeatingAirVolFlow;
         } else if (this->m_CoolCoilExists && !this->m_HeatCoilExists) {
             if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
+            state.dataSize->DXCoolCap = CoolCapAtPeak;
         }
 
         // PT Units report sizing for cooling then heating, UnitarySystem reverses that order
@@ -3095,7 +3096,7 @@ namespace UnitarySystems {
 
             TempSize = this->DesignMaxOutletTemp;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
-            if (this->m_sysType == SysType::PackagedHP) {
+            if (this->m_sysType >= SysType::PackagedHP) {
                 PrintFlag = true;
                 std::string stringOverride = "Maximum Supply Air Temperature from Supplemental Heater [C]";
                 sizerMaxHeaterOutTemp.overrideSizingString(stringOverride);
@@ -3116,10 +3117,10 @@ namespace UnitarySystems {
             case SysType::CoilCoolingWater:
             case SysType::PackagedAC:
                 break;
+            case SysType::PackagedWSHP:
             case SysType::PackagedHP:
                 if (this->m_HVACSizingIndex <= 0) EqSizing.HeatingCapacity = false; // ensure PTHP supplemental heating coil sizes to load
                 break;
-            case SysType::PackagedWSHP:
             default:
                 break;
             }
@@ -3145,7 +3146,7 @@ namespace UnitarySystems {
                 TempSize = DataSizing::AutoSize;
             }
 
-            if (this->m_OKToPrintSizing && this->m_sysType != SysType::PackagedHP) PrintFlag = true;
+            if (this->m_OKToPrintSizing && this->m_sysType < SysType::PackagedHP) PrintFlag = true;
             bool errorsFound = false;
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
