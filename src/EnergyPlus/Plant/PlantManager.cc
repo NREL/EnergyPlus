@@ -1802,7 +1802,7 @@ void GetPlantInput(EnergyPlusData &state)
 
             } // loop over components in branches on the loop (ventilation report data)
 
-        }     // loop over branches on the loop (ventilation report data)
+        } // loop over branches on the loop (ventilation report data)
 
         this_vent_cond_demand.Name = this_cond_loop.Name;
         this_vent_cond_demand.NodeNumIn = this_cond_demand.NodeNumIn;
