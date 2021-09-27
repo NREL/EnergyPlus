@@ -643,8 +643,6 @@ struct DaylightingManagerData : BaseGlobalStruct
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationV;    // temporary vector
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationRWin; // Window center
     Vector2<Real64> DayltgInteriorMapIllumDFSUHR;               // Sun daylight factor for bare/shaded window
-    Vector2<Real64> DayltgInteriorMapIllumSFSUHR;               // Sun source luminance factor for bare/shaded window
-    Vector2<Real64> DayltgInteriorMapIllumBFSUHR;               // Sun background luminance factor for bare/shaded window
     Vector4<Real64> DayltgInteriorMapIllumHorIllSky;            // Horizontal illuminance for different sky types
     Vector3<Real64> CalcMinIntWinSolidAngsW1;                   // Window vertices
     Vector3<Real64> CalcMinIntWinSolidAngsW2;
