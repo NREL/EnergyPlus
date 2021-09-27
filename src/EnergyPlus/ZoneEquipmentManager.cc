@@ -3035,8 +3035,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     using ZoneDehumidifier::SimZoneDehumidifier;
     using ZonePlenum::SimAirZonePlenum;
 
-
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ActualZoneNum;
     int ControlledZoneNum;

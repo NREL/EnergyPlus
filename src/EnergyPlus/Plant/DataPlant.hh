@@ -214,7 +214,6 @@ namespace DataPlant {
     constexpr int TypeOf_HeatPumpEIRHeating(96);
     constexpr int TypeOf_IceRink(97);
 
-
     extern Array1D<Real64> const ConvergenceHistoryARR;
 
     // These all are going to be hard coded for now, but when we move to C++20 we will have constexpr methods available to fix this

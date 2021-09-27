@@ -129,10 +129,10 @@ namespace IceRink {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Set to true if errors in input,
-        int IOStatus;                   // Used in GetObjectItem
-        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-        int NumArgs;                    // Unused variable that is part of a subroutine call
+        int IOStatus;            // Used in GetObjectItem
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int NumArgs;             // Unused variable that is part of a subroutine call
 
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "IceRink:Indoor", NumArgs, NumAlphas, NumNumbers);
 
@@ -140,9 +140,9 @@ namespace IceRink {
 
         if (state.dataIceRink->NumOfRinks <= 0) ShowFatalError(state, "No Rink objects found in input.");
 
-        auto & Surface(state.dataSurface->Surface);
-        auto & Rink = state.dataIceRink->Rink;
-        auto & NumOfRinks = state.dataIceRink->NumOfRinks;
+        auto &Surface(state.dataSurface->Surface);
+        auto &Rink = state.dataIceRink->Rink;
+        auto &NumOfRinks = state.dataIceRink->NumOfRinks;
 
         if (allocated(Rink)) Rink.deallocate();
         Rink.allocate(NumOfRinks);
@@ -177,7 +177,9 @@ namespace IceRink {
             Rink(Item).ZoneName = state.dataIPShortCut->cAlphaArgs(3);
             Rink(Item).ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (Rink(Item).ZonePtr == 0) {
-                ShowSevereError(state, format("{}: Invalid {} = {}", RoutineName, state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                ShowSevereError(
+                    state,
+                    format("{}: Invalid {} = {}", RoutineName, state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, "Occurs in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -188,7 +190,11 @@ namespace IceRink {
                 (Surface(Rink(Item).SurfacePtr).Class == DataSurfaces::SurfaceClass::Window) ||
                 (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(Surface(Rink(Item).SurfacePtr).Construction) ||
                  (!state.dataConstruction->Construct(Surface(Rink(Item).SurfacePtr).Construction).SourceSinkPresent))) {
-                ShowSevereError(state, format("{}: {}=\"{}\", Invalid Surface", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state,
+                                format("{}: {}=\"{}\", Invalid Surface",
+                                       RoutineName,
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                       "\" either is not defines as a floor or is defined as a window or is a part of ventilated slab or has no "
@@ -200,7 +206,7 @@ namespace IceRink {
             Rink(Item).TubeDiameter = state.dataIPShortCut->rNumericArgs(1);
             Rink(Item).TubeLength = state.dataIPShortCut->rNumericArgs(2);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "BOTC")) {   // TODO: These need to be more verbose strings
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "BOTC")) { // TODO: These need to be more verbose strings
                 Rink(Item).ControlStrategy = ControlType::BrineOutletTemp;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "STC")) {
                 Rink(Item).ControlStrategy = ControlType::SurfaceTemp;
@@ -241,11 +247,11 @@ namespace IceRink {
             }
 
             BranchNodeConnections::TestCompSet(state,
-                        state.dataIPShortCut->cCurrentModuleObject,
-                        state.dataIPShortCut->cAlphaArgs(1),
-                        state.dataIPShortCut->cAlphaArgs(6),
-                        state.dataIPShortCut->cAlphaArgs(7),
-                        "Refrigerant Nodes");
+                                               state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(6),
+                                               state.dataIPShortCut->cAlphaArgs(7),
+                                               "Refrigerant Nodes");
 
             Rink(Item).ResurfacingSchedName = state.dataIPShortCut->cAlphaArgs(8);
             Rink(Item).ResurfacingSchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
@@ -257,76 +263,120 @@ namespace IceRink {
 
             Rink(Item).LengthRink = state.dataIPShortCut->rNumericArgs(5);
             if (Rink(Item).LengthRink <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative rink length.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative rink length.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The rink length has been reset to 60.");
                 Rink(Item).LengthRink = 60.0;
             }
 
             Rink(Item).WidthRink = state.dataIPShortCut->rNumericArgs(6);
             if (Rink(Item).WidthRink <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative rink width.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative rink width.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The rink width has been reset to 30.");
                 Rink(Item).WidthRink = 30.0;
             }
 
             Rink(Item).WaterTemp = state.dataIPShortCut->rNumericArgs(7);
             if (Rink(Item).WaterTemp <= -21.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with too low water temperature.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with too low water temperature.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The rink water has been reset to 22");
                 Rink(Item).WaterTemp = 22.0;
             }
 
             Rink(Item).IceThickness = state.dataIPShortCut->rNumericArgs(8);
             if (Rink(Item).IceThickness <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative ice thickness.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative ice thickness.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The rink ice thickness has been reset to 0.1.");
                 Rink(Item).IceThickness = 0.0254;
             }
 
             Rink(Item).COP = state.dataIPShortCut->rNumericArgs(9);
             if (Rink(Item).COP <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative COP.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative COP.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The COP is reset to 2.5.");
                 Rink(Item).COP = 2.5;
             }
 
             Rink(Item).IceSetPointTemp = state.dataIPShortCut->rNumericArgs(10);
             if (Rink(Item).IceSetPointTemp >= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or positive ice rink set-point temperature.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or positive ice rink set-point temperature.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The ice rink setpoint temperature has been reset to -3 C.");
                 Rink(Item).IceSetPointTemp = -3;
             }
 
             Rink(Item).HXSpacing = state.dataIPShortCut->rNumericArgs(11);
             if (Rink(Item).HXSpacing <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative HX spacing.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative HX spacing.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The HX spacing has been reset to 0.01m.");
                 Rink(Item).HXSpacing = 0.01;
             }
             Rink(Item).ResurfTank = state.dataIPShortCut->rNumericArgs(12);
             if (Rink(Item).ResurfTank <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative resurfacer tank volume.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative resurfacer tank volume.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The resurfacer tank volume has been reset to 0.55m3.");
                 Rink(Item).ResurfTank = 0.55;
             }
 
             Rink(Item).InitialWaterTemp = state.dataIPShortCut->rNumericArgs(13);
             if (Rink(Item).InitialWaterTemp <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative initial resurfacer water temp.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative initial resurfacer water temp.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The resurfacer initial water temperature has been reset to 18C.");
                 Rink(Item).InitialWaterTemp = 18;
             }
 
             Rink(Item).ResurfWaterTemp = state.dataIPShortCut->rNumericArgs(14);
             if (Rink(Item).ResurfWaterTemp <= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or negative resurfacer water temp.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or negative resurfacer water temp.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The resurfacer hot water temperature has been reset to 55C.");
                 Rink(Item).ResurfWaterTemp = 55;
             }
 
             Rink(Item).DesignSetPoint = state.dataIPShortCut->rNumericArgs(15);
             if (Rink(Item).DesignSetPoint >= 0.0) {
-                ShowWarningError(state, format("{}: {}=\"{}\" was entered with zero or positive design set point temperature.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowWarningError(state,
+                                 format("{}: {}=\"{}\" was entered with zero or positive design set point temperature.",
+                                        RoutineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "The design setpoint has been reset to -10C");
                 Rink(Item).DesignSetPoint = -10;
             }
@@ -338,7 +388,7 @@ namespace IceRink {
 
     void IceRinkData::initialize(EnergyPlusData &state)
     {
-        auto & Node(state.dataLoopNodes->Node);
+        auto &Node(state.dataLoopNodes->Node);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
@@ -387,10 +437,10 @@ namespace IceRink {
             this->PastRefrigMassFlow = 0.01;
             this->RefrigTempIn = -10;
             this->CpRefrig = FluidProperties::GetSpecificHeatGlycol(state,
-                                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                   this->RefrigTempIn,
-                                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
+                                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                    this->RefrigTempIn,
+                                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                    RoutineName);
             this->Qsrcmax = -(IceRinkFreezing(state)); // To calculate maximum Q source in order to obtain design capacity.
             this->maxmdot = fabs(this->Qsrcmax) / (this->CpRefrig * this->deltatemp); // To calculate maximum mass flow rate of the system.
 
@@ -582,11 +632,11 @@ namespace IceRink {
         Real64 Volume = this->LengthRink * this->WidthRink * this->IceThickness;
 
         return 1.3 * (RhoWater * Volume * ((CpWater * this->WaterTemp) + (QFusion) + (CpIce * (0 - this->DesignSetPoint))) /
-                                  (hrstofreeze * DataGlobalConstants::SecInHour));
+                      (hrstofreeze * DataGlobalConstants::SecInHour));
     }
 
     Real64 IceRinkData::calcEffectiveness(EnergyPlusData &state,
-                                          Real64 const Temperature,    // Temperature of refrigerant entering the floor radiant system, in C
+                                          Real64 const Temperature,           // Temperature of refrigerant entering the floor radiant system, in C
                                           Real64 const lRefrigMassFlow) const // Mass flow rate of refrigerant in the floor radiant system, in kg/s
     {
         static constexpr std::string_view RoutineName("IceRink:calcEffectiveness");
@@ -600,18 +650,20 @@ namespace IceRink {
             state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         // Calculate the Reynold's number from RE=(4*MassFlow)/(Pi*Mu*Diameter)
-        Real64 const ReynoldsNum = 4.0 * lRefrigMassFlow / (DataGlobalConstants::Pi * Viscosity * this->TubeDiameter * this->circuits); // circuits is defined in .hh file.
+        Real64 const ReynoldsNum =
+            4.0 * lRefrigMassFlow / (DataGlobalConstants::Pi * Viscosity * this->TubeDiameter * this->circuits); // circuits is defined in .hh file.
 
         Real64 const PrandtlNum = Viscosity * SpecificHeat / Conductivity;
 
         // Calculate the Nusselt number based on what flow regime one is in. h = (k)(Nu)/D
-        Real64 NusseltNum = 3.66; // Laminar flow --> use constant surface temperature relation
+        Real64 NusseltNum = 3.66;              // Laminar flow --> use constant surface temperature relation
         Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-        if (ReynoldsNum >= MaxLaminarRe) { // Turbulent flow --> use Dittus-Boelter equation
+        if (ReynoldsNum >= MaxLaminarRe) {     // Turbulent flow --> use Dittus-Boelter equation
             NusseltNum = 0.023 * std::pow(ReynoldsNum, 0.8) * std::pow(PrandtlNum, 0.33);
         }
 
-        Real64 const NTU = DataGlobalConstants::Pi * Conductivity * NusseltNum * (this->TubeLength * this->circuits) / (lRefrigMassFlow * SpecificHeat);
+        Real64 const NTU =
+            DataGlobalConstants::Pi * Conductivity * NusseltNum * (this->TubeLength * this->circuits) / (lRefrigMassFlow * SpecificHeat);
         Real64 constexpr MaxExpPower(50.0);
         if (NTU <= MaxExpPower) {
             return 1.0 - std::exp(-NTU);
@@ -622,7 +674,7 @@ namespace IceRink {
     void IceRinkData::calculateIceRink(EnergyPlusData &state, Real64 &CurLoad) // should this begin in the second time-step?
     {
         static constexpr std::string_view RoutineName("IceRink:calculateDirectIceRink");
-        auto & SurfNum = this->SurfacePtr;
+        auto &SurfNum = this->SurfacePtr;
 
         this->operation = ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr) >= 1 ? 1 : 0;
         Real64 const PipeArea = (DataGlobalConstants::Pi * this->TubeLength * this->circuits * this->TubeDiameter); // pipe surface area
@@ -635,10 +687,10 @@ namespace IceRink {
         this->Tsurfin1 = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
         this->Tsrc = state.dataHeatBalSurf->SurfTempSource(SurfNum);
         this->CpRefrig = FluidProperties::GetSpecificHeatGlycol(state,
-                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                               this->RefrigTempIn,
-                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                this->RefrigTempIn,
+                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                RoutineName);
 
         int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
         this->coeffs.Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
@@ -685,7 +737,8 @@ namespace IceRink {
 
             this->QResurface = this->ResurfaceON * 1000.0 * 1000.0 * this->ResurfTank *
                                ((4.2 * this->ResurfWaterTemp) + (334.0) - (2.0 * this->Tsurfin1)) /
-                               ((1.0 / state.dataGlobal->NumOfTimeStepInHour) * (DataGlobalConstants::SecInHour)); // 1000*1000 just to convert to Joules from KJoules - check ASHRAE
+                               ((1.0 / state.dataGlobal->NumOfTimeStepInHour) *
+                                (DataGlobalConstants::SecInHour)); // 1000*1000 just to convert to Joules from KJoules - check ASHRAE
             this->HeatingWater = this->ResurfaceON * this->ResurfTank * RhoWater * CpWater * (this->ResurfWaterTemp - this->InitialWaterTemp);
             if (this->Tsurfin1 > 0) {
                 this->QResurface = 0;
@@ -700,7 +753,8 @@ namespace IceRink {
                 this->RefrigMassFlow = 0.0;
                 this->ReqMassFlow = 0;
                 this->PastRefrigMassFlow = this->RefrigMassFlow;
-                PlantUtilities::SetComponentFlowRate(state, this->PastRefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->PastRefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
 
             } else {
 
@@ -709,7 +763,8 @@ namespace IceRink {
 
                     this->RefrigMassFlow = this->maxmdot;
                     this->PastRefrigMassFlow = this->RefrigMassFlow;
-                    PlantUtilities::SetComponentFlowRate(state, this->RefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, this->RefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
                     this->MassflowTest = this->RefrigMassFlow;
 
                     if (this->RefrigMassFlow <= 0) {

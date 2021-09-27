@@ -1388,10 +1388,10 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
-                    } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")){
+                    } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")) {
                         this_comp.TypeOf_Num = TypeOf_IceRink;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
-                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
+                        this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else {
                         // discover unsupported equipment on branches.
                         ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) + "\", invalid component on branch.");
@@ -1803,7 +1803,7 @@ void GetPlantInput(EnergyPlusData &state)
                 this_vent_cond_supply_comp.NodeNumIn = this_cond_supply_comp.NodeNumIn;
                 this_vent_cond_supply_comp.NodeNumOut = this_cond_supply_comp.NodeNumOut;
             } // loop over components in branches on the loop (ventilation report data)
-        } // loop over branches on the loop (ventilation report data)
+        }     // loop over branches on the loop (ventilation report data)
 
         this_vent_cond_demand.Name = this_cond_loop.Name;
         this_vent_cond_demand.NodeNumIn = this_cond_demand.NodeNumIn;
