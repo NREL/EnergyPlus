@@ -67,12 +67,12 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 class InputOutputFile;
-struct EnergyPlusData;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
