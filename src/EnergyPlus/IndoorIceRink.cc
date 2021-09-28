@@ -690,7 +690,8 @@ namespace IceRink {
         this->Qsetpoint =
             ((((1 - (this->coeffs.Cb * this->coeffs.Ce)) * this->IceSetPointTemp) - this->coeffs.Ca - (this->coeffs.Cb * this->coeffs.Cd)) /
              (this->coeffs.Cc + (this->coeffs.Cb * this->coeffs.Cf)));
-        this->Effectiveness = 1.0; // TODO: Edwin added this temporarily -- the Effectiveness is used in this equation but it isn't assigned until later...
+        this->Effectiveness =
+            1.0; // TODO: Edwin added this temporarily -- the Effectiveness is used in this equation but it isn't assigned until later...
         this->ReqMassFlow =
             (((this->coeffs.Ck - this->RefrigTempIn) / (this->deltatemp)) - (1 / Effectiveness)) * (PipeArea / (this->CpRefrig * this->coeffs.Cl));
         // Floor Surface temperatures. Only the current temperature is used. The others are for tracking and reporting purposes of the simulation.

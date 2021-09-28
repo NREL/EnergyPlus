@@ -190,8 +190,8 @@ namespace IceRink {
         Real64 FreezingLoad = 0.0;
 
         // ReportData
-        Real64 CoolPower = 0.0;       // Cooling sent to rink floor in Watts
-        Real64 CoolEnergy = 0.0;      // Cooling sent to rink floor in Joules
+        Real64 CoolPower = 0.0;  // Cooling sent to rink floor in Watts
+        Real64 CoolEnergy = 0.0; // Cooling sent to rink floor in Joules
 
         // Members
         std::string NameR; // Resurfacer Name

@@ -53,12 +53,12 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
@@ -68,40 +68,38 @@ using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, IceRink_GetInput)
 {
-    std::string const idf_objects = delimited_string({
-        "   IceRink:Indoor,                                                                ",
-        "       Indoor Ice Rink,         !- Name                                           ",
-        "       AlwaysOnSchedule,        !- Availability Schedule Name                     ",
-        "       Main Floor,              !- Zone Name                                      ",
-        "       Floor,                   !- Surface Name                                   ",
-        "       0.013,                   !- Tube Diameter {m}                              ",
-        "       100,                     !- Tube Length {m}                                ",
-        "       STC,                     !- Ice Rink Control Strategy                      ",
-        "       3,                       !- Hours to freeze the water                      ",
-        "       2,                       !- Delta temperature                              ",
-        "       Rink Inlet Node,         !- Refrigerant Inlet Node Name                    ",
-        "       Rink Outlet Node,        !- Refrigerant Outlet Node Name                   ",
-        "       ResurfaceSched,          !- Resurface Schedule                             ",
-        "       60,                      !- Rink Length {m}                                ",
-        "       30,                      !- Rink Width {m}                                 ",
-        "       ,                        !- Water Temperature                              ",
-        "       0.0254,                  !- Ice Thickness {m}                              ",
-        "       3.14,                    !- COP                                            ",
-        "       ,                        !- Ice Rink Setpoint Temperature                  ",
-        "       ,                        !- Ice Rink HX Spacing                            ",
-        "       ,                        !- Resurfacer Tank (Volume?)                      ",
-        "       ,                        !- Resurfacer Initial Water Temperature           ",
-        "       ,                        !- Resurfacer Hot Water Temperature               ",
-        "       ;                        !- Ice Temperature Design Setpoint                ",
-        "       Schedule:Constant,AlwaysOnSchedule,,2;                                     ",
-        "       Schedule:Constant,ResurfaceSched,,2;                                       ",
-        "  Zone,",
-        "    Main Floor,                  !- Name",
-        "    0,                       !- Direction of Relative North {deg}",
-        "    0,                       !- X Origin {m}",
-        "    0,                       !- Y Origin {m}",
-        "    0;                       !- Z Origin {m}"
-    });
+    std::string const idf_objects = delimited_string({"   IceRink:Indoor,                                                                ",
+                                                      "       Indoor Ice Rink,         !- Name                                           ",
+                                                      "       AlwaysOnSchedule,        !- Availability Schedule Name                     ",
+                                                      "       Main Floor,              !- Zone Name                                      ",
+                                                      "       Floor,                   !- Surface Name                                   ",
+                                                      "       0.013,                   !- Tube Diameter {m}                              ",
+                                                      "       100,                     !- Tube Length {m}                                ",
+                                                      "       STC,                     !- Ice Rink Control Strategy                      ",
+                                                      "       3,                       !- Hours to freeze the water                      ",
+                                                      "       2,                       !- Delta temperature                              ",
+                                                      "       Rink Inlet Node,         !- Refrigerant Inlet Node Name                    ",
+                                                      "       Rink Outlet Node,        !- Refrigerant Outlet Node Name                   ",
+                                                      "       ResurfaceSched,          !- Resurface Schedule                             ",
+                                                      "       60,                      !- Rink Length {m}                                ",
+                                                      "       30,                      !- Rink Width {m}                                 ",
+                                                      "       ,                        !- Water Temperature                              ",
+                                                      "       0.0254,                  !- Ice Thickness {m}                              ",
+                                                      "       3.14,                    !- COP                                            ",
+                                                      "       ,                        !- Ice Rink Setpoint Temperature                  ",
+                                                      "       ,                        !- Ice Rink HX Spacing                            ",
+                                                      "       ,                        !- Resurfacer Tank (Volume?)                      ",
+                                                      "       ,                        !- Resurfacer Initial Water Temperature           ",
+                                                      "       ,                        !- Resurfacer Hot Water Temperature               ",
+                                                      "       ;                        !- Ice Temperature Design Setpoint                ",
+                                                      "       Schedule:Constant,AlwaysOnSchedule,,2;                                     ",
+                                                      "       Schedule:Constant,ResurfaceSched,,2;                                       ",
+                                                      "  Zone,",
+                                                      "    Main Floor,                  !- Name",
+                                                      "    0,                       !- Direction of Relative North {deg}",
+                                                      "    0,                       !- X Origin {m}",
+                                                      "    0,                       !- Y Origin {m}",
+                                                      "    0;                       !- Z Origin {m}"});
 
     ASSERT_TRUE(process_idf(idf_objects, false));
 
@@ -126,7 +124,7 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 
     // For Ice Rink Input:
     int constexpr NumOfRinks = 1;
-    auto & rink(state->dataIceRink->Rink(NumOfRinks));
+    auto &rink(state->dataIceRink->Rink(NumOfRinks));
     EXPECT_EQ(rink.Name, "INDOOR ICE RINK");
     EXPECT_EQ(rink.SchedName, "ALWAYSONSCHEDULE");
     EXPECT_EQ(rink.ZoneName, "MAIN FLOOR");
@@ -135,19 +133,18 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
     EXPECT_EQ(rink.TubeLength, 100);
     EXPECT_EQ(rink.hrstofreeze, 3);
     EXPECT_EQ(rink.deltatemp, 2);
-//    EXPECT_EQ(rink.IceSetptSched, "ICESCHED");
-//    EXPECT_EQ(rink.PeopleSchedName, "PEOPLESCHED");
-//    EXPECT_EQ(rink.MaxNumOfPeople, 100);
-//    EXPECT_EQ(rink.LengthRink, 60);
-//    EXPECT_EQ(rink.WidthRink, 30);
-//    EXPECT_EQ(rink.WaterTemp, 22);
-//    EXPECT_EQ(rink.IceThickness, 0.0254);
-//    EXPECT_EQ(rink.FloodWaterTemp, 15);
-//    EXPECT_EQ(rink.IceSetPointTemp, -3);
+    //    EXPECT_EQ(rink.IceSetptSched, "ICESCHED");
+    //    EXPECT_EQ(rink.PeopleSchedName, "PEOPLESCHED");
+    //    EXPECT_EQ(rink.MaxNumOfPeople, 100);
+    //    EXPECT_EQ(rink.LengthRink, 60);
+    //    EXPECT_EQ(rink.WidthRink, 30);
+    //    EXPECT_EQ(rink.WaterTemp, 22);
+    //    EXPECT_EQ(rink.IceThickness, 0.0254);
+    //    EXPECT_EQ(rink.FloodWaterTemp, 15);
+    //    EXPECT_EQ(rink.IceSetPointTemp, -3);
 }
 
-
-//TEST_F(EnergyPlusFixture, IceRink_Freezing)
+// TEST_F(EnergyPlusFixture, IceRink_Freezing)
 //{
 //    Real64 Q;
 //    auto & Rink(state->dataIceRink->Rink);
@@ -169,7 +166,7 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 //    EXPECT_NEAR(Q, 1823947.78, 1);
 //}
 //
-//TEST_F(EnergyPlusFixture, IceRink_Effectiveness)
+// TEST_F(EnergyPlusFixture, IceRink_Effectiveness)
 //{
 //    auto & Rink(state->dataIceRink->Rink);
 //    auto & PlantLoop(state->dataPlnt->PlantLoop);
@@ -200,7 +197,7 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 //    EXPECT_NEAR(Result1, 0.319, 0.1);
 //}
 
-//TEST_F(EnergyPlusFixture, IceRink_Resurfacer)
+// TEST_F(EnergyPlusFixture, IceRink_Resurfacer)
 //{
 //    Resurfacer.allocate(1);
 //    Resurfacer(1).ResurfacingWaterTemp = 60;
@@ -214,13 +211,12 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 //    EXPECT_NEAR(Result, 1743136.91, 0.1);
 //}
 
+// TODO; Still working on fixing errors within function below.
 
-//TODO; Still working on fixing errors within function below.
-
-//TEST_F(EnergyPlusFixture, calculateIceRink)
+// TEST_F(EnergyPlusFixture, calculateIceRink)
 //{
 //    Rink.allocate(1);
-//    PlantLoop.allocate(1); 
+//    PlantLoop.allocate(1);
 //    int const SurfaceTempControl(1);
 //    Real64 LoadMet;
 //    //Schedule.allocate(1);
@@ -242,7 +238,7 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 //    Rink(1).EpsMdotCp = 141563.934;
 //    Rink(1).operation = 1;
 //    Rink(1).Tsurfin2 = 22.5;
-//        
+//
 //
 //
 //    Schedule(1).CurrentValue = -3.0;
@@ -254,7 +250,6 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 //
 //    Rink(1).calculateIceRink(*state, LoadMet);
 //
-//    EXPECT_NEAR(LoadMet, -172756.078, 1); 
-
+//    EXPECT_NEAR(LoadMet, -172756.078, 1);
 
 //}
