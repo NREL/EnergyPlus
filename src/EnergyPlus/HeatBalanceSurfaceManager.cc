@@ -2869,7 +2869,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     state.dataEnvrn->BeamSolarRad *
                     state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) * CosInc;
                 // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum);
+                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
+                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
                 // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
                 // Incident diffuse solar from beam-to-diffuse reflection from ground
@@ -2904,7 +2905,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     state.dataHeatBal->SurfCosIncidenceAngle(SurfNum);
 
                 // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum);
+                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
+                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
                 // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
                 // Incident diffuse solar from beam-to-diffuse reflection from ground
@@ -2953,7 +2955,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::iRadType::SolarBeam) /
                                      state.dataConstruction->Construct(ConstrNum).TransDiff;
 
-            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum2) *
+            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
                                                           TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::iRadType::SolarAniso) /
                                                           state.dataConstruction->Construct(ConstrNum).TransDiff;
 
@@ -2984,12 +2986,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
             Real64 ShelfSolarRad = (state.dataEnvrn->BeamSolarRad *
                                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) *
                                         state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) +
-                                    state.dataSurface->SurfSkySolarInc(OutShelfSurf)) *
+                                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
             // Add all reflected solar from the outside shelf to the ground solar
             // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-            state.dataSurface->SurfGndSolarInc(SurfNum) += ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+            state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround +
+                                                          ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
         }
 
         // Calculate Exterior and Interior Absorbed Short Wave Radiation
