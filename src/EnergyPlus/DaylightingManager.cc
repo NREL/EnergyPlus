@@ -1524,11 +1524,11 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                 // Also calculate corresponding glare factors.
                 ILB = IL;
                 for (IHR = 1; IHR <= 24; ++IHR) {
-                    FigureMapPointDayltgFactorsToAddIllums(state, mapNum, ILB, IHR, IWin, loopwin, NWX, NWY, ICtrl);
+                    FigureMapPointDayltgFactorsToAddIllums(state, mapNum, ILB, IHR, IWin, loopwin, ICtrl);
                 } // End of sun position loop, IHR
             } else {
                 ILB = IL;
-                FigureMapPointDayltgFactorsToAddIllums(state, mapNum, ILB, state.dataGlobal->HourOfDay, IWin, loopwin, NWX, NWY, ICtrl);
+                FigureMapPointDayltgFactorsToAddIllums(state, mapNum, ILB, state.dataGlobal->HourOfDay, IWin, loopwin, ICtrl);
             }
 
         } // End of window loop, loopwin - IWin
@@ -3923,8 +3923,6 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
                                             int const iHour,
                                             int const IWin,
                                             int const loopwin,
-                                            int const NWX,  // Number of window elements in x direction for dayltg calc
-                                            int const NWY,  // Number of window elements in y direction for dayltg calc
                                             int const ICtrl // Window control counter
 )
 {
@@ -3932,8 +3930,6 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith, Oct 2012, derived from legacy code by Fred Winkelmann, Peter Ellis, Linda Lawrie
     //       DATE WRITTEN   Nov. 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // calculation worker routine to fill daylighting coefficients
@@ -3952,16 +3948,6 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     //  fully-switched state to that of the unswitched state
 
     if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return;
-
-    // Altitude of sun (degrees)
-    state.dataDaylightingManager->PHSUN = state.dataDaylightingManager->PHSUNHR(iHour);
-    state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(iHour);
-    state.dataDaylightingManager->CPHSUN = state.dataDaylightingManager->CPHSUNHR(iHour);
-
-    // Azimuth of sun in absolute coord sys
-    state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(iHour);
-
-    int const enclNum = state.dataSurface->Surface(IWin).SolarEnclIndex;
 
     for (ISky = 1; ISky <= 4; ++ISky) { // Loop over sky types
 

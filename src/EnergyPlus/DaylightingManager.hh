@@ -295,8 +295,6 @@ namespace DaylightingManager {
                                                 int const iHour,
                                                 int const IWin,
                                                 int const loopwin,
-                                                int const NWX,  // Number of window elements in x direction for dayltg calc
-                                                int const NWY,  // Number of window elements in y direction for dayltg calc
                                                 int const ICtrl // Window control counter
     );
 
