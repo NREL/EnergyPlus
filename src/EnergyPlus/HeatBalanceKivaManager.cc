@@ -730,7 +730,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     }
                 }
             } else {
-                for (auto i = surface.Vertex.size() - 1; i >= 0; --i) {
+                for (int i = surface.Vertex.size() - 1; i >= 0; --i) {
                     auto &v = surface.Vertex[i];
                     floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
                     if (!userSetExposedPerimeter) {
