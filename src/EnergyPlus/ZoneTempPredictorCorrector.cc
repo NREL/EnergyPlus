@@ -892,7 +892,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 auto const SELECT_CASE_var(ControlTypeNum);
 
                 if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                    if (!TStatControlTypes(TempControlledZoneNum).MustHave(ControlTypeNum)) continue;
+                    if (!TStatControlTypes(TempControlledZoneNum).MustHave(ControlTypeNum)) continue; // TODO: Isn't this already caught above?
                     ShowWarningError(state, "Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
                     ShowContinueError(state,
                                       "...should include control type 1 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint)) +

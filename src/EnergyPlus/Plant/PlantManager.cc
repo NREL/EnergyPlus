@@ -1388,7 +1388,7 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")) {
                         this_comp.TypeOf_Num = TypeOf_IceRink;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
-                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
+                        this_comp.compPtr = EnergyPlus::IceRink::IceRinkData::factory(state, CompNames(CompNum));
                     } else {
                         // discover unsupported equipment on branches.
                         ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) + "\", invalid component on branch.");

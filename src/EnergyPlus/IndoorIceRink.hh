@@ -186,12 +186,10 @@ namespace IceRink {
         Real64 ResurfTank = 0.0; // in m3 - 0.55m3 default is from ASHRAE capacity range
         Real64 QResurface = 0.0;
         Real64 HeatingWater = 0.0;
-        Real64 MassflowTest = 0.0;
 
         Real64 FreezingLoad = 0.0;
 
         // ReportData
-        Real64 RefrigInletTemp = 0.0; // Refrigerant inlet temperature
         Real64 CoolPower = 0.0;       // Cooling sent to rink floor in Watts
         Real64 CoolEnergy = 0.0;      // Cooling sent to rink floor in Joules
 

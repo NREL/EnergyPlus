@@ -360,6 +360,7 @@ add_simulation_test(IDF_FILE IceStorage-Series-ChillerDownstream.idf EPW_FILE US
 add_simulation_test(IDF_FILE IceStorage-Series-ChillerUpstream.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE IndEvapCoolerRTUoffice.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 add_simulation_test(IDF_FILE IndirectAbsorptionChiller.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+add_simulation_test(IDF_FILE IndoorIceRink.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE InternalMass_wZoneList.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE LgOffVAV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE LrgOff_GridStorageDemandLeveling.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

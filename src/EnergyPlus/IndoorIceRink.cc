@@ -120,6 +120,8 @@ namespace IceRink {
 
     void IceRinkData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
+        state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr) = true;
+        state.dataSurface->SurfIsPool(this->SurfacePtr) = true;
     }
 
     void GetIndoorIceRink(EnergyPlusData &state)
@@ -251,7 +253,7 @@ namespace IceRink {
                                                state.dataIPShortCut->cAlphaArgs(1),
                                                state.dataIPShortCut->cAlphaArgs(6),
                                                state.dataIPShortCut->cAlphaArgs(7),
-                                               "Refrigerant Nodes");
+                                               "Ice Rink Nodes");
 
             Rink(Item).ResurfacingSchedName = state.dataIPShortCut->cAlphaArgs(8);
             Rink(Item).ResurfacingSchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
@@ -392,7 +394,7 @@ namespace IceRink {
         Real64 constexpr DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
         static constexpr std::string_view RoutineName("initialize");
 
-        if ((this->MyFlag) && allocated(state.dataPlnt->PlantLoop)) {
+        if (this->MyFlag) {
             bool errFlag = false;
             this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(
@@ -472,151 +474,121 @@ namespace IceRink {
     void IceRinkData::setupOutputVariables(EnergyPlusData &state)
     {
         // Set up output variables CurrentModuleObject='IceRink:Indoor'
-        if (this->RinkType_Num == DataPlant::TypeOf_IceRink) {
-            SetupOutputVariable(state,
-                                "Rink Refrigerant Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->RefrigInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Refrig out temp", // TODO: These names need to be more verbose
-                                OutputProcessor::Unit::C,
-                                this->TRefigOutCheck,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Refrig in temp",
-                                OutputProcessor::Unit::C,
-                                this->RefrigTempIn,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "CpRefrig",
-                                OutputProcessor::Unit::None,
-                                this->CpRefrig,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Rink Refrigerant Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->RefrigMassFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "MassflowTest",
-                                OutputProcessor::Unit::kg_s,
-                                this->MassflowTest,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Max mass flowrate",
-                                OutputProcessor::Unit::kg_s,
-                                this->maxmdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Current TH22",
-                                OutputProcessor::Unit::C,
-                                this->Tsurfin1,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Tsource",
-                                OutputProcessor::Unit::C,
-                                this->Tsrc,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Qsource max",
-                                OutputProcessor::Unit::W,
-                                this->Qsrcmax,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Qsetpoint",
-                                OutputProcessor::Unit::W,
-                                this->Qsetpoint,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Qsrc after HB update",
-                                OutputProcessor::Unit::W,
-                                this->Qsource2,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Qsrc",
-                                OutputProcessor::Unit::W,
-                                this->Q,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "QResurfacer",
-                                OutputProcessor::Unit::W,
-                                this->QResurface,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Effectiveness",
-                                OutputProcessor::Unit::None,
-                                this->Effectiveness,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Rink Refrigeration Rate",
-                                OutputProcessor::Unit::W,
-                                this->CoolPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "HX circuits",
-                                OutputProcessor::Unit::None,
-                                this->circuits,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                this->Name);
-            SetupOutputVariable(state,
-                                "Rink Refrigeration Energy",
-                                OutputProcessor::Unit::J,
-                                this->CoolEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                this->Name,
-                                _,
-                                "Electricity",
-                                "REFRIGERATION",
-                                _,
-                                "System");
-            SetupOutputVariable(state,
-                                "Resurfacer Water Heater",
-                                OutputProcessor::Unit::J,
-                                this->HeatingWater,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                this->Name,
-                                _,
-                                "Electricity",
-                                "WaterSystem",
-                                _,
-                                "System");
-        }
+        SetupOutputVariable(state,
+                            "Ice Rink Refrigerant Outlet Temperature", // TODO: These names need to be more verbose
+                            OutputProcessor::Unit::C,
+                            this->TRefigOutCheck,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Refrigerant Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->RefrigTempIn,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Calculated Specific Heat",
+                            OutputProcessor::Unit::J_kgK,
+                            this->CpRefrig,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Refrigerant Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->RefrigMassFlow,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Maximum Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->maxmdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Inside Surface Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Tsurfin1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Effective Source Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Tsrc,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Maximum Cooling Capacity to Freeze Water",
+                            OutputProcessor::Unit::W,
+                            this->Qsrcmax,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Cooling Rate Required to Meet Setpoint",
+                            OutputProcessor::Unit::W,
+                            this->Qsetpoint,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->Q,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Resurfacer Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QResurface,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Heat Exchanger Effectiveness",
+                            OutputProcessor::Unit::None,
+                            this->Effectiveness,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Refrigeration Power",
+                            OutputProcessor::Unit::W,
+                            this->CoolPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Ice Rink Refrigeration Energy",
+                            OutputProcessor::Unit::J,
+                            this->CoolEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name,
+                            _,
+                            "Electricity",
+                            "REFRIGERATION",
+                            _,
+                            "System");
+        SetupOutputVariable(state,
+                            "Ice Rink Resurfacer Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeatingWater,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name,
+                            _,
+                            "Electricity",
+                            "WaterSystem",
+                            _,
+                            "System");
     }
 
     Real64 IceRinkData::IceRinkFreezing(EnergyPlusData &state)
@@ -718,6 +690,7 @@ namespace IceRink {
         this->Qsetpoint =
             ((((1 - (this->coeffs.Cb * this->coeffs.Ce)) * this->IceSetPointTemp) - this->coeffs.Ca - (this->coeffs.Cb * this->coeffs.Cd)) /
              (this->coeffs.Cc + (this->coeffs.Cb * this->coeffs.Cf)));
+        this->Effectiveness = 1.0; // TODO: Edwin added this temporarily -- the Effectiveness is used in this equation but it isn't assigned until later...
         this->ReqMassFlow =
             (((this->coeffs.Ck - this->RefrigTempIn) / (this->deltatemp)) - (1 / Effectiveness)) * (PipeArea / (this->CpRefrig * this->coeffs.Cl));
         // Floor Surface temperatures. Only the current temperature is used. The others are for tracking and reporting purposes of the simulation.
@@ -763,7 +736,6 @@ namespace IceRink {
                     this->PastRefrigMassFlow = this->RefrigMassFlow;
                     PlantUtilities::SetComponentFlowRate(
                         state, this->RefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
-                    this->MassflowTest = this->RefrigMassFlow;
 
                     if (this->RefrigMassFlow <= 0) {
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0;
@@ -786,13 +758,11 @@ namespace IceRink {
                         this->PastRefrigMassFlow = this->RefrigMassFlow;
                         PlantUtilities::SetComponentFlowRate(
                             state, this->RefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
-                        this->MassflowTest = this->RefrigMassFlow;
                     } else {
                         this->RefrigMassFlow = this->ReqMassFlow;
                         this->PastRefrigMassFlow = this->RefrigMassFlow;
                         PlantUtilities::SetComponentFlowRate(
                             state, this->RefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
-                        this->MassflowTest = this->RefrigMassFlow;
 
                         if (this->RefrigMassFlow <= 0) {
                             state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0;
@@ -834,7 +804,6 @@ namespace IceRink {
     void IceRinkData::report(EnergyPlusData &state)
     {
         this->CoolPower = fabs(this->LoadMet) / this->COP;
-        this->RefrigInletTemp = state.dataLoopNodes->Node(this->InNode).Temp;
         this->CoolEnergy = this->CoolPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 } // namespace IceRink
