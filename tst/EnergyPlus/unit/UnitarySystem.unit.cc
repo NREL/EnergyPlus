@@ -8722,7 +8722,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     // these next 2 variables are used to modulate the coil PLR irrespective of the fan PLR - they are non-zero when the model is called and CAN be 0
     // when load exceeds capacity the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio *
     // max other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.01374, 0.0001); // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.04123, 0.0001); // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);     // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(thisSys->FanPartLoadRatio, thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxHeatAirMassFlow,
                 0.0001);                                                                  // fan PLR at minimum speed
@@ -8796,7 +8796,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_LT(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);       // air flow lower than high speed fan flow
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate,
                      state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0667, 0.0001);          // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.3592, 0.0001);          // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);             // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(thisSys->FanPartLoadRatio,
                 0.6198,
@@ -8839,7 +8839,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate,
                      state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2532, 0.001);           // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.7704, 0.001);           // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);             // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_GT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
@@ -8878,7 +8878,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     // test model performance
     EXPECT_GT(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys); // Watts - system CANNOT meet load
-    EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                          // system maxed out on capacity
+    EXPECT_NEAR(Qsens_sys, 10909.95, 0.1);                                                                          // system maxed out on capacity
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate,
                      state->dataLoopNodes->Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_EQ(state->dataLoopNodes->Node(thisSys->HeatCoilFluidInletNode).MassFlowRate,
@@ -8889,7 +8889,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001); // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0);                 // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_GT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
-    EXPECT_NEAR(state->dataLoopNodes->Node(OutletNode).Temp, 25.85, 0.01); // system allowed to exceed max outlet air temp to meet additional load
+    EXPECT_NEAR(state->dataLoopNodes->Node(OutletNode).Temp, 25.63, 0.01); // system allowed to exceed max outlet air temp to meet additional load
 
     // COOLING LOAD
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -2000.0; // cooling load
