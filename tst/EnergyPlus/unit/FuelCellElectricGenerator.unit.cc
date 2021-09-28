@@ -801,7 +801,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
     EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->generatorType));
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
-    EXPECT_EQ("GENERATOR:FUELCELL", GeneratorTypes[static_cast<int>(generatorController->generatorType)]);
+    EXPECT_EQ("GENERATOR:FUELCELL", GeneratorTypesUC[static_cast<int>(generatorController->generatorType)]);
 
     EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Generator_FCExhaust, generatorController->compPlantType));
 
@@ -1748,7 +1748,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
     EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->generatorType));
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
-    EXPECT_EQ("GENERATOR:FUELCELL", GeneratorTypes[static_cast<int>(generatorController->generatorType)]);
+    EXPECT_EQ("GENERATOR:FUELCELL", GeneratorTypesUC[static_cast<int>(generatorController->generatorType)]);
 
     EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Generator_FCExhaust, generatorController->compPlantType));
 

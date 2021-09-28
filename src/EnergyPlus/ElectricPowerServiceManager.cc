@@ -2155,33 +2155,29 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     name = objectName;
 
-    switch (getEnumerationValue(GeneratorTypes, objectType)) {
-    case 0: { //"Generator:InternalCombustionEngine"
-        generatorType = GeneratorType::ICEngine;
+    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypes, objectType));
+    switch (generatorType) {
+    case GeneratorType::ICEngine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
         compPlantName = name;
         break;
     }
-    case 1: { // "Generator:CombustionTurbine"
-        generatorType = GeneratorType::CombTurbine;
+    case GeneratorType::CombTurbine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_CTurbine;
         compPlantName = name;
         break;
     }
-    case 2: { // "Generator:MicroTurbine"
-        generatorType = GeneratorType::Microturbine;
+    case GeneratorType::Microturbine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_MicroTurbine;
         compPlantName = name;
         break;
     }
-    case 3: { // "Generator:Photovoltaic"
-        generatorType = GeneratorType::PV;
+    case GeneratorType::PV: {
         compPlantType = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
         compPlantName = name;
         break;
     }
-    case 4: { // "Generator:PVWatts"
-        generatorType = GeneratorType::PVWatts;
+    case GeneratorType::PVWatts: {
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
         int ObjNum =
@@ -2194,8 +2190,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         pvwattsGenerator->setupOutputVariables(state);
         break;
     }
-    case 5: { // "Generator:FuelCell"
-        generatorType = GeneratorType::FuelCell;
+    case GeneratorType::FuelCell: {
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantType = DataPlant::PlantEquipmentType::Generator_FCExhaust;
@@ -2204,14 +2199,12 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->ExhaustHX.Name;
         break;
     }
-    case 6: { // "Generator:MicroCHP"
-        generatorType = GeneratorType::MicroCHP;
+    case GeneratorType::MicroCHP: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_MicroCHP;
         compPlantName = name;
         break;
     }
-    case 7: { // "Generator:WindTurbine"
-        generatorType = GeneratorType::WindTurbine;
+    case GeneratorType::WindTurbine: {
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
         break;
     }
