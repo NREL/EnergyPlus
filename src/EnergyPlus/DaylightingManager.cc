@@ -3185,7 +3185,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // Rob/TH - Not sure whether this call is necessary for interior zones with interior windows only.
     //  new code would be -
     // IF (LSHCAL == 1 .AND. ExtWinType /= AdjZoneExtWin) CALL DayltgInterReflectedIllum(ISunPos,IHR,ZoneNum,IWin2)
-    // TODO MJW: This may be getting repeated if there is more than one daylighting control in an enclosure
     int enclNum = 0; // enclosure index
     int zoneNum = 0; // zone index
     if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
@@ -5997,19 +5996,53 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
     }
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex);
-        thisDaylightControl.DaylIllumAtRefPt = 0.0;
-        thisDaylightControl.GlareIndexAtRefPt = 0.0;
         thisDaylightControl.PowerReductionFactor = 1.0;
-        thisEnclDaylight.InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
-        if (thisDaylightControl.TotalDaylRefPoints != 0) {
-            thisDaylightControl.TimeExceedingGlareIndexSPAtRefPt = 0.0;
-            thisDaylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
+        if (state.dataEnvrn->PreviousSolRadPositive) {
+            // Reset to zero only if there was solar in the previous timestep, otherwise these are already zero
+            thisDaylightControl.DaylIllumAtRefPt = 0.0;
+            thisDaylightControl.GlareIndexAtRefPt = 0.0;
+            state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex).InterReflIllFrIntWins =
+                0.0; // inter-reflected illuminance from interior windows
+            for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
+                thisDaylightControl.TimeExceedingGlareIndexSPAtRefPt(refPtNum) = 0.0;
+                thisDaylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum) = 0.0;
+            }
         }
 
         if (state.dataEnvrn->SunIsUp && thisDaylightControl.TotalDaylRefPoints != 0) {
             if (initSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
             DayltgInteriorIllum(state, daylightCtrlNum);
+        }
+    }
+
+    // The following report variables are valid only for daylit zones/enclosures without interior windows
+    if (state.dataEnvrn->SunIsUp) {
+        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+            if ((state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0) &&
+                (!state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow)) {
+                auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+                for (int extWinNum = 1; extWinNum <= thisEnclDaylight.NumOfDayltgExtWins; ++extWinNum) {
+                    int IWin = thisEnclDaylight.DayltgExtWinSurfNums(extWinNum);
+                    int IS = 1;
+                    if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel &&
+                        (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
+                        IS = 2;
+                    }
+                    int refPtCount = 0;
+                    for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
+                        auto &thisControl = state.dataDaylightingData->daylightControl(controlNum);
+                        if (thisControl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+                            for (int refPtNum = 1; refPtNum <= thisControl.TotalDaylRefPoints; ++refPtNum) {
+                                ++refPtCount; // Count reference points across each daylighting control in the same enclosure
+                                state.dataSurface->SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) =
+                                    thisControl.IllumFromWinAtRefPt(extWinNum, IS, refPtNum);
+                                state.dataSurface->SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) =
+                                    thisControl.SourceLumFromWinAtRefPt(extWinNum, IS, refPtNum);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -6059,16 +6092,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
             if (iErrorFlag != 0) {
                 // Open DElight Electric Lighting Error File for reading
                 auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
-                if (iDElightErrorFile.good()) {
-                    elOpened = true;
-                } else {
-                    elOpened = false;
-                }
-                //            IF (iwriteStatus /= 0) THEN
-                //              CALL ShowFatalError(state, 'InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output
-                //              (readwrite).')
-                //            ENDIF
-                //            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
+                elOpened = iDElightErrorFile.good();
 
                 // Sequentially read lines in DElight Electric Lighting Error File
                 // and process them using standard EPlus warning/error handling calls
@@ -7187,31 +7211,6 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             thisDaylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = state.dataGlobal->TimeStepZone; // fraction of hours
         } else {
             thisDaylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = 0.0;
-        }
-    }
-
-    // The following report variables are valid only for daylit zones/enclosures without interior windows
-    // TODO MJW: I think this ends up getting repeated if there are multiple daylighting controls in the same enclosure
-    if (!state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow) {
-        for (loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
-            int IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
-            int IS = 1;
-            if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel &&
-                (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
-                IS = 2;
-            if (thisDaylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
-                int refPtCount = 0;
-                for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
-                    auto &thisControl = state.dataDaylightingData->daylightControl(controlNum);
-                    for (int refPtNum = 1; refPtNum <= thisControl.TotalDaylRefPoints; ++refPtNum) {
-                        ++refPtCount; // Count reference points across each daylighting control in the same enclosure
-                        state.dataSurface->SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) =
-                            thisControl.IllumFromWinAtRefPt(loop, IS, refPtNum);
-                        state.dataSurface->SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) =
-                            thisControl.SourceLumFromWinAtRefPt(loop, IS, refPtNum);
-                    }
-                }
-            }
         }
     }
 }
