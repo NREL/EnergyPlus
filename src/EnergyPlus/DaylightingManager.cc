@@ -2027,9 +2027,9 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     //  of window element onto ground (m)
 
     // Local complex fenestration variables
-    int CplxFenState; // Current complex fenestration state
-    int NReflSurf;    // Number of blocked beams for complex fenestration
-    int ICplxFen;     // Complex fenestration counter
+    int CplxFenState;  // Current complex fenestration state
+    int NReflSurf = 0; // Number of blocked beams for complex fenestration
+    int ICplxFen;      // Complex fenestration counter
     int RayIndex;
     Real64 TransBeam; // Obstructions transmittance for incoming BSDF rays (temporary variable)
 
@@ -3968,7 +3968,6 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, JSH, ISky, iMapPoint, loopwin) =
                     (state.dataDaylightingManager->EDIRSK(iHour, JSH, ISky) + state.dataDaylightingManager->EINTSK(iHour, JSH, ISky)) /
                     state.dataDaylightingManager->GILSK(iHour, ISky);
-                (DataGlobalConstants::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
             } else {
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, JSH, ISky, iMapPoint, loopwin) = 0.0;
             }
