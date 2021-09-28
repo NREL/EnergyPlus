@@ -101,7 +101,7 @@ void InitComponentNodes(EnergyPlusData &state,
     //  reset inlet node if more restrictive
 
     // Using/Aliasing
-    using DataPlant::DemandOpSchemeType;
+    using DataPlant::Demand;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 tmpMinCompMdot; // local value
@@ -162,7 +162,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
     auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
     auto &comp(loop_side.Branch(BranchIndex).Comp(CompIndex));
 
-    if (comp.CurOpSchemeType == DataPlant::DemandOpSchemeType) {
+    if (comp.CurOpSchemeType == DataPlant::Demand) {
         // store flow request on inlet node
         state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = CompFlow;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail =
@@ -286,7 +286,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
         ShowFatalError(state, "SetComponentFlowRate: Flow lock out of range"); // DEBUG error...should never get here LCOV_EXCL_LINE
     }
 
-    if (comp.CurOpSchemeType == DataPlant::DemandOpSchemeType) {
+    if (comp.CurOpSchemeType == DataPlant::Demand) {
         if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
             if (std::abs(MdotOldRequest - state.dataLoopNodes->Node(InletNode).MassFlowRateRequest) >
                 DataBranchAirLoopPlant::MassFlowTolerance) { // demand comp changed its flow request
@@ -442,9 +442,9 @@ Real64 RegulateCondenserCompFlowReqOp(
     // If not then we will have no choice but to leave the flow request alone (uncontrolled operation?)
 
     // Using/Aliasing
-    using DataPlant::CompSetPtBasedSchemeType;
-    using DataPlant::CoolingRBOpSchemeType;
-    using DataPlant::HeatingRBOpSchemeType;
+    using DataPlant::CompSetPtBased;
+    using DataPlant::CoolingRB;
+    using DataPlant::HeatingRB;
 
     // Return value
     Real64 FlowVal;
@@ -466,8 +466,8 @@ Real64 RegulateCondenserCompFlowReqOp(
         {
             auto const SELECT_CASE_var(CompOpScheme);
 
-            if ((SELECT_CASE_var == HeatingRBOpSchemeType) || (SELECT_CASE_var == CoolingRBOpSchemeType) ||
-                (SELECT_CASE_var == CompSetPtBasedSchemeType)) { // These provide meaningful MyLoad values
+            if ((SELECT_CASE_var == HeatingRB) || (SELECT_CASE_var == CoolingRB) ||
+                (SELECT_CASE_var == CompSetPtBased)) { // These provide meaningful MyLoad values
                 if (std::abs(CompCurLoad) > ZeroLoad) {
                     FlowVal = TentativeFlowRequest;
                 } else { // no load

@@ -190,12 +190,12 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     auto &this_op_scheme(state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr));
 
     // Load the 'range variable' according to the type of control scheme specified
-    if ((CurSchemeType == UncontrolledOpSchemeType) || (CurSchemeType == CompSetPtBasedSchemeType)) {
+    if ((CurSchemeType == Uncontrolled) || (CurSchemeType == CompSetPtBased)) {
         // No RangeVariable specified for these types
-    } else if (CurSchemeType == EMSOpSchemeType) {
+    } else if (CurSchemeType == EMS) {
         InitLoadDistribution(state, FirstHVACIteration);
         // No RangeVariable specified for these types
-    } else if (CurSchemeType == HeatingRBOpSchemeType) {
+    } else if (CurSchemeType == HeatingRB) {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand < SmallLoad) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -204,7 +204,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             return;
         }
         RangeVariable = LoopDemand;
-    } else if (CurSchemeType == CoolingRBOpSchemeType) {
+    } else if (CurSchemeType == CoolingRB) {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand > (-1.0 * SmallLoad)) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -213,15 +213,15 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             return;
         }
         RangeVariable = LoopDemand;
-    } else if (CurSchemeType == DryBulbRBOpSchemeType) {
+    } else if (CurSchemeType == DryBulbRB) {
         RangeVariable = state.dataEnvrn->OutDryBulbTemp;
-    } else if (CurSchemeType == WetBulbRBOpSchemeType) {
+    } else if (CurSchemeType == WetBulbRB) {
         RangeVariable = state.dataEnvrn->OutWetBulbTemp;
-    } else if (CurSchemeType == RelHumRBOpSchemeType) {
+    } else if (CurSchemeType == RelHumRB) {
         RangeVariable = state.dataEnvrn->OutRelHum;
-    } else if (CurSchemeType == DewPointRBOpSchemeType) {
+    } else if (CurSchemeType == DewPointRB) {
         RangeVariable = state.dataEnvrn->OutDewPointTemp;
-    } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) || (CurSchemeType == DewPointTDBOpSchemeType)) {
+    } else if ((CurSchemeType == DryBulbTDB) || (CurSchemeType == WetBulbTDB) || (CurSchemeType == DewPointTDB)) {
         RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
     } else {
         // No controls specified.  This is a fatal error
@@ -232,16 +232,16 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
 
     // Find the proper list within the specified scheme
     foundlist = false;
-    if (CurSchemeType == UncontrolledOpSchemeType) {
+    if (CurSchemeType == Uncontrolled) {
         //!***what else do we do with 'uncontrolled' equipment?
         // There's an equipment list...but I think the idea is to just
         // Set one component to run in an 'uncontrolled' way (whatever that means!)
 
-    } else if (CurSchemeType == CompSetPtBasedSchemeType) {
+    } else if (CurSchemeType == CompSetPtBased) {
         // check for EMS Control
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
-    } else if (CurSchemeType == EMSOpSchemeType) {
+    } else if (CurSchemeType == EMS) {
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
     } else { // it's a range based control type with multiple equipment lists
@@ -392,33 +392,33 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                         auto const plantLoopOperation(state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).TypeOf);
 
                         if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = CoolingRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = CoolingRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = HeatingRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = HeatingRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT") { //* Temp Based Control
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = CompSetPtBasedSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = CompSetPtBased;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE") { //* Simple TES Control
                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType =
-                                CompSetPtBasedSchemeType; // set this to component based as it will be converted to this
+                                CompSetPtBased; // set this to component based as it will be converted to this
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = EMSOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = EMS;
                             state.dataPlnt->AnyEMSPlantOpSchemesInModel = true;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = WetBulbRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = WetBulbRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DewPointRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DewPointRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = RelHumRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = RelHumRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbTDBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbTDB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = WetBulbTDBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = WetBulbTDB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DewPointTDBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DewPointTDB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = UncontrolledOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = Uncontrolled;
                         } else { // invalid op scheme type for plant loop
                             ShowSevereError(state,
                                             std::string{RoutineName} + "Invalid " + state.dataIPShortCut->cAlphaFieldNames(Num * 3 - 1) + '=' +
@@ -2127,7 +2127,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
             for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                 auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
                 // skip non-load based op schemes
-                if ((this_op_scheme.OpSchemeType != HeatingRBOpSchemeType) && (this_op_scheme.OpSchemeType != CoolingRBOpSchemeType)) continue;
+                if ((this_op_scheme.OpSchemeType != HeatingRB) && (this_op_scheme.OpSchemeType != CoolingRB)) continue;
                 HighestRange = 0.0;
                 for (int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum) {
                     HighestRange = max(HighestRange, this_op_scheme.EquipList(ListNum).RangeUpperLimit);
@@ -2148,7 +2148,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
             for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                 auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
-                if (this_op_scheme.OpSchemeType == EMSOpSchemeType) {
+                if (this_op_scheme.OpSchemeType == EMS) {
                     if (state.dataGlobal->BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
                         if (this_op_scheme.ErlInitProgramMngr > 0) {
                             bool anyEMSRan;
@@ -2180,9 +2180,9 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         this_component.MyLoad = 0.0;
                         this_component.EMSLoadOverrideOn = false;
                         // Zero out the old curOpSchemePtr so that we don't get 'carry-over' when we update schedules
-                        if (this_component.CurOpSchemeType != DemandOpSchemeType && this_component.CurOpSchemeType != PumpOpSchemeType &&
-                            this_component.CurOpSchemeType != WSEconOpSchemeType && this_component.CurOpSchemeType != NoControlOpSchemeType) {
-                            this_component.CurOpSchemeType = NoControlOpSchemeType;
+                        if (this_component.CurOpSchemeType != Demand && this_component.CurOpSchemeType != Pump &&
+                            this_component.CurOpSchemeType != WSEcon && this_component.CurOpSchemeType != NoControl) {
+                            this_component.CurOpSchemeType = NoControl;
                         }
                         this_component.CurCompLevelOpNum = 0;
                     }
@@ -2217,7 +2217,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             // then set up a reference to the component on the plant data structure
                             auto &this_loop_component(state.dataPlnt->PlantLoop(LoopPtr).LoopSide(LoopSidePtr).Branch(BranchPtr).Comp(CompPtr));
 
-                            if (this_loop_component.CurOpSchemeType != PumpOpSchemeType) {
+                            if (this_loop_component.CurOpSchemeType != Pump) {
                                 this_loop_component.CurOpSchemeType = this_op_scheme.OpSchemeType;
                             } else {
                                 ShowSevereError(state,
@@ -3208,15 +3208,15 @@ Real64 FindRangeVariable(EnergyPlusData &state,
     int ReferenceNodeNum;
     Real64 NodeTemperature;
 
-    if (CurSchemeType == DryBulbTDBOpSchemeType) { // drybulb temp based controls
+    if (CurSchemeType == DryBulbTDB) { // drybulb temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDryBulbTemp;
-    } else if (CurSchemeType == WetBulbTDBOpSchemeType) { // wetbulb temp based controls
+    } else if (CurSchemeType == WetBulbTDB) { // wetbulb temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutWetBulbTemp;
-    } else if (CurSchemeType == DewPointTDBOpSchemeType) { // dewpoint temp based controls
+    } else if (CurSchemeType == DewPointTDB) { // dewpoint temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDewPointTemp;

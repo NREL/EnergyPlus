@@ -1899,7 +1899,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                              .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
-                             .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
+                             .CurOpSchemeType == DataPlant::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else {
@@ -1911,7 +1911,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                              .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
-                             .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
+                             .CurOpSchemeType == DataPlant::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     } else {

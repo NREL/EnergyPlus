@@ -71,25 +71,25 @@ int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop f
 enum OpSchemeType
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
-    UnknownStatusOpSchemeType = -1,
-    NoControlOpSchemeType = 0,          // Scheme Type placeholder for items such as pipes
-    HeatingRBOpSchemeType = 1,          // Scheme Type for Heating Load Range Based Operation
-    CoolingRBOpSchemeType = 2,          // Scheme Type for Cooling  Load Range Based Operation
-    WetBulbRBOpSchemeType = 3,          // Scheme Type for Wet bulb range based Operation
-    DryBulbRBOpSchemeType = 4,          // Scheme Type for Dry bulb range based Operation
-    DewPointRBOpSchemeType = 5,         // Scheme Type for Dewpoint range based Operation
-    RelHumRBOpSchemeType = 6,           // Scheme Type for relative humidity range based Operation
-    DryBulbTDBOpSchemeType = 7,         // Scheme Type for relative humidity range based Operation
-    WetBulbTDBOpSchemeType = 8,         // Scheme Type for Wet bulb range based Operation
-    DewPointTDBOpSchemeType = 9,        // Scheme Type for Wet bulb range based Operation
-    CompSetPtBasedSchemeType = 10,      // Temp Based Control
-    UncontrolledOpSchemeType = 11,      // Scheme Type for Uncontrolled Operation
-    EMSOpSchemeType = 12,               // Scheme Type for EMS based operation user Define scheme
-    PumpOpSchemeType = 13,              // Not really an OpScheme, just a placeholder
-    DemandOpSchemeType = 14,            // Placeholder for demand side equipment such as coils
-    FreeRejectionOpSchemeType = 15,     // Scheme Type for waterside economizers and the like
-    WSEconOpSchemeType = 16,            // Scheme Type for waterside economizers and the like
-    ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
+    Unassigned = -1,
+    NoControl,           // Scheme Type placeholder for items such as pipes
+    HeatingRB,           // Scheme Type for Heating Load Range Based Operation
+    CoolingRB,           // Scheme Type for Cooling  Load Range Based Operation
+    WetBulbRB,           // Scheme Type for Wet bulb range based Operation
+    DryBulbRB,           // Scheme Type for Dry bulb range based Operation
+    DewPointRB,          // Scheme Type for Dew point range based Operation
+    RelHumRB,            // Scheme Type for relative humidity range based Operation
+    DryBulbTDB,          // Scheme Type for dry bulb temp range based Operation
+    WetBulbTDB,          // Scheme Type for wet bulb temp based Operation
+    DewPointTDB,         // Scheme Type for dew point temp based Operation
+    CompSetPtBased,      // Temp Based Control
+    Uncontrolled,        // Scheme Type for Uncontrolled Operation
+    EMS,                 // Scheme Type for EMS based operation user Define scheme
+    Pump,                // Not really an OpScheme, just a placeholder
+    Demand,              // Placeholder for demand side equipment such as coils
+    FreeRejection,       // Scheme Type for waterside economizers and the like
+    WSEcon,              // Scheme Type for waterside economizers and the like
+    ThermalEnergyStorage // Scheme Type for Simplified Thermal Energy Storage operation
 };
 
 enum class PlantEquipmentType

@@ -552,14 +552,14 @@ Add component type for 'CoilSystem:Cooling:Water' in Primary Air Loop
 					} else if (UtilityRoutines::SameString(this_comp_type,
 					    "Coil:Heating:Steam")) {
 						this_comp.Type = TypeOf_CoilSteamAirHeating;
-						this_comp.CurOpSchemeType = DemandOpSchemeType;
+						this_comp.CurOpSchemeType = Demand;
 
                     **New demand side condenser equipment "CoilSystem:Cooling:Water"**
 
 					} else if (UtilityRoutines::SameString(this_comp_type,
 					    "CoilSystem:Cooling:Water")) {
 						this_comp.Type = TypeOf_CoilSystemCoolingWater;
-						this_comp.CurOpSchemeType = DemandOpSchemeType;
+						this_comp.CurOpSchemeType = Demand;
 					...
 
 
