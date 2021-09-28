@@ -358,6 +358,10 @@ namespace DaylightingManager {
                                     bool &hit                  // True iff ray hits an obstruction
     );
 
+    void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefirstTime);
+
+    void manageDaylighting(EnergyPlusData &state);
+
     void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum); // Daylighting:Controls number
 
     void DayltgInteriorTDDIllum(EnergyPlusData &state);
