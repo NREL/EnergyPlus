@@ -1970,37 +1970,36 @@ namespace DataPlant {
         int const OutletNode(this_comp.NodeNumOut);
 
         if (this->FlowLock == DataPlant::FlowLock::Unlocked) {
-            {
-                switch (this_comp.CurOpSchemeType) {
-                case (HeatingRB):
-                case (CoolingRB): { //~ load range based
-                    break;          // Don't do anything for load based components
-                }
 
-                default: {
-                    // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
-                    ComponentMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
-                    // make sure components like economizers use the mass flow request
-                    break;
-                }
-                }
+            switch (this_comp.CurOpSchemeType) {
+            case (HeatingRB):
+            case (CoolingRB): { //~ load range based
+                break;          // Don't do anything for load based components
+            }
+
+            default: {
+                // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
+                ComponentMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
+                // make sure components like economizers use the mass flow request
+                break;
+            }
             }
 
         } else if (this->FlowLock == DataPlant::FlowLock::Locked) {
 
             // For locked flow just use the mass flow rate
-            {
-                switch (this_comp.CurOpSchemeType) {
-                case (HeatingRB):
-                case (CoolingRB): { //~ load range based
-                    break;          // Don't do anything for load based components
-                }
-                default: {
-                    // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
-                    ComponentMassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-                }
-                }
+
+            switch (this_comp.CurOpSchemeType) {
+            case (HeatingRB):
+            case (CoolingRB): { //~ load range based
+                break;          // Don't do anything for load based components
             }
+            default: {
+                // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
+                ComponentMassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
+            }
+            }
+
         } else { // flow pump query? problem?
         }
 
