@@ -68,8 +68,6 @@ namespace DElightManagerF {
 
     void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
-    std::string ReplaceBlanksWithUnderscores(std::string const &InputString);
-
     void DElightElecLtgCtrl(int iNameLength,
                             std::string cZoneName,
                             Real64 dBldgLat,

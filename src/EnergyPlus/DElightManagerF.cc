@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -113,6 +112,28 @@ namespace DElightManagerF {
 
     // USE STATEMENTS:
     using namespace DataDElight;
+
+    std::string ReplaceBlanksWithUnderscores(std::string const &InputString) // Input String
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Robert J. Hitchcock
+        //       DATE WRITTEN   August 2003
+        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This function returns a representation of the InputString with blanks replaced with underscores.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the std::replace function from the C++ library
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+        std::string ResultString(trimmed(InputString));
+        std::replace(ResultString.begin(), ResultString.end(), ' ', '_');
+        return ResultString;
+    }
 
     void DElightInputGenerator(EnergyPlusData &state)
     {
@@ -812,28 +833,6 @@ namespace DElightManagerF {
             doTransform = false;
             state.dataSurface->AspectTransform = false;
         }
-    }
-
-    std::string ReplaceBlanksWithUnderscores(std::string const &InputString) // Input String
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Robert J. Hitchcock
-        //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This function returns a representation of the InputString with blanks replaced with underscores.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the std::replace function from the C++ library
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        std::string ResultString(trimmed(InputString));
-        std::replace(ResultString.begin(), ResultString.end(), ' ', '_');
-        return ResultString;
     }
 
     void DElightElecLtgCtrl(int iNameLength,

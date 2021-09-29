@@ -146,6 +146,1559 @@ namespace DesiccantDehumidifiers {
 
     static std::string const fluidNameSteam("STEAM");
 
+    void InitDesiccantDehumidifier(EnergyPlusData &state,
+                                   int const DesicDehumNum,      // number of the current dehumidifier being simulated
+                                   bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
+        //                      for Gas Research Institute
+        //       DATE WRITTEN   March 2001
+        //       MODIFIED       Jan 2005 M. J. Witte, GARD Analytics, Inc.
+        //                        Add setpoint validation for new control type option:
+        //                          NODE LEAVING HUMRAT SETPOINT:BYPASS
+        //                        Work supported by ASHRAE research project 1254-RP
+        //                      June 2007 R. Raustad, FSEC
+        //                        Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
+        //                      May 2009, B. Griffith, NREL. added EMS node setpoint checks
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for initializations of the dehumidifier Components.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the status flags to trigger initializations.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+        auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
+        using EMSManager::CheckIfNodeSetPointManagedByEMS;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
+        using SteamCoils::SimulateSteamCoilComponents;
+        auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
+        using DataPlant::TypeOf_CoilSteamAirHeating;
+        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+        using DataSizing::AutoSize;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSatDensityRefrig;
+        using PlantUtilities::InitComponentNodes;
+        using PlantUtilities::ScanPlantLoopsForObject;
+        using PlantUtilities::SetComponentFlowRate;
+        using WaterCoils::GetCoilMaxWaterFlowRate;
+        using WaterCoils::SimulateWaterCoilComponents;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view RoutineName("InitDesiccantDehumidifier");
+        static std::string const initCBVAV("InitCBVAV");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int ProcInNode;            // inlet node number
+        int RegenInNode;           // inlet node number
+        int ControlNode;           // control node number
+        bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
+        int SteamIndex;            // steam coil index
+        Real64 FluidDensity;       // steam or water coil fluid density
+        Real64 CoilMaxVolFlowRate; // water or steam max volumetric water flow rate
+        Real64 QCoilActual;        // actual CBVAV steam heating coil load met (W)
+        bool ErrorFlag;            // local error flag returned from data mining
+
+        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &MyEnvrnFlag(state.dataDesiccantDehumidifiers->MyEnvrnFlag);
+        auto &MyPlantScanFlag(state.dataDesiccantDehumidifiers->MyPlantScanFlag);
+
+        if (state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag) {
+
+            // initialize the environment and sizing flags
+            MyEnvrnFlag.allocate(state.dataDesiccantDehumidifiers->NumDesicDehums);
+            MyPlantScanFlag.allocate(state.dataDesiccantDehumidifiers->NumDesicDehums);
+            MyEnvrnFlag = true;
+
+            state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag = false;
+            MyPlantScanFlag = true;
+        }
+
+        if (MyPlantScanFlag(DesicDehumNum) && allocated(state.dataPlnt->PlantLoop)) {
+            if ((DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) ||
+                (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam)) {
+                if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
+                    ErrorFlag = false;
+                    ScanPlantLoopsForObject(state,
+                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                            TypeOf_CoilWaterSimpleHeating,
+                                            DesicDehum(DesicDehumNum).LoopNum,
+                                            DesicDehum(DesicDehumNum).LoopSide,
+                                            DesicDehum(DesicDehumNum).BranchNum,
+                                            DesicDehum(DesicDehumNum).CompNum,
+                                            ErrorFlag,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _);
+                    if (ErrorFlag) {
+                        ShowFatalError(state, "InitDesiccantDehumidifier: Program terminated for previous conditions.");
+                    }
+
+                    ErrorFlag = false;
+                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow =
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
+                    if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
+                        FluidDensity = GetDensityGlycol(state,
+                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
+                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
+                                                        initCBVAV);
+                        DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
+                    }
+
+                } else if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
+
+                    ErrorFlag = false;
+                    ScanPlantLoopsForObject(state,
+                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                            TypeOf_CoilSteamAirHeating,
+                                            DesicDehum(DesicDehumNum).LoopNum,
+                                            DesicDehum(DesicDehumNum).LoopSide,
+                                            DesicDehum(DesicDehumNum).BranchNum,
+                                            DesicDehum(DesicDehumNum).CompNum,
+                                            ErrorFlag,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _);
+
+                    if (ErrorFlag) {
+                        ShowFatalError(state, "InitDesiccantDehumidifier: Program terminated for previous conditions.");
+                    }
+                    ErrorFlag = false;
+                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorFlag);
+
+                    if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
+                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                        FluidDensity =
+                            GetSatDensityRefrig(state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, RoutineName);
+                        DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
+                    }
+                }
+
+                // fill outlet node for regenartion hot water or steam heating coil
+                DesicDehum(DesicDehumNum).CoilOutletNode = state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum)
+                                                               .LoopSide(DesicDehum(DesicDehumNum).LoopSide)
+                                                               .Branch(DesicDehum(DesicDehumNum).BranchNum)
+                                                               .Comp(DesicDehum(DesicDehumNum).CompNum)
+                                                               .NodeNumOut;
+                MyPlantScanFlag(DesicDehumNum) = false;
+
+            } else { // DesicDehum is not connected to plant
+                MyPlantScanFlag(DesicDehumNum) = false;
+            }
+        } else if (MyPlantScanFlag(DesicDehumNum) && !state.dataGlobal->AnyPlantInModel) {
+            MyPlantScanFlag(DesicDehumNum) = false;
+        }
+
+        {
+            auto const SELECT_CASE_var((DesicDehum(DesicDehumNum).DehumTypeCode));
+
+            if (SELECT_CASE_var == DesicDehumType::Solid) {
+
+                if (!state.dataGlobal->SysSizingCalc && state.dataDesiccantDehumidifiers->MySetPointCheckFlag && DoSetPointTest) {
+                    if (DesicDehum(DesicDehumNum).ControlType == DesicDehumCtrlType::NodeHumratBypass) {
+                        ControlNode = DesicDehum(DesicDehumNum).ProcAirOutNode;
+                        if (ControlNode > 0) {
+                            if (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                    ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
+                                    ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
+                                    ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
+                                    ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
+                                    SetPointErrorFlag = true;
+                                } else {
+                                    CheckIfNodeSetPointManagedByEMS(
+                                        state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                    if (SetPointErrorFlag) {
+                                        ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
+                                        ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
+                                        ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
+                                        ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
+                                        ShowContinueError(state, "Or use EMS Actuator to establish a setpoint at the process air outlet node.");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    state.dataDesiccantDehumidifiers->MySetPointCheckFlag = false;
+                }
+                // always do these initializations every iteration
+                ProcInNode = DesicDehum(DesicDehumNum).ProcAirInNode;
+                DesicDehum(DesicDehumNum).ProcAirInTemp = state.dataLoopNodes->Node(ProcInNode).Temp;
+                DesicDehum(DesicDehumNum).ProcAirInHumRat = state.dataLoopNodes->Node(ProcInNode).HumRat;
+                DesicDehum(DesicDehumNum).ProcAirInEnthalpy = state.dataLoopNodes->Node(ProcInNode).Enthalpy;
+                DesicDehum(DesicDehumNum).ProcAirInMassFlowRate = state.dataLoopNodes->Node(ProcInNode).MassFlowRate;
+
+                //  Determine heating coil inlet conditions by calling it with zero load
+                //  Not sure if this is really a good way to do this, should revisit for next release.
+                CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, 0.0);
+
+                RegenInNode = DesicDehum(DesicDehumNum).RegenAirInNode;
+                DesicDehum(DesicDehumNum).RegenAirInTemp = state.dataLoopNodes->Node(RegenInNode).Temp;
+                DesicDehum(DesicDehumNum).RegenAirInHumRat = state.dataLoopNodes->Node(RegenInNode).HumRat;
+                DesicDehum(DesicDehumNum).RegenAirInEnthalpy = state.dataLoopNodes->Node(RegenInNode).Enthalpy;
+
+                DesicDehum(DesicDehumNum).WaterRemove = 0.0;
+                DesicDehum(DesicDehumNum).ElecUseEnergy = 0.0;
+                DesicDehum(DesicDehumNum).ElecUseRate = 0.0;
+
+            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
+
+                //      Do the Begin Environment initializations
+                if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
+                    // Change the Volume Flow Rates to Mass Flow Rates
+                    DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate =
+                        DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * state.dataEnvrn->StdRhoAir;
+
+                    //   set fluid-side hardware limits
+                    if (DesicDehum(DesicDehumNum).CoilControlNode > 0) {
+                        //    If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
+                        if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow == AutoSize) {
+                            if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
+                                SimulateWaterCoilComponents(
+                                    state, DesicDehum(DesicDehumNum).RegenCoilName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenCoilIndex);
+                                ErrorFlag = false;
+                                CoilMaxVolFlowRate =
+                                    GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
+                                if (ErrorFlag) {
+                                    ErrorsFound = true;
+                                }
+                                if (CoilMaxVolFlowRate != AutoSize) {
+                                    FluidDensity = GetDensityGlycol(state,
+                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
+                                                                    DataGlobalConstants::HWInitConvTemp,
+                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
+                                                                    RoutineName);
+                                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
+                                }
+                            }
+                            if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
+                                SimulateSteamCoilComponents(state,
+                                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                                            FirstHVACIteration,
+                                                            DesicDehum(DesicDehumNum).RegenCoilIndex,
+                                                            1.0,
+                                                            QCoilActual); // simulate any load > 0 to get max capacity of steam coil
+                                ErrorFlag = false;
+                                CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorFlag);
+                                if (ErrorFlag) {
+                                    ErrorsFound = true;
+                                }
+                                if (CoilMaxVolFlowRate != AutoSize) {
+                                    SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                                    FluidDensity = GetSatDensityRefrig(
+                                        state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, RoutineName);
+                                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
+                                }
+                            }
+                        }
+                        InitComponentNodes(state,
+                                           0.0,
+                                           DesicDehum(DesicDehumNum).MaxCoilFluidFlow,
+                                           DesicDehum(DesicDehumNum).CoilControlNode,
+                                           DesicDehum(DesicDehumNum).CoilOutletNode,
+                                           DesicDehum(DesicDehumNum).LoopNum,
+                                           DesicDehum(DesicDehumNum).LoopSide,
+                                           DesicDehum(DesicDehumNum).BranchNum,
+                                           DesicDehum(DesicDehumNum).CompNum);
+                    }
+
+                    MyEnvrnFlag(DesicDehumNum) = false;
+                }
+
+                if (!state.dataGlobal->SysSizingCalc && state.dataDesiccantDehumidifiers->MySetPointCheckFlag && DoSetPointTest) {
+                    ControlNode = DesicDehum(DesicDehumNum).ControlNodeNum;
+                    if (ControlNode > 0) {
+                        if (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
+                                ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
+                                ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
+                                ShowContinueError(state,
+                                                  "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
+                                SetPointErrorFlag = true;
+                            } else {
+                                CheckIfNodeSetPointManagedByEMS(
+                                    state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                if (SetPointErrorFlag) {
+                                    ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
+                                    ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
+                                    ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
+                                    ShowContinueError(
+                                        state, "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
+                                    ShowContinueError(state, "Or use EMS Actuator to establish a setpoint at the process air outlet node.");
+                                }
+                            }
+                        }
+                    }
+                    state.dataDesiccantDehumidifiers->MySetPointCheckFlag = false;
+                }
+                RegenInNode = DesicDehum(DesicDehumNum).RegenAirInNode;
+                DesicDehum(DesicDehumNum).RegenAirInTemp = state.dataLoopNodes->Node(RegenInNode).Temp;
+                DesicDehum(DesicDehumNum).RegenAirInMassFlowRate = state.dataLoopNodes->Node(RegenInNode).MassFlowRate;
+
+                DesicDehum(DesicDehumNum).ExhaustFanPower = 0.0;
+                DesicDehum(DesicDehumNum).WaterRemoveRate = 0.0;
+            }
+        }
+    }
+
+    void ControlDesiccantDehumidifier(EnergyPlusData &state,
+                                      int const DesicDehumNum, // number of the current dehumidifier being simulated
+                                      Real64 &HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
+                                      [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
+        //                      for Gas Research Institute
+        //       DATE WRITTEN   March 2001
+        //       MODIFIED       Jan 2005 M. J. Witte, GARD Analytics, Inc.
+        //                        Add new control type option:
+        //                          NODE LEAVING HUMRAT SETPOINT:BYPASS
+        //                        Change existing control type to:
+        //                          FIXED LEAVING HUMRAT SETPOINT:BYPASS
+        //                        Work supported by ASHRAE research project 1254-RP
+        //                      June 2007 R. Raustad, FSEC
+        //                        Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine sets the output required from the dehumidifier
+
+        // METHODOLOGY EMPLOYED:
+        // Uses a maximum humidity ratio setpoint to calculate required process
+        // leaving humidity ratio
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool UnitOn;                 // unit on flag
+        Real64 ProcAirMassFlowRate;  // process air mass flow rate [kg/s]
+        Real64 RegenAirMassFlowRate; // regen air mass flow rate [kg/s]
+
+        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+
+        ProcAirMassFlowRate = 0.0;
+        RegenAirMassFlowRate = 0.0;
+        UnitOn = true;
+
+        {
+            auto const SELECT_CASE_var((DesicDehum(DesicDehumNum).DehumTypeCode));
+
+            if (SELECT_CASE_var == DesicDehumType::Solid) {
+
+                if (DesicDehum(DesicDehumNum).HumRatSet <= 0.0) UnitOn = false;
+                ProcAirMassFlowRate = DesicDehum(DesicDehumNum).ProcAirInMassFlowRate;
+                if (ProcAirMassFlowRate <= SmallMassFlow) UnitOn = false;
+
+                if (GetCurrentScheduleValue(state, DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
+
+                // If incoming conditions are outside valid range for curve fits, then shut unit off, do not issue warnings
+
+                if (UnitOn) {
+                    if ((DesicDehum(DesicDehumNum).ProcAirInTemp < DesicDehum(DesicDehumNum).MinProcAirInTemp) ||
+                        (DesicDehum(DesicDehumNum).ProcAirInTemp > DesicDehum(DesicDehumNum).MaxProcAirInTemp)) {
+                        UnitOn = false;
+                    }
+                    if ((DesicDehum(DesicDehumNum).ProcAirInHumRat < DesicDehum(DesicDehumNum).MinProcAirInHumRat) ||
+                        (DesicDehum(DesicDehumNum).ProcAirInHumRat > DesicDehum(DesicDehumNum).MaxProcAirInHumRat)) {
+                        UnitOn = false;
+                    }
+                }
+
+                if (UnitOn) {
+
+                    // perform the correct dehumidifier control strategy
+                    {
+                        auto const SELECT_CASE_var1(DesicDehum(DesicDehumNum).ControlType);
+
+                        if (SELECT_CASE_var1 == DesicDehumCtrlType::FixedHumratBypass) {
+
+                            HumRatNeeded = DesicDehum(DesicDehumNum).HumRatSet;
+                            if (HumRatNeeded <= 0.0) {
+                                ShowSevereError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
+                                ShowContinueError(state, format("Invalid Leaving Max Humidity Ratio Setpoint={:.8T}", HumRatNeeded));
+                                ShowFatalError(state, "must be > 0.0");
+                            }
+
+                        } else if (SELECT_CASE_var1 == DesicDehumCtrlType::NodeHumratBypass) {
+
+                            HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRatMax;
+
+                        } else {
+
+                            ShowFatalError(state, "Invalid control type in desiccant dehumidifier = " + DesicDehum(DesicDehumNum).Name);
+                        }
+                    }
+
+                    // Setpoint of zero indicates no load from setpoint manager max hum
+                    if ((HumRatNeeded == 0.0) || (DesicDehum(DesicDehumNum).ProcAirInHumRat <= HumRatNeeded)) {
+                        UnitOn = false;
+                        HumRatNeeded = DesicDehum(DesicDehumNum).ProcAirInHumRat;
+                    }
+                } else {
+                    HumRatNeeded = DesicDehum(DesicDehumNum).ProcAirInHumRat;
+                }
+
+            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
+
+                ProcAirMassFlowRate = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
+                if (ProcAirMassFlowRate <= SmallMassFlow) UnitOn = false;
+
+                if (GetCurrentScheduleValue(state, DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
+
+                if (UnitOn) {
+                    if (DesicDehum(DesicDehumNum).ControlNodeNum == DesicDehum(DesicDehumNum).ProcAirOutNode) {
+                        HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRatMax;
+                    } else {
+                        if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRatMax > 0.0) {
+                            HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRatMax -
+                                           (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRat -
+                                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
+                        } else {
+                            HumRatNeeded = 0.0;
+                        }
+                    }
+
+                    // Setpoint of zero indicates no load from setpoint manager max hum
+                    if ((HumRatNeeded == 0.0) || (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat <= HumRatNeeded)) {
+                        HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat;
+                    }
+                } else {
+                    HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat;
+                }
+
+            } else {
+            }
+        }
+    }
+
+    void CalcSolidDesiccantDehumidifier(EnergyPlusData &state,
+                                        int const DesicDehumNum,      // number of the current dehumidifier being simulated
+                                        Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kgWater/kgDryAir]
+                                        bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
+        //                      for Gas Research Institute
+        //       DATE WRITTEN   March 2001
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculate the electricity consumption, regen heat requirements and the outlet
+        // conditions for a solid desiccant dehumidifier, given the inlet conditions and
+        // and the needed process leaving humidity ratio.
+
+        // METHODOLOGY EMPLOYED:
+        // Given the entering conditions, the full-load outlet conditions are calculated.
+        // Adjust for part-load if required.
+        // Caclulate required regen energy and call regen coil and regen fan.
+        // Desiccant wheel leaving conditions and regen energy requirements are calculated
+        // from empirical curve fits.  The user can select either default built-in
+        // performance curves, or use custom user-defined curves.
+
+        // REFERENCES:
+        // The default performance curves represent a commerical-grade solid desiccant
+        // wheel typical of HVAC applications in the early 1990's.  These curves were
+        // developed for Gas Research Institute by William W. Worek, University of Illinois
+        // at Chicago.
+
+        // Using/Aliasing
+        using Psychrometrics::PsyHFnTdbW;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        Real64 ProcAirInHumRat;     // process inlet air humidity ratio [kgWater/kgDryAir]
+        Real64 ProcAirInTemp;       // process inlet air temperature [C]
+        Real64 ProcAirOutHumRat;    // process outlet air humidity ratio [kgWater/kgDryAir]
+        Real64 MinProcAirOutHumRat; // minimum available process outlet air humidity ratio [kgWater/kgDryAir]
+        Real64 ProcAirOutTemp;      // process outlet air temperature [C]
+        Real64 ProcAirVel;          // process air velocity [m/s]
+        Real64 QRegen;              // regen heat input rate requested from regen coil [W]
+        Real64 QDelivered;          // regen heat actually delivered by regen coil [W]
+        // REAL(r64) :: RegenAirInHumRat        ! regen inlet air humidity ratio [kgWater/kgDryAir]
+        Real64 RegenAirInTemp;       // regen inlet air temperature [C]
+        Real64 RegenAirVel;          // regen air velocity [m/s]
+        Real64 ProcAirMassFlowRate;  // process air mass flow rate [kg/s]
+        Real64 RegenAirMassFlowRate; // regen air mass flow rate [kg/s]
+        Real64 SpecRegenEnergy;      // specific regen energy [J/kg of water removed]
+        Real64 NomRegenTemp;         // nominal regen temperature for regen energy curve
+        Real64 ElecUseRate;          // electricity consumption rate [W]
+        Real64 PartLoad;             // fraction of dehumidification capacity required to meet setpoint
+        bool UnitOn;                 // unit on flag
+
+        // Variables for hardwired coefficients for default performance model
+
+        Real64 TC0;
+        Real64 TC1;
+        Real64 TC2;
+        Real64 TC3;
+        Real64 TC4;
+        Real64 TC5;
+        Real64 TC6;
+        Real64 TC7;
+        Real64 TC8;
+        Real64 TC9;
+        Real64 TC10;
+        Real64 TC11;
+        Real64 TC12;
+        Real64 TC13;
+        Real64 TC14;
+        Real64 TC15;
+
+        Real64 WC0;
+        Real64 WC1;
+        Real64 WC2;
+        Real64 WC3;
+        Real64 WC4;
+        Real64 WC5;
+        Real64 WC6;
+        Real64 WC7;
+        Real64 WC8;
+        Real64 WC9;
+        Real64 WC10;
+        Real64 WC11;
+        Real64 WC12;
+        Real64 WC13;
+        Real64 WC14;
+        Real64 WC15;
+
+        Real64 QC0;
+        Real64 QC1;
+        Real64 QC2;
+        Real64 QC3;
+        Real64 QC4;
+        Real64 QC5;
+        Real64 QC6;
+        Real64 QC7;
+        Real64 QC8;
+        Real64 QC9;
+        Real64 QC10;
+        Real64 QC11;
+        Real64 QC12;
+        Real64 QC13;
+        Real64 QC14;
+        Real64 QC15;
+
+        Real64 RC0;
+        Real64 RC1;
+        Real64 RC2;
+        Real64 RC3;
+        Real64 RC4;
+        Real64 RC5;
+        Real64 RC6;
+        Real64 RC7;
+        Real64 RC8;
+        Real64 RC9;
+        Real64 RC10;
+        Real64 RC11;
+        Real64 RC12;
+        Real64 RC13;
+        Real64 RC14;
+        Real64 RC15;
+
+        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &RhoAirStdInit(state.dataDesiccantDehumidifiers->RhoAirStdInit);
+
+        // Setup internal variables for calculations
+
+        ProcAirInTemp = DesicDehum(DesicDehumNum).ProcAirInTemp;
+        ProcAirInHumRat = DesicDehum(DesicDehumNum).ProcAirInHumRat;
+        ProcAirMassFlowRate = DesicDehum(DesicDehumNum).ProcAirInMassFlowRate;
+        ProcAirVel = DesicDehum(DesicDehumNum).NomProcAirVel;
+        PartLoad = 0.0;
+
+        RegenAirInTemp = DesicDehum(DesicDehumNum).RegenAirInTemp;
+        NomRegenTemp = DesicDehum(DesicDehumNum).NomRegenTemp;
+
+        // Calculate min available process out humrat
+        UnitOn = false;
+        MinProcAirOutHumRat = 0.0; // MAX(MinProcAirOutHumRat,0.000857)
+
+        if (HumRatNeeded < ProcAirInHumRat) {
+
+            UnitOn = true;
+
+            {
+                auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).PerformanceModel_Num); // Performance Model Part A
+
+                if (SELECT_CASE_var == PerformanceModel::Default) {
+
+                    WC0 = 0.0148880824323806;
+                    WC1 = -0.000283393198398211;
+                    WC2 = -0.87802168940547;
+                    WC3 = -0.000713615831236411;
+                    WC4 = 0.0311261188874622;
+                    WC5 = 1.51738892142485e-06;
+                    WC6 = 0.0287250198281021;
+                    WC7 = 4.94796903231558e-06;
+                    WC8 = 24.0771139652826;
+                    WC9 = 0.000122270283927978;
+                    WC10 = -0.0151657189566474;
+                    WC11 = 3.91641393230322e-08;
+                    WC12 = 0.126032651553348;
+                    WC13 = 0.000391653854431574;
+                    WC14 = 0.002160537360507;
+                    WC15 = 0.00132732844211593;
+
+                    MinProcAirOutHumRat = WC0 + WC1 * ProcAirInTemp + WC2 * ProcAirInHumRat + WC3 * ProcAirVel +
+                                          WC4 * ProcAirInTemp * ProcAirInHumRat + WC5 * ProcAirInTemp * ProcAirVel +
+                                          WC6 * ProcAirInHumRat * ProcAirVel + WC7 * ProcAirInTemp * ProcAirInTemp +
+                                          WC8 * ProcAirInHumRat * ProcAirInHumRat + WC9 * ProcAirVel * ProcAirVel +
+                                          WC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
+                                          WC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
+                                          WC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + WC13 * std::log(ProcAirInTemp) +
+                                          WC14 * std::log(ProcAirInHumRat) + WC15 * std::log(ProcAirVel);
+
+                    // limit to 6 grains/lb (0.000857 kg/kg)
+
+                } else if (SELECT_CASE_var == PerformanceModel::UserCurves) {
+
+                    MinProcAirOutHumRat = CurveValue(state, DesicDehum(DesicDehumNum).ProcHumRatCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                          CurveValue(state, DesicDehum(DesicDehumNum).ProcHumRatCurvefV, ProcAirVel);
+
+                } else {
+
+                    ShowFatalError(
+                        state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
+                }
+            } // Performance Model Part A
+
+            MinProcAirOutHumRat = max(MinProcAirOutHumRat, 0.000857);
+        }
+
+        if (MinProcAirOutHumRat >= ProcAirInHumRat) UnitOn = false;
+
+        if (UnitOn) {
+
+            // Calculate partload fraction of dehumidification capacity required to meet setpoint
+            PartLoad = 1.0;
+            if (MinProcAirOutHumRat < HumRatNeeded) PartLoad = (ProcAirInHumRat - HumRatNeeded) / (ProcAirInHumRat - MinProcAirOutHumRat);
+            PartLoad = max(0.0, PartLoad);
+            PartLoad = min(1.0, PartLoad);
+
+            {
+                auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).PerformanceModel_Num); // Performance Model Part B
+
+                if (SELECT_CASE_var == PerformanceModel::Default) {
+
+                    // Calculate leaving conditions
+                    TC0 = -38.7782841989449;
+                    TC1 = 2.0127655837628;
+                    TC2 = 5212.49360216097;
+                    TC3 = 15.2362536782665;
+                    TC4 = -80.4910419759181;
+                    TC5 = -0.105014122001509;
+                    TC6 = -229.668673645144;
+                    TC7 = -0.015424703743461;
+                    TC8 = -69440.0689831847;
+                    TC9 = -1.6686064694322;
+                    TC10 = 38.5855718977592;
+                    TC11 = 0.000196395381206009;
+                    TC12 = 386.179386548324;
+                    TC13 = -0.801959614172614;
+                    TC14 = -3.33080986818745;
+                    TC15 = -15.2034386065714;
+
+                    ProcAirOutTemp = TC0 + TC1 * ProcAirInTemp + TC2 * ProcAirInHumRat + TC3 * ProcAirVel + TC4 * ProcAirInTemp * ProcAirInHumRat +
+                                     TC5 * ProcAirInTemp * ProcAirVel + TC6 * ProcAirInHumRat * ProcAirVel + TC7 * ProcAirInTemp * ProcAirInTemp +
+                                     TC8 * ProcAirInHumRat * ProcAirInHumRat + TC9 * ProcAirVel * ProcAirVel +
+                                     TC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
+                                     TC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
+                                     TC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + TC13 * std::log(ProcAirInTemp) +
+                                     TC14 * std::log(ProcAirInHumRat) + TC15 * std::log(ProcAirVel);
+
+                    // Regen energy
+                    QC0 = -27794046.6291107;
+                    QC1 = -235725.171759615;
+                    QC2 = 975461343.331328;
+                    QC3 = -686069.373946731;
+                    QC4 = -17717307.3766266;
+                    QC5 = 31482.2539662489;
+                    QC6 = 55296552.8260743;
+                    QC7 = 6195.36070023868;
+                    QC8 = -8304781359.40435;
+                    QC9 = -188987.543809419;
+                    QC10 = 3933449.40965846;
+                    QC11 = -6.66122876558634;
+                    QC12 = -349102295.417547;
+                    QC13 = 83672.179730172;
+                    QC14 = -6059524.33170538;
+                    QC15 = 1220523.39525162;
+
+                    SpecRegenEnergy = QC0 + QC1 * ProcAirInTemp + QC2 * ProcAirInHumRat + QC3 * ProcAirVel + QC4 * ProcAirInTemp * ProcAirInHumRat +
+                                      QC5 * ProcAirInTemp * ProcAirVel + QC6 * ProcAirInHumRat * ProcAirVel + QC7 * ProcAirInTemp * ProcAirInTemp +
+                                      QC8 * ProcAirInHumRat * ProcAirInHumRat + QC9 * ProcAirVel * ProcAirVel +
+                                      QC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
+                                      QC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
+                                      QC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + QC13 * std::log(ProcAirInTemp) +
+                                      QC14 * std::log(ProcAirInHumRat) + QC15 * std::log(ProcAirVel);
+
+                    // Regen face velocity
+                    RC0 = -4.67358908091488;
+                    RC1 = 0.0654323095468338;
+                    RC2 = 396.950518702316;
+                    RC3 = 1.52610165426736;
+                    RC4 = -11.3955868430328;
+                    RC5 = 0.00520693906104437;
+                    RC6 = 57.783645385621;
+                    RC7 = -0.000464800668311693;
+                    RC8 = -5958.78613212602;
+                    RC9 = -0.205375818291012;
+                    RC10 = 5.26762675442845;
+                    RC11 = -8.88452553055039e-05;
+                    RC12 = -182.382479369311;
+                    RC13 = -0.100289774002047;
+                    RC14 = -0.486980507964251;
+                    RC15 = -0.972715425435447;
+
+                    RegenAirVel = RC0 + RC1 * ProcAirInTemp + RC2 * ProcAirInHumRat + RC3 * ProcAirVel + RC4 * ProcAirInTemp * ProcAirInHumRat +
+                                  RC5 * ProcAirInTemp * ProcAirVel + RC6 * ProcAirInHumRat * ProcAirVel + RC7 * ProcAirInTemp * ProcAirInTemp +
+                                  RC8 * ProcAirInHumRat * ProcAirInHumRat + RC9 * ProcAirVel * ProcAirVel +
+                                  RC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
+                                  RC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
+                                  RC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + RC13 * std::log(ProcAirInTemp) +
+                                  RC14 * std::log(ProcAirInHumRat) + RC15 * std::log(ProcAirVel);
+
+                } else if (SELECT_CASE_var == PerformanceModel::UserCurves) {
+
+                    ProcAirOutTemp = CurveValue(state, DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                     CurveValue(state, DesicDehum(DesicDehumNum).ProcDryBulbCurvefV, ProcAirVel);
+
+                    SpecRegenEnergy = CurveValue(state, DesicDehum(DesicDehumNum).RegenEnergyCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                      CurveValue(state, DesicDehum(DesicDehumNum).RegenEnergyCurvefV, ProcAirVel);
+
+                    RegenAirVel = CurveValue(state, DesicDehum(DesicDehumNum).RegenVelCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                  CurveValue(state, DesicDehum(DesicDehumNum).RegenVelCurvefV, ProcAirVel);
+
+                } else {
+
+                    ShowFatalError(
+                        state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
+
+                    // Suppress uninitialized warnings
+                    ProcAirOutTemp = 0.0;
+                    SpecRegenEnergy = 0.0;
+                    RegenAirVel = 0.0;
+                }
+            } // Performance Model Part B
+
+            ProcAirOutTemp = (1 - PartLoad) * ProcAirInTemp + (PartLoad)*ProcAirOutTemp;
+
+            ProcAirOutHumRat = (1 - PartLoad) * ProcAirInHumRat + (PartLoad)*MinProcAirOutHumRat;
+
+            // Calculate water removal
+            DesicDehum(DesicDehumNum).WaterRemoveRate = ProcAirMassFlowRate * (ProcAirInHumRat - ProcAirOutHumRat);
+
+            // Adjust for regen inlet temperature
+            SpecRegenEnergy *= (NomRegenTemp - RegenAirInTemp) / (NomRegenTemp - ProcAirInTemp);
+            SpecRegenEnergy = max(SpecRegenEnergy, 0.0);
+            QRegen = SpecRegenEnergy * DesicDehum(DesicDehumNum).WaterRemoveRate;
+
+            // Above curves are based on a 90deg regen angle and 245deg process air angle
+            RegenAirMassFlowRate = ProcAirMassFlowRate * 90.0 / 245.0 * RegenAirVel / ProcAirVel;
+
+            ElecUseRate = DesicDehum(DesicDehumNum).NomRotorPower;
+
+        } else { // Unit is off
+
+            ProcAirOutTemp = ProcAirInTemp;
+            ProcAirOutHumRat = ProcAirInHumRat;
+            SpecRegenEnergy = 0.0;
+            QRegen = 0.0;
+            ElecUseRate = 0.0;
+            RegenAirVel = 0.0;
+            RegenAirMassFlowRate = 0.0;
+            DesicDehum(DesicDehumNum).WaterRemoveRate = 0.0;
+            PartLoad = 0.0;
+
+        } // UnitOn/Off
+
+        // Set regen mass flow
+        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate = RegenAirMassFlowRate;
+        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRateMaxAvail = RegenAirMassFlowRate;
+        // Call regen fan
+        if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+        } else {
+            state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+        }
+
+        // Call regen heating coil
+        CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen, QDelivered);
+
+        // Verify is requestd flow was delivered (must do after heating coil has executed to pass flow to RegenAirInNode)
+        if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate != RegenAirMassFlowRate) {
+            // Initialize standard air density
+            if (state.dataDesiccantDehumidifiers->CalcSolidDesiccantDehumidifierMyOneTimeFlag) {
+                RhoAirStdInit = state.dataEnvrn->StdRhoAir;
+            }
+            ShowRecurringSevereErrorAtEnd(state,
+                                          "Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
+                                          DesicDehum(DesicDehumNum).RegenFanErrorIndex1);
+            ShowRecurringContinueErrorAtEnd(
+                state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name, DesicDehum(DesicDehumNum).RegenFanErrorIndex2);
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
+            ShowRecurringContinueErrorAtEnd(state,
+                                            "Flow requested [m3/s] from " + DesicDehum(DesicDehumNum).RegenFanType + '=' +
+                                                DesicDehum(DesicDehumNum).RegenFanName,
+                                            DesicDehum(DesicDehumNum).RegenFanErrorIndex3,
+                                            (RegenAirMassFlowRate / RhoAirStdInit));
+            ShowRecurringContinueErrorAtEnd(
+                state,
+                "Flow request varied from delivered by [m3/s]",
+                DesicDehum(DesicDehumNum).RegenFanErrorIndex4,
+                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) / RhoAirStdInit),
+                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) / RhoAirStdInit));
+        }
+
+        // Verify is requestd heating was delivered
+        if (QDelivered < QRegen) {
+            ShowRecurringSevereErrorAtEnd(
+                state,
+                "Inadequate heat delivered by desiccant regen coil - RESULTS INVALID! Check regen coil capacity and schedule.",
+                DesicDehum(DesicDehumNum).RegenCapErrorIndex1);
+            ShowRecurringContinueErrorAtEnd(
+                state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name, DesicDehum(DesicDehumNum).RegenCapErrorIndex2);
+            ShowRecurringContinueErrorAtEnd(state,
+                                            "Load requested [W] from " + DesicDehum(DesicDehumNum).RegenCoilType + '=' +
+                                                DesicDehum(DesicDehumNum).RegenCoilName,
+                                            DesicDehum(DesicDehumNum).RegenCapErrorIndex3,
+                                            QRegen);
+            ShowRecurringContinueErrorAtEnd(
+                state, "Load request exceeded delivered by [W]", DesicDehum(DesicDehumNum).RegenCapErrorIndex4, (QRegen - QDelivered));
+        }
+
+        DesicDehum(DesicDehumNum).SpecRegenEnergy = SpecRegenEnergy;
+        DesicDehum(DesicDehumNum).QRegen = QRegen;
+        DesicDehum(DesicDehumNum).ElecUseRate = ElecUseRate;
+        DesicDehum(DesicDehumNum).PartLoad = PartLoad;
+
+        DesicDehum(DesicDehumNum).ProcAirOutMassFlowRate = ProcAirMassFlowRate;
+        DesicDehum(DesicDehumNum).ProcAirOutTemp = ProcAirOutTemp;
+        DesicDehum(DesicDehumNum).ProcAirOutHumRat = ProcAirOutHumRat;
+        DesicDehum(DesicDehumNum).ProcAirOutEnthalpy = PsyHFnTdbW(ProcAirOutTemp, ProcAirOutHumRat);
+        DesicDehum(DesicDehumNum).RegenAirInMassFlowRate = RegenAirMassFlowRate;
+        DesicDehum(DesicDehumNum).RegenAirVel = RegenAirVel;
+
+        //  DesicDehum(DesicDehumNum)%RegenAirOutTemp        = -999.
+        //  DesicDehum(DesicDehumNum)%RegenAirOutHumRat      = -999.
+        //  DesicDehum(DesicDehumNum)%RegenAirOutEnthalpy    = -999.
+    }
+
+    void CalcGenericDesiccantDehumidifier(EnergyPlusData &state,
+                                          int const DesicDehumNum,      // number of the current dehumidifier being simulated
+                                          Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
+                                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Mangesh Basarkar, FSEC
+        //       DATE WRITTEN   May 2007
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculate the electricity consumption, regen heat requirements and the outlet
+        // conditions for a desiccant dehumidifier, given the inlet conditions,
+        // DX coil part-load ratio, and/or the needed process leaving humidity ratio.
+
+        // METHODOLOGY EMPLOYED:
+        // Given the entering conditions, the full-load outlet conditions are calculated.
+        // Adjust for part-load if required.
+        // Calculate the required regen energy and call the regen coil and the regen fan.
+
+        // REFERENCES:
+        // Kosar, D. 2006. Dehumidification Enhancements, ASHRAE Journal, Vol. 48, No. 2, February 2006.
+        // Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems Through Component
+        //   Augmentation of the Cooling Coil. 15th Symposium on Improving Building Systems in Hot and Humid
+        //   Climates, July 24-26, 2006.
+
+        // Using/Aliasing
+        using HeatRecovery::SimHeatRecovery;
+        using Psychrometrics::PsyHFnTdbW;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
+        // min vol flow per rated evaporator capacity
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 DDPartLoadRatio;        // fraction of dehumidification capacity required to meet setpoint
+        Real64 MassFlowRateNew;        // new required mass flow rate calculated to keep regen setpoint temperature (kg/s)
+        Real64 CondenserWasteHeat;     // Condenser waste heat (W)
+        Real64 CpAir;                  // Specific heat of air (J/kg-K)
+        Real64 NewRegenInTemp;         // new temp calculated from condenser waste heat (C)
+        Real64 ExhaustFanMassFlowRate; // exhaust fan mass flow rate (kg/s)
+        Real64 ExhaustFanPLR;          // exhaust fan run time fraction calculated from new mass flow rate for regen side
+        Real64 ExhaustFanPowerMod;     // used to calculate exhaust fan power from flow fraction
+        Real64 VolFlowPerRatedTotQ;    // flow rate per rated total cooling capacity of the companion coil (m3/s/W)
+        Real64 FanDeltaT;              // used to account for fan heat when calculating regeneration heater energy (C)
+        Real64 OnOffFanPLF;            // save air loop fan part load fracton while calculating exhaust fan power
+        Real64 RegenSetPointTemp;      // regeneration temperature setpoint (C)
+        int RegenCoilIndex;            // index to regeneration heating coil, 0 when not used
+        int CompanionCoilIndexNum;     // index for companion DX cooling coil, 0 when DX coil is not used
+        std::string MinVol;            // character string used for error messages
+        bool UnitOn;                   // unit on flag
+        //  LOGICAL       :: SimFlag                    ! used to turn off additional simulation if DX Coil is off
+        Real64 QRegen_OASysFanAdjust; // temporary variable used to adjust regen heater load during iteration
+
+        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
+        auto &QRegen(state.dataDesiccantDehumidifiers->QRegen);
+
+        UnitOn = false;
+        DDPartLoadRatio = 0.0;
+        RegenCoilIndex = DesicDehum(DesicDehumNum).RegenCoilIndex;
+        FanDeltaT = 0.0;
+        RegenSetPointTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
+        ExhaustFanMassFlowRate = 0.0;
+
+        // Save OnOffFanPartLoadFraction while performing exhaust fan calculations
+        OnOffFanPLF = state.dataHVACGlobal->OnOffFanPartLoadFraction;
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+
+        if (DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Selection::Yes) {
+            // Cooling coil directly upstream of desiccant dehumidifier, dehumidifier runs in tandem with DX coil
+
+            CompanionCoilIndexNum = DesicDehum(DesicDehumNum).DXCoilIndex;
+        } else {
+            // desiccant dehumidifier determines its own PLR
+            CompanionCoilIndexNum = 0;
+        }
+
+        if (state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag) {
+            state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD = state.dataEnvrn->StdRhoAir;
+            state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag = false;
+        }
+
+        if (HumRatNeeded < state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat) {
+            UnitOn = true;
+        }
+
+        if (DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Selection::Yes) {
+            if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                if (state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) == 0.0) {
+                    UnitOn = false;
+                }
+            }
+        }
+
+        if (UnitOn) {
+
+            if (DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode) {
+                if (DesicDehum(DesicDehumNum).HXTypeNum == BalancedHX) {
+                    state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate =
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
+                    state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRateMaxAvail =
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
+                }
+            }
+
+            // Get conditions from DX Coil condenser if present (DXCoilIndex verified > 0 in GetInput)
+            if (DesicDehum(DesicDehumNum).Preheat == Selection::Yes) {
+
+                //     condenser waste heat is proportional to DX coil PLR
+                if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                    (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                    CondenserWasteHeat = state.dataHeatBal->HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
+                    state.dataHeatBal->HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
+                } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    CondenserWasteHeat = state.dataHeatBal->HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
+                    state.dataHeatBal->HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
+                }
+
+                CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat);
+
+                if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                    if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                        Fans::SimulateFanComponents(
+                            state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+                    } else {
+                        state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+                    }
+                    FanDeltaT = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).Temp -
+                                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).Temp;
+                    //       Adjust setpoint to account for fan heat
+                    RegenSetPointTemp -= FanDeltaT;
+                }
+
+                //     CompanionCoilIndexNum .GT. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == Yes
+                if (CompanionCoilIndexNum > 0) {
+                    if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                        (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                        DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
+                    } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                        DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
+                    }
+                }
+
+                //     calculate actual condenser outlet node (regen inlet node) temperature
+                if (CompanionCoilIndexNum > 0) {
+                    if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                        (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                        if (state.dataDXCoils->DXCoilFanOpMode(DesicDehum(DesicDehumNum).DXCoilIndex) == ContFanCycCoil) {
+                            NewRegenInTemp =
+                                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
+                                CondenserWasteHeat /
+                                    (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) * DDPartLoadRatio);
+                            CondenserWasteHeat /= DDPartLoadRatio;
+                        } else {
+                            NewRegenInTemp =
+                                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
+                                CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
+                        }
+                    } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                        NewRegenInTemp =
+                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
+                            CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
+                    } else {
+                        NewRegenInTemp =
+                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
+                            CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
+                    }
+                } else {
+                    NewRegenInTemp =
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
+                        CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
+                }
+
+                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp = NewRegenInTemp;
+                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Enthalpy =
+                    PsyHFnTdbW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp,
+                               state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
+                MassFlowRateNew = 0.0;
+
+                if (DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0) {
+
+                    //       calculate mass flow rate required to maintain regen inlet setpoint temp
+                    if (NewRegenInTemp > RegenSetPointTemp) {
+                        if (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp != 0.0) {
+                            MassFlowRateNew =
+                                max(0.0,
+                                    CondenserWasteHeat /
+                                        (CpAir * (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp)));
+                        } else {
+                            MassFlowRateNew = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate;
+                        }
+                    }
+
+                    //       calculate exhaust fan mass flow rate and new regen inlet temperature (may not be at setpoint)
+                    if (MassFlowRateNew > state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) {
+                        ExhaustFanMassFlowRate = MassFlowRateNew - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate;
+                        ExhaustFanMassFlowRate = max(0.0, min(ExhaustFanMassFlowRate, DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate));
+
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp =
+                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
+                            CondenserWasteHeat /
+                                (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate));
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat =
+                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat;
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Enthalpy =
+                            PsyHFnTdbW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp,
+                                       state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
+                    }
+                }
+
+                if (RegenCoilIndex > 0) {
+                    if (NewRegenInTemp < RegenSetPointTemp) {
+                        CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
+                    }
+                    QRegen = max(0.0,
+                                 (CpAir * state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
+                                  (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp)));
+                    if (QRegen == 0.0) QRegen = -1.0;
+                }
+
+                //     CompanionCoilIndexNum .EQ. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == No
+                if (CompanionCoilIndexNum == 0) {
+
+                    if (RegenCoilIndex > 0) {
+
+                        QRegen_OASysFanAdjust = QRegen;
+                        if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                            if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate > 0.0) {
+                                //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
+                                //             reduction through fan
+                                QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).MassFlowRate /
+                                                         state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate;
+                            }
+                        }
+
+                        CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust);
+                    }
+
+                    SimHeatRecovery(state,
+                                    DesicDehum(DesicDehumNum).HXName,
+                                    FirstHVACIteration,
+                                    DesicDehum(DesicDehumNum).CompIndex,
+                                    ContFanCycCoil,
+                                    1.0,
+                                    true,
+                                    CompanionCoilIndexNum,
+                                    DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
+                                    _,
+                                    _,
+                                    DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
+
+                    //       calculate desiccant part-load ratio
+                    if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat !=
+                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat) {
+                        DDPartLoadRatio = (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat - HumRatNeeded) /
+                                          (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat -
+                                           state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
+                        DDPartLoadRatio = max(0.0, min(1.0, DDPartLoadRatio));
+                    } else {
+                        DDPartLoadRatio = 1.0;
+                    }
+                }
+
+                if (ExhaustFanMassFlowRate > 0.0) {
+
+                    //       calculate exhaust fan mass flow rate due to desiccant system operation
+                    ExhaustFanMassFlowRate *= DDPartLoadRatio;
+
+                    //       calculate exhaust fan PLR due to desiccant system operation
+                    ExhaustFanPLR = ExhaustFanMassFlowRate / DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate;
+
+                    //       find exhaust fan power multiplier using exhaust fan part-load ratio
+                    if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
+                        ExhaustFanPowerMod = min(1.0, max(0.0, CurveValue(state, DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, ExhaustFanPLR)));
+                    } else {
+                        ExhaustFanPowerMod = 1.0;
+                    }
+
+                    //       calculate exhaust fan power due to desiccant operation
+                    DesicDehum(DesicDehumNum).ExhaustFanPower = DesicDehum(DesicDehumNum).ExhaustFanMaxPower * ExhaustFanPowerMod;
+                }
+
+            } else { // ELSE for IF(DesicDehum(DesicDehumNum)%Preheat == Yes)THEN
+
+                if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat > HumRatNeeded) {
+
+                    //       Get Full load output of desiccant wheel
+                    if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                        if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                            Fans::SimulateFanComponents(
+                                state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+                        } else {
+                            state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+                        }
+
+                        FanDeltaT = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).Temp -
+                                    state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).Temp;
+                        RegenSetPointTemp -= FanDeltaT;
+                    }
+
+                    if (RegenCoilIndex > 0) {
+                        CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
+                        QRegen = max(0.0,
+                                     (CpAir * state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
+                                      (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp)));
+
+                        QRegen_OASysFanAdjust = QRegen;
+                        if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                            if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate > 0.0) {
+                                //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
+                                //             reduction through fan
+                                QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).MassFlowRate /
+                                                         state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate;
+                            }
+                        }
+
+                        if (QRegen_OASysFanAdjust == 0.0) QRegen_OASysFanAdjust = -1.0;
+                        CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust);
+                    }
+
+                    //       CompanionCoilIndexNum .EQ. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == No
+                    if (CompanionCoilIndexNum == 0) {
+                        SimHeatRecovery(state,
+                                        DesicDehum(DesicDehumNum).HXName,
+                                        FirstHVACIteration,
+                                        DesicDehum(DesicDehumNum).CompIndex,
+                                        ContFanCycCoil,
+                                        1.0,
+                                        true,
+                                        CompanionCoilIndexNum,
+                                        DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
+                                        _,
+                                        _,
+                                        DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
+
+                        //         calculate desiccant part-load ratio
+                        if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat !=
+                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat) {
+                            DDPartLoadRatio = (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat - HumRatNeeded) /
+                                              (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat -
+                                               state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
+                            DDPartLoadRatio = max(0.0, min(1.0, DDPartLoadRatio));
+                        } else {
+                            DDPartLoadRatio = 1.0;
+                        }
+                    } else {
+                        if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                            (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                            DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
+                        } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                            DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
+                        }
+                    }
+                } else { // ELSE for IF(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum)%ProcAirInNode)%HumRat .GT. HumRatNeeded)THEN
+                    DDPartLoadRatio = 0.0;
+                } // END IF for IF(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum)%ProcAirInNode)%HumRat .GT. HumRatNeeded)THEN
+
+            } // END IF for IF(DesicDehum(DesicDehumNum)%Preheat == Yes)THEN
+
+            DesicDehum(DesicDehumNum).PartLoad = DDPartLoadRatio;
+            QRegen_OASysFanAdjust = QRegen;
+
+            // set average regeneration air mass flow rate based on desiccant cycling ratio (DDPartLoadRatio)
+            if (DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode) {
+                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *= DDPartLoadRatio;
+
+                // **RR moved to here, only adjust regen heater load if mass flow rate is changed
+                //   adjust regen heating coil capacity based on desiccant cycling ratio (PLR)
+                QRegen_OASysFanAdjust *= DDPartLoadRatio;
+            }
+
+            // Call regen fan, balanced desiccant HX and heating coil
+            if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(
+                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+                } else {
+                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+                }
+            }
+
+            if (RegenCoilIndex > 0) {
+
+                //!   adjust regen heating coil capacity based on desiccant cycling ratio (PLR)
+                //    QRegen_OASysFanAdjust = QRegen * DDPartLoadRatio
+
+                if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                    if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate > 0.0) {
+                        //       For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot reduction through fan
+                        QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).MassFlowRate /
+                                                 state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate;
+                    }
+                }
+
+                if (QRegen_OASysFanAdjust == 0.0) QRegen_OASysFanAdjust = -1.0;
+                CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust);
+            }
+
+            SimHeatRecovery(state,
+                            DesicDehum(DesicDehumNum).HXName,
+                            FirstHVACIteration,
+                            DesicDehum(DesicDehumNum).CompIndex,
+                            ContFanCycCoil,
+                            DDPartLoadRatio,
+                            true,
+                            CompanionCoilIndexNum,
+                            DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
+                            _,
+                            _,
+                            DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
+
+            if (DesicDehum(DesicDehumNum).RegenFanPlacement == DrawThru) {
+                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(
+                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+                } else {
+                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+                }
+            }
+
+            // Calculate water removal
+            DesicDehum(DesicDehumNum).WaterRemoveRate = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate *
+                                                        (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat -
+                                                         state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
+
+            // If preheat is Yes, exhaust fan is condenser fan, if CoilUpstreamOfProcessSide is No, DD runs an its own PLR
+            if (DesicDehum(DesicDehumNum).Preheat == Selection::Yes && DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Selection::No) {
+                //    should actually use DX coil RTF instead of PLR since fan power is being calculated
+                if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                    (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                    DesicDehum(DesicDehumNum).ExhaustFanPower +=
+                        max(0.0,
+                            (DesicDehum(DesicDehumNum).ExhaustFanMaxPower *
+                             (state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) - DDPartLoadRatio)));
+                } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    DesicDehum(DesicDehumNum).ExhaustFanPower += max(0.0, (DesicDehum(DesicDehumNum).ExhaustFanMaxPower * (1.0 - DDPartLoadRatio)));
+                }
+            }
+
+        } else { // unit must be off
+
+            DesicDehum(DesicDehumNum).PartLoad = 0.0;
+
+            if (DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode) {
+                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRateMaxAvail = 0.0;
+            }
+
+            if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
+                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(
+                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+                } else {
+                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+                }
+            }
+
+            if (RegenCoilIndex > 0) {
+                CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, -1.0);
+            }
+
+            SimHeatRecovery(state,
+                            DesicDehum(DesicDehumNum).HXName,
+                            FirstHVACIteration,
+                            DesicDehum(DesicDehumNum).CompIndex,
+                            ContFanCycCoil,
+                            0.0,
+                            false,
+                            CompanionCoilIndexNum,
+                            DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
+                            _,
+                            _,
+                            DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
+
+            if (DesicDehum(DesicDehumNum).RegenFanPlacement == DrawThru) {
+                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(
+                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
+                } else {
+                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
+                }
+            }
+
+            // Turn on exhaust fan if DX Coil is operating
+            if (DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0) {
+                if (DesicDehum(DesicDehumNum).DXCoilIndex > 0) {
+                    if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                        (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                        DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
+                    } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                        DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
+                    }
+                    DesicDehum(DesicDehumNum).ExhaustFanPower = DesicDehum(DesicDehumNum).ExhaustFanMaxPower * DDPartLoadRatio;
+                    ExhaustFanMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate * DDPartLoadRatio;
+                }
+            }
+
+        } // UnitOn/Off
+
+        // check condenser minimum flow per rated total capacity
+        if (DDPartLoadRatio > 0.0 && DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0.0) {
+            VolFlowPerRatedTotQ =
+                (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
+                max(0.00001,
+                    (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD));
+            if (!state.dataGlobal->WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
+                ++DesicDehum(DesicDehumNum).ErrCount;
+                if (DesicDehum(DesicDehumNum).ErrCount < 2) {
+                    ShowWarningError(state,
+                                     format("{} \"{}\" - Air volume flow rate per watt of total condenser waste heat is below the minimum "
+                                            "recommended at {:N} m3/s/W.",
+                                            DesicDehum(DesicDehumNum).DehumType,
+                                            DesicDehum(DesicDehumNum).Name,
+                                            VolFlowPerRatedTotQ));
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state,
+                                      format("Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [{:N}]", MinVolFlowPerRatedTotQ));
+                    ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components ");
+                    ShowContinueError(state, "on the regeneration side of the desiccant dehumidifier.");
+                } else {
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name +
+                            "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...",
+                        DesicDehum(DesicDehumNum).ErrIndex1,
+                        VolFlowPerRatedTotQ,
+                        VolFlowPerRatedTotQ);
+                }
+            } // flow per rated total capacity check ends
+        }
+
+        // Reset OnOffFanPartLoadFraction for process side fan calculations
+        state.dataHVACGlobal->OnOffFanPartLoadFraction = OnOffFanPLF;
+    }
+
+    void UpdateDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum) // number of the current dehumidifier being simulated
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
+        //                      for Gas Research Institute
+        //       DATE WRITTEN   March 2001
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Moves dehumidifier output to the outlet nodes.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int ProcInNode;  // process air inlet node number
+        int ProcOutNode; // process air outlet node number
+
+        {
+            auto const SELECT_CASE_var(state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).DehumTypeCode);
+
+            if (SELECT_CASE_var == DesicDehumType::Solid) {
+                ProcInNode = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirInNode;
+                ProcOutNode = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutNode;
+                // Set the process outlet air node of the dehumidifier
+                state.dataLoopNodes->Node(ProcOutNode).Temp = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutTemp;
+                state.dataLoopNodes->Node(ProcOutNode).HumRat = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutHumRat;
+                state.dataLoopNodes->Node(ProcOutNode).Enthalpy = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutEnthalpy;
+
+                // Set the process outlet nodes for properties that just pass through & not used
+                state.dataLoopNodes->Node(ProcOutNode).Quality = state.dataLoopNodes->Node(ProcInNode).Quality;
+                state.dataLoopNodes->Node(ProcOutNode).Press = state.dataLoopNodes->Node(ProcInNode).Press;
+                state.dataLoopNodes->Node(ProcOutNode).MassFlowRate = state.dataLoopNodes->Node(ProcInNode).MassFlowRate;
+                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMin = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMin;
+                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMax = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMinAvail;
+                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMaxAvail;
+
+                //   RegenInNode =DesicDehum(DesicDehumNum)%RegenAirInNode
+                //   RegenOutNode = DesicDehum(DesicDehumNum)%RegenAirOutNode
+                // Set the regen outlet air node of the dehumidifier
+                //   Node(RegenOutNode)%Temp         = DesicDehum(DesicDehumNum)%RegenAirOutTemp
+                //   Node(RegenOutNode)%HumRat       = DesicDehum(DesicDehumNum)%RegenAirOutHumRat
+                //   Node(RegenOutNode)%Enthalpy     = DesicDehum(DesicDehumNum)%RegenAirOutEnthalpy
+
+                // Set the regen outlet nodes for properties that just pass through & not used
+                //   Node(RegenOutNode)%Quality             = Node(RegenInNode)%Quality
+                //   Node(RegenOutNode)%Press               = Node(RegenInNode)%Press
+                //   Node(RegenOutNode)%MassFlowRate        = Node(RegenInNode)%MassFlowRate
+                //   Node(RegenOutNode)%MassFlowRateMin     = Node(RegenInNode)%MassFlowRateMin
+                //   Node(RegenOutNode)%MassFlowRateMax     = Node(RegenInNode)%MassFlowRateMax
+                //   Node(RegenOutNode)%MassFlowRateMinAvail= Node(RegenInNode)%MassFlowRateMinAvail
+                //   Node(RegenOutNode)%MassFlowRateMaxAvail= Node(RegenInNode)%MassFlowRateMaxAvail
+
+            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
+
+                return;
+            }
+        }
+    }
+
+    void ReportDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum) // number of the current dehumidifier being simulated
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
+        //                      for Gas Research Institute
+        //       DATE WRITTEN   March 2001
+        //       MODIFIED       June 2007, R. Raustad, Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Fill remaining report variables
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 ReportingConstant;
+
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+
+        {
+            auto const SELECT_CASE_var(state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).DehumTypeCode);
+
+            if (SELECT_CASE_var == DesicDehumType::Solid) {
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemove =
+                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenEnergy =
+                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).QRegen * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseEnergy =
+                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseRate * ReportingConstant;
+            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemove =
+                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanElecConsumption =
+                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanPower * ReportingConstant;
+            }
+        }
+    }
+
     void SimDesiccantDehumidifier(EnergyPlusData &state,
                                   std::string const &CompName,   // name of the dehumidifier unit
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -1755,1559 +3308,6 @@ namespace DesiccantDehumidifiers {
         Numbers.deallocate();
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
-    }
-
-    void InitDesiccantDehumidifier(EnergyPlusData &state,
-                                   int const DesicDehumNum,      // number of the current dehumidifier being simulated
-                                   bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
-        //                      for Gas Research Institute
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       Jan 2005 M. J. Witte, GARD Analytics, Inc.
-        //                        Add setpoint validation for new control type option:
-        //                          NODE LEAVING HUMRAT SETPOINT:BYPASS
-        //                        Work supported by ASHRAE research project 1254-RP
-        //                      June 2007 R. Raustad, FSEC
-        //                        Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
-        //                      May 2009, B. Griffith, NREL. added EMS node setpoint checks
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the dehumidifier Components.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger initializations.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-        auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
-        using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using SteamCoils::SimulateSteamCoilComponents;
-        auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
-        using DataSizing::AutoSize;
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSatDensityRefrig;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::ScanPlantLoopsForObject;
-        using PlantUtilities::SetComponentFlowRate;
-        using WaterCoils::GetCoilMaxWaterFlowRate;
-        using WaterCoils::SimulateWaterCoilComponents;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("InitDesiccantDehumidifier");
-        static std::string const initCBVAV("InitCBVAV");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ProcInNode;            // inlet node number
-        int RegenInNode;           // inlet node number
-        int ControlNode;           // control node number
-        bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
-        int SteamIndex;            // steam coil index
-        Real64 FluidDensity;       // steam or water coil fluid density
-        Real64 CoilMaxVolFlowRate; // water or steam max volumetric water flow rate
-        Real64 QCoilActual;        // actual CBVAV steam heating coil load met (W)
-        bool ErrorFlag;            // local error flag returned from data mining
-
-        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
-        auto &MyEnvrnFlag(state.dataDesiccantDehumidifiers->MyEnvrnFlag);
-        auto &MyPlantScanFlag(state.dataDesiccantDehumidifiers->MyPlantScanFlag);
-
-        if (state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag) {
-
-            // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataDesiccantDehumidifiers->NumDesicDehums);
-            MyPlantScanFlag.allocate(state.dataDesiccantDehumidifiers->NumDesicDehums);
-            MyEnvrnFlag = true;
-
-            state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag = false;
-            MyPlantScanFlag = true;
-        }
-
-        if (MyPlantScanFlag(DesicDehumNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) ||
-                (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam)) {
-                if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
-                    ErrorFlag = false;
-                    ScanPlantLoopsForObject(state,
-                                            DesicDehum(DesicDehumNum).RegenCoilName,
-                                            TypeOf_CoilWaterSimpleHeating,
-                                            DesicDehum(DesicDehumNum).LoopNum,
-                                            DesicDehum(DesicDehumNum).LoopSide,
-                                            DesicDehum(DesicDehumNum).BranchNum,
-                                            DesicDehum(DesicDehumNum).CompNum,
-                                            ErrorFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
-                    if (ErrorFlag) {
-                        ShowFatalError(state, "InitDesiccantDehumidifier: Program terminated for previous conditions.");
-                    }
-
-                    ErrorFlag = false;
-                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
-                    if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
-                        FluidDensity = GetDensityGlycol(state,
-                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
-                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
-                                                        initCBVAV);
-                        DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
-                    }
-
-                } else if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
-
-                    ErrorFlag = false;
-                    ScanPlantLoopsForObject(state,
-                                            DesicDehum(DesicDehumNum).RegenCoilName,
-                                            TypeOf_CoilSteamAirHeating,
-                                            DesicDehum(DesicDehumNum).LoopNum,
-                                            DesicDehum(DesicDehumNum).LoopSide,
-                                            DesicDehum(DesicDehumNum).BranchNum,
-                                            DesicDehum(DesicDehumNum).CompNum,
-                                            ErrorFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
-
-                    if (ErrorFlag) {
-                        ShowFatalError(state, "InitDesiccantDehumidifier: Program terminated for previous conditions.");
-                    }
-                    ErrorFlag = false;
-                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorFlag);
-
-                    if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        FluidDensity =
-                            GetSatDensityRefrig(state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, RoutineName);
-                        DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
-                    }
-                }
-
-                // fill outlet node for regenartion hot water or steam heating coil
-                DesicDehum(DesicDehumNum).CoilOutletNode = state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum)
-                                                               .LoopSide(DesicDehum(DesicDehumNum).LoopSide)
-                                                               .Branch(DesicDehum(DesicDehumNum).BranchNum)
-                                                               .Comp(DesicDehum(DesicDehumNum).CompNum)
-                                                               .NodeNumOut;
-                MyPlantScanFlag(DesicDehumNum) = false;
-
-            } else { // DesicDehum is not connected to plant
-                MyPlantScanFlag(DesicDehumNum) = false;
-            }
-        } else if (MyPlantScanFlag(DesicDehumNum) && !state.dataGlobal->AnyPlantInModel) {
-            MyPlantScanFlag(DesicDehumNum) = false;
-        }
-
-        {
-            auto const SELECT_CASE_var((DesicDehum(DesicDehumNum).DehumTypeCode));
-
-            if (SELECT_CASE_var == DesicDehumType::Solid) {
-
-                if (!state.dataGlobal->SysSizingCalc && state.dataDesiccantDehumidifiers->MySetPointCheckFlag && DoSetPointTest) {
-                    if (DesicDehum(DesicDehumNum).ControlType == DesicDehumCtrlType::NodeHumratBypass) {
-                        ControlNode = DesicDehum(DesicDehumNum).ProcAirOutNode;
-                        if (ControlNode > 0) {
-                            if (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
-                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                    ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
-                                    ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
-                                    ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
-                                    ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
-                                    SetPointErrorFlag = true;
-                                } else {
-                                    CheckIfNodeSetPointManagedByEMS(
-                                        state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
-                                    if (SetPointErrorFlag) {
-                                        ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
-                                        ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
-                                        ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
-                                        ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
-                                        ShowContinueError(state, "Or use EMS Actuator to establish a setpoint at the process air outlet node.");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    state.dataDesiccantDehumidifiers->MySetPointCheckFlag = false;
-                }
-                // always do these initializations every iteration
-                ProcInNode = DesicDehum(DesicDehumNum).ProcAirInNode;
-                DesicDehum(DesicDehumNum).ProcAirInTemp = state.dataLoopNodes->Node(ProcInNode).Temp;
-                DesicDehum(DesicDehumNum).ProcAirInHumRat = state.dataLoopNodes->Node(ProcInNode).HumRat;
-                DesicDehum(DesicDehumNum).ProcAirInEnthalpy = state.dataLoopNodes->Node(ProcInNode).Enthalpy;
-                DesicDehum(DesicDehumNum).ProcAirInMassFlowRate = state.dataLoopNodes->Node(ProcInNode).MassFlowRate;
-
-                //  Determine heating coil inlet conditions by calling it with zero load
-                //  Not sure if this is really a good way to do this, should revisit for next release.
-                CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, 0.0);
-
-                RegenInNode = DesicDehum(DesicDehumNum).RegenAirInNode;
-                DesicDehum(DesicDehumNum).RegenAirInTemp = state.dataLoopNodes->Node(RegenInNode).Temp;
-                DesicDehum(DesicDehumNum).RegenAirInHumRat = state.dataLoopNodes->Node(RegenInNode).HumRat;
-                DesicDehum(DesicDehumNum).RegenAirInEnthalpy = state.dataLoopNodes->Node(RegenInNode).Enthalpy;
-
-                DesicDehum(DesicDehumNum).WaterRemove = 0.0;
-                DesicDehum(DesicDehumNum).ElecUseEnergy = 0.0;
-                DesicDehum(DesicDehumNum).ElecUseRate = 0.0;
-
-            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
-
-                //      Do the Begin Environment initializations
-                if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
-                    // Change the Volume Flow Rates to Mass Flow Rates
-                    DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate =
-                        DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * state.dataEnvrn->StdRhoAir;
-
-                    //   set fluid-side hardware limits
-                    if (DesicDehum(DesicDehumNum).CoilControlNode > 0) {
-                        //    If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
-                        if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow == AutoSize) {
-                            if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
-                                SimulateWaterCoilComponents(
-                                    state, DesicDehum(DesicDehumNum).RegenCoilName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenCoilIndex);
-                                ErrorFlag = false;
-                                CoilMaxVolFlowRate =
-                                    GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
-                                if (ErrorFlag) {
-                                    ErrorsFound = true;
-                                }
-                                if (CoilMaxVolFlowRate != AutoSize) {
-                                    FluidDensity = GetDensityGlycol(state,
-                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                                    DataGlobalConstants::HWInitConvTemp,
-                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
-                                                                    RoutineName);
-                                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
-                                }
-                            }
-                            if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
-                                SimulateSteamCoilComponents(state,
-                                                            DesicDehum(DesicDehumNum).RegenCoilName,
-                                                            FirstHVACIteration,
-                                                            DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                            1.0,
-                                                            QCoilActual); // simulate any load > 0 to get max capacity of steam coil
-                                ErrorFlag = false;
-                                CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorFlag);
-                                if (ErrorFlag) {
-                                    ErrorsFound = true;
-                                }
-                                if (CoilMaxVolFlowRate != AutoSize) {
-                                    SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                                    FluidDensity = GetSatDensityRefrig(
-                                        state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, RoutineName);
-                                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
-                                }
-                            }
-                        }
-                        InitComponentNodes(state,
-                                           0.0,
-                                           DesicDehum(DesicDehumNum).MaxCoilFluidFlow,
-                                           DesicDehum(DesicDehumNum).CoilControlNode,
-                                           DesicDehum(DesicDehumNum).CoilOutletNode,
-                                           DesicDehum(DesicDehumNum).LoopNum,
-                                           DesicDehum(DesicDehumNum).LoopSide,
-                                           DesicDehum(DesicDehumNum).BranchNum,
-                                           DesicDehum(DesicDehumNum).CompNum);
-                    }
-
-                    MyEnvrnFlag(DesicDehumNum) = false;
-                }
-
-                if (!state.dataGlobal->SysSizingCalc && state.dataDesiccantDehumidifiers->MySetPointCheckFlag && DoSetPointTest) {
-                    ControlNode = DesicDehum(DesicDehumNum).ControlNodeNum;
-                    if (ControlNode > 0) {
-                        if (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
-                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
-                                ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
-                                ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
-                                ShowContinueError(state,
-                                                  "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
-                                SetPointErrorFlag = true;
-                            } else {
-                                CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
-                                    ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
-                                    ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
-                                    ShowContinueError(state, "Node Referenced=" + state.dataLoopNodes->NodeID(ControlNode));
-                                    ShowContinueError(
-                                        state, "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
-                                    ShowContinueError(state, "Or use EMS Actuator to establish a setpoint at the process air outlet node.");
-                                }
-                            }
-                        }
-                    }
-                    state.dataDesiccantDehumidifiers->MySetPointCheckFlag = false;
-                }
-                RegenInNode = DesicDehum(DesicDehumNum).RegenAirInNode;
-                DesicDehum(DesicDehumNum).RegenAirInTemp = state.dataLoopNodes->Node(RegenInNode).Temp;
-                DesicDehum(DesicDehumNum).RegenAirInMassFlowRate = state.dataLoopNodes->Node(RegenInNode).MassFlowRate;
-
-                DesicDehum(DesicDehumNum).ExhaustFanPower = 0.0;
-                DesicDehum(DesicDehumNum).WaterRemoveRate = 0.0;
-            }
-        }
-    }
-
-    void ControlDesiccantDehumidifier(EnergyPlusData &state,
-                                      int const DesicDehumNum, // number of the current dehumidifier being simulated
-                                      Real64 &HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
-                                      [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
-        //                      for Gas Research Institute
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       Jan 2005 M. J. Witte, GARD Analytics, Inc.
-        //                        Add new control type option:
-        //                          NODE LEAVING HUMRAT SETPOINT:BYPASS
-        //                        Change existing control type to:
-        //                          FIXED LEAVING HUMRAT SETPOINT:BYPASS
-        //                        Work supported by ASHRAE research project 1254-RP
-        //                      June 2007 R. Raustad, FSEC
-        //                        Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine sets the output required from the dehumidifier
-
-        // METHODOLOGY EMPLOYED:
-        // Uses a maximum humidity ratio setpoint to calculate required process
-        // leaving humidity ratio
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool UnitOn;                 // unit on flag
-        Real64 ProcAirMassFlowRate;  // process air mass flow rate [kg/s]
-        Real64 RegenAirMassFlowRate; // regen air mass flow rate [kg/s]
-
-        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
-
-        ProcAirMassFlowRate = 0.0;
-        RegenAirMassFlowRate = 0.0;
-        UnitOn = true;
-
-        {
-            auto const SELECT_CASE_var((DesicDehum(DesicDehumNum).DehumTypeCode));
-
-            if (SELECT_CASE_var == DesicDehumType::Solid) {
-
-                if (DesicDehum(DesicDehumNum).HumRatSet <= 0.0) UnitOn = false;
-                ProcAirMassFlowRate = DesicDehum(DesicDehumNum).ProcAirInMassFlowRate;
-                if (ProcAirMassFlowRate <= SmallMassFlow) UnitOn = false;
-
-                if (GetCurrentScheduleValue(state, DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
-
-                // If incoming conditions are outside valid range for curve fits, then shut unit off, do not issue warnings
-
-                if (UnitOn) {
-                    if ((DesicDehum(DesicDehumNum).ProcAirInTemp < DesicDehum(DesicDehumNum).MinProcAirInTemp) ||
-                        (DesicDehum(DesicDehumNum).ProcAirInTemp > DesicDehum(DesicDehumNum).MaxProcAirInTemp)) {
-                        UnitOn = false;
-                    }
-                    if ((DesicDehum(DesicDehumNum).ProcAirInHumRat < DesicDehum(DesicDehumNum).MinProcAirInHumRat) ||
-                        (DesicDehum(DesicDehumNum).ProcAirInHumRat > DesicDehum(DesicDehumNum).MaxProcAirInHumRat)) {
-                        UnitOn = false;
-                    }
-                }
-
-                if (UnitOn) {
-
-                    // perform the correct dehumidifier control strategy
-                    {
-                        auto const SELECT_CASE_var1(DesicDehum(DesicDehumNum).ControlType);
-
-                        if (SELECT_CASE_var1 == DesicDehumCtrlType::FixedHumratBypass) {
-
-                            HumRatNeeded = DesicDehum(DesicDehumNum).HumRatSet;
-                            if (HumRatNeeded <= 0.0) {
-                                ShowSevereError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
-                                ShowContinueError(state, format("Invalid Leaving Max Humidity Ratio Setpoint={:.8T}", HumRatNeeded));
-                                ShowFatalError(state, "must be > 0.0");
-                            }
-
-                        } else if (SELECT_CASE_var1 == DesicDehumCtrlType::NodeHumratBypass) {
-
-                            HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRatMax;
-
-                        } else {
-
-                            ShowFatalError(state, "Invalid control type in desiccant dehumidifier = " + DesicDehum(DesicDehumNum).Name);
-                        }
-                    }
-
-                    // Setpoint of zero indicates no load from setpoint manager max hum
-                    if ((HumRatNeeded == 0.0) || (DesicDehum(DesicDehumNum).ProcAirInHumRat <= HumRatNeeded)) {
-                        UnitOn = false;
-                        HumRatNeeded = DesicDehum(DesicDehumNum).ProcAirInHumRat;
-                    }
-                } else {
-                    HumRatNeeded = DesicDehum(DesicDehumNum).ProcAirInHumRat;
-                }
-
-            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
-
-                ProcAirMassFlowRate = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
-                if (ProcAirMassFlowRate <= SmallMassFlow) UnitOn = false;
-
-                if (GetCurrentScheduleValue(state, DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
-
-                if (UnitOn) {
-                    if (DesicDehum(DesicDehumNum).ControlNodeNum == DesicDehum(DesicDehumNum).ProcAirOutNode) {
-                        HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRatMax;
-                    } else {
-                        if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRatMax > 0.0) {
-                            HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRatMax -
-                                           (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ControlNodeNum).HumRat -
-                                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
-                        } else {
-                            HumRatNeeded = 0.0;
-                        }
-                    }
-
-                    // Setpoint of zero indicates no load from setpoint manager max hum
-                    if ((HumRatNeeded == 0.0) || (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat <= HumRatNeeded)) {
-                        HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat;
-                    }
-                } else {
-                    HumRatNeeded = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat;
-                }
-
-            } else {
-            }
-        }
-    }
-
-    void CalcSolidDesiccantDehumidifier(EnergyPlusData &state,
-                                        int const DesicDehumNum,      // number of the current dehumidifier being simulated
-                                        Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kgWater/kgDryAir]
-                                        bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
-        //                      for Gas Research Institute
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculate the electricity consumption, regen heat requirements and the outlet
-        // conditions for a solid desiccant dehumidifier, given the inlet conditions and
-        // and the needed process leaving humidity ratio.
-
-        // METHODOLOGY EMPLOYED:
-        // Given the entering conditions, the full-load outlet conditions are calculated.
-        // Adjust for part-load if required.
-        // Caclulate required regen energy and call regen coil and regen fan.
-        // Desiccant wheel leaving conditions and regen energy requirements are calculated
-        // from empirical curve fits.  The user can select either default built-in
-        // performance curves, or use custom user-defined curves.
-
-        // REFERENCES:
-        // The default performance curves represent a commerical-grade solid desiccant
-        // wheel typical of HVAC applications in the early 1990's.  These curves were
-        // developed for Gas Research Institute by William W. Worek, University of Illinois
-        // at Chicago.
-
-        // Using/Aliasing
-        using Psychrometrics::PsyHFnTdbW;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        Real64 ProcAirInHumRat;     // process inlet air humidity ratio [kgWater/kgDryAir]
-        Real64 ProcAirInTemp;       // process inlet air temperature [C]
-        Real64 ProcAirOutHumRat;    // process outlet air humidity ratio [kgWater/kgDryAir]
-        Real64 MinProcAirOutHumRat; // minimum available process outlet air humidity ratio [kgWater/kgDryAir]
-        Real64 ProcAirOutTemp;      // process outlet air temperature [C]
-        Real64 ProcAirVel;          // process air velocity [m/s]
-        Real64 QRegen;              // regen heat input rate requested from regen coil [W]
-        Real64 QDelivered;          // regen heat actually delivered by regen coil [W]
-        // REAL(r64) :: RegenAirInHumRat        ! regen inlet air humidity ratio [kgWater/kgDryAir]
-        Real64 RegenAirInTemp;       // regen inlet air temperature [C]
-        Real64 RegenAirVel;          // regen air velocity [m/s]
-        Real64 ProcAirMassFlowRate;  // process air mass flow rate [kg/s]
-        Real64 RegenAirMassFlowRate; // regen air mass flow rate [kg/s]
-        Real64 SpecRegenEnergy;      // specific regen energy [J/kg of water removed]
-        Real64 NomRegenTemp;         // nominal regen temperature for regen energy curve
-        Real64 ElecUseRate;          // electricity consumption rate [W]
-        Real64 PartLoad;             // fraction of dehumidification capacity required to meet setpoint
-        bool UnitOn;                 // unit on flag
-
-        // Variables for hardwired coefficients for default performance model
-
-        Real64 TC0;
-        Real64 TC1;
-        Real64 TC2;
-        Real64 TC3;
-        Real64 TC4;
-        Real64 TC5;
-        Real64 TC6;
-        Real64 TC7;
-        Real64 TC8;
-        Real64 TC9;
-        Real64 TC10;
-        Real64 TC11;
-        Real64 TC12;
-        Real64 TC13;
-        Real64 TC14;
-        Real64 TC15;
-
-        Real64 WC0;
-        Real64 WC1;
-        Real64 WC2;
-        Real64 WC3;
-        Real64 WC4;
-        Real64 WC5;
-        Real64 WC6;
-        Real64 WC7;
-        Real64 WC8;
-        Real64 WC9;
-        Real64 WC10;
-        Real64 WC11;
-        Real64 WC12;
-        Real64 WC13;
-        Real64 WC14;
-        Real64 WC15;
-
-        Real64 QC0;
-        Real64 QC1;
-        Real64 QC2;
-        Real64 QC3;
-        Real64 QC4;
-        Real64 QC5;
-        Real64 QC6;
-        Real64 QC7;
-        Real64 QC8;
-        Real64 QC9;
-        Real64 QC10;
-        Real64 QC11;
-        Real64 QC12;
-        Real64 QC13;
-        Real64 QC14;
-        Real64 QC15;
-
-        Real64 RC0;
-        Real64 RC1;
-        Real64 RC2;
-        Real64 RC3;
-        Real64 RC4;
-        Real64 RC5;
-        Real64 RC6;
-        Real64 RC7;
-        Real64 RC8;
-        Real64 RC9;
-        Real64 RC10;
-        Real64 RC11;
-        Real64 RC12;
-        Real64 RC13;
-        Real64 RC14;
-        Real64 RC15;
-
-        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
-        auto &RhoAirStdInit(state.dataDesiccantDehumidifiers->RhoAirStdInit);
-
-        // Setup internal variables for calculations
-
-        ProcAirInTemp = DesicDehum(DesicDehumNum).ProcAirInTemp;
-        ProcAirInHumRat = DesicDehum(DesicDehumNum).ProcAirInHumRat;
-        ProcAirMassFlowRate = DesicDehum(DesicDehumNum).ProcAirInMassFlowRate;
-        ProcAirVel = DesicDehum(DesicDehumNum).NomProcAirVel;
-        PartLoad = 0.0;
-
-        RegenAirInTemp = DesicDehum(DesicDehumNum).RegenAirInTemp;
-        NomRegenTemp = DesicDehum(DesicDehumNum).NomRegenTemp;
-
-        // Calculate min available process out humrat
-        UnitOn = false;
-        MinProcAirOutHumRat = 0.0; // MAX(MinProcAirOutHumRat,0.000857)
-
-        if (HumRatNeeded < ProcAirInHumRat) {
-
-            UnitOn = true;
-
-            {
-                auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).PerformanceModel_Num); // Performance Model Part A
-
-                if (SELECT_CASE_var == PerformanceModel::Default) {
-
-                    WC0 = 0.0148880824323806;
-                    WC1 = -0.000283393198398211;
-                    WC2 = -0.87802168940547;
-                    WC3 = -0.000713615831236411;
-                    WC4 = 0.0311261188874622;
-                    WC5 = 1.51738892142485e-06;
-                    WC6 = 0.0287250198281021;
-                    WC7 = 4.94796903231558e-06;
-                    WC8 = 24.0771139652826;
-                    WC9 = 0.000122270283927978;
-                    WC10 = -0.0151657189566474;
-                    WC11 = 3.91641393230322e-08;
-                    WC12 = 0.126032651553348;
-                    WC13 = 0.000391653854431574;
-                    WC14 = 0.002160537360507;
-                    WC15 = 0.00132732844211593;
-
-                    MinProcAirOutHumRat = WC0 + WC1 * ProcAirInTemp + WC2 * ProcAirInHumRat + WC3 * ProcAirVel +
-                                          WC4 * ProcAirInTemp * ProcAirInHumRat + WC5 * ProcAirInTemp * ProcAirVel +
-                                          WC6 * ProcAirInHumRat * ProcAirVel + WC7 * ProcAirInTemp * ProcAirInTemp +
-                                          WC8 * ProcAirInHumRat * ProcAirInHumRat + WC9 * ProcAirVel * ProcAirVel +
-                                          WC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
-                                          WC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
-                                          WC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + WC13 * std::log(ProcAirInTemp) +
-                                          WC14 * std::log(ProcAirInHumRat) + WC15 * std::log(ProcAirVel);
-
-                    // limit to 6 grains/lb (0.000857 kg/kg)
-
-                } else if (SELECT_CASE_var == PerformanceModel::UserCurves) {
-
-                    MinProcAirOutHumRat = CurveValue(state, DesicDehum(DesicDehumNum).ProcHumRatCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                          CurveValue(state, DesicDehum(DesicDehumNum).ProcHumRatCurvefV, ProcAirVel);
-
-                } else {
-
-                    ShowFatalError(
-                        state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
-                }
-            } // Performance Model Part A
-
-            MinProcAirOutHumRat = max(MinProcAirOutHumRat, 0.000857);
-        }
-
-        if (MinProcAirOutHumRat >= ProcAirInHumRat) UnitOn = false;
-
-        if (UnitOn) {
-
-            // Calculate partload fraction of dehumidification capacity required to meet setpoint
-            PartLoad = 1.0;
-            if (MinProcAirOutHumRat < HumRatNeeded) PartLoad = (ProcAirInHumRat - HumRatNeeded) / (ProcAirInHumRat - MinProcAirOutHumRat);
-            PartLoad = max(0.0, PartLoad);
-            PartLoad = min(1.0, PartLoad);
-
-            {
-                auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).PerformanceModel_Num); // Performance Model Part B
-
-                if (SELECT_CASE_var == PerformanceModel::Default) {
-
-                    // Calculate leaving conditions
-                    TC0 = -38.7782841989449;
-                    TC1 = 2.0127655837628;
-                    TC2 = 5212.49360216097;
-                    TC3 = 15.2362536782665;
-                    TC4 = -80.4910419759181;
-                    TC5 = -0.105014122001509;
-                    TC6 = -229.668673645144;
-                    TC7 = -0.015424703743461;
-                    TC8 = -69440.0689831847;
-                    TC9 = -1.6686064694322;
-                    TC10 = 38.5855718977592;
-                    TC11 = 0.000196395381206009;
-                    TC12 = 386.179386548324;
-                    TC13 = -0.801959614172614;
-                    TC14 = -3.33080986818745;
-                    TC15 = -15.2034386065714;
-
-                    ProcAirOutTemp = TC0 + TC1 * ProcAirInTemp + TC2 * ProcAirInHumRat + TC3 * ProcAirVel + TC4 * ProcAirInTemp * ProcAirInHumRat +
-                                     TC5 * ProcAirInTemp * ProcAirVel + TC6 * ProcAirInHumRat * ProcAirVel + TC7 * ProcAirInTemp * ProcAirInTemp +
-                                     TC8 * ProcAirInHumRat * ProcAirInHumRat + TC9 * ProcAirVel * ProcAirVel +
-                                     TC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
-                                     TC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
-                                     TC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + TC13 * std::log(ProcAirInTemp) +
-                                     TC14 * std::log(ProcAirInHumRat) + TC15 * std::log(ProcAirVel);
-
-                    // Regen energy
-                    QC0 = -27794046.6291107;
-                    QC1 = -235725.171759615;
-                    QC2 = 975461343.331328;
-                    QC3 = -686069.373946731;
-                    QC4 = -17717307.3766266;
-                    QC5 = 31482.2539662489;
-                    QC6 = 55296552.8260743;
-                    QC7 = 6195.36070023868;
-                    QC8 = -8304781359.40435;
-                    QC9 = -188987.543809419;
-                    QC10 = 3933449.40965846;
-                    QC11 = -6.66122876558634;
-                    QC12 = -349102295.417547;
-                    QC13 = 83672.179730172;
-                    QC14 = -6059524.33170538;
-                    QC15 = 1220523.39525162;
-
-                    SpecRegenEnergy = QC0 + QC1 * ProcAirInTemp + QC2 * ProcAirInHumRat + QC3 * ProcAirVel + QC4 * ProcAirInTemp * ProcAirInHumRat +
-                                      QC5 * ProcAirInTemp * ProcAirVel + QC6 * ProcAirInHumRat * ProcAirVel + QC7 * ProcAirInTemp * ProcAirInTemp +
-                                      QC8 * ProcAirInHumRat * ProcAirInHumRat + QC9 * ProcAirVel * ProcAirVel +
-                                      QC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
-                                      QC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
-                                      QC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + QC13 * std::log(ProcAirInTemp) +
-                                      QC14 * std::log(ProcAirInHumRat) + QC15 * std::log(ProcAirVel);
-
-                    // Regen face velocity
-                    RC0 = -4.67358908091488;
-                    RC1 = 0.0654323095468338;
-                    RC2 = 396.950518702316;
-                    RC3 = 1.52610165426736;
-                    RC4 = -11.3955868430328;
-                    RC5 = 0.00520693906104437;
-                    RC6 = 57.783645385621;
-                    RC7 = -0.000464800668311693;
-                    RC8 = -5958.78613212602;
-                    RC9 = -0.205375818291012;
-                    RC10 = 5.26762675442845;
-                    RC11 = -8.88452553055039e-05;
-                    RC12 = -182.382479369311;
-                    RC13 = -0.100289774002047;
-                    RC14 = -0.486980507964251;
-                    RC15 = -0.972715425435447;
-
-                    RegenAirVel = RC0 + RC1 * ProcAirInTemp + RC2 * ProcAirInHumRat + RC3 * ProcAirVel + RC4 * ProcAirInTemp * ProcAirInHumRat +
-                                  RC5 * ProcAirInTemp * ProcAirVel + RC6 * ProcAirInHumRat * ProcAirVel + RC7 * ProcAirInTemp * ProcAirInTemp +
-                                  RC8 * ProcAirInHumRat * ProcAirInHumRat + RC9 * ProcAirVel * ProcAirVel +
-                                  RC10 * ProcAirInTemp * ProcAirInTemp * ProcAirInHumRat * ProcAirInHumRat +
-                                  RC11 * ProcAirInTemp * ProcAirInTemp * ProcAirVel * ProcAirVel +
-                                  RC12 * ProcAirInHumRat * ProcAirInHumRat * ProcAirVel * ProcAirVel + RC13 * std::log(ProcAirInTemp) +
-                                  RC14 * std::log(ProcAirInHumRat) + RC15 * std::log(ProcAirVel);
-
-                } else if (SELECT_CASE_var == PerformanceModel::UserCurves) {
-
-                    ProcAirOutTemp = CurveValue(state, DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                     CurveValue(state, DesicDehum(DesicDehumNum).ProcDryBulbCurvefV, ProcAirVel);
-
-                    SpecRegenEnergy = CurveValue(state, DesicDehum(DesicDehumNum).RegenEnergyCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                      CurveValue(state, DesicDehum(DesicDehumNum).RegenEnergyCurvefV, ProcAirVel);
-
-                    RegenAirVel = CurveValue(state, DesicDehum(DesicDehumNum).RegenVelCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                  CurveValue(state, DesicDehum(DesicDehumNum).RegenVelCurvefV, ProcAirVel);
-
-                } else {
-
-                    ShowFatalError(
-                        state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
-
-                    // Suppress uninitialized warnings
-                    ProcAirOutTemp = 0.0;
-                    SpecRegenEnergy = 0.0;
-                    RegenAirVel = 0.0;
-                }
-            } // Performance Model Part B
-
-            ProcAirOutTemp = (1 - PartLoad) * ProcAirInTemp + (PartLoad)*ProcAirOutTemp;
-
-            ProcAirOutHumRat = (1 - PartLoad) * ProcAirInHumRat + (PartLoad)*MinProcAirOutHumRat;
-
-            // Calculate water removal
-            DesicDehum(DesicDehumNum).WaterRemoveRate = ProcAirMassFlowRate * (ProcAirInHumRat - ProcAirOutHumRat);
-
-            // Adjust for regen inlet temperature
-            SpecRegenEnergy *= (NomRegenTemp - RegenAirInTemp) / (NomRegenTemp - ProcAirInTemp);
-            SpecRegenEnergy = max(SpecRegenEnergy, 0.0);
-            QRegen = SpecRegenEnergy * DesicDehum(DesicDehumNum).WaterRemoveRate;
-
-            // Above curves are based on a 90deg regen angle and 245deg process air angle
-            RegenAirMassFlowRate = ProcAirMassFlowRate * 90.0 / 245.0 * RegenAirVel / ProcAirVel;
-
-            ElecUseRate = DesicDehum(DesicDehumNum).NomRotorPower;
-
-        } else { // Unit is off
-
-            ProcAirOutTemp = ProcAirInTemp;
-            ProcAirOutHumRat = ProcAirInHumRat;
-            SpecRegenEnergy = 0.0;
-            QRegen = 0.0;
-            ElecUseRate = 0.0;
-            RegenAirVel = 0.0;
-            RegenAirMassFlowRate = 0.0;
-            DesicDehum(DesicDehumNum).WaterRemoveRate = 0.0;
-            PartLoad = 0.0;
-
-        } // UnitOn/Off
-
-        // Set regen mass flow
-        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate = RegenAirMassFlowRate;
-        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRateMaxAvail = RegenAirMassFlowRate;
-        // Call regen fan
-        if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-        } else {
-            state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-        }
-
-        // Call regen heating coil
-        CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen, QDelivered);
-
-        // Verify is requestd flow was delivered (must do after heating coil has executed to pass flow to RegenAirInNode)
-        if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate != RegenAirMassFlowRate) {
-            // Initialize standard air density
-            if (state.dataDesiccantDehumidifiers->CalcSolidDesiccantDehumidifierMyOneTimeFlag) {
-                RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-            }
-            ShowRecurringSevereErrorAtEnd(state,
-                                          "Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
-                                          DesicDehum(DesicDehumNum).RegenFanErrorIndex1);
-            ShowRecurringContinueErrorAtEnd(
-                state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name, DesicDehum(DesicDehumNum).RegenFanErrorIndex2);
-            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-            ShowRecurringContinueErrorAtEnd(state,
-                                            "Flow requested [m3/s] from " + DesicDehum(DesicDehumNum).RegenFanType + '=' +
-                                                DesicDehum(DesicDehumNum).RegenFanName,
-                                            DesicDehum(DesicDehumNum).RegenFanErrorIndex3,
-                                            (RegenAirMassFlowRate / RhoAirStdInit));
-            ShowRecurringContinueErrorAtEnd(
-                state,
-                "Flow request varied from delivered by [m3/s]",
-                DesicDehum(DesicDehumNum).RegenFanErrorIndex4,
-                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) / RhoAirStdInit),
-                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) / RhoAirStdInit));
-        }
-
-        // Verify is requestd heating was delivered
-        if (QDelivered < QRegen) {
-            ShowRecurringSevereErrorAtEnd(
-                state,
-                "Inadequate heat delivered by desiccant regen coil - RESULTS INVALID! Check regen coil capacity and schedule.",
-                DesicDehum(DesicDehumNum).RegenCapErrorIndex1);
-            ShowRecurringContinueErrorAtEnd(
-                state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name, DesicDehum(DesicDehumNum).RegenCapErrorIndex2);
-            ShowRecurringContinueErrorAtEnd(state,
-                                            "Load requested [W] from " + DesicDehum(DesicDehumNum).RegenCoilType + '=' +
-                                                DesicDehum(DesicDehumNum).RegenCoilName,
-                                            DesicDehum(DesicDehumNum).RegenCapErrorIndex3,
-                                            QRegen);
-            ShowRecurringContinueErrorAtEnd(
-                state, "Load request exceeded delivered by [W]", DesicDehum(DesicDehumNum).RegenCapErrorIndex4, (QRegen - QDelivered));
-        }
-
-        DesicDehum(DesicDehumNum).SpecRegenEnergy = SpecRegenEnergy;
-        DesicDehum(DesicDehumNum).QRegen = QRegen;
-        DesicDehum(DesicDehumNum).ElecUseRate = ElecUseRate;
-        DesicDehum(DesicDehumNum).PartLoad = PartLoad;
-
-        DesicDehum(DesicDehumNum).ProcAirOutMassFlowRate = ProcAirMassFlowRate;
-        DesicDehum(DesicDehumNum).ProcAirOutTemp = ProcAirOutTemp;
-        DesicDehum(DesicDehumNum).ProcAirOutHumRat = ProcAirOutHumRat;
-        DesicDehum(DesicDehumNum).ProcAirOutEnthalpy = PsyHFnTdbW(ProcAirOutTemp, ProcAirOutHumRat);
-        DesicDehum(DesicDehumNum).RegenAirInMassFlowRate = RegenAirMassFlowRate;
-        DesicDehum(DesicDehumNum).RegenAirVel = RegenAirVel;
-
-        //  DesicDehum(DesicDehumNum)%RegenAirOutTemp        = -999.
-        //  DesicDehum(DesicDehumNum)%RegenAirOutHumRat      = -999.
-        //  DesicDehum(DesicDehumNum)%RegenAirOutEnthalpy    = -999.
-    }
-
-    void CalcGenericDesiccantDehumidifier(EnergyPlusData &state,
-                                          int const DesicDehumNum,      // number of the current dehumidifier being simulated
-                                          Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
-                                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mangesh Basarkar, FSEC
-        //       DATE WRITTEN   May 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculate the electricity consumption, regen heat requirements and the outlet
-        // conditions for a desiccant dehumidifier, given the inlet conditions,
-        // DX coil part-load ratio, and/or the needed process leaving humidity ratio.
-
-        // METHODOLOGY EMPLOYED:
-        // Given the entering conditions, the full-load outlet conditions are calculated.
-        // Adjust for part-load if required.
-        // Calculate the required regen energy and call the regen coil and the regen fan.
-
-        // REFERENCES:
-        // Kosar, D. 2006. Dehumidification Enhancements, ASHRAE Journal, Vol. 48, No. 2, February 2006.
-        // Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems Through Component
-        //   Augmentation of the Cooling Coil. 15th Symposium on Improving Building Systems in Hot and Humid
-        //   Climates, July 24-26, 2006.
-
-        // Using/Aliasing
-        using HeatRecovery::SimHeatRecovery;
-        using Psychrometrics::PsyHFnTdbW;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
-        // min vol flow per rated evaporator capacity
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 DDPartLoadRatio;        // fraction of dehumidification capacity required to meet setpoint
-        Real64 MassFlowRateNew;        // new required mass flow rate calculated to keep regen setpoint temperature (kg/s)
-        Real64 CondenserWasteHeat;     // Condenser waste heat (W)
-        Real64 CpAir;                  // Specific heat of air (J/kg-K)
-        Real64 NewRegenInTemp;         // new temp calculated from condenser waste heat (C)
-        Real64 ExhaustFanMassFlowRate; // exhaust fan mass flow rate (kg/s)
-        Real64 ExhaustFanPLR;          // exhaust fan run time fraction calculated from new mass flow rate for regen side
-        Real64 ExhaustFanPowerMod;     // used to calculate exhaust fan power from flow fraction
-        Real64 VolFlowPerRatedTotQ;    // flow rate per rated total cooling capacity of the companion coil (m3/s/W)
-        Real64 FanDeltaT;              // used to account for fan heat when calculating regeneration heater energy (C)
-        Real64 OnOffFanPLF;            // save air loop fan part load fracton while calculating exhaust fan power
-        Real64 RegenSetPointTemp;      // regeneration temperature setpoint (C)
-        int RegenCoilIndex;            // index to regeneration heating coil, 0 when not used
-        int CompanionCoilIndexNum;     // index for companion DX cooling coil, 0 when DX coil is not used
-        std::string MinVol;            // character string used for error messages
-        bool UnitOn;                   // unit on flag
-        //  LOGICAL       :: SimFlag                    ! used to turn off additional simulation if DX Coil is off
-        Real64 QRegen_OASysFanAdjust; // temporary variable used to adjust regen heater load during iteration
-
-        auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
-        auto &QRegen(state.dataDesiccantDehumidifiers->QRegen);
-
-        UnitOn = false;
-        DDPartLoadRatio = 0.0;
-        RegenCoilIndex = DesicDehum(DesicDehumNum).RegenCoilIndex;
-        FanDeltaT = 0.0;
-        RegenSetPointTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-        ExhaustFanMassFlowRate = 0.0;
-
-        // Save OnOffFanPartLoadFraction while performing exhaust fan calculations
-        OnOffFanPLF = state.dataHVACGlobal->OnOffFanPartLoadFraction;
-        state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-
-        if (DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Selection::Yes) {
-            // Cooling coil directly upstream of desiccant dehumidifier, dehumidifier runs in tandem with DX coil
-
-            CompanionCoilIndexNum = DesicDehum(DesicDehumNum).DXCoilIndex;
-        } else {
-            // desiccant dehumidifier determines its own PLR
-            CompanionCoilIndexNum = 0;
-        }
-
-        if (state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag) {
-            state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD = state.dataEnvrn->StdRhoAir;
-            state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag = false;
-        }
-
-        if (HumRatNeeded < state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat) {
-            UnitOn = true;
-        }
-
-        if (DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Selection::Yes) {
-            if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                if (state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) == 0.0) {
-                    UnitOn = false;
-                }
-            }
-        }
-
-        if (UnitOn) {
-
-            if (DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode) {
-                if (DesicDehum(DesicDehumNum).HXTypeNum == BalancedHX) {
-                    state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate =
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
-                    state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRateMaxAvail =
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
-                }
-            }
-
-            // Get conditions from DX Coil condenser if present (DXCoilIndex verified > 0 in GetInput)
-            if (DesicDehum(DesicDehumNum).Preheat == Selection::Yes) {
-
-                //     condenser waste heat is proportional to DX coil PLR
-                if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                    CondenserWasteHeat = state.dataHeatBal->HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
-                    state.dataHeatBal->HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
-                } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    CondenserWasteHeat = state.dataHeatBal->HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
-                    state.dataHeatBal->HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
-                }
-
-                CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat);
-
-                if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                    if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                        Fans::SimulateFanComponents(
-                            state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-                    } else {
-                        state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-                    }
-                    FanDeltaT = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).Temp -
-                                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).Temp;
-                    //       Adjust setpoint to account for fan heat
-                    RegenSetPointTemp -= FanDeltaT;
-                }
-
-                //     CompanionCoilIndexNum .GT. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == Yes
-                if (CompanionCoilIndexNum > 0) {
-                    if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                        (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                        DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
-                    } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
-                    }
-                }
-
-                //     calculate actual condenser outlet node (regen inlet node) temperature
-                if (CompanionCoilIndexNum > 0) {
-                    if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                        (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                        if (state.dataDXCoils->DXCoilFanOpMode(DesicDehum(DesicDehumNum).DXCoilIndex) == ContFanCycCoil) {
-                            NewRegenInTemp =
-                                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
-                                CondenserWasteHeat /
-                                    (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) * DDPartLoadRatio);
-                            CondenserWasteHeat /= DDPartLoadRatio;
-                        } else {
-                            NewRegenInTemp =
-                                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
-                                CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
-                        }
-                    } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        NewRegenInTemp =
-                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
-                            CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
-                    } else {
-                        NewRegenInTemp =
-                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
-                            CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
-                    }
-                } else {
-                    NewRegenInTemp =
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
-                        CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate));
-                }
-
-                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp = NewRegenInTemp;
-                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Enthalpy =
-                    PsyHFnTdbW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp,
-                               state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
-                MassFlowRateNew = 0.0;
-
-                if (DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0) {
-
-                    //       calculate mass flow rate required to maintain regen inlet setpoint temp
-                    if (NewRegenInTemp > RegenSetPointTemp) {
-                        if (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp != 0.0) {
-                            MassFlowRateNew =
-                                max(0.0,
-                                    CondenserWasteHeat /
-                                        (CpAir * (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp)));
-                        } else {
-                            MassFlowRateNew = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate;
-                        }
-                    }
-
-                    //       calculate exhaust fan mass flow rate and new regen inlet temperature (may not be at setpoint)
-                    if (MassFlowRateNew > state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) {
-                        ExhaustFanMassFlowRate = MassFlowRateNew - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate;
-                        ExhaustFanMassFlowRate = max(0.0, min(ExhaustFanMassFlowRate, DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate));
-
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp =
-                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
-                            CondenserWasteHeat /
-                                (CpAir * (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate));
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat =
-                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat;
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Enthalpy =
-                            PsyHFnTdbW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp,
-                                       state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
-                    }
-                }
-
-                if (RegenCoilIndex > 0) {
-                    if (NewRegenInTemp < RegenSetPointTemp) {
-                        CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
-                    }
-                    QRegen = max(0.0,
-                                 (CpAir * state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
-                                  (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp)));
-                    if (QRegen == 0.0) QRegen = -1.0;
-                }
-
-                //     CompanionCoilIndexNum .EQ. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == No
-                if (CompanionCoilIndexNum == 0) {
-
-                    if (RegenCoilIndex > 0) {
-
-                        QRegen_OASysFanAdjust = QRegen;
-                        if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                            if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate > 0.0) {
-                                //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
-                                //             reduction through fan
-                                QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).MassFlowRate /
-                                                         state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate;
-                            }
-                        }
-
-                        CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust);
-                    }
-
-                    SimHeatRecovery(state,
-                                    DesicDehum(DesicDehumNum).HXName,
-                                    FirstHVACIteration,
-                                    DesicDehum(DesicDehumNum).CompIndex,
-                                    ContFanCycCoil,
-                                    1.0,
-                                    true,
-                                    CompanionCoilIndexNum,
-                                    DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
-                                    _,
-                                    _,
-                                    DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
-
-                    //       calculate desiccant part-load ratio
-                    if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat !=
-                        state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat) {
-                        DDPartLoadRatio = (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat - HumRatNeeded) /
-                                          (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat -
-                                           state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
-                        DDPartLoadRatio = max(0.0, min(1.0, DDPartLoadRatio));
-                    } else {
-                        DDPartLoadRatio = 1.0;
-                    }
-                }
-
-                if (ExhaustFanMassFlowRate > 0.0) {
-
-                    //       calculate exhaust fan mass flow rate due to desiccant system operation
-                    ExhaustFanMassFlowRate *= DDPartLoadRatio;
-
-                    //       calculate exhaust fan PLR due to desiccant system operation
-                    ExhaustFanPLR = ExhaustFanMassFlowRate / DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate;
-
-                    //       find exhaust fan power multiplier using exhaust fan part-load ratio
-                    if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                        ExhaustFanPowerMod = min(1.0, max(0.0, CurveValue(state, DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, ExhaustFanPLR)));
-                    } else {
-                        ExhaustFanPowerMod = 1.0;
-                    }
-
-                    //       calculate exhaust fan power due to desiccant operation
-                    DesicDehum(DesicDehumNum).ExhaustFanPower = DesicDehum(DesicDehumNum).ExhaustFanMaxPower * ExhaustFanPowerMod;
-                }
-
-            } else { // ELSE for IF(DesicDehum(DesicDehumNum)%Preheat == Yes)THEN
-
-                if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat > HumRatNeeded) {
-
-                    //       Get Full load output of desiccant wheel
-                    if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                        if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                            Fans::SimulateFanComponents(
-                                state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-                        } else {
-                            state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-                        }
-
-                        FanDeltaT = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).Temp -
-                                    state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).Temp;
-                        RegenSetPointTemp -= FanDeltaT;
-                    }
-
-                    if (RegenCoilIndex > 0) {
-                        CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
-                        QRegen = max(0.0,
-                                     (CpAir * state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
-                                      (RegenSetPointTemp - state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp)));
-
-                        QRegen_OASysFanAdjust = QRegen;
-                        if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                            if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate > 0.0) {
-                                //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
-                                //             reduction through fan
-                                QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).MassFlowRate /
-                                                         state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate;
-                            }
-                        }
-
-                        if (QRegen_OASysFanAdjust == 0.0) QRegen_OASysFanAdjust = -1.0;
-                        CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust);
-                    }
-
-                    //       CompanionCoilIndexNum .EQ. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == No
-                    if (CompanionCoilIndexNum == 0) {
-                        SimHeatRecovery(state,
-                                        DesicDehum(DesicDehumNum).HXName,
-                                        FirstHVACIteration,
-                                        DesicDehum(DesicDehumNum).CompIndex,
-                                        ContFanCycCoil,
-                                        1.0,
-                                        true,
-                                        CompanionCoilIndexNum,
-                                        DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
-                                        _,
-                                        _,
-                                        DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
-
-                        //         calculate desiccant part-load ratio
-                        if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat !=
-                            state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat) {
-                            DDPartLoadRatio = (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat - HumRatNeeded) /
-                                              (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat -
-                                               state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
-                            DDPartLoadRatio = max(0.0, min(1.0, DDPartLoadRatio));
-                        } else {
-                            DDPartLoadRatio = 1.0;
-                        }
-                    } else {
-                        if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                            (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                            DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
-                        } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                            DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
-                        }
-                    }
-                } else { // ELSE for IF(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum)%ProcAirInNode)%HumRat .GT. HumRatNeeded)THEN
-                    DDPartLoadRatio = 0.0;
-                } // END IF for IF(state.dataLoopNodes->Node(DesicDehum(DesicDehumNum)%ProcAirInNode)%HumRat .GT. HumRatNeeded)THEN
-
-            } // END IF for IF(DesicDehum(DesicDehumNum)%Preheat == Yes)THEN
-
-            DesicDehum(DesicDehumNum).PartLoad = DDPartLoadRatio;
-            QRegen_OASysFanAdjust = QRegen;
-
-            // set average regeneration air mass flow rate based on desiccant cycling ratio (DDPartLoadRatio)
-            if (DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode) {
-                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *= DDPartLoadRatio;
-
-                // **RR moved to here, only adjust regen heater load if mass flow rate is changed
-                //   adjust regen heating coil capacity based on desiccant cycling ratio (PLR)
-                QRegen_OASysFanAdjust *= DDPartLoadRatio;
-            }
-
-            // Call regen fan, balanced desiccant HX and heating coil
-            if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-                } else {
-                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-                }
-            }
-
-            if (RegenCoilIndex > 0) {
-
-                //!   adjust regen heating coil capacity based on desiccant cycling ratio (PLR)
-                //    QRegen_OASysFanAdjust = QRegen * DDPartLoadRatio
-
-                if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                    if (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate > 0.0) {
-                        //       For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot reduction through fan
-                        QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanOutNode).MassFlowRate /
-                                                 state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenFanInNode).MassFlowRate;
-                    }
-                }
-
-                if (QRegen_OASysFanAdjust == 0.0) QRegen_OASysFanAdjust = -1.0;
-                CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust);
-            }
-
-            SimHeatRecovery(state,
-                            DesicDehum(DesicDehumNum).HXName,
-                            FirstHVACIteration,
-                            DesicDehum(DesicDehumNum).CompIndex,
-                            ContFanCycCoil,
-                            DDPartLoadRatio,
-                            true,
-                            CompanionCoilIndexNum,
-                            DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
-                            _,
-                            _,
-                            DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
-
-            if (DesicDehum(DesicDehumNum).RegenFanPlacement == DrawThru) {
-                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-                } else {
-                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-                }
-            }
-
-            // Calculate water removal
-            DesicDehum(DesicDehumNum).WaterRemoveRate = state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate *
-                                                        (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat -
-                                                         state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).ProcAirOutNode).HumRat);
-
-            // If preheat is Yes, exhaust fan is condenser fan, if CoilUpstreamOfProcessSide is No, DD runs an its own PLR
-            if (DesicDehum(DesicDehumNum).Preheat == Selection::Yes && DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Selection::No) {
-                //    should actually use DX coil RTF instead of PLR since fan power is being calculated
-                if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                    DesicDehum(DesicDehumNum).ExhaustFanPower +=
-                        max(0.0,
-                            (DesicDehum(DesicDehumNum).ExhaustFanMaxPower *
-                             (state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) - DDPartLoadRatio)));
-                } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    DesicDehum(DesicDehumNum).ExhaustFanPower += max(0.0, (DesicDehum(DesicDehumNum).ExhaustFanMaxPower * (1.0 - DDPartLoadRatio)));
-                }
-            }
-
-        } else { // unit must be off
-
-            DesicDehum(DesicDehumNum).PartLoad = 0.0;
-
-            if (DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode) {
-                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate = 0.0;
-                state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRateMaxAvail = 0.0;
-            }
-
-            if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
-                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-                } else {
-                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-                }
-            }
-
-            if (RegenCoilIndex > 0) {
-                CalcNonDXHeatingCoils(state, DesicDehumNum, FirstHVACIteration, -1.0);
-            }
-
-            SimHeatRecovery(state,
-                            DesicDehum(DesicDehumNum).HXName,
-                            FirstHVACIteration,
-                            DesicDehum(DesicDehumNum).CompIndex,
-                            ContFanCycCoil,
-                            0.0,
-                            false,
-                            CompanionCoilIndexNum,
-                            DesicDehum(DesicDehumNum).RegenInletIsOutsideAirNode,
-                            _,
-                            _,
-                            DesicDehum(DesicDehumNum).coolingCoil_TypeNum);
-
-            if (DesicDehum(DesicDehumNum).RegenFanPlacement == DrawThru) {
-                if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, DesicDehum(DesicDehumNum).RegenFanName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenFanIndex);
-                } else {
-                    state.dataHVACFan->fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->simulate(state, _, _, _, _);
-                }
-            }
-
-            // Turn on exhaust fan if DX Coil is operating
-            if (DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0) {
-                if (DesicDehum(DesicDehumNum).DXCoilIndex > 0) {
-                    if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                        (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                        DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
-                    } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
-                    }
-                    DesicDehum(DesicDehumNum).ExhaustFanPower = DesicDehum(DesicDehumNum).ExhaustFanMaxPower * DDPartLoadRatio;
-                    ExhaustFanMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate * DDPartLoadRatio;
-                }
-            }
-
-        } // UnitOn/Off
-
-        // check condenser minimum flow per rated total capacity
-        if (DDPartLoadRatio > 0.0 && DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0.0) {
-            VolFlowPerRatedTotQ =
-                (state.dataLoopNodes->Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
-                max(0.00001,
-                    (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD));
-            if (!state.dataGlobal->WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
-                ++DesicDehum(DesicDehumNum).ErrCount;
-                if (DesicDehum(DesicDehumNum).ErrCount < 2) {
-                    ShowWarningError(state,
-                                     format("{} \"{}\" - Air volume flow rate per watt of total condenser waste heat is below the minimum "
-                                            "recommended at {:N} m3/s/W.",
-                                            DesicDehum(DesicDehumNum).DehumType,
-                                            DesicDehum(DesicDehumNum).Name,
-                                            VolFlowPerRatedTotQ));
-                    ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state,
-                                      format("Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [{:N}]", MinVolFlowPerRatedTotQ));
-                    ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components ");
-                    ShowContinueError(state, "on the regeneration side of the desiccant dehumidifier.");
-                } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name +
-                            "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...",
-                        DesicDehum(DesicDehumNum).ErrIndex1,
-                        VolFlowPerRatedTotQ,
-                        VolFlowPerRatedTotQ);
-                }
-            } // flow per rated total capacity check ends
-        }
-
-        // Reset OnOffFanPartLoadFraction for process side fan calculations
-        state.dataHVACGlobal->OnOffFanPartLoadFraction = OnOffFanPLF;
-    }
-
-    void UpdateDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum) // number of the current dehumidifier being simulated
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
-        //                      for Gas Research Institute
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Moves dehumidifier output to the outlet nodes.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ProcInNode;  // process air inlet node number
-        int ProcOutNode; // process air outlet node number
-
-        {
-            auto const SELECT_CASE_var(state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).DehumTypeCode);
-
-            if (SELECT_CASE_var == DesicDehumType::Solid) {
-                ProcInNode = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirInNode;
-                ProcOutNode = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutNode;
-                // Set the process outlet air node of the dehumidifier
-                state.dataLoopNodes->Node(ProcOutNode).Temp = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutTemp;
-                state.dataLoopNodes->Node(ProcOutNode).HumRat = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutHumRat;
-                state.dataLoopNodes->Node(ProcOutNode).Enthalpy = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ProcAirOutEnthalpy;
-
-                // Set the process outlet nodes for properties that just pass through & not used
-                state.dataLoopNodes->Node(ProcOutNode).Quality = state.dataLoopNodes->Node(ProcInNode).Quality;
-                state.dataLoopNodes->Node(ProcOutNode).Press = state.dataLoopNodes->Node(ProcInNode).Press;
-                state.dataLoopNodes->Node(ProcOutNode).MassFlowRate = state.dataLoopNodes->Node(ProcInNode).MassFlowRate;
-                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMin = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMin;
-                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMax = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMax;
-                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMinAvail;
-                state.dataLoopNodes->Node(ProcOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(ProcInNode).MassFlowRateMaxAvail;
-
-                //   RegenInNode =DesicDehum(DesicDehumNum)%RegenAirInNode
-                //   RegenOutNode = DesicDehum(DesicDehumNum)%RegenAirOutNode
-                // Set the regen outlet air node of the dehumidifier
-                //   Node(RegenOutNode)%Temp         = DesicDehum(DesicDehumNum)%RegenAirOutTemp
-                //   Node(RegenOutNode)%HumRat       = DesicDehum(DesicDehumNum)%RegenAirOutHumRat
-                //   Node(RegenOutNode)%Enthalpy     = DesicDehum(DesicDehumNum)%RegenAirOutEnthalpy
-
-                // Set the regen outlet nodes for properties that just pass through & not used
-                //   Node(RegenOutNode)%Quality             = Node(RegenInNode)%Quality
-                //   Node(RegenOutNode)%Press               = Node(RegenInNode)%Press
-                //   Node(RegenOutNode)%MassFlowRate        = Node(RegenInNode)%MassFlowRate
-                //   Node(RegenOutNode)%MassFlowRateMin     = Node(RegenInNode)%MassFlowRateMin
-                //   Node(RegenOutNode)%MassFlowRateMax     = Node(RegenInNode)%MassFlowRateMax
-                //   Node(RegenOutNode)%MassFlowRateMinAvail= Node(RegenInNode)%MassFlowRateMinAvail
-                //   Node(RegenOutNode)%MassFlowRateMaxAvail= Node(RegenInNode)%MassFlowRateMaxAvail
-
-            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
-
-                return;
-            }
-        }
-    }
-
-    void ReportDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum) // number of the current dehumidifier being simulated
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
-        //                      for Gas Research Institute
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       June 2007, R. Raustad, Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Fill remaining report variables
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-        {
-            auto const SELECT_CASE_var(state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).DehumTypeCode);
-
-            if (SELECT_CASE_var == DesicDehumType::Solid) {
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemove =
-                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * ReportingConstant;
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenEnergy =
-                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).QRegen * ReportingConstant;
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseEnergy =
-                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseRate * ReportingConstant;
-            } else if (SELECT_CASE_var == DesicDehumType::Generic) {
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemove =
-                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * ReportingConstant;
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanElecConsumption =
-                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanPower * ReportingConstant;
-            }
-        }
     }
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,

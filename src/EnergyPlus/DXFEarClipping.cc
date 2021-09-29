@@ -151,15 +151,13 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(EnergyPlusData &state,
-                    int const nsides, // number of sides to polygon
-                    Array1D<Vector> &polygon,
-                    Array1D<dTriangle> &outtriangles,
-                    Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
-                    Real64 const surftilt,               // surface tilt angle
-                    std::string const &surfname,         // surface name (for error messages)
-                    DataSurfaces::SurfaceClass surfclass // surface class
-    )
+    void CalcRfFlrCoordinateTransformation(int const nsides,
+                                           Array1D<Vector> &polygon,
+                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
+                                           Real64 const surftilt,
+                                           Array1D<Real64> &xvt,
+                                           Array1D<Real64> &yvt,
+                                           Array1D<Real64> &zvt)
     {
 
         // Subroutine information:
@@ -169,154 +167,76 @@ namespace DXFEarClipping {
         //       Re-engineered  na
 
         // Purpose of this subroutine:
-        // This routine is a self-contained triangulation calculation from a polygon
-        // of 3D vertices, nsides, to a returned set (as possible) of triangles -- noted
-        // by vertex numbers.
+        // This routine transforms a roof/floor (normally flat polygon) to a flat
+        // polygon in 2 d (z vertices are then ignored).
 
-        // Using/Aliasing
-        using DataSurfaces::cSurfaceClass;
-        using DataSurfaces::SurfaceClass;
-
-        // Return value
-        int Triangulate;
+        // Methodology employed:
+        // Standard angle rotation
 
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
-
-        // Subroutine parameter definitions:
-        Real64 const point_tolerance(0.00001);
+        EP_SIZE_CHECK(xvt, nsides);
+        EP_SIZE_CHECK(yvt, nsides);
+        EP_SIZE_CHECK(zvt, nsides);
 
         // Subroutine local variable declarations:
-        bool errFlag;
-        Array1D_int ears(nsides);
-        Array1D_int r_angles(nsides);
-        Array1D<Real64> rangles(nsides);
-        Array1D_int c_vertices(nsides);
-        Array2D_int earvert(nsides, 3);
-        Array1D_bool removed(nsides);
-        Array1D_int earverts(3);
-        Array1D<Real64> xvt(nsides);
-        Array1D<Real64> yvt(nsides);
-        Array1D<Real64> zvt(nsides);
 
-        int ntri;
-        int nvertcur;
-        int ncount;
-        int svert;
-        int mvert;
-        int evert;
-        int nears;
-        int nrangles;
-        int ncverts;
-        std::string line;
+        Real64 const alpha = -surftilt;
+        Real64 const alphrad = alpha / DataGlobalConstants::RadToDeg;
+        Real64 const cos_alphrad = std::cos(alphrad);
+        Real64 const sin_alphrad = std::sin(alphrad);
 
-        // Object Data
-        Array1D<Vector_2d> vertex(nsides);
-        Array1D<dTriangle> Triangle(nsides);
-
-        errFlag = false;
-        //  vertex=polygon
-        //  if (surfname == 'BOTTOM:OFFICE_E_3') THEN
-        //    trackit=.TRUE.
-        //  else
-        //    trackit=.FALSE.
-        //  endif
-        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
-            CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
-            for (svert = 1; svert <= nsides; ++svert) {
-                for (mvert = svert + 1; mvert <= nsides; ++mvert) {
-                    if (std::abs(xvt(svert) - xvt(mvert)) <= point_tolerance) xvt(svert) = xvt(mvert);
-                    if (std::abs(zvt(svert) - zvt(mvert)) <= point_tolerance) zvt(svert) = zvt(mvert);
-                }
-            }
-            for (svert = 1; svert <= nsides; ++svert) {
-                vertex(svert).x = xvt(svert);
-                vertex(svert).y = zvt(svert);
-                //      if (trackit) write(outputfiledebug,*) 'x=',xvt(svert),' y=',zvt(svert)
-            }
-        } else {
-            CalcWallCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
-            for (svert = 1; svert <= nsides; ++svert) {
-                for (mvert = svert + 1; mvert <= nsides; ++mvert) {
-                    if (std::abs(xvt(svert) - xvt(mvert)) <= point_tolerance) xvt(svert) = xvt(mvert);
-                    if (std::abs(zvt(svert) - zvt(mvert)) <= point_tolerance) zvt(svert) = zvt(mvert);
-                }
-            }
-            for (svert = 1; svert <= nsides; ++svert) {
-                vertex(svert).x = xvt(svert);
-                vertex(svert).y = zvt(svert);
-            }
+        for (int i = 1; i <= nsides; ++i) {
+            xvt(i) = polygon(i).x;
+            yvt(i) = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
+            zvt(i) = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
         }
+    }
 
-        // find ears
-        nvertcur = nsides;
-        ncount = 0;
-        svert = 1;
-        mvert = 2;
-        evert = 3;
-        removed = false;
-        while (nvertcur > 3) {
-            generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
-            if (!any_gt(ears, 0)) {
-                ShowWarningError(state,
-                                 "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
-                                     "\", check surface vertex order(entry)");
-                ++state.dataDXFEarClipping->errcount;
-                if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
-                }
-                if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+    void CalcWallCoordinateTransformation(int const nsides,
+                                          Array1D<Vector> &polygon,
+                                          Real64 const surfazimuth,
+                                          [[maybe_unused]] Real64 const surftilt, // unused1208
+                                          Array1D<Real64> &xvt,
+                                          Array1D<Real64> &yvt,
+                                          Array1D<Real64> &zvt)
+    {
 
-                    for (int j = 1; j <= nsides; ++j) {
-                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})", j, polygon(j).x, polygon(j).y, polygon(j).z));
-                    }
-                    ShowMessage(state, format(" number of triangles found={:12}", ncount));
-                    for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg));
-                    }
-                }
-                break; // while loop
-            }
-            if (nears > 0) {
-                svert = earverts(1);
-                mvert = earverts(2);
-                evert = earverts(3);
-                // remove ear
-                ++ncount;
-                removed(mvert) = true;
-                earvert(ncount, 1) = svert;
-                earvert(ncount, 2) = mvert;
-                earvert(ncount, 3) = evert;
-                --nvertcur;
-            }
-            if (nvertcur == 3) {
-                int j = 1;
-                ++ncount;
-                for (int i = 1; i <= nsides; ++i) {
-                    if (removed(i)) continue;
-                    earvert(ncount, j) = i;
-                    ++j;
-                }
-            }
+        // Subroutine information:
+        //       Author         Linda Lawrie
+        //       Date written   October 2005
+        //       Modified       na
+        //       Re-engineered  na
+
+        // Purpose of this subroutine:
+        // This routine transforms a "wall" (normally vertical polygon) to a south facing (180 deg outward
+        // normal) polygon in 2 d (y vertices are then ignored).
+
+        // Methodology employed:
+        // Standard angle rotation
+
+        // Argument array dimensioning
+        EP_SIZE_CHECK(polygon, nsides);
+        EP_SIZE_CHECK(xvt, nsides);
+        EP_SIZE_CHECK(yvt, nsides);
+        EP_SIZE_CHECK(zvt, nsides);
+
+        // Subroutine local variable declarations:
+
+        // convert surface (wall) to facing 180 (outward normal)
+
+        Real64 const alpha = surfazimuth;
+
+        Real64 const alpha180 = 180.0 - alpha; // amount to rotate
+        Real64 const alphrad = alpha180 / DataGlobalConstants::RadToDeg;
+        Real64 const cos_alphrad = std::cos(alphrad);
+        Real64 const sin_alphrad = std::sin(alphrad);
+
+        for (int i = 1; i <= nsides; ++i) {
+            xvt(i) = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
+            yvt(i) = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
+            zvt(i) = polygon(i).z;
         }
-
-        ntri = ncount;
-
-        for (int i = 1; i <= ntri; ++i) {
-            Triangle(i).vv0 = earvert(i, 1);
-            Triangle(i).vv1 = earvert(i, 2);
-            Triangle(i).vv2 = earvert(i, 3);
-        }
-
-        outtriangles.allocate(ntri);
-        for (int i = 1; i <= ntri; ++i) {
-            outtriangles(i) = Triangle(i);
-        }
-
-        Triangulate = ntri;
-
-        return Triangulate;
     }
 
     Real64 angle_2dvector(Real64 const xa, // vertex coordinate
@@ -575,13 +495,15 @@ namespace DXFEarClipping {
         }
     }
 
-    void CalcWallCoordinateTransformation(int const nsides,
-                                          Array1D<Vector> &polygon,
-                                          Real64 const surfazimuth,
-                                          [[maybe_unused]] Real64 const surftilt, // unused1208
-                                          Array1D<Real64> &xvt,
-                                          Array1D<Real64> &yvt,
-                                          Array1D<Real64> &zvt)
+    int Triangulate(EnergyPlusData &state,
+                    int const nsides, // number of sides to polygon
+                    Array1D<Vector> &polygon,
+                    Array1D<dTriangle> &outtriangles,
+                    Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
+                    Real64 const surftilt,               // surface tilt angle
+                    std::string const &surfname,         // surface name (for error messages)
+                    DataSurfaces::SurfaceClass surfclass // surface class
+    )
     {
 
         // Subroutine information:
@@ -591,76 +513,154 @@ namespace DXFEarClipping {
         //       Re-engineered  na
 
         // Purpose of this subroutine:
-        // This routine transforms a "wall" (normally vertical polygon) to a south facing (180 deg outward
-        // normal) polygon in 2 d (y vertices are then ignored).
+        // This routine is a self-contained triangulation calculation from a polygon
+        // of 3D vertices, nsides, to a returned set (as possible) of triangles -- noted
+        // by vertex numbers.
 
-        // Methodology employed:
-        // Standard angle rotation
+        // Using/Aliasing
+        using DataSurfaces::cSurfaceClass;
+        using DataSurfaces::SurfaceClass;
 
-        // Argument array dimensioning
-        EP_SIZE_CHECK(polygon, nsides);
-        EP_SIZE_CHECK(xvt, nsides);
-        EP_SIZE_CHECK(yvt, nsides);
-        EP_SIZE_CHECK(zvt, nsides);
-
-        // Subroutine local variable declarations:
-
-        // convert surface (wall) to facing 180 (outward normal)
-
-        Real64 const alpha = surfazimuth;
-
-        Real64 const alpha180 = 180.0 - alpha; // amount to rotate
-        Real64 const alphrad = alpha180 / DataGlobalConstants::RadToDeg;
-        Real64 const cos_alphrad = std::cos(alphrad);
-        Real64 const sin_alphrad = std::sin(alphrad);
-
-        for (int i = 1; i <= nsides; ++i) {
-            xvt(i) = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
-            yvt(i) = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
-            zvt(i) = polygon(i).z;
-        }
-    }
-
-    void CalcRfFlrCoordinateTransformation(int const nsides,
-                                           Array1D<Vector> &polygon,
-                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
-                                           Real64 const surftilt,
-                                           Array1D<Real64> &xvt,
-                                           Array1D<Real64> &yvt,
-                                           Array1D<Real64> &zvt)
-    {
-
-        // Subroutine information:
-        //       Author         Linda Lawrie
-        //       Date written   October 2005
-        //       Modified       na
-        //       Re-engineered  na
-
-        // Purpose of this subroutine:
-        // This routine transforms a roof/floor (normally flat polygon) to a flat
-        // polygon in 2 d (z vertices are then ignored).
-
-        // Methodology employed:
-        // Standard angle rotation
+        // Return value
+        int Triangulate;
 
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
-        EP_SIZE_CHECK(xvt, nsides);
-        EP_SIZE_CHECK(yvt, nsides);
-        EP_SIZE_CHECK(zvt, nsides);
+
+        // Subroutine parameter definitions:
+        Real64 const point_tolerance(0.00001);
 
         // Subroutine local variable declarations:
+        bool errFlag;
+        Array1D_int ears(nsides);
+        Array1D_int r_angles(nsides);
+        Array1D<Real64> rangles(nsides);
+        Array1D_int c_vertices(nsides);
+        Array2D_int earvert(nsides, 3);
+        Array1D_bool removed(nsides);
+        Array1D_int earverts(3);
+        Array1D<Real64> xvt(nsides);
+        Array1D<Real64> yvt(nsides);
+        Array1D<Real64> zvt(nsides);
 
-        Real64 const alpha = -surftilt;
-        Real64 const alphrad = alpha / DataGlobalConstants::RadToDeg;
-        Real64 const cos_alphrad = std::cos(alphrad);
-        Real64 const sin_alphrad = std::sin(alphrad);
+        int ntri;
+        int nvertcur;
+        int ncount;
+        int svert;
+        int mvert;
+        int evert;
+        int nears;
+        int nrangles;
+        int ncverts;
+        std::string line;
 
-        for (int i = 1; i <= nsides; ++i) {
-            xvt(i) = polygon(i).x;
-            yvt(i) = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
-            zvt(i) = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
+        // Object Data
+        Array1D<Vector_2d> vertex(nsides);
+        Array1D<dTriangle> Triangle(nsides);
+
+        errFlag = false;
+        //  vertex=polygon
+        //  if (surfname == 'BOTTOM:OFFICE_E_3') THEN
+        //    trackit=.TRUE.
+        //  else
+        //    trackit=.FALSE.
+        //  endif
+        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
+            CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
+            for (svert = 1; svert <= nsides; ++svert) {
+                for (mvert = svert + 1; mvert <= nsides; ++mvert) {
+                    if (std::abs(xvt(svert) - xvt(mvert)) <= point_tolerance) xvt(svert) = xvt(mvert);
+                    if (std::abs(zvt(svert) - zvt(mvert)) <= point_tolerance) zvt(svert) = zvt(mvert);
+                }
+            }
+            for (svert = 1; svert <= nsides; ++svert) {
+                vertex(svert).x = xvt(svert);
+                vertex(svert).y = zvt(svert);
+                //      if (trackit) write(outputfiledebug,*) 'x=',xvt(svert),' y=',zvt(svert)
+            }
+        } else {
+            CalcWallCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
+            for (svert = 1; svert <= nsides; ++svert) {
+                for (mvert = svert + 1; mvert <= nsides; ++mvert) {
+                    if (std::abs(xvt(svert) - xvt(mvert)) <= point_tolerance) xvt(svert) = xvt(mvert);
+                    if (std::abs(zvt(svert) - zvt(mvert)) <= point_tolerance) zvt(svert) = zvt(mvert);
+                }
+            }
+            for (svert = 1; svert <= nsides; ++svert) {
+                vertex(svert).x = xvt(svert);
+                vertex(svert).y = zvt(svert);
+            }
         }
+
+        // find ears
+        nvertcur = nsides;
+        ncount = 0;
+        svert = 1;
+        mvert = 2;
+        evert = 3;
+        removed = false;
+        while (nvertcur > 3) {
+            generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            if (!any_gt(ears, 0)) {
+                ShowWarningError(state,
+                                 "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
+                                     "\", check surface vertex order(entry)");
+                ++state.dataDXFEarClipping->errcount;
+                if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                }
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+
+                    for (int j = 1; j <= nsides; ++j) {
+                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})", j, polygon(j).x, polygon(j).y, polygon(j).z));
+                    }
+                    ShowMessage(state, format(" number of triangles found={:12}", ncount));
+                    for (int j = 1; j <= nrangles; ++j) {
+                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg));
+                    }
+                }
+                break; // while loop
+            }
+            if (nears > 0) {
+                svert = earverts(1);
+                mvert = earverts(2);
+                evert = earverts(3);
+                // remove ear
+                ++ncount;
+                removed(mvert) = true;
+                earvert(ncount, 1) = svert;
+                earvert(ncount, 2) = mvert;
+                earvert(ncount, 3) = evert;
+                --nvertcur;
+            }
+            if (nvertcur == 3) {
+                int j = 1;
+                ++ncount;
+                for (int i = 1; i <= nsides; ++i) {
+                    if (removed(i)) continue;
+                    earvert(ncount, j) = i;
+                    ++j;
+                }
+            }
+        }
+
+        ntri = ncount;
+
+        for (int i = 1; i <= ntri; ++i) {
+            Triangle(i).vv0 = earvert(i, 1);
+            Triangle(i).vv1 = earvert(i, 2);
+            Triangle(i).vv2 = earvert(i, 3);
+        }
+
+        outtriangles.allocate(ntri);
+        for (int i = 1; i <= ntri; ++i) {
+            outtriangles(i) = Triangle(i);
+        }
+
+        Triangulate = ntri;
+
+        return Triangulate;
     }
 
     void reorder([[maybe_unused]] int &nvert) // unused1208

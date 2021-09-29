@@ -84,12 +84,6 @@ namespace DataSurfaceColors {
         NUM
     };
 
-    bool MatchAndSetColorTextString(EnergyPlusData &state,
-                                    std::string const &String,   // string to be matched
-                                    int SetValue,                // value to be used for the color
-                                    std::string const &ColorType // for now, must be DXF
-    );
-
     void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType = _);
 
 } // namespace DataSurfaceColors

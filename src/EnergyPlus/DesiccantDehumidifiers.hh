@@ -248,33 +248,6 @@ namespace DesiccantDehumidifiers {
 
     void GetDesiccantDehumidifierInput(EnergyPlusData &state);
 
-    void InitDesiccantDehumidifier(EnergyPlusData &state,
-                                   int DesicDehumNum,      // number of the current dehumidifier being simulated
-                                   bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    );
-
-    void ControlDesiccantDehumidifier(EnergyPlusData &state,
-                                      int DesicDehumNum,      // number of the current dehumidifier being simulated
-                                      Real64 &HumRatNeeded,   // process air leaving humidity ratio set by controller [kg water/kg air]
-                                      bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
-    );
-
-    void CalcSolidDesiccantDehumidifier(EnergyPlusData &state,
-                                        int DesicDehumNum,      // number of the current dehumidifier being simulated
-                                        Real64 HumRatNeeded,    // process air leaving humidity ratio set by controller [kgWater/kgDryAir]
-                                        bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    );
-
-    void CalcGenericDesiccantDehumidifier(EnergyPlusData &state,
-                                          int DesicDehumNum,      // number of the current dehumidifier being simulated
-                                          Real64 HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
-                                          bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    );
-
-    void UpdateDesiccantDehumidifier(EnergyPlusData &state, int DesicDehumNum); // number of the current dehumidifier being simulated
-
-    void ReportDesiccantDehumidifier(EnergyPlusData &state, int DesicDehumNum); // number of the current dehumidifier being simulated
-
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
                                int DesicDehumNum,                    // Desiccant dehumidifier unit index
                                bool FirstHVACIteration,              // flag for first HVAC iteration in the time step
@@ -290,32 +263,6 @@ namespace DesiccantDehumidifiers {
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
 
     int GetProcAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    //        End of Reporting subroutines for the SimAir Module
-    // *****************************************************************************
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
-
-    //     GRI LEGAL NOTICE
-    //     Neither GRI, members of GRI nor any person or organization acting on behalf
-    //     of either:
-
-    //     A. Makes any warranty of representation, express or implied with respect to
-    //        the accuracy, completness, or usefulness of the information contained in
-    //        in this program, including any warranty of merchantability or fitness of
-    //        any purpose with respoect to the program, or that the use of any
-    //        information disclosed in this program may not infringe privately-owned
-    //        rights, or
-
-    //     B.  Assumes any liability with respoct to the use of, or for any and all
-    //         damages resulting from the use of the program or any portion thereof or
-    //         any information disclosed therein.
 
 } // namespace DesiccantDehumidifiers
 
