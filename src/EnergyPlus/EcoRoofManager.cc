@@ -98,6 +98,456 @@ namespace EcoRoofManager {
 
     // Functions
 
+    void UpdateSoilProps(EnergyPlusData &state,
+                         Real64 &Moisture,
+                         Real64 &MeanRootMoisture,
+                         Real64 const MoistureMax,
+                         Real64 const MoistureResidual,
+                         Real64 const SoilThickness,
+                         Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
+                         Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
+                         int const ConstrNum, // Indicator for construction index for the current surface
+                         Real64 &Alphag,
+                         [[maybe_unused]] int const unit,
+                         [[maybe_unused]] Real64 const Tg,
+                         [[maybe_unused]] Real64 const Tf,
+                         [[maybe_unused]] Real64 const Qsoil
+    )
+    {
+        // SUBROUTINE INFORMATION
+        //     AUTHOR          David Sailor
+        //     DATE WRITTEN    Jan 2007
+        //     MODIFIED        Stephen Forner, Portland State University (SF); 7/15/2010
+        //     RE-ENGINEERED   na
+
+        // PURPOSE OF THIS MODULE:
+
+        // Track moisture input/output to ecoroof soil media (precipitation, irrigation, evapotranspiration, runoff)
+        // Update soil thermal properties associated with variations in soil moisture and update CTF calculations
+        // for the ecoroof construction layer.
+
+        // METHODOLOGY EMPLOYED:
+        // Define 2 soil layers (top and root). Moisture redistribution between top and root layers is proportional
+        // to moisture differences. Input and Output of moisture are partitioned between layers.
+        // Soil thermal properties vary based on non-dimensionalization of experimental data for 8 typical soils.
+        // Specifically, THERMAL PROPERTY = Dry Value + (fraction of moisture content)*Wet Value
+
+        // Using/Aliasing
+        using namespace DataEnvironment;
+        using namespace DataSurfaces;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
+
+        // Soil Parameters from Reference listed in the code:
+        Real64 const alpha(23.0); // These parameters are empirical constants
+        Real64 const n(1.27);     // These parameters are empirical constants
+        Real64 const lambda(0.5); // These parameters are empirical constants
+        // This is another parameter of the soil which describes the soil conductivity at the saturation point (m/s)
+        Real64 const SoilConductivitySaturation(5.157e-7);
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 RatioMax;
+        Real64 RatioMin;
+        Real64 MoistureDiffusion; // moisture transport down from near-surface to root zone
+        Real64 SoilConductivity;  // Moisture dependent conductivity to be fed back into CTF Calculator
+        Real64 SoilSpecHeat;      // Moisture dependent Spec. Heat to be fed back into CTF Calculator
+        Real64 SoilAbsorpSolar;   // Moisture dependent Solar absorptance (1-albedo)
+        Real64 SoilDensity;       // Moisture dependent density to be fed back into CTF Calculator
+        Real64 SatRatio;
+        Real64 TestRatio;   // Ratio to determine if timestep change in properties is too abrupt for CTF
+        Real64 AvgMoisture; // Average soil moisture over depth of ecoroof media
+        int index1;
+
+        // NOTE:  As Energyplus calls the energy balance manager (and hence CalcEcoroof)
+        // once for each surface within each zone that has an ecoroof
+        // --- the CALCECOROOF routine is called multiple times within each time step
+        // So, it is important that the UpdateSoilProps subroutine is called ONLY ONCE for each time step!!!
+
+        // Recall Moisture = near-surface moisture value (m^3/m^3)
+        // Recall MeanRootMoisture = root zone moisture value (m^3/m^3)
+
+        // DJS 2009 set the ratiomax and ratiomin values in the code now (rather than as parameters) so that
+        // DJS 2009 we can link them to timesteps and make these limits apply to actual RATES...
+        // DJS 2009 reasonable rates are +/- 10% change in properties per 15 minute period... Otherwise we have
+        // DJS 2009 stability issues.
+        // DJS 2011 FEB - Since we no longer use CTF with soil-dependent properties (Do not RECALL INITCONDUCTION...
+        // DJS 2011 FEB - we may be able to get away with NO limits on rates of change when using CFD routine.
+        // DJS 2011 FEB - for now we stick with 20% per quarter hour.
+        RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
+        RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
+
+        if (state.dataEcoRoofMgr->UpdatebeginFlag) {
+
+            // SET dry values that NEVER CHANGE
+            state.dataEcoRoofMgr->DryCond = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
+            state.dataEcoRoofMgr->DryDens = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
+            state.dataEcoRoofMgr->DryAbsorp = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+            state.dataEcoRoofMgr->DrySpecHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+
+            // DETERMINE RELATIVE THICKNESS OF TWO LAYERS OF SOIL (also unchanging)
+            if (SoilThickness > 0.12) {
+                state.dataEcoRoofMgr->TopDepth = 0.06; // For now use 6cm as top depth - everything else is root layer
+            } else {
+                state.dataEcoRoofMgr->TopDepth = 0.5 * SoilThickness; // In unusual case of very thin soil make topdepth half of total
+            }
+            // This loop outputs the minimum number of time steps needed to keep the solution stable
+            // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
+                Real64 const depth_limit(depth_fac * std::pow(state.dataEcoRoofMgr->TopDepth + state.dataEcoRoofMgr->RootDepth, 2.07));
+                for (index1 = 1; index1 <= 20; ++index1) {
+                    if (double(state.dataGlobal->MinutesPerTimeStep / index1) <= depth_limit) break;
+                }
+                if (index1 > 1) {
+                    ShowWarningError(state, "CalcEcoRoof: Too few time steps per hour for stability.");
+                    if (ceil(60 * index1 / state.dataGlobal->MinutesPerTimeStep) <= 60) {
+                        ShowContinueError(
+                            state,
+                            format("...Entered Timesteps per hour=[{}], Change to some value greater than or equal to [{}] for assured stability.",
+                                   state.dataGlobal->NumOfTimeStepInHour,
+                                   60 * index1 / state.dataGlobal->MinutesPerTimeStep));
+                        ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
+                        ShowContinueError(state,
+                                          "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
+                                          "here could be the reason.");
+                    } else {
+                        ShowContinueError(state,
+                                          format("...Entered Timesteps per hour=[{}], however the required frequency for stability [{}] is over the "
+                                                 "EnergyPlus maximum of 60.",
+                                                 state.dataGlobal->NumOfTimeStepInHour,
+                                                 60 * index1 / state.dataGlobal->MinutesPerTimeStep));
+                        ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");
+                        ShowContinueError(state,
+                                          "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
+                                          "here could be the reason.");
+                    }
+                }
+            }
+
+            state.dataEcoRoofMgr->RootDepth = SoilThickness - state.dataEcoRoofMgr->TopDepth;
+            // Next create a timestep in seconds
+            state.dataEcoRoofMgr->TimeStepZoneSec = state.dataGlobal->MinutesPerTimeStep * 60.0;
+
+            state.dataEcoRoofMgr->UpdatebeginFlag = false;
+        }
+
+        state.dataEcoRoofMgr->CurrentRunoff = 0.0; // Initialize current time step runoff as it is used in several spots below...
+
+        // FIRST Subtract water evaporated by plants and at soil surface
+        Moisture -= (Vfluxg)*state.dataGlobal->MinutesPerTimeStep * 60.0 / state.dataEcoRoofMgr->TopDepth;          // soil surface evaporation
+        MeanRootMoisture -= (Vfluxf)*state.dataGlobal->MinutesPerTimeStep * 60.0 / state.dataEcoRoofMgr->RootDepth; // plant extraction from root zone
+
+        // NEXT Update evapotranspiration summary variable for print out
+        state.dataEcoRoofMgr->CurrentET = (Vfluxg + Vfluxf) * state.dataGlobal->MinutesPerTimeStep * 60.0; // units are meters
+        if (!state.dataGlobal->WarmupFlag) {
+            state.dataEcoRoofMgr->CumET += state.dataEcoRoofMgr->CurrentET;
+        }
+
+        // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
+        if (!state.dataGlobal->WarmupFlag) {
+            state.dataEcoRoofMgr->CurrentPrecipitation = 0.0; // first initialize to zero
+        }
+        state.dataEcoRoofMgr->CurrentPrecipitation = 0.0; // first initialize to zero
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
+            state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
+            Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
+            if (!state.dataGlobal->WarmupFlag) {
+                state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
+            }
+        }
+
+        // NEXT Add Irrigation to surface soil moisture variable (if a schedule exists)
+        state.dataEcoRoofMgr->CurrentIrrigation = 0.0; // first initialize to zero
+        state.dataWaterData->Irrigation.ActualAmount = 0.0;
+        if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) {
+            state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
+            state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
+            //    elseif (Irrigation%ModeID ==IrrSmartSched .and. moisture .lt. 0.4d0*MoistureMax) then
+        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched &&
+                   Moisture < state.dataWaterData->Irrigation.IrrigationThreshold * MoistureMax) {
+            // Smart schedule only irrigates when scheduled AND the soil is less than 40% saturated
+            state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
+            state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
+        }
+
+        Moisture += state.dataEcoRoofMgr->CurrentIrrigation / state.dataEcoRoofMgr->TopDepth; // irrigation in (m)/timestep put into top layer
+        if (!state.dataGlobal->WarmupFlag) {
+            state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
+        }
+
+        // Note: If soil top layer gets a massive influx of rain &/or irrigation some of
+        // the water will simply run right off the top and not penetrate at all!
+        // At the present time this limit is fairly small due to some minor stability issues
+        // in EnergyPlus. If the moisture changes too rapidly the code cannot handle the rapid changes in
+        // surface characteristics and heat fluxes. The result that I've noticed is a non-physical fluctation
+        // in ground surface temperature that oscillates up to 10 deg C from one hour to the next until the
+        // code catches up. The temporary solution is to simply limit how much moisture can enter the soil
+        // in any time step to 0.5"/hour. In the future this might be fixed by running with finer time steps
+        // or by using a finite difference temperature solution rather than the CTF.
+        // I suspect that 15 minute intervals may be needed. Another option is to have an internal moisture
+        // overflow bin that will hold extra moisture and then distribute it in subsequent hours. This way the
+        // soil still gets the same total moisture... it is just distributed over a longer period.
+        if (state.dataEcoRoofMgr->CurrentIrrigation + state.dataEcoRoofMgr->CurrentPrecipitation >
+            0.5 * 0.0254 * state.dataGlobal->MinutesPerTimeStep / 60.0) {
+            state.dataEcoRoofMgr->CurrentRunoff = state.dataEcoRoofMgr->CurrentIrrigation + state.dataEcoRoofMgr->CurrentPrecipitation -
+                                                  (0.5 * 0.0254 * state.dataGlobal->MinutesPerTimeStep / 60.0);
+            // If we get here then TOO much moisture has already been added to soil (must now subtract excess)
+            Moisture -= state.dataEcoRoofMgr->CurrentRunoff / state.dataEcoRoofMgr->TopDepth; // currently any incident moisture in excess of 1/4 "
+                                                                                              // per hour
+                                                                                              // simply runs off the top of the soil.
+        }
+        // Now, if top layer is beyond saturation... the excess simply runs off without penetrating into the lower
+        // layers.
+        if (Moisture > MoistureMax) {
+            state.dataEcoRoofMgr->CurrentRunoff += (Moisture - MoistureMax) * state.dataEcoRoofMgr->TopDepth;
+            Moisture = MoistureMax;
+        }
+
+        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
+
+            // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
+            // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
+            // See below this commented out code for the new moisture distribution model.
+            //*********************************************************************************************************
+            //*********************************************************************************************************
+            // NEXT Redistribute moisture based on moisture diffusion.
+            // The effective diffusivities should be revisted when better moisture transport data in ecoroof soils are
+            // available.
+            // Here the diffusion rate is in units of [1/s]
+            // A value of 0.0001 would be ~ 36% / hour
+            // A value of 0.00005 would be ~ 18%/hour change in moisture
+            // A value of 0.000025 gives about a 9%/hour change in moisture
+            // a value of 0.0000125 gives 5%/hour...
+            // Note: This formulation allows moisture to have a directional bias - ie, it can sink into soil easier than
+            // it can be brought up.
+            if (Moisture > MeanRootMoisture) {
+                // move moisture from top layer into root zone
+                MoistureDiffusion = min((MoistureMax - MeanRootMoisture) * state.dataEcoRoofMgr->RootDepth,
+                                        (Moisture - MeanRootMoisture) * state.dataEcoRoofMgr->TopDepth);
+                MoistureDiffusion = max(0.0, MoistureDiffusion); // Safety net to keep positive (not needed?)
+                // at this point moistureDiffusion is in units of (m)/timestep
+                MoistureDiffusion *= 0.00005 * state.dataGlobal->MinutesPerTimeStep * 60.0;
+                Moisture -= MoistureDiffusion / state.dataEcoRoofMgr->TopDepth;
+                MeanRootMoisture += MoistureDiffusion / state.dataEcoRoofMgr->RootDepth;
+            } else if (MeanRootMoisture > Moisture) {
+                // move moisture to top layer from root zone
+                MoistureDiffusion =
+                    min((MoistureMax - Moisture) * state.dataEcoRoofMgr->TopDepth, (MeanRootMoisture - Moisture) * state.dataEcoRoofMgr->RootDepth);
+                MoistureDiffusion = max(0.0, MoistureDiffusion); // Safety net (not needed?)
+                // at this point moistureDiffusion is in units of (m)/timestep
+                MoistureDiffusion *= 0.00001 * state.dataGlobal->MinutesPerTimeStep * 60.0;
+                Moisture += MoistureDiffusion / state.dataEcoRoofMgr->TopDepth;
+                MeanRootMoisture -= MoistureDiffusion / state.dataEcoRoofMgr->RootDepth;
+            }
+        } else {
+            //********************************************************************************************************
+            //********************************************************************************************************
+            // THE SECTION ABOVE WAS THE MOISTURE DISTRIBUTION MODEL. REPLACED SF-7/21/2010
+
+            // NEXT redistribute the moisture in the soil based on:
+            // Marcel G Schaap and Martinus Th van Genuchten, 2006, 'A modified Maulem-van
+            // Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation'.
+            // Written in MATLAB by Vishal Sharma (of Portland State) and modified for FORTRAN by Stephen Forner Summer 2010
+            // This model is based on curve fit data that describes the capillary motion of the water in combination with the gravitational
+            // forces on the water.
+            // This set of equations is unstable if the time step is larger than given by a curve fit equation.  This first DO loop is to
+            // see how many time steps are needed to be stable.
+            // This method of moisture distribution relies on variables which are experimentally determined: alpha, lambda, n and the
+            // hydraulic conductivity at saturation.
+
+            // Now, solve for the soil parameters for  of the top soil layer
+
+            state.dataEcoRoofMgr->RelativeSoilSaturationTop = (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
+            if (state.dataEcoRoofMgr->RelativeSoilSaturationTop < 0.0001) {
+                if (state.dataEcoRoofMgr->ErrIndex == 0) {
+                    ShowWarningMessage(state,
+                                       format("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[{:.5R}].",
+                                              state.dataEcoRoofMgr->RelativeSoilSaturationTop));
+                    ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
+                    ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");
+                }
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
+                                               state.dataEcoRoofMgr->ErrIndex,
+                                               state.dataEcoRoofMgr->RelativeSoilSaturationTop,
+                                               state.dataEcoRoofMgr->RelativeSoilSaturationTop);
+                state.dataEcoRoofMgr->RelativeSoilSaturationTop = 0.0001;
+            }
+            state.dataEcoRoofMgr->SoilHydroConductivityTop =
+                SoilConductivitySaturation * std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationTop, lambda) *
+                pow_2(1.0 - std::pow(1.0 - std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationTop, n / (n - 1.0)), (n - 1.0) / n));
+            state.dataEcoRoofMgr->CapillaryPotentialTop =
+                (-1.0 / alpha) * std::pow(std::pow(1.0 / state.dataEcoRoofMgr->RelativeSoilSaturationTop, n / (n - 1.0)) - 1.0, 1.0 / n);
+
+            // Then the soil parameters for the root soil layer
+            state.dataEcoRoofMgr->RelativeSoilSaturationRoot = (MeanRootMoisture - MoistureResidual) / (MoistureMax - MoistureResidual);
+            state.dataEcoRoofMgr->SoilHydroConductivityRoot =
+                SoilConductivitySaturation * std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationRoot, lambda) *
+                pow_2(1.0 - std::pow(1.0 - std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationRoot, n / (n - 1.0)), (n - 1.0) / n));
+            state.dataEcoRoofMgr->CapillaryPotentialRoot =
+                (-1.0 / alpha) * std::pow(std::pow(1.0 / state.dataEcoRoofMgr->RelativeSoilSaturationRoot, n / (n - 1.0)) - 1.0, 1.0 / n);
+
+            // Next, using the soil parameters, solve for the soil moisture
+            state.dataEcoRoofMgr->SoilConductivityAveTop =
+                (state.dataEcoRoofMgr->SoilHydroConductivityTop + state.dataEcoRoofMgr->SoilHydroConductivityRoot) * 0.5;
+            Moisture +=
+                (state.dataEcoRoofMgr->TimeStepZoneSec / state.dataEcoRoofMgr->TopDepth) *
+                ((state.dataEcoRoofMgr->SoilConductivityAveTop *
+                  (state.dataEcoRoofMgr->CapillaryPotentialTop - state.dataEcoRoofMgr->CapillaryPotentialRoot) / state.dataEcoRoofMgr->TopDepth) -
+                 state.dataEcoRoofMgr->SoilConductivityAveTop);
+
+            // Now limit the soil from going over the moisture maximum and takes excess to create runoff
+            if (Moisture >= MoistureMax) {       // This statement makes sure that the top layer is not over the moisture maximum for the soil.
+                Moisture = 0.9999 * MoistureMax; // then it takes any moisture over the maximum amount and makes it runoff
+                state.dataEcoRoofMgr->CurrentRunoff += (Moisture - MoistureMax * 0.9999) * state.dataEcoRoofMgr->TopDepth;
+            }
+
+            // Now make sure that the soil does not go below the moisture minimum
+            if (Moisture <= (1.01 * MoistureResidual)) {
+                Moisture = 1.01 * MoistureResidual;
+            }
+
+            // Next, solve the parameters for the bottom layer
+            state.dataEcoRoofMgr->SoilConductivityAveRoot = state.dataEcoRoofMgr->SoilHydroConductivityRoot;
+
+            // Now make sure the rate of liquid leaving the soil is more than one drop per hour
+            if ((state.dataEcoRoofMgr->SoilConductivityAveRoot * 3600.0) <= (2.33e-7)) {
+                state.dataEcoRoofMgr->SoilConductivityAveRoot = 0.0;
+            }
+
+            // Using the parameters above, distribute the Root Layer moisture
+            state.dataEcoRoofMgr->TestMoisture = MeanRootMoisture;
+            MeanRootMoisture +=
+                (state.dataEcoRoofMgr->TimeStepZoneSec / state.dataEcoRoofMgr->RootDepth) *
+                ((state.dataEcoRoofMgr->SoilConductivityAveTop *
+                  (state.dataEcoRoofMgr->CapillaryPotentialTop - state.dataEcoRoofMgr->CapillaryPotentialRoot) / state.dataEcoRoofMgr->RootDepth) +
+                 state.dataEcoRoofMgr->SoilConductivityAveTop - state.dataEcoRoofMgr->SoilConductivityAveRoot);
+
+            // Limit the moisture from going over the saturation limit and create runoff:
+            if (MeanRootMoisture >= MoistureMax) {
+                MeanRootMoisture = 0.9999 * MoistureMax;
+                state.dataEcoRoofMgr->CurrentRunoff += (Moisture - MoistureMax * 0.9999) * state.dataEcoRoofMgr->RootDepth;
+            }
+
+            // Limit the soil from going below the soil saturation limit:
+            if (MeanRootMoisture <= (1.01 * MoistureResidual)) {
+                MeanRootMoisture = 1.01 * MoistureResidual;
+            }
+
+            // Next, track runoff from the bottom of the soil:
+            state.dataEcoRoofMgr->CurrentRunoff += state.dataEcoRoofMgr->SoilConductivityAveRoot * state.dataEcoRoofMgr->TimeStepZoneSec;
+
+            //~~~END SF EDITS
+        }
+
+        // NEXT Limit moisture values to saturation (create RUNOFF that we can track)
+        // CurrentRunoff is sum of "overwatering" in a timestep and excess moisture content
+        if (!state.dataGlobal->WarmupFlag) {
+            state.dataEcoRoofMgr->CumRunoff += state.dataEcoRoofMgr->CurrentRunoff;
+        }
+
+        if (MeanRootMoisture <= MoistureResidual * 1.00001) {
+            Moisture -= (MoistureResidual * 1.00001 - MeanRootMoisture) * state.dataEcoRoofMgr->RootDepth / state.dataEcoRoofMgr->TopDepth;
+            // If the plant has extracted more moisture than is in the root zone soil, then make it come from
+            // the top layer rather than the root zone... unless top is also dry...
+            if (Moisture < MoistureResidual * 1.00001) Moisture = MoistureResidual * 1.00001;
+            MeanRootMoisture = MoistureResidual * 1.00001; // Need to make sure we do not divide by zero later.
+        }
+
+        // ------------------------------------------------------------------------------------------
+        // Having updated moisture values now we modify soil thermal properties based on moisture content
+
+        // NOTE: Variables SoilAbsorpSolar, SoilDensity, SoilSpecHeat, and SoilConductivity are the values
+        // that the soil properties OUGHT to attain for the current moisture level. These values are then
+        // moderated using the TestRatio variable so that from one time step to the next no variable
+        // changes by more than a certain percentage (typically 5-20%).
+
+        // Note wet soil absorptance is generally 25-50% higher than dry soil absorptance (assume linear)
+        SoilAbsorpSolar = state.dataEcoRoofMgr->DryAbsorp +
+                          (0.92 - state.dataEcoRoofMgr->DryAbsorp) * (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
+        // Limit solar absorptivity to 95% so soil abledo is always above 5%
+        if (SoilAbsorpSolar > 0.95) SoilAbsorpSolar = 0.95;
+        // Limit solar absorptivity to greater than 20% so that albedo is always less than 80%
+        if (SoilAbsorpSolar < 0.20) SoilAbsorpSolar = 0.20;
+
+        // Need to use for albedo in CalcEcoroof
+        TestRatio = (1.0 - SoilAbsorpSolar) / Alphag;
+        if (TestRatio > RatioMax) TestRatio = RatioMax;
+        if (TestRatio < RatioMin) TestRatio = RatioMin;
+        Alphag *= TestRatio; //  included 1.0 - to make it albedo rather than SW absorptivity
+        // Note wet soil density is calculated by simply adding the mass of water...
+        AvgMoisture = (state.dataEcoRoofMgr->RootDepth * MeanRootMoisture + state.dataEcoRoofMgr->TopDepth * Moisture) / SoilThickness;
+        SoilDensity = state.dataEcoRoofMgr->DryDens + (AvgMoisture - MoistureResidual) * 990.0;
+        // Note 990 kg/m^3 is water density and the moisture is depth-averaged
+
+        // Note wet soil has specific heat that is 40% higher than dry soil (assume linear)
+        // OLD ::  SoilSpecHeat = DrySpecHeat*(1.0d0+ 0.4d0*(AvgMoisture-MoistureResidual)/(MoistureMax-MoistureResidual))
+        // This is now based on Melos Hagos's results for C (March 2009)
+        //    SoilSpecHeat = DrySpecHeat + 3.09*(AvgMoisture) CLEARLY in ERROR BY FACTOR of 1000
+        //    DJS - Melos report has Spec = Cdry + 1.9 theta (where C is in kJ/kg/K), so...
+        SoilSpecHeat = state.dataEcoRoofMgr->DrySpecHeat + 1900.0 * AvgMoisture;
+
+        // Note wet soil has thermal conductivity that is up to 3 times that of  dry soil ...
+        // For now simply let it DOUBLE over the range of moisture
+
+        // Note wet soil has thermal conductivity that is up to 3 times that of  dry soil ...
+        // OLD :: SoilConductivity = DryCond* (1.0d0 + 1.0d0 * (AvgMoisture-MoistureResidual)/(MoistureMax-MoistureResidual))
+        // This is now based on Melos Hagos's results for k/kdry (March 2009)
+        SatRatio = (AvgMoisture - MoistureResidual) / (MoistureMax - MoistureResidual);
+        SoilConductivity = (state.dataEcoRoofMgr->DryCond / 1.15) * (1.45 * std::exp(4.411 * SatRatio)) / (1.0 + 0.45 * std::exp(4.411 * SatRatio));
+        // DJS 2009 - note, this allows the actual conductivity to dip a little below the dry value... corresponding to
+        // DJS 2009 - "bone dry" if you will, when moisture --> residual value.
+
+        // HERE WE RE-RUN THE CONDUCTION TRANSFER FUNCTION (CTF) CALCULATIONS
+
+        // NOTE: CTF uses the original dataMaterial.Material( )%xxx variables, so must update these for current construction and
+        //       time step...
+        // TestRatio variable is available just in case there are stability issues. If so, we can limit the amount
+        // by which soil properties are allowed to vary in one time step (10% in example below).
+
+        TestRatio = SoilConductivity / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        if (TestRatio > RatioMax) TestRatio = RatioMax;
+        if (TestRatio < RatioMin) TestRatio = RatioMin;
+        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
+        SoilConductivity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
+
+        TestRatio = SoilDensity / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
+        if (TestRatio > RatioMax) TestRatio = RatioMax;
+        if (TestRatio < RatioMin) TestRatio = RatioMin;
+        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
+        SoilDensity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
+
+        TestRatio = SoilSpecHeat / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        if (TestRatio > RatioMax) TestRatio = RatioMax;
+        if (TestRatio < RatioMin) TestRatio = RatioMin;
+        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
+        SoilSpecHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+
+        // Now call InitConductionTransferFunction with the ConstrNum as the argument. As long as the argument is
+        // non-zero InitConductionTransferFunction will ONLY update this construction. If the argument is 0 it will
+        // rerun the ENTIRE InitConductionTransferFunction on all constructions (as in initial code start-up mode).
+
+        // DJS The following works for most simulations, but has stability issues in some cases.
+        // DJS - in the present version it seems best to NOT update soil thermal properties.
+        //   Call InitConductionTransferFunctions(ConstrNum)
+        // DJS In future revision we will implement these modified soil thermal properties in the finite difference
+        // solution scheme.
+
+        // DJS - Note the following write/format statements should be commented out prior to releasing within EnergyPlus
+        // DJS - they are handy in doing hourly validation/evaluations, though, so leave them in for future development.
+
+        //   write(unit,799) DayofYear, HourOfDay, Qsoil,Tg, Tf, Moisture, MeanRootMoisture,CumPrecip &
+        //  ,CumET,CumRunoff, CumIrrigation, SoilDensity, SoilSpecHeat,SoilConductivity,Alphag
+        // 799 format(' ',I3,' ',I3,' ',' ',f9.3,' ',f6.2,' ',f6.2,' ',f5.3,' ',f5.3,' ',f6.4, '  '  &
+        //    f7.3, ' ', f7.3, ' ',f7.3, ' ',f6.1,' ',f7.1,'  ',f6.3,'  ',f6.2)
+    }
+
     void CalcEcoRoof(EnergyPlusData &state,
                      int const SurfNum,   // Indicator of Surface Number for the current surface
                      int const ZoneNum,   // Indicator for zone number where the current surface
@@ -163,7 +613,6 @@ namespace EcoRoofManager {
         Real64 qg;   // mixing ratio of air at surface.
         Real64 RS;   // shortwave radiation
         Real64 EpsilonOne;
-        // unused1208  REAL(r64) :: e
         Real64 eair;
         Real64 Rhoa;
         Real64 Tak;
@@ -753,456 +1202,6 @@ namespace EcoRoofManager {
 
         state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
         TempExt = state.dataEcoRoofMgr->Tgold;
-    }
-
-    void UpdateSoilProps(EnergyPlusData &state,
-                         Real64 &Moisture,
-                         Real64 &MeanRootMoisture,
-                         Real64 const MoistureMax,
-                         Real64 const MoistureResidual,
-                         Real64 const SoilThickness,
-                         Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
-                         Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int const ConstrNum, // Indicator for construction index for the current surface
-                         Real64 &Alphag,
-                         [[maybe_unused]] int const unit,    // unused1208
-                         [[maybe_unused]] Real64 const Tg,   // unused1208
-                         [[maybe_unused]] Real64 const Tf,   // unused1208
-                         [[maybe_unused]] Real64 const Qsoil // unused1208
-    )
-    {
-        // SUBROUTINE INFORMATION
-        //     AUTHOR          David Sailor
-        //     DATE WRITTEN    Jan 2007
-        //     MODIFIED        Stephen Forner, Portland State University (SF); 7/15/2010
-        //     RE-ENGINEERED   na
-
-        // PURPOSE OF THIS MODULE:
-
-        // Track moisture input/output to ecoroof soil media (precipitation, irrigation, evapotranspiration, runoff)
-        // Update soil thermal properties associated with variations in soil moisture and update CTF calculations
-        // for the ecoroof construction layer.
-
-        // METHODOLOGY EMPLOYED:
-        // Define 2 soil layers (top and root). Moisture redistribution between top and root layers is proportional
-        // to moisture differences. Input and Output of moisture are partitioned between layers.
-        // Soil thermal properties vary based on non-dimensionalization of experimental data for 8 typical soils.
-        // Specifically, THERMAL PROPERTY = Dry Value + (fraction of moisture content)*Wet Value
-
-        // Using/Aliasing
-        using namespace DataEnvironment;
-        using namespace DataSurfaces;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
-
-        // Soil Parameters from Reference listed in the code:
-        Real64 const alpha(23.0); // These parameters are empirical constants
-        Real64 const n(1.27);     // These parameters are empirical constants
-        Real64 const lambda(0.5); // These parameters are empirical constants
-        // This is another parameter of the soil which describes the soil conductivity at the saturation point (m/s)
-        Real64 const SoilConductivitySaturation(5.157e-7);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 RatioMax;
-        Real64 RatioMin;
-        Real64 MoistureDiffusion; // moisture transport down from near-surface to root zone
-        Real64 SoilConductivity;  // Moisture dependent conductivity to be fed back into CTF Calculator
-        Real64 SoilSpecHeat;      // Moisture dependent Spec. Heat to be fed back into CTF Calculator
-        Real64 SoilAbsorpSolar;   // Moisture dependent Solar absorptance (1-albedo)
-        Real64 SoilDensity;       // Moisture dependent density to be fed back into CTF Calculator
-        Real64 SatRatio;
-        Real64 TestRatio;   // Ratio to determine if timestep change in properties is too abrupt for CTF
-        Real64 AvgMoisture; // Average soil moisture over depth of ecoroof media
-        int index1;
-
-        // NOTE:  As Energyplus calls the energy balance manager (and hence CalcEcoroof)
-        // once for each surface within each zone that has an ecoroof
-        // --- the CALCECOROOF routine is called multiple times within each time step
-        // So, it is important that the UpdateSoilProps subroutine is called ONLY ONCE for each time step!!!
-
-        // Recall Moisture = near-surface moisture value (m^3/m^3)
-        // Recall MeanRootMoisture = root zone moisture value (m^3/m^3)
-
-        // DJS 2009 set the ratiomax and ratiomin values in the code now (rather than as parameters) so that
-        // DJS 2009 we can link them to timesteps and make these limits apply to actual RATES...
-        // DJS 2009 reasonable rates are +/- 10% change in properties per 15 minute period... Otherwise we have
-        // DJS 2009 stability issues.
-        // DJS 2011 FEB - Since we no longer use CTF with soil-dependent properties (Do not RECALL INITCONDUCTION...
-        // DJS 2011 FEB - we may be able to get away with NO limits on rates of change when using CFD routine.
-        // DJS 2011 FEB - for now we stick with 20% per quarter hour.
-        RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
-        RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
-
-        if (state.dataEcoRoofMgr->UpdatebeginFlag) {
-
-            // SET dry values that NEVER CHANGE
-            state.dataEcoRoofMgr->DryCond = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
-            state.dataEcoRoofMgr->DryDens = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
-            state.dataEcoRoofMgr->DryAbsorp = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-            state.dataEcoRoofMgr->DrySpecHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
-
-            // DETERMINE RELATIVE THICKNESS OF TWO LAYERS OF SOIL (also unchanging)
-            if (SoilThickness > 0.12) {
-                state.dataEcoRoofMgr->TopDepth = 0.06; // For now use 6cm as top depth - everything else is root layer
-            } else {
-                state.dataEcoRoofMgr->TopDepth = 0.5 * SoilThickness; // In unusual case of very thin soil make topdepth half of total
-            }
-            // This loop outputs the minimum number of time steps needed to keep the solution stable
-            // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
-                Real64 const depth_limit(depth_fac * std::pow(state.dataEcoRoofMgr->TopDepth + state.dataEcoRoofMgr->RootDepth, 2.07));
-                for (index1 = 1; index1 <= 20; ++index1) {
-                    if (double(state.dataGlobal->MinutesPerTimeStep / index1) <= depth_limit) break;
-                }
-                if (index1 > 1) {
-                    ShowWarningError(state, "CalcEcoRoof: Too few time steps per hour for stability.");
-                    if (ceil(60 * index1 / state.dataGlobal->MinutesPerTimeStep) <= 60) {
-                        ShowContinueError(
-                            state,
-                            format("...Entered Timesteps per hour=[{}], Change to some value greater than or equal to [{}] for assured stability.",
-                                   state.dataGlobal->NumOfTimeStepInHour,
-                                   60 * index1 / state.dataGlobal->MinutesPerTimeStep));
-                        ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
-                        ShowContinueError(state,
-                                          "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
-                                          "here could be the reason.");
-                    } else {
-                        ShowContinueError(state,
-                                          format("...Entered Timesteps per hour=[{}], however the required frequency for stability [{}] is over the "
-                                                 "EnergyPlus maximum of 60.",
-                                                 state.dataGlobal->NumOfTimeStepInHour,
-                                                 60 * index1 / state.dataGlobal->MinutesPerTimeStep));
-                        ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");
-                        ShowContinueError(state,
-                                          "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
-                                          "here could be the reason.");
-                    }
-                }
-            }
-
-            state.dataEcoRoofMgr->RootDepth = SoilThickness - state.dataEcoRoofMgr->TopDepth;
-            // Next create a timestep in seconds
-            state.dataEcoRoofMgr->TimeStepZoneSec = state.dataGlobal->MinutesPerTimeStep * 60.0;
-
-            state.dataEcoRoofMgr->UpdatebeginFlag = false;
-        }
-
-        state.dataEcoRoofMgr->CurrentRunoff = 0.0; // Initialize current time step runoff as it is used in several spots below...
-
-        // FIRST Subtract water evaporated by plants and at soil surface
-        Moisture -= (Vfluxg)*state.dataGlobal->MinutesPerTimeStep * 60.0 / state.dataEcoRoofMgr->TopDepth;          // soil surface evaporation
-        MeanRootMoisture -= (Vfluxf)*state.dataGlobal->MinutesPerTimeStep * 60.0 / state.dataEcoRoofMgr->RootDepth; // plant extraction from root zone
-
-        // NEXT Update evapotranspiration summary variable for print out
-        state.dataEcoRoofMgr->CurrentET = (Vfluxg + Vfluxf) * state.dataGlobal->MinutesPerTimeStep * 60.0; // units are meters
-        if (!state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->CumET += state.dataEcoRoofMgr->CurrentET;
-        }
-
-        // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
-        if (!state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->CurrentPrecipitation = 0.0; // first initialize to zero
-        }
-        state.dataEcoRoofMgr->CurrentPrecipitation = 0.0; // first initialize to zero
-        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
-            state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
-            Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
-            if (!state.dataGlobal->WarmupFlag) {
-                state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-            }
-        }
-
-        // NEXT Add Irrigation to surface soil moisture variable (if a schedule exists)
-        state.dataEcoRoofMgr->CurrentIrrigation = 0.0; // first initialize to zero
-        state.dataWaterData->Irrigation.ActualAmount = 0.0;
-        if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) {
-            state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
-            state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
-            //    elseif (Irrigation%ModeID ==IrrSmartSched .and. moisture .lt. 0.4d0*MoistureMax) then
-        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched &&
-                   Moisture < state.dataWaterData->Irrigation.IrrigationThreshold * MoistureMax) {
-            // Smart schedule only irrigates when scheduled AND the soil is less than 40% saturated
-            state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
-            state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
-        }
-
-        Moisture += state.dataEcoRoofMgr->CurrentIrrigation / state.dataEcoRoofMgr->TopDepth; // irrigation in (m)/timestep put into top layer
-        if (!state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
-        }
-
-        // Note: If soil top layer gets a massive influx of rain &/or irrigation some of
-        // the water will simply run right off the top and not penetrate at all!
-        // At the present time this limit is fairly small due to some minor stability issues
-        // in EnergyPlus. If the moisture changes too rapidly the code cannot handle the rapid changes in
-        // surface characteristics and heat fluxes. The result that I've noticed is a non-physical fluctation
-        // in ground surface temperature that oscillates up to 10 deg C from one hour to the next until the
-        // code catches up. The temporary solution is to simply limit how much moisture can enter the soil
-        // in any time step to 0.5"/hour. In the future this might be fixed by running with finer time steps
-        // or by using a finite difference temperature solution rather than the CTF.
-        // I suspect that 15 minute intervals may be needed. Another option is to have an internal moisture
-        // overflow bin that will hold extra moisture and then distribute it in subsequent hours. This way the
-        // soil still gets the same total moisture... it is just distributed over a longer period.
-        if (state.dataEcoRoofMgr->CurrentIrrigation + state.dataEcoRoofMgr->CurrentPrecipitation >
-            0.5 * 0.0254 * state.dataGlobal->MinutesPerTimeStep / 60.0) {
-            state.dataEcoRoofMgr->CurrentRunoff = state.dataEcoRoofMgr->CurrentIrrigation + state.dataEcoRoofMgr->CurrentPrecipitation -
-                                                  (0.5 * 0.0254 * state.dataGlobal->MinutesPerTimeStep / 60.0);
-            // If we get here then TOO much moisture has already been added to soil (must now subtract excess)
-            Moisture -= state.dataEcoRoofMgr->CurrentRunoff / state.dataEcoRoofMgr->TopDepth; // currently any incident moisture in excess of 1/4 "
-                                                                                              // per hour
-                                                                                              // simply runs off the top of the soil.
-        }
-        // Now, if top layer is beyond saturation... the excess simply runs off without penetrating into the lower
-        // layers.
-        if (Moisture > MoistureMax) {
-            state.dataEcoRoofMgr->CurrentRunoff += (Moisture - MoistureMax) * state.dataEcoRoofMgr->TopDepth;
-            Moisture = MoistureMax;
-        }
-
-        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
-
-            // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
-            // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
-            // See below this commented out code for the new moisture distribution model.
-            //*********************************************************************************************************
-            //*********************************************************************************************************
-            // NEXT Redistribute moisture based on moisture diffusion.
-            // The effective diffusivities should be revisted when better moisture transport data in ecoroof soils are
-            // available.
-            // Here the diffusion rate is in units of [1/s]
-            // A value of 0.0001 would be ~ 36% / hour
-            // A value of 0.00005 would be ~ 18%/hour change in moisture
-            // A value of 0.000025 gives about a 9%/hour change in moisture
-            // a value of 0.0000125 gives 5%/hour...
-            // Note: This formulation allows moisture to have a directional bias - ie, it can sink into soil easier than
-            // it can be brought up.
-            if (Moisture > MeanRootMoisture) {
-                // move moisture from top layer into root zone
-                MoistureDiffusion = min((MoistureMax - MeanRootMoisture) * state.dataEcoRoofMgr->RootDepth,
-                                        (Moisture - MeanRootMoisture) * state.dataEcoRoofMgr->TopDepth);
-                MoistureDiffusion = max(0.0, MoistureDiffusion); // Safety net to keep positive (not needed?)
-                // at this point moistureDiffusion is in units of (m)/timestep
-                MoistureDiffusion *= 0.00005 * state.dataGlobal->MinutesPerTimeStep * 60.0;
-                Moisture -= MoistureDiffusion / state.dataEcoRoofMgr->TopDepth;
-                MeanRootMoisture += MoistureDiffusion / state.dataEcoRoofMgr->RootDepth;
-            } else if (MeanRootMoisture > Moisture) {
-                // move moisture to top layer from root zone
-                MoistureDiffusion =
-                    min((MoistureMax - Moisture) * state.dataEcoRoofMgr->TopDepth, (MeanRootMoisture - Moisture) * state.dataEcoRoofMgr->RootDepth);
-                MoistureDiffusion = max(0.0, MoistureDiffusion); // Safety net (not needed?)
-                // at this point moistureDiffusion is in units of (m)/timestep
-                MoistureDiffusion *= 0.00001 * state.dataGlobal->MinutesPerTimeStep * 60.0;
-                Moisture += MoistureDiffusion / state.dataEcoRoofMgr->TopDepth;
-                MeanRootMoisture -= MoistureDiffusion / state.dataEcoRoofMgr->RootDepth;
-            }
-        } else {
-            //********************************************************************************************************
-            //********************************************************************************************************
-            // THE SECTION ABOVE WAS THE MOISTURE DISTRIBUTION MODEL. REPLACED SF-7/21/2010
-
-            // NEXT redistribute the moisture in the soil based on:
-            // Marcel G Schaap and Martinus Th van Genuchten, 2006, 'A modified Maulem-van
-            // Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation'.
-            // Written in MATLAB by Vishal Sharma (of Portland State) and modified for FORTRAN by Stephen Forner Summer 2010
-            // This model is based on curve fit data that describes the capillary motion of the water in combination with the gravitational
-            // forces on the water.
-            // This set of equations is unstable if the time step is larger than given by a curve fit equation.  This first DO loop is to
-            // see how many time steps are needed to be stable.
-            // This method of moisture distribution relies on variables which are experimentally determined: alpha, lambda, n and the
-            // hydraulic conductivity at saturation.
-
-            // Now, solve for the soil parameters for  of the top soil layer
-
-            state.dataEcoRoofMgr->RelativeSoilSaturationTop = (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
-            if (state.dataEcoRoofMgr->RelativeSoilSaturationTop < 0.0001) {
-                if (state.dataEcoRoofMgr->ErrIndex == 0) {
-                    ShowWarningMessage(state,
-                                       format("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[{:.5R}].",
-                                              state.dataEcoRoofMgr->RelativeSoilSaturationTop));
-                    ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
-                    ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");
-                }
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
-                                               state.dataEcoRoofMgr->ErrIndex,
-                                               state.dataEcoRoofMgr->RelativeSoilSaturationTop,
-                                               state.dataEcoRoofMgr->RelativeSoilSaturationTop);
-                state.dataEcoRoofMgr->RelativeSoilSaturationTop = 0.0001;
-            }
-            state.dataEcoRoofMgr->SoilHydroConductivityTop =
-                SoilConductivitySaturation * std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationTop, lambda) *
-                pow_2(1.0 - std::pow(1.0 - std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationTop, n / (n - 1.0)), (n - 1.0) / n));
-            state.dataEcoRoofMgr->CapillaryPotentialTop =
-                (-1.0 / alpha) * std::pow(std::pow(1.0 / state.dataEcoRoofMgr->RelativeSoilSaturationTop, n / (n - 1.0)) - 1.0, 1.0 / n);
-
-            // Then the soil parameters for the root soil layer
-            state.dataEcoRoofMgr->RelativeSoilSaturationRoot = (MeanRootMoisture - MoistureResidual) / (MoistureMax - MoistureResidual);
-            state.dataEcoRoofMgr->SoilHydroConductivityRoot =
-                SoilConductivitySaturation * std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationRoot, lambda) *
-                pow_2(1.0 - std::pow(1.0 - std::pow(state.dataEcoRoofMgr->RelativeSoilSaturationRoot, n / (n - 1.0)), (n - 1.0) / n));
-            state.dataEcoRoofMgr->CapillaryPotentialRoot =
-                (-1.0 / alpha) * std::pow(std::pow(1.0 / state.dataEcoRoofMgr->RelativeSoilSaturationRoot, n / (n - 1.0)) - 1.0, 1.0 / n);
-
-            // Next, using the soil parameters, solve for the soil moisture
-            state.dataEcoRoofMgr->SoilConductivityAveTop =
-                (state.dataEcoRoofMgr->SoilHydroConductivityTop + state.dataEcoRoofMgr->SoilHydroConductivityRoot) * 0.5;
-            Moisture +=
-                (state.dataEcoRoofMgr->TimeStepZoneSec / state.dataEcoRoofMgr->TopDepth) *
-                ((state.dataEcoRoofMgr->SoilConductivityAveTop *
-                  (state.dataEcoRoofMgr->CapillaryPotentialTop - state.dataEcoRoofMgr->CapillaryPotentialRoot) / state.dataEcoRoofMgr->TopDepth) -
-                 state.dataEcoRoofMgr->SoilConductivityAveTop);
-
-            // Now limit the soil from going over the moisture maximum and takes excess to create runoff
-            if (Moisture >= MoistureMax) {       // This statement makes sure that the top layer is not over the moisture maximum for the soil.
-                Moisture = 0.9999 * MoistureMax; // then it takes any moisture over the maximum amount and makes it runoff
-                state.dataEcoRoofMgr->CurrentRunoff += (Moisture - MoistureMax * 0.9999) * state.dataEcoRoofMgr->TopDepth;
-            }
-
-            // Now make sure that the soil does not go below the moisture minimum
-            if (Moisture <= (1.01 * MoistureResidual)) {
-                Moisture = 1.01 * MoistureResidual;
-            }
-
-            // Next, solve the parameters for the bottom layer
-            state.dataEcoRoofMgr->SoilConductivityAveRoot = state.dataEcoRoofMgr->SoilHydroConductivityRoot;
-
-            // Now make sure the rate of liquid leaving the soil is more than one drop per hour
-            if ((state.dataEcoRoofMgr->SoilConductivityAveRoot * 3600.0) <= (2.33e-7)) {
-                state.dataEcoRoofMgr->SoilConductivityAveRoot = 0.0;
-            }
-
-            // Using the parameters above, distribute the Root Layer moisture
-            state.dataEcoRoofMgr->TestMoisture = MeanRootMoisture;
-            MeanRootMoisture +=
-                (state.dataEcoRoofMgr->TimeStepZoneSec / state.dataEcoRoofMgr->RootDepth) *
-                ((state.dataEcoRoofMgr->SoilConductivityAveTop *
-                  (state.dataEcoRoofMgr->CapillaryPotentialTop - state.dataEcoRoofMgr->CapillaryPotentialRoot) / state.dataEcoRoofMgr->RootDepth) +
-                 state.dataEcoRoofMgr->SoilConductivityAveTop - state.dataEcoRoofMgr->SoilConductivityAveRoot);
-
-            // Limit the moisture from going over the saturation limit and create runoff:
-            if (MeanRootMoisture >= MoistureMax) {
-                MeanRootMoisture = 0.9999 * MoistureMax;
-                state.dataEcoRoofMgr->CurrentRunoff += (Moisture - MoistureMax * 0.9999) * state.dataEcoRoofMgr->RootDepth;
-            }
-
-            // Limit the soil from going below the soil saturation limit:
-            if (MeanRootMoisture <= (1.01 * MoistureResidual)) {
-                MeanRootMoisture = 1.01 * MoistureResidual;
-            }
-
-            // Next, track runoff from the bottom of the soil:
-            state.dataEcoRoofMgr->CurrentRunoff += state.dataEcoRoofMgr->SoilConductivityAveRoot * state.dataEcoRoofMgr->TimeStepZoneSec;
-
-            //~~~END SF EDITS
-        }
-
-        // NEXT Limit moisture values to saturation (create RUNOFF that we can track)
-        // CurrentRunoff is sum of "overwatering" in a timestep and excess moisture content
-        if (!state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->CumRunoff += state.dataEcoRoofMgr->CurrentRunoff;
-        }
-
-        if (MeanRootMoisture <= MoistureResidual * 1.00001) {
-            Moisture -= (MoistureResidual * 1.00001 - MeanRootMoisture) * state.dataEcoRoofMgr->RootDepth / state.dataEcoRoofMgr->TopDepth;
-            // If the plant has extracted more moisture than is in the root zone soil, then make it come from
-            // the top layer rather than the root zone... unless top is also dry...
-            if (Moisture < MoistureResidual * 1.00001) Moisture = MoistureResidual * 1.00001;
-            MeanRootMoisture = MoistureResidual * 1.00001; // Need to make sure we do not divide by zero later.
-        }
-
-        // ------------------------------------------------------------------------------------------
-        // Having updated moisture values now we modify soil thermal properties based on moisture content
-
-        // NOTE: Variables SoilAbsorpSolar, SoilDensity, SoilSpecHeat, and SoilConductivity are the values
-        // that the soil properties OUGHT to attain for the current moisture level. These values are then
-        // moderated using the TestRatio variable so that from one time step to the next no variable
-        // changes by more than a certain percentage (typically 5-20%).
-
-        // Note wet soil absorptance is generally 25-50% higher than dry soil absorptance (assume linear)
-        SoilAbsorpSolar = state.dataEcoRoofMgr->DryAbsorp +
-                          (0.92 - state.dataEcoRoofMgr->DryAbsorp) * (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
-        // Limit solar absorptivity to 95% so soil abledo is always above 5%
-        if (SoilAbsorpSolar > 0.95) SoilAbsorpSolar = 0.95;
-        // Limit solar absorptivity to greater than 20% so that albedo is always less than 80%
-        if (SoilAbsorpSolar < 0.20) SoilAbsorpSolar = 0.20;
-
-        // Need to use for albedo in CalcEcoroof
-        TestRatio = (1.0 - SoilAbsorpSolar) / Alphag;
-        if (TestRatio > RatioMax) TestRatio = RatioMax;
-        if (TestRatio < RatioMin) TestRatio = RatioMin;
-        Alphag *= TestRatio; //  included 1.0 - to make it albedo rather than SW absorptivity
-        // Note wet soil density is calculated by simply adding the mass of water...
-        AvgMoisture = (state.dataEcoRoofMgr->RootDepth * MeanRootMoisture + state.dataEcoRoofMgr->TopDepth * Moisture) / SoilThickness;
-        SoilDensity = state.dataEcoRoofMgr->DryDens + (AvgMoisture - MoistureResidual) * 990.0;
-        // Note 990 kg/m^3 is water density and the moisture is depth-averaged
-
-        // Note wet soil has specific heat that is 40% higher than dry soil (assume linear)
-        // OLD ::  SoilSpecHeat = DrySpecHeat*(1.0d0+ 0.4d0*(AvgMoisture-MoistureResidual)/(MoistureMax-MoistureResidual))
-        // This is now based on Melos Hagos's results for C (March 2009)
-        //    SoilSpecHeat = DrySpecHeat + 3.09*(AvgMoisture) CLEARLY in ERROR BY FACTOR of 1000
-        //    DJS - Melos report has Spec = Cdry + 1.9 theta (where C is in kJ/kg/K), so...
-        SoilSpecHeat = state.dataEcoRoofMgr->DrySpecHeat + 1900.0 * AvgMoisture;
-
-        // Note wet soil has thermal conductivity that is up to 3 times that of  dry soil ...
-        // For now simply let it DOUBLE over the range of moisture
-
-        // Note wet soil has thermal conductivity that is up to 3 times that of  dry soil ...
-        // OLD :: SoilConductivity = DryCond* (1.0d0 + 1.0d0 * (AvgMoisture-MoistureResidual)/(MoistureMax-MoistureResidual))
-        // This is now based on Melos Hagos's results for k/kdry (March 2009)
-        SatRatio = (AvgMoisture - MoistureResidual) / (MoistureMax - MoistureResidual);
-        SoilConductivity = (state.dataEcoRoofMgr->DryCond / 1.15) * (1.45 * std::exp(4.411 * SatRatio)) / (1.0 + 0.45 * std::exp(4.411 * SatRatio));
-        // DJS 2009 - note, this allows the actual conductivity to dip a little below the dry value... corresponding to
-        // DJS 2009 - "bone dry" if you will, when moisture --> residual value.
-
-        // HERE WE RE-RUN THE CONDUCTION TRANSFER FUNCTION (CTF) CALCULATIONS
-
-        // NOTE: CTF uses the original dataMaterial.Material( )%xxx variables, so must update these for current construction and
-        //       time step...
-        // TestRatio variable is available just in case there are stability issues. If so, we can limit the amount
-        // by which soil properties are allowed to vary in one time step (10% in example below).
-
-        TestRatio = SoilConductivity / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
-        if (TestRatio > RatioMax) TestRatio = RatioMax;
-        if (TestRatio < RatioMin) TestRatio = RatioMin;
-        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
-        SoilConductivity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
-
-        TestRatio = SoilDensity / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
-        if (TestRatio > RatioMax) TestRatio = RatioMax;
-        if (TestRatio < RatioMin) TestRatio = RatioMin;
-        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
-        SoilDensity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
-
-        TestRatio = SoilSpecHeat / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
-        if (TestRatio > RatioMax) TestRatio = RatioMax;
-        if (TestRatio < RatioMin) TestRatio = RatioMin;
-        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
-        SoilSpecHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
-
-        // Now call InitConductionTransferFunction with the ConstrNum as the argument. As long as the argument is
-        // non-zero InitConductionTransferFunction will ONLY update this construction. If the argument is 0 it will
-        // rerun the ENTIRE InitConductionTransferFunction on all constructions (as in initial code start-up mode).
-
-        // DJS The following works for most simulations, but has stability issues in some cases.
-        // DJS - in the present version it seems best to NOT update soil thermal properties.
-        //   Call InitConductionTransferFunctions(ConstrNum)
-        // DJS In future revision we will implement these modified soil thermal properties in the finite difference
-        // solution scheme.
-
-        // DJS - Note the following write/format statements should be commented out prior to releasing within EnergyPlus
-        // DJS - they are handy in doing hourly validation/evaluations, though, so leave them in for future development.
-
-        //   write(unit,799) DayofYear, HourOfDay, Qsoil,Tg, Tf, Moisture, MeanRootMoisture,CumPrecip &
-        //  ,CumET,CumRunoff, CumIrrigation, SoilDensity, SoilSpecHeat,SoilConductivity,Alphag
-        // 799 format(' ',I3,' ',I3,' ',' ',f9.3,' ',f6.2,' ',f6.2,' ',f5.3,' ',f5.3,' ',f6.4, '  '  &
-        //    f7.3, ' ', f7.3, ' ',f7.3, ' ',f6.1,' ',f7.1,'  ',f6.3,'  ',f6.2)
     }
 
     void CalculateEcoRoofSolar(EnergyPlusData &state,

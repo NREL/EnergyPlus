@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -82,49 +81,140 @@ namespace EnergyPlus::EconomicTariff {
 //    use estimate.
 using ScheduleManager::GetScheduleIndex;
 
-void UpdateUtilityBills(EnergyPlusData &state)
+std::string RemoveSpaces(EnergyPlusData &state, std::string const &StringIn)
 {
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   September 2003
+    //    DATE WRITTEN   May 2004
 
-    //    Single routine used to call all get input
-    //    routines for economics.
+    //   Return the string with all spaces removed.
 
-    using OutputReportTabular::AddTOCEntry;
-
-    bool ErrorsFound(false);
-
-    if (state.dataEconTariff->Update_GetInput) {
-        GetInputEconomicsTariff(state, ErrorsFound);
-        // do rest of GetInput only if at least one tariff is defined.
-        GetInputEconomicsCurrencyType(state, ErrorsFound);
-        if (state.dataEconTariff->numTariff >= 1) {
-            if (!ErrorsFound && state.dataOutRptTab->displayEconomicResultSummary)
-                AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
-            CreateCategoryNativeVariables(state);
-            GetInputEconomicsQualify(state, ErrorsFound);
-            GetInputEconomicsChargeSimple(state, ErrorsFound);
-            GetInputEconomicsChargeBlock(state, ErrorsFound);
-            GetInputEconomicsRatchet(state, ErrorsFound);
-            GetInputEconomicsVariable(state, ErrorsFound);
-            GetInputEconomicsComputation(state, ErrorsFound);
-            CreateDefaultComputation(state);
+    std::string StringOut;
+    bool foundSpaces = false;
+    for (std::string::size_type iString = 0; iString < len(StringIn); ++iString) {
+        if (StringIn[iString] != ' ') {
+            StringOut += StringIn[iString];
+        } else {
+            foundSpaces = true;
         }
-        state.dataEconTariff->Update_GetInput = false;
-        if (ErrorsFound) ShowFatalError(state, "UpdateUtilityBills: Preceding errors cause termination.");
     }
-    if (state.dataGlobal->DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
-        GatherForEconomics(state);
+    if (foundSpaces) {
+        ShowWarningError(state, "UtilityCost: Spaces were removed from the variable=\"" + StringIn + "\".");
+        ShowContinueError(state, "...Resultant variable=\"" + StringOut + "\".");
     }
+    return StringOut;
 }
 
-//======================================================================================================================
-//======================================================================================================================
+void incrementEconVar(EnergyPlusData &state)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
 
-//    GET INPUT ROUTINES
+    //   Increment the Increase the size of the
 
-//======================================================================================================================
-//======================================================================================================================
+    int constexpr sizeIncrement(100);
+
+    auto &econVar(state.dataEconTariff->econVar);
+
+    if (!allocated(econVar)) {
+        econVar.allocate(sizeIncrement);
+        state.dataEconTariff->sizeEconVar = sizeIncrement;
+        state.dataEconTariff->numEconVar = 1;
+    } else {
+        ++state.dataEconTariff->numEconVar;
+        // if larger than current size grow the array
+        if (state.dataEconTariff->numEconVar > state.dataEconTariff->sizeEconVar) {
+            econVar.redimension(state.dataEconTariff->sizeEconVar += sizeIncrement);
+        }
+    }
+    // initialize new record) //Autodesk Most of these match default initialization so not needed
+    econVar(state.dataEconTariff->numEconVar).name = "";
+    econVar(state.dataEconTariff->numEconVar).tariffIndx = 0;
+    econVar(state.dataEconTariff->numEconVar).kindOfObj = iEconVarObjType::Unknown;
+    econVar(state.dataEconTariff->numEconVar).index = 0;
+    econVar(state.dataEconTariff->numEconVar).values = 0.0;
+    econVar(state.dataEconTariff->numEconVar).isArgument = false;
+    econVar(state.dataEconTariff->numEconVar).isAssigned = false;
+    econVar(state.dataEconTariff->numEconVar).specific = varNotYetDefined;
+    //        econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
+    // Autodesk Don't initialize cntMeDependOn
+    econVar(state.dataEconTariff->numEconVar).Operator = 0;
+    econVar(state.dataEconTariff->numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0
+    econVar(state.dataEconTariff->numEconVar).lastOperand = 0;
+    econVar(state.dataEconTariff->numEconVar).activeNow = false;
+    econVar(state.dataEconTariff->numEconVar).isEvaluated = false;
+    // Autodesk Don't initialize isReported
+    // Autodesk Don't initialize varUnitType
+}
+
+int AssignVariablePt(EnergyPlusData &state,
+                     std::string const &stringIn,
+                     bool const flagIfNotNumeric,
+                     int const useOfVar,
+                     int const varSpecific,
+                     iEconVarObjType const econObjKind,
+                     int const objIndex,
+                     int const tariffPt)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //   If the string is not numeric, check if it is a valid string to use as
+    //   a variable name. Check if name has been used before and if not create
+    //   the variable using the string as its name.
+    //   Return the index of the variable.
+
+    int AssignVariablePt;
+
+    std::string inNoSpaces;
+    int found;
+    int iVar;
+
+    auto &econVar(state.dataEconTariff->econVar);
+
+    if (flagIfNotNumeric && (len(stringIn) >= 1)) {
+        inNoSpaces = RemoveSpaces(state, stringIn);
+        found = 0;
+        if (allocated(econVar)) {
+            for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+                if (econVar(iVar).tariffIndx == tariffPt) {
+                    if (UtilityRoutines::SameString(econVar(iVar).name, inNoSpaces)) {
+                        found = iVar;
+                        break;
+                    }
+                }
+            }
+        }
+        if (found > 0) {
+            AssignVariablePt = found;
+            if (econVar(found).kindOfObj == iEconVarObjType::Unknown) {
+                econVar(found).kindOfObj = econObjKind;
+                if (econVar(found).index == 0) econVar(found).index = objIndex;
+            }
+        } else {
+            incrementEconVar(state);
+            econVar(state.dataEconTariff->numEconVar).name = inNoSpaces;
+            econVar(state.dataEconTariff->numEconVar).kindOfObj = econObjKind;
+            econVar(state.dataEconTariff->numEconVar).index = objIndex;
+            AssignVariablePt = state.dataEconTariff->numEconVar;
+        }
+        // now set the flag for the type of usage the variable has
+        if (useOfVar == varIsArgument) {
+            econVar(AssignVariablePt).isArgument = true;
+        } else if (useOfVar == varIsAssigned) {
+            econVar(AssignVariablePt).isAssigned = true;
+        }
+        econVar(AssignVariablePt).tariffIndx = tariffPt;
+        // if the user defines the UtilityCost:Computation then this is called when reading the
+        // UtilityCost:Tariff with varNotYetDefined but they are already defined because
+        // the subroutine CreateCategoryNativeVariables has already been called.
+        if (!((varSpecific == varNotYetDefined) && (econVar(AssignVariablePt).specific >= catEnergyCharges))) {
+            econVar(AssignVariablePt).specific = varSpecific;
+        }
+    } else { // if the string was numeric return a zero
+        AssignVariablePt = 0;
+    }
+    return AssignVariablePt;
+}
 
 void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
 {
@@ -640,6 +730,134 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     }
 }
 
+int FindTariffIndex(
+    EnergyPlusData &state, std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Find the index for the tariff string provided or else
+    //    raise a warning.
+
+    int FindTariffIndex;
+    int iTariff;
+    int found;
+
+    found = 0;
+    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+        if (UtilityRoutines::SameString(nameOfTariff, state.dataEconTariff->tariff(iTariff).tariffName)) {
+            found = iTariff;
+            break;
+        }
+    }
+    if (found > 0) {
+        FindTariffIndex = found;
+    } else {
+        ShowSevereError(state, nameOfCurObj + "=\"" + nameOfReferingObj + "\" invalid tariff referenced");
+        ShowContinueError(state, "not found UtilityCost:Tariff=\"" + nameOfTariff + "\".");
+        ErrorsFound = true;
+        FindTariffIndex = 0;
+    }
+    return FindTariffIndex;
+}
+
+void warnIfNativeVarname(
+    EnergyPlusData &state, std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   March 2007
+
+    //   Issue a warning if the variable name (usually the object name) is
+    //   one of the names of native variables
+
+    bool throwError;
+
+    throwError = false;
+    if (UtilityRoutines::SameString(objName, "TotalEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "TotalDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "ShoulderEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "ShoulderDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "OffPeakEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "OffPeakDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "MidPeakEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "MidPeakDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakExceedsOffPeak")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "OffPeakExceedsPeak")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakExceedsMidPeak")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "MidPeakExceedsPeak")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakExceedsShoulder")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "ShoulderExceedsPeak")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsWinter")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsNotWinter")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsSpring")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsNotSpring")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsSummer")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsNotSummer")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsAutumn")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "IsNotAutumn")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakAndShoulderEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakAndShoulderDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakAndMidPeakEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakAndMidPeakDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "ShoulderAndOffPeakEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "ShoulderAndOffPeakDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakAndOffPeakEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "PeakAndOffPeakDemand")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "RealTimePriceCosts")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "AboveCustomerBaseCosts")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "BelowCustomerBaseCosts")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "AboveCustomerBaseEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "BelowCustomerBaseEnergy")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "EnergyCharges")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "DemandCharges")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "ServiceCharges")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "Basis")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "Surcharges")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "Adjustments")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "Subtotal")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "Taxes")) throwError = true;
+    if (UtilityRoutines::SameString(objName, "Total")) throwError = true;
+    if (throwError) {
+        ErrorsFound = true;
+        if (curTariffIndex >= 1 && curTariffIndex <= state.dataEconTariff->numTariff) {
+            ShowSevereError(state, "UtilityCost:Tariff=\"" + state.dataEconTariff->tariff(curTariffIndex).tariffName + "\" invalid referenced name");
+            ShowContinueError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
+        } else {
+            ShowSevereError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
+        }
+    }
+}
+
+int LookUpSeason(EnergyPlusData &state, std::string const &nameOfSeason, std::string const &nameOfReferingObj)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Find the index for the season string provided or else
+    //    raise a warning.
+
+    int LookUpSeason;
+
+    if (UtilityRoutines::SameString(nameOfSeason, "Summer")) {
+        LookUpSeason = seasonSummer;
+    } else if (UtilityRoutines::SameString(nameOfSeason, "Winter")) {
+        LookUpSeason = seasonWinter;
+    } else if (UtilityRoutines::SameString(nameOfSeason, "Spring")) {
+        LookUpSeason = seasonSpring;
+    } else if (UtilityRoutines::SameString(nameOfSeason, "Fall")) {
+        LookUpSeason = seasonFall;
+    } else if (UtilityRoutines::SameString(nameOfSeason, "Annual")) {
+        LookUpSeason = seasonAnnual;
+    } else {
+        ShowWarningError(state, "UtilityCost: Invalid season name " + nameOfSeason + " in: " + nameOfReferingObj);
+        ShowContinueError(state, "  Defaulting to Annual");
+        LookUpSeason = seasonAnnual;
+    }
+    return LookUpSeason;
+}
+
 void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
 {
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -738,680 +956,6 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         }
         // number of months the test must be good for
         qualify(iInObj).numberOfMonths = state.dataIPShortCut->rNumericArgs(1);
-    }
-}
-
-void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //    Read the input file for "Economics:Charge:Simple" objects.
-
-    static constexpr std::string_view RoutineName("GetInputEconomicsChargeSimple: ");
-    int iInObj;    // loop index variable for reading in objects
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    bool isNotNumeric;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
-
-    auto &chargeSimple(state.dataEconTariff->chargeSimple);
-    auto &tariff(state.dataEconTariff->tariff);
-
-    CurrentModuleObject = "UtilityCost:Charge:Simple";
-    state.dataEconTariff->numChargeSimple = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    chargeSimple.allocate(state.dataEconTariff->numChargeSimple);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeSimple; ++iInObj) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 iInObj,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
-            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
-                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
-            }
-        }
-        // index of the tariff name in the tariff array
-        chargeSimple(iInObj).tariffIndx =
-            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeSimple(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
-        chargeSimple(iInObj).namePt = AssignVariablePt(state,
-                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                       true,
-                                                       varIsAssigned,
-                                                       varNotYetDefined,
-                                                       iEconVarObjType::ChargeSimple,
-                                                       iInObj,
-                                                       chargeSimple(iInObj).tariffIndx);
-        // index of the variable in the variable array
-        chargeSimple(iInObj).sourcePt = AssignVariablePt(state,
-                                                         state.dataIPShortCut->cAlphaArgs(3),
-                                                         true,
-                                                         varIsArgument,
-                                                         varNotYetDefined,
-                                                         iEconVarObjType::Unknown,
-                                                         0,
-                                                         chargeSimple(iInObj).tariffIndx);
-        // enumerated list of the kind of season
-        chargeSimple(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
-        // check to make sure a seasonal schedule is specified if the season is not annual
-        if (chargeSimple(iInObj).season != seasonAnnual) {
-            if (chargeSimple(iInObj).tariffIndx != 0) {
-                if (tariff(chargeSimple(iInObj).tariffIndx).seasonSchIndex == 0) {
-                    ShowWarningError(
-                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
-                    ShowContinueError(state,
-                                      " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
-                }
-            }
-        }
-        // index of the category in the variable array
-        chargeSimple(iInObj).categoryPt = AssignVariablePt(state,
-                                                           state.dataIPShortCut->cAlphaArgs(5),
-                                                           true,
-                                                           varIsAssigned,
-                                                           varNotYetDefined,
-                                                           iEconVarObjType::Category,
-                                                           iInObj,
-                                                           chargeSimple(iInObj).tariffIndx);
-        // cost per unit value or variable
-        chargeSimple(iInObj).costPerVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(6), isNotNumeric);
-        chargeSimple(iInObj).costPerPt = AssignVariablePt(state,
-                                                          state.dataIPShortCut->cAlphaArgs(6),
-                                                          isNotNumeric,
-                                                          varIsArgument,
-                                                          varNotYetDefined,
-                                                          iEconVarObjType::Unknown,
-                                                          0,
-                                                          chargeSimple(iInObj).tariffIndx);
-    }
-}
-
-void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //    Read the input file for "Economics:Charge:Block" objects.
-
-    static constexpr std::string_view RoutineName("GetInputEconomicsChargeBlock: ");
-    int iInObj;    // loop index variable for reading in objects
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    bool isNotNumeric;
-    int jBlk;               // loop index for blocks
-    int alphaOffset;        // offset used in blocks for alpha array
-    Real64 hugeNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
-
-    auto &chargeBlock(state.dataEconTariff->chargeBlock);
-    auto &tariff(state.dataEconTariff->tariff);
-
-    CurrentModuleObject = "UtilityCost:Charge:Block";
-    hugeNumber = HUGE_(hugeNumber);
-    state.dataEconTariff->numChargeBlock = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    chargeBlock.allocate(state.dataEconTariff->numChargeBlock);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeBlock; ++iInObj) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 iInObj,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
-            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
-                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
-            }
-        }
-        // index of the tariff name in the tariff array
-        chargeBlock(iInObj).tariffIndx =
-            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeBlock(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
-        chargeBlock(iInObj).namePt = AssignVariablePt(state,
-                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                      true,
-                                                      varIsAssigned,
-                                                      varNotYetDefined,
-                                                      iEconVarObjType::ChargeBlock,
-                                                      iInObj,
-                                                      chargeBlock(iInObj).tariffIndx);
-        // index of the variable in the variable array
-        chargeBlock(iInObj).sourcePt = AssignVariablePt(state,
-                                                        state.dataIPShortCut->cAlphaArgs(3),
-                                                        true,
-                                                        varIsArgument,
-                                                        varNotYetDefined,
-                                                        iEconVarObjType::Unknown,
-                                                        0,
-                                                        chargeBlock(iInObj).tariffIndx);
-        // enumerated list of the kind of season
-        chargeBlock(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
-        // check to make sure a seasonal schedule is specified if the season is not annual
-        if (chargeBlock(iInObj).season != seasonAnnual) {
-            if (chargeBlock(iInObj).tariffIndx != 0) {
-                if (tariff(chargeBlock(iInObj).tariffIndx).seasonSchIndex == 0) {
-                    ShowWarningError(
-                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
-                    ShowContinueError(state,
-                                      " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
-                }
-            }
-        }
-        // index of the category in the variable array
-        chargeBlock(iInObj).categoryPt = AssignVariablePt(state,
-                                                          state.dataIPShortCut->cAlphaArgs(5),
-                                                          true,
-                                                          varIsAssigned,
-                                                          varNotYetDefined,
-                                                          iEconVarObjType::Category,
-                                                          iInObj,
-                                                          chargeBlock(iInObj).tariffIndx);
-        // index of the remaining into variable in the variable array
-        chargeBlock(iInObj).remainingPt = AssignVariablePt(state,
-                                                           state.dataIPShortCut->cAlphaArgs(6),
-                                                           true,
-                                                           varIsAssigned,
-                                                           varNotYetDefined,
-                                                           iEconVarObjType::Category,
-                                                           iInObj,
-                                                           chargeBlock(iInObj).tariffIndx);
-        // block size multiplier
-        if (len(state.dataIPShortCut->cAlphaArgs(7)) == 0) { // if blank
-            chargeBlock(iInObj).blkSzMultVal = 1.0;          // default is 1 if left blank
-            chargeBlock(iInObj).blkSzMultPt = 0;
-        } else {
-            chargeBlock(iInObj).blkSzMultVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
-            chargeBlock(iInObj).blkSzMultPt = AssignVariablePt(state,
-                                                               state.dataIPShortCut->cAlphaArgs(7),
-                                                               isNotNumeric,
-                                                               varIsArgument,
-                                                               varNotYetDefined,
-                                                               iEconVarObjType::Unknown,
-                                                               0,
-                                                               chargeBlock(iInObj).tariffIndx);
-        }
-        // number of blocks used
-        chargeBlock(iInObj).numBlk = (NumAlphas - 7) / 2;
-        for (jBlk = 1; jBlk <= chargeBlock(iInObj).numBlk; ++jBlk) {
-            alphaOffset = 7 + (jBlk - 1) * 2;
-            // catch the "remaining" code word for the block size
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), "REMAINING")) {
-                chargeBlock(iInObj).blkSzVal(jBlk) = hugeNumber / 1000000; // using small portion of largest possible value to prevent overflow
-                chargeBlock(iInObj).blkSzPt(jBlk) = 0;
-            } else {
-                // array of block size
-                chargeBlock(iInObj).blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), isNotNumeric);
-
-                chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(state,
-                                                                     state.dataIPShortCut->cAlphaArgs(alphaOffset + 1),
-                                                                     isNotNumeric,
-                                                                     varIsArgument,
-                                                                     varNotYetDefined,
-                                                                     iEconVarObjType::Unknown,
-                                                                     0,
-                                                                     chargeBlock(iInObj).tariffIndx);
-            }
-            // array of block cost
-            chargeBlock(iInObj).blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 2), isNotNumeric);
-            chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(state,
-                                                                   state.dataIPShortCut->cAlphaArgs(alphaOffset + 2),
-                                                                   isNotNumeric,
-                                                                   varIsArgument,
-                                                                   varNotYetDefined,
-                                                                   iEconVarObjType::Unknown,
-                                                                   0,
-                                                                   chargeBlock(iInObj).tariffIndx);
-        }
-    }
-}
-
-void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //    Read the input file for "Economics:Ratchet" objects.
-
-    static constexpr std::string_view RoutineName("GetInputEconomicsRatchet: ");
-    int iInObj;    // loop index variable for reading in objects
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    bool isNotNumeric;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
-
-    auto &ratchet(state.dataEconTariff->ratchet);
-
-    CurrentModuleObject = "UtilityCost:Ratchet";
-    state.dataEconTariff->numRatchet = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    ratchet.allocate(state.dataEconTariff->numRatchet);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numRatchet; ++iInObj) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 iInObj,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
-            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
-                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
-            }
-        }
-        // index of the tariff name in the tariff array
-        ratchet(iInObj).tariffIndx =
-            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), ratchet(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
-        ratchet(iInObj).namePt = AssignVariablePt(state,
-                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                  true,
-                                                  varIsAssigned,
-                                                  varNotYetDefined,
-                                                  iEconVarObjType::Ratchet,
-                                                  iInObj,
-                                                  ratchet(iInObj).tariffIndx);
-        // index of the variable in the variable array
-        ratchet(iInObj).baselinePt = AssignVariablePt(state,
-                                                      state.dataIPShortCut->cAlphaArgs(3),
-                                                      true,
-                                                      varIsArgument,
-                                                      varNotYetDefined,
-                                                      iEconVarObjType::Ratchet,
-                                                      iInObj,
-                                                      ratchet(iInObj).tariffIndx);
-        // index of the variable in the variable array
-        ratchet(iInObj).adjustmentPt = AssignVariablePt(state,
-                                                        state.dataIPShortCut->cAlphaArgs(4),
-                                                        true,
-                                                        varIsArgument,
-                                                        varNotYetDefined,
-                                                        iEconVarObjType::Ratchet,
-                                                        iInObj,
-                                                        ratchet(iInObj).tariffIndx);
-        // seasons to and from
-        ratchet(iInObj).seasonFrom = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(1));
-        ratchet(iInObj).seasonTo = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(1));
-        // ratchet multiplier
-        ratchet(iInObj).multiplierVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
-        ratchet(iInObj).multiplierPt = AssignVariablePt(state,
-                                                        state.dataIPShortCut->cAlphaArgs(7),
-                                                        isNotNumeric,
-                                                        varIsArgument,
-                                                        varNotYetDefined,
-                                                        iEconVarObjType::Unknown,
-                                                        0,
-                                                        ratchet(iInObj).tariffIndx);
-        // ratchet offset
-        ratchet(iInObj).offsetVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
-        ratchet(iInObj).offsetPt = AssignVariablePt(state,
-                                                    state.dataIPShortCut->cAlphaArgs(8),
-                                                    isNotNumeric,
-                                                    varIsArgument,
-                                                    varNotYetDefined,
-                                                    iEconVarObjType::Unknown,
-                                                    0,
-                                                    ratchet(iInObj).tariffIndx);
-    }
-}
-
-void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //    Read the input file for "Economics:Variable" objects.
-
-    static constexpr std::string_view RoutineName("GetInputEconomicsVariable: ");
-
-    int numEconVarObj;
-    int tariffPt;
-    int iInObj;    // loop index variable for reading in objects
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    int jVal;
-    int variablePt;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
-
-    auto &econVar(state.dataEconTariff->econVar);
-
-    CurrentModuleObject = "UtilityCost:Variable";
-    numEconVarObj = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 iInObj,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
-            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
-                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
-            }
-        }
-        tariffPt = FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        variablePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(1), true, varIsArgument, varUserDefined, iEconVarObjType::Variable, iInObj, tariffPt);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
-        // validate the kind of variable - not used internally except for validation
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ENERGY")) {
-            econVar(variablePt).varUnitType = varUnitTypeEnergy;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DEMAND")) {
-            econVar(variablePt).varUnitType = varUnitTypeDemand;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DIMENSIONLESS")) {
-            econVar(variablePt).varUnitType = varUnitTypeDimensionless;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "CURRENCY")) {
-            econVar(variablePt).varUnitType = varUnitTypeCurrency;
-        } else {
-            econVar(variablePt).varUnitType = varUnitTypeDimensionless;
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-            ShowContinueError(state, "invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
-            ErrorsFound = true;
-        }
-        // move number inputs into econVar
-        for (jVal = 1; jVal <= NumNums; ++jVal) {
-            econVar(variablePt).values(jVal) = state.dataIPShortCut->rNumericArgs(jVal);
-        }
-        // fill the rest of the array with the last value entered
-        if (NumNums < MaxNumMonths) {
-            for (jVal = NumNums + 1; jVal <= MaxNumMonths; ++jVal) {
-                econVar(variablePt).values(jVal) = state.dataIPShortCut->rNumericArgs(NumNums);
-            }
-        }
-    }
-}
-
-void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //    Read the input file for "Economics:Computation" objects.
-    //    This object is only used for very complex rates.
-
-    static constexpr std::string_view RoutineName("GetInputEconomicsComputation: ");
-
-    int tariffPt;
-    int iInObj;    // loop index variable for reading in objects
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    int jLine;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
-
-    auto &computation(state.dataEconTariff->computation);
-
-    CurrentModuleObject = "UtilityCost:Computation";
-    state.dataEconTariff->numComputation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    computation.allocate(state.dataEconTariff->numTariff); // not the number of Computations but the number of tariffs
-    // set default values for computation
-    for (auto &e : computation) {
-        e.computeName.clear();
-        e.firstStep = 0;
-        e.lastStep = -1;
-        e.isUserDef = false;
-    }
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numComputation; ++iInObj) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 iInObj,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
-            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
-                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
-            }
-        }
-        tariffPt = FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
-        // tariff and computation share the same index, the tariff index
-        // so all references are to the tariffPt
-        if (isWithinRange(state, tariffPt, 1, state.dataEconTariff->numTariff)) {
-            computation(tariffPt).computeName = state.dataIPShortCut->cAlphaArgs(1);
-            computation(tariffPt).firstStep = state.dataEconTariff->numSteps + 1;
-            for (jLine = 3; jLine <= NumAlphas; ++jLine) {
-                parseComputeLine(state, state.dataIPShortCut->cAlphaArgs(jLine), tariffPt);
-            }
-            computation(tariffPt).lastStep = state.dataEconTariff->numSteps;
-            // check to make sure that some steps were defined
-            if (computation(tariffPt).firstStep >= computation(tariffPt).lastStep) {
-                computation(tariffPt).firstStep = 0;
-                computation(tariffPt).lastStep = -1;
-                computation(tariffPt).isUserDef = false;
-                ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
-                ShowContinueError(state, "... No lines in the computation can be interpreted ");
-                ErrorsFound = true;
-            } else {
-                computation(tariffPt).isUserDef = true;
-            }
-        } else {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
-            ShowContinueError(state,
-                              "... not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
-        }
-    }
-}
-
-void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
-{
-    //       AUTHOR         Jason Glazer
-    //       DATE WRITTEN   August 2008
-
-    //   Sets the type of currency (U.S. Dollar, Euro, Yen, etc.. )
-    //   This is a "unique" object.
-
-    std::string const CurrentModuleObject("CurrencyType");
-    static constexpr std::string_view RoutineName("GetInputEconomicsCurrencyType: ");
-
-    int NumCurrencyType;
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    int i;
-
-    initializeMonetaryUnit(state);
-    NumCurrencyType = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataCostEstimateManager->selectedMonetaryUnit = 0; // invalid
-    if (NumCurrencyType == 0) {
-        state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
-    } else if (NumCurrencyType == 1) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 1,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        // Monetary Unit
-        for (i = 1; i <= state.dataCostEstimateManager->numMonetaryUnit; ++i) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
-                state.dataCostEstimateManager->selectedMonetaryUnit = i;
-                break;
-            }
-        }
-        if (state.dataCostEstimateManager->selectedMonetaryUnit == 0) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
-            ShowContinueError(state, "... invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '.');
-            ErrorsFound = true;
-        }
-    } else if (NumCurrencyType > 1) {
-        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
-        state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
-    }
-}
-
-void parseComputeLine(EnergyPlusData &state, std::string const &lineOfCompute, int const fromTariff)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   June 2004
-
-    //   Converts a single line in the ECONOMICS:COMPUTE
-    //   command into tokens for computation
-
-    //   Scan the line from the end of the line to the front of the
-    //   line and search for operators and variables. All items
-    //   are put into the step array.
-
-    std::string word;
-    std::string::size_type endOfWord;
-    int token;
-
-    endOfWord = len(lineOfCompute) - 1;
-    while (endOfWord != std::string::npos) {
-        // get a single word (text string delimited by spaces)
-        GetLastWord(lineOfCompute, endOfWord, word);
-        // first see if word is an operator
-        token = lookupOperator(word);
-        // if not an operator then look for
-        if (token == 0) {
-            // see if argument or assignment (assignment will be first string on line)
-            if (endOfWord != std::string::npos) {
-                token = AssignVariablePt(state, word, true, varIsArgument, varNotYetDefined, iEconVarObjType::Unknown, 0, fromTariff);
-            } else {
-                token = AssignVariablePt(state, word, true, varIsAssigned, varNotYetDefined, iEconVarObjType::AssignCompute, 0, fromTariff);
-            }
-        }
-        // if a token is found then put it into step array
-        if (token == 0) {
-            ShowWarningError(state, "In UtilityCost:Computation line: " + lineOfCompute);
-            ShowContinueError(state, "  Do not recognize: " + word + " Will skip.");
-        } else {
-            incrementSteps(state);
-            state.dataEconTariff->steps(state.dataEconTariff->numSteps) = token;
-        }
-    }
-    incrementSteps(state);
-    state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0; // at the end of the line show a zero to clear the stack
-}
-
-void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   June 2004
-
-    //   Returns the last substring of the line of text to the
-    //   left of the endOfSubStrg pointer. A substring is
-    //   delimitted by spaces.  Quotes are not significant
-    //   (they are treated just like any other non-space character)
-
-    //   Scan the string from the end.
-
-    bool isInWord;
-    bool isSpace;
-    std::string::size_type iString;
-    std::string::size_type curEndOfScan;
-    std::string::size_type beginOfWord;
-    std::string::size_type endOfWord;
-
-    curEndOfScan = endOfScan;
-    if (curEndOfScan != std::string::npos) {
-        if (curEndOfScan >= len(lineOfText)) {
-            curEndOfScan = len(lineOfText) - 1;
-        }
-        // check if currently on a space or not
-        if (lineOfText[curEndOfScan] == ' ') {
-            isInWord = false;
-            beginOfWord = 0;
-            endOfWord = 0;
-        } else {
-            isInWord = true;
-            beginOfWord = curEndOfScan;
-            endOfWord = curEndOfScan;
-        }
-        // scan backwards from
-        for (iString = curEndOfScan; iString <= curEndOfScan; --iString) { // Unsigned will wrap to npos after 0
-            if (lineOfText[iString] == ' ') {
-                isSpace = true;
-            } else {
-                isSpace = false;
-            }
-            // all logical conditions of isSpace and isInWord
-            if (isSpace) {
-                if (isInWord) {
-                    // found the space in front of the word
-                    break;
-                } else {
-                    // still have not found the back of the word
-                    // do nothing
-                }
-            } else {
-                if (isInWord) {
-                    // still have not found the space in front of the word
-                    beginOfWord = iString;
-                } else {
-                    // found the last character of the word
-                    endOfWord = iString;
-                    beginOfWord = iString;
-                    isInWord = true;
-                }
-            }
-        }
-        aWord = lineOfText.substr(beginOfWord, endOfWord - beginOfWord + 1);
-        endOfScan = beginOfWord - 1;
-        if (endOfScan == std::string::npos) {
-            endOfScan = std::string::npos;
-        }
-    } else {
-        endOfScan = std::string::npos;
-        aWord = "";
     }
 }
 
@@ -1766,292 +1310,57 @@ void initializeMonetaryUnit(EnergyPlusData &state)
     state.dataCostEstimateManager->monetaryUnit(111).html = "Z$";
 }
 
-int LookUpSeason(EnergyPlusData &state, std::string const &nameOfSeason, std::string const &nameOfReferingObj)
+void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
 {
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
+    //       AUTHOR         Jason Glazer
+    //       DATE WRITTEN   August 2008
 
-    //    Find the index for the season string provided or else
-    //    raise a warning.
+    //   Sets the type of currency (U.S. Dollar, Euro, Yen, etc.. )
+    //   This is a "unique" object.
 
-    int LookUpSeason;
+    std::string const CurrentModuleObject("CurrencyType");
+    static constexpr std::string_view RoutineName("GetInputEconomicsCurrencyType: ");
 
-    if (UtilityRoutines::SameString(nameOfSeason, "Summer")) {
-        LookUpSeason = seasonSummer;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Winter")) {
-        LookUpSeason = seasonWinter;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Spring")) {
-        LookUpSeason = seasonSpring;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Fall")) {
-        LookUpSeason = seasonFall;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Annual")) {
-        LookUpSeason = seasonAnnual;
-    } else {
-        ShowWarningError(state, "UtilityCost: Invalid season name " + nameOfSeason + " in: " + nameOfReferingObj);
-        ShowContinueError(state, "  Defaulting to Annual");
-        LookUpSeason = seasonAnnual;
-    }
-    return LookUpSeason;
-}
+    int NumCurrencyType;
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
+    int i;
 
-int FindTariffIndex(
-    EnergyPlusData &state, std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //    Find the index for the tariff string provided or else
-    //    raise a warning.
-
-    int FindTariffIndex;
-    int iTariff;
-    int found;
-
-    found = 0;
-    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        if (UtilityRoutines::SameString(nameOfTariff, state.dataEconTariff->tariff(iTariff).tariffName)) {
-            found = iTariff;
-            break;
-        }
-    }
-    if (found > 0) {
-        FindTariffIndex = found;
-    } else {
-        ShowSevereError(state, nameOfCurObj + "=\"" + nameOfReferingObj + "\" invalid tariff referenced");
-        ShowContinueError(state, "not found UtilityCost:Tariff=\"" + nameOfTariff + "\".");
-        ErrorsFound = true;
-        FindTariffIndex = 0;
-    }
-    return FindTariffIndex;
-}
-
-void warnIfNativeVarname(
-    EnergyPlusData &state, std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   March 2007
-
-    //   Issue a warning if the variable name (usually the object name) is
-    //   one of the names of native variables
-
-    bool throwError;
-
-    throwError = false;
-    if (UtilityRoutines::SameString(objName, "TotalEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "TotalDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "OffPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "OffPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "MidPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "MidPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakExceedsOffPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "OffPeakExceedsPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakExceedsMidPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "MidPeakExceedsPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakExceedsShoulder")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderExceedsPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsWinter")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotWinter")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsSpring")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotSpring")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsSummer")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotSummer")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsAutumn")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotAutumn")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndShoulderEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndShoulderDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndMidPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndMidPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderAndOffPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderAndOffPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndOffPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndOffPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "RealTimePriceCosts")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "AboveCustomerBaseCosts")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "BelowCustomerBaseCosts")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "AboveCustomerBaseEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "BelowCustomerBaseEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "EnergyCharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "DemandCharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ServiceCharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Basis")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Surcharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Adjustments")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Subtotal")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Taxes")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Total")) throwError = true;
-    if (throwError) {
-        ErrorsFound = true;
-        if (curTariffIndex >= 1 && curTariffIndex <= state.dataEconTariff->numTariff) {
-            ShowSevereError(state, "UtilityCost:Tariff=\"" + state.dataEconTariff->tariff(curTariffIndex).tariffName + "\" invalid referenced name");
-            ShowContinueError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
-        } else {
-            ShowSevereError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
-        }
-    }
-}
-
-int AssignVariablePt(EnergyPlusData &state,
-                     std::string const &stringIn,
-                     bool const flagIfNotNumeric,
-                     int const useOfVar,
-                     int const varSpecific,
-                     iEconVarObjType const econObjKind,
-                     int const objIndex,
-                     int const tariffPt)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //   If the string is not numeric, check if it is a valid string to use as
-    //   a variable name. Check if name has been used before and if not create
-    //   the variable using the string as its name.
-    //   Return the index of the variable.
-
-    int AssignVariablePt;
-
-    std::string inNoSpaces;
-    int found;
-    int iVar;
-
-    auto &econVar(state.dataEconTariff->econVar);
-
-    if (flagIfNotNumeric && (len(stringIn) >= 1)) {
-        inNoSpaces = RemoveSpaces(state, stringIn);
-        found = 0;
-        if (allocated(econVar)) {
-            for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-                if (econVar(iVar).tariffIndx == tariffPt) {
-                    if (UtilityRoutines::SameString(econVar(iVar).name, inNoSpaces)) {
-                        found = iVar;
-                        break;
-                    }
-                }
+    initializeMonetaryUnit(state);
+    NumCurrencyType = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataCostEstimateManager->selectedMonetaryUnit = 0; // invalid
+    if (NumCurrencyType == 0) {
+        state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
+    } else if (NumCurrencyType == 1) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 1,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        // Monetary Unit
+        for (i = 1; i <= state.dataCostEstimateManager->numMonetaryUnit; ++i) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
+                state.dataCostEstimateManager->selectedMonetaryUnit = i;
+                break;
             }
         }
-        if (found > 0) {
-            AssignVariablePt = found;
-            if (econVar(found).kindOfObj == iEconVarObjType::Unknown) {
-                econVar(found).kindOfObj = econObjKind;
-                if (econVar(found).index == 0) econVar(found).index = objIndex;
-            }
-        } else {
-            incrementEconVar(state);
-            econVar(state.dataEconTariff->numEconVar).name = inNoSpaces;
-            econVar(state.dataEconTariff->numEconVar).kindOfObj = econObjKind;
-            econVar(state.dataEconTariff->numEconVar).index = objIndex;
-            AssignVariablePt = state.dataEconTariff->numEconVar;
+        if (state.dataCostEstimateManager->selectedMonetaryUnit == 0) {
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
+            ShowContinueError(state, "... invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '.');
+            ErrorsFound = true;
         }
-        // now set the flag for the type of usage the variable has
-        if (useOfVar == varIsArgument) {
-            econVar(AssignVariablePt).isArgument = true;
-        } else if (useOfVar == varIsAssigned) {
-            econVar(AssignVariablePt).isAssigned = true;
-        }
-        econVar(AssignVariablePt).tariffIndx = tariffPt;
-        // if the user defines the UtilityCost:Computation then this is called when reading the
-        // UtilityCost:Tariff with varNotYetDefined but they are already defined because
-        // the subroutine CreateCategoryNativeVariables has already been called.
-        if (!((varSpecific == varNotYetDefined) && (econVar(AssignVariablePt).specific >= catEnergyCharges))) {
-            econVar(AssignVariablePt).specific = varSpecific;
-        }
-    } else { // if the string was numeric return a zero
-        AssignVariablePt = 0;
+    } else if (NumCurrencyType > 1) {
+        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
+        state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
     }
-    return AssignVariablePt;
-}
-
-void incrementEconVar(EnergyPlusData &state)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //   Increment the Increase the size of the
-
-    int constexpr sizeIncrement(100);
-
-    auto &econVar(state.dataEconTariff->econVar);
-
-    if (!allocated(econVar)) {
-        econVar.allocate(sizeIncrement);
-        state.dataEconTariff->sizeEconVar = sizeIncrement;
-        state.dataEconTariff->numEconVar = 1;
-    } else {
-        ++state.dataEconTariff->numEconVar;
-        // if larger than current size grow the array
-        if (state.dataEconTariff->numEconVar > state.dataEconTariff->sizeEconVar) {
-            econVar.redimension(state.dataEconTariff->sizeEconVar += sizeIncrement);
-        }
-    }
-    // initialize new record) //Autodesk Most of these match default initialization so not needed
-    econVar(state.dataEconTariff->numEconVar).name = "";
-    econVar(state.dataEconTariff->numEconVar).tariffIndx = 0;
-    econVar(state.dataEconTariff->numEconVar).kindOfObj = iEconVarObjType::Unknown;
-    econVar(state.dataEconTariff->numEconVar).index = 0;
-    econVar(state.dataEconTariff->numEconVar).values = 0.0;
-    econVar(state.dataEconTariff->numEconVar).isArgument = false;
-    econVar(state.dataEconTariff->numEconVar).isAssigned = false;
-    econVar(state.dataEconTariff->numEconVar).specific = varNotYetDefined;
-    //        econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
-    // Autodesk Don't initialize cntMeDependOn
-    econVar(state.dataEconTariff->numEconVar).Operator = 0;
-    econVar(state.dataEconTariff->numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0
-    econVar(state.dataEconTariff->numEconVar).lastOperand = 0;
-    econVar(state.dataEconTariff->numEconVar).activeNow = false;
-    econVar(state.dataEconTariff->numEconVar).isEvaluated = false;
-    // Autodesk Don't initialize isReported
-    // Autodesk Don't initialize varUnitType
-}
-
-void incrementSteps(EnergyPlusData &state)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   June 2004
-
-    //   Increment the step array counter and if
-    //   necessary increase the size of the array.
-
-    int const sizeIncrement(100);
-
-    if (!allocated(state.dataEconTariff->steps)) {
-        state.dataEconTariff->steps.allocate(sizeIncrement);
-        state.dataEconTariff->sizeSteps = sizeIncrement;
-        state.dataEconTariff->numSteps = 1;
-    } else {
-        ++state.dataEconTariff->numSteps;
-        // if larger than current size grow the array
-        if (state.dataEconTariff->numSteps > state.dataEconTariff->sizeSteps) {
-            state.dataEconTariff->steps.redimension(state.dataEconTariff->sizeSteps += sizeIncrement);
-        }
-    }
-    // initialize new record
-    state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0;
-}
-
-std::string RemoveSpaces(EnergyPlusData &state, std::string const &StringIn)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2004
-
-    //   Return the string with all spaces removed.
-
-    std::string StringOut;
-    bool foundSpaces = false;
-    for (std::string::size_type iString = 0; iString < len(StringIn); ++iString) {
-        if (StringIn[iString] != ' ') {
-            StringOut += StringIn[iString];
-        } else {
-            foundSpaces = true;
-        }
-    }
-    if (foundSpaces) {
-        ShowWarningError(state, "UtilityCost: Spaces were removed from the variable=\"" + StringIn + "\".");
-        ShowContinueError(state, "...Resultant variable=\"" + StringOut + "\".");
-    }
-    return StringOut;
 }
 
 void CreateCategoryNativeVariables(EnergyPlusData &state)
@@ -2163,6 +1472,445 @@ void CreateCategoryNativeVariables(EnergyPlusData &state)
         tariff(iTariff).nativeBelowCustomerBaseEnergy = AssignVariablePt(
             state, "BelowCustomerBaseEnergy", true, varIsArgument, nativeBelowCustomerBaseEnergy, iEconVarObjType::Native, 0, iTariff);
         tariff(iTariff).lastNative = state.dataEconTariff->numEconVar;
+    }
+}
+
+void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Read the input file for "Economics:Charge:Simple" objects.
+
+    static constexpr std::string_view RoutineName("GetInputEconomicsChargeSimple: ");
+    int iInObj;    // loop index variable for reading in objects
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
+    bool isNotNumeric;
+    int jFld;
+    std::string CurrentModuleObject; // for ease in renaming.
+
+    auto &chargeSimple(state.dataEconTariff->chargeSimple);
+    auto &tariff(state.dataEconTariff->tariff);
+
+    CurrentModuleObject = "UtilityCost:Charge:Simple";
+    state.dataEconTariff->numChargeSimple = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    chargeSimple.allocate(state.dataEconTariff->numChargeSimple);
+    for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeSimple; ++iInObj) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 iInObj,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        // check to make sure none of the values are another economic object
+        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
+            }
+        }
+        // index of the tariff name in the tariff array
+        chargeSimple(iInObj).tariffIndx =
+            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeSimple(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
+        chargeSimple(iInObj).namePt = AssignVariablePt(state,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       true,
+                                                       varIsAssigned,
+                                                       varNotYetDefined,
+                                                       iEconVarObjType::ChargeSimple,
+                                                       iInObj,
+                                                       chargeSimple(iInObj).tariffIndx);
+        // index of the variable in the variable array
+        chargeSimple(iInObj).sourcePt = AssignVariablePt(state,
+                                                         state.dataIPShortCut->cAlphaArgs(3),
+                                                         true,
+                                                         varIsArgument,
+                                                         varNotYetDefined,
+                                                         iEconVarObjType::Unknown,
+                                                         0,
+                                                         chargeSimple(iInObj).tariffIndx);
+        // enumerated list of the kind of season
+        chargeSimple(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
+        // check to make sure a seasonal schedule is specified if the season is not annual
+        if (chargeSimple(iInObj).season != seasonAnnual) {
+            if (chargeSimple(iInObj).tariffIndx != 0) {
+                if (tariff(chargeSimple(iInObj).tariffIndx).seasonSchIndex == 0) {
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                    ShowContinueError(state,
+                                      " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
+                }
+            }
+        }
+        // index of the category in the variable array
+        chargeSimple(iInObj).categoryPt = AssignVariablePt(state,
+                                                           state.dataIPShortCut->cAlphaArgs(5),
+                                                           true,
+                                                           varIsAssigned,
+                                                           varNotYetDefined,
+                                                           iEconVarObjType::Category,
+                                                           iInObj,
+                                                           chargeSimple(iInObj).tariffIndx);
+        // cost per unit value or variable
+        chargeSimple(iInObj).costPerVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(6), isNotNumeric);
+        chargeSimple(iInObj).costPerPt = AssignVariablePt(state,
+                                                          state.dataIPShortCut->cAlphaArgs(6),
+                                                          isNotNumeric,
+                                                          varIsArgument,
+                                                          varNotYetDefined,
+                                                          iEconVarObjType::Unknown,
+                                                          0,
+                                                          chargeSimple(iInObj).tariffIndx);
+    }
+}
+
+void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Read the input file for "Economics:Charge:Block" objects.
+
+    static constexpr std::string_view RoutineName("GetInputEconomicsChargeBlock: ");
+    int iInObj;    // loop index variable for reading in objects
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
+    bool isNotNumeric;
+    int jBlk;               // loop index for blocks
+    int alphaOffset;        // offset used in blocks for alpha array
+    Real64 hugeNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
+    int jFld;
+    std::string CurrentModuleObject; // for ease in renaming.
+
+    auto &chargeBlock(state.dataEconTariff->chargeBlock);
+    auto &tariff(state.dataEconTariff->tariff);
+
+    CurrentModuleObject = "UtilityCost:Charge:Block";
+    hugeNumber = HUGE_(hugeNumber);
+    state.dataEconTariff->numChargeBlock = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    chargeBlock.allocate(state.dataEconTariff->numChargeBlock);
+    for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeBlock; ++iInObj) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 iInObj,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        // check to make sure none of the values are another economic object
+        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
+            }
+        }
+        // index of the tariff name in the tariff array
+        chargeBlock(iInObj).tariffIndx =
+            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeBlock(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
+        chargeBlock(iInObj).namePt = AssignVariablePt(state,
+                                                      state.dataIPShortCut->cAlphaArgs(1),
+                                                      true,
+                                                      varIsAssigned,
+                                                      varNotYetDefined,
+                                                      iEconVarObjType::ChargeBlock,
+                                                      iInObj,
+                                                      chargeBlock(iInObj).tariffIndx);
+        // index of the variable in the variable array
+        chargeBlock(iInObj).sourcePt = AssignVariablePt(state,
+                                                        state.dataIPShortCut->cAlphaArgs(3),
+                                                        true,
+                                                        varIsArgument,
+                                                        varNotYetDefined,
+                                                        iEconVarObjType::Unknown,
+                                                        0,
+                                                        chargeBlock(iInObj).tariffIndx);
+        // enumerated list of the kind of season
+        chargeBlock(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
+        // check to make sure a seasonal schedule is specified if the season is not annual
+        if (chargeBlock(iInObj).season != seasonAnnual) {
+            if (chargeBlock(iInObj).tariffIndx != 0) {
+                if (tariff(chargeBlock(iInObj).tariffIndx).seasonSchIndex == 0) {
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                    ShowContinueError(state,
+                                      " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
+                }
+            }
+        }
+        // index of the category in the variable array
+        chargeBlock(iInObj).categoryPt = AssignVariablePt(state,
+                                                          state.dataIPShortCut->cAlphaArgs(5),
+                                                          true,
+                                                          varIsAssigned,
+                                                          varNotYetDefined,
+                                                          iEconVarObjType::Category,
+                                                          iInObj,
+                                                          chargeBlock(iInObj).tariffIndx);
+        // index of the remaining into variable in the variable array
+        chargeBlock(iInObj).remainingPt = AssignVariablePt(state,
+                                                           state.dataIPShortCut->cAlphaArgs(6),
+                                                           true,
+                                                           varIsAssigned,
+                                                           varNotYetDefined,
+                                                           iEconVarObjType::Category,
+                                                           iInObj,
+                                                           chargeBlock(iInObj).tariffIndx);
+        // block size multiplier
+        if (len(state.dataIPShortCut->cAlphaArgs(7)) == 0) { // if blank
+            chargeBlock(iInObj).blkSzMultVal = 1.0;          // default is 1 if left blank
+            chargeBlock(iInObj).blkSzMultPt = 0;
+        } else {
+            chargeBlock(iInObj).blkSzMultVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
+            chargeBlock(iInObj).blkSzMultPt = AssignVariablePt(state,
+                                                               state.dataIPShortCut->cAlphaArgs(7),
+                                                               isNotNumeric,
+                                                               varIsArgument,
+                                                               varNotYetDefined,
+                                                               iEconVarObjType::Unknown,
+                                                               0,
+                                                               chargeBlock(iInObj).tariffIndx);
+        }
+        // number of blocks used
+        chargeBlock(iInObj).numBlk = (NumAlphas - 7) / 2;
+        for (jBlk = 1; jBlk <= chargeBlock(iInObj).numBlk; ++jBlk) {
+            alphaOffset = 7 + (jBlk - 1) * 2;
+            // catch the "remaining" code word for the block size
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), "REMAINING")) {
+                chargeBlock(iInObj).blkSzVal(jBlk) = hugeNumber / 1000000; // using small portion of largest possible value to prevent overflow
+                chargeBlock(iInObj).blkSzPt(jBlk) = 0;
+            } else {
+                // array of block size
+                chargeBlock(iInObj).blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), isNotNumeric);
+
+                chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(state,
+                                                                     state.dataIPShortCut->cAlphaArgs(alphaOffset + 1),
+                                                                     isNotNumeric,
+                                                                     varIsArgument,
+                                                                     varNotYetDefined,
+                                                                     iEconVarObjType::Unknown,
+                                                                     0,
+                                                                     chargeBlock(iInObj).tariffIndx);
+            }
+            // array of block cost
+            chargeBlock(iInObj).blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 2), isNotNumeric);
+            chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(state,
+                                                                   state.dataIPShortCut->cAlphaArgs(alphaOffset + 2),
+                                                                   isNotNumeric,
+                                                                   varIsArgument,
+                                                                   varNotYetDefined,
+                                                                   iEconVarObjType::Unknown,
+                                                                   0,
+                                                                   chargeBlock(iInObj).tariffIndx);
+        }
+    }
+}
+
+void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Read the input file for "Economics:Ratchet" objects.
+
+    static constexpr std::string_view RoutineName("GetInputEconomicsRatchet: ");
+    int iInObj;    // loop index variable for reading in objects
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
+    bool isNotNumeric;
+    int jFld;
+    std::string CurrentModuleObject; // for ease in renaming.
+
+    auto &ratchet(state.dataEconTariff->ratchet);
+
+    CurrentModuleObject = "UtilityCost:Ratchet";
+    state.dataEconTariff->numRatchet = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    ratchet.allocate(state.dataEconTariff->numRatchet);
+    for (iInObj = 1; iInObj <= state.dataEconTariff->numRatchet; ++iInObj) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 iInObj,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        // check to make sure none of the values are another economic object
+        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
+            }
+        }
+        // index of the tariff name in the tariff array
+        ratchet(iInObj).tariffIndx =
+            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), ratchet(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
+        ratchet(iInObj).namePt = AssignVariablePt(state,
+                                                  state.dataIPShortCut->cAlphaArgs(1),
+                                                  true,
+                                                  varIsAssigned,
+                                                  varNotYetDefined,
+                                                  iEconVarObjType::Ratchet,
+                                                  iInObj,
+                                                  ratchet(iInObj).tariffIndx);
+        // index of the variable in the variable array
+        ratchet(iInObj).baselinePt = AssignVariablePt(state,
+                                                      state.dataIPShortCut->cAlphaArgs(3),
+                                                      true,
+                                                      varIsArgument,
+                                                      varNotYetDefined,
+                                                      iEconVarObjType::Ratchet,
+                                                      iInObj,
+                                                      ratchet(iInObj).tariffIndx);
+        // index of the variable in the variable array
+        ratchet(iInObj).adjustmentPt = AssignVariablePt(state,
+                                                        state.dataIPShortCut->cAlphaArgs(4),
+                                                        true,
+                                                        varIsArgument,
+                                                        varNotYetDefined,
+                                                        iEconVarObjType::Ratchet,
+                                                        iInObj,
+                                                        ratchet(iInObj).tariffIndx);
+        // seasons to and from
+        ratchet(iInObj).seasonFrom = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(1));
+        ratchet(iInObj).seasonTo = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(1));
+        // ratchet multiplier
+        ratchet(iInObj).multiplierVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
+        ratchet(iInObj).multiplierPt = AssignVariablePt(state,
+                                                        state.dataIPShortCut->cAlphaArgs(7),
+                                                        isNotNumeric,
+                                                        varIsArgument,
+                                                        varNotYetDefined,
+                                                        iEconVarObjType::Unknown,
+                                                        0,
+                                                        ratchet(iInObj).tariffIndx);
+        // ratchet offset
+        ratchet(iInObj).offsetVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
+        ratchet(iInObj).offsetPt = AssignVariablePt(state,
+                                                    state.dataIPShortCut->cAlphaArgs(8),
+                                                    isNotNumeric,
+                                                    varIsArgument,
+                                                    varNotYetDefined,
+                                                    iEconVarObjType::Unknown,
+                                                    0,
+                                                    ratchet(iInObj).tariffIndx);
+    }
+}
+
+bool isWithinRange(EnergyPlusData &state, int const testVal, int const minThreshold, int const maxThreshold)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //   Simple function to check if an integer is equal to or between
+    //   two other values.
+
+    bool isWithinRange;
+
+    if (maxThreshold < minThreshold) {
+        ShowWarningError(state, "UtilityCost: Invalid thresholds in IsWithinRange routine.");
+    }
+    if ((testVal <= maxThreshold) && (testVal >= minThreshold)) {
+        isWithinRange = true;
+    } else {
+        isWithinRange = false;
+    }
+    return isWithinRange;
+}
+
+void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   June 2004
+
+    //   Returns the last substring of the line of text to the
+    //   left of the endOfSubStrg pointer. A substring is
+    //   delimitted by spaces.  Quotes are not significant
+    //   (they are treated just like any other non-space character)
+
+    //   Scan the string from the end.
+
+    bool isInWord;
+    bool isSpace;
+    std::string::size_type iString;
+    std::string::size_type curEndOfScan;
+    std::string::size_type beginOfWord;
+    std::string::size_type endOfWord;
+
+    curEndOfScan = endOfScan;
+    if (curEndOfScan != std::string::npos) {
+        if (curEndOfScan >= len(lineOfText)) {
+            curEndOfScan = len(lineOfText) - 1;
+        }
+        // check if currently on a space or not
+        if (lineOfText[curEndOfScan] == ' ') {
+            isInWord = false;
+            beginOfWord = 0;
+            endOfWord = 0;
+        } else {
+            isInWord = true;
+            beginOfWord = curEndOfScan;
+            endOfWord = curEndOfScan;
+        }
+        // scan backwards from
+        for (iString = curEndOfScan; iString <= curEndOfScan; --iString) { // Unsigned will wrap to npos after 0
+            if (lineOfText[iString] == ' ') {
+                isSpace = true;
+            } else {
+                isSpace = false;
+            }
+            // all logical conditions of isSpace and isInWord
+            if (isSpace) {
+                if (isInWord) {
+                    // found the space in front of the word
+                    break;
+                } else {
+                    // still have not found the back of the word
+                    // do nothing
+                }
+            } else {
+                if (isInWord) {
+                    // still have not found the space in front of the word
+                    beginOfWord = iString;
+                } else {
+                    // found the last character of the word
+                    endOfWord = iString;
+                    beginOfWord = iString;
+                    isInWord = true;
+                }
+            }
+        }
+        aWord = lineOfText.substr(beginOfWord, endOfWord - beginOfWord + 1);
+        endOfScan = beginOfWord - 1;
+        if (endOfScan == std::string::npos) {
+            endOfScan = std::string::npos;
+        }
+    } else {
+        endOfScan = std::string::npos;
+        aWord = "";
     }
 }
 
@@ -2283,13 +2031,228 @@ int lookupOperator(std::string const &opString)
     return lookupOperator;
 }
 
-//======================================================================================================================
-//======================================================================================================================
+void incrementSteps(EnergyPlusData &state)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   June 2004
 
-//    DEFAULT COMPUTATION RELATED ROUTINES
+    //   Increment the step array counter and if
+    //   necessary increase the size of the array.
 
-//======================================================================================================================
-//======================================================================================================================
+    int const sizeIncrement(100);
+
+    if (!allocated(state.dataEconTariff->steps)) {
+        state.dataEconTariff->steps.allocate(sizeIncrement);
+        state.dataEconTariff->sizeSteps = sizeIncrement;
+        state.dataEconTariff->numSteps = 1;
+    } else {
+        ++state.dataEconTariff->numSteps;
+        // if larger than current size grow the array
+        if (state.dataEconTariff->numSteps > state.dataEconTariff->sizeSteps) {
+            state.dataEconTariff->steps.redimension(state.dataEconTariff->sizeSteps += sizeIncrement);
+        }
+    }
+    // initialize new record
+    state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0;
+}
+
+void parseComputeLine(EnergyPlusData &state, std::string const &lineOfCompute, int const fromTariff)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   June 2004
+
+    //   Converts a single line in the ECONOMICS:COMPUTE
+    //   command into tokens for computation
+
+    //   Scan the line from the end of the line to the front of the
+    //   line and search for operators and variables. All items
+    //   are put into the step array.
+
+    std::string word;
+    std::string::size_type endOfWord;
+    int token;
+
+    endOfWord = len(lineOfCompute) - 1;
+    while (endOfWord != std::string::npos) {
+        // get a single word (text string delimited by spaces)
+        GetLastWord(lineOfCompute, endOfWord, word);
+        // first see if word is an operator
+        token = lookupOperator(word);
+        // if not an operator then look for
+        if (token == 0) {
+            // see if argument or assignment (assignment will be first string on line)
+            if (endOfWord != std::string::npos) {
+                token = AssignVariablePt(state, word, true, varIsArgument, varNotYetDefined, iEconVarObjType::Unknown, 0, fromTariff);
+            } else {
+                token = AssignVariablePt(state, word, true, varIsAssigned, varNotYetDefined, iEconVarObjType::AssignCompute, 0, fromTariff);
+            }
+        }
+        // if a token is found then put it into step array
+        if (token == 0) {
+            ShowWarningError(state, "In UtilityCost:Computation line: " + lineOfCompute);
+            ShowContinueError(state, "  Do not recognize: " + word + " Will skip.");
+        } else {
+            incrementSteps(state);
+            state.dataEconTariff->steps(state.dataEconTariff->numSteps) = token;
+        }
+    }
+    incrementSteps(state);
+    state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0; // at the end of the line show a zero to clear the stack
+}
+
+void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Read the input file for "Economics:Computation" objects.
+    //    This object is only used for very complex rates.
+
+    static constexpr std::string_view RoutineName("GetInputEconomicsComputation: ");
+
+    int tariffPt;
+    int iInObj;    // loop index variable for reading in objects
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
+    int jLine;
+    int jFld;
+    std::string CurrentModuleObject; // for ease in renaming.
+
+    auto &computation(state.dataEconTariff->computation);
+
+    CurrentModuleObject = "UtilityCost:Computation";
+    state.dataEconTariff->numComputation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    computation.allocate(state.dataEconTariff->numTariff); // not the number of Computations but the number of tariffs
+    // set default values for computation
+    for (auto &e : computation) {
+        e.computeName.clear();
+        e.firstStep = 0;
+        e.lastStep = -1;
+        e.isUserDef = false;
+    }
+    for (iInObj = 1; iInObj <= state.dataEconTariff->numComputation; ++iInObj) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 iInObj,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        // check to make sure none of the values are another economic object
+        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
+            }
+        }
+        tariffPt = FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
+        // tariff and computation share the same index, the tariff index
+        // so all references are to the tariffPt
+        if (isWithinRange(state, tariffPt, 1, state.dataEconTariff->numTariff)) {
+            computation(tariffPt).computeName = state.dataIPShortCut->cAlphaArgs(1);
+            computation(tariffPt).firstStep = state.dataEconTariff->numSteps + 1;
+            for (jLine = 3; jLine <= NumAlphas; ++jLine) {
+                parseComputeLine(state, state.dataIPShortCut->cAlphaArgs(jLine), tariffPt);
+            }
+            computation(tariffPt).lastStep = state.dataEconTariff->numSteps;
+            // check to make sure that some steps were defined
+            if (computation(tariffPt).firstStep >= computation(tariffPt).lastStep) {
+                computation(tariffPt).firstStep = 0;
+                computation(tariffPt).lastStep = -1;
+                computation(tariffPt).isUserDef = false;
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
+                ShowContinueError(state, "... No lines in the computation can be interpreted ");
+                ErrorsFound = true;
+            } else {
+                computation(tariffPt).isUserDef = true;
+            }
+        } else {
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
+            ShowContinueError(state,
+                              "... not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+            ErrorsFound = true;
+        }
+    }
+}
+
+void addOperand(EnergyPlusData &state, int const varMe, int const varOperand)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //   Used by CreateDefaultComputation to create the dependancy
+    //   relationship in the EconVar array
+
+    int constexpr sizeIncrement(100);
+
+    auto &econVar(state.dataEconTariff->econVar);
+
+    if (varOperand != 0) {
+        // increment the numOperand and allocate/reallocate the array
+        // if necessary
+        if (!allocated(state.dataEconTariff->operand)) {
+            state.dataEconTariff->operand.allocate(sizeIncrement);
+            state.dataEconTariff->sizeOperand = sizeIncrement;
+            state.dataEconTariff->numOperand = 1;
+        } else {
+            ++state.dataEconTariff->numOperand;
+            // if larger than current size grow the array
+            if (state.dataEconTariff->numOperand > state.dataEconTariff->sizeOperand) {
+                state.dataEconTariff->operand.redimension(state.dataEconTariff->sizeOperand += sizeIncrement);
+            }
+        }
+        // now add the dependency relationship
+        state.dataEconTariff->operand(state.dataEconTariff->numOperand) = varOperand;
+        econVar(varMe).lastOperand = state.dataEconTariff->numOperand;
+        // if it is the first time addOperand was called with the varMe value
+        // then set the first pointer as well
+        if (varMe != state.dataEconTariff->addOperand_prevVarMe) {
+            econVar(varMe).firstOperand = state.dataEconTariff->numOperand;
+            state.dataEconTariff->addOperand_prevVarMe = varMe;
+        }
+    }
+}
+
+void addChargesToOperand(EnergyPlusData &state, int const curTariff, int const curPointer)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //   Used by CreateDefaultComputation to create the "equation"
+    //   for the categories that are summations of ECONOMICS:CHARGES:BLOCK
+    //   and ECONOMICS:CHARGES:SIMPLE
+
+    int kObj;
+
+    auto &econVar(state.dataEconTariff->econVar);
+    auto &chargeSimple(state.dataEconTariff->chargeSimple);
+    auto &chargeBlock(state.dataEconTariff->chargeBlock);
+
+    econVar(curPointer).Operator = opSUM;
+    econVar(curPointer).activeNow = true;
+    for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
+        if (chargeSimple(kObj).tariffIndx == curTariff) {
+            if (chargeSimple(kObj).categoryPt == curPointer) {
+                addOperand(state, curPointer, chargeSimple(kObj).namePt);
+            }
+        }
+    }
+    for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
+        if (chargeBlock(kObj).tariffIndx == curTariff) {
+            if (chargeBlock(kObj).categoryPt == curPointer) {
+                addOperand(state, curPointer, chargeBlock(kObj).namePt);
+            }
+        }
+    }
+}
 
 void CreateDefaultComputation(EnergyPlusData &state)
 {
@@ -2599,84 +2562,117 @@ void CreateDefaultComputation(EnergyPlusData &state)
     }
 }
 
-void addOperand(EnergyPlusData &state, int const varMe, int const varOperand)
+void UpdateUtilityBills(EnergyPlusData &state)
 {
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
+    //    DATE WRITTEN   September 2003
 
-    //   Used by CreateDefaultComputation to create the dependancy
-    //   relationship in the EconVar array
+    //    Single routine used to call all get input
+    //    routines for economics.
 
-    int constexpr sizeIncrement(100);
+    using OutputReportTabular::AddTOCEntry;
+
+    bool ErrorsFound(false);
+
+    if (state.dataEconTariff->Update_GetInput) {
+        GetInputEconomicsTariff(state, ErrorsFound);
+        // do rest of GetInput only if at least one tariff is defined.
+        GetInputEconomicsCurrencyType(state, ErrorsFound);
+        if (state.dataEconTariff->numTariff >= 1) {
+            if (!ErrorsFound && state.dataOutRptTab->displayEconomicResultSummary)
+                AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
+            CreateCategoryNativeVariables(state);
+            GetInputEconomicsQualify(state, ErrorsFound);
+            GetInputEconomicsChargeSimple(state, ErrorsFound);
+            GetInputEconomicsChargeBlock(state, ErrorsFound);
+            GetInputEconomicsRatchet(state, ErrorsFound);
+            GetInputEconomicsVariable(state, ErrorsFound);
+            GetInputEconomicsComputation(state, ErrorsFound);
+            CreateDefaultComputation(state);
+        }
+        state.dataEconTariff->Update_GetInput = false;
+        if (ErrorsFound) ShowFatalError(state, "UpdateUtilityBills: Preceding errors cause termination.");
+    }
+    if (state.dataGlobal->DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+        GatherForEconomics(state);
+    }
+}
+
+void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2004
+
+    //    Read the input file for "Economics:Variable" objects.
+
+    static constexpr std::string_view RoutineName("GetInputEconomicsVariable: ");
+
+    int numEconVarObj;
+    int tariffPt;
+    int iInObj;    // loop index variable for reading in objects
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
+    int jVal;
+    int variablePt;
+    int jFld;
+    std::string CurrentModuleObject; // for ease in renaming.
 
     auto &econVar(state.dataEconTariff->econVar);
 
-    if (varOperand != 0) {
-        // increment the numOperand and allocate/reallocate the array
-        // if necessary
-        if (!allocated(state.dataEconTariff->operand)) {
-            state.dataEconTariff->operand.allocate(sizeIncrement);
-            state.dataEconTariff->sizeOperand = sizeIncrement;
-            state.dataEconTariff->numOperand = 1;
+    CurrentModuleObject = "UtilityCost:Variable";
+    numEconVarObj = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 iInObj,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        // check to make sure none of the values are another economic object
+        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
+            }
+        }
+        tariffPt = FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        variablePt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(1), true, varIsArgument, varUserDefined, iEconVarObjType::Variable, iInObj, tariffPt);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
+        // validate the kind of variable - not used internally except for validation
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ENERGY")) {
+            econVar(variablePt).varUnitType = varUnitTypeEnergy;
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DEMAND")) {
+            econVar(variablePt).varUnitType = varUnitTypeDemand;
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DIMENSIONLESS")) {
+            econVar(variablePt).varUnitType = varUnitTypeDimensionless;
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "CURRENCY")) {
+            econVar(variablePt).varUnitType = varUnitTypeCurrency;
         } else {
-            ++state.dataEconTariff->numOperand;
-            // if larger than current size grow the array
-            if (state.dataEconTariff->numOperand > state.dataEconTariff->sizeOperand) {
-                state.dataEconTariff->operand.redimension(state.dataEconTariff->sizeOperand += sizeIncrement);
-            }
+            econVar(variablePt).varUnitType = varUnitTypeDimensionless;
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+            ShowContinueError(state, "invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+            ErrorsFound = true;
         }
-        // now add the dependency relationship
-        state.dataEconTariff->operand(state.dataEconTariff->numOperand) = varOperand;
-        econVar(varMe).lastOperand = state.dataEconTariff->numOperand;
-        // if it is the first time addOperand was called with the varMe value
-        // then set the first pointer as well
-        if (varMe != state.dataEconTariff->addOperand_prevVarMe) {
-            econVar(varMe).firstOperand = state.dataEconTariff->numOperand;
-            state.dataEconTariff->addOperand_prevVarMe = varMe;
+        // move number inputs into econVar
+        for (jVal = 1; jVal <= NumNums; ++jVal) {
+            econVar(variablePt).values(jVal) = state.dataIPShortCut->rNumericArgs(jVal);
         }
-    }
-}
-
-void addChargesToOperand(EnergyPlusData &state, int const curTariff, int const curPointer)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-
-    //   Used by CreateDefaultComputation to create the "equation"
-    //   for the categories that are summations of ECONOMICS:CHARGES:BLOCK
-    //   and ECONOMICS:CHARGES:SIMPLE
-
-    int kObj;
-
-    auto &econVar(state.dataEconTariff->econVar);
-    auto &chargeSimple(state.dataEconTariff->chargeSimple);
-    auto &chargeBlock(state.dataEconTariff->chargeBlock);
-
-    econVar(curPointer).Operator = opSUM;
-    econVar(curPointer).activeNow = true;
-    for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
-        if (chargeSimple(kObj).tariffIndx == curTariff) {
-            if (chargeSimple(kObj).categoryPt == curPointer) {
-                addOperand(state, curPointer, chargeSimple(kObj).namePt);
-            }
-        }
-    }
-    for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
-        if (chargeBlock(kObj).tariffIndx == curTariff) {
-            if (chargeBlock(kObj).categoryPt == curPointer) {
-                addOperand(state, curPointer, chargeBlock(kObj).namePt);
+        // fill the rest of the array with the last value entered
+        if (NumNums < MaxNumMonths) {
+            for (jVal = NumNums + 1; jVal <= MaxNumMonths; ++jVal) {
+                econVar(variablePt).values(jVal) = state.dataIPShortCut->rNumericArgs(NumNums);
             }
         }
     }
 }
-
-//======================================================================================================================
-//======================================================================================================================
-
-//    GATHER TIMESTEP VALUES ROUTINE
-
-//======================================================================================================================
-//======================================================================================================================
 
 void GatherForEconomics(EnergyPlusData &state)
 {
@@ -2795,505 +2791,192 @@ void GatherForEconomics(EnergyPlusData &state)
     }
 }
 
-bool isWithinRange(EnergyPlusData &state, int const testVal, int const minThreshold, int const maxThreshold)
+void setNativeVariables(EnergyPlusData &state)
 {
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
     //    DATE WRITTEN   July 2004
 
-    //   Simple function to check if an integer is equal to or between
-    //   two other values.
-
-    bool isWithinRange;
-
-    if (maxThreshold < minThreshold) {
-        ShowWarningError(state, "UtilityCost: Invalid thresholds in IsWithinRange routine.");
-    }
-    if ((testVal <= maxThreshold) && (testVal >= minThreshold)) {
-        isWithinRange = true;
-    } else {
-        isWithinRange = false;
-    }
-    return isWithinRange;
-}
-
-//======================================================================================================================
-//======================================================================================================================
-
-//    COMPUTE THE UTILITY BILLS AND CREATE REPORTS
-
-//======================================================================================================================
-//======================================================================================================================
-
-void ComputeTariff(EnergyPlusData &state)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-
-    //    Perform the calculation steps to compute the monthly
-    //    utility bills for the user entered tariffs.
-    //    The list of steps for the tariff computation are in order
-    //    for stack based computation (reverse polish notation)
-
-    // values used in specific operations
-    Array1D<Real64> a(MaxNumMonths);
-    int aPt;
-    Array1D<Real64> b(MaxNumMonths);
-    int bPt;
-    Array1D<Real64> c(MaxNumMonths);
-    int cPt;
-    Array1D<Real64> d(MaxNumMonths);
+    //    Set up the "built in" i.e. native variables that hold
+    //    the energy and demand from the simulation.
 
     int iTariff;
-    int jStep;
-    int lMonth;
-    int nVar;
-    int curStep;
-    int const noVar(0);
+    int jPeriod;
+    int kMonth;
+    Array1D<Real64> monthVal(MaxNumMonths);
+    Real64 bigNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
 
-    Real64 hugeValue;
-    Real64 annualAggregate;
-    int annualCnt;
-
+    auto &tariff(state.dataEconTariff->tariff);
     auto &econVar(state.dataEconTariff->econVar);
-    auto &computation(state.dataEconTariff->computation);
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
-        state.dataOutRptTab->WriteTabularFiles = false;
-        return;
-    }
-
-    hugeValue = HUGE_(Real64());
-    //  Clear the isEvaluated flags for all economics variables.
-    for (nVar = 1; nVar <= state.dataEconTariff->numEconVar; ++nVar) {
-        econVar(nVar).isEvaluated = false;
-    }
-    if (state.dataEconTariff->numTariff >= 1) {
-        state.dataOutRptTab->WriteTabularFiles = true;
-        setNativeVariables(state);
-        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
-                curStep = state.dataEconTariff->steps(jStep);
-                {
-                    auto const SELECT_CASE_var(curStep);
-                    if (SELECT_CASE_var == 0) { // end of line - assign variable and clear stack
-                        // if the stack still has two items on it then assign the values to the
-                        // pointer otherwise if it follows a NOOP line it will only have one item
-                        // that has already been assigned and no further action is required.
-                        if (state.dataEconTariff->topOfStack >= 2) {
-                            popStack(state, b, bPt); // pop the variable pointer
-                            popStack(state, a, aPt); // pop the values
-                            if (isWithinRange(state, bPt, 1, state.dataEconTariff->numEconVar)) {
-                                econVar(bPt).values = a;
-                            }
-                        }
-                        state.dataEconTariff->topOfStack = 0;
-                    } else if ((SELECT_CASE_var >= 1)) { // all positive values are a reference to an econVar
-                        pushStack(state, econVar(curStep).values, curStep);
-                    } else if (SELECT_CASE_var == opSUM) {
-                        a = 0.0;
-                        for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
-                             ++kStack) { // popStack modifies topOfStack
-                            popStack(state, b, bPt);
-                            a += b;
-                        }
-                        pushStack(state, a, noVar);
-                    } else if (SELECT_CASE_var == opMULTIPLY) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        pushStack(state, a * b, noVar);
-                    } else if (SELECT_CASE_var == opSUBTRACT) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        pushStack(state, b - a, noVar);
-                    } else if (SELECT_CASE_var == opDIVIDE) {
-                        popStack(state, a, aPt);
-                        popStack(state, b, bPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (b(lMonth) != 0) {
-                                c(lMonth) = a(lMonth) / b(lMonth);
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opABSOLUTE) {
-                        popStack(state, a, aPt);
-                        pushStack(state, ObjexxFCL::abs(a), noVar);
-                    } else if (SELECT_CASE_var == opINTEGER) {
-                        popStack(state, a, aPt);
-                        pushStack(state, Array1D_double(Array1D_int(a)), noVar);
-                    } else if (SELECT_CASE_var == opSIGN) {
-                        popStack(state, a, aPt);
-                        pushStack(state, sign(1.0, a), noVar);
-                        //        CASE (opROUND)
-                        //          CALL popStack(b,bPt)
-                        //          CALL popStack(a,aPt)
-                        //          DO lMonth = 1,MaxNumMonths
-                        //            IF ((b(lMonth) .LE. 5) .AND. (b(lMonth) .GE. -5)) THEN
-                        //              c(lMonth) = FLOAT(INT(a(lMonth) / (10 ** b(lMonth))) * (10 ** b(lMonth)))
-                        //            END IF
-                        //          END DO
-                        //          CALL pushStack(c,noVar)
-                    } else if (SELECT_CASE_var == opMAXIMUM) {
-                        a = -hugeValue;
-                        for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
-                             ++kStack) { // popStack modifies topOfStack
-                            popStack(state, b, bPt);
-                            for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                                if (b(lMonth) > a(lMonth)) {
-                                    a(lMonth) = b(lMonth);
-                                }
-                            }
-                        }
-                        pushStack(state, a, noVar);
-                    } else if (SELECT_CASE_var == opMINIMUM) {
-                        a = hugeValue;
-                        for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
-                             ++kStack) { // popStack modifies topOfStack
-                            popStack(state, b, bPt);
-                            for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                                if (b(lMonth) < a(lMonth)) {
-                                    a(lMonth) = b(lMonth);
-                                }
-                            }
-                        }
-                        pushStack(state, a, noVar);
-                    } else if (SELECT_CASE_var == opEXCEEDS) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) > b(lMonth)) {
-                                c(lMonth) = a(lMonth) - b(lMonth);
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALMINIMUM) {
-                        // takes the minimum but ignores zeros
-                        annualAggregate = hugeValue;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != 0) {
-                                if (a(lMonth) < annualAggregate) {
-                                    annualAggregate = a(lMonth);
-                                }
-                            }
-                        }
-                        // if all months are zero then hugeValue still in annual but should be zero
-                        if (annualAggregate == hugeValue) {
-                            annualAggregate = 0.0;
-                        }
-                        c = annualAggregate;
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALMAXIMUM) {
-                        // takes the maximum but ignores zeros
-                        annualAggregate = -hugeValue;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != 0) {
-                                if (a(lMonth) > annualAggregate) {
-                                    annualAggregate = a(lMonth);
-                                }
-                            }
-                        }
-                        // if all months are zero then hugeValue still in annual but should be zero
-                        if (annualAggregate == -hugeValue) {
-                            annualAggregate = 0.0;
-                        }
-                        c = annualAggregate;
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALSUM) {
-                        // takes the maximum but ignores zeros
-                        annualAggregate = 0.0;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            annualAggregate += a(lMonth);
-                        }
-                        c = annualAggregate;
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALAVERAGE) {
-                        // takes the annual sum but ignores zeros
-                        annualAggregate = 0.0;
-                        annualCnt = 0;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != 0) {
-                                annualAggregate += a(lMonth);
-                                ++annualCnt;
-                            }
-                        }
-                        // if all months are zero then return zero
-                        if (annualCnt != 0) {
-                            c = annualAggregate / annualCnt;
-                        } else {
-                            c = 0.0;
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALOR) {
-                        annualCnt = 0;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != 0) {
-                                ++annualCnt;
-                            }
-                        }
-                        // if any months is not zero then "true"
-                        if (annualCnt >= 1) {
-                            c = 1.0;
-                        } else {
-                            c = 0.0;
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALAND) {
-                        annualCnt = 0;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != 0) {
-                                ++annualCnt;
-                            }
-                        }
-                        // if all months are not zero then "true"
-                        if (annualCnt == MaxNumMonths) {
-                            c = 1.0;
-                        } else {
-                            c = 0.0;
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALMAXIMUMZERO) {
-                        // takes the maximum including zeros
-                        annualAggregate = -hugeValue;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) > annualAggregate) {
-                                annualAggregate = a(lMonth);
-                            }
-                        }
-                        c = annualAggregate;
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opANNUALMINIMUMZERO) {
-                        // takes the maximum including zeros
-                        annualAggregate = hugeValue;
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) < annualAggregate) {
-                                annualAggregate = a(lMonth);
-                            }
-                        }
-                        c = annualAggregate;
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opIF) {
-                        popStack(state, c, cPt);
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != 0) {
-                                d(lMonth) = b(lMonth);
-                            } else {
-                                d(lMonth) = c(lMonth);
-                            }
-                        }
-                        pushStack(state, d, noVar);
-                    } else if (SELECT_CASE_var == opGREATERTHAN) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) > b(lMonth)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opGREATEREQUAL) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) >= b(lMonth)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opLESSTHAN) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) < b(lMonth)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opLESSEQUAL) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) <= b(lMonth)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opEQUAL) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) == b(lMonth)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opNOTEQUAL) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) != b(lMonth)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opAND) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if ((a(lMonth) != 0) && (b(lMonth) != 0)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opOR) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if ((a(lMonth) != 0) || (b(lMonth) != 0)) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opNOT) {
-                        popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
-                            if (a(lMonth) == 0) {
-                                c(lMonth) = 1.0;
-                            } else {
-                                c(lMonth) = 0.0;
-                            }
-                        }
-                        pushStack(state, c, noVar);
-                    } else if (SELECT_CASE_var == opADD) {
-                        popStack(state, b, bPt);
-                        popStack(state, a, aPt);
-                        pushStack(state, a + b, noVar);
-                    } else if (SELECT_CASE_var == opNOOP) {
-                        // do nothing but clear the stack
-                        state.dataEconTariff->topOfStack = 0;
-                        // No longer pushing a zero to fix bug
-                        // and push zero
-                        // a = 0
-                    }
+    bigNumber = HUGE_(bigNumber);
+    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+        // nativeTotalEnergy
+        monthVal = 0.0;
+        for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
+            for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+                monthVal(kMonth) += tariff(iTariff).gatherEnergy(kMonth, jPeriod);
+            }
+        }
+        econVar(tariff(iTariff).nativeTotalEnergy).values = monthVal;
+        // nativeTotalDemand
+        monthVal = -bigNumber;
+        for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
+            for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+                if (tariff(iTariff).gatherDemand(kMonth, jPeriod) > monthVal(kMonth)) {
+                    monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, jPeriod);
                 }
             }
-            checkMinimumMonthlyCharge(state, iTariff);
         }
-        selectTariff(state);
-        LEEDtariffReporting(state);
-    }
-}
-
-void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int const variablePointer)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-
-    //    A stack is used in the evaluation of the tariff since
-    //    the variables and operators are in a reverse polish
-    //    notation order. The stack operates on a last-in
-    //    first out basis. The stack consists of both a pointer
-    //    to the variable and the twelve monthly values.
-    //    This routine puts an item on the top of the stack.
-
-    monthlyArray.dim(MaxNumMonths);
-
-    Array1D<Real64> curMonthlyArray(MaxNumMonths);
-    int constexpr sizeIncrement(50);
-
-    auto &stack(state.dataEconTariff->stack);
-    auto &econVar(state.dataEconTariff->econVar);
-    auto &tariff(state.dataEconTariff->tariff);
-
-    curMonthlyArray = monthlyArray;
-    if (!allocated(stack)) {
-        stack.allocate(sizeIncrement);
-        state.dataEconTariff->sizeStack = sizeIncrement;
-        state.dataEconTariff->topOfStack = 1;
-    } else {
-        ++state.dataEconTariff->topOfStack;
-        // if larger than current size grow the array
-        if (state.dataEconTariff->topOfStack > state.dataEconTariff->sizeStack) {
-            stack.redimension(state.dataEconTariff->sizeStack += sizeIncrement);
-        }
-    }
-    // now push the values on to the stack
-    stack(state.dataEconTariff->topOfStack).varPt = variablePointer;
-    // check if variable has been evaluated if it is CHARGE:SIMPLE, CHARGE:BLOCK, RATCHET, or QUALIFY
-    // if it has not overwrite the values for monthlyArray with the evaluated values
-    if (variablePointer != 0) {
-        if (!econVar(variablePointer).isEvaluated) {
-
-            switch (econVar(variablePointer).kindOfObj) {
-            case iEconVarObjType::ChargeSimple:
-                evaluateChargeSimple(state, variablePointer);
-                break;
-            case iEconVarObjType::ChargeBlock:
-                evaluateChargeBlock(state, variablePointer);
-                break;
-            case iEconVarObjType::Ratchet:
-                evaluateRatchet(state, variablePointer);
-                break;
-            case iEconVarObjType::Qualify:
-                evaluateQualify(state, variablePointer);
-                break;
-            case iEconVarObjType::Unknown:
-                ShowWarningError(state, "UtilityCost variable not defined: " + econVar(variablePointer).name);
-                ShowContinueError(state, "   In tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
-                ShowContinueError(state, "   This may be the result of a misspelled variable name in the UtilityCost:Computation object.");
-                ShowContinueError(state, "   All zero values will be assumed for this variable.");
-                break;
-            case iEconVarObjType::Variable:
-            case iEconVarObjType::Category:
-            case iEconVarObjType::Native:
-            case iEconVarObjType::AssignCompute:
-            case iEconVarObjType::Tariff:
-            case iEconVarObjType::Computation:
-                // do nothing
-                break;
-            default:
-                ShowWarningError(state,
-                                 format("UtilityCost Debugging issue. Invalid kind of variable used (pushStack). {} in tariff: {}",
-                                        econVar(variablePointer).kindOfObj,
-                                        tariff(econVar(variablePointer).tariffIndx).tariffName));
+        // if no maximum was set just set to zero
+        for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+            if (monthVal(kMonth) == -bigNumber) {
+                monthVal(kMonth) = 0.0;
             }
-            // if the serviceCharges are being evaluated add in the monthly charges
-            if (econVar(variablePointer).specific == catServiceCharges) addMonthlyCharge(state, variablePointer);
-            // get the results of performing the evaulation - should have been
-            // put into the econVar values
-            curMonthlyArray = econVar(variablePointer).values;
+        }
+        econVar(tariff(iTariff).nativeTotalDemand).values = monthVal;
+        for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+            // nativePeakEnergy
+            econVar(tariff(iTariff).nativePeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodPeak);
+            // nativePeakDemand
+            econVar(tariff(iTariff).nativePeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            // nativeShoulderEnergy
+            econVar(tariff(iTariff).nativeShoulderEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
+            // nativeShoulderDemand
+            econVar(tariff(iTariff).nativeShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            // nativeOffPeakEnergy
+            econVar(tariff(iTariff).nativeOffPeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
+            // nativeOffPeakDemand
+            econVar(tariff(iTariff).nativeOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+            // nativeMidPeakEnergy
+            econVar(tariff(iTariff).nativeMidPeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
+            // nativeMidPeakDemand
+            econVar(tariff(iTariff).nativeMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
+            // nativePeakExceedsOffPeak
+            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+            if (monthVal(kMonth) > 0) {
+                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = monthVal(kMonth);
+            } else {
+                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+            }
+            // nativeOffPeakExceedsPeak
+            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            if (monthVal(kMonth) > 0) {
+                econVar(tariff(iTariff).nativeOffPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
+            } else {
+                econVar(tariff(iTariff).nativeOffPeakExceedsPeak).values(kMonth) = 0.0;
+            }
+            // nativePeakExceedsMidPeak
+            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
+            if (monthVal(kMonth) > 0) {
+                econVar(tariff(iTariff).nativePeakExceedsMidPeak).values(kMonth) = monthVal(kMonth);
+            } else {
+                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+            }
+            // nativeMidPeakExceedsPeak
+            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            if (monthVal(kMonth) > 0) {
+                econVar(tariff(iTariff).nativeMidPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
+            } else {
+                econVar(tariff(iTariff).nativeMidPeakExceedsPeak).values(kMonth) = 0.0;
+            }
+            // nativePeakExceedsShoulder
+            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            if (monthVal(kMonth) > 0) {
+                econVar(tariff(iTariff).nativePeakExceedsShoulder).values(kMonth) = monthVal(kMonth);
+            } else {
+                econVar(tariff(iTariff).nativePeakExceedsShoulder).values(kMonth) = 0.0;
+            }
+            // nativeShoulderExceedsPeak
+            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            if (monthVal(kMonth) > 0) {
+                econVar(tariff(iTariff).nativeShoulderExceedsPeak).values(kMonth) = monthVal(kMonth);
+            } else {
+                econVar(tariff(iTariff).nativeShoulderExceedsPeak).values(kMonth) = 0.0;
+            }
+            // nativeIsWinter
+            // nativeIsNotWinter
+            if (tariff(iTariff).seasonForMonth(kMonth) == seasonWinter) {
+                econVar(tariff(iTariff).nativeIsWinter).values(kMonth) = 1.0;
+                econVar(tariff(iTariff).nativeIsNotWinter).values(kMonth) = 0.0;
+            } else {
+                econVar(tariff(iTariff).nativeIsWinter).values(kMonth) = 0.0;
+                econVar(tariff(iTariff).nativeIsNotWinter).values(kMonth) = 1.0;
+            }
+            // nativeIsSpring
+            // nativeIsNotSpring
+            if (tariff(iTariff).seasonForMonth(kMonth) == seasonSpring) {
+                econVar(tariff(iTariff).nativeIsSpring).values(kMonth) = 1.0;
+                econVar(tariff(iTariff).nativeIsNotSpring).values(kMonth) = 0.0;
+            } else {
+                econVar(tariff(iTariff).nativeIsSpring).values(kMonth) = 0.0;
+                econVar(tariff(iTariff).nativeIsNotSpring).values(kMonth) = 1.0;
+            }
+            // nativeIsSummer
+            // nativeIsNotSummer
+            if (tariff(iTariff).seasonForMonth(kMonth) == seasonSummer) {
+                econVar(tariff(iTariff).nativeIsSummer).values(kMonth) = 1.0;
+                econVar(tariff(iTariff).nativeIsNotSummer).values(kMonth) = 0.0;
+            } else {
+                econVar(tariff(iTariff).nativeIsSummer).values(kMonth) = 0.0;
+                econVar(tariff(iTariff).nativeIsNotSummer).values(kMonth) = 1.0;
+            }
+            // nativeIsAutumn
+            // nativeIsNotAutumn
+            if (tariff(iTariff).seasonForMonth(kMonth) == seasonFall) {
+                econVar(tariff(iTariff).nativeIsAutumn).values(kMonth) = 1.0;
+                econVar(tariff(iTariff).nativeIsNotAutumn).values(kMonth) = 0.0;
+            } else {
+                econVar(tariff(iTariff).nativeIsAutumn).values(kMonth) = 0.0;
+                econVar(tariff(iTariff).nativeIsNotAutumn).values(kMonth) = 1.0;
+            }
+            // nativePeakAndShoulderEnergy
+            econVar(tariff(iTariff).nativePeakAndShoulderEnergy).values(kMonth) =
+                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
+            // nativePeakAndShoulderDemand
+            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodShoulder)) {
+                econVar(tariff(iTariff).nativePeakAndShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            } else {
+                econVar(tariff(iTariff).nativePeakAndShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            }
+            // nativePeakAndMidPeakEnergy
+            econVar(tariff(iTariff).nativePeakAndMidPeakEnergy).values(kMonth) =
+                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
+            // nativePeakAndMidPeakDemand
+            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodMidPeak)) {
+                econVar(tariff(iTariff).nativePeakAndMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            } else {
+                econVar(tariff(iTariff).nativePeakAndMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
+            }
+            // nativeShoulderAndOffPeakEnergy
+            econVar(tariff(iTariff).nativeShoulderAndOffPeakEnergy).values(kMonth) =
+                tariff(iTariff).gatherEnergy(kMonth, periodShoulder) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
+            // nativeShoulderAndOffPeakDemand
+            if (tariff(iTariff).gatherDemand(kMonth, periodShoulder) > tariff(iTariff).gatherDemand(kMonth, periodOffPeak)) {
+                econVar(tariff(iTariff).nativeShoulderAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            } else {
+                econVar(tariff(iTariff).nativeShoulderAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+            }
+            // nativePeakAndOffPeakEnergy
+            econVar(tariff(iTariff).nativePeakAndOffPeakEnergy).values(kMonth) =
+                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
+            // nativePeakAndOffPeakDemand
+            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodOffPeak)) {
+                econVar(tariff(iTariff).nativePeakAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            } else {
+                econVar(tariff(iTariff).nativePeakAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+            }
+            // nativeRealTimePriceCosts
+            econVar(tariff(iTariff).nativeRealTimePriceCosts).values(kMonth) = tariff(iTariff).RTPcost(kMonth);
+            // nativeAboveCustomerBaseCosts
+            econVar(tariff(iTariff).nativeAboveCustomerBaseCosts).values(kMonth) = tariff(iTariff).RTPaboveBaseCost(kMonth);
+            // nativeBelowCustomerBaseCosts
+            econVar(tariff(iTariff).nativeBelowCustomerBaseCosts).values(kMonth) = tariff(iTariff).RTPbelowBaseCost(kMonth);
+            // nativeAboveCustomerBaseEnergy
+            econVar(tariff(iTariff).nativeAboveCustomerBaseEnergy).values(kMonth) = tariff(iTariff).RTPaboveBaseEnergy(kMonth);
+            // nativeBelowCustomerBaseEnergy
+            econVar(tariff(iTariff).nativeBelowCustomerBaseEnergy).values(kMonth) = tariff(iTariff).RTPbelowBaseEnergy(kMonth);
         }
     }
-    // now assign
-    stack(state.dataEconTariff->topOfStack).values = curMonthlyArray;
 }
 
 void popStack(EnergyPlusData &state, Array1A<Real64> monthlyArray, int &variablePointer)
@@ -3817,6 +3500,90 @@ void addMonthlyCharge(EnergyPlusData &state, int const usingVariable)
     // END DO
 }
 
+void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int const variablePointer)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //    A stack is used in the evaluation of the tariff since
+    //    the variables and operators are in a reverse polish
+    //    notation order. The stack operates on a last-in
+    //    first out basis. The stack consists of both a pointer
+    //    to the variable and the twelve monthly values.
+    //    This routine puts an item on the top of the stack.
+
+    monthlyArray.dim(MaxNumMonths);
+
+    Array1D<Real64> curMonthlyArray(MaxNumMonths);
+    int constexpr sizeIncrement(50);
+
+    auto &stack(state.dataEconTariff->stack);
+    auto &econVar(state.dataEconTariff->econVar);
+    auto &tariff(state.dataEconTariff->tariff);
+
+    curMonthlyArray = monthlyArray;
+    if (!allocated(stack)) {
+        stack.allocate(sizeIncrement);
+        state.dataEconTariff->sizeStack = sizeIncrement;
+        state.dataEconTariff->topOfStack = 1;
+    } else {
+        ++state.dataEconTariff->topOfStack;
+        // if larger than current size grow the array
+        if (state.dataEconTariff->topOfStack > state.dataEconTariff->sizeStack) {
+            stack.redimension(state.dataEconTariff->sizeStack += sizeIncrement);
+        }
+    }
+    // now push the values on to the stack
+    stack(state.dataEconTariff->topOfStack).varPt = variablePointer;
+    // check if variable has been evaluated if it is CHARGE:SIMPLE, CHARGE:BLOCK, RATCHET, or QUALIFY
+    // if it has not overwrite the values for monthlyArray with the evaluated values
+    if (variablePointer != 0) {
+        if (!econVar(variablePointer).isEvaluated) {
+
+            switch (econVar(variablePointer).kindOfObj) {
+            case iEconVarObjType::ChargeSimple:
+                evaluateChargeSimple(state, variablePointer);
+                break;
+            case iEconVarObjType::ChargeBlock:
+                evaluateChargeBlock(state, variablePointer);
+                break;
+            case iEconVarObjType::Ratchet:
+                evaluateRatchet(state, variablePointer);
+                break;
+            case iEconVarObjType::Qualify:
+                evaluateQualify(state, variablePointer);
+                break;
+            case iEconVarObjType::Unknown:
+                ShowWarningError(state, "UtilityCost variable not defined: " + econVar(variablePointer).name);
+                ShowContinueError(state, "   In tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
+                ShowContinueError(state, "   This may be the result of a misspelled variable name in the UtilityCost:Computation object.");
+                ShowContinueError(state, "   All zero values will be assumed for this variable.");
+                break;
+            case iEconVarObjType::Variable:
+            case iEconVarObjType::Category:
+            case iEconVarObjType::Native:
+            case iEconVarObjType::AssignCompute:
+            case iEconVarObjType::Tariff:
+            case iEconVarObjType::Computation:
+                // do nothing
+                break;
+            default:
+                ShowWarningError(state,
+                                 format("UtilityCost Debugging issue. Invalid kind of variable used (pushStack). {} in tariff: {}",
+                                        econVar(variablePointer).kindOfObj,
+                                        tariff(econVar(variablePointer).tariffIndx).tariffName));
+            }
+            // if the serviceCharges are being evaluated add in the monthly charges
+            if (econVar(variablePointer).specific == catServiceCharges) addMonthlyCharge(state, variablePointer);
+            // get the results of performing the evaulation - should have been
+            // put into the econVar values
+            curMonthlyArray = econVar(variablePointer).values;
+        }
+    }
+    // now assign
+    stack(state.dataEconTariff->topOfStack).values = curMonthlyArray;
+}
+
 void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff)
 {
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -3849,191 +3616,588 @@ void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff)
     }
 }
 
-void setNativeVariables(EnergyPlusData &state)
+void selectTariff(EnergyPlusData &state)
 {
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
     //    DATE WRITTEN   July 2004
 
-    //    Set up the "built in" i.e. native variables that hold
-    //    the energy and demand from the simulation.
+    //    To select tariffs for each combination of meter and
+    //    group.  If multipler tariffs have the same meter and
+    //    group, then select the one with the lowest cost.
+    //    For electric tariffs, since they may have buy, sell, or
+    //    netmetering, they need to be combined more carefully.
+    //    Multiple meters are used but buy + sell might be more or
+    //    less expensive than netmeter.
 
+    int totalVarPt;
+    int totEneVarPt;
+    Real64 annualTotal;
+    Real64 annEneTotal;
     int iTariff;
-    int jPeriod;
-    int kMonth;
-    Array1D<Real64> monthVal(MaxNumMonths);
-    Real64 bigNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
+    int jMonth;
+    int kTariff;
+    int lMin;
+    int mGroup;
+    Array1D_int groupIndex;     // index number (in tariff) for the group name
+    Array1D_int MinTariffIndex; // tariff index for the Minimum value
+    int numMins;
+    int curMinTariffIndex;
+    bool isFound;
+    int groupCount;
+    int lowestSimpleTariff;
+    int lowestPurchaseTariff;
+    int lowestSurplusSoldTariff;
+    int lowestNetMeterTariff;
 
     auto &tariff(state.dataEconTariff->tariff);
     auto &econVar(state.dataEconTariff->econVar);
 
-    bigNumber = HUGE_(bigNumber);
+    groupIndex.dimension(state.dataEconTariff->numTariff, 0);
+    groupCount = 0;
+    numMins = 0;
+    MinTariffIndex.dimension(state.dataEconTariff->numTariff, 0);
     for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        // nativeTotalEnergy
-        monthVal = 0.0;
-        for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
-            for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
-                monthVal(kMonth) += tariff(iTariff).gatherEnergy(kMonth, jPeriod);
-            }
+        // compute the total annual cost of each tariff
+        totalVarPt = tariff(iTariff).ptTotal;
+        totEneVarPt = tariff(iTariff).nativeTotalEnergy;
+        annualTotal = 0.0;
+        annEneTotal = 0.0;
+        for (jMonth = 1; jMonth <= MaxNumMonths; ++jMonth) {
+            annualTotal += econVar(totalVarPt).values(jMonth);
+            annEneTotal += econVar(totEneVarPt).values(jMonth);
         }
-        econVar(tariff(iTariff).nativeTotalEnergy).values = monthVal;
-        // nativeTotalDemand
-        monthVal = -bigNumber;
-        for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
-            for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
-                if (tariff(iTariff).gatherDemand(kMonth, jPeriod) > monthVal(kMonth)) {
-                    monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, jPeriod);
+        tariff(iTariff).totalAnnualCost = annualTotal;
+        tariff(iTariff).totalAnnualEnergy = annEneTotal;
+        // Set the groupIndex
+        if (groupIndex(iTariff) == 0) {
+            // set the current item to the tariff index
+            ++groupCount;
+            groupIndex(iTariff) = groupCount;
+            // set all remaining matching items to the same index
+            for (kTariff = iTariff + 1; kTariff <= state.dataEconTariff->numTariff; ++kTariff) {
+                if (UtilityRoutines::SameString(tariff(kTariff).groupName, tariff(iTariff).groupName)) {
+                    groupIndex(kTariff) = groupCount;
                 }
             }
         }
-        // if no maximum was set just set to zero
-        for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
-            if (monthVal(kMonth) == -bigNumber) {
-                monthVal(kMonth) = 0.0;
+    }
+    // First process the all tariff and identify the lowest cost for each type of meter and group.
+    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+        if (tariff(iTariff).isQualified) {
+            isFound = false;
+            for (lMin = 1; lMin <= numMins; ++lMin) {
+                curMinTariffIndex = MinTariffIndex(lMin);
+                // find matching meter and group
+                if (tariff(iTariff).reportMeterIndx == tariff(curMinTariffIndex).reportMeterIndx) {
+                    if (groupIndex(iTariff) == groupIndex(curMinTariffIndex)) {
+                        isFound = true;
+                        // found the matching mater and group now test if smaller Min is current tariff
+                        if (tariff(iTariff).totalAnnualCost < tariff(curMinTariffIndex).totalAnnualCost) {
+                            MinTariffIndex(lMin) = iTariff;
+                            // select the new Minimum tariff and deselect the one that was just exceeded
+                            tariff(curMinTariffIndex).isSelected = false;
+                            tariff(iTariff).isSelected = true;
+                        }
+                    }
+                }
+            }
+            if (!isFound) {
+                ++numMins;
+                if (numMins > state.dataEconTariff->numTariff) {
+                    ShowWarningError(state, "UtilityCost:Tariff Debugging error numMins greater than numTariff.");
+                }
+                MinTariffIndex(numMins) = iTariff;
+                // tariff(numMins)%isSelected = .TRUE.  !original
+                tariff(iTariff).isSelected = true; // BTG changed 2/7/2005     CR6573
             }
         }
-        econVar(tariff(iTariff).nativeTotalDemand).values = monthVal;
-        for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
-            // nativePeakEnergy
-            econVar(tariff(iTariff).nativePeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodPeak);
-            // nativePeakDemand
-            econVar(tariff(iTariff).nativePeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            // nativeShoulderEnergy
-            econVar(tariff(iTariff).nativeShoulderEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
-            // nativeShoulderDemand
-            econVar(tariff(iTariff).nativeShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
-            // nativeOffPeakEnergy
-            econVar(tariff(iTariff).nativeOffPeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
-            // nativeOffPeakDemand
-            econVar(tariff(iTariff).nativeOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
-            // nativeMidPeakEnergy
-            econVar(tariff(iTariff).nativeMidPeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
-            // nativeMidPeakDemand
-            econVar(tariff(iTariff).nativeMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
-            // nativePeakExceedsOffPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
-            if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = monthVal(kMonth);
-            } else {
-                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+    }
+    // Now select for the electric meters. If electric buying and selling and netmetering all are going
+    // on, need to determine which combination should be selected. Within each group select just one set
+    // of electric results.  The electric results can be either the buy rate only, the buy rate plus the
+    // sell rate, or the netmetering rate, whichever of these three is the lowest combination.
+    // (The kindElectricMtr was assigned in GetInputEconomicsTariff)
+    for (mGroup = 1; mGroup <= groupCount; ++mGroup) {
+        lowestSimpleTariff = 0;
+        lowestPurchaseTariff = 0;
+        lowestSurplusSoldTariff = 0;
+        lowestNetMeterTariff = 0;
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+            if (tariff(iTariff).isQualified) {
+                if (tariff(iTariff).isSelected) {
+                    if (groupIndex(iTariff) == mGroup) {
+                        {
+                            auto const SELECT_CASE_var(tariff(iTariff).kindElectricMtr);
+                            if (SELECT_CASE_var == kindMeterElecSimple) {
+                                lowestSimpleTariff = iTariff;
+                            } else if (SELECT_CASE_var == kindMeterElecProduced) {
+                                // don't show electric produced rates as ever selected since surplus sold is more relevant
+                                tariff(iTariff).isSelected = false;
+                            } else if (SELECT_CASE_var == kindMeterElecPurchased) {
+                                lowestPurchaseTariff = iTariff;
+                            } else if (SELECT_CASE_var == kindMeterElecSurplusSold) {
+                                lowestSurplusSoldTariff = iTariff;
+                            } else if (SELECT_CASE_var == kindMeterElecNet) {
+                                lowestNetMeterTariff = iTariff;
+                            }
+                        }
+                    }
+                }
             }
-            // nativeOffPeakExceedsPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativeOffPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
-            } else {
-                econVar(tariff(iTariff).nativeOffPeakExceedsPeak).values(kMonth) = 0.0;
-            }
-            // nativePeakExceedsMidPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
-            if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativePeakExceedsMidPeak).values(kMonth) = monthVal(kMonth);
-            } else {
-                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = 0.0;
-            }
-            // nativeMidPeakExceedsPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativeMidPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
-            } else {
-                econVar(tariff(iTariff).nativeMidPeakExceedsPeak).values(kMonth) = 0.0;
-            }
-            // nativePeakExceedsShoulder
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodShoulder);
-            if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativePeakExceedsShoulder).values(kMonth) = monthVal(kMonth);
-            } else {
-                econVar(tariff(iTariff).nativePeakExceedsShoulder).values(kMonth) = 0.0;
-            }
-            // nativeShoulderExceedsPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativeShoulderExceedsPeak).values(kMonth) = monthVal(kMonth);
-            } else {
-                econVar(tariff(iTariff).nativeShoulderExceedsPeak).values(kMonth) = 0.0;
-            }
-            // nativeIsWinter
-            // nativeIsNotWinter
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonWinter) {
-                econVar(tariff(iTariff).nativeIsWinter).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotWinter).values(kMonth) = 0.0;
-            } else {
-                econVar(tariff(iTariff).nativeIsWinter).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotWinter).values(kMonth) = 1.0;
-            }
-            // nativeIsSpring
-            // nativeIsNotSpring
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonSpring) {
-                econVar(tariff(iTariff).nativeIsSpring).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotSpring).values(kMonth) = 0.0;
-            } else {
-                econVar(tariff(iTariff).nativeIsSpring).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotSpring).values(kMonth) = 1.0;
-            }
-            // nativeIsSummer
-            // nativeIsNotSummer
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonSummer) {
-                econVar(tariff(iTariff).nativeIsSummer).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotSummer).values(kMonth) = 0.0;
-            } else {
-                econVar(tariff(iTariff).nativeIsSummer).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotSummer).values(kMonth) = 1.0;
-            }
-            // nativeIsAutumn
-            // nativeIsNotAutumn
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonFall) {
-                econVar(tariff(iTariff).nativeIsAutumn).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotAutumn).values(kMonth) = 0.0;
-            } else {
-                econVar(tariff(iTariff).nativeIsAutumn).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotAutumn).values(kMonth) = 1.0;
-            }
-            // nativePeakAndShoulderEnergy
-            econVar(tariff(iTariff).nativePeakAndShoulderEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
-            // nativePeakAndShoulderDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodShoulder)) {
-                econVar(tariff(iTariff).nativePeakAndShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            } else {
-                econVar(tariff(iTariff).nativePeakAndShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
-            }
-            // nativePeakAndMidPeakEnergy
-            econVar(tariff(iTariff).nativePeakAndMidPeakEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
-            // nativePeakAndMidPeakDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodMidPeak)) {
-                econVar(tariff(iTariff).nativePeakAndMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            } else {
-                econVar(tariff(iTariff).nativePeakAndMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
-            }
-            // nativeShoulderAndOffPeakEnergy
-            econVar(tariff(iTariff).nativeShoulderAndOffPeakEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodShoulder) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
-            // nativeShoulderAndOffPeakDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodShoulder) > tariff(iTariff).gatherDemand(kMonth, periodOffPeak)) {
-                econVar(tariff(iTariff).nativeShoulderAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
-            } else {
-                econVar(tariff(iTariff).nativeShoulderAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
-            }
-            // nativePeakAndOffPeakEnergy
-            econVar(tariff(iTariff).nativePeakAndOffPeakEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
-            // nativePeakAndOffPeakDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodOffPeak)) {
-                econVar(tariff(iTariff).nativePeakAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
-            } else {
-                econVar(tariff(iTariff).nativePeakAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
-            }
-            // nativeRealTimePriceCosts
-            econVar(tariff(iTariff).nativeRealTimePriceCosts).values(kMonth) = tariff(iTariff).RTPcost(kMonth);
-            // nativeAboveCustomerBaseCosts
-            econVar(tariff(iTariff).nativeAboveCustomerBaseCosts).values(kMonth) = tariff(iTariff).RTPaboveBaseCost(kMonth);
-            // nativeBelowCustomerBaseCosts
-            econVar(tariff(iTariff).nativeBelowCustomerBaseCosts).values(kMonth) = tariff(iTariff).RTPbelowBaseCost(kMonth);
-            // nativeAboveCustomerBaseEnergy
-            econVar(tariff(iTariff).nativeAboveCustomerBaseEnergy).values(kMonth) = tariff(iTariff).RTPaboveBaseEnergy(kMonth);
-            // nativeBelowCustomerBaseEnergy
-            econVar(tariff(iTariff).nativeBelowCustomerBaseEnergy).values(kMonth) = tariff(iTariff).RTPbelowBaseEnergy(kMonth);
         }
+        // compare the simple and purchased metered tariffs
+        if ((lowestSimpleTariff > 0) && (lowestPurchaseTariff > 0)) {
+            if (tariff(lowestSimpleTariff).totalAnnualCost < tariff(lowestPurchaseTariff).totalAnnualCost) {
+                tariff(lowestPurchaseTariff).isSelected = false;
+                lowestPurchaseTariff = 0;
+            } else {
+                tariff(lowestSimpleTariff).isSelected = false;
+                lowestSimpleTariff = 0;
+            }
+        }
+        // if surplus sold is negative use it otherwise don't
+        if (lowestSurplusSoldTariff > 0) {
+            if (tariff(lowestSurplusSoldTariff).totalAnnualCost > 0) {
+                tariff(lowestSurplusSoldTariff).isSelected = false;
+                lowestSurplusSoldTariff = 0;
+            }
+        }
+        // if netmetering is used compare it to simple plus surplus
+        if (((lowestNetMeterTariff > 0) && (lowestSurplusSoldTariff > 0)) && (lowestSimpleTariff > 0)) {
+            if (tariff(lowestNetMeterTariff).totalAnnualCost <
+                (tariff(lowestSimpleTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
+                tariff(lowestSimpleTariff).isSelected = false;
+                lowestSimpleTariff = 0;
+                tariff(lowestSurplusSoldTariff).isSelected = false;
+                lowestSurplusSoldTariff = 0;
+            } else {
+                tariff(lowestNetMeterTariff).isSelected = false;
+                lowestNetMeterTariff = 0;
+            }
+        }
+        // if netmetering is used compare it to purchased plus surplus
+        if (((lowestNetMeterTariff > 0) && (lowestSurplusSoldTariff > 0)) && (lowestPurchaseTariff > 0)) {
+            if (tariff(lowestNetMeterTariff).totalAnnualCost <
+                (tariff(lowestPurchaseTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
+                tariff(lowestPurchaseTariff).isSelected = false;
+                lowestPurchaseTariff = 0;
+                tariff(lowestSurplusSoldTariff).isSelected = false;
+                lowestSurplusSoldTariff = 0;
+            } else {
+                tariff(lowestNetMeterTariff).isSelected = false;
+                lowestNetMeterTariff = 0;
+            }
+        }
+        // if netmetering is used compare it to simple only
+        if ((lowestNetMeterTariff > 0) && (lowestSimpleTariff > 0)) {
+            if (tariff(lowestNetMeterTariff).totalAnnualCost < tariff(lowestSimpleTariff).totalAnnualCost) {
+                tariff(lowestSimpleTariff).isSelected = false;
+                lowestSimpleTariff = 0;
+            } else {
+                tariff(lowestNetMeterTariff).isSelected = false;
+                lowestNetMeterTariff = 0;
+            }
+        }
+        // if netmetering is used compare it to purchased only
+        if ((lowestNetMeterTariff > 0) && (lowestPurchaseTariff > 0)) {
+            if (tariff(lowestNetMeterTariff).totalAnnualCost < tariff(lowestPurchaseTariff).totalAnnualCost) {
+                tariff(lowestPurchaseTariff).isSelected = false;
+                lowestPurchaseTariff = 0;
+            } else {
+                tariff(lowestNetMeterTariff).isSelected = false;
+                lowestNetMeterTariff = 0;
+            }
+        }
+    }
+    groupIndex.deallocate();
+    MinTariffIndex.deallocate();
+}
+
+void ComputeTariff(EnergyPlusData &state)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //    Perform the calculation steps to compute the monthly
+    //    utility bills for the user entered tariffs.
+    //    The list of steps for the tariff computation are in order
+    //    for stack based computation (reverse polish notation)
+
+    // values used in specific operations
+    Array1D<Real64> a(MaxNumMonths);
+    int aPt;
+    Array1D<Real64> b(MaxNumMonths);
+    int bPt;
+    Array1D<Real64> c(MaxNumMonths);
+    int cPt;
+    Array1D<Real64> d(MaxNumMonths);
+
+    int iTariff;
+    int jStep;
+    int lMonth;
+    int nVar;
+    int curStep;
+    int const noVar(0);
+
+    Real64 hugeValue;
+    Real64 annualAggregate;
+    int annualCnt;
+
+    auto &econVar(state.dataEconTariff->econVar);
+    auto &computation(state.dataEconTariff->computation);
+
+    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
+        state.dataOutRptTab->WriteTabularFiles = false;
+        return;
+    }
+
+    hugeValue = HUGE_(Real64());
+    //  Clear the isEvaluated flags for all economics variables.
+    for (nVar = 1; nVar <= state.dataEconTariff->numEconVar; ++nVar) {
+        econVar(nVar).isEvaluated = false;
+    }
+    if (state.dataEconTariff->numTariff >= 1) {
+        state.dataOutRptTab->WriteTabularFiles = true;
+        setNativeVariables(state);
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+            for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
+                curStep = state.dataEconTariff->steps(jStep);
+                {
+                    auto const SELECT_CASE_var(curStep);
+                    if (SELECT_CASE_var == 0) { // end of line - assign variable and clear stack
+                        // if the stack still has two items on it then assign the values to the
+                        // pointer otherwise if it follows a NOOP line it will only have one item
+                        // that has already been assigned and no further action is required.
+                        if (state.dataEconTariff->topOfStack >= 2) {
+                            popStack(state, b, bPt); // pop the variable pointer
+                            popStack(state, a, aPt); // pop the values
+                            if (isWithinRange(state, bPt, 1, state.dataEconTariff->numEconVar)) {
+                                econVar(bPt).values = a;
+                            }
+                        }
+                        state.dataEconTariff->topOfStack = 0;
+                    } else if ((SELECT_CASE_var >= 1)) { // all positive values are a reference to an econVar
+                        pushStack(state, econVar(curStep).values, curStep);
+                    } else if (SELECT_CASE_var == opSUM) {
+                        a = 0.0;
+                        for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
+                             ++kStack) { // popStack modifies topOfStack
+                            popStack(state, b, bPt);
+                            a += b;
+                        }
+                        pushStack(state, a, noVar);
+                    } else if (SELECT_CASE_var == opMULTIPLY) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        pushStack(state, a * b, noVar);
+                    } else if (SELECT_CASE_var == opSUBTRACT) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        pushStack(state, b - a, noVar);
+                    } else if (SELECT_CASE_var == opDIVIDE) {
+                        popStack(state, a, aPt);
+                        popStack(state, b, bPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (b(lMonth) != 0) {
+                                c(lMonth) = a(lMonth) / b(lMonth);
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opABSOLUTE) {
+                        popStack(state, a, aPt);
+                        pushStack(state, ObjexxFCL::abs(a), noVar);
+                    } else if (SELECT_CASE_var == opINTEGER) {
+                        popStack(state, a, aPt);
+                        pushStack(state, Array1D_double(Array1D_int(a)), noVar);
+                    } else if (SELECT_CASE_var == opSIGN) {
+                        popStack(state, a, aPt);
+                        pushStack(state, sign(1.0, a), noVar);
+                        //        CASE (opROUND)
+                        //          CALL popStack(b,bPt)
+                        //          CALL popStack(a,aPt)
+                        //          DO lMonth = 1,MaxNumMonths
+                        //            IF ((b(lMonth) .LE. 5) .AND. (b(lMonth) .GE. -5)) THEN
+                        //              c(lMonth) = FLOAT(INT(a(lMonth) / (10 ** b(lMonth))) * (10 ** b(lMonth)))
+                        //            END IF
+                        //          END DO
+                        //          CALL pushStack(c,noVar)
+                    } else if (SELECT_CASE_var == opMAXIMUM) {
+                        a = -hugeValue;
+                        for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
+                             ++kStack) { // popStack modifies topOfStack
+                            popStack(state, b, bPt);
+                            for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                                if (b(lMonth) > a(lMonth)) {
+                                    a(lMonth) = b(lMonth);
+                                }
+                            }
+                        }
+                        pushStack(state, a, noVar);
+                    } else if (SELECT_CASE_var == opMINIMUM) {
+                        a = hugeValue;
+                        for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
+                             ++kStack) { // popStack modifies topOfStack
+                            popStack(state, b, bPt);
+                            for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                                if (b(lMonth) < a(lMonth)) {
+                                    a(lMonth) = b(lMonth);
+                                }
+                            }
+                        }
+                        pushStack(state, a, noVar);
+                    } else if (SELECT_CASE_var == opEXCEEDS) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) > b(lMonth)) {
+                                c(lMonth) = a(lMonth) - b(lMonth);
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALMINIMUM) {
+                        // takes the minimum but ignores zeros
+                        annualAggregate = hugeValue;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != 0) {
+                                if (a(lMonth) < annualAggregate) {
+                                    annualAggregate = a(lMonth);
+                                }
+                            }
+                        }
+                        // if all months are zero then hugeValue still in annual but should be zero
+                        if (annualAggregate == hugeValue) {
+                            annualAggregate = 0.0;
+                        }
+                        c = annualAggregate;
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALMAXIMUM) {
+                        // takes the maximum but ignores zeros
+                        annualAggregate = -hugeValue;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != 0) {
+                                if (a(lMonth) > annualAggregate) {
+                                    annualAggregate = a(lMonth);
+                                }
+                            }
+                        }
+                        // if all months are zero then hugeValue still in annual but should be zero
+                        if (annualAggregate == -hugeValue) {
+                            annualAggregate = 0.0;
+                        }
+                        c = annualAggregate;
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALSUM) {
+                        // takes the maximum but ignores zeros
+                        annualAggregate = 0.0;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            annualAggregate += a(lMonth);
+                        }
+                        c = annualAggregate;
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALAVERAGE) {
+                        // takes the annual sum but ignores zeros
+                        annualAggregate = 0.0;
+                        annualCnt = 0;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != 0) {
+                                annualAggregate += a(lMonth);
+                                ++annualCnt;
+                            }
+                        }
+                        // if all months are zero then return zero
+                        if (annualCnt != 0) {
+                            c = annualAggregate / annualCnt;
+                        } else {
+                            c = 0.0;
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALOR) {
+                        annualCnt = 0;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != 0) {
+                                ++annualCnt;
+                            }
+                        }
+                        // if any months is not zero then "true"
+                        if (annualCnt >= 1) {
+                            c = 1.0;
+                        } else {
+                            c = 0.0;
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALAND) {
+                        annualCnt = 0;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != 0) {
+                                ++annualCnt;
+                            }
+                        }
+                        // if all months are not zero then "true"
+                        if (annualCnt == MaxNumMonths) {
+                            c = 1.0;
+                        } else {
+                            c = 0.0;
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALMAXIMUMZERO) {
+                        // takes the maximum including zeros
+                        annualAggregate = -hugeValue;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) > annualAggregate) {
+                                annualAggregate = a(lMonth);
+                            }
+                        }
+                        c = annualAggregate;
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opANNUALMINIMUMZERO) {
+                        // takes the maximum including zeros
+                        annualAggregate = hugeValue;
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) < annualAggregate) {
+                                annualAggregate = a(lMonth);
+                            }
+                        }
+                        c = annualAggregate;
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opIF) {
+                        popStack(state, c, cPt);
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != 0) {
+                                d(lMonth) = b(lMonth);
+                            } else {
+                                d(lMonth) = c(lMonth);
+                            }
+                        }
+                        pushStack(state, d, noVar);
+                    } else if (SELECT_CASE_var == opGREATERTHAN) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) > b(lMonth)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opGREATEREQUAL) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) >= b(lMonth)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opLESSTHAN) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) < b(lMonth)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opLESSEQUAL) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) <= b(lMonth)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opEQUAL) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) == b(lMonth)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opNOTEQUAL) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) != b(lMonth)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opAND) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if ((a(lMonth) != 0) && (b(lMonth) != 0)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opOR) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if ((a(lMonth) != 0) || (b(lMonth) != 0)) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opNOT) {
+                        popStack(state, a, aPt);
+                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            if (a(lMonth) == 0) {
+                                c(lMonth) = 1.0;
+                            } else {
+                                c(lMonth) = 0.0;
+                            }
+                        }
+                        pushStack(state, c, noVar);
+                    } else if (SELECT_CASE_var == opADD) {
+                        popStack(state, b, bPt);
+                        popStack(state, a, aPt);
+                        pushStack(state, a + b, noVar);
+                    } else if (SELECT_CASE_var == opNOOP) {
+                        // do nothing but clear the stack
+                        state.dataEconTariff->topOfStack = 0;
+                        // No longer pushing a zero to fix bug
+                        // and push zero
+                        // a = 0
+                    }
+                }
+            }
+            checkMinimumMonthlyCharge(state, iTariff);
+        }
+        selectTariff(state);
+        LEEDtariffReporting(state);
     }
 }
 
@@ -4195,6 +4359,231 @@ void LEEDtariffReporting(EnergyPlusData &state)
                          elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost,
                          2);
     }
+}
+
+void showWarningsBasedOnTotal(EnergyPlusData &state)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //    Get the annual maximum and sum for the econVariable.
+
+    int iTariff;
+    auto &tariff(state.dataEconTariff->tariff);
+
+    if (state.dataEconTariff->numTariff > 0) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+            {
+                auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
+                if (SELECT_CASE_var == buyFromUtility) {
+                    if (tariff(iTariff).totalAnnualCost < 0) {
+                        ShowWarningError(state,
+                                         "UtilityCost:Tariff: A negative annual total cost when buying electricity from a utility is unusual. ");
+                        ShowContinueError(state, "  In UtilityCost:Tariff named " + tariff(iTariff).tariffName);
+                    }
+                } else if (SELECT_CASE_var == sellToUtility) {
+                    if (tariff(iTariff).totalAnnualCost > 0) {
+                        ShowWarningError(state,
+                                         "UtilityCost:Tariff: A positive annual total cost when selling electricity to a utility is unusual. ");
+                        ShowContinueError(state, "  In UtilityCost:Tariff named " + tariff(iTariff).tariffName);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void getMaxAndSum(EnergyPlusData &state, int const varPointer, Real64 &sumResult, Real64 &maxResult)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+
+    //    Get the annual maximum and sum for the econVariable.
+
+    Real64 sumVal;
+    Real64 maximumVal(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
+    Real64 curVal;
+    int jMonth;
+
+    auto &econVar(state.dataEconTariff->econVar);
+
+    sumVal = 0.0;
+    maximumVal = -HUGE_(maximumVal);
+    for (jMonth = 1; jMonth <= 12; ++jMonth) { // note not all months get printed out if more than 12 are used.- need to fix this later
+        curVal = econVar(varPointer).values(jMonth);
+        sumVal += curVal;
+        if (curVal > maximumVal) {
+            maximumVal = curVal;
+        }
+    }
+    sumResult = sumVal;
+    maxResult = maximumVal;
+}
+
+void ReportEconomicVariable(
+    EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
+{
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2004
+    //    MODIFIED       January 2010, Kyle Benne
+    //                   Added sqlite output
+
+    //    Report all econVar that show as activeNow
+
+    using OutputReportTabular::RealToStr;
+    using OutputReportTabular::WriteReportHeaders;
+    using OutputReportTabular::WriteSubtitle;
+    using OutputReportTabular::WriteTable;
+
+    // all arrays are in the format: (row, column)
+    Array1D_string columnHead;
+    Array1D_int columnWidth;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    Real64 sumVal;
+    Real64 maximumVal;
+    Real64 curVal;
+    int curIndex;
+    int curCatPt;
+    int curCategory;
+
+    int iVar;
+    int jMonth;
+    int cntOfVar;
+    int nCntOfVar;
+
+    auto &econVar(state.dataEconTariff->econVar);
+    auto &chargeBlock(state.dataEconTariff->chargeBlock);
+    auto &chargeSimple(state.dataEconTariff->chargeSimple);
+
+    cntOfVar = 0;
+    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+        if (econVar(iVar).activeNow) {
+            ++cntOfVar;
+        }
+    }
+    if (includeCategory) {
+        rowHead.allocate(cntOfVar);
+        columnHead.allocate(15);
+        columnWidth.allocate(15);
+        tableBody.allocate(15, cntOfVar);
+    } else {
+        rowHead.allocate(cntOfVar);
+        columnHead.allocate(14);
+        columnWidth.allocate(14);
+        tableBody.allocate(14, cntOfVar);
+    }
+    // column names
+    columnHead(1) = "Jan";
+    columnHead(2) = "Feb";
+    columnHead(3) = "Mar";
+    columnHead(4) = "Apr";
+    columnHead(5) = "May";
+    columnHead(6) = "Jun";
+    columnHead(7) = "Jul";
+    columnHead(8) = "Aug";
+    columnHead(9) = "Sep";
+    columnHead(10) = "Oct";
+    columnHead(11) = "Nov";
+    columnHead(12) = "Dec";
+    columnHead(13) = "Sum";
+    columnHead(14) = "Max";
+    if (includeCategory) {
+        columnHead(15) = "Category";
+    }
+    nCntOfVar = 0;
+    // row names
+    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+        if (econVar(iVar).activeNow) {
+            ++nCntOfVar;
+            if (showCurrencySymbol) {
+                rowHead(nCntOfVar) = econVar(iVar).name + " (~~$~~)";
+            } else {
+                rowHead(nCntOfVar) = econVar(iVar).name;
+            }
+        }
+    }
+    // fill the body
+    nCntOfVar = 0;
+    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+        if (econVar(iVar).activeNow) {
+            ++nCntOfVar;
+            for (jMonth = 1; jMonth <= 12; ++jMonth) { // note not all months get printed out if more than 12 are used.- need to fix this later
+                curVal = econVar(iVar).values(jMonth);
+                if ((curVal > 0) && (curVal < 1)) {
+                    tableBody(jMonth, nCntOfVar) = RealToStr(curVal, 4);
+                } else {
+                    tableBody(jMonth, nCntOfVar) = RealToStr(curVal, 2);
+                }
+            }
+            getMaxAndSum(state, iVar, sumVal, maximumVal);
+            tableBody(13, nCntOfVar) = RealToStr(sumVal, 2);
+            tableBody(14, nCntOfVar) = RealToStr(maximumVal, 2);
+            if (includeCategory) {
+                // first find category
+                curCategory = 0;
+                curIndex = econVar(iVar).index;
+
+                switch (econVar(iVar).kindOfObj) {
+                case iEconVarObjType::ChargeSimple:
+                    if ((curIndex >= 1) && (curIndex <= state.dataEconTariff->numChargeSimple)) {
+                        curCatPt = chargeSimple(curIndex).categoryPt;
+                    }
+                    break;
+                case iEconVarObjType::ChargeBlock:
+                    if ((curIndex >= 1) && (curIndex <= state.dataEconTariff->numChargeBlock)) {
+                        curCatPt = chargeBlock(curIndex).categoryPt;
+                    }
+                    break;
+                default:
+                    break;
+                }
+
+                if ((curCatPt >= 1) && (curCatPt <= state.dataEconTariff->numEconVar)) {
+                    curCategory = econVar(curCatPt).specific;
+                }
+                {
+                    auto const SELECT_CASE_var(curCategory);
+                    if (SELECT_CASE_var == catEnergyCharges) {
+                        tableBody(15, nCntOfVar) = "EnergyCharges";
+                    } else if (SELECT_CASE_var == catDemandCharges) {
+                        tableBody(15, nCntOfVar) = "DemandCharges";
+                    } else if (SELECT_CASE_var == catServiceCharges) {
+                        tableBody(15, nCntOfVar) = "ServiceCharges";
+                    } else if (SELECT_CASE_var == catBasis) {
+                        tableBody(15, nCntOfVar) = "Basis";
+                    } else if (SELECT_CASE_var == catAdjustment) {
+                        tableBody(15, nCntOfVar) = "Adjustment";
+                    } else if (SELECT_CASE_var == catSurcharge) {
+                        tableBody(15, nCntOfVar) = "Surcharge";
+                    } else if (SELECT_CASE_var == catSubtotal) {
+                        tableBody(15, nCntOfVar) = "Subtotal";
+                    } else if (SELECT_CASE_var == catTaxes) {
+                        tableBody(15, nCntOfVar) = "Taxes";
+                    } else if (SELECT_CASE_var == catTotal) {
+                        tableBody(15, nCntOfVar) = "Total";
+                    } else {
+                        tableBody(15, nCntOfVar) = "none";
+                    }
+                }
+            }
+            econVar(iVar).isReported = true;
+        }
+    }
+    columnWidth = 14; // array assignment - same for all columns
+    WriteSubtitle(state, titleString);
+    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
+    }
+    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+            tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
+    }
+    columnHead.deallocate();
+    rowHead.deallocate();
+    columnWidth.deallocate();
+    tableBody.deallocate();
 }
 
 void WriteTabularTariffReports(EnergyPlusData &state)
@@ -4659,428 +5048,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             }
         }
     }
-}
-
-void showWarningsBasedOnTotal(EnergyPlusData &state)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-
-    //    Get the annual maximum and sum for the econVariable.
-
-    int iTariff;
-    auto &tariff(state.dataEconTariff->tariff);
-
-    if (state.dataEconTariff->numTariff > 0) {
-        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            {
-                auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
-                if (SELECT_CASE_var == buyFromUtility) {
-                    if (tariff(iTariff).totalAnnualCost < 0) {
-                        ShowWarningError(state,
-                                         "UtilityCost:Tariff: A negative annual total cost when buying electricity from a utility is unusual. ");
-                        ShowContinueError(state, "  In UtilityCost:Tariff named " + tariff(iTariff).tariffName);
-                    }
-                } else if (SELECT_CASE_var == sellToUtility) {
-                    if (tariff(iTariff).totalAnnualCost > 0) {
-                        ShowWarningError(state,
-                                         "UtilityCost:Tariff: A positive annual total cost when selling electricity to a utility is unusual. ");
-                        ShowContinueError(state, "  In UtilityCost:Tariff named " + tariff(iTariff).tariffName);
-                    }
-                }
-            }
-        }
-    }
-}
-
-void getMaxAndSum(EnergyPlusData &state, int const varPointer, Real64 &sumResult, Real64 &maxResult)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-
-    //    Get the annual maximum and sum for the econVariable.
-
-    Real64 sumVal;
-    Real64 maximumVal(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
-    Real64 curVal;
-    int jMonth;
-
-    auto &econVar(state.dataEconTariff->econVar);
-
-    sumVal = 0.0;
-    maximumVal = -HUGE_(maximumVal);
-    for (jMonth = 1; jMonth <= 12; ++jMonth) { // note not all months get printed out if more than 12 are used.- need to fix this later
-        curVal = econVar(varPointer).values(jMonth);
-        sumVal += curVal;
-        if (curVal > maximumVal) {
-            maximumVal = curVal;
-        }
-    }
-    sumResult = sumVal;
-    maxResult = maximumVal;
-}
-
-void ReportEconomicVariable(
-    EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-    //    MODIFIED       January 2010, Kyle Benne
-    //                   Added sqlite output
-
-    //    Report all econVar that show as activeNow
-
-    using OutputReportTabular::RealToStr;
-    using OutputReportTabular::WriteReportHeaders;
-    using OutputReportTabular::WriteSubtitle;
-    using OutputReportTabular::WriteTable;
-
-    // all arrays are in the format: (row, column)
-    Array1D_string columnHead;
-    Array1D_int columnWidth;
-    Array1D_string rowHead;
-    Array2D_string tableBody;
-    Real64 sumVal;
-    Real64 maximumVal;
-    Real64 curVal;
-    int curIndex;
-    int curCatPt;
-    int curCategory;
-
-    int iVar;
-    int jMonth;
-    int cntOfVar;
-    int nCntOfVar;
-
-    auto &econVar(state.dataEconTariff->econVar);
-    auto &chargeBlock(state.dataEconTariff->chargeBlock);
-    auto &chargeSimple(state.dataEconTariff->chargeSimple);
-
-    cntOfVar = 0;
-    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-        if (econVar(iVar).activeNow) {
-            ++cntOfVar;
-        }
-    }
-    if (includeCategory) {
-        rowHead.allocate(cntOfVar);
-        columnHead.allocate(15);
-        columnWidth.allocate(15);
-        tableBody.allocate(15, cntOfVar);
-    } else {
-        rowHead.allocate(cntOfVar);
-        columnHead.allocate(14);
-        columnWidth.allocate(14);
-        tableBody.allocate(14, cntOfVar);
-    }
-    // column names
-    columnHead(1) = "Jan";
-    columnHead(2) = "Feb";
-    columnHead(3) = "Mar";
-    columnHead(4) = "Apr";
-    columnHead(5) = "May";
-    columnHead(6) = "Jun";
-    columnHead(7) = "Jul";
-    columnHead(8) = "Aug";
-    columnHead(9) = "Sep";
-    columnHead(10) = "Oct";
-    columnHead(11) = "Nov";
-    columnHead(12) = "Dec";
-    columnHead(13) = "Sum";
-    columnHead(14) = "Max";
-    if (includeCategory) {
-        columnHead(15) = "Category";
-    }
-    nCntOfVar = 0;
-    // row names
-    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-        if (econVar(iVar).activeNow) {
-            ++nCntOfVar;
-            if (showCurrencySymbol) {
-                rowHead(nCntOfVar) = econVar(iVar).name + " (~~$~~)";
-            } else {
-                rowHead(nCntOfVar) = econVar(iVar).name;
-            }
-        }
-    }
-    // fill the body
-    nCntOfVar = 0;
-    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-        if (econVar(iVar).activeNow) {
-            ++nCntOfVar;
-            for (jMonth = 1; jMonth <= 12; ++jMonth) { // note not all months get printed out if more than 12 are used.- need to fix this later
-                curVal = econVar(iVar).values(jMonth);
-                if ((curVal > 0) && (curVal < 1)) {
-                    tableBody(jMonth, nCntOfVar) = RealToStr(curVal, 4);
-                } else {
-                    tableBody(jMonth, nCntOfVar) = RealToStr(curVal, 2);
-                }
-            }
-            getMaxAndSum(state, iVar, sumVal, maximumVal);
-            tableBody(13, nCntOfVar) = RealToStr(sumVal, 2);
-            tableBody(14, nCntOfVar) = RealToStr(maximumVal, 2);
-            if (includeCategory) {
-                // first find category
-                curCategory = 0;
-                curIndex = econVar(iVar).index;
-
-                switch (econVar(iVar).kindOfObj) {
-                case iEconVarObjType::ChargeSimple:
-                    if ((curIndex >= 1) && (curIndex <= state.dataEconTariff->numChargeSimple)) {
-                        curCatPt = chargeSimple(curIndex).categoryPt;
-                    }
-                    break;
-                case iEconVarObjType::ChargeBlock:
-                    if ((curIndex >= 1) && (curIndex <= state.dataEconTariff->numChargeBlock)) {
-                        curCatPt = chargeBlock(curIndex).categoryPt;
-                    }
-                    break;
-                default:
-                    break;
-                }
-
-                if ((curCatPt >= 1) && (curCatPt <= state.dataEconTariff->numEconVar)) {
-                    curCategory = econVar(curCatPt).specific;
-                }
-                {
-                    auto const SELECT_CASE_var(curCategory);
-                    if (SELECT_CASE_var == catEnergyCharges) {
-                        tableBody(15, nCntOfVar) = "EnergyCharges";
-                    } else if (SELECT_CASE_var == catDemandCharges) {
-                        tableBody(15, nCntOfVar) = "DemandCharges";
-                    } else if (SELECT_CASE_var == catServiceCharges) {
-                        tableBody(15, nCntOfVar) = "ServiceCharges";
-                    } else if (SELECT_CASE_var == catBasis) {
-                        tableBody(15, nCntOfVar) = "Basis";
-                    } else if (SELECT_CASE_var == catAdjustment) {
-                        tableBody(15, nCntOfVar) = "Adjustment";
-                    } else if (SELECT_CASE_var == catSurcharge) {
-                        tableBody(15, nCntOfVar) = "Surcharge";
-                    } else if (SELECT_CASE_var == catSubtotal) {
-                        tableBody(15, nCntOfVar) = "Subtotal";
-                    } else if (SELECT_CASE_var == catTaxes) {
-                        tableBody(15, nCntOfVar) = "Taxes";
-                    } else if (SELECT_CASE_var == catTotal) {
-                        tableBody(15, nCntOfVar) = "Total";
-                    } else {
-                        tableBody(15, nCntOfVar) = "none";
-                    }
-                }
-            }
-            econVar(iVar).isReported = true;
-        }
-    }
-    columnWidth = 14; // array assignment - same for all columns
-    WriteSubtitle(state, titleString);
-    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
-    }
-    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
-    }
-    columnHead.deallocate();
-    rowHead.deallocate();
-    columnWidth.deallocate();
-    tableBody.deallocate();
-}
-
-void selectTariff(EnergyPlusData &state)
-{
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2004
-
-    //    To select tariffs for each combination of meter and
-    //    group.  If multipler tariffs have the same meter and
-    //    group, then select the one with the lowest cost.
-    //    For electric tariffs, since they may have buy, sell, or
-    //    netmetering, they need to be combined more carefully.
-    //    Multiple meters are used but buy + sell might be more or
-    //    less expensive than netmeter.
-
-    int totalVarPt;
-    int totEneVarPt;
-    Real64 annualTotal;
-    Real64 annEneTotal;
-    int iTariff;
-    int jMonth;
-    int kTariff;
-    int lMin;
-    int mGroup;
-    Array1D_int groupIndex;     // index number (in tariff) for the group name
-    Array1D_int MinTariffIndex; // tariff index for the Minimum value
-    int numMins;
-    int curMinTariffIndex;
-    bool isFound;
-    int groupCount;
-    int lowestSimpleTariff;
-    int lowestPurchaseTariff;
-    int lowestSurplusSoldTariff;
-    int lowestNetMeterTariff;
-
-    auto &tariff(state.dataEconTariff->tariff);
-    auto &econVar(state.dataEconTariff->econVar);
-
-    groupIndex.dimension(state.dataEconTariff->numTariff, 0);
-    groupCount = 0;
-    numMins = 0;
-    MinTariffIndex.dimension(state.dataEconTariff->numTariff, 0);
-    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        // compute the total annual cost of each tariff
-        totalVarPt = tariff(iTariff).ptTotal;
-        totEneVarPt = tariff(iTariff).nativeTotalEnergy;
-        annualTotal = 0.0;
-        annEneTotal = 0.0;
-        for (jMonth = 1; jMonth <= MaxNumMonths; ++jMonth) {
-            annualTotal += econVar(totalVarPt).values(jMonth);
-            annEneTotal += econVar(totEneVarPt).values(jMonth);
-        }
-        tariff(iTariff).totalAnnualCost = annualTotal;
-        tariff(iTariff).totalAnnualEnergy = annEneTotal;
-        // Set the groupIndex
-        if (groupIndex(iTariff) == 0) {
-            // set the current item to the tariff index
-            ++groupCount;
-            groupIndex(iTariff) = groupCount;
-            // set all remaining matching items to the same index
-            for (kTariff = iTariff + 1; kTariff <= state.dataEconTariff->numTariff; ++kTariff) {
-                if (UtilityRoutines::SameString(tariff(kTariff).groupName, tariff(iTariff).groupName)) {
-                    groupIndex(kTariff) = groupCount;
-                }
-            }
-        }
-    }
-    // First process the all tariff and identify the lowest cost for each type of meter and group.
-    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        if (tariff(iTariff).isQualified) {
-            isFound = false;
-            for (lMin = 1; lMin <= numMins; ++lMin) {
-                curMinTariffIndex = MinTariffIndex(lMin);
-                // find matching meter and group
-                if (tariff(iTariff).reportMeterIndx == tariff(curMinTariffIndex).reportMeterIndx) {
-                    if (groupIndex(iTariff) == groupIndex(curMinTariffIndex)) {
-                        isFound = true;
-                        // found the matching mater and group now test if smaller Min is current tariff
-                        if (tariff(iTariff).totalAnnualCost < tariff(curMinTariffIndex).totalAnnualCost) {
-                            MinTariffIndex(lMin) = iTariff;
-                            // select the new Minimum tariff and deselect the one that was just exceeded
-                            tariff(curMinTariffIndex).isSelected = false;
-                            tariff(iTariff).isSelected = true;
-                        }
-                    }
-                }
-            }
-            if (!isFound) {
-                ++numMins;
-                if (numMins > state.dataEconTariff->numTariff) {
-                    ShowWarningError(state, "UtilityCost:Tariff Debugging error numMins greater than numTariff.");
-                }
-                MinTariffIndex(numMins) = iTariff;
-                // tariff(numMins)%isSelected = .TRUE.  !original
-                tariff(iTariff).isSelected = true; // BTG changed 2/7/2005     CR6573
-            }
-        }
-    }
-    // Now select for the electric meters. If electric buying and selling and netmetering all are going
-    // on, need to determine which combination should be selected. Within each group select just one set
-    // of electric results.  The electric results can be either the buy rate only, the buy rate plus the
-    // sell rate, or the netmetering rate, whichever of these three is the lowest combination.
-    // (The kindElectricMtr was assigned in GetInputEconomicsTariff)
-    for (mGroup = 1; mGroup <= groupCount; ++mGroup) {
-        lowestSimpleTariff = 0;
-        lowestPurchaseTariff = 0;
-        lowestSurplusSoldTariff = 0;
-        lowestNetMeterTariff = 0;
-        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            if (tariff(iTariff).isQualified) {
-                if (tariff(iTariff).isSelected) {
-                    if (groupIndex(iTariff) == mGroup) {
-                        {
-                            auto const SELECT_CASE_var(tariff(iTariff).kindElectricMtr);
-                            if (SELECT_CASE_var == kindMeterElecSimple) {
-                                lowestSimpleTariff = iTariff;
-                            } else if (SELECT_CASE_var == kindMeterElecProduced) {
-                                // don't show electric produced rates as ever selected since surplus sold is more relevant
-                                tariff(iTariff).isSelected = false;
-                            } else if (SELECT_CASE_var == kindMeterElecPurchased) {
-                                lowestPurchaseTariff = iTariff;
-                            } else if (SELECT_CASE_var == kindMeterElecSurplusSold) {
-                                lowestSurplusSoldTariff = iTariff;
-                            } else if (SELECT_CASE_var == kindMeterElecNet) {
-                                lowestNetMeterTariff = iTariff;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // compare the simple and purchased metered tariffs
-        if ((lowestSimpleTariff > 0) && (lowestPurchaseTariff > 0)) {
-            if (tariff(lowestSimpleTariff).totalAnnualCost < tariff(lowestPurchaseTariff).totalAnnualCost) {
-                tariff(lowestPurchaseTariff).isSelected = false;
-                lowestPurchaseTariff = 0;
-            } else {
-                tariff(lowestSimpleTariff).isSelected = false;
-                lowestSimpleTariff = 0;
-            }
-        }
-        // if surplus sold is negative use it otherwise don't
-        if (lowestSurplusSoldTariff > 0) {
-            if (tariff(lowestSurplusSoldTariff).totalAnnualCost > 0) {
-                tariff(lowestSurplusSoldTariff).isSelected = false;
-                lowestSurplusSoldTariff = 0;
-            }
-        }
-        // if netmetering is used compare it to simple plus surplus
-        if (((lowestNetMeterTariff > 0) && (lowestSurplusSoldTariff > 0)) && (lowestSimpleTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost <
-                (tariff(lowestSimpleTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
-                tariff(lowestSimpleTariff).isSelected = false;
-                lowestSimpleTariff = 0;
-                tariff(lowestSurplusSoldTariff).isSelected = false;
-                lowestSurplusSoldTariff = 0;
-            } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
-                lowestNetMeterTariff = 0;
-            }
-        }
-        // if netmetering is used compare it to purchased plus surplus
-        if (((lowestNetMeterTariff > 0) && (lowestSurplusSoldTariff > 0)) && (lowestPurchaseTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost <
-                (tariff(lowestPurchaseTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
-                tariff(lowestPurchaseTariff).isSelected = false;
-                lowestPurchaseTariff = 0;
-                tariff(lowestSurplusSoldTariff).isSelected = false;
-                lowestSurplusSoldTariff = 0;
-            } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
-                lowestNetMeterTariff = 0;
-            }
-        }
-        // if netmetering is used compare it to simple only
-        if ((lowestNetMeterTariff > 0) && (lowestSimpleTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost < tariff(lowestSimpleTariff).totalAnnualCost) {
-                tariff(lowestSimpleTariff).isSelected = false;
-                lowestSimpleTariff = 0;
-            } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
-                lowestNetMeterTariff = 0;
-            }
-        }
-        // if netmetering is used compare it to purchased only
-        if ((lowestNetMeterTariff > 0) && (lowestPurchaseTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost < tariff(lowestPurchaseTariff).totalAnnualCost) {
-                tariff(lowestPurchaseTariff).isSelected = false;
-                lowestPurchaseTariff = 0;
-            } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
-                lowestNetMeterTariff = 0;
-            }
-        }
-    }
-    groupIndex.deallocate();
-    MinTariffIndex.deallocate();
 }
 
 void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)

@@ -73,26 +73,6 @@ namespace ExteriorEnergyUse {
     // affect simulation results for the energy usage in a building but may affect the "metered"
     // usage of a facility.
 
-    void ManageExteriorEnergyUse(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine provides the usual call for the Simulation Manager.
-
-        if (state.dataExteriorEnergyUse->GetExteriorEnergyInputFlag) {
-            ExteriorEnergyUse::GetExteriorEnergyUseInput(state);
-            state.dataExteriorEnergyUse->GetExteriorEnergyInputFlag = false;
-        }
-
-        ExteriorEnergyUse::ReportExteriorEnergyUse(state);
-    }
-
     void GetExteriorEnergyUseInput(EnergyPlusData &state)
     {
 
@@ -523,6 +503,26 @@ namespace ExteriorEnergyUse {
         if (ErrorsFound) {
             ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
         }
+    }
+
+    void ManageExteriorEnergyUse(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2001
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine provides the usual call for the Simulation Manager.
+
+        if (state.dataExteriorEnergyUse->GetExteriorEnergyInputFlag) {
+            ExteriorEnergyUse::GetExteriorEnergyUseInput(state);
+            state.dataExteriorEnergyUse->GetExteriorEnergyInputFlag = false;
+        }
+
+        ExteriorEnergyUse::ReportExteriorEnergyUse(state);
     }
 
     void ValidateFuelType(EnergyPlusData &state,

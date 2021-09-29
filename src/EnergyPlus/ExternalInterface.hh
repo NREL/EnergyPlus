@@ -288,44 +288,9 @@ namespace ExternalInterface {
 
     void CloseSocket(EnergyPlusData &state, int FlagToWriteToSocket);
 
-    void InitExternalInterface(EnergyPlusData &state);
-
-    void GetExternalInterfaceInput(EnergyPlusData &state);
-
-    void CalcExternalInterface(EnergyPlusData &state);
-
-    void ParseString(std::string const &str, Array1D_string &ele, int nEle);
-
-    void GetReportVariableKey(EnergyPlusData &state,
-                              const Array1D_string &varKeys,
-                              int numberOfKeys,
-                              const Array1D_string &varNames,
-                              Array1D_int &keyVarIndexes,
-                              Array1D<OutputProcessor::VariableType> &varTypes);
-
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 
     std::string getStringFromCharArray(std::vector<char> originalCharArray);
-
-    void StopExternalInterfaceIfError(EnergyPlusData &state);
-
-    void ValidateRunControl(EnergyPlusData &state);
-
-    void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string const &ObjectWord);
-
-    void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
-
-    void InitExternalInterfaceFMUImport(EnergyPlusData &state);
-
-    void InstantiateInitializeFMUImport(EnergyPlusData &state);
-
-    void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation);
-
-    void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state);
-
-    void VerifyExternalInterfaceObject(EnergyPlusData &state);
-
-    Real64 GetCurSimStartTimeSeconds(EnergyPlusData &state);
 
     std::string trim(std::string const &str);
 

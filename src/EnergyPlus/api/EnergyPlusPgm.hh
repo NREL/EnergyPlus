@@ -56,12 +56,6 @@
 
 // Functions
 
-std::string CreateCurrentDateTimeString();
-
-int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath);
-
-int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
-
 int ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
 int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());

@@ -127,11 +127,7 @@ namespace ElectricBaseboardRadiator {
 
     void GetElectricBaseboardInput(EnergyPlusData &state);
 
-    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
-
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
-
-    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,
@@ -147,10 +143,6 @@ namespace ElectricBaseboardRadiator {
     void UpdateElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void UpdateBBElecRadSourceValAvg(EnergyPlusData &state, bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
-
-    void DistributeBBElecRadGains(EnergyPlusData &state);
-
-    void ReportElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 

@@ -115,18 +115,7 @@ namespace EMSManager {
 
     void InitEMS(EnergyPlusData &state, EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
-    void ReportEMS(EnergyPlusData &state);
-
     void GetEMSInput(EnergyPlusData &state);
-
-    void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
-
-    void GetVariableTypeAndIndex(
-        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VariableType &VarType, int &VarIndex);
-
-    void EchoOutActuatorKeyChoices(EnergyPlusData &state);
-
-    void EchoOutInternalVariableChoices(EnergyPlusData &state);
 
     void SetupNodeSetPointsAsActuators(EnergyPlusData &state);
 
@@ -149,21 +138,7 @@ namespace EMSManager {
                                         int nodeNum, // index of node being checked.
                                         std::string const &varName);
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
-
     void SetupWindowShadingControlActuators(EnergyPlusData &state);
-
-    void SetupThermostatActuators(EnergyPlusData &state);
-
-    void SetupSurfaceConvectionActuators(EnergyPlusData &state);
-
-    void SetupSurfaceConstructionActuators(EnergyPlusData &state);
-
-    void SetupSurfaceOutdoorBoundaryConditionActuators(EnergyPlusData &state);
-
-    void SetupZoneOutdoorBoundaryConditionActuators(EnergyPlusData &state);
-
-    void SetupZoneInfoAsInternalDataAvail(EnergyPlusData &state);
 
     void checkForUnusedActuatorsAtEnd(EnergyPlusData &state);
 

@@ -286,51 +286,11 @@ namespace EconomicLifeCycleCost {
 
     void ComputeLifeCycleCostAndReport(EnergyPlusData &state);
 
-    //======================================================================================================================
-    //======================================================================================================================
-
-    //    GET INPUT ROUTINES
-
-    //======================================================================================================================
-    //======================================================================================================================
-
-    void GetInputLifeCycleCostParameters(EnergyPlusData &state);
-
-    void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state);
-
-    void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state);
-
-    void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
-
-    void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
-
     int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth);
-
-    //======================================================================================================================
-    //======================================================================================================================
-
-    //    COMPUTATION ROUTINES
-
-    //======================================================================================================================
-    //======================================================================================================================
 
     void ExpressAsCashFlows(EnergyPlusData &state);
 
     void ComputeEscalatedEnergyCosts(EnergyPlusData &state);
-
-    void ComputePresentValue(EnergyPlusData &state);
-
-    void ComputeTaxAndDepreciation(EnergyPlusData &state);
-
-    //======================================================================================================================
-    //======================================================================================================================
-
-    //    OUTPUT ROUTINES
-
-    //======================================================================================================================
-    //======================================================================================================================
-
-    void WriteTabularLifeCycleCostReport(EnergyPlusData &state);
 
 } // namespace EconomicLifeCycleCost
 

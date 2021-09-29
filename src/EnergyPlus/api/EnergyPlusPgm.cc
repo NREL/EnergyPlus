@@ -224,6 +224,41 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     return RunEnergyPlus(state, filepath);
 }
 
+std::string CreateCurrentDateTimeString()
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   October 2010
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Be able to supply a current date/time string from intrinsic calls so
+    // that one is always available.
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Array1D_int value(8);
+    // value(1)   Current year
+    // value(2)   Current month
+    // value(3)   Current day
+    // value(4)   Time difference with respect to UTC in minutes (0-59)
+    // value(5)   Hour of the day (0-23)
+    // value(6)   Minutes (0-59)
+    // value(7)   Seconds (0-59)
+    // value(8)   Milliseconds (0-999)
+    std::string datestring; // supposedly returns blank when no date available.
+
+    date_and_time(datestring, _, _, value);
+    if (!datestring.empty()) {
+        return EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
+    } else {
+        return " unknown date/time";
+    }
+}
+
 void commonInitialize(EnergyPlus::EnergyPlusData &state)
 {
     using namespace EnergyPlus;
@@ -459,39 +494,4 @@ void StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int cons
 void StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &))
 {
     state.dataGlobal->fMessagePtr = f;
-}
-
-std::string CreateCurrentDateTimeString()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   October 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Be able to supply a current date/time string from intrinsic calls so
-    // that one is always available.
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D_int value(8);
-    // value(1)   Current year
-    // value(2)   Current month
-    // value(3)   Current day
-    // value(4)   Time difference with respect to UTC in minutes (0-59)
-    // value(5)   Hour of the day (0-23)
-    // value(6)   Minutes (0-59)
-    // value(7)   Seconds (0-59)
-    // value(8)   Milliseconds (0-999)
-    std::string datestring; // supposedly returns blank when no date available.
-
-    date_and_time(datestring, _, _, value);
-    if (!datestring.empty()) {
-        return EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
-    } else {
-        return " unknown date/time";
-    }
 }

@@ -103,61 +103,6 @@ using namespace DataGlobalConstants;
 
 // Functions
 
-void GetInputForLifeCycleCost(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2010
-    //    MODIFIED       na
-    //    RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //    Read the input file for "LifeCycleCost:Parameters" object.
-
-    // Using/Aliasing
-    using OutputReportTabular::AddTOCEntry;
-
-    auto &elcc(state.dataEconLifeCycleCost);
-
-    if (elcc->GetInput_GetLifeCycleCostInput) {
-        GetInputLifeCycleCostParameters(state);
-        GetInputLifeCycleCostRecurringCosts(state);
-        GetInputLifeCycleCostNonrecurringCost(state);
-        GetInputLifeCycleCostUsePriceEscalation(state);
-        GetInputLifeCycleCostUseAdjustment(state);
-        elcc->GetInput_GetLifeCycleCostInput = false;
-    }
-}
-
-void ComputeLifeCycleCostAndReport(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   May 2010
-    //    MODIFIED       na
-    //    RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //    Perform the life cycle cost computations and write report.
-
-    if (state.dataEconLifeCycleCost->LCCparamPresent) {
-        DisplayString(state, "Computing Life Cycle Costs and Reporting");
-        ExpressAsCashFlows(state);
-        ComputePresentValue(state);
-        ComputeEscalatedEnergyCosts(state);
-        ComputeTaxAndDepreciation(state);
-        WriteTabularLifeCycleCostReport(state);
-    }
-}
-
-//======================================================================================================================
-//======================================================================================================================
-
-//    GET INPUT ROUTINES
-
-//======================================================================================================================
-//======================================================================================================================
-
 void GetInputLifeCycleCostParameters(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -1003,458 +948,29 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
     }
 }
 
-int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Jason Glazer
-    //       DATE WRITTEN   May 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    //  Convert the string of the name of the month into numbers 1 to 12
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    int MonthToMonthNumber;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-    if (UtilityRoutines::SameString(inMonthString, "January")) {
-        MonthToMonthNumber = 1;
-    } else if (UtilityRoutines::SameString(inMonthString, "February")) {
-        MonthToMonthNumber = 2;
-    } else if (UtilityRoutines::SameString(inMonthString, "March")) {
-        MonthToMonthNumber = 3;
-    } else if (UtilityRoutines::SameString(inMonthString, "April")) {
-        MonthToMonthNumber = 4;
-    } else if (UtilityRoutines::SameString(inMonthString, "May")) {
-        MonthToMonthNumber = 5;
-    } else if (UtilityRoutines::SameString(inMonthString, "June")) {
-        MonthToMonthNumber = 6;
-    } else if (UtilityRoutines::SameString(inMonthString, "July")) {
-        MonthToMonthNumber = 7;
-    } else if (UtilityRoutines::SameString(inMonthString, "August")) {
-        MonthToMonthNumber = 8;
-    } else if (UtilityRoutines::SameString(inMonthString, "September")) {
-        MonthToMonthNumber = 9;
-    } else if (UtilityRoutines::SameString(inMonthString, "October")) {
-        MonthToMonthNumber = 10;
-    } else if (UtilityRoutines::SameString(inMonthString, "November")) {
-        MonthToMonthNumber = 11;
-    } else if (UtilityRoutines::SameString(inMonthString, "December")) {
-        MonthToMonthNumber = 12;
-    } else {
-        MonthToMonthNumber = inDefaultMonth;
-    }
-    return MonthToMonthNumber;
-}
-
-//======================================================================================================================
-//======================================================================================================================
-
-//    COMPUTATION ROUTINES
-
-//======================================================================================================================
-//======================================================================================================================
-
-void ExpressAsCashFlows(EnergyPlusData &state)
+void GetInputForLifeCycleCost(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-    //    DATE WRITTEN   July 2010
+    //    DATE WRITTEN   May 2010
     //    MODIFIED       na
     //    RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    //    Convert all recurring and nonrecurring costs into cash flows
-    //    used in calculations and reporting.
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
+    //    Read the input file for "LifeCycleCost:Parameters" object.
 
     // Using/Aliasing
-    using EconomicTariff::GetMonthlyCostForResource;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int iCashFlow;
-    int jCost;
-    int jAdj;
-    int kYear;
-    int offset;
-    int month; // number of months since base date
-    int firstMonth;
-    int monthsBaseToService;
-
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
-    for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-        std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
-        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-            monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-        }
-        resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(jMonth, monthMap));
-    }
-
-    Array1D<Real64> curResourceCosts(12);
-
-    std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
-    }
-
-    std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-    }
-
-    Real64 annualCost;
-    int cashFlowCounter;
-    int found;
-    int curCategory;
-    Array1D<Real64> monthlyInflationFactor;
-    Real64 inflationPerMonth;
-    int iLoop;
+    using OutputReportTabular::AddTOCEntry;
 
     auto &elcc(state.dataEconLifeCycleCost);
 
-    // compute months from 1900 for base and service period
-    elcc->ExpressAsCashFlows_baseMonths1900 = (elcc->baseDateYear - 1900) * 12 + elcc->baseDateMonth;
-    elcc->ExpressAsCashFlows_serviceMonths1900 = (elcc->serviceDateYear - 1900) * 12 + elcc->serviceDateMonth;
-    monthsBaseToService = elcc->ExpressAsCashFlows_serviceMonths1900 - elcc->ExpressAsCashFlows_baseMonths1900;
-    // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
-    if (state.dataCostEstimateManager->CurntBldg.GrandTotal >
-        0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
-        ++elcc->numNonrecurringCost;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).name = "Total of ComponentCost:*";
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).lineItem = "";
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).category = costCatConstruction;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).yearsFromStart = 0;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).monthsFromStart = 0;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).totalMonthsFromStart = 0;
-    }
-
-    // gather costs from EconomicTariff for each end use
-    elcc->numResourcesUsed = 0;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        GetMonthlyCostForResource(state, iResource, curResourceCosts);
-        annualCost = 0.0;
-        for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-            resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);
-            annualCost += resourceCosts.at(jMonth).at(iResource);
-        }
-        if (annualCost != 0.0) {
-            ++elcc->numResourcesUsed;
-            resourceCostNotZero.at(iResource) = true;
-        } else {
-            resourceCostNotZero.at(iResource) = false;
-        }
-        resourceCostAnnual.at(iResource) = annualCost;
-    }
-    // allocate the escalated energy cost arrays
-    for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-        }
-        elcc->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
-    }
-
-    elcc->EscalatedTotEnergy.allocate(elcc->lengthStudyYears);
-    elcc->EscalatedTotEnergy = 0.0;
-
-    // pre-compute the inflation factors for each year
-    monthlyInflationFactor.allocate(elcc->lengthStudyTotalMonths);
-    if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
-        monthlyInflationFactor = 1.0; // not really used but just in case
-    } else if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
-        // to allocate an interest rate (in this case inflation) cannot just use 1/12
-        // for the monthly value since it will be slightly wrong. Instead use inverse of
-        // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
-        inflationPerMonth = std::pow(elcc->inflation + 1.0, 1.0 / 12.0) - 1;
-        for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
-            monthlyInflationFactor(jMonth) = std::pow(1.0 + inflationPerMonth, jMonth - 1);
-        }
-    }
-
-    elcc->numCashFlow = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed;
-    // Cashflow array order:
-    //   1 cost categories
-    //   2 recurring costs
-    //   3 nonrecurring costs
-    //   4 resource costs
-    elcc->CashFlow.allocate(elcc->numCashFlow);
-    for (iCashFlow = 1; iCashFlow <= elcc->numCashFlow; ++iCashFlow) {
-        elcc->CashFlow(iCashFlow).mnAmount.allocate(elcc->lengthStudyTotalMonths);
-        elcc->CashFlow(iCashFlow).yrAmount.allocate(elcc->lengthStudyYears);
-        elcc->CashFlow(iCashFlow).yrPresVal.allocate(elcc->lengthStudyYears);
-        elcc->CashFlow(iCashFlow).mnAmount = 0.0;  // zero all cash flow values
-        elcc->CashFlow(iCashFlow).yrAmount = 0.0;  // zero all cash flow values
-        elcc->CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
-    }
-    // Put nonrecurring costs into cashflows
-    offset = countOfCostCat + elcc->numRecurringCosts;
-    for (jCost = 1; jCost <= elcc->numNonrecurringCost; ++jCost) {
-        elcc->CashFlow(offset + jCost).name = elcc->NonrecurringCost(jCost).name;
-        elcc->CashFlow(offset + jCost).SourceKind = iSourceKind::Nonrecurring;
-        elcc->CashFlow(offset + jCost).Category = elcc->NonrecurringCost(jCost).category;
-        elcc->CashFlow(offset + jCost).orginalCost = elcc->NonrecurringCost(jCost).cost;
-        elcc->CashFlow(offset + jCost).mnAmount = 0.0;
-        if (elcc->NonrecurringCost(jCost).startOfCosts == iStartCosts::ServicePeriod) {
-            month = elcc->NonrecurringCost(jCost).totalMonthsFromStart + monthsBaseToService + 1;
-        } else if (elcc->NonrecurringCost(jCost).startOfCosts == iStartCosts::BasePeriod) {
-            month = elcc->NonrecurringCost(jCost).totalMonthsFromStart + 1;
-        }
-        if ((month >= 1) && (month <= elcc->lengthStudyTotalMonths)) {
-            elcc->CashFlow(offset + jCost).mnAmount(month) = elcc->NonrecurringCost(jCost).cost * monthlyInflationFactor(month);
-        } else {
-            ShowWarningError(state,
-                             "For life cycle costing a nonrecurring cost named " + elcc->NonrecurringCost(jCost).name +
-                                 " contains a cost which is not within the study period.");
-        }
-    }
-    // Put recurring costs into cashflows
-    offset = countOfCostCat;
-    for (jCost = 1; jCost <= elcc->numRecurringCosts; ++jCost) {
-        elcc->CashFlow(offset + jCost).name = elcc->RecurringCosts(jCost).name;
-        elcc->CashFlow(offset + jCost).SourceKind = iSourceKind::Recurring;
-        elcc->CashFlow(offset + jCost).Category = elcc->RecurringCosts(jCost).category;
-        elcc->CashFlow(offset + jCost).orginalCost = elcc->RecurringCosts(jCost).cost;
-        if (elcc->RecurringCosts(jCost).startOfCosts == iStartCosts::ServicePeriod) {
-            firstMonth = elcc->RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1;
-        } else if (elcc->RecurringCosts(jCost).startOfCosts == iStartCosts::BasePeriod) {
-            firstMonth = elcc->RecurringCosts(jCost).totalMonthsFromStart + 1;
-        }
-        if ((firstMonth >= 1) && (firstMonth <= elcc->lengthStudyTotalMonths)) {
-            month = firstMonth;
-            if (elcc->RecurringCosts(jCost).totalRepeatPeriodMonths >= 1) {
-                for (iLoop = 1; iLoop <= 10000; ++iLoop) { // add a limit to the loop to prevent runaway condition
-                    elcc->CashFlow(offset + jCost).mnAmount(month) = elcc->RecurringCosts(jCost).cost * monthlyInflationFactor(month);
-                    month += elcc->RecurringCosts(jCost).totalRepeatPeriodMonths;
-                    if (month > elcc->lengthStudyTotalMonths) break;
-                }
-            }
-        } else {
-            ShowWarningError(state,
-                             "For life cycle costing the recurring cost named " + elcc->RecurringCosts(jCost).name +
-                                 " has the first year of the costs that is not within the study period.");
-        }
-    }
-    // Put resource costs into cashflows
-    // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
-    cashFlowCounter = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        if (resourceCostNotZero.at(iResource)) {
-            ++cashFlowCounter;
-
-            switch (iResource) {
-            case DataGlobalConstants::ResourceType::Water:
-            case DataGlobalConstants::ResourceType::OnSiteWater:
-            case DataGlobalConstants::ResourceType::MainsWater:
-            case DataGlobalConstants::ResourceType::RainWater:
-            case DataGlobalConstants::ResourceType::WellWater:
-            case DataGlobalConstants::ResourceType::Condensate:
-                elcc->CashFlow(cashFlowCounter).Category = costCatWater;
-                break;
-            case DataGlobalConstants::ResourceType::Electricity:
-            case DataGlobalConstants::ResourceType::Natural_Gas:
-            case DataGlobalConstants::ResourceType::Gasoline:
-            case DataGlobalConstants::ResourceType::Diesel:
-            case DataGlobalConstants::ResourceType::Coal:
-            case DataGlobalConstants::ResourceType::FuelOil_1:
-            case DataGlobalConstants::ResourceType::FuelOil_2:
-            case DataGlobalConstants::ResourceType::Propane:
-            case DataGlobalConstants::ResourceType::EnergyTransfer:
-            case DataGlobalConstants::ResourceType::Steam:
-            case DataGlobalConstants::ResourceType::DistrictCooling:
-            case DataGlobalConstants::ResourceType::DistrictHeating:
-            case DataGlobalConstants::ResourceType::ElectricityProduced:
-            case DataGlobalConstants::ResourceType::ElectricityPurchased:
-            case DataGlobalConstants::ResourceType::ElectricityNet:
-            case DataGlobalConstants::ResourceType::SolarWater:
-            case DataGlobalConstants::ResourceType::SolarAir:
-                elcc->CashFlow(cashFlowCounter).Category = costCatEnergy;
-                break;
-            default:
-                elcc->CashFlow(cashFlowCounter).Category = costCatOperation;
-            }
-
-            elcc->CashFlow(cashFlowCounter).Resource = iResource;
-            elcc->CashFlow(cashFlowCounter).SourceKind = iSourceKind::Resource;
-            elcc->CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
-            if (cashFlowCounter <= elcc->numCashFlow) {
-                // put the monthly energy costs into the cashflow prior to adjustments
-                // energy costs (a.k.a. resource costs) start at the start of service and repeat
-                // until the end of the study total
-                for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-                    elcc->CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
-                }
-                elcc->CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual.at(iResource);
-                for (int jMonth = monthsBaseToService + 13; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
-                    // use the cost from a year earlier
-                    elcc->CashFlow(cashFlowCounter).mnAmount(jMonth) = elcc->CashFlow(cashFlowCounter).mnAmount(jMonth - 12);
-                }
-                // add in the impact of inflation
-                for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
-                    elcc->CashFlow(cashFlowCounter).mnAmount(jMonth) *= monthlyInflationFactor(jMonth);
-                }
-                // now factor in adjustments
-                // need to find the correct adjustment to use for the current resource
-                found = 0;
-                for (jAdj = 1; jAdj <= elcc->numUseAdjustment; ++jAdj) {
-                    if (elcc->UseAdjustment(jAdj).resource == iResource) {
-                        found = jAdj;
-                        break;
-                    }
-                }
-                // if any adjustments were found for that resource apply the multiplier
-                if (found != 0) {
-                    for (kYear = 1; kYear <= elcc->lengthStudyYears;
-                         ++kYear) { // if service period is later than base period then this will go too far
-                        for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-                            month = (kYear - 1) * 12 + jMonth;
-                            if (month > elcc->lengthStudyTotalMonths) break;
-                            elcc->CashFlow(cashFlowCounter).mnAmount(month) *= elcc->UseAdjustment(found).Adjustment(kYear);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    // put cashflows into categories
-    for (jCost = 1; jCost <= countOfCostCat; ++jCost) {
-        elcc->CashFlow(jCost).Category = jCost; // make each category the type indicated
-        elcc->CashFlow(jCost).SourceKind = iSourceKind::Sum;
-    }
-    // add the cashflows by category
-    for (jCost = countOfCostCat + 1; jCost <= elcc->numCashFlow; ++jCost) {
-        curCategory = elcc->CashFlow(jCost).Category;
-        if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
-            for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
-                elcc->CashFlow(curCategory).mnAmount(jMonth) += elcc->CashFlow(jCost).mnAmount(jMonth);
-            }
-        }
-    }
-    // create total categories
-    for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
-        elcc->CashFlow(costCatTotEnergy).mnAmount(jMonth) = elcc->CashFlow(costCatEnergy).mnAmount(jMonth);
-        elcc->CashFlow(costCatTotOper).mnAmount(jMonth) =
-            elcc->CashFlow(costCatMaintenance).mnAmount(jMonth) + elcc->CashFlow(costCatRepair).mnAmount(jMonth) +
-            elcc->CashFlow(costCatOperation).mnAmount(jMonth) + elcc->CashFlow(costCatReplacement).mnAmount(jMonth) +
-            elcc->CashFlow(costCatMinorOverhaul).mnAmount(jMonth) + elcc->CashFlow(costCatMajorOverhaul).mnAmount(jMonth) +
-            elcc->CashFlow(costCatOtherOperational).mnAmount(jMonth) + elcc->CashFlow(costCatWater).mnAmount(jMonth) +
-            elcc->CashFlow(costCatEnergy).mnAmount(jMonth);
-        elcc->CashFlow(costCatTotCaptl).mnAmount(jMonth) = elcc->CashFlow(costCatConstruction).mnAmount(jMonth) +
-                                                           elcc->CashFlow(costCatSalvage).mnAmount(jMonth) +
-                                                           elcc->CashFlow(costCatOtherCapital).mnAmount(jMonth);
-        elcc->CashFlow(costCatTotGrand).mnAmount(jMonth) =
-            elcc->CashFlow(costCatTotOper).mnAmount(jMonth) + elcc->CashFlow(costCatTotCaptl).mnAmount(jMonth);
-    }
-    // convert all monthly cashflows into yearly cashflows
-    for (jCost = 1; jCost <= elcc->numCashFlow; ++jCost) {
-        for (kYear = 1; kYear <= elcc->lengthStudyYears; ++kYear) {
-            annualCost = 0.0;
-            for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-                month = (kYear - 1) * 12 + jMonth;
-                if (month <= elcc->lengthStudyTotalMonths) {
-                    annualCost += elcc->CashFlow(jCost).mnAmount(month);
-                }
-            }
-            elcc->CashFlow(jCost).yrAmount(kYear) = annualCost;
-        }
-    }
-    // generate a warning if resource referenced was not used
-    for (int nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        auto curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
-        if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
-            ShowWarningError(state,
-                             "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + elcc->UsePriceEscalation(nUsePriceEsc).name +
-                                 "\" has no energy cost. ");
-            ShowContinueError(state, "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
-        }
-    }
-}
-
-void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
-{
-    // J. Glazer - August 2019
-    int nUsePriceEsc;
-
-    auto &elcc(state.dataEconLifeCycleCost);
-
-    for (int iCashFlow = 1; iCashFlow <= elcc->numCashFlow; ++iCashFlow) {
-        if (elcc->CashFlow(iCashFlow).pvKind == iPrValKind::Energy) {
-            // make sure this is not water
-            auto curResource = elcc->CashFlow(iCashFlow).Resource;
-            if (elcc->CashFlow(iCashFlow).Resource == DataGlobalConstants::ResourceType::Water ||
-                (elcc->CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::OnSiteWater &&
-                 elcc->CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::Condensate)) {
-                continue;
-            }
-            if ((curResource != DataGlobalConstants::ResourceType::None)) {
-                int found = 0;
-                for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-                    if (elcc->UsePriceEscalation(nUsePriceEsc).resource == curResource) {
-                        found = nUsePriceEsc;
-                        break;
-                    }
-                }
-                if (found > 0) {
-                    for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-                        elcc->EscalatedEnergy.at(jYear).at(curResource) =
-                            elcc->CashFlow(iCashFlow).yrAmount(jYear) * elcc->UsePriceEscalation(found).Escalation(jYear);
-                    }
-                } else { // if no escalation than just store the original energy cost
-                    for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-                        elcc->EscalatedEnergy.at(jYear).at(curResource) = elcc->CashFlow(iCashFlow).yrAmount(jYear);
-                    }
-                }
-            }
-        }
-    }
-    for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
-        for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-            elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
-        }
+    if (elcc->GetInput_GetLifeCycleCostInput) {
+        GetInputLifeCycleCostParameters(state);
+        GetInputLifeCycleCostRecurringCosts(state);
+        GetInputLifeCycleCostNonrecurringCost(state);
+        GetInputLifeCycleCostUsePriceEscalation(state);
+        GetInputLifeCycleCostUseAdjustment(state);
+        elcc->GetInput_GetLifeCycleCostInput = false;
     }
 }
 
@@ -1954,14 +1470,6 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
         elcc->AfterTaxPresentValue(iYear) = elcc->CashFlow(costCatTotGrand).yrPresVal(iYear) - elcc->Taxes(iYear) * elcc->SPV(iYear);
     }
 }
-
-//======================================================================================================================
-//======================================================================================================================
-
-//    OUTPUT ROUTINES
-
-//======================================================================================================================
-//======================================================================================================================
 
 void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
 {
@@ -2762,6 +2270,482 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             rowHead.deallocate();
             columnWidth.deallocate();
             tableBody.deallocate();
+        }
+    }
+}
+
+void ComputeLifeCycleCostAndReport(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   May 2010
+    //    MODIFIED       na
+    //    RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    //    Perform the life cycle cost computations and write report.
+
+    if (state.dataEconLifeCycleCost->LCCparamPresent) {
+        DisplayString(state, "Computing Life Cycle Costs and Reporting");
+        ExpressAsCashFlows(state);
+        ComputePresentValue(state);
+        ComputeEscalatedEnergyCosts(state);
+        ComputeTaxAndDepreciation(state);
+        WriteTabularLifeCycleCostReport(state);
+    }
+}
+
+int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Jason Glazer
+    //       DATE WRITTEN   May 2010
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    //  Convert the string of the name of the month into numbers 1 to 12
+
+    // METHODOLOGY EMPLOYED:
+    // <description>
+
+    // REFERENCES:
+    // na
+
+    // USE STATEMENTS:
+    // na
+
+    // Return value
+    int MonthToMonthNumber;
+
+    // Locals
+    // FUNCTION ARGUMENT DEFINITIONS:
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS:
+    // na
+
+    // DERIVED TYPE DEFINITIONS:
+    // na
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+    if (UtilityRoutines::SameString(inMonthString, "January")) {
+        MonthToMonthNumber = 1;
+    } else if (UtilityRoutines::SameString(inMonthString, "February")) {
+        MonthToMonthNumber = 2;
+    } else if (UtilityRoutines::SameString(inMonthString, "March")) {
+        MonthToMonthNumber = 3;
+    } else if (UtilityRoutines::SameString(inMonthString, "April")) {
+        MonthToMonthNumber = 4;
+    } else if (UtilityRoutines::SameString(inMonthString, "May")) {
+        MonthToMonthNumber = 5;
+    } else if (UtilityRoutines::SameString(inMonthString, "June")) {
+        MonthToMonthNumber = 6;
+    } else if (UtilityRoutines::SameString(inMonthString, "July")) {
+        MonthToMonthNumber = 7;
+    } else if (UtilityRoutines::SameString(inMonthString, "August")) {
+        MonthToMonthNumber = 8;
+    } else if (UtilityRoutines::SameString(inMonthString, "September")) {
+        MonthToMonthNumber = 9;
+    } else if (UtilityRoutines::SameString(inMonthString, "October")) {
+        MonthToMonthNumber = 10;
+    } else if (UtilityRoutines::SameString(inMonthString, "November")) {
+        MonthToMonthNumber = 11;
+    } else if (UtilityRoutines::SameString(inMonthString, "December")) {
+        MonthToMonthNumber = 12;
+    } else {
+        MonthToMonthNumber = inDefaultMonth;
+    }
+    return MonthToMonthNumber;
+}
+
+//======================================================================================================================
+//======================================================================================================================
+
+//    COMPUTATION ROUTINES
+
+//======================================================================================================================
+//======================================================================================================================
+
+void ExpressAsCashFlows(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+    //    DATE WRITTEN   July 2010
+    //    MODIFIED       na
+    //    RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    //    Convert all recurring and nonrecurring costs into cash flows
+    //    used in calculations and reporting.
+
+    // METHODOLOGY EMPLOYED:
+
+    // REFERENCES:
+    // na
+
+    // USE STATEMENTS:
+
+    // Using/Aliasing
+    using EconomicTariff::GetMonthlyCostForResource;
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // na
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int iCashFlow;
+    int jCost;
+    int jAdj;
+    int kYear;
+    int offset;
+    int month; // number of months since base date
+    int firstMonth;
+    int monthsBaseToService;
+
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
+    for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+        std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
+            monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
+        }
+        resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(jMonth, monthMap));
+    }
+
+    Array1D<Real64> curResourceCosts(12);
+
+    std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
+    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
+        resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
+    }
+
+    std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
+    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
+        resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
+    }
+
+    Real64 annualCost;
+    int cashFlowCounter;
+    int found;
+    int curCategory;
+    Array1D<Real64> monthlyInflationFactor;
+    Real64 inflationPerMonth;
+    int iLoop;
+
+    auto &elcc(state.dataEconLifeCycleCost);
+
+    // compute months from 1900 for base and service period
+    elcc->ExpressAsCashFlows_baseMonths1900 = (elcc->baseDateYear - 1900) * 12 + elcc->baseDateMonth;
+    elcc->ExpressAsCashFlows_serviceMonths1900 = (elcc->serviceDateYear - 1900) * 12 + elcc->serviceDateMonth;
+    monthsBaseToService = elcc->ExpressAsCashFlows_serviceMonths1900 - elcc->ExpressAsCashFlows_baseMonths1900;
+    // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
+    if (state.dataCostEstimateManager->CurntBldg.GrandTotal >
+        0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
+        ++elcc->numNonrecurringCost;
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).name = "Total of ComponentCost:*";
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).lineItem = "";
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).category = costCatConstruction;
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).yearsFromStart = 0;
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).monthsFromStart = 0;
+        elcc->NonrecurringCost(elcc->numNonrecurringCost).totalMonthsFromStart = 0;
+    }
+
+    // gather costs from EconomicTariff for each end use
+    elcc->numResourcesUsed = 0;
+    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
+        GetMonthlyCostForResource(state, iResource, curResourceCosts);
+        annualCost = 0.0;
+        for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+            resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);
+            annualCost += resourceCosts.at(jMonth).at(iResource);
+        }
+        if (annualCost != 0.0) {
+            ++elcc->numResourcesUsed;
+            resourceCostNotZero.at(iResource) = true;
+        } else {
+            resourceCostNotZero.at(iResource) = false;
+        }
+        resourceCostAnnual.at(iResource) = annualCost;
+    }
+    // allocate the escalated energy cost arrays
+    for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
+        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
+        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
+            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
+        }
+        elcc->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+    }
+
+    elcc->EscalatedTotEnergy.allocate(elcc->lengthStudyYears);
+    elcc->EscalatedTotEnergy = 0.0;
+
+    // pre-compute the inflation factors for each year
+    monthlyInflationFactor.allocate(elcc->lengthStudyTotalMonths);
+    if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
+        monthlyInflationFactor = 1.0; // not really used but just in case
+    } else if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
+        // to allocate an interest rate (in this case inflation) cannot just use 1/12
+        // for the monthly value since it will be slightly wrong. Instead use inverse of
+        // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
+        inflationPerMonth = std::pow(elcc->inflation + 1.0, 1.0 / 12.0) - 1;
+        for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
+            monthlyInflationFactor(jMonth) = std::pow(1.0 + inflationPerMonth, jMonth - 1);
+        }
+    }
+
+    elcc->numCashFlow = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed;
+    // Cashflow array order:
+    //   1 cost categories
+    //   2 recurring costs
+    //   3 nonrecurring costs
+    //   4 resource costs
+    elcc->CashFlow.allocate(elcc->numCashFlow);
+    for (iCashFlow = 1; iCashFlow <= elcc->numCashFlow; ++iCashFlow) {
+        elcc->CashFlow(iCashFlow).mnAmount.allocate(elcc->lengthStudyTotalMonths);
+        elcc->CashFlow(iCashFlow).yrAmount.allocate(elcc->lengthStudyYears);
+        elcc->CashFlow(iCashFlow).yrPresVal.allocate(elcc->lengthStudyYears);
+        elcc->CashFlow(iCashFlow).mnAmount = 0.0;  // zero all cash flow values
+        elcc->CashFlow(iCashFlow).yrAmount = 0.0;  // zero all cash flow values
+        elcc->CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
+    }
+    // Put nonrecurring costs into cashflows
+    offset = countOfCostCat + elcc->numRecurringCosts;
+    for (jCost = 1; jCost <= elcc->numNonrecurringCost; ++jCost) {
+        elcc->CashFlow(offset + jCost).name = elcc->NonrecurringCost(jCost).name;
+        elcc->CashFlow(offset + jCost).SourceKind = iSourceKind::Nonrecurring;
+        elcc->CashFlow(offset + jCost).Category = elcc->NonrecurringCost(jCost).category;
+        elcc->CashFlow(offset + jCost).orginalCost = elcc->NonrecurringCost(jCost).cost;
+        elcc->CashFlow(offset + jCost).mnAmount = 0.0;
+        if (elcc->NonrecurringCost(jCost).startOfCosts == iStartCosts::ServicePeriod) {
+            month = elcc->NonrecurringCost(jCost).totalMonthsFromStart + monthsBaseToService + 1;
+        } else if (elcc->NonrecurringCost(jCost).startOfCosts == iStartCosts::BasePeriod) {
+            month = elcc->NonrecurringCost(jCost).totalMonthsFromStart + 1;
+        }
+        if ((month >= 1) && (month <= elcc->lengthStudyTotalMonths)) {
+            elcc->CashFlow(offset + jCost).mnAmount(month) = elcc->NonrecurringCost(jCost).cost * monthlyInflationFactor(month);
+        } else {
+            ShowWarningError(state,
+                             "For life cycle costing a nonrecurring cost named " + elcc->NonrecurringCost(jCost).name +
+                                 " contains a cost which is not within the study period.");
+        }
+    }
+    // Put recurring costs into cashflows
+    offset = countOfCostCat;
+    for (jCost = 1; jCost <= elcc->numRecurringCosts; ++jCost) {
+        elcc->CashFlow(offset + jCost).name = elcc->RecurringCosts(jCost).name;
+        elcc->CashFlow(offset + jCost).SourceKind = iSourceKind::Recurring;
+        elcc->CashFlow(offset + jCost).Category = elcc->RecurringCosts(jCost).category;
+        elcc->CashFlow(offset + jCost).orginalCost = elcc->RecurringCosts(jCost).cost;
+        if (elcc->RecurringCosts(jCost).startOfCosts == iStartCosts::ServicePeriod) {
+            firstMonth = elcc->RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1;
+        } else if (elcc->RecurringCosts(jCost).startOfCosts == iStartCosts::BasePeriod) {
+            firstMonth = elcc->RecurringCosts(jCost).totalMonthsFromStart + 1;
+        }
+        if ((firstMonth >= 1) && (firstMonth <= elcc->lengthStudyTotalMonths)) {
+            month = firstMonth;
+            if (elcc->RecurringCosts(jCost).totalRepeatPeriodMonths >= 1) {
+                for (iLoop = 1; iLoop <= 10000; ++iLoop) { // add a limit to the loop to prevent runaway condition
+                    elcc->CashFlow(offset + jCost).mnAmount(month) = elcc->RecurringCosts(jCost).cost * monthlyInflationFactor(month);
+                    month += elcc->RecurringCosts(jCost).totalRepeatPeriodMonths;
+                    if (month > elcc->lengthStudyTotalMonths) break;
+                }
+            }
+        } else {
+            ShowWarningError(state,
+                             "For life cycle costing the recurring cost named " + elcc->RecurringCosts(jCost).name +
+                                 " has the first year of the costs that is not within the study period.");
+        }
+    }
+    // Put resource costs into cashflows
+    // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
+    cashFlowCounter = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost;
+    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
+        if (resourceCostNotZero.at(iResource)) {
+            ++cashFlowCounter;
+
+            switch (iResource) {
+            case DataGlobalConstants::ResourceType::Water:
+            case DataGlobalConstants::ResourceType::OnSiteWater:
+            case DataGlobalConstants::ResourceType::MainsWater:
+            case DataGlobalConstants::ResourceType::RainWater:
+            case DataGlobalConstants::ResourceType::WellWater:
+            case DataGlobalConstants::ResourceType::Condensate:
+                elcc->CashFlow(cashFlowCounter).Category = costCatWater;
+                break;
+            case DataGlobalConstants::ResourceType::Electricity:
+            case DataGlobalConstants::ResourceType::Natural_Gas:
+            case DataGlobalConstants::ResourceType::Gasoline:
+            case DataGlobalConstants::ResourceType::Diesel:
+            case DataGlobalConstants::ResourceType::Coal:
+            case DataGlobalConstants::ResourceType::FuelOil_1:
+            case DataGlobalConstants::ResourceType::FuelOil_2:
+            case DataGlobalConstants::ResourceType::Propane:
+            case DataGlobalConstants::ResourceType::EnergyTransfer:
+            case DataGlobalConstants::ResourceType::Steam:
+            case DataGlobalConstants::ResourceType::DistrictCooling:
+            case DataGlobalConstants::ResourceType::DistrictHeating:
+            case DataGlobalConstants::ResourceType::ElectricityProduced:
+            case DataGlobalConstants::ResourceType::ElectricityPurchased:
+            case DataGlobalConstants::ResourceType::ElectricityNet:
+            case DataGlobalConstants::ResourceType::SolarWater:
+            case DataGlobalConstants::ResourceType::SolarAir:
+                elcc->CashFlow(cashFlowCounter).Category = costCatEnergy;
+                break;
+            default:
+                elcc->CashFlow(cashFlowCounter).Category = costCatOperation;
+            }
+
+            elcc->CashFlow(cashFlowCounter).Resource = iResource;
+            elcc->CashFlow(cashFlowCounter).SourceKind = iSourceKind::Resource;
+            elcc->CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
+            if (cashFlowCounter <= elcc->numCashFlow) {
+                // put the monthly energy costs into the cashflow prior to adjustments
+                // energy costs (a.k.a. resource costs) start at the start of service and repeat
+                // until the end of the study total
+                for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+                    elcc->CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
+                }
+                elcc->CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual.at(iResource);
+                for (int jMonth = monthsBaseToService + 13; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
+                    // use the cost from a year earlier
+                    elcc->CashFlow(cashFlowCounter).mnAmount(jMonth) = elcc->CashFlow(cashFlowCounter).mnAmount(jMonth - 12);
+                }
+                // add in the impact of inflation
+                for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
+                    elcc->CashFlow(cashFlowCounter).mnAmount(jMonth) *= monthlyInflationFactor(jMonth);
+                }
+                // now factor in adjustments
+                // need to find the correct adjustment to use for the current resource
+                found = 0;
+                for (jAdj = 1; jAdj <= elcc->numUseAdjustment; ++jAdj) {
+                    if (elcc->UseAdjustment(jAdj).resource == iResource) {
+                        found = jAdj;
+                        break;
+                    }
+                }
+                // if any adjustments were found for that resource apply the multiplier
+                if (found != 0) {
+                    for (kYear = 1; kYear <= elcc->lengthStudyYears;
+                         ++kYear) { // if service period is later than base period then this will go too far
+                        for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+                            month = (kYear - 1) * 12 + jMonth;
+                            if (month > elcc->lengthStudyTotalMonths) break;
+                            elcc->CashFlow(cashFlowCounter).mnAmount(month) *= elcc->UseAdjustment(found).Adjustment(kYear);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // put cashflows into categories
+    for (jCost = 1; jCost <= countOfCostCat; ++jCost) {
+        elcc->CashFlow(jCost).Category = jCost; // make each category the type indicated
+        elcc->CashFlow(jCost).SourceKind = iSourceKind::Sum;
+    }
+    // add the cashflows by category
+    for (jCost = countOfCostCat + 1; jCost <= elcc->numCashFlow; ++jCost) {
+        curCategory = elcc->CashFlow(jCost).Category;
+        if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
+            for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
+                elcc->CashFlow(curCategory).mnAmount(jMonth) += elcc->CashFlow(jCost).mnAmount(jMonth);
+            }
+        }
+    }
+    // create total categories
+    for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
+        elcc->CashFlow(costCatTotEnergy).mnAmount(jMonth) = elcc->CashFlow(costCatEnergy).mnAmount(jMonth);
+        elcc->CashFlow(costCatTotOper).mnAmount(jMonth) =
+            elcc->CashFlow(costCatMaintenance).mnAmount(jMonth) + elcc->CashFlow(costCatRepair).mnAmount(jMonth) +
+            elcc->CashFlow(costCatOperation).mnAmount(jMonth) + elcc->CashFlow(costCatReplacement).mnAmount(jMonth) +
+            elcc->CashFlow(costCatMinorOverhaul).mnAmount(jMonth) + elcc->CashFlow(costCatMajorOverhaul).mnAmount(jMonth) +
+            elcc->CashFlow(costCatOtherOperational).mnAmount(jMonth) + elcc->CashFlow(costCatWater).mnAmount(jMonth) +
+            elcc->CashFlow(costCatEnergy).mnAmount(jMonth);
+        elcc->CashFlow(costCatTotCaptl).mnAmount(jMonth) = elcc->CashFlow(costCatConstruction).mnAmount(jMonth) +
+                                                           elcc->CashFlow(costCatSalvage).mnAmount(jMonth) +
+                                                           elcc->CashFlow(costCatOtherCapital).mnAmount(jMonth);
+        elcc->CashFlow(costCatTotGrand).mnAmount(jMonth) =
+            elcc->CashFlow(costCatTotOper).mnAmount(jMonth) + elcc->CashFlow(costCatTotCaptl).mnAmount(jMonth);
+    }
+    // convert all monthly cashflows into yearly cashflows
+    for (jCost = 1; jCost <= elcc->numCashFlow; ++jCost) {
+        for (kYear = 1; kYear <= elcc->lengthStudyYears; ++kYear) {
+            annualCost = 0.0;
+            for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+                month = (kYear - 1) * 12 + jMonth;
+                if (month <= elcc->lengthStudyTotalMonths) {
+                    annualCost += elcc->CashFlow(jCost).mnAmount(month);
+                }
+            }
+            elcc->CashFlow(jCost).yrAmount(kYear) = annualCost;
+        }
+    }
+    // generate a warning if resource referenced was not used
+    for (int nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
+        auto curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
+            ShowWarningError(state,
+                             "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + elcc->UsePriceEscalation(nUsePriceEsc).name +
+                                 "\" has no energy cost. ");
+            ShowContinueError(state, "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
+        }
+    }
+}
+
+void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
+{
+    // J. Glazer - August 2019
+    int nUsePriceEsc;
+
+    auto &elcc(state.dataEconLifeCycleCost);
+
+    for (int iCashFlow = 1; iCashFlow <= elcc->numCashFlow; ++iCashFlow) {
+        if (elcc->CashFlow(iCashFlow).pvKind == iPrValKind::Energy) {
+            // make sure this is not water
+            auto curResource = elcc->CashFlow(iCashFlow).Resource;
+            if (elcc->CashFlow(iCashFlow).Resource == DataGlobalConstants::ResourceType::Water ||
+                (elcc->CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::OnSiteWater &&
+                 elcc->CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::Condensate)) {
+                continue;
+            }
+            if ((curResource != DataGlobalConstants::ResourceType::None)) {
+                int found = 0;
+                for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
+                    if (elcc->UsePriceEscalation(nUsePriceEsc).resource == curResource) {
+                        found = nUsePriceEsc;
+                        break;
+                    }
+                }
+                if (found > 0) {
+                    for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+                        elcc->EscalatedEnergy.at(jYear).at(curResource) =
+                            elcc->CashFlow(iCashFlow).yrAmount(jYear) * elcc->UsePriceEscalation(found).Escalation(jYear);
+                    }
+                } else { // if no escalation than just store the original energy cost
+                    for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+                        elcc->EscalatedEnergy.at(jYear).at(curResource) = elcc->CashFlow(iCashFlow).yrAmount(jYear);
+                    }
+                }
+            }
+        }
+    }
+    for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
+        for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+            elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
         }
     }
 }

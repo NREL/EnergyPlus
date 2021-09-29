@@ -68,22 +68,6 @@ namespace EcoRoofManager {
                      Real64 &TempExt      // Exterior temperature boundary condition
     );
 
-    void UpdateSoilProps(EnergyPlusData &state,
-                         Real64 &Moisture,
-                         Real64 &MeanRootMoisture,
-                         Real64 const MoistureMax,
-                         Real64 const MoistureResidual,
-                         Real64 const SoilThickness,
-                         Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
-                         Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int const ConstrNum, // Indicator for construction index for the current surface
-                         Real64 &Alphag,
-                         int const unit,    // unused1208
-                         Real64 const Tg,   // unused1208
-                         Real64 const Tf,   // unused1208
-                         Real64 const Qsoil // unused1208
-    );
-
     void CalculateEcoRoofSolar(EnergyPlusData &state,
                                Real64 &RS, // Solar radiation on a horizontal surface (roof)
                                Real64 &f1, // Solar term in Stomatal Resistance
@@ -122,9 +106,7 @@ struct EcoRoofManagerData : BaseGlobalStruct
     Real64 Tg = 10.0;                 // Ground Surface temperature C ***** FROM PREVIOUS TIME STEP
     Real64 Tf = 10.0;                 // Leaf temperature C ***** FROM PREVIOUS TIME STEP
     Real64 Zf = 0.2;                  // Height of plants (m)
-    // DJS Oct 2007 release - note I got rid of the initialization of moisture and meanrootmoisture here as these
-    // values are now set at beginning of each new DD and each new warm-up loop.
-    Real64 Moisture = 0.0; // m^3/m^3.The moisture content in the soil is the value provided by a user
+    Real64 Moisture = 0.0;            // m^3/m^3.The moisture content in the soil is the value provided by a user
     Real64 MoistureResidual =
         0.05;                      // m^3/m^3. Residual & maximum water contents are unique to each material. See Frankenstein et al (2004b) for data.
     Real64 MoistureMax = 0.5;      // Maximum volumetric moisture content (porosity) m^3/m^3
@@ -132,20 +114,19 @@ struct EcoRoofManagerData : BaseGlobalStruct
     Real64 SoilThickness = 0.2;    // Soil thickness (m)
     Real64 StomatalResistanceMin = 0.0; // s/m . ! Minimum stomatal resistance is unique for each veg. type.
     Real64 f3 = 1.0;                    // As the value of gd for tall grass is 0, then f3 = 1
-    // ECMWF 2002 CY25R1 report has gd=0.0 for all veg except trees where gd=0.03.
-    Real64 Zog = 0.001;     // Ground roughness length scale (m)
-    Real64 Za = 2.0;        // Instrument height where atmospheric wind speed is measured (m)
-    Real64 Lf = 0.0;        // latent heat flux
-    Real64 Vfluxf = 0.0;    // Water evapotr. rate associated with latent heat from vegetation [m/s]
-    Real64 Qsoil = 0.0;     // heat flux from the soil layer
-    Real64 sheatf = 0.0;    // sensible heat flux coeff for foliage (W/m^2K)
-    Real64 sensiblef = 0.0; // sensible heat transfer TO foliage (W/m^2) DJS Jan 2011
-    Real64 sheatg = 0.0;    // intermediate calculation variable - sensible flux coef (W/m^2K for ground)
-    Real64 sensibleg = 0.0; // sensible heat flux TO ground (w/m^2) DJS Jan 2011
-    Real64 Lg = 0.0;        // latent heat flux from ground surface
-    Real64 Vfluxg = 0.0;    // Water evapotr. rate associated with latent heat from ground surface [m/s]
-    Real64 TopDepth = 0.0;  // Thickness of "near-surface" soil layer
-    Real64 RootDepth = 0.0; // Thickness of "root zone" soil layer //Autodesk Was used uninitialized
+    Real64 Zog = 0.001;                 // Ground roughness length scale (m)
+    Real64 Za = 2.0;                    // Instrument height where atmospheric wind speed is measured (m)
+    Real64 Lf = 0.0;                    // latent heat flux
+    Real64 Vfluxf = 0.0;                // Water evapotr. rate associated with latent heat from vegetation [m/s]
+    Real64 Qsoil = 0.0;                 // heat flux from the soil layer
+    Real64 sheatf = 0.0;                // sensible heat flux coeff for foliage (W/m^2K)
+    Real64 sensiblef = 0.0;             // sensible heat transfer TO foliage (W/m^2) DJS Jan 2011
+    Real64 sheatg = 0.0;                // intermediate calculation variable - sensible flux coef (W/m^2K for ground)
+    Real64 sensibleg = 0.0;             // sensible heat flux TO ground (w/m^2) DJS Jan 2011
+    Real64 Lg = 0.0;                    // latent heat flux from ground surface
+    Real64 Vfluxg = 0.0;                // Water evapotr. rate associated with latent heat from ground surface [m/s]
+    Real64 TopDepth = 0.0;              // Thickness of "near-surface" soil layer
+    Real64 RootDepth = 0.0;             // Thickness of "root zone" soil layer //Autodesk Was used uninitialized
     // Note TopDepth+RootDepth = thickness of ecoroof soil layer
     Real64 TimeStepZoneSec = 0.0;               // Seconds per TimeStep
     Real64 DryCond = 0.0;                       // Dry soil value of conductivity
