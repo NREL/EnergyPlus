@@ -1544,8 +1544,6 @@ namespace HeatBalanceHAMTManager {
         int cid;
         Real64 watermass;
         Real64 matmass;
-        // unused1208    REAL(r64), SAVE :: InOld=0.0D0
-        // unused1208    REAL(r64), SAVE :: OutOld=0.0D0
 
         // Update Temperatures and RHs. Calculate report variables
         matmass = 0.0;

@@ -339,7 +339,7 @@ namespace PurchasedAirManager {
 
     void InitPurchasedAir(EnergyPlusData &state,
                           int PurchAirNum,
-                          bool FirstHVACIteration, // unused1208
+                          bool FirstHVACIteration,
                           int ControlledZoneNum,
                           int ActualZoneNum);
 

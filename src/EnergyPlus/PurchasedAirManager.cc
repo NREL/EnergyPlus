@@ -1167,7 +1167,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
 void InitPurchasedAir(EnergyPlusData &state,
                       int const PurchAirNum,
-                      [[maybe_unused]] bool const FirstHVACIteration, // unused1208
+                      [[maybe_unused]] bool const FirstHVACIteration,
                       int const ControlledZoneNum,
                       int const ActualZoneNum)
 {

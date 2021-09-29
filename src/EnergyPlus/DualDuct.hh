@@ -219,7 +219,7 @@ namespace DualDuct {
         // Beginning of Reporting subroutines for the Damper Module
         // *****************************************************************************
 
-        void ReportDualDuct(); // unused1208
+        void ReportDualDuct();
     };
 
     // Functions

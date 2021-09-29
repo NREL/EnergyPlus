@@ -5377,7 +5377,7 @@ void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum)
     }
 }
 
-void ReportOAMixer([[maybe_unused]] int const OAMixerNum) // unused1208
+void ReportOAMixer([[maybe_unused]] int const OAMixerNum)
 {
 
     // SUBROUTINE ARGUMENT DEFINITIONS

@@ -5909,7 +5909,7 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
 // Beginning of Reporting subroutines for the Sys Module
 // *****************************************************************************
 
-void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state) // unused1208
+void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:

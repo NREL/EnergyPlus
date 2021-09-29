@@ -5975,7 +5975,7 @@ Label10:;
 }
 
 void CheckWaterCoilSchedule(EnergyPlusData &state,
-                            [[maybe_unused]] std::string const &CompType, // unused1208
+                            [[maybe_unused]] std::string const &CompType,
                             std::string_view CompName,
                             Real64 &Value,
                             int &CompIndex)

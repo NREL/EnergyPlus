@@ -213,14 +213,6 @@ namespace FluidCoolers {
 
     void GetFluidCoolerInput(EnergyPlusData &state);
 
-    void CalcFluidCoolerOutlet(
-        EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
-
-    Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
-                                       Real64 UA,                       // UA of fluid cooler
-                                       std::array<Real64, 5> const &Par // par(1) = design fluid cooler load [W]
-    );
-
 } // namespace FluidCoolers
 
 struct FluidCoolersData : BaseGlobalStruct

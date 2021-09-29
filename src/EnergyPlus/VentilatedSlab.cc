@@ -3619,7 +3619,6 @@ namespace VentilatedSlab {
         Real64 QCoilReq; // Heat addition required from an electric/gas heating coil
         Real64 HCoilOutAirTemp;
         Real64 HCoilInAirTemp;
-        // unused1208  REAL(r64)           :: RadInTemp       ! Set temperature for "Slab In Node"
 
         SimVentSlabOAMixer(state, Item);
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {

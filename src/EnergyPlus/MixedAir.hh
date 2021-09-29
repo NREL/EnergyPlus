@@ -482,7 +482,7 @@ namespace MixedAir {
 
     void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum);
 
-    void ReportOAMixer(int const OAMixerNum); // unused1208
+    void ReportOAMixer(int const OAMixerNum);
 
     // End of Sizing Section of the Module
     //******************************************************************************

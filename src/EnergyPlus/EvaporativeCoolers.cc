@@ -285,7 +285,6 @@ void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 c
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 StageEff; // Stage Efficiency of the Heat Exchanger
     Real64 TEDB;     // Entering Dry Bulb Temperature
-    Real64 TEWB;     // Entering Wet Bulb Temperature
     Real64 QHX;      // Q Across Sec HX in Watts or J/sec
     Real64 RhoWater;
     Real64 RhoAir; // Density of the primary side air
@@ -334,7 +333,6 @@ void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 c
         //   DRY BULB TEMP APPROACHES THE WET BULB TEMP ACROSS THE INDIRECT STAGE.
         //***************************************************************************
         //                  CALCULATE THE TLDB
-        TEWB = EvapCond(EvapCoolNum).InletWetBulbTemp;
         TEDB = EvapCond(EvapCoolNum).InletTemp;
         TWBSec =
             PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecInletTemp, EvapCond(EvapCoolNum).SecInletHumRat, EvapCond(EvapCoolNum).SecInletPressure);
@@ -437,7 +435,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TEDB;      // Entering Dry Bulb Temperature
-    Real64 TEWB;      // Entering Wet Bulb Temperature
     Real64 BoundTemp; // temperature limit for outlet
     Real64 PartLoad;
     Real64 SecRho;
@@ -472,7 +469,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     FlowRatioSecWet = 0.0;
     EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = OperatingMode::None;
     TEDB = EvapCond(EvapCoolNum).InletTemp;
-    TEWB = EvapCond(EvapCoolNum).InletWetBulbTemp;
     SysTempSetPoint = EvapCond(EvapCoolNum).DesiredOutletTemp;
     SecRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
     MassFlowRateSecMax = SecRho * EvapCond(EvapCoolNum).IndirectVolFlowRate;
@@ -872,7 +868,6 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
     Real64 SecondaryInletHumRatio;     // entering humidity ratio for secondary/purge side
     Real64 StageEff;                   // Stage Efficiency of the Heat Exchanger
     Real64 TEDB;                       // Entering Dry Bulb Temperature
-    Real64 TEWB;                       // Entering Wet Bulb Temperature
     Real64 QHX;                        // Q Across Sec HX in Watts or J/sec
     Real64 RhoWater;
     Real64 RhoAir; // Density of the primary side air
@@ -982,7 +977,6 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
 
         } else {
 
-            TEWB = EvapCond(EvapCoolNum).InletWetBulbTemp;
             TEDB = EvapCond(EvapCoolNum).InletTemp;
             PartLoad = EvapCond(EvapCoolNum).PartLoadFract;
 
@@ -1076,6 +1070,80 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
 
     // the pressure is not changed across the evap cooler
     EvapCond(EvapCoolNum).OutletPressure = EvapCond(EvapCoolNum).InletPressure;
+}
+
+void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard J. Liesen
+    //       DATE WRITTEN   October 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // Using/Aliasing
+    using namespace DataWater;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int OutletNode;
+    int InletNode;
+    int OutletNodeSec;
+    Real64 AvailWaterRate(0.0);
+
+    auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
+    OutletNode = EvapCond(EvapCoolNum).OutletNode;
+    InletNode = EvapCond(EvapCoolNum).InletNode;
+
+    OutletNodeSec = EvapCond(EvapCoolNum).SecondaryOutletNode;
+
+    // Set the outlet air nodes of the EvapCooler
+    state.dataLoopNodes->Node(OutletNode).MassFlowRate = EvapCond(EvapCoolNum).OutletMassFlowRate;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = EvapCond(EvapCoolNum).OutletMassFlowRateMaxAvail;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = EvapCond(EvapCoolNum).OutletMassFlowRateMinAvail;
+    state.dataLoopNodes->Node(OutletNode).Temp = EvapCond(EvapCoolNum).OutletTemp;
+    state.dataLoopNodes->Node(OutletNode).HumRat = EvapCond(EvapCoolNum).OutletHumRat;
+    state.dataLoopNodes->Node(OutletNode).Enthalpy = EvapCond(EvapCoolNum).OutletEnthalpy;
+    state.dataLoopNodes->Node(OutletNode).Press = EvapCond(EvapCoolNum).OutletPressure;
+
+    if (EvapCond(EvapCoolNum).SecondaryOutletNode > 0) {
+        // set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
+        if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial && EvapCond(EvapCoolNum).EvapCoolerOperationControlFlag) {
+            state.dataLoopNodes->Node(OutletNodeSec).Temp = EvapCond(EvapCoolNum).SecOutletTemp;
+            state.dataLoopNodes->Node(OutletNodeSec).HumRat = EvapCond(EvapCoolNum).SecOutletHumRat;
+            state.dataLoopNodes->Node(OutletNodeSec).Enthalpy = EvapCond(EvapCoolNum).SecOutletEnthalpy;
+            state.dataLoopNodes->Node(OutletNodeSec).MassFlowRate = EvapCond(EvapCoolNum).SecOutletMassFlowRate;
+        }
+    }
+
+    // Set the outlet nodes for properties that just pass through & not used
+    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+
+    // Set the demand request for supply water from water storage tank (if needed)
+    if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
+        state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID)
+            .VdotRequestDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID) = EvapCond(EvapCoolNum).EvapWaterConsumpRate;
+    }
+
+    // check if should be starved by restricted flow from tank
+    if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
+        AvailWaterRate = state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID)
+                             .VdotAvailDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID);
+        if (AvailWaterRate < EvapCond(EvapCoolNum).EvapWaterConsumpRate) {
+            EvapCond(EvapCoolNum).EvapWaterStarvMakupRate = EvapCond(EvapCoolNum).EvapWaterConsumpRate - AvailWaterRate;
+            EvapCond(EvapCoolNum).EvapWaterConsumpRate = AvailWaterRate;
+        } else {
+            EvapCond(EvapCoolNum).EvapWaterStarvMakupRate = 0.0;
+        }
+    }
+
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+    }
+
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+    }
 }
 
 void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum)
@@ -3103,8 +3171,6 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 OutletTemp;       // evaporative cooler current outlet air drybulb temperature
-    Real64 RhoAirSec;        // density of secondary air at inlet condition
-    Real64 RhoAirSys;        // density of primary air at inlet condition
     Real64 EffectivenessDry; // dry coil effectiveness
     Real64 EffectivenessWet; // wet coil effectiveness
     Real64 FlowRatio;        // flow ratio based on current to the design of secondary air flow rate
@@ -3128,8 +3194,6 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
         FlowRatio = 1.0;
     }
     if (AirMassFlowSec > 0.0) {
-        RhoAirSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EDBTSec, EHumRatSec);
-        RhoAirSys = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
         if (DryOrWetOperatingMode == OperatingMode::DryModulated || DryOrWetOperatingMode == OperatingMode::DryFull) {
             if (EvapCond(EvapCoolNum).DrybulbEffecCurveIndex > 0) {
                 EffModDryMode = CurveValue(state, EvapCond(EvapCoolNum).DrybulbEffecCurveIndex, FlowRatio);
@@ -3474,79 +3538,134 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
     EvapCond(EvapCoolNum).OutletPressure = EvapCond(EvapCoolNum).InletPressure;
 }
 
-void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
+void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // unit number
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard J. Liesen
-    //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
+    //       AUTHOR         B. Griffith
+    //       DATE WRITTEN   July 2013
+    //       MODIFIED       August 2014 Bereket Nigusse, added scalable sizing
+    //       MODIFIED       January 2013 Daeho Kang, add component sizing table entries
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using namespace DataWater;
+    using namespace DataSizing;
+    using DataHVACGlobals::CoolingCapacitySizing;
+    using DataSizing::AutoSize;
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
-    int OutletNodeSec;
-    int InletNodeSec;
-    Real64 AvailWaterRate(0.0);
+    std::string CompName;     // component name
+    std::string CompType;     // component type
+    std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+    Real64 TempSize;          // autosized value of coil input field
+    int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
+                              // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+    bool PrintFlag;           // TRUE when sizing information is reported in the eio file
+    int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
+    int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+                              // FractionOfAutosizedHeatingAirflow ...)
 
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
+    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
-    OutletNode = EvapCond(EvapCoolNum).OutletNode;
-    InletNode = EvapCond(EvapCoolNum).InletNode;
+    state.dataSize->DataScalableSizingON = false;
+    state.dataSize->ZoneHeatingOnlyFan = false;
+    state.dataSize->ZoneCoolingOnlyFan = false;
 
-    InletNodeSec = EvapCond(EvapCoolNum).SecondaryInletNode;
-    OutletNodeSec = EvapCond(EvapCoolNum).SecondaryOutletNode;
+    CompType = "ZoneHVAC:EvaporativeCoolerUnit";
+    CompName = ZoneEvapUnit(UnitNum).Name;
+    state.dataSize->DataZoneNumber = ZoneEvapUnit(UnitNum).ZonePtr;
+    PrintFlag = true;
+    bool errorsFound = false;
 
-    // Set the outlet air nodes of the EvapCooler
-    state.dataLoopNodes->Node(OutletNode).MassFlowRate = EvapCond(EvapCoolNum).OutletMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = EvapCond(EvapCoolNum).OutletMassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = EvapCond(EvapCoolNum).OutletMassFlowRateMinAvail;
-    state.dataLoopNodes->Node(OutletNode).Temp = EvapCond(EvapCoolNum).OutletTemp;
-    state.dataLoopNodes->Node(OutletNode).HumRat = EvapCond(EvapCoolNum).OutletHumRat;
-    state.dataLoopNodes->Node(OutletNode).Enthalpy = EvapCond(EvapCoolNum).OutletEnthalpy;
-    state.dataLoopNodes->Node(OutletNode).Press = EvapCond(EvapCoolNum).OutletPressure;
+    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+    auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
 
-    if (EvapCond(EvapCoolNum).SecondaryOutletNode > 0) {
-        // set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
-        if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial && EvapCond(EvapCoolNum).EvapCoolerOperationControlFlag) {
-            state.dataLoopNodes->Node(OutletNodeSec).Temp = EvapCond(EvapCoolNum).SecOutletTemp;
-            state.dataLoopNodes->Node(OutletNodeSec).HumRat = EvapCond(EvapCoolNum).SecOutletHumRat;
-            state.dataLoopNodes->Node(OutletNodeSec).Enthalpy = EvapCond(EvapCoolNum).SecOutletEnthalpy;
-            state.dataLoopNodes->Node(OutletNodeSec).MassFlowRate = EvapCond(EvapCoolNum).SecOutletMassFlowRate;
-        }
-    }
+    if (CurZoneEqNum > 0) {
 
-    // Set the outlet nodes for properties that just pass through & not used
-    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+        if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
+            state.dataSize->ZoneCoolingOnlyFan = true;
+            zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
+            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+            SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
+            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+            if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
+                SAFMethod == FractionOfAutosizedCoolingAirflow) {
+                if (SAFMethod == SupplyAirFlowRate) {
+                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                    }
+                    TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
+                        PrintFlag = false;
+                    }
+                } else if (SAFMethod == FlowPerFloorArea) {
+                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                    ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
+                                                            state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
+                } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
+                    state.dataSize->DataFracOfAutosizedCoolingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                    TempSize = AutoSize;
+                    state.dataSize->DataScalableSizingON = true;
+                } else {
+                    TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                }
 
-    // Set the demand request for supply water from water storage tank (if needed)
-    if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
-        state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID)
-            .VdotRequestDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID) = EvapCond(EvapCoolNum).EvapWaterConsumpRate;
-    }
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
+                if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
-    // check if should be starved by restricted flow from tank
-    if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
-        AvailWaterRate = state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID)
-                             .VdotAvailDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID);
-        if (AvailWaterRate < EvapCond(EvapCoolNum).EvapWaterConsumpRate) {
-            EvapCond(EvapCoolNum).EvapWaterStarvMakupRate = EvapCond(EvapCoolNum).EvapWaterConsumpRate - AvailWaterRate;
-            EvapCond(EvapCoolNum).EvapWaterConsumpRate = AvailWaterRate;
+            } else if (SAFMethod == FlowPerCoolingCapacity) {
+                SizingMethod = CoolingCapacitySizing;
+                TempSize = AutoSize;
+                PrintFlag = false;
+                state.dataSize->DataScalableSizingON = true;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
+                    state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                }
+                CoolingCapacitySizer sizerCoolingCapacity;
+                sizerCoolingCapacity.overrideSizingString(SizingString);
+                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                PrintFlag = true;
+                TempSize = AutoSize;
+
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
+                if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+            }
+            state.dataSize->DataScalableSizingON = false;
+            state.dataSize->ZoneCoolingOnlyFan = false;
         } else {
-            EvapCond(EvapCoolNum).EvapWaterStarvMakupRate = 0.0;
+            // no scalble sizing method has been specified. Sizing proceeds using the method
+            // specified in the zoneHVAC object
+            // N1 , \field Maximum Supply Air Flow Rate
+            state.dataSize->ZoneCoolingOnlyFan = true;
+            if (ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate > 0.0) {
+                PrintFlag = false;
+            }
+            TempSize = ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
+            CoolingAirFlowSizer sizingCoolingAirFlow;
+            std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
+            if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
+            sizingCoolingAirFlow.overrideSizingString(stringOverride);
+            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+            state.dataSize->ZoneCoolingOnlyFan = false;
         }
-    }
-
-    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
-    }
-
-    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
     }
 }
 
@@ -3740,8 +3859,6 @@ Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio,
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int UnitNum;
-    int ZoneNum;
-    int ZoneNodeNum;
     Real64 LoadToBeMet; // sensible load to be met
     Real64 MinHumRat;
     Real64 SensibleOutputProvided;
@@ -3750,8 +3867,6 @@ Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio,
     auto &Node(state.dataLoopNodes->Node);
 
     UnitNum = int(Par[0]);
-    ZoneNum = int(Par[1]);
-    ZoneNodeNum = int(Par[2]);
     LoadToBeMet = Par[4];
 
     Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate * FanSpeedRatio;
@@ -4602,137 +4717,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 ZoneEvapUnit(UnitLoop).Name);
-        }
-    }
-}
-
-void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // unit number
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Griffith
-    //       DATE WRITTEN   July 2013
-    //       MODIFIED       August 2014 Bereket Nigusse, added scalable sizing
-    //       MODIFIED       January 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    using namespace DataSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
-    using DataSizing::AutoSize;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CompName;     // component name
-    std::string CompType;     // component type
-    std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-    Real64 TempSize;          // autosized value of coil input field
-    int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
-                              // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
-    bool PrintFlag;           // TRUE when sizing information is reported in the eio file
-    int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
-    int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                              // FractionOfAutosizedHeatingAirflow ...)
-
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-
-    state.dataSize->DataScalableSizingON = false;
-    state.dataSize->ZoneHeatingOnlyFan = false;
-    state.dataSize->ZoneCoolingOnlyFan = false;
-
-    CompType = "ZoneHVAC:EvaporativeCoolerUnit";
-    CompName = ZoneEvapUnit(UnitNum).Name;
-    state.dataSize->DataZoneNumber = ZoneEvapUnit(UnitNum).ZonePtr;
-    PrintFlag = true;
-    bool errorsFound = false;
-
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
-
-    if (CurZoneEqNum > 0) {
-
-        if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
-            state.dataSize->ZoneCoolingOnlyFan = true;
-            zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
-            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-            SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-            if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
-                SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                if (SAFMethod == SupplyAirFlowRate) {
-                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                    }
-                    TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                        PrintFlag = false;
-                    }
-                } else if (SAFMethod == FlowPerFloorArea) {
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
-                                                            state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                    state.dataSize->DataScalableSizingON = true;
-                } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                    state.dataSize->DataFracOfAutosizedCoolingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                    TempSize = AutoSize;
-                    state.dataSize->DataScalableSizingON = true;
-                } else {
-                    TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                }
-
-                CoolingAirFlowSizer sizingCoolingAirFlow;
-                std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
-                if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
-                sizingCoolingAirFlow.overrideSizingString(stringOverride);
-                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-
-            } else if (SAFMethod == FlowPerCoolingCapacity) {
-                SizingMethod = CoolingCapacitySizing;
-                TempSize = AutoSize;
-                PrintFlag = false;
-                state.dataSize->DataScalableSizingON = true;
-                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                    state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                }
-                CoolingCapacitySizer sizerCoolingCapacity;
-                sizerCoolingCapacity.overrideSizingString(SizingString);
-                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                PrintFlag = true;
-                TempSize = AutoSize;
-
-                CoolingAirFlowSizer sizingCoolingAirFlow;
-                std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
-                if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
-                sizingCoolingAirFlow.overrideSizingString(stringOverride);
-                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-            }
-            state.dataSize->DataScalableSizingON = false;
-            state.dataSize->ZoneCoolingOnlyFan = false;
-        } else {
-            // no scalble sizing method has been specified. Sizing proceeds using the method
-            // specified in the zoneHVAC object
-            // N1 , \field Maximum Supply Air Flow Rate
-            state.dataSize->ZoneCoolingOnlyFan = true;
-            if (ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate > 0.0) {
-                PrintFlag = false;
-            }
-            TempSize = ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
-            CoolingAirFlowSizer sizingCoolingAirFlow;
-            std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
-            if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
-            sizingCoolingAirFlow.overrideSizingString(stringOverride);
-            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-            state.dataSize->ZoneCoolingOnlyFan = false;
         }
     }
 }

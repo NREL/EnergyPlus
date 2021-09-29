@@ -87,7 +87,7 @@ namespace DXFEarClipping {
                     DataSurfaces::SurfaceClass surfclass // surface class
     );
 
-    void reorder(int &nvert); // unused1208
+    void reorder(int &nvert);
 
 } // namespace DXFEarClipping
 

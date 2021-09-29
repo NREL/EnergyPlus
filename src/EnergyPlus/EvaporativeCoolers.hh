@@ -386,8 +386,6 @@ namespace EvaporativeCoolers {
 
     void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 FanPLR = 1.0);
 
-    void UpdateEvapCooler(EnergyPlusData &state, int EvapCoolNum);
-
     void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
                                       std::string_view CompName,      // name of the packaged terminal heat pump
                                       int ZoneNum,                    // number of zone being served
@@ -397,8 +395,6 @@ namespace EvaporativeCoolers {
     );
 
     void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state);
-
-    void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 
     void CalcZoneEvapUnitOutput(EnergyPlusData &state,
                                 int UnitNum,                    // unit number

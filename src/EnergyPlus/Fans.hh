@@ -242,7 +242,7 @@ namespace Fans {
 
     void InitFan(EnergyPlusData &state,
                  int FanNum,
-                 bool FirstHVACIteration // unused1208
+                 bool FirstHVACIteration
     );
 
     void SizeFan(EnergyPlusData &state, int FanNum);
@@ -252,12 +252,6 @@ namespace Fans {
     void SimVariableVolumeFan(EnergyPlusData &state, int FanNum, Optional<Real64 const> PressureRise = _);
 
     void SimOnOffFan(EnergyPlusData &state, int FanNum, Optional<Real64 const> SpeedRatio = _);
-
-    void SimZoneExhaustFan(EnergyPlusData &state, int FanNum);
-
-    void SimComponentModelFan(EnergyPlusData &state, int FanNum);
-
-    void UpdateFan(EnergyPlusData &state, int FanNum);
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
@@ -286,11 +280,6 @@ namespace Fans {
                         std::string_view FanType, // must match fan types in this module
                         std::string_view FanName, // must match fan names for the fan type
                         bool &ErrorsFound         // set to true if problem
-    );
-
-    int getFanInNodeIndex(EnergyPlusData &state,
-                          int const &FanIndex, // fan index
-                          bool &ErrorsFound    // set to true if problem
     );
 
     int GetFanOutletNode(EnergyPlusData &state,

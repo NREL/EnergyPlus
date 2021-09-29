@@ -13698,15 +13698,11 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 H; // Height and width of original window (m)
         Real64 W;
-        // unused1208  REAL(r64)    :: MulWidth                        ! Mullion width (m)
         Real64 h1; // height and width of first glazing system (m)
         Real64 w1;
-        // unused1208  REAL(r64)    :: h2,w2                           ! height and width of second glazing system (m)
-        // unused1208  type (rectangularwindow) :: NewCoord
         int IConst;             // Construction number of first glazing system
         int IConst2;            // Construction number of second glazing system
         std::string Const2Name; // Name of construction of second glazing system
-        // unused1208  REAL(r64)    :: AreaNew                         ! Sum of areas of the two glazing systems (m2)
 
         struct rectangularwindow
         {

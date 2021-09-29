@@ -854,6 +854,111 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
                                          this->CompNum);
 }
 
+void CalcFluidCoolerOutlet(
+    EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Chandan Sharma
+    //       DATE WRITTEN   August 2008
+    //       MODIFIED       April 2010, Chandan Sharma, FSEC
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // See purpose for Single Speed or Two Speed Fluid Cooler model
+
+    // METHODOLOGY EMPLOYED:
+    // See methodology for Single Speed or Two Speed Fluid Cooler model
+
+    // Locals
+    Real64 _Qactual; // Actual heat transfer rate between fluid cooler water and air [W]
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("CalcFluidCoolerOutlet");
+
+    if (UAdesign == 0.0) return;
+
+    // set local fluid cooler inlet and outlet temperature variables
+    Real64 _InletWaterTemp = state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterTemp;
+    _OutletWaterTemp = _InletWaterTemp;
+    Real64 InletAirTemp = state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirTemp;
+
+    // set water and air properties
+    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                          state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirPress,
+                                                          InletAirTemp,
+                                                          state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
+    Real64 AirMassFlowRate = AirFlowRate * AirDensity;
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
+    Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
+        state,
+        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
+        _InletWaterTemp,
+        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
+        RoutineName);
+
+    // Calculate mass flow rates
+    Real64 MdotCpWater = _WaterMassFlowRate * CpWater;
+    Real64 AirCapacity = AirMassFlowRate * CpAir;
+
+    // calculate the minimum to maximum capacity ratios of airside and waterside
+    Real64 CapacityRatioMin = min(AirCapacity, MdotCpWater);
+    Real64 CapacityRatioMax = max(AirCapacity, MdotCpWater);
+    Real64 CapacityRatio = CapacityRatioMin / CapacityRatioMax;
+
+    // Calculate number of transfer units (NTU)
+    Real64 NumTransferUnits = UAdesign / CapacityRatioMin;
+    Real64 ETA = std::pow(NumTransferUnits, 0.22);
+    Real64 A = CapacityRatio * NumTransferUnits / ETA;
+    Real64 effectiveness = 1.0 - std::exp((std::exp(-A) - 1.0) / (CapacityRatio / ETA));
+
+    // calculate water to air heat transfer
+    _Qactual = effectiveness * CapacityRatioMin * (_InletWaterTemp - InletAirTemp);
+
+    if (_Qactual >= 0.0) {
+        _OutletWaterTemp = _InletWaterTemp - _Qactual / MdotCpWater;
+    } else {
+        _OutletWaterTemp = _InletWaterTemp;
+    }
+}
+
+Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
+                                   Real64 const UA,                 // UA of fluid cooler
+                                   std::array<Real64, 5> const &Par // par(1) = design fluid cooler load [W]
+)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Chandan Sharma
+    //       DATE WRITTEN   August 2008
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculates residual function (Design fluid cooler load - fluid cooler Output) / Design fluid cooler load.
+    // Fluid cooler output depends on the UA which is being varied to zero the residual.
+
+    // METHODOLOGY EMPLOYED:
+    // Puts UA into the fluid cooler data structure, calls CalcFluidCoolerOutlet, and calculates
+    // the residual as defined above.
+
+    // REFERENCES:
+    // Based on SimpleTowerUAResidual by Fred Buhl, May 2002
+
+    // par(2) = Fluid cooler number
+    // par(3) = design water mass flow rate [kg/s]
+    // par(4) = design air volume flow rate [m3/s]
+    // par(5) = water specific heat [J/(kg*C)]
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
+
+    int FluidCoolerIndex = int(Par[1]);
+    CalcFluidCoolerOutlet(state, FluidCoolerIndex, Par[2], Par[3], UA, OutWaterTemp);
+    Real64 const Output = Par[4] * Par[2] * (state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
+    return (Par[0] - Output) / Par[0];
+}
+
 void FluidCoolerspecs::size(EnergyPlusData &state)
 {
 
@@ -1743,111 +1848,6 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(waterInletNode).Temp - this->OutletWaterTemp);
 }
 
-void CalcFluidCoolerOutlet(
-    EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Chandan Sharma
-    //       DATE WRITTEN   August 2008
-    //       MODIFIED       April 2010, Chandan Sharma, FSEC
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // See purpose for Single Speed or Two Speed Fluid Cooler model
-
-    // METHODOLOGY EMPLOYED:
-    // See methodology for Single Speed or Two Speed Fluid Cooler model
-
-    // Locals
-    Real64 _Qactual; // Actual heat transfer rate between fluid cooler water and air [W]
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcFluidCoolerOutlet");
-
-    if (UAdesign == 0.0) return;
-
-    // set local fluid cooler inlet and outlet temperature variables
-    Real64 _InletWaterTemp = state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterTemp;
-    _OutletWaterTemp = _InletWaterTemp;
-    Real64 InletAirTemp = state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirTemp;
-
-    // set water and air properties
-    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                                          state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirPress,
-                                                          InletAirTemp,
-                                                          state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
-    Real64 AirMassFlowRate = AirFlowRate * AirDensity;
-    Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
-    Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
-        state,
-        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
-        _InletWaterTemp,
-        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
-        RoutineName);
-
-    // Calculate mass flow rates
-    Real64 MdotCpWater = _WaterMassFlowRate * CpWater;
-    Real64 AirCapacity = AirMassFlowRate * CpAir;
-
-    // calculate the minimum to maximum capacity ratios of airside and waterside
-    Real64 CapacityRatioMin = min(AirCapacity, MdotCpWater);
-    Real64 CapacityRatioMax = max(AirCapacity, MdotCpWater);
-    Real64 CapacityRatio = CapacityRatioMin / CapacityRatioMax;
-
-    // Calculate number of transfer units (NTU)
-    Real64 NumTransferUnits = UAdesign / CapacityRatioMin;
-    Real64 ETA = std::pow(NumTransferUnits, 0.22);
-    Real64 A = CapacityRatio * NumTransferUnits / ETA;
-    Real64 effectiveness = 1.0 - std::exp((std::exp(-A) - 1.0) / (CapacityRatio / ETA));
-
-    // calculate water to air heat transfer
-    _Qactual = effectiveness * CapacityRatioMin * (_InletWaterTemp - InletAirTemp);
-
-    if (_Qactual >= 0.0) {
-        _OutletWaterTemp = _InletWaterTemp - _Qactual / MdotCpWater;
-    } else {
-        _OutletWaterTemp = _InletWaterTemp;
-    }
-}
-
-Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
-                                   Real64 const UA,                 // UA of fluid cooler
-                                   std::array<Real64, 5> const &Par // par(1) = design fluid cooler load [W]
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Chandan Sharma
-    //       DATE WRITTEN   August 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Design fluid cooler load - fluid cooler Output) / Design fluid cooler load.
-    // Fluid cooler output depends on the UA which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts UA into the fluid cooler data structure, calls CalcFluidCoolerOutlet, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-    // Based on SimpleTowerUAResidual by Fred Buhl, May 2002
-
-    // par(2) = Fluid cooler number
-    // par(3) = design water mass flow rate [kg/s]
-    // par(4) = design air volume flow rate [m3/s]
-    // par(5) = water specific heat [J/(kg*C)]
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
-
-    int FluidCoolerIndex = int(Par[1]);
-    CalcFluidCoolerOutlet(state, FluidCoolerIndex, Par[2], Par[3], UA, OutWaterTemp);
-    Real64 const Output = Par[4] * Par[2] * (state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
-    return (Par[0] - Output) / Par[0];
-}
-
 void FluidCoolerspecs::update(EnergyPlusData &state)
 {
 
@@ -1894,7 +1894,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+    if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {

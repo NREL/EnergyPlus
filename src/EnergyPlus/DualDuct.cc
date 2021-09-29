@@ -2126,7 +2126,7 @@ namespace DualDuct {
     // Beginning of Reporting subroutines for the Damper Module
     // *****************************************************************************
 
-    void DualDuctAirTerminal::ReportDualDuct() // unused1208
+    void DualDuctAirTerminal::ReportDualDuct()
     {
 
         // SUBROUTINE INFORMATION:

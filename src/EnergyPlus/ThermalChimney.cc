@@ -696,7 +696,6 @@ namespace ThermalChimney {
         Real64 Process1; // Temporary Variable Used in the Middle of the Calculation
         Real64 Process2; // Temporary Variable Used in the Middle of the Calculation
         Real64 Process3; // Temporary Variable Used in the Middle of the Calculation
-        // unused1208  REAL(r64)   :: Process4                            ! Temporary Variable Used in the Middle of the Calculation
         Real64 AirDensityThermalChim; // (kg/m^3)
         Real64 AirDensity;            // (kg/m^3)
         Real64 CpAir;

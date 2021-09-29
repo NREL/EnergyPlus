@@ -63,11 +63,11 @@ namespace ReturnAirPathManager {
 
     void GetReturnAirPathInput(EnergyPlusData &state);
 
-    void InitReturnAirPath(int &ReturnAirPathNum); // unused1208
+    void InitReturnAirPath(int &ReturnAirPathNum);
 
     void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum);
 
-    void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
+    void ReportReturnAirPath(int &ReturnAirPathNum);
 
 } // namespace ReturnAirPathManager
 

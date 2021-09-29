@@ -249,7 +249,7 @@ namespace HVACControllers {
                            std::string const &ControllerName,
                            int &ControllerIndex,
                            bool FirstHVACIteration,
-                           int AirLoopNum, // unused1208
+                           int AirLoopNum,
                            DataHVACControllers::ControllerOperation Operation,
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,

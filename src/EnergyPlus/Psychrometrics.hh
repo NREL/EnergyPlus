@@ -1593,7 +1593,7 @@ namespace Psychrometrics {
         return (A0 + X * (A1 + X * (A2 + X * (A3 + X * (A4 + X * (A5 + X * A6)))))) / 1.0E10;
     }
 
-    inline Real64 CPCW([[maybe_unused]] Real64 const Temperature // unused1208
+    inline Real64 CPCW([[maybe_unused]] Real64 const Temperature
     )
     {
         // FUNCTION INFORMATION:
@@ -1606,7 +1606,7 @@ namespace Psychrometrics {
         return 4180.0;
     }
 
-    inline Real64 CPHW([[maybe_unused]] Real64 const Temperature // unused1208
+    inline Real64 CPHW([[maybe_unused]] Real64 const Temperature
     )
     {
         // FUNCTION INFORMATION:

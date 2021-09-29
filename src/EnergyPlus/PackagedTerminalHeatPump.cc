@@ -5954,7 +5954,6 @@ void ControlPTUnitOutput(EnergyPlusData &state,
     auto &ControlPTUnitOutputPar = state.dataPTHP->ControlPTUnitOutputPar;
     Real64 CpAir;              // air specific heat
     Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
-    // unused1208  REAL(r64)          :: UpperLimitPLR ! used when RegulaFalsi exceeds iteration limit
     Real64 TempMinPLR;
     Real64 TempMaxPLR;
     bool ContinueIter;
