@@ -101,116 +101,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 // MODULE PARAMETER DEFINITIONS
 std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 
-void SimCoolingPanel(EnergyPlusData &state,
-                     std::string const &EquipName,
-                     int const ActualZoneNum,
-                     int const ControlledZoneNum,
-                     bool const FirstHVACIteration,
-                     Real64 &PowerMet,
-                     int &CompIndex)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Rick Strand
-    //       DATE WRITTEN   Aug 2014
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine simulates the simple cooling (chilled ceiling) panel.  It borrows heavily
-    // from the hot water radiant-convective baseboard model code.
-
-    // REFERENCES:
-    // Existing code for hot water baseboard models (radiant-convective variety)
-
-    // Using/Aliasing
-    using DataPlant::TypeOf_CoolingPanel_Simple;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CoolingPanelNum; // Index of unit in baseboard array
-    Real64 QZnReq;       // Zone load not yet satisfied
-    Real64 MaxWaterFlow;
-    Real64 MinWaterFlow;
-
-    if (state.dataChilledCeilingPanelSimple->GetInputFlag) {
-        GetCoolingPanelInput(state);
-        state.dataChilledCeilingPanelSimple->GetInputFlag = false;
-    }
-
-    // Find the correct Baseboard Equipment
-    if (CompIndex == 0) {
-        CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName,
-                                                          state.dataChilledCeilingPanelSimple->CoolingPanel,
-                                                          &CoolingPanelParams::EquipID,
-                                                          state.dataChilledCeilingPanelSimple->NumCoolingPanels);
-        if (CoolingPanelNum == 0) {
-            ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
-        }
-        CompIndex = CoolingPanelNum;
-    } else {
-        CoolingPanelNum = CompIndex;
-        if (CoolingPanelNum > state.dataChilledCeilingPanelSimple->NumCoolingPanels || CoolingPanelNum < 1) {
-            ShowFatalError(state,
-                           format("SimCoolingPanelSimple:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
-                                  CoolingPanelNum,
-                                  state.dataChilledCeilingPanelSimple->NumCoolingPanels,
-                                  EquipName));
-        }
-        if (state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum)) {
-            if (EquipName != state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID) {
-                ShowFatalError(state,
-                               format("SimCoolingPanelSimple: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
-                                      CoolingPanelNum,
-                                      EquipName,
-                                      state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID));
-            }
-            state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum) = false;
-        }
-    }
-
-    if (CompIndex > 0) {
-
-        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-
-        InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
-
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
-
-        // On the first HVAC iteration the system values are given to the controller, but after that
-        // the demand limits are in place and there needs to be feedback to the Zone Equipment
-        if (FirstHVACIteration) {
-            MaxWaterFlow = ThisCP.WaterMassFlowRateMax;
-            MinWaterFlow = 0.0;
-        } else {
-            MaxWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMaxAvail;
-            MinWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
-        }
-
-        {
-            auto const SELECT_CASE_var(ThisCP.EquipType);
-
-            if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-                ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
-            } else {
-                ShowSevereError(state,
-                                "SimCoolingPanelSimple: Errors in CoolingPanel=" +
-                                    state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-                ShowContinueError(state,
-                                  format("Invalid or unimplemented equipment type={}",
-                                         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
-        }
-
-        PowerMet = ThisCP.TotPower;
-
-        UpdateCoolingPanel(state, CoolingPanelNum);
-
-        state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel(state);
-
-    } else {
-        ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
-    }
-}
-
 void GetCoolingPanelInput(EnergyPlusData &state)
 {
 
@@ -755,7 +645,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     // This subroutine initializes the cooling panel units, and determines the UA values during simulation.
 
     // METHODOLOGY EMPLOYED:
-    // The initialization subrotines borrowed from other sources and heat exchanger formulation for cooling panel.
+    // The initialization subroutines borrowed from other sources and heat exchanger formulation for cooling panel.
 
     // REFERENCES:
     // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
@@ -772,7 +662,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
-    int ZoneNode;
     int ZoneNum;
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
@@ -929,7 +818,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     // Do the every time step initializations
-    ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
     ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
     ThisCP.WaterInletTemp = ThisInNode.Temp;
     ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;
@@ -941,6 +829,101 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     ThisCP.Energy = 0.0;
     ThisCP.ConvEnergy = 0.0;
     ThisCP.RadEnergy = 0.0;
+}
+
+void SimCoolingPanel(EnergyPlusData &state,
+                     std::string const &EquipName,
+                     int const ActualZoneNum [[maybe_unused]],
+                     int const ControlledZoneNum,
+                     bool const FirstHVACIteration,
+                     Real64 &PowerMet,
+                     int &CompIndex)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   Aug 2014
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine simulates the simple cooling (chilled ceiling) panel.  It borrows heavily
+    // from the hot water radiant-convective baseboard model code.
+
+    // REFERENCES:
+    // Existing code for hot water baseboard models (radiant-convective variety)
+
+    // Using/Aliasing
+    using DataPlant::TypeOf_CoolingPanel_Simple;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int CoolingPanelNum; // Index of unit in baseboard array
+
+    if (state.dataChilledCeilingPanelSimple->GetInputFlag) {
+        GetCoolingPanelInput(state);
+        state.dataChilledCeilingPanelSimple->GetInputFlag = false;
+    }
+
+    // Find the correct Baseboard Equipment
+    if (CompIndex == 0) {
+        CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName,
+                                                          state.dataChilledCeilingPanelSimple->CoolingPanel,
+                                                          &CoolingPanelParams::EquipID,
+                                                          state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        if (CoolingPanelNum == 0) {
+            ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
+        }
+        CompIndex = CoolingPanelNum;
+    } else {
+        CoolingPanelNum = CompIndex;
+        if (CoolingPanelNum > state.dataChilledCeilingPanelSimple->NumCoolingPanels || CoolingPanelNum < 1) {
+            ShowFatalError(state,
+                           format("SimCoolingPanelSimple:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                  CoolingPanelNum,
+                                  state.dataChilledCeilingPanelSimple->NumCoolingPanels,
+                                  EquipName));
+        }
+        if (state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum)) {
+            if (EquipName != state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID) {
+                ShowFatalError(state,
+                               format("SimCoolingPanelSimple: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                      CoolingPanelNum,
+                                      EquipName,
+                                      state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID));
+            }
+            state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum) = false;
+        }
+    }
+
+    if (CompIndex > 0) {
+
+        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
+
+        InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
+
+        {
+            auto const SELECT_CASE_var(ThisCP.EquipType);
+
+            if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+                ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
+            } else {
+                ShowSevereError(state,
+                                "SimCoolingPanelSimple: Errors in CoolingPanel=" +
+                                    state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+                ShowContinueError(state,
+                                  format("Invalid or unimplemented equipment type={}",
+                                         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
+                ShowFatalError(state, "Preceding condition causes termination.");
+            }
+        }
+
+        PowerMet = ThisCP.TotPower;
+
+        UpdateCoolingPanel(state, CoolingPanelNum);
+
+        state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel(state);
+
+    } else {
+        ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
+    }
 }
 
 void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
@@ -1238,6 +1221,83 @@ bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
     return SizeCoolingPanelUA;
 }
 
+void DistributeCoolingPanelRadGains(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   Sept 2014
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // To distribute the gains from the hot water basebaord heater
+    // as specified in the user input file.  This includes distribution
+    // of long wavelength radiant gains to surfaces and "people."
+
+    // METHODOLOGY EMPLOYED:
+    // We must cycle through all of the radiant systems because each
+    // surface could feel the effect of more than one radiant system.
+    // Note that the energy radiated to people is assumed to affect them
+    // but them it is assumed to be convected to the air.
+
+    // REFERENCES:
+    // Existing code for hot water baseboard models (radiant-convective variety)
+
+    // Using/Aliasing
+    using DataHeatBalFanSys::MaxRadHeatFlux;
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
+    int CoolingPanelNum;      // Counter for the baseboard
+    int SurfNum;              // Pointer to the Surface derived type
+    int ZoneNum;              // Pointer to the Zone derived type
+    Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
+
+    // Initialize arrays
+    state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
+    state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
+
+    for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
+
+        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
+
+        ZoneNum = ThisCP.ZonePtr;
+        if (ZoneNum <= 0) continue;
+        state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(ZoneNum) +=
+            state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
+
+        for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
+            SurfNum = ThisCP.SurfacePtr(RadSurfNum);
+            auto &ThisSurf(state.dataSurface->Surface(SurfNum));
+            if (ThisSurf.Area > SmallestArea) {
+                ThisSurfIntensity =
+                    (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
+                state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) += ThisSurfIntensity;
+                state.dataHeatBalSurf->AnyRadiantSystems = true;
+                // CR 8074, trap for excessive intensity (throws off surface balance )
+                if (ThisSurfIntensity > MaxRadHeatFlux) {
+                    ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
+                    ShowContinueError(state, "Surface = " + ThisSurf.Name);
+                    ShowContinueError(state, format("Surface area = {:.3R} [m2]", ThisSurf.Area));
+                    ShowContinueError(state, "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                    ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
+                    ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
+                    ShowFatalError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
+                }
+            } else {
+                ShowSevereError(state, "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
+                ShowContinueError(state, "Surface = " + ThisSurf.Name);
+                ShowContinueError(state, format("Surface area = {:.3R} [m2]", ThisSurf.Area));
+                ShowContinueError(state, "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
+                ShowFatalError(state, "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
+            }
+        }
+    }
+}
+
 void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 {
     // SUBROUTINE INFORMATION:
@@ -1276,8 +1336,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     Real64 waterOutletTemp;
     Real64 waterMassFlowRate;
     Real64 waterMassFlowRateMax;
-    Real64 CapacitanceWater;
-    Real64 NTU;
     Real64 Effectiveness;
     Real64 QZnReq;
     Real64 Cp;
@@ -1286,7 +1344,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     Real64 MCpEpsAct;
     Real64 MCpEpsLow;
     Real64 MCpEpsHigh;
-    Real64 MdotLow;
     Real64 MdotHigh;
     Real64 FracGuess;
     Real64 MdotGuess;
@@ -1299,9 +1356,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     Real64 DewPointTemp;
     Real64 LoadMet;
     bool CoolingPanelOn;
-    bool ModifiedWaterInletTemp;
 
-    ModifiedWaterInletTemp = false;
     ZoneNum = this->ZonePtr;
     QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
     waterInletTemp = this->WaterInletTemp;
@@ -1371,7 +1426,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // We might not have enough flow rate to meet whatever load we have, but at least
             // the system is still running at some partial load and avoiding condensation.
             waterInletTemp = DewPointTemp + this->CondDewPtDeltaT;
-            ModifiedWaterInletTemp = true;
         }
     }
 
@@ -1401,7 +1455,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // the proper value for MCpEpsAct.  Limit iterations to avoid too much time wasting.
             MCpEpsAct = QZnReq / (waterInletTemp - Tzone);
             MCpEpsLow = 0.0;
-            MdotLow = 0.0;
             MCpEpsHigh = waterMassFlowRateMax * Cp * (1.0 - exp(-this->UA / (waterMassFlowRateMax * Cp)));
             MdotHigh = waterMassFlowRateMax;
             if (MCpEpsAct <= MCpEpsLow) {
@@ -1420,7 +1473,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
                     MCpEpsGuess = MdotGuess * Cp * (1.0 - exp(-this->UA / (MdotGuess * Cp)));
                     if (MCpEpsGuess <= MCpEpsAct) {
                         MCpEpsLow = MCpEpsGuess;
-                        MdotLow = MdotGuess;
                     } else { // MCpEpsGuess > MCpEpsAct
                         MCpEpsHigh = MCpEpsGuess;
                         MdotHigh = MdotGuess;
@@ -1510,8 +1562,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
         this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
 
     } else { // cooling panel off
-        CapacitanceWater = 0.0;
-        NTU = 0.0;
         Effectiveness = 0.0;
         waterOutletTemp = waterInletTemp;
         CoolingPanelCool = 0.0;
@@ -1659,83 +1709,6 @@ void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
     state.dataChilledCeilingPanelSimple->CoolingPanelSource = state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg;
 
     DistributeCoolingPanelRadGains(state); // CoolingPanelRadSource has been modified so we need to redistribute gains
-}
-
-void DistributeCoolingPanelRadGains(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Rick Strand
-    //       DATE WRITTEN   Sept 2014
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // To distribute the gains from the hot water basebaord heater
-    // as specified in the user input file.  This includes distribution
-    // of long wavelength radiant gains to surfaces and "people."
-
-    // METHODOLOGY EMPLOYED:
-    // We must cycle through all of the radiant systems because each
-    // surface could feel the effect of more than one radiant system.
-    // Note that the energy radiated to people is assumed to affect them
-    // but them it is assumed to be convected to the air.
-
-    // REFERENCES:
-    // Existing code for hot water baseboard models (radiant-convective variety)
-
-    // Using/Aliasing
-    using DataHeatBalFanSys::MaxRadHeatFlux;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
-    int CoolingPanelNum;      // Counter for the baseboard
-    int SurfNum;              // Pointer to the Surface derived type
-    int ZoneNum;              // Pointer to the Zone derived type
-    Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
-
-    // Initialize arrays
-    state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
-    state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
-
-    for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
-
-        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-
-        ZoneNum = ThisCP.ZonePtr;
-        if (ZoneNum <= 0) continue;
-        state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(ZoneNum) +=
-            state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
-
-        for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
-            SurfNum = ThisCP.SurfacePtr(RadSurfNum);
-            auto &ThisSurf(state.dataSurface->Surface(SurfNum));
-            if (ThisSurf.Area > SmallestArea) {
-                ThisSurfIntensity =
-                    (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
-                state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) += ThisSurfIntensity;
-                state.dataHeatBalSurf->AnyRadiantSystems = true;
-                // CR 8074, trap for excessive intensity (throws off surface balance )
-                if (ThisSurfIntensity > MaxRadHeatFlux) {
-                    ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
-                    ShowContinueError(state, "Surface = " + ThisSurf.Name);
-                    ShowContinueError(state, format("Surface area = {:.3R} [m2]", ThisSurf.Area));
-                    ShowContinueError(state, "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                    ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
-                    ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
-                    ShowFatalError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
-                }
-            } else {
-                ShowSevereError(state, "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
-                ShowContinueError(state, "Surface = " + ThisSurf.Name);
-                ShowContinueError(state, format("Surface area = {:.3R} [m2]", ThisSurf.Area));
-                ShowContinueError(state, "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
-                ShowFatalError(state, "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
-            }
-        }
-    }
 }
 
 void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)

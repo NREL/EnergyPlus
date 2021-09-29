@@ -93,6 +93,159 @@ namespace BranchInputManager {
     const char *cMIXER("Connector:Mixer");
     const char *cSPLITTER("Connector:Splitter");
 
+    void GetBranchListInput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   July 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine gets the branch list input and fills up the structures for
+        // branch lists.
+        // This subroutine gets the input for the following IDD structure:
+        // BRANCH LIST,
+        //  \extensible:1 Just duplicate last field and \ comments (changing numbering, please)
+        //  \memo Branches MUST be listed in flow order: inlet branch, then parallel branches, then outlet branch.
+        //  \memo Branches are simulated in the order listed.  Branch names cannot be duplicated within a single branch list.
+        //    A1, \field Branch List Name
+        //        \required-field
+        //        \reference BranchLists
+        //    A2, \field Branch Name 1
+        //        \required-field
+        //        \type object-list
+        //        \object-list Branches
+        //    A3, \field Branch Name 2
+        //        \type object-list
+        //        \object-list Branches
+
+        // Using/Aliasing
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view RoutineName("GetBranchListInput: ");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Count;     // Loop Counter
+        int BCount;    // Actual Branch List Count
+        int Loop;      // Loop Counter
+        int Found;     // Points to correct Branch List/Branch
+        bool ErrFound; // True when error has occurred (cannot find Branch List)
+        // Following are needed because routine calls GetBranchInput
+        // which would overwrite the module Alphas and NumAlphas
+        int NumAlphas;         // Used to retrieve Branch list from IDF
+        Array1D_string Alphas; // Used to retrieve names from IDF
+        int NumNumbers;
+        Array1D<Real64> Numbers; // Not used in this object
+        Array1D_string cAlphaFields;
+        Array1D_string cNumericFields;
+        Array1D_bool lNumericBlanks;
+        Array1D_bool lAlphaBlanks;
+        int IOStat; // Could be used in the Get Routines, not currently checked
+        int NumParams;
+        std::string TestName;
+
+        ErrFound = false;
+        std::string CurrentModuleObject = "BranchList";
+        state.dataBranchInputManager->NumOfBranchLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataBranchInputManager->BranchList.allocate(state.dataBranchInputManager->NumOfBranchLists);
+        for (auto &e : state.dataBranchInputManager->BranchList) {
+            e.LoopName.clear();
+            e.LoopType.clear();
+        }
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        Alphas.allocate(NumAlphas);
+        Numbers.dimension(NumNumbers, 0.0);
+        cAlphaFields.allocate(NumAlphas);
+        cNumericFields.allocate(NumNumbers);
+        lAlphaBlanks.dimension(NumAlphas, true);
+        lNumericBlanks.dimension(NumNumbers, true);
+
+        if (NumNumbers > 0) {
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject +
+                                " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
+            ErrFound = true;
+        }
+        BCount = 0;
+        for (Count = 1; Count <= state.dataBranchInputManager->NumOfBranchLists; ++Count) {
+            CurrentModuleObject = "BranchList";
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     Count,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrFound)) continue;
+
+            ++BCount;
+            state.dataBranchInputManager->BranchList(BCount).Name = Alphas(1);
+            state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames = NumAlphas - 1;
+            state.dataBranchInputManager->BranchList(BCount).BranchNames.allocate(NumAlphas - 1);
+            if (state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames == 0) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
+                                    "\", No branch names entered.");
+                ErrFound = true;
+            } else {
+                state.dataBranchInputManager->BranchList(BCount).BranchNames({1, NumAlphas - 1}) = Alphas({2, NumAlphas});
+                for (Loop = 1; Loop <= state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames; ++Loop) {
+                    // If NumOfBranches = 0 then Branches havent been read yet.
+                    if (state.dataBranchInputManager->NumOfBranches == 0) {
+                        GetBranchInput(state);
+                    }
+                    if (!state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop).empty()) {
+                        Found = UtilityRoutines::FindItemInList(state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop),
+                                                                state.dataBranchInputManager->Branch);
+                        if (Found == 0) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
+                            ShowContinueError(state,
+                                              "..invalid Branch Name not found=\"" +
+                                                  state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop) + "\".");
+                            ErrFound = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check for duplicate names specified in Branch Lists
+        for (Count = 1; Count <= state.dataBranchInputManager->NumOfBranchLists; ++Count) {
+            if (state.dataBranchInputManager->BranchList(Count).NumOfBranchNames == 0) continue;
+            TestName = state.dataBranchInputManager->BranchList(Count).BranchNames(1);
+            for (Loop = 2; Loop <= state.dataBranchInputManager->BranchList(Count).NumOfBranchNames; ++Loop) {
+                if (TestName != state.dataBranchInputManager->BranchList(Count).BranchNames(Loop)) continue;
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
+                                    "\", invalid data.");
+                ShowContinueError(state, "..invalid: duplicate branch name specified in the list.");
+                ShowContinueError(state, "..Branch Name=" + TestName);
+                ShowContinueError(state, fmt::format("..Branch Name #{} is duplicate.", Loop));
+                ErrFound = true;
+            }
+        }
+
+        if (ErrFound) {
+            ShowSevereError(state, std::string{RoutineName} + " Invalid Input -- preceding condition(s) will likely cause termination.");
+        }
+        state.dataBranchInputManager->NumOfBranchLists = BCount;
+        Alphas.deallocate();
+        Numbers.deallocate();
+        cAlphaFields.deallocate();
+        cNumericFields.deallocate();
+        lAlphaBlanks.deallocate();
+        lNumericBlanks.deallocate();
+    }
+
     void ManageBranchInput(EnergyPlusData &state)
     {
 
@@ -221,6 +374,63 @@ namespace BranchInputManager {
         NumBranchesInBranchList = state.dataBranchInputManager->BranchList(Found).NumOfBranchNames;
 
         return NumBranchesInBranchList;
+    }
+
+    void GetInternalBranchData(EnergyPlusData &state,
+                               std::string const &LoopName,                               // Loop Name for Branch
+                               std::string const &BranchName,                             // Requested Branch Name
+                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of pressure curve object
+                               int &PressCurveIndex,                                      // Index of pressure curve object
+                               int &NumComps,                                             // Number of Components on Branch
+                               Array1D<ComponentData> &BComponents,                       // Component data returned
+                               bool &ErrorsFound // True when Loop Name is already assigned and this not same loop
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   October 1999
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine gets the Branch Data (internal structure) for the requested
+        // Branch Name and returns it to the calling routine.  This is used internally
+        // in the module.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Found; // Pointer to requested Branch Name
+
+        if (state.dataBranchInputManager->GetBranchInputFlag) {
+            GetBranchInput(state);
+            state.dataBranchInputManager->GetBranchInputFlag = false;
+        }
+
+        Found = UtilityRoutines::FindItemInList(BranchName, state.dataBranchInputManager->Branch);
+        if (Found == 0) {
+            ShowSevereError(state, "GetInternalBranchData:  Branch not found=" + BranchName);
+            ErrorsFound = true;
+            NumComps = 0;
+        } else {
+            if (state.dataBranchInputManager->Branch(Found).AssignedLoopName.empty()) {
+                state.dataBranchInputManager->Branch(Found).AssignedLoopName = LoopName;
+                PressCurveType = state.dataBranchInputManager->Branch(Found).PressureCurveType;
+                PressCurveIndex = state.dataBranchInputManager->Branch(Found).PressureCurveIndex;
+                NumComps = state.dataBranchInputManager->Branch(Found).NumOfComponents;
+                BComponents({1, NumComps}) = state.dataBranchInputManager->Branch(Found).Component({1, NumComps});
+            } else if (state.dataBranchInputManager->Branch(Found).AssignedLoopName != LoopName) {
+                ShowSevereError(state, "Attempt to assign branch to two different loops, Branch=" + BranchName);
+                ShowContinueError(state, "Branch already assigned to loop=" + state.dataBranchInputManager->Branch(Found).AssignedLoopName);
+                ShowContinueError(state, "New attempt to assign to loop=" + LoopName);
+                ErrorsFound = true;
+                NumComps = 0;
+            } else {
+                PressCurveType = state.dataBranchInputManager->Branch(Found).PressureCurveType;
+                PressCurveIndex = state.dataBranchInputManager->Branch(Found).PressureCurveIndex;
+                NumComps = state.dataBranchInputManager->Branch(Found).NumOfComponents;
+                BComponents({1, NumComps}) = state.dataBranchInputManager->Branch(Found).Component({1, NumComps});
+            }
+        }
     }
 
     void GetBranchData(EnergyPlusData &state,
@@ -421,15 +631,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetInternalBranchData(EnergyPlusData &state,
-                               std::string const &LoopName,                               // Loop Name for Branch
-                               std::string const &BranchName,                             // Requested Branch Name
-                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of pressure curve object
-                               int &PressCurveIndex,                                      // Index of pressure curve object
-                               int &NumComps,                                             // Number of Components on Branch
-                               Array1D<ComponentData> &BComponents,                       // Component data returned
-                               bool &ErrorsFound // True when Loop Name is already assigned and this not same loop
-    )
+    void GetConnectorListInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -439,42 +641,270 @@ namespace BranchInputManager {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This routine gets the Branch Data (internal structure) for the requested
-        // Branch Name and returns it to the calling routine.  This is used internally
-        // in the module.
+        // Obtains connector list input from IDF.
+        // ConnectorList,
+        //         \memo only two connectors allowed per loop
+        //         \memo if two entered, one must be Connector:Splitter and one must be Connector:Mixer
+        //     A1, \field Name
+        //         \required-field
+        //         \reference ConnectorLists
+        //     A2, \field Connector 1 Object Type
+        //         \required-field
+        //         \key Connector:Splitter
+        //         \key Connector:Mixer
+        //     A3, \field Connector 1 Name
+        //         \required-field
+        //     A4, \field Connector 2 Object Type
+        //         \key Connector:Splitter
+        //         \key Connector:Mixer
+        //     A5; \field Connector 2 Name
+        //  This is in the process of possibly being extended, thus the code herein.
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Found; // Pointer to requested Branch Name
+        int Count;               // Loop Counter
+        int NumAlphas;           // Used to retrieve names from IDF
+        Array1D_string Alphas;   // Used to retrieve names from IDF
+        int NumNumbers;          // Used to retrieve numbers from IDF
+        Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
+        Array1D_string cAlphaFields;
+        Array1D_string cNumericFields;
+        Array1D_bool lNumericBlanks;
+        Array1D_bool lAlphaBlanks;
+        int IOStat; // Could be used in the Get Routines, not currently checked
+        int NumParams;
+        int NumConnectors;
+        int CCount;
+        int Arg;
+        int SplitNum;
+        int MixerNum;
+        Array1D_string BranchNames;
+        int NumBranchNames;
+        bool ErrorsFound;
+        int Loop;
+        int Loop1;
+        int Loop2;
+        bool CurMixer;
+        bool CurSplitter;
+        int TestNum;
+        bool MatchFound;
 
-        if (state.dataBranchInputManager->GetBranchInputFlag) {
-            GetBranchInput(state);
-            state.dataBranchInputManager->GetBranchInputFlag = false;
+        if (!state.dataBranchInputManager->GetConnectorListInputFlag) return;
+        ErrorsFound = false;
+        std::string CurrentModuleObject = "ConnectorList";
+        state.dataBranchInputManager->NumOfConnectorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataBranchInputManager->ConnectorLists.allocate(state.dataBranchInputManager->NumOfConnectorLists);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        if (NumAlphas != 5 || NumNumbers != 0) {
+            ShowWarningError(state,
+                             "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject +
+                                 " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)");
+        }
+        Alphas.allocate(NumAlphas);
+        Numbers.dimension(NumNumbers, 0.0);
+        cAlphaFields.allocate(NumAlphas);
+        cNumericFields.allocate(NumNumbers);
+        lAlphaBlanks.dimension(NumAlphas, true);
+        lNumericBlanks.dimension(NumNumbers, true);
+        for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     Count,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            state.dataBranchInputManager->ConnectorLists(Count).Name = Alphas(1);
+            NumConnectors = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
+            if (mod(NumAlphas - 1, 2) != 0) ++NumConnectors;
+            state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors = NumConnectors;
+            state.dataBranchInputManager->ConnectorLists(Count).ConnectorType.allocate(NumConnectors);
+            state.dataBranchInputManager->ConnectorLists(Count).ConnectorName.allocate(NumConnectors);
+            state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo.allocate(NumConnectors);
+            state.dataBranchInputManager->ConnectorLists(Count).ConnectorType = "UNKNOWN";
+            state.dataBranchInputManager->ConnectorLists(Count).ConnectorName = "UNKNOWN";
+            state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo = 0;
+            state.dataBranchInputManager->ConnectorLists(Count).NumOfSplitters = 0;
+            state.dataBranchInputManager->ConnectorLists(Count).NumOfMixers = 0;
+
+            CCount = 0;
+            for (Arg = 2; Arg <= NumAlphas; Arg += 2) {
+                ++CCount;
+                if (UtilityRoutines::SameString(Alphas(Arg), cSPLITTER)) {
+                    state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(CCount) = Alphas(Arg).substr(0, 30);
+                    ++state.dataBranchInputManager->ConnectorLists(Count).NumOfSplitters;
+                } else if (UtilityRoutines::SameString(Alphas(Arg), cMIXER)) {
+                    state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(CCount) = Alphas(Arg).substr(0, 30);
+                    ++state.dataBranchInputManager->ConnectorLists(Count).NumOfMixers;
+                } else {
+                    ShowWarningError(state,
+                                     "GetConnectorListInput: Invalid " + cAlphaFields(Arg) + '=' + Alphas(Arg) + " in " + CurrentModuleObject + '=' +
+                                         Alphas(1));
+                }
+                state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(CCount) = Alphas(Arg + 1);
+            }
+        }
+        state.dataBranchInputManager->GetConnectorListInputFlag = false;
+        Alphas.deallocate();
+        Numbers.deallocate();
+        cAlphaFields.deallocate();
+        cNumericFields.deallocate();
+        lAlphaBlanks.deallocate();
+        lNumericBlanks.deallocate();
+
+        // Validity checks on Connector Lists
+        if (state.dataBranchInputManager->GetSplitterInputFlag) {
+            GetSplitterInput(state);
+            state.dataBranchInputManager->GetSplitterInputFlag = false;
+        }
+        if (state.dataBranchInputManager->GetMixerInputFlag) {
+            GetMixerInput(state);
+            state.dataBranchInputManager->GetMixerInputFlag = false;
         }
 
-        Found = UtilityRoutines::FindItemInList(BranchName, state.dataBranchInputManager->Branch);
-        if (Found == 0) {
-            ShowSevereError(state, "GetInternalBranchData:  Branch not found=" + BranchName);
-            ErrorsFound = true;
-            NumComps = 0;
-        } else {
-            if (state.dataBranchInputManager->Branch(Found).AssignedLoopName.empty()) {
-                state.dataBranchInputManager->Branch(Found).AssignedLoopName = LoopName;
-                PressCurveType = state.dataBranchInputManager->Branch(Found).PressureCurveType;
-                PressCurveIndex = state.dataBranchInputManager->Branch(Found).PressureCurveIndex;
-                NumComps = state.dataBranchInputManager->Branch(Found).NumOfComponents;
-                BComponents({1, NumComps}) = state.dataBranchInputManager->Branch(Found).Component({1, NumComps});
-            } else if (state.dataBranchInputManager->Branch(Found).AssignedLoopName != LoopName) {
-                ShowSevereError(state, "Attempt to assign branch to two different loops, Branch=" + BranchName);
-                ShowContinueError(state, "Branch already assigned to loop=" + state.dataBranchInputManager->Branch(Found).AssignedLoopName);
-                ShowContinueError(state, "New attempt to assign to loop=" + LoopName);
-                ErrorsFound = true;
-                NumComps = 0;
-            } else {
-                PressCurveType = state.dataBranchInputManager->Branch(Found).PressureCurveType;
-                PressCurveIndex = state.dataBranchInputManager->Branch(Found).PressureCurveIndex;
-                NumComps = state.dataBranchInputManager->Branch(Found).NumOfComponents;
-                BComponents({1, NumComps}) = state.dataBranchInputManager->Branch(Found).Component({1, NumComps});
+        SplitNum = 0;
+        MixerNum = 0;
+        for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
+            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors <= 1) continue; // Air Loop only has one.
+            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors > 2) continue;  // Rules not clear for this case
+            for (Loop = 1; Loop <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop) {
+                if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) != 0) continue;
+                if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), cSPLITTER)) {
+                    CurSplitter = true;
+                    CurMixer = false;
+                    SplitNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
+                                                               state.dataBranchInputManager->Splitters);
+                    // Following code sets up branch names to be matched from Splitter/Mixer data structure
+                    if (SplitNum == 0) {
+                        ShowSevereError(
+                            state,
+                            "Invalid Connector:Splitter(none)=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
+                                ", referenced by " + CurrentModuleObject + '=' + state.dataBranchInputManager->ConnectorLists(Count).Name);
+                        ErrorsFound = true;
+                        continue;
+                    }
+                    NumBranchNames = state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches;
+                    BranchNames = state.dataBranchInputManager->Splitters(SplitNum).OutletBranchNames;
+                } else if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), cMIXER)) {
+                    CurSplitter = true;
+                    CurMixer = false;
+                    MixerNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
+                                                               state.dataBranchInputManager->Mixers);
+                    if (MixerNum == 0) {
+                        ShowSevereError(state,
+                                        "Invalid Connector:Mixer(none)=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
+                                            ", referenced by " + CurrentModuleObject + '=' +
+                                            state.dataBranchInputManager->ConnectorLists(Count).Name);
+                        ErrorsFound = true;
+                        continue;
+                    }
+                    NumBranchNames = state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches;
+                    BranchNames = state.dataBranchInputManager->Mixers(MixerNum).InletBranchNames;
+                } else {
+                    continue;
+                }
+                // Try to match mixer to splitter
+                for (Loop1 = Loop + 1; Loop1 <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop1) {
+                    if (CurMixer && !UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cSPLITTER))
+                        continue;
+                    if (CurSplitter && !UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cMIXER))
+                        continue;
+                    if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) != 0) continue;
+                    {
+                        auto const SELECT_CASE_var(CurSplitter);
+                        if (SELECT_CASE_var) {
+                            // Current "item" is a splitter, candidate is a mixer.
+                            MixerNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
+                                                                       state.dataBranchInputManager->Mixers);
+                            if (MixerNum == 0) continue;
+                            if (state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches != NumBranchNames) continue;
+                            MatchFound = true;
+                            for (Loop2 = 1; Loop2 <= state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches; ++Loop2) {
+                                TestNum = UtilityRoutines::FindItemInList(
+                                    state.dataBranchInputManager->Mixers(MixerNum).InletBranchNames(Loop2), BranchNames, NumBranchNames);
+                                if (TestNum == 0) {
+                                    MatchFound = false;
+                                    break;
+                                }
+                            }
+                            if (MatchFound) {
+                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) = MixerNum;
+                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) = SplitNum;
+                            }
+                        } else {
+                            // Current "item" is a splitter, candidate is a mixer.
+                            SplitNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
+                                                                       state.dataBranchInputManager->Splitters);
+                            if (SplitNum == 0) continue;
+                            if (state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches != NumBranchNames) continue;
+                            MatchFound = true;
+                            for (Loop2 = 1; Loop2 <= state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches; ++Loop2) {
+                                TestNum = UtilityRoutines::FindItemInList(
+                                    state.dataBranchInputManager->Splitters(SplitNum).OutletBranchNames(Loop2), BranchNames, NumBranchNames);
+                                if (TestNum == 0) {
+                                    MatchFound = false;
+                                    break;
+                                }
+                            }
+                            if (MatchFound) {
+                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) = SplitNum;
+                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) = MixerNum;
+                            }
+                        }
+                    }
+                }
+                BranchNames.deallocate();
             }
+        }
+
+        for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
+            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors <= 1) continue; // Air Loop only has one.
+            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors > 2) continue;  // Rules not clear
+            for (Loop = 1; Loop <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop) {
+                if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) != 0) continue;
+                //  = 0, not matched.
+                ShowSevereError(state, "For " + CurrentModuleObject + '=' + state.dataBranchInputManager->ConnectorLists(Count).Name);
+                ShowContinueError(state,
+                                  "...Item=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
+                                      ", Type=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop) + " was not matched.");
+                if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), "Connector:Splitter")) {
+                    ShowContinueError(
+                        state, "The BranchList for this Connector:Splitter does not match the BranchList for its corresponding Connector:Mixer.");
+                } else {
+                    ShowContinueError(
+                        state, "The BranchList for this Connector:Mixer does not match the BranchList for its corresponding Connector:Splitter.");
+                }
+                ErrorsFound = true;
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "GetConnectorListInput: Program terminates for preceding conditions.");
         }
     }
 
@@ -521,7 +951,7 @@ namespace BranchInputManager {
     void GetConnectorList(EnergyPlusData &state,
                           std::string const &ConnectorListName, // Requested Connector List
                           ConnectorData &Connectoid,            // Returned Connector Data
-                          Optional_int_const NumInList          // Number of the current connector in the list of connectors
+                          Optional_int_const NumInList = _      // Number of the current connector in the list of connectors
     )
     {
 
@@ -1266,433 +1696,189 @@ namespace BranchInputManager {
         state.dataBranchInputManager->Branch(BCount).NumOfComponents = NumInComps;
     }
 
-    void GetBranchListInput(EnergyPlusData &state)
+    void FindPlantLoopBranchConnection(EnergyPlusData &state,
+                                       std::string const &BranchListName,
+                                       std::string &FoundPlantLoopName,
+                                       int &FoundPlantLoopNum,
+                                       std::string &FoundSupplyDemand,
+                                       Real64 &FoundVolFlowRate,
+                                       bool &MatchedPlantLoop)
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   July 2003
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   October 2007
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine gets the branch list input and fills up the structures for
-        // branch lists.
-        // This subroutine gets the input for the following IDD structure:
-        // BRANCH LIST,
-        //  \extensible:1 Just duplicate last field and \ comments (changing numbering, please)
-        //  \memo Branches MUST be listed in flow order: inlet branch, then parallel branches, then outlet branch.
-        //  \memo Branches are simulated in the order listed.  Branch names cannot be duplicated within a single branch list.
-        //    A1, \field Branch List Name
-        //        \required-field
-        //        \reference BranchLists
-        //    A2, \field Branch Name 1
-        //        \required-field
-        //        \type object-list
-        //        \object-list Branches
-        //    A3, \field Branch Name 2
-        //        \type object-list
-        //        \object-list Branches
-
-        // Using/Aliasing
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("GetBranchListInput: ");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;     // Loop Counter
-        int BCount;    // Actual Branch List Count
-        int Loop;      // Loop Counter
-        int Found;     // Points to correct Branch List/Branch
-        bool ErrFound; // True when error has occurred (cannot find Branch List)
-        // Following are needed because routine calls GetBranchInput
-        // which would overwrite the module Alphas and NumAlphas
-        int NumAlphas;         // Used to retrieve Branch list from IDF
-        Array1D_string Alphas; // Used to retrieve names from IDF
-        int NumNumbers;
-        Array1D<Real64> Numbers; // Not used in this object
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
-        int IOStat; // Could be used in the Get Routines, not currently checked
-        int NumParams;
-        std::string TestName;
-
-        ErrFound = false;
-        std::string CurrentModuleObject = "BranchList";
-        state.dataBranchInputManager->NumOfBranchLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataBranchInputManager->BranchList.allocate(state.dataBranchInputManager->NumOfBranchLists);
-        for (auto &e : state.dataBranchInputManager->BranchList) {
-            e.LoopName.clear();
-            e.LoopType.clear();
-        }
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
-        Alphas.allocate(NumAlphas);
-        Numbers.dimension(NumNumbers, 0.0);
-        cAlphaFields.allocate(NumAlphas);
-        cNumericFields.allocate(NumNumbers);
-        lAlphaBlanks.dimension(NumAlphas, true);
-        lNumericBlanks.dimension(NumNumbers, true);
-
-        if (NumNumbers > 0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject +
-                                " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
-            ErrFound = true;
-        }
-        BCount = 0;
-        for (Count = 1; Count <= state.dataBranchInputManager->NumOfBranchLists; ++Count) {
-            CurrentModuleObject = "BranchList";
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Count,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
-            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrFound)) continue;
-
-            ++BCount;
-            state.dataBranchInputManager->BranchList(BCount).Name = Alphas(1);
-            state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames = NumAlphas - 1;
-            state.dataBranchInputManager->BranchList(BCount).BranchNames.allocate(NumAlphas - 1);
-            if (state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames == 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
-                                    "\", No branch names entered.");
-                ErrFound = true;
-            } else {
-                state.dataBranchInputManager->BranchList(BCount).BranchNames({1, NumAlphas - 1}) = Alphas({2, NumAlphas});
-                for (Loop = 1; Loop <= state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames; ++Loop) {
-                    // If NumOfBranches = 0 then Branches havent been read yet.
-                    if (state.dataBranchInputManager->NumOfBranches == 0) {
-                        GetBranchInput(state);
-                    }
-                    if (!state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop).empty()) {
-                        Found = UtilityRoutines::FindItemInList(state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop),
-                                                                state.dataBranchInputManager->Branch);
-                        if (Found == 0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                                state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
-                            ShowContinueError(state,
-                                              "..invalid Branch Name not found=\"" +
-                                                  state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop) + "\".");
-                            ErrFound = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Check for duplicate names specified in Branch Lists
-        for (Count = 1; Count <= state.dataBranchInputManager->NumOfBranchLists; ++Count) {
-            if (state.dataBranchInputManager->BranchList(Count).NumOfBranchNames == 0) continue;
-            TestName = state.dataBranchInputManager->BranchList(Count).BranchNames(1);
-            for (Loop = 2; Loop <= state.dataBranchInputManager->BranchList(Count).NumOfBranchNames; ++Loop) {
-                if (TestName != state.dataBranchInputManager->BranchList(Count).BranchNames(Loop)) continue;
-                ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
-                                    "\", invalid data.");
-                ShowContinueError(state, "..invalid: duplicate branch name specified in the list.");
-                ShowContinueError(state, "..Branch Name=" + TestName);
-                ShowContinueError(state, fmt::format("..Branch Name #{} is duplicate.", Loop));
-                ErrFound = true;
-            }
-        }
-
-        if (ErrFound) {
-            ShowSevereError(state, std::string{RoutineName} + " Invalid Input -- preceding condition(s) will likely cause termination.");
-        }
-        state.dataBranchInputManager->NumOfBranchLists = BCount;
-        Alphas.deallocate();
-        Numbers.deallocate();
-        cAlphaFields.deallocate();
-        cNumericFields.deallocate();
-        lAlphaBlanks.deallocate();
-        lNumericBlanks.deallocate();
-    }
-
-    void GetConnectorListInput(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Obtains connector list input from IDF.
-        // ConnectorList,
-        //         \memo only two connectors allowed per loop
-        //         \memo if two entered, one must be Connector:Splitter and one must be Connector:Mixer
-        //     A1, \field Name
-        //         \required-field
-        //         \reference ConnectorLists
-        //     A2, \field Connector 1 Object Type
-        //         \required-field
-        //         \key Connector:Splitter
-        //         \key Connector:Mixer
-        //     A3, \field Connector 1 Name
-        //         \required-field
-        //     A4, \field Connector 2 Object Type
-        //         \key Connector:Splitter
-        //         \key Connector:Mixer
-        //     A5; \field Connector 2 Name
-        //  This is in the process of possibly being extended, thus the code herein.
+        // An auxiliary routine locate a plant loop and type from a BranchListName
 
         // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
+        // Calls GetObject for PLANT LOOP
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;               // Loop Counter
-        int NumAlphas;           // Used to retrieve names from IDF
-        Array1D_string Alphas;   // Used to retrieve names from IDF
-        int NumNumbers;          // Used to retrieve numbers from IDF
-        Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
-        int IOStat; // Could be used in the Get Routines, not currently checked
+        int Num;
+        int NumPlantLoops;
         int NumParams;
-        int NumConnectors;
-        int CCount;
-        int Arg;
-        int SplitNum;
-        int MixerNum;
-        Array1D_string BranchNames;
-        int NumBranchNames;
-        bool ErrorsFound;
-        int Loop;
-        int Loop1;
-        int Loop2;
-        bool CurMixer;
-        bool CurSplitter;
-        int TestNum;
-        bool MatchFound;
+        Array1D_string Alphas;
+        int NumAlphas;
+        Array1D<Real64> Numbers;
+        int NumNumbers;
+        int IOStat;
 
-        if (!state.dataBranchInputManager->GetConnectorListInputFlag) return;
-        ErrorsFound = false;
-        std::string CurrentModuleObject = "ConnectorList";
-        state.dataBranchInputManager->NumOfConnectorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataBranchInputManager->ConnectorLists.allocate(state.dataBranchInputManager->NumOfConnectorLists);
+        // Get Inputs
+        std::string CurrentModuleObject = "PlantLoop";
+
+        NumPlantLoops = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
-        if (NumAlphas != 5 || NumNumbers != 0) {
-            ShowWarningError(state,
-                             "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject +
-                                 " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)");
-        }
         Alphas.allocate(NumAlphas);
-        Numbers.dimension(NumNumbers, 0.0);
-        cAlphaFields.allocate(NumAlphas);
-        cNumericFields.allocate(NumNumbers);
-        lAlphaBlanks.dimension(NumAlphas, true);
-        lNumericBlanks.dimension(NumNumbers, true);
-        for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Count,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
-            state.dataBranchInputManager->ConnectorLists(Count).Name = Alphas(1);
-            NumConnectors = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
-            if (mod(NumAlphas - 1, 2) != 0) ++NumConnectors;
-            state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors = NumConnectors;
-            state.dataBranchInputManager->ConnectorLists(Count).ConnectorType.allocate(NumConnectors);
-            state.dataBranchInputManager->ConnectorLists(Count).ConnectorName.allocate(NumConnectors);
-            state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo.allocate(NumConnectors);
-            state.dataBranchInputManager->ConnectorLists(Count).ConnectorType = "UNKNOWN";
-            state.dataBranchInputManager->ConnectorLists(Count).ConnectorName = "UNKNOWN";
-            state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo = 0;
-            state.dataBranchInputManager->ConnectorLists(Count).NumOfSplitters = 0;
-            state.dataBranchInputManager->ConnectorLists(Count).NumOfMixers = 0;
+        Numbers.allocate(NumNumbers);
 
-            CCount = 0;
-            for (Arg = 2; Arg <= NumAlphas; Arg += 2) {
-                ++CCount;
-                if (UtilityRoutines::SameString(Alphas(Arg), cSPLITTER)) {
-                    state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(CCount) = Alphas(Arg).substr(0, 30);
-                    ++state.dataBranchInputManager->ConnectorLists(Count).NumOfSplitters;
-                } else if (UtilityRoutines::SameString(Alphas(Arg), cMIXER)) {
-                    state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(CCount) = Alphas(Arg).substr(0, 30);
-                    ++state.dataBranchInputManager->ConnectorLists(Count).NumOfMixers;
-                } else {
-                    ShowWarningError(state,
-                                     "GetConnectorListInput: Invalid " + cAlphaFields(Arg) + '=' + Alphas(Arg) + " in " + CurrentModuleObject + '=' +
-                                         Alphas(1));
-                }
-                state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(CCount) = Alphas(Arg + 1);
+        for (Num = 1; Num <= NumPlantLoops; ++Num) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            // Only looking for BranchList here.
+            if (Alphas(8) == BranchListName) {
+                FoundPlantLoopName = Alphas(1);
+                FoundSupplyDemand = "Supply";
+                FoundVolFlowRate = Numbers(3);
+                FoundPlantLoopNum = Num;
+                MatchedPlantLoop = true;
+                break;
+            } else if (Alphas(12) == BranchListName) {
+                FoundPlantLoopName = Alphas(1);
+                FoundSupplyDemand = "Demand";
+                FoundVolFlowRate = Numbers(3);
+                FoundPlantLoopNum = Num;
+                MatchedPlantLoop = true;
+                break;
             }
         }
-        state.dataBranchInputManager->GetConnectorListInputFlag = false;
+
         Alphas.deallocate();
         Numbers.deallocate();
-        cAlphaFields.deallocate();
-        cNumericFields.deallocate();
-        lAlphaBlanks.deallocate();
-        lNumericBlanks.deallocate();
+    }
 
-        // Validity checks on Connector Lists
-        if (state.dataBranchInputManager->GetSplitterInputFlag) {
-            GetSplitterInput(state);
-            state.dataBranchInputManager->GetSplitterInputFlag = false;
-        }
-        if (state.dataBranchInputManager->GetMixerInputFlag) {
-            GetMixerInput(state);
-            state.dataBranchInputManager->GetMixerInputFlag = false;
-        }
+    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
+                                           std::string const &BranchListName,
+                                           std::string &FoundCondLoopName,
+                                           int &FoundCondLoopNum,
+                                           std::string &FoundSupplyDemand,
+                                           Real64 &FoundVolFlowRate,
+                                           bool &MatchedCondLoop)
+    {
 
-        SplitNum = 0;
-        MixerNum = 0;
-        for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
-            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors <= 1) continue; // Air Loop only has one.
-            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors > 2) continue;  // Rules not clear for this case
-            for (Loop = 1; Loop <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop) {
-                if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) != 0) continue;
-                if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), cSPLITTER)) {
-                    CurSplitter = true;
-                    CurMixer = false;
-                    SplitNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
-                                                               state.dataBranchInputManager->Splitters);
-                    // Following code sets up branch names to be matched from Splitter/Mixer data structure
-                    if (SplitNum == 0) {
-                        ShowSevereError(
-                            state,
-                            "Invalid Connector:Splitter(none)=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
-                                ", referenced by " + CurrentModuleObject + '=' + state.dataBranchInputManager->ConnectorLists(Count).Name);
-                        ErrorsFound = true;
-                        continue;
-                    }
-                    NumBranchNames = state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches;
-                    BranchNames = state.dataBranchInputManager->Splitters(SplitNum).OutletBranchNames;
-                } else if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), cMIXER)) {
-                    CurSplitter = true;
-                    CurMixer = false;
-                    MixerNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
-                                                               state.dataBranchInputManager->Mixers);
-                    if (MixerNum == 0) {
-                        ShowSevereError(state,
-                                        "Invalid Connector:Mixer(none)=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
-                                            ", referenced by " + CurrentModuleObject + '=' +
-                                            state.dataBranchInputManager->ConnectorLists(Count).Name);
-                        ErrorsFound = true;
-                        continue;
-                    }
-                    NumBranchNames = state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches;
-                    BranchNames = state.dataBranchInputManager->Mixers(MixerNum).InletBranchNames;
-                } else {
-                    continue;
-                }
-                // Try to match mixer to splitter
-                for (Loop1 = Loop + 1; Loop1 <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop1) {
-                    if (CurMixer && !UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cSPLITTER))
-                        continue;
-                    if (CurSplitter && !UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cMIXER))
-                        continue;
-                    if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) != 0) continue;
-                    {
-                        auto const SELECT_CASE_var(CurSplitter);
-                        if (SELECT_CASE_var) {
-                            // Current "item" is a splitter, candidate is a mixer.
-                            MixerNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
-                                                                       state.dataBranchInputManager->Mixers);
-                            if (MixerNum == 0) continue;
-                            if (state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches != NumBranchNames) continue;
-                            MatchFound = true;
-                            for (Loop2 = 1; Loop2 <= state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches; ++Loop2) {
-                                TestNum = UtilityRoutines::FindItemInList(
-                                    state.dataBranchInputManager->Mixers(MixerNum).InletBranchNames(Loop2), BranchNames, NumBranchNames);
-                                if (TestNum == 0) {
-                                    MatchFound = false;
-                                    break;
-                                }
-                            }
-                            if (MatchFound) {
-                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) = MixerNum;
-                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) = SplitNum;
-                            }
-                        } else {
-                            // Current "item" is a splitter, candidate is a mixer.
-                            SplitNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
-                                                                       state.dataBranchInputManager->Splitters);
-                            if (SplitNum == 0) continue;
-                            if (state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches != NumBranchNames) continue;
-                            MatchFound = true;
-                            for (Loop2 = 1; Loop2 <= state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches; ++Loop2) {
-                                TestNum = UtilityRoutines::FindItemInList(
-                                    state.dataBranchInputManager->Splitters(SplitNum).OutletBranchNames(Loop2), BranchNames, NumBranchNames);
-                                if (TestNum == 0) {
-                                    MatchFound = false;
-                                    break;
-                                }
-                            }
-                            if (MatchFound) {
-                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) = SplitNum;
-                                state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) = MixerNum;
-                            }
-                        }
-                    }
-                }
-                BranchNames.deallocate();
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   February 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // An auxiliary routine locate a condenser loop and type from a BranchListName
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Num;
+        int NumCondLoops;
+        int NumParams;
+        Array1D_string Alphas;
+        int NumAlphas;
+        Array1D<Real64> Numbers;
+        int NumNumbers;
+        int IOStat;
+
+        // Get Inputs
+        std::string CurrentModuleObject = "CondenserLoop";
+
+        NumCondLoops = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        Alphas.allocate(NumAlphas);
+        Numbers.allocate(NumNumbers);
+
+        for (Num = 1; Num <= NumCondLoops; ++Num) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            // Only looking for BranchList here.
+            if (Alphas(8) == BranchListName) {
+                FoundCondLoopName = Alphas(1);
+                FoundSupplyDemand = "Supply";
+                FoundVolFlowRate = Numbers(3);
+                FoundCondLoopNum = Num;
+                MatchedCondLoop = true;
+                break;
+            } else if (Alphas(12) == BranchListName) {
+                FoundCondLoopName = Alphas(1);
+                FoundSupplyDemand = "Demand";
+                FoundVolFlowRate = Numbers(3);
+                FoundCondLoopNum = Num;
+                MatchedCondLoop = true;
+                break;
             }
         }
 
-        for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
-            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors <= 1) continue; // Air Loop only has one.
-            if (state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors > 2) continue;  // Rules not clear
-            for (Loop = 1; Loop <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop) {
-                if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) != 0) continue;
-                //  = 0, not matched.
-                ShowSevereError(state, "For " + CurrentModuleObject + '=' + state.dataBranchInputManager->ConnectorLists(Count).Name);
-                ShowContinueError(state,
-                                  "...Item=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
-                                      ", Type=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop) + " was not matched.");
-                if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), "Connector:Splitter")) {
-                    ShowContinueError(
-                        state, "The BranchList for this Connector:Splitter does not match the BranchList for its corresponding Connector:Mixer.");
-                } else {
-                    ShowContinueError(
-                        state, "The BranchList for this Connector:Mixer does not match the BranchList for its corresponding Connector:Splitter.");
-                }
-                ErrorsFound = true;
-            }
+        Alphas.deallocate();
+        Numbers.deallocate();
+    }
+
+    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
+                                                 std::string const &BranchListName, // Branch List Name
+                                                 std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
+                                                 std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
+                                                 bool &MatchedLoop                  // true if found
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   February 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Assist in validating Loop Splitter/Mixer connections.
+
+        // METHODOLOGY EMPLOYED:
+        // Call two previously written subroutines that match a Branch List Name to
+        // Plant or Condenser Loop
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        std::string FoundLoopName;
+        int FoundLoopNum;
+        Real64 FoundLoopVolFlowRate;
+
+        LoopSupplyDemandAir = std::string();
+        FoundLoopName = std::string();
+        FoundLoopNum = 0;
+        FoundLoopVolFlowRate = 0.0;
+        MatchedLoop = false;
+        LoopType = std::string();
+
+        // Try Plant first
+        FindPlantLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
+
+        if (MatchedLoop) LoopType = "Plant";
+        if (!MatchedLoop) { // Try Condenser Loop
+            LoopSupplyDemandAir = std::string();
+            FoundLoopName = std::string();
+            FoundLoopNum = 0;
+            FoundLoopVolFlowRate = 0.0;
+            MatchedLoop = false;
+
+            // Try Condenser
+            FindCondenserLoopBranchConnection(
+                state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
+            if (MatchedLoop) LoopType = "Condenser";
         }
 
-        if (ErrorsFound) {
-            ShowFatalError(state, "GetConnectorListInput: Program terminates for preceding conditions.");
+        if (!MatchedLoop) { // Try Air Loop
+            LoopSupplyDemandAir = std::string();
+            FoundLoopName = std::string();
+            FoundLoopNum = 0;
+            FoundLoopVolFlowRate = 0.0;
+            MatchedLoop = false;
+
+            // Try Air
+            FindAirLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
+            if (MatchedLoop) LoopType = "Air";
         }
     }
 
@@ -2185,129 +2371,6 @@ namespace BranchInputManager {
         }
     }
 
-    void FindPlantLoopBranchConnection(EnergyPlusData &state,
-                                       std::string const &BranchListName,
-                                       std::string &FoundPlantLoopName,
-                                       int &FoundPlantLoopNum,
-                                       std::string &FoundSupplyDemand,
-                                       Real64 &FoundVolFlowRate,
-                                       bool &MatchedPlantLoop)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   October 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // An auxiliary routine locate a plant loop and type from a BranchListName
-
-        // METHODOLOGY EMPLOYED:
-        // Calls GetObject for PLANT LOOP
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Num;
-        int NumPlantLoops;
-        int NumParams;
-        Array1D_string Alphas;
-        int NumAlphas;
-        Array1D<Real64> Numbers;
-        int NumNumbers;
-        int IOStat;
-
-        // Get Inputs
-        std::string CurrentModuleObject = "PlantLoop";
-
-        NumPlantLoops = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
-        Alphas.allocate(NumAlphas);
-        Numbers.allocate(NumNumbers);
-
-        for (Num = 1; Num <= NumPlantLoops; ++Num) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
-            // Only looking for BranchList here.
-            if (Alphas(8) == BranchListName) {
-                FoundPlantLoopName = Alphas(1);
-                FoundSupplyDemand = "Supply";
-                FoundVolFlowRate = Numbers(3);
-                FoundPlantLoopNum = Num;
-                MatchedPlantLoop = true;
-                break;
-            } else if (Alphas(12) == BranchListName) {
-                FoundPlantLoopName = Alphas(1);
-                FoundSupplyDemand = "Demand";
-                FoundVolFlowRate = Numbers(3);
-                FoundPlantLoopNum = Num;
-                MatchedPlantLoop = true;
-                break;
-            }
-        }
-
-        Alphas.deallocate();
-        Numbers.deallocate();
-    }
-
-    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
-                                           std::string const &BranchListName,
-                                           std::string &FoundCondLoopName,
-                                           int &FoundCondLoopNum,
-                                           std::string &FoundSupplyDemand,
-                                           Real64 &FoundVolFlowRate,
-                                           bool &MatchedCondLoop)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // An auxiliary routine locate a condenser loop and type from a BranchListName
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Num;
-        int NumCondLoops;
-        int NumParams;
-        Array1D_string Alphas;
-        int NumAlphas;
-        Array1D<Real64> Numbers;
-        int NumNumbers;
-        int IOStat;
-
-        // Get Inputs
-        std::string CurrentModuleObject = "CondenserLoop";
-
-        NumCondLoops = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
-        Alphas.allocate(NumAlphas);
-        Numbers.allocate(NumNumbers);
-
-        for (Num = 1; Num <= NumCondLoops; ++Num) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
-            // Only looking for BranchList here.
-            if (Alphas(8) == BranchListName) {
-                FoundCondLoopName = Alphas(1);
-                FoundSupplyDemand = "Supply";
-                FoundVolFlowRate = Numbers(3);
-                FoundCondLoopNum = Num;
-                MatchedCondLoop = true;
-                break;
-            } else if (Alphas(12) == BranchListName) {
-                FoundCondLoopName = Alphas(1);
-                FoundSupplyDemand = "Demand";
-                FoundVolFlowRate = Numbers(3);
-                FoundCondLoopNum = Num;
-                MatchedCondLoop = true;
-                break;
-            }
-        }
-
-        Alphas.deallocate();
-        Numbers.deallocate();
-    }
-
     void FindAirLoopBranchConnection(EnergyPlusData &state,
                                      std::string const &BranchListName,
                                      std::string &FoundAirLoopName,
@@ -2361,69 +2424,6 @@ namespace BranchInputManager {
 
         Alphas.deallocate();
         Numbers.deallocate();
-    }
-
-    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
-                                                 std::string const &BranchListName, // Branch List Name
-                                                 std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
-                                                 std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
-                                                 bool &MatchedLoop                  // true if found
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Assist in validating Loop Splitter/Mixer connections.
-
-        // METHODOLOGY EMPLOYED:
-        // Call two previously written subroutines that match a Branch List Name to
-        // Plant or Condenser Loop
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string FoundLoopName;
-        int FoundLoopNum;
-        Real64 FoundLoopVolFlowRate;
-
-        LoopSupplyDemandAir = std::string();
-        FoundLoopName = std::string();
-        FoundLoopNum = 0;
-        FoundLoopVolFlowRate = 0.0;
-        MatchedLoop = false;
-        LoopType = std::string();
-
-        // Try Plant first
-        FindPlantLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
-
-        if (MatchedLoop) LoopType = "Plant";
-        if (!MatchedLoop) { // Try Condenser Loop
-            LoopSupplyDemandAir = std::string();
-            FoundLoopName = std::string();
-            FoundLoopNum = 0;
-            FoundLoopVolFlowRate = 0.0;
-            MatchedLoop = false;
-
-            // Try Condenser
-            FindCondenserLoopBranchConnection(
-                state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
-            if (MatchedLoop) LoopType = "Condenser";
-        }
-
-        if (!MatchedLoop) { // Try Air Loop
-            LoopSupplyDemandAir = std::string();
-            FoundLoopName = std::string();
-            FoundLoopNum = 0;
-            FoundLoopVolFlowRate = 0.0;
-            MatchedLoop = false;
-
-            // Try Air
-            FindAirLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
-            if (MatchedLoop) LoopType = "Air";
-        }
     }
 
     //==================================================================================

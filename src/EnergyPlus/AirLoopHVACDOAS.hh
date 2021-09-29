@@ -204,8 +204,6 @@ namespace AirLoopHVACDOAS {
         void GetDesignDayConditions(EnergyPlusData &state);
     };
 
-    int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName);
-    int getAirLoopSplitterIndex(EnergyPlusData &state, std::string const &objectName);
     void getAirLoopHVACDOASInput(EnergyPlusData &state);
 
 } // namespace AirLoopHVACDOAS

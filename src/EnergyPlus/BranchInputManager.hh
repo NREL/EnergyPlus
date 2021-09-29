@@ -220,28 +220,12 @@ namespace BranchInputManager {
                               bool &ErrFound // Set to true if error found, false otherwise
     );
 
-    void GetInternalBranchData(EnergyPlusData &state,
-                               std::string const &LoopName,                               // Loop Name for Branch
-                               std::string const &BranchName,                             // Requested Branch Name
-                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of pressure curve object
-                               int &PressCurveIndex,                                      // Index of pressure curve object
-                               int &NumComps,                                             // Number of Components on Branch
-                               Array1D<ComponentData> &BComponents,                       // Component data returned
-                               bool &ErrorsFound // True when Loop Name is already assigned and this not same loop
-    );
-
     void GetNumSplitterMixerInConntrList(EnergyPlusData &state,
                                          std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
                                          std::string const &ConnectorListName, // Requested Connector List Name
                                          int &numSplitters,                    // Number of splitters in the loop
                                          int &numMixers,                       // Number of mixers in the loop
                                          bool &ErrorsFound                     // if no connector list
-    );
-
-    void GetConnectorList(EnergyPlusData &state,
-                          std::string const &ConnectorListName, // Requested Connector List
-                          ConnectorData &Connectoid,            // Returned Connector Data
-                          Optional_int_const NumInList = _      // Number of the current connector in the list of connectors
     );
 
     void GetLoopMixer(EnergyPlusData &state,
@@ -293,29 +277,9 @@ namespace BranchInputManager {
                               Array1D_int &NodeNums,
                               Array1D_bool &lAlphaBlanks);
 
-    void GetBranchListInput(EnergyPlusData &state);
-
-    void GetConnectorListInput(EnergyPlusData &state);
-
     void GetSplitterInput(EnergyPlusData &state);
 
     void GetMixerInput(EnergyPlusData &state);
-
-    void FindPlantLoopBranchConnection(EnergyPlusData &state,
-                                       std::string const &BranchListName,
-                                       std::string &FoundPlantLoopName,
-                                       int &FoundPlantLoopNum,
-                                       std::string &FoundSupplyDemand,
-                                       Real64 &FoundVolFlowRate,
-                                       bool &MatchedPlantLoop);
-
-    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
-                                           std::string const &BranchListName,
-                                           std::string &FoundCondLoopName,
-                                           int &FoundCondLoopNum,
-                                           std::string &FoundSupplyDemand,
-                                           Real64 &FoundVolFlowRate,
-                                           bool &MatchedCondLoop);
 
     void FindAirLoopBranchConnection(EnergyPlusData &state,
                                      std::string const &BranchListName,
@@ -324,13 +288,6 @@ namespace BranchInputManager {
                                      std::string &FoundAir,
                                      Real64 &FoundVolFlowRate,
                                      bool &MatchedAirLoop);
-
-    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
-                                                 std::string const &BranchListName, // Branch List Name
-                                                 std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
-                                                 std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
-                                                 bool &MatchedLoop                  // true if found
-    );
 
     //==================================================================================
     //   Routines that test branch integrity

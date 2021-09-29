@@ -119,129 +119,6 @@ namespace CostEstimateManager {
         }
     }
 
-    void GetCostEstimateInput(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         BGriffith
-        //       DATE WRITTEN   April 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Get Cost Estimation object input.
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Item; // Item to be "gotten"
-        int NumCostAdjust;
-        int NumRefAdjust;
-        int NumAlphas;           // Number of Alphas for each GetObjectItem call
-        int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        int IOStatus;            // Used in GetObjectItem
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-
-        state.dataCostEstimateManager->NumLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
-
-        if (state.dataCostEstimateManager->NumLineItems == 0) {
-            state.dataCostEstimateManager->DoCostEstimate = false;
-            return;
-        } else {
-            state.dataCostEstimateManager->DoCostEstimate = true;
-            //    WriteTabularFiles = .TRUE.
-        }
-
-        if (!allocated(state.dataCostEstimateManager->CostLineItem)) {
-            state.dataCostEstimateManager->CostLineItem.allocate(state.dataCostEstimateManager->NumLineItems);
-        }
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "ComponentCost:LineItem";
-
-        for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Item,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus);
-            state.dataCostEstimateManager->CostLineItem(Item).LineName = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = state.dataIPShortCut->cAlphaArgs(3);
-            state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = state.dataIPShortCut->cAlphaArgs(4);
-            state.dataCostEstimateManager->CostLineItem(Item).PerEach = state.dataIPShortCut->rNumericArgs(1);
-            state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = state.dataIPShortCut->rNumericArgs(2);
-            state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap = state.dataIPShortCut->rNumericArgs(3);
-            state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP = state.dataIPShortCut->rNumericArgs(4);
-            state.dataCostEstimateManager->CostLineItem(Item).PerCubicMeter = state.dataIPShortCut->rNumericArgs(5);
-            state.dataCostEstimateManager->CostLineItem(Item).PerCubMeterPerSec = state.dataIPShortCut->rNumericArgs(6);
-            state.dataCostEstimateManager->CostLineItem(Item).PerUAinWattperDelK = state.dataIPShortCut->rNumericArgs(7);
-            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataIPShortCut->rNumericArgs(8);
-        }
-
-        // most input error checking to be performed later within Case construct in Calc routine.
-
-        cCurrentModuleObject = "ComponentCost:Adjustments";
-        NumCostAdjust = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumCostAdjust == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     1,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus);
-            state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(1);
-            state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(2);
-            state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(3);
-            state.dataCostEstimateManager->CurntBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(4);
-            state.dataCostEstimateManager->CurntBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(5);
-            state.dataCostEstimateManager->CurntBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(6);
-            state.dataCostEstimateManager->CurntBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(7);
-
-        } else if (NumCostAdjust > 1) {
-            ShowSevereError(state, cCurrentModuleObject + ": Only one instance of this object is allowed.");
-            ErrorsFound = true;
-        }
-
-        cCurrentModuleObject = "ComponentCost:Reference";
-        NumRefAdjust = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumRefAdjust == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     1,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus);
-            state.dataCostEstimateManager->RefrncBldg.LineItemTot = state.dataIPShortCut->rNumericArgs(1);
-            state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(2);
-            state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(3);
-            state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(4);
-            state.dataCostEstimateManager->RefrncBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(5);
-            state.dataCostEstimateManager->RefrncBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(6);
-            state.dataCostEstimateManager->RefrncBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(7);
-            state.dataCostEstimateManager->RefrncBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(8);
-
-        } else if (NumRefAdjust > 1) {
-            ShowSevereError(state, cCurrentModuleObject + " : Only one instance of this object is allowed.");
-            ErrorsFound = true;
-        }
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing cost estimate input");
-        }
-
-        CheckCostEstimateInput(state, ErrorsFound);
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing cost estimate input");
-        }
-    }
-
     void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors in input, fatal at end of routine
     {
 
@@ -549,6 +426,129 @@ namespace CostEstimateManager {
                     ShowContinueError(state, "... invalid object type=" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjType);
                 }
             }
+        }
+    }
+
+    void GetCostEstimateInput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         BGriffith
+        //       DATE WRITTEN   April 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Get Cost Estimation object input.
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Item; // Item to be "gotten"
+        int NumCostAdjust;
+        int NumRefAdjust;
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int IOStatus;            // Used in GetObjectItem
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+
+        state.dataCostEstimateManager->NumLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
+
+        if (state.dataCostEstimateManager->NumLineItems == 0) {
+            state.dataCostEstimateManager->DoCostEstimate = false;
+            return;
+        } else {
+            state.dataCostEstimateManager->DoCostEstimate = true;
+            //    WriteTabularFiles = .TRUE.
+        }
+
+        if (!allocated(state.dataCostEstimateManager->CostLineItem)) {
+            state.dataCostEstimateManager->CostLineItem.allocate(state.dataCostEstimateManager->NumLineItems);
+        }
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        cCurrentModuleObject = "ComponentCost:LineItem";
+
+        for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus);
+            state.dataCostEstimateManager->CostLineItem(Item).LineName = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = state.dataIPShortCut->cAlphaArgs(3);
+            state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = state.dataIPShortCut->cAlphaArgs(4);
+            state.dataCostEstimateManager->CostLineItem(Item).PerEach = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->CostLineItem(Item).PerCubicMeter = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->CostLineItem(Item).PerCubMeterPerSec = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->CostLineItem(Item).PerUAinWattperDelK = state.dataIPShortCut->rNumericArgs(7);
+            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataIPShortCut->rNumericArgs(8);
+        }
+
+        // most input error checking to be performed later within Case construct in Calc routine.
+
+        cCurrentModuleObject = "ComponentCost:Adjustments";
+        NumCostAdjust = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (NumCostAdjust == 1) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     1,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus);
+            state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->CurntBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->CurntBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->CurntBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->CurntBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(7);
+
+        } else if (NumCostAdjust > 1) {
+            ShowSevereError(state, cCurrentModuleObject + ": Only one instance of this object is allowed.");
+            ErrorsFound = true;
+        }
+
+        cCurrentModuleObject = "ComponentCost:Reference";
+        NumRefAdjust = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (NumRefAdjust == 1) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     1,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus);
+            state.dataCostEstimateManager->RefrncBldg.LineItemTot = state.dataIPShortCut->rNumericArgs(1);
+            state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = state.dataIPShortCut->rNumericArgs(2);
+            state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = state.dataIPShortCut->rNumericArgs(3);
+            state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac = state.dataIPShortCut->rNumericArgs(4);
+            state.dataCostEstimateManager->RefrncBldg.ContingencyFrac = state.dataIPShortCut->rNumericArgs(5);
+            state.dataCostEstimateManager->RefrncBldg.BondCostFrac = state.dataIPShortCut->rNumericArgs(6);
+            state.dataCostEstimateManager->RefrncBldg.CommissioningFrac = state.dataIPShortCut->rNumericArgs(7);
+            state.dataCostEstimateManager->RefrncBldg.RegionalModifier = state.dataIPShortCut->rNumericArgs(8);
+
+        } else if (NumRefAdjust > 1) {
+            ShowSevereError(state, cCurrentModuleObject + " : Only one instance of this object is allowed.");
+            ErrorsFound = true;
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found in processing cost estimate input");
+        }
+
+        CheckCostEstimateInput(state, ErrorsFound);
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found in processing cost estimate input");
         }
     }
 

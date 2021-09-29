@@ -67,6 +67,150 @@ namespace CommandLineInterface {
 
     using namespace ez;
 
+    // Fix This is Fortranic code that needs to be brought up to C++ style
+    //     All the index and len and strip should be eliminated and replaced by string calls only where needed
+    //     I/o with std::string should not be pulling in trailing blanks so stripping should not be needed, etc.
+    //     Rewinding is a big performance hit and should be avoided if possible
+    //     Case-insensitive comparison is much faster than converting strings to upper or lower case
+    //     Each strip and case conversion is a heap hit and should be avoided if possible
+    void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
+                     std::string const &Heading,         // Heading for the parameters ('[heading]')
+                     std::string const &KindofParameter, // Kind of parameter to be found (String)
+                     std::string &DataOut                // Output from the retrieval
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine reads the .ini file and retrieves
+        // the path names for the files from it.
+
+        // METHODOLOGY EMPLOYED:
+        // Duplicate the kind of reading the Windows "GetINISetting" would
+        // do.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace EnergyPlus;
+        using namespace DataStringGlobals;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        std::string Param;
+        std::string::size_type ILB;
+        std::string::size_type IRB;
+        std::string::size_type IEQ;
+        std::string::size_type IPAR;
+        std::string::size_type IPOS;
+        std::string::size_type ILEN;
+
+        // Formats
+
+        DataOut.clear();
+
+        // I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
+
+        Param = KindofParameter;
+        strip(Param);
+        ILEN = len(Param);
+        inputFile.rewind();
+        bool Found = false;
+        bool NewHeading = false;
+
+        while (inputFile.good() && !Found) {
+            const auto readResult = inputFile.readLine();
+
+            if (readResult.eof) {
+                break;
+            }
+
+            if (readResult.data.empty()) {
+                continue;
+            } // Ignore Blank Lines
+
+            std::string LINEOut;
+            ConvertCaseToLower(readResult.data, LINEOut); // Turn line into lower case
+            //        LINE=LINEOut
+
+            if (!has(LINEOut, Heading)) continue;
+
+            //                                  See if [ and ] are on line
+            ILB = index(LINEOut, '[');
+            IRB = index(LINEOut, ']');
+            if (ILB == std::string::npos && IRB == std::string::npos) continue;
+            if (!has(LINEOut, '[' + Heading + ']')) continue; // Must be really correct heading line
+
+            //                                  Heading line found, now looking for Kind
+            while (inputFile.good() && !NewHeading) {
+                const auto innerReadResult = inputFile.readLine();
+                if (innerReadResult.eof) {
+                    break;
+                }
+
+                auto line = innerReadResult.data;
+                strip(line);
+
+                if (line.empty()) continue; // Ignore Blank Lines
+
+                ConvertCaseToLower(line, LINEOut); // Turn line into lower case
+                //         LINE=LINEOut
+
+                ILB = index(LINEOut, '[');
+                IRB = index(LINEOut, ']');
+                NewHeading = (ILB != std::string::npos && IRB != std::string::npos);
+
+                //                                  Should be a parameter line
+                //                                  KindofParameter = string
+                IEQ = index(LINEOut, '=');
+                IPAR = index(LINEOut, Param);
+                if (IEQ == std::string::npos) continue;
+                if (IPAR == std::string::npos) continue;
+                if (IPAR != 0) continue;
+                if (!has(LINEOut, Param + '=')) continue; // needs to be param=
+
+                //                                  = found and parameter found.
+                if (IPAR > IEQ) continue;
+
+                //                                  parameter = found
+                //                                  Set output string to start with non-blank character
+
+                DataOut = stripped(line.substr(IEQ + 1));
+                Found = true;
+                break;
+            }
+        }
+
+        if (Param == "dir") {
+            IPOS = len(DataOut);
+            if (IPOS != 0) {
+                // Non-blank make sure last position is valid path character
+                //  (Set in DataStringGlobals)
+
+                if (DataOut[IPOS - 1] != pathChar) {
+                    DataOut += pathChar;
+                }
+            }
+        }
+    }
+
     int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
@@ -725,150 +869,6 @@ namespace CommandLineInterface {
         }
 
         return static_cast<int>(ReturnCodes::Success);
-    }
-
-    // Fix This is Fortranic code that needs to be brought up to C++ style
-    //     All the index and len and strip should be eliminated and replaced by string calls only where needed
-    //     I/o with std::string should not be pulling in trailing blanks so stripping should not be needed, etc.
-    //     Rewinding is a big performance hit and should be avoided if possible
-    //     Case-insensitive comparison is much faster than converting strings to upper or lower case
-    //     Each strip and case conversion is a heap hit and should be avoided if possible
-    void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine reads the .ini file and retrieves
-        // the path names for the files from it.
-
-        // METHODOLOGY EMPLOYED:
-        // Duplicate the kind of reading the Windows "GetINISetting" would
-        // do.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace EnergyPlus;
-        using namespace DataStringGlobals;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        std::string Param;
-        std::string::size_type ILB;
-        std::string::size_type IRB;
-        std::string::size_type IEQ;
-        std::string::size_type IPAR;
-        std::string::size_type IPOS;
-        std::string::size_type ILEN;
-
-        // Formats
-
-        DataOut.clear();
-
-        // I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
-
-        Param = KindofParameter;
-        strip(Param);
-        ILEN = len(Param);
-        inputFile.rewind();
-        bool Found = false;
-        bool NewHeading = false;
-
-        while (inputFile.good() && !Found) {
-            const auto readResult = inputFile.readLine();
-
-            if (readResult.eof) {
-                break;
-            }
-
-            if (readResult.data.empty()) {
-                continue;
-            } // Ignore Blank Lines
-
-            std::string LINEOut;
-            ConvertCaseToLower(readResult.data, LINEOut); // Turn line into lower case
-            //        LINE=LINEOut
-
-            if (!has(LINEOut, Heading)) continue;
-
-            //                                  See if [ and ] are on line
-            ILB = index(LINEOut, '[');
-            IRB = index(LINEOut, ']');
-            if (ILB == std::string::npos && IRB == std::string::npos) continue;
-            if (!has(LINEOut, '[' + Heading + ']')) continue; // Must be really correct heading line
-
-            //                                  Heading line found, now looking for Kind
-            while (inputFile.good() && !NewHeading) {
-                const auto innerReadResult = inputFile.readLine();
-                if (innerReadResult.eof) {
-                    break;
-                }
-
-                auto line = innerReadResult.data;
-                strip(line);
-
-                if (line.empty()) continue; // Ignore Blank Lines
-
-                ConvertCaseToLower(line, LINEOut); // Turn line into lower case
-                //         LINE=LINEOut
-
-                ILB = index(LINEOut, '[');
-                IRB = index(LINEOut, ']');
-                NewHeading = (ILB != std::string::npos && IRB != std::string::npos);
-
-                //                                  Should be a parameter line
-                //                                  KindofParameter = string
-                IEQ = index(LINEOut, '=');
-                IPAR = index(LINEOut, Param);
-                if (IEQ == std::string::npos) continue;
-                if (IPAR == std::string::npos) continue;
-                if (IPAR != 0) continue;
-                if (!has(LINEOut, Param + '=')) continue; // needs to be param=
-
-                //                                  = found and parameter found.
-                if (IPAR > IEQ) continue;
-
-                //                                  parameter = found
-                //                                  Set output string to start with non-blank character
-
-                DataOut = stripped(line.substr(IEQ + 1));
-                Found = true;
-                break;
-            }
-        }
-
-        if (Param == "dir") {
-            IPOS = len(DataOut);
-            if (IPOS != 0) {
-                // Non-blank make sure last position is valid path character
-                //  (Set in DataStringGlobals)
-
-                if (DataOut[IPOS - 1] != pathChar) {
-                    DataOut += pathChar;
-                }
-            }
-        }
     }
 
     int runReadVarsESO(EnergyPlusData &state)

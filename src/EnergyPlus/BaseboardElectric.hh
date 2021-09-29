@@ -114,8 +114,6 @@ namespace BaseboardElectric {
 
     void SizeElectricBaseboard(EnergyPlusData &state, int BaseboardNum);
 
-    void SimElectricConvective(EnergyPlusData &state, int BaseboardNum, Real64 LoadMet);
-
 } // namespace BaseboardElectric
 
 struct BaseboardElectricData : BaseGlobalStruct

@@ -184,18 +184,12 @@ namespace CoolingPanelSimple {
                          Real64 &PowerMet,
                          int &CompIndex);
 
-    void GetCoolingPanelInput(EnergyPlusData &state);
-
-    void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
-
     void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
     void UpdateCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
     void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
                                         bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
-
-    void DistributeCoolingPanelRadGains(EnergyPlusData &state);
 
     Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 

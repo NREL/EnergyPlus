@@ -674,6 +674,41 @@ namespace BaseboardRadiator {
         baseboard->Baseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
     }
 
+    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
+                                 Real64 const UA,                 // UA of coil
+                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   February 2002
+        //       MODIFIED
+        //       RE-ENGINEERED
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates residual function (Design Coil Load - Coil Heating Output) / Design Coil Load.
+        // Coil Heating Output depends on the UA which is being varied to zero the residual.
+
+        // METHODOLOGY EMPLOYED:
+        // Puts UA into the baseboard data structure, calls SimHWConvective, and calculates
+        // the residual as defined above.
+
+        // Return value
+        Real64 Residuum; // residual to be minimized to zero
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int BaseboardIndex;
+        Real64 LoadMet;
+
+        BaseboardIndex = int(Par[1]);
+        state.dataBaseboardRadiator->Baseboard(BaseboardIndex).UA = UA;
+        SimHWConvective(state, BaseboardIndex, LoadMet);
+        Residuum = (Par[0] - LoadMet) / Par[0];
+
+        return Residuum;
+    }
+
     void SizeBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
@@ -1227,41 +1262,6 @@ namespace BaseboardRadiator {
         // Set the outlet water nodes for the Coil
         state.dataLoopNodes->Node(WaterOutletNode).Temp = baseboard->Baseboard(BaseboardNum).WaterOutletTemp;
         state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = baseboard->Baseboard(BaseboardNum).WaterOutletEnthalpy;
-    }
-
-    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 const UA,                 // UA of coil
-                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   February 2002
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Design Coil Load - Coil Heating Output) / Design Coil Load.
-        // Coil Heating Output depends on the UA which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Puts UA into the baseboard data structure, calls SimHWConvective, and calculates
-        // the residual as defined above.
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int BaseboardIndex;
-        Real64 LoadMet;
-
-        BaseboardIndex = int(Par[1]);
-        state.dataBaseboardRadiator->Baseboard(BaseboardIndex).UA = UA;
-        SimHWConvective(state, BaseboardIndex, LoadMet);
-        Residuum = (Par[0] - LoadMet) / Par[0];
-
-        return Residuum;
     }
 
 } // namespace BaseboardRadiator

@@ -61,13 +61,7 @@ namespace CrossVentMgr {
 
     void ManageUCSDCVModel(EnergyPlusData &state, int ZoneNum);
 
-    void InitUCSDCV(EnergyPlusData &state, int ZoneNum);
-
-    void HcUCSDCV(EnergyPlusData &state, int ZoneNum);
-
     void EvolveParaUCSDCV(EnergyPlusData &state, int ZoneNum);
-
-    void CalcUCSDCV(EnergyPlusData &state, int ZoneNum);
 
 } // namespace CrossVentMgr
 

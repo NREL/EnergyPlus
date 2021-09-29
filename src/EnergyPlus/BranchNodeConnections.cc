@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -74,6 +73,34 @@ namespace EnergyPlus::BranchNodeConnections {
 // Using/Aliasing
 using namespace DataLoopNode;
 using namespace DataBranchNodeConnections;
+
+bool IsValidConnectionType(std::string_view ConnectionType)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   August 2003
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This function determines if a connection type is valid.
+
+    // Return value
+    bool IsValid;
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int Count;
+
+    IsValid = false;
+    for (Count = 1; Count <= NumValidConnectionTypes; ++Count) {
+        if (ConnectionType != DataLoopNode::ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(Count))) continue;
+        IsValid = true;
+        break;
+    }
+
+    return IsValid;
+}
 
 void RegisterNodeConnection(EnergyPlusData &state,
                             int const NodeNumber,                                // Number for this Node
@@ -250,34 +277,6 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
         ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
         errFlag = true;
     }
-}
-
-bool IsValidConnectionType(std::string_view ConnectionType)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   August 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function determines if a connection type is valid.
-
-    // Return value
-    bool IsValid;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int Count;
-
-    IsValid = false;
-    for (Count = 1; Count <= NumValidConnectionTypes; ++Count) {
-        if (ConnectionType != DataLoopNode::ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(Count))) continue;
-        IsValid = true;
-        break;
-    }
-
-    return IsValid;
 }
 
 void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
@@ -807,6 +806,39 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     state.dataBranchNodeConnections->NumNodeConnectionErrors += ErrorCounter;
 }
 
+bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   May 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This routine determines if a component name is a parent node.
+
+    // METHODOLOGY EMPLOYED:
+    // Traverses CompSet structure.
+
+    // Return value
+    bool IsParent; // True if this combination is a parent
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int Loop;
+
+    IsParent = false;
+    for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
+        if (state.dataBranchNodeConnections->CompSets(Loop).ParentCType == ComponentType &&
+            state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
+            IsParent = true;
+            break;
+        }
+    }
+
+    return IsParent;
+}
+
 bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
 {
 
@@ -876,6 +908,40 @@ int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std:
     return WhichOne;
 }
 
+int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   May 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This routine determines which comp set (number) for a given component name
+    // and type.
+
+    // METHODOLOGY EMPLOYED:
+    // Traverses CompSet structure.
+
+    // Return value
+    int WhichOne;
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int Loop;
+
+    WhichOne = 0;
+    for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
+        if (state.dataBranchNodeConnections->CompSets(Loop).CType == ComponentType &&
+            state.dataBranchNodeConnections->CompSets(Loop).CName == ComponentName) {
+            WhichOne = Loop;
+            break;
+        }
+    }
+
+    return WhichOne;
+}
+
 void GetParentData(EnergyPlusData &state,
                    std::string const &ComponentType,
                    std::string const &ComponentName,
@@ -936,73 +1002,6 @@ void GetParentData(EnergyPlusData &state,
     }
 
     if (ErrInObject) ErrorsFound = true;
-}
-
-bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   May 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine determines if a component name is a parent node.
-
-    // METHODOLOGY EMPLOYED:
-    // Traverses CompSet structure.
-
-    // Return value
-    bool IsParent; // True if this combination is a parent
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    IsParent = false;
-    for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-        if (state.dataBranchNodeConnections->CompSets(Loop).ParentCType == ComponentType &&
-            state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
-            IsParent = true;
-            break;
-        }
-    }
-
-    return IsParent;
-}
-
-int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   May 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine determines which comp set (number) for a given component name
-    // and type.
-
-    // METHODOLOGY EMPLOYED:
-    // Traverses CompSet structure.
-
-    // Return value
-    int WhichOne;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    WhichOne = 0;
-    for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-        if (state.dataBranchNodeConnections->CompSets(Loop).CType == ComponentType &&
-            state.dataBranchNodeConnections->CompSets(Loop).CName == ComponentName) {
-            WhichOne = Loop;
-            break;
-        }
-    }
-
-    return WhichOne;
 }
 
 int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
@@ -1681,52 +1680,6 @@ void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound)
     AlreadyNoted.deallocate();
 }
 
-void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Lixing Gu
-    //       DATE WRITTEN   Jan 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function provides a connection type with given node number
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int NodeConnectIndex;
-    int NumInList;
-    Array1D_int ListArray;
-    Array1D_string ConnectionTypes(15);
-
-    for (int nodetype = 1; nodetype <= NumValidConnectionTypes; ++nodetype) {
-        ConnectionTypes(nodetype) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
-    }
-
-    if (allocated(NodeConnectType)) NodeConnectType.deallocate();
-
-    FindAllNodeNumbersInList(
-        NodeNumber, state.dataBranchNodeConnections->NodeConnections, state.dataBranchNodeConnections->NumOfNodeConnections, NumInList, ListArray);
-
-    NodeConnectType.allocate(NumInList);
-
-    if (NumInList > 0) {
-        for (NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex) {
-            NodeConnectType(NodeConnectIndex) =
-                UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->NodeConnections(ListArray(NodeConnectIndex)).ConnectionType,
-                                                ConnectionTypes,
-                                                NumValidConnectionTypes);
-        }
-    } else {
-        if (NodeNumber > 0) {
-            ShowWarningError(state, "Node not found = " + state.dataLoopNodes->NodeID(NodeNumber) + '.');
-        } else {
-            ShowWarningError(state, "Invalid node number passed = 0.");
-        }
-        errFlag = true;
-    }
-}
-
 void FindAllNodeNumbersInList(int const WhichNumber,
                               Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                               int const NumItems,
@@ -1770,6 +1723,52 @@ void FindAllNodeNumbersInList(int const WhichNumber,
                 AllNumbersInList(CountOfItems) = Count;
             }
         }
+    }
+}
+
+void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Lixing Gu
+    //       DATE WRITTEN   Jan 2007
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This function provides a connection type with given node number
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int NodeConnectIndex;
+    int NumInList;
+    Array1D_int ListArray;
+    Array1D_string ConnectionTypes(15);
+
+    for (int nodetype = 1; nodetype <= NumValidConnectionTypes; ++nodetype) {
+        ConnectionTypes(nodetype) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
+    }
+
+    if (allocated(NodeConnectType)) NodeConnectType.deallocate();
+
+    FindAllNodeNumbersInList(
+        NodeNumber, state.dataBranchNodeConnections->NodeConnections, state.dataBranchNodeConnections->NumOfNodeConnections, NumInList, ListArray);
+
+    NodeConnectType.allocate(NumInList);
+
+    if (NumInList > 0) {
+        for (NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex) {
+            NodeConnectType(NodeConnectIndex) =
+                UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->NodeConnections(ListArray(NodeConnectIndex)).ConnectionType,
+                                                ConnectionTypes,
+                                                NumValidConnectionTypes);
+        }
+    } else {
+        if (NodeNumber > 0) {
+            ShowWarningError(state, "Node not found = " + state.dataLoopNodes->NodeID(NodeNumber) + '.');
+        } else {
+            ShowWarningError(state, "Invalid node number passed = 0.");
+        }
+        errFlag = true;
     }
 }
 

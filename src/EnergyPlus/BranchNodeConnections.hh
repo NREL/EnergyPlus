@@ -90,26 +90,9 @@ namespace BranchNodeConnections {
                                     bool &errFlag                                  // Will be True if errors already detected or if errors found here
     );
 
-    bool IsValidConnectionType(std::string_view ConnectionType);
-
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
     bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
-
-    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
-
-    void GetParentData(EnergyPlusData &state,
-                       std::string const &ComponentType,
-                       std::string const &ComponentName,
-                       std::string &InletNodeName,
-                       int &InletNodeNum,
-                       std::string &OutletNodeName,
-                       int &OutletNodeNum,
-                       bool &ErrorsFound);
-
-    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
-
-    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
     int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
@@ -163,13 +146,6 @@ namespace BranchNodeConnections {
     void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
     void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
-
-    void FindAllNodeNumbersInList(int WhichNumber,
-                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
-                                  int NumItems,
-                                  int &CountOfItems,            // Number of items found
-                                  Array1D_int &AllNumbersInList // Index array to all numbers found
-    );
 
 } // namespace BranchNodeConnections
 

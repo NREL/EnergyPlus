@@ -142,8 +142,6 @@ namespace CostEstimateManager {
 
     void GetCostEstimateInput(EnergyPlusData &state);
 
-    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
-
     void CalcCostEstimate(EnergyPlusData &state);
 
 } // namespace CostEstimateManager

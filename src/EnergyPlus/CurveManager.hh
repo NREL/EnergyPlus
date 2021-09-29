@@ -286,8 +286,6 @@ namespace CurveManager {
 
     void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state);
-
     Real64 CurveValue(EnergyPlusData &state,
                       int CurveIndex,                  // index of curve in curve array
                       Real64 Var1,                     // 1st independent variable
@@ -303,28 +301,6 @@ namespace CurveManager {
     void GetCurveInputData(EnergyPlusData &state, bool &ErrorsFound);
 
     void InitCurveReporting(EnergyPlusData &state);
-
-    Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int CurveIndex,                  // index of curve in curve array
-                                  Real64 Var1,                     // 1st independent variable
-                                  Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                  Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                  Optional<Real64 const> Var4 = _, // 4th independent variable
-                                  Optional<Real64 const> Var5 = _  // 5th independent variable
-    );
-
-    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int CurveIndex,                  // index of curve in curve array
-                                   Real64 Var1,                     // 1st independent variable
-                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                   Optional<Real64 const> Var5 = _, // 5th independent variable
-                                   Optional<Real64 const> Var6 = _);
-
-    bool IsCurveInputTypeValid(std::string const &InInputType); // index of curve in curve array
-
-    bool IsCurveOutputTypeValid(std::string const &InOutputType); // index of curve in curve array
 
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
@@ -372,16 +348,12 @@ namespace CurveManager {
                                     Optional<Real64 const> CurveMax = _  // Maximum values of curve output
     );
 
-    void GetPressureSystemInput(EnergyPlusData &state);
-
     void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
                                       std::string const &PressureCurveName, // name of the curve
                                       DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex);
 
     Real64 PressureCurveValue(EnergyPlusData &state, int PressureCurveIndex, Real64 MassFlow, Real64 Density, Real64 Viscosity);
-
-    Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 ReynoldsNumber, Real64 RoughnessRatio);
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,
                                      std::string callingRoutineObj,   // calling routine with object type

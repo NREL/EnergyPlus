@@ -72,12 +72,6 @@ namespace CommandLineInterface {
     // Process command line arguments
     int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
 
-    void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    );
-
     int runReadVarsESO(EnergyPlusData &state);
 
 } // namespace CommandLineInterface

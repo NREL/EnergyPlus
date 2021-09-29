@@ -89,36 +89,6 @@ namespace CoolTower {
     // Using/Aliasing
     using namespace DataHeatBalance;
 
-    void ManageCoolTower(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Daeho Kang
-        //       DATE WRITTEN   Aug 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages the simulation of Cooltower component.
-        // This driver manages the calls to all of the other drivers and simulation algorithms.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // Obtains and allocates heat balance related parameters from input
-        if (state.dataCoolTower->GetInputFlag) {
-            GetCoolTower(state);
-            state.dataCoolTower->GetInputFlag = false;
-        }
-
-        if (state.dataCoolTower->NumCoolTowers == 0) return;
-
-        CalcCoolTower(state);
-
-        UpdateCoolTower(state);
-
-        ReportCoolTower(state);
-    }
-
     void GetCoolTower(EnergyPlusData &state)
     {
 
@@ -823,6 +793,36 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeup =
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate * TSMult;
         }
+    }
+
+    void ManageCoolTower(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Daeho Kang
+        //       DATE WRITTEN   Aug 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine manages the simulation of Cooltower component.
+        // This driver manages the calls to all of the other drivers and simulation algorithms.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        // Obtains and allocates heat balance related parameters from input
+        if (state.dataCoolTower->GetInputFlag) {
+            GetCoolTower(state);
+            state.dataCoolTower->GetInputFlag = false;
+        }
+
+        if (state.dataCoolTower->NumCoolTowers == 0) return;
+
+        CalcCoolTower(state);
+
+        UpdateCoolTower(state);
+
+        ReportCoolTower(state);
     }
 
 } // namespace CoolTower

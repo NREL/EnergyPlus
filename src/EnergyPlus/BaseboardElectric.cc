@@ -83,6 +83,71 @@ namespace BaseboardElectric {
     const char *cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:Convective:Electric";
     constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
+    void SimElectricConvective(EnergyPlusData &state, int const BaseboardNum, Real64 const LoadMet)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Liesen
+        //       DATE WRITTEN   Nov 2001
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE: This subroutine calculates the heat exchange rate
+        // in a pure Electricconvective baseboard heater.
+
+        // METHODOLOGY EMPLOYED:
+        // Currently this is primarily modified from HW Convective baseboard which has connections to
+        //  a water loop and was necessary to calculate temps, flow rates and other things.  This
+        //  model might be made more sophisticated and might use some of those data structures in the future
+        //  so they are left in place even though this model does not utilize them.
+
+        // Using/Aliasing
+        using DataHVACGlobals::SmallLoad;
+        using Psychrometrics::PsyCpAirFnW;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 AirInletTemp;
+        Real64 CpAir;
+        Real64 AirMassFlowRate;
+        Real64 CapacitanceAir;
+        Real64 Effic;
+        Real64 AirOutletTemp;
+        Real64 QBBCap;
+
+        auto &baseboard = state.dataBaseboardElectric;
+
+        AirInletTemp = baseboard->Baseboard(BaseboardNum).AirInletTemp;
+        CpAir = PsyCpAirFnW(baseboard->Baseboard(BaseboardNum).AirInletHumRat);
+        AirMassFlowRate = SimpConvAirFlowSpeed;
+        CapacitanceAir = CpAir * AirMassFlowRate;
+        // currently only the efficiency is used to calculate the electric consumption.  There could be some
+        //  thermal loss that could be accounted for with this efficiency input.
+        Effic = baseboard->Baseboard(BaseboardNum).BaseboardEfficiency;
+
+        if (GetCurrentScheduleValue(state, baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
+
+            // if the load exceeds the capacity than the capacity is set to the BB limit.
+            if (LoadMet > baseboard->Baseboard(BaseboardNum).NominalCapacity) {
+                QBBCap = baseboard->Baseboard(BaseboardNum).NominalCapacity;
+            } else {
+                QBBCap = LoadMet;
+            }
+
+            // this could be utilized somehow or even reported so the data structures are left in place
+            AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
+
+            // The Baseboard electric Load is calculated using the efficiency
+            baseboard->Baseboard(BaseboardNum).ElecUseRate = QBBCap / Effic;
+
+        } else {
+            // if there is an off condition the BB does nothing.
+            AirOutletTemp = AirInletTemp;
+            QBBCap = 0.0;
+            baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
+        }
+
+        baseboard->Baseboard(BaseboardNum).AirOutletTemp = AirOutletTemp;
+        baseboard->Baseboard(BaseboardNum).Power = QBBCap;
+    }
+
     void SimElectricBaseboard(
         EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
@@ -550,71 +615,6 @@ namespace BaseboardElectric {
                 state.dataSize->DataScalableCapSizingON = false;
             }
         }
-    }
-
-    void SimElectricConvective(EnergyPlusData &state, int const BaseboardNum, Real64 const LoadMet)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard Liesen
-        //       DATE WRITTEN   Nov 2001
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine calculates the heat exchange rate
-        // in a pure Electricconvective baseboard heater.
-
-        // METHODOLOGY EMPLOYED:
-        // Currently this is primarily modified from HW Convective baseboard which has connections to
-        //  a water loop and was necessary to calculate temps, flow rates and other things.  This
-        //  model might be made more sophisticated and might use some of those data structures in the future
-        //  so they are left in place even though this model does not utilize them.
-
-        // Using/Aliasing
-        using DataHVACGlobals::SmallLoad;
-        using Psychrometrics::PsyCpAirFnW;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AirInletTemp;
-        Real64 CpAir;
-        Real64 AirMassFlowRate;
-        Real64 CapacitanceAir;
-        Real64 Effic;
-        Real64 AirOutletTemp;
-        Real64 QBBCap;
-
-        auto &baseboard = state.dataBaseboardElectric;
-
-        AirInletTemp = baseboard->Baseboard(BaseboardNum).AirInletTemp;
-        CpAir = PsyCpAirFnW(baseboard->Baseboard(BaseboardNum).AirInletHumRat);
-        AirMassFlowRate = SimpConvAirFlowSpeed;
-        CapacitanceAir = CpAir * AirMassFlowRate;
-        // currently only the efficiency is used to calculate the electric consumption.  There could be some
-        //  thermal loss that could be accounted for with this efficiency input.
-        Effic = baseboard->Baseboard(BaseboardNum).BaseboardEfficiency;
-
-        if (GetCurrentScheduleValue(state, baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
-
-            // if the load exceeds the capacity than the capacity is set to the BB limit.
-            if (LoadMet > baseboard->Baseboard(BaseboardNum).NominalCapacity) {
-                QBBCap = baseboard->Baseboard(BaseboardNum).NominalCapacity;
-            } else {
-                QBBCap = LoadMet;
-            }
-
-            // this could be utilized somehow or even reported so the data structures are left in place
-            AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
-
-            // The Baseboard electric Load is calculated using the efficiency
-            baseboard->Baseboard(BaseboardNum).ElecUseRate = QBBCap / Effic;
-
-        } else {
-            // if there is an off condition the BB does nothing.
-            AirOutletTemp = AirInletTemp;
-            QBBCap = 0.0;
-            baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
-        }
-
-        baseboard->Baseboard(BaseboardNum).AirOutletTemp = AirOutletTemp;
-        baseboard->Baseboard(BaseboardNum).Power = QBBCap;
     }
 
 } // namespace BaseboardElectric

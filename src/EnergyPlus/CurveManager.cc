@@ -160,6 +160,183 @@ namespace CurveManager {
         }
     }
 
+    Real64 PerformanceCurveObject(EnergyPlusData &state,
+                                  int const CurveIndex,            // index of curve in curve array
+                                  Real64 const Var1,               // 1st independent variable
+                                  Optional<Real64 const> Var2 = _, // 2nd independent variable
+                                  Optional<Real64 const> Var3 = _, // 3rd independent variable
+                                  Optional<Real64 const> Var4 = _, // 4th independent variable
+                                  Optional<Real64 const> Var5 = _  // 5th independent variable
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   May 2000
+        //       MODIFIED       Lixing Gu, July 2006; B. Griffith July 2006
+        //                      22Aug2010 Craig Wray, added new curves for fan component model:
+        //                          FanPressureRise, ExponentialSkewNormal, Sigmoid, RectangularHyperbola1,
+        //                          RectangularHyperbola2, ExponentialDecay
+
+        //       RE-ENGINEERED  Autodesk: Performance tuning
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index and the values of 1 or 2 independent variables,
+        // returns the value of an equipment performance curve.
+
+        // Return value
+        Real64 CurveValue;
+
+        static Real64 const sqrt_2_inv(1.0 / std::sqrt(2.0));
+
+        Real64 CoeffZ1;         // Coefficient Z1 in exponential skew normal curve
+        Real64 CoeffZ2;         // Coefficient Z2 in exponential skew normal curve
+        Real64 CoeffZ3;         // Coefficient Z3 in exponential skew normal curve
+        Real64 CurveValueNumer; // Numerator in in exponential skew normal curve
+        Real64 CurveValueDenom; // Numerator in in exponential skew normal curve
+        Real64 CurveValueExp;   // Exponential term in sigmoid curve
+        auto const &Curve(state.dataCurveManager->PerfCurve(CurveIndex));
+
+        Real64 const V1(max(min(Var1, Curve.Var1Max), Curve.Var1Min));                        // 1st independent variable after limits imposed
+        Real64 const V2(Var2.present() ? max(min(Var2, Curve.Var2Max), Curve.Var2Min) : 0.0); // 2nd independent variable after limits imposed
+        Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
+        Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
+        Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
+
+        {
+            auto const SELECT_CASE_var(Curve.CurveType);
+            if (SELECT_CASE_var == CurveTypeEnum::Linear) {
+                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
+            } else if (SELECT_CASE_var == CurveTypeEnum::Quadratic) {
+                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
+            } else if (SELECT_CASE_var == CurveTypeEnum::QuadLinear) {
+                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
+            } else if (SELECT_CASE_var == CurveTypeEnum::QuintLinear) {
+                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
+            } else if (SELECT_CASE_var == CurveTypeEnum::Cubic) {
+                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
+            } else if (SELECT_CASE_var == CurveTypeEnum::Quartic) {
+                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
+            } else if (SELECT_CASE_var == CurveTypeEnum::BiQuadratic) {
+                CurveValue =
+                    Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
+            } else if (SELECT_CASE_var == CurveTypeEnum::QuadraticLinear) {
+                CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
+            } else if (SELECT_CASE_var == CurveTypeEnum::CubicLinear) {
+                CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
+            } else if (SELECT_CASE_var == CurveTypeEnum::BiCubic) {
+                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
+                             V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
+                             V1 * V2 * V2 * Curve.Coeff10;
+            } else if (SELECT_CASE_var == CurveTypeEnum::ChillerPartLoadWithLift) {
+                CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
+                             Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
+                             Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
+            } else if (SELECT_CASE_var == CurveTypeEnum::TriQuadratic) {
+                auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
+                auto const V1s(V1 * V1);
+                auto const V2s(V2 * V2);
+                auto const V3s(V3 * V3);
+                CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s +
+                             Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s +
+                             Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 +
+                             Tri2ndOrder.CoeffA11 * V1s * V3s + Tri2ndOrder.CoeffA12 * V1 * V3 + Tri2ndOrder.CoeffA13 * V1 * V3s +
+                             Tri2ndOrder.CoeffA14 * V1s * V3 + Tri2ndOrder.CoeffA15 * V2s * V3s + Tri2ndOrder.CoeffA16 * V2 * V3 +
+                             Tri2ndOrder.CoeffA17 * V2 * V3s + Tri2ndOrder.CoeffA18 * V2s * V3 + Tri2ndOrder.CoeffA19 * V1s * V2s * V3s +
+                             Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
+                             Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
+                             Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
+            } else if (SELECT_CASE_var == CurveTypeEnum::Exponent) {
+                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
+            } else if (SELECT_CASE_var == CurveTypeEnum::FanPressureRise) {
+                CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
+            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialSkewNormal) {
+                CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
+                CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
+                CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
+                CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
+                CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
+                CurveValue = CurveValueNumer / CurveValueDenom;
+            } else if (SELECT_CASE_var == CurveTypeEnum::Sigmoid) {
+                CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
+                CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
+            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola1) {
+                CurveValueNumer = Curve.Coeff1 * V1;
+                CurveValueDenom = Curve.Coeff2 + V1;
+                CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
+            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola2) {
+                CurveValueNumer = Curve.Coeff1 * V1;
+                CurveValueDenom = Curve.Coeff2 + V1;
+                CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
+            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialDecay) {
+                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
+            } else if (SELECT_CASE_var == CurveTypeEnum::DoubleExponentialDecay) {
+                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
+            } else {
+                CurveValue = 0.0;
+            }
+        }
+
+        if (Curve.CurveMinPresent) CurveValue = max(CurveValue, Curve.CurveMin);
+        if (Curve.CurveMaxPresent) CurveValue = min(CurveValue, Curve.CurveMax);
+
+        return CurveValue;
+    }
+
+    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                   int const CurveIndex,            // index of curve in curve array
+                                   Real64 const Var1,               // 1st independent variable
+                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
+                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
+                                   Optional<Real64 const> Var4 = _, // 4th independent variable
+                                   Optional<Real64 const> Var5 = _, // 5th independent variable
+                                   Optional<Real64 const> Var6 = _  // 6th independent variable
+    )
+    {
+        // TODO: Generalize for N-dims
+        Real64 var = Var1;
+        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
+        std::vector<double> target{var};
+        if (present(Var2)) {
+            var = Var2;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var2Max), state.dataCurveManager->PerfCurve(CurveIndex).Var2Min);
+            target.push_back(var);
+        }
+        if (present(Var3)) {
+            var = Var3;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var3Max), state.dataCurveManager->PerfCurve(CurveIndex).Var3Min);
+            target.push_back(var);
+        }
+        if (present(Var4)) {
+            var = Var4;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var4Max), state.dataCurveManager->PerfCurve(CurveIndex).Var4Min);
+            target.push_back(var);
+        }
+        if (present(Var5)) {
+            var = Var5;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var5Max), state.dataCurveManager->PerfCurve(CurveIndex).Var5Min);
+            target.push_back(var);
+        }
+        if (present(Var6)) {
+            var = Var6;
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var6Max), state.dataCurveManager->PerfCurve(CurveIndex).Var6Min);
+            target.push_back(var);
+        }
+
+        std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(
+            state.dataCurveManager->PerfCurve(CurveIndex).TableIndex, state.dataCurveManager->PerfCurve(CurveIndex).GridValueIndex, target);
+
+        if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMinPresent)
+            TableValue = max(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMin);
+        if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMaxPresent)
+            TableValue = min(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMax);
+
+        return TableValue;
+    }
+
     Real64 CurveValue(EnergyPlusData &state,
                       int const CurveIndex,        // index of curve in curve array
                       Real64 const Var1,           // 1st independent variable
@@ -237,6 +414,78 @@ namespace CurveManager {
         if (GetInputErrorsFound) {
             ShowFatalError(state, "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination.");
         }
+    }
+
+    bool IsCurveInputTypeValid(std::string const &InInputType) // index of curve in curve array
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jason Glazer
+        //       DATE WRITTEN   Oct 2009
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns true if the input unit type is valid
+
+        // Return value
+        bool IsCurveInputTypeValid;
+
+        if (len(InInputType) > 0) {
+            if (UtilityRoutines::SameString(InInputType, "DIMENSIONLESS")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "TEMPERATURE")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "PRESSURE")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "VOLUMETRICFLOW")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "MASSFLOW")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "POWER")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "DISTANCE")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "WAVELENGTH")) {
+                IsCurveInputTypeValid = true;
+            } else if (UtilityRoutines::SameString(InInputType, "ANGLE")) {
+                IsCurveInputTypeValid = true;
+            } else {
+                IsCurveInputTypeValid = false;
+            }
+        } else {
+            IsCurveInputTypeValid = true; // if not used it is valid
+        }
+        return IsCurveInputTypeValid;
+    }
+
+    bool IsCurveOutputTypeValid(std::string const &InOutputType) // index of curve in curve array
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jason Glazer
+        //       DATE WRITTEN   Oct 2009
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns true if the output unit type is valid
+
+        // Return value
+        bool IsCurveOutputTypeValid;
+
+        if (UtilityRoutines::SameString(InOutputType, "DIMENSIONLESS")) {
+            IsCurveOutputTypeValid = true;
+        } else if (UtilityRoutines::SameString(InOutputType, "PRESSURE")) {
+            IsCurveOutputTypeValid = true;
+        } else if (UtilityRoutines::SameString(InOutputType, "TEMPERATURE")) {
+            IsCurveOutputTypeValid = true;
+        } else if (UtilityRoutines::SameString(InOutputType, "CAPACITY")) {
+            IsCurveOutputTypeValid = true;
+        } else if (UtilityRoutines::SameString(InOutputType, "POWER")) {
+            IsCurveOutputTypeValid = true;
+        } else {
+            IsCurveOutputTypeValid = false;
+        }
+        return IsCurveOutputTypeValid;
     }
 
     void GetCurveInputData(EnergyPlusData &state, bool &ErrorsFound)
@@ -2551,255 +2800,6 @@ namespace CurveManager {
         }
     }
 
-    Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int const CurveIndex,        // index of curve in curve array
-                                  Real64 const Var1,           // 1st independent variable
-                                  Optional<Real64 const> Var2, // 2nd independent variable
-                                  Optional<Real64 const> Var3, // 3rd independent variable
-                                  Optional<Real64 const> Var4, // 4th independent variable
-                                  Optional<Real64 const> Var5  // 5th independent variable
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       Lixing Gu, July 2006; B. Griffith July 2006
-        //                      22Aug2010 Craig Wray, added new curves for fan component model:
-        //                          FanPressureRise, ExponentialSkewNormal, Sigmoid, RectangularHyperbola1,
-        //                          RectangularHyperbola2, ExponentialDecay
-
-        //       RE-ENGINEERED  Autodesk: Performance tuning
-
-        // PURPOSE OF THIS FUNCTION:
-        // Given the curve index and the values of 1 or 2 independent variables,
-        // returns the value of an equipment performance curve.
-
-        // Return value
-        Real64 CurveValue;
-
-        static Real64 const sqrt_2_inv(1.0 / std::sqrt(2.0));
-
-        Real64 CoeffZ1;         // Coefficient Z1 in exponential skew normal curve
-        Real64 CoeffZ2;         // Coefficient Z2 in exponential skew normal curve
-        Real64 CoeffZ3;         // Coefficient Z3 in exponential skew normal curve
-        Real64 CurveValueNumer; // Numerator in in exponential skew normal curve
-        Real64 CurveValueDenom; // Numerator in in exponential skew normal curve
-        Real64 CurveValueExp;   // Exponential term in sigmoid curve
-        auto const &Curve(state.dataCurveManager->PerfCurve(CurveIndex));
-
-        Real64 const V1(max(min(Var1, Curve.Var1Max), Curve.Var1Min));                        // 1st independent variable after limits imposed
-        Real64 const V2(Var2.present() ? max(min(Var2, Curve.Var2Max), Curve.Var2Min) : 0.0); // 2nd independent variable after limits imposed
-        Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
-        Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
-        Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-
-        {
-            auto const SELECT_CASE_var(Curve.CurveType);
-            if (SELECT_CASE_var == CurveTypeEnum::Linear) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Quadratic) {
-                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
-            } else if (SELECT_CASE_var == CurveTypeEnum::QuadLinear) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
-            } else if (SELECT_CASE_var == CurveTypeEnum::QuintLinear) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Cubic) {
-                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
-            } else if (SELECT_CASE_var == CurveTypeEnum::Quartic) {
-                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
-            } else if (SELECT_CASE_var == CurveTypeEnum::BiQuadratic) {
-                CurveValue =
-                    Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == CurveTypeEnum::QuadraticLinear) {
-                CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::CubicLinear) {
-                CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::BiCubic) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
-                             V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
-                             V1 * V2 * V2 * Curve.Coeff10;
-            } else if (SELECT_CASE_var == CurveTypeEnum::ChillerPartLoadWithLift) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
-                             Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
-                             Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::TriQuadratic) {
-                auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
-                auto const V1s(V1 * V1);
-                auto const V2s(V2 * V2);
-                auto const V3s(V3 * V3);
-                CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s +
-                             Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s +
-                             Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 +
-                             Tri2ndOrder.CoeffA11 * V1s * V3s + Tri2ndOrder.CoeffA12 * V1 * V3 + Tri2ndOrder.CoeffA13 * V1 * V3s +
-                             Tri2ndOrder.CoeffA14 * V1s * V3 + Tri2ndOrder.CoeffA15 * V2s * V3s + Tri2ndOrder.CoeffA16 * V2 * V3 +
-                             Tri2ndOrder.CoeffA17 * V2 * V3s + Tri2ndOrder.CoeffA18 * V2s * V3 + Tri2ndOrder.CoeffA19 * V1s * V2s * V3s +
-                             Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
-                             Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
-                             Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Exponent) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
-            } else if (SELECT_CASE_var == CurveTypeEnum::FanPressureRise) {
-                CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialSkewNormal) {
-                CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
-                CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
-                CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
-                CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
-                CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
-                CurveValue = CurveValueNumer / CurveValueDenom;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Sigmoid) {
-                CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
-            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola1) {
-                CurveValueNumer = Curve.Coeff1 * V1;
-                CurveValueDenom = Curve.Coeff2 + V1;
-                CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
-            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola2) {
-                CurveValueNumer = Curve.Coeff1 * V1;
-                CurveValueDenom = Curve.Coeff2 + V1;
-                CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialDecay) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == CurveTypeEnum::DoubleExponentialDecay) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
-            } else {
-                CurveValue = 0.0;
-            }
-        }
-
-        if (Curve.CurveMinPresent) CurveValue = max(CurveValue, Curve.CurveMin);
-        if (Curve.CurveMaxPresent) CurveValue = min(CurveValue, Curve.CurveMax);
-
-        return CurveValue;
-    }
-
-    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int const CurveIndex,        // index of curve in curve array
-                                   Real64 const Var1,           // 1st independent variable
-                                   Optional<Real64 const> Var2, // 2nd independent variable
-                                   Optional<Real64 const> Var3, // 3rd independent variable
-                                   Optional<Real64 const> Var4, // 4th independent variable
-                                   Optional<Real64 const> Var5, // 5th independent variable
-                                   Optional<Real64 const> Var6  // 6th independent variable
-    )
-    {
-        // TODO: Generalize for N-dims
-        Real64 var = Var1;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
-        std::vector<double> target{var};
-        if (present(Var2)) {
-            var = Var2;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var2Max), state.dataCurveManager->PerfCurve(CurveIndex).Var2Min);
-            target.push_back(var);
-        }
-        if (present(Var3)) {
-            var = Var3;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var3Max), state.dataCurveManager->PerfCurve(CurveIndex).Var3Min);
-            target.push_back(var);
-        }
-        if (present(Var4)) {
-            var = Var4;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var4Max), state.dataCurveManager->PerfCurve(CurveIndex).Var4Min);
-            target.push_back(var);
-        }
-        if (present(Var5)) {
-            var = Var5;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var5Max), state.dataCurveManager->PerfCurve(CurveIndex).Var5Min);
-            target.push_back(var);
-        }
-        if (present(Var6)) {
-            var = Var6;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var6Max), state.dataCurveManager->PerfCurve(CurveIndex).Var6Min);
-            target.push_back(var);
-        }
-
-        std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
-        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
-        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(
-            state.dataCurveManager->PerfCurve(CurveIndex).TableIndex, state.dataCurveManager->PerfCurve(CurveIndex).GridValueIndex, target);
-
-        if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMinPresent)
-            TableValue = max(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMin);
-        if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMaxPresent)
-            TableValue = min(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMax);
-
-        return TableValue;
-    }
-
-    bool IsCurveInputTypeValid(std::string const &InInputType) // index of curve in curve array
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   Oct 2009
-        //       MODIFIED
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns true if the input unit type is valid
-
-        // Return value
-        bool IsCurveInputTypeValid;
-
-        if (len(InInputType) > 0) {
-            if (UtilityRoutines::SameString(InInputType, "DIMENSIONLESS")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "TEMPERATURE")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "PRESSURE")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "VOLUMETRICFLOW")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "MASSFLOW")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "POWER")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "DISTANCE")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "WAVELENGTH")) {
-                IsCurveInputTypeValid = true;
-            } else if (UtilityRoutines::SameString(InInputType, "ANGLE")) {
-                IsCurveInputTypeValid = true;
-            } else {
-                IsCurveInputTypeValid = false;
-            }
-        } else {
-            IsCurveInputTypeValid = true; // if not used it is valid
-        }
-        return IsCurveInputTypeValid;
-    }
-
-    bool IsCurveOutputTypeValid(std::string const &InOutputType) // index of curve in curve array
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   Oct 2009
-        //       MODIFIED
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns true if the output unit type is valid
-
-        // Return value
-        bool IsCurveOutputTypeValid;
-
-        if (UtilityRoutines::SameString(InOutputType, "DIMENSIONLESS")) {
-            IsCurveOutputTypeValid = true;
-        } else if (UtilityRoutines::SameString(InOutputType, "PRESSURE")) {
-            IsCurveOutputTypeValid = true;
-        } else if (UtilityRoutines::SameString(InOutputType, "TEMPERATURE")) {
-            IsCurveOutputTypeValid = true;
-        } else if (UtilityRoutines::SameString(InOutputType, "CAPACITY")) {
-            IsCurveOutputTypeValid = true;
-        } else if (UtilityRoutines::SameString(InOutputType, "POWER")) {
-            IsCurveOutputTypeValid = true;
-        } else {
-            IsCurveOutputTypeValid = false;
-        }
-        return IsCurveOutputTypeValid;
-    }
-
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
                         std::vector<int> validDims,
@@ -2851,6 +2851,73 @@ namespace CurveManager {
             GetCurveName = "";
         }
         return GetCurveName;
+    }
+
+    void GetPressureSystemInput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   August 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Currently it just reads the input for pressure curve objects
+
+        // METHODOLOGY EMPLOYED:
+        // General EnergyPlus Methodology
+
+        // Using/Aliasing
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        constexpr auto CurveObjectName = "Curve:Functional:PressureDrop";
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NumPressure;
+        Array1D_string Alphas(1);   // Alpha items for object
+        Array1D<Real64> Numbers(5); // Numeric items for object
+        int NumAlphas;              // Number of Alphas for each GetObjectItem call
+        int NumNumbers;             // Number of Numbers for each GetObjectItem call
+        int IOStatus;               // Used in GetObjectItem
+        bool ErrsFound(false);      // Set to true if errors in input, fatal at end of routine
+        int CurveNum;
+
+        NumPressure = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurveObjectName);
+        state.dataBranchAirLoopPlant->PressureCurve.allocate(NumPressure);
+        for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurveObjectName,
+                                                                     CurveNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, state.dataIPShortCut->cAlphaFieldNames(1), ErrsFound);
+            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).Name = Alphas(1);
+            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivDiameter = Numbers(1);
+            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
+            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivLength = Numbers(3);
+            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivRoughness = Numbers(4);
+            if (NumNumbers > 4 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
+                if (Numbers(5) != 0.0) {
+                    state.dataBranchAirLoopPlant->PressureCurve(CurveNum).ConstantFPresent = true;
+                    state.dataBranchAirLoopPlant->PressureCurve(CurveNum).ConstantF = Numbers(5);
+                }
+            }
+        }
+
+        state.dataBranchAirLoopPlant->NumPressureCurves = NumPressure;
+
+        if (ErrsFound) {
+            ShowFatalError(state, "GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination.");
+        }
     }
 
     int GetCurveIndex(EnergyPlusData &state, std::string const &CurveName) // name of the curve
@@ -3000,73 +3067,6 @@ namespace CurveManager {
         }
     }
 
-    void GetPressureSystemInput(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   August 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Currently it just reads the input for pressure curve objects
-
-        // METHODOLOGY EMPLOYED:
-        // General EnergyPlus Methodology
-
-        // Using/Aliasing
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto CurveObjectName = "Curve:Functional:PressureDrop";
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumPressure;
-        Array1D_string Alphas(1);   // Alpha items for object
-        Array1D<Real64> Numbers(5); // Numeric items for object
-        int NumAlphas;              // Number of Alphas for each GetObjectItem call
-        int NumNumbers;             // Number of Numbers for each GetObjectItem call
-        int IOStatus;               // Used in GetObjectItem
-        bool ErrsFound(false);      // Set to true if errors in input, fatal at end of routine
-        int CurveNum;
-
-        NumPressure = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurveObjectName);
-        state.dataBranchAirLoopPlant->PressureCurve.allocate(NumPressure);
-        for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurveObjectName,
-                                                                     CurveNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(
-                state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, state.dataIPShortCut->cAlphaFieldNames(1), ErrsFound);
-            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).Name = Alphas(1);
-            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivDiameter = Numbers(1);
-            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
-            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivLength = Numbers(3);
-            state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivRoughness = Numbers(4);
-            if (NumNumbers > 4 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
-                if (Numbers(5) != 0.0) {
-                    state.dataBranchAirLoopPlant->PressureCurve(CurveNum).ConstantFPresent = true;
-                    state.dataBranchAirLoopPlant->PressureCurve(CurveNum).ConstantF = Numbers(5);
-                }
-            }
-        }
-
-        state.dataBranchAirLoopPlant->NumPressureCurves = NumPressure;
-
-        if (ErrsFound) {
-            ShowFatalError(state, "GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination.");
-        }
-    }
-
     void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
                                       std::string const &PressureCurveName, // name of the curve
                                       DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
@@ -3154,6 +3154,71 @@ namespace CurveManager {
         PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Error;
     }
 
+    Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 const ReynoldsNumber, Real64 const RoughnessRatio)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   August 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This will evaluate the moody friction factor based on Reynolds number and roughness ratio
+
+        // METHODOLOGY EMPLOYED:
+        // General empirical correlations for friction factor based on Moody Chart data
+
+        // REFERENCES:
+        // Haaland, SE (1983). "Simple and Explicit Formulas for the Friction Factor in Turbulent Flow".
+        //   Trans. ASIVIE, J. of Fluids Engineering 103: 89-90.
+
+        // Using/Aliasing
+
+        // Return value
+        Real64 CalculateMoodyFrictionFactor;
+
+        Real64 Term1;
+        Real64 Term2;
+        Real64 Term3;
+        std::string RR;
+        std::string Re;
+
+        // Check for no flow before calculating values
+        if (ReynoldsNumber == 0.0) {
+            CalculateMoodyFrictionFactor = 0.0;
+            return CalculateMoodyFrictionFactor;
+        }
+
+        // Check for no roughness also here
+        if (RoughnessRatio == 0.0) {
+            CalculateMoodyFrictionFactor = 0.0;
+            return CalculateMoodyFrictionFactor;
+        }
+
+        // Calculate the friction factor
+        Term1 = std::pow(RoughnessRatio / 3.7, 1.11);
+        Term2 = 6.9 / ReynoldsNumber;
+        Term3 = -1.8 * std::log10(Term1 + Term2);
+        if (Term3 != 0.0) {
+            CalculateMoodyFrictionFactor = std::pow(Term3, -2.0);
+        } else {
+            if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
+                RR = format("{:.7R}", RoughnessRatio);
+                Re = format("{:.1R}", ReynoldsNumber);
+                ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
+                ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
+                ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
+                ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
+                ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
+                state.dataCurveManager->FrictionFactorErrorHasOccurred = true;
+            }
+            CalculateMoodyFrictionFactor = 0.04;
+        }
+
+        return CalculateMoodyFrictionFactor;
+    }
+
     Real64
     PressureCurveValue(EnergyPlusData &state, int const PressureCurveIndex, Real64 const MassFlow, Real64 const Density, Real64 const Viscosity)
     {
@@ -3230,71 +3295,6 @@ namespace CurveManager {
         state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).CurveOutput = PressureCurveValue;
 
         return PressureCurveValue;
-    }
-
-    Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 const ReynoldsNumber, Real64 const RoughnessRatio)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   August 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This will evaluate the moody friction factor based on Reynolds number and roughness ratio
-
-        // METHODOLOGY EMPLOYED:
-        // General empirical correlations for friction factor based on Moody Chart data
-
-        // REFERENCES:
-        // Haaland, SE (1983). "Simple and Explicit Formulas for the Friction Factor in Turbulent Flow".
-        //   Trans. ASIVIE, J. of Fluids Engineering 103: 89-90.
-
-        // Using/Aliasing
-
-        // Return value
-        Real64 CalculateMoodyFrictionFactor;
-
-        Real64 Term1;
-        Real64 Term2;
-        Real64 Term3;
-        std::string RR;
-        std::string Re;
-
-        // Check for no flow before calculating values
-        if (ReynoldsNumber == 0.0) {
-            CalculateMoodyFrictionFactor = 0.0;
-            return CalculateMoodyFrictionFactor;
-        }
-
-        // Check for no roughness also here
-        if (RoughnessRatio == 0.0) {
-            CalculateMoodyFrictionFactor = 0.0;
-            return CalculateMoodyFrictionFactor;
-        }
-
-        // Calculate the friction factor
-        Term1 = std::pow(RoughnessRatio / 3.7, 1.11);
-        Term2 = 6.9 / ReynoldsNumber;
-        Term3 = -1.8 * std::log10(Term1 + Term2);
-        if (Term3 != 0.0) {
-            CalculateMoodyFrictionFactor = std::pow(Term3, -2.0);
-        } else {
-            if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
-                RR = format("{:.7R}", RoughnessRatio);
-                Re = format("{:.1R}", ReynoldsNumber);
-                ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
-                ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
-                ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
-                ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
-                ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
-                state.dataCurveManager->FrictionFactorErrorHasOccurred = true;
-            }
-            CalculateMoodyFrictionFactor = 0.04;
-        }
-
-        return CalculateMoodyFrictionFactor;
     }
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,

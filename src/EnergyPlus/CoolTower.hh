@@ -138,14 +138,6 @@ namespace CoolTower {
 
     void ManageCoolTower(EnergyPlusData &state);
 
-    void GetCoolTower(EnergyPlusData &state);
-
-    void CalcCoolTower(EnergyPlusData &state);
-
-    void UpdateCoolTower(EnergyPlusData &state);
-
-    void ReportCoolTower(EnergyPlusData &state);
-
 } // namespace CoolTower
 
 struct CoolTowerData : BaseGlobalStruct
