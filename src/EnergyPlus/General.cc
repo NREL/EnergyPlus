@@ -398,67 +398,39 @@ void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
     }
 }
 
-void ProcessDateString(EnergyPlusData &state,
-                       std::string const &String,
-                       int &PMonth,
-                       int &PDay,
-                       int &PWeekDay,
-                       WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
-                       bool &ErrorsFound,
-                       Optional_int PYear)
+void ValidateMonthDay(EnergyPlusData &state,
+                      std::string const &String, // REAL(r64) string being processed
+                      int const Day,
+                      int const Month,
+                      bool &ErrorsFound)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   December 1999
+    //       DATE WRITTEN   August 2000
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine will process a date from a string and determine
-    // the proper month and day for that date string.
+    // This subroutine validates a potential Day, Month values, produces an error
+    // message when not valid, and sets error flag.
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static Array1D_int const EndMonthDay(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FstNum{};
-    bool errFlag{};
-    int NumTokens{};
-    int TokenDay{};
-    int TokenMonth{};
-    int TokenWeekday{};
+    bool InternalError;
 
-    FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-    DateType = WeatherManager::DateType::InvalidDate;
-    if (!errFlag) {
-        // Entered single number, do inverse JDay
-        if (FstNum == 0) {
-            PMonth = 0;
-            PDay = 0;
-            DateType = WeatherManager::DateType::MonthDay;
-        } else if (FstNum < 0 || FstNum > 366) {
-            ShowSevereError(state, "Invalid Julian date Entered=" + String);
-            ErrorsFound = true;
-        } else {
-            InvOrdinalDay(FstNum, PMonth, PDay, 0);
-            DateType = WeatherManager::DateType::LastDayInMonth;
-        }
+    InternalError = false;
+    if (Month < 1 || Month > 12) InternalError = true;
+    if (!InternalError) {
+        if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
+    }
+    if (InternalError) {
+        ShowSevereError(state, "Invalid Month Day date format=" + String);
+        ErrorsFound = true;
     } else {
-        // Error when processing as number, try x/x
-        if (!present(PYear)) {
-            DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
-        } else {
-            int TokenYear = 0;
-            DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
-            PYear = TokenYear;
-        }
-        if (DateType == WeatherManager::DateType::MonthDay) {
-            PDay = TokenDay;
-            PMonth = TokenMonth;
-        } else if (DateType == WeatherManager::DateType::NthDayInMonth || DateType == WeatherManager::DateType::LastDayInMonth) {
-            // interpret as TokenDay TokenWeekday in TokenMonth
-            PDay = TokenDay;
-            PMonth = TokenMonth;
-            PWeekDay = TokenWeekday;
-        }
+        ErrorsFound = false;
     }
 }
 
@@ -470,7 +442,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                          int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
                          WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                          bool &ErrorsFound,                  // Set to true if cannot process this string as a date
-                         Optional_int TokenYear              // Value of Year if one appears to be present and this argument is present
+                         Optional_int TokenYear = _          // Value of Year if one appears to be present and this argument is present
 )
 {
 
@@ -663,39 +635,67 @@ void DetermineDateTokens(EnergyPlusData &state,
     }
 }
 
-void ValidateMonthDay(EnergyPlusData &state,
-                      std::string const &String, // REAL(r64) string being processed
-                      int const Day,
-                      int const Month,
-                      bool &ErrorsFound)
+void ProcessDateString(EnergyPlusData &state,
+                       std::string const &String,
+                       int &PMonth,
+                       int &PDay,
+                       int &PWeekDay,
+                       WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                       bool &ErrorsFound,
+                       Optional_int PYear)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   August 2000
+    //       DATE WRITTEN   December 1999
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine validates a potential Day, Month values, produces an error
-    // message when not valid, and sets error flag.
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_int const EndMonthDay(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+    // This subroutine will process a date from a string and determine
+    // the proper month and day for that date string.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool InternalError;
+    int FstNum{};
+    bool errFlag{};
+    int NumTokens{};
+    int TokenDay{};
+    int TokenMonth{};
+    int TokenWeekday{};
 
-    InternalError = false;
-    if (Month < 1 || Month > 12) InternalError = true;
-    if (!InternalError) {
-        if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
-    }
-    if (InternalError) {
-        ShowSevereError(state, "Invalid Month Day date format=" + String);
-        ErrorsFound = true;
+    FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
+    DateType = WeatherManager::DateType::InvalidDate;
+    if (!errFlag) {
+        // Entered single number, do inverse JDay
+        if (FstNum == 0) {
+            PMonth = 0;
+            PDay = 0;
+            DateType = WeatherManager::DateType::MonthDay;
+        } else if (FstNum < 0 || FstNum > 366) {
+            ShowSevereError(state, "Invalid Julian date Entered=" + String);
+            ErrorsFound = true;
+        } else {
+            InvOrdinalDay(FstNum, PMonth, PDay, 0);
+            DateType = WeatherManager::DateType::LastDayInMonth;
+        }
     } else {
-        ErrorsFound = false;
+        // Error when processing as number, try x/x
+        if (!present(PYear)) {
+            DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
+        } else {
+            int TokenYear = 0;
+            DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
+            PYear = TokenYear;
+        }
+        if (DateType == WeatherManager::DateType::MonthDay) {
+            PDay = TokenDay;
+            PMonth = TokenMonth;
+        } else if (DateType == WeatherManager::DateType::NthDayInMonth || DateType == WeatherManager::DateType::LastDayInMonth) {
+            // interpret as TokenDay TokenWeekday in TokenMonth
+            PDay = TokenDay;
+            PMonth = TokenMonth;
+            PWeekDay = TokenWeekday;
+        }
     }
 }
 

@@ -695,285 +695,124 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
     TankOutletTemp = TankAverageTemp;
 }
 
-void UpdateCommonPipe(
-    EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, DataPlant::iCommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+void SetupCommonPipes(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Rick Strand
-    //       DATE WRITTEN   September 2001
-    //       MODIFIED       Simon Rees, July 2007
-    //                      Brent Griffith, Feb. 2010, add LoopNum arg
-    //       RE-ENGINEERED  Brent Griffith, Sept 2010, generalize for both loop sides
-    //                                           add pump heat from other loop
-    //                      B.Griffith and L.Gu, Oct 2011, solve via analytical soln, use average over timestep
+    //       AUTHOR         B. Griffith
+    //       DATE WRITTEN   Jan. 2010
+    //       MODIFIED       B. Griffith Oct. 2011
+    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine calculates the new loop side inlet temperature
-    // based on the previous temperature of the mixed tank, mass flow rate and the new
-    // outlet temperature on the supply side.  The temperature does not
-    // pass directly across because the loop has some capacitance. It is
-    // called separately but used for both supply-to-demand, and demand-to-supply
-
-    // METHODOLOGY EMPLOYED:
-    // This uses a analytical solution for changes in the
-    // fluid loop temperature.  The user defines some volume of fluid
-    // for the loop which gets converted to a fixed amount of mass.
-    // The loop side inlet node is modeled as the outlet of a fully mixed
-    // tank. Note that this routine is called repeatedly to re calculate
-    // loop capacitance based on current plant conditions
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using DataPlant::DemandSide;
-    using FluidProperties::GetSpecificHeatGlycol;
-
-    // Locals
-    // SUBROUTINE ARGUMENTS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("UpdateCommonPipe");
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int TankOutletLoopSide;    // inlet loopsidenumber
-    int TankInletNode;         // inlet loop side outlet node
-    int TankOutletNode;        // inlet loop side outlet node
-    Real64 TankInletTemp;      // temporary variable
-    Real64 LastTankOutletTemp; // temporary variable
-    Real64 Cp;                 // specific heat
-    Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
-
-    Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
-    Real64 TimeStepSeconds;
-    Real64 MassFlowRate;
-    Real64 PumpHeat;
-    Real64 ThisTankMass;
-    Real64 TankFinalTemp;
-    Real64 TankAverageTemp;
-
-    // find tank inlet and outlet nodes
-    TankOutletLoopSide = 3 - TankInletLoopSide;
-    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
-    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
-
-    TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
-
-    if (TankInletLoopSide == DataPlant::DemandSide) {
-        // for common pipe loops, assume 75% of plant loop volume is on the demand side
-        FracTotLoopMass = 0.25;
-    } else {
-        FracTotLoopMass = 0.75;
-    }
-
-    // This needs to be based on time to deal with system downstepping and repeated timesteps
-    TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
-            state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
-    }
-
-    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
-
-    // calculate the specific heat for the capacitance calculation
-    Cp = GetSpecificHeatGlycol(
-        state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LastTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-
-    // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
-
-    // calculate new loop inlet temperature.  The calculation is a simple 'tank' (thermal capacitance) calculation that includes:
-    //--half of loop mass.  The other half is accounted for at the other half loop interface
-    //--pump heat.  Pump heat for a single loop setpoint with pumps only on the supply side is added at the supply side inlet.
-    // Pump heat for a dual setpoint loop is added to each loop side inlet
-    // The previous inlet side temp,'ThisLoopSideTankOutletTemp' is used to prevent accumulation of pump heat during iterations.
-    // The placement of the 'tank' for common pipes is *after* the outlet node and *before* the flow split or flow mixing.
-    // This requires no logical check in the code since for purposes of temperature calculations, it is identical to the
-    // no common pipe case.
-    // calculation is separated because for common pipe, a different split for mass fraction is applied
-    // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-    TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
-    MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
-    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
-    ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
-
-    if (ThisTankMass <= 0.0) { // no mass, no plant loop volume
-        if (MassFlowRate > 0.0) {
-            TankFinalTemp = TankInletTemp + PumpHeat / (MassFlowRate * Cp);
-            TankAverageTemp = (TankFinalTemp + LastTankOutletTemp) / 2.0;
-        } else {
-            TankFinalTemp = LastTankOutletTemp;
-            TankAverageTemp = LastTankOutletTemp;
-        }
-
-    } else { // tank has mass
-        if (MassFlowRate > 0.0) {
-            TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds) +
-                            (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
-            TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
-                                   (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                   (1.0 - std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)) / TimeStepSeconds +
-                               (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
-        } else {
-
-            TankFinalTemp = PumpHeat / (ThisTankMass * Cp) * TimeStepSeconds + LastTankOutletTemp;
-            TankAverageTemp = (TankFinalTemp + LastTankOutletTemp) / 2.0;
-        }
-    }
-    // Common Pipe Simulation
-    if (CommonPipeType == DataPlant::iCommonPipeType::Single) {
-        ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
-        // 2-way (controlled) common pipe simulation
-    } else if (CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
-
-        ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
-        MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
-    }
-
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet = TankFinalTemp;
-
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TankTemp = TankAverageTemp;
-}
-
-void ManageSingleCommonPipe(EnergyPlusData &state,
-                            int const LoopNum,           // plant loop number
-                            int const LoopSide,          // plant loop side number
-                            Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
-                            Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Sankaranarayanan K P
-    //       DATE WRITTEN   November 2006
-    //       MODIFIED       B. Griffith, Jan 2010 clean up setup to allow mixing common pipe modes
-    //                      B. Griffith, Mar 2010 add LoopNum arg and simplify
-    //       RE-ENGINEERED  D. Fisher, Sept. 2010
-    //                      B. Griffith, Oct 2011, major rewrite for plant upgrade
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // To determine the conditions in common pipe viz., the flow flow temperature and direction of flow.
-
-    // METHODOLOGY EMPLOYED:
-    // Determine the flow on both sides of the common pipe. Decide if flow is coming into common pipe
-    // or going out of common pipe. After that determine which interface calls the subroutine, i.e. if
-    // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
-    // accordingly.
+    // collect allocation, outputs, and other set up for common pipes
 
     // Using/Aliasing
     using namespace DataPlant;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS
-    Real64 MdotPri(0.0);      // flow rate on primary side kg/s
-    Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
-    Real64 MdotPriRCLeg(0.0); // flow rate of primary recirculation thru common pipe kg/s
-    Real64 MdotSecRCLeg(0.0); // flow rate of secondary recirculation thru common pipe kg/s
-    Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
-    Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
-    Real64 TempPriOutTankOut(0.0);
-    Real64 TempSecOutTankOut(0.0);
-    int NodeNumPriOut(0);
-    int NodeNumSecOut(0);
-    int NodeNumPriIn(0);
-    int NodeNumSecIn(0);
-    int CPFlowDir; // flow direction in single common pipe
-    Real64 CommonPipeTemp;
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int CurLoopNum; // local do loop counter
 
     auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
-    auto &MyEnvrnFlag(state.dataHVACInterfaceMgr->MyEnvrnFlag_SingleCommonPipe);
 
-    // One time call to set up report variables and set common pipe 'type' flag
-    if (state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe) {
-        if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
-        MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
-        state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe = false;
-    }
+    PlantCommonPipe.allocate(state.dataPlnt->TotNumLoops);
 
-    // fill local node indexes
-    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn;
-    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut;
-    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
-    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumOut;
+    for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
-    if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).Flow = 0.0;
-        PlantCommonPipe(LoopNum).Temp = 0.0;
-        PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
-        MyEnvrnFlag(LoopNum) = false;
-    }
-    if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag(LoopNum) = true;
-    }
+        // reference to easily lookup the first item once
+        auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).TypeOf_Num);
+        auto &first_supply_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).TypeOf_Num);
 
-    // every time inits
-    MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate;
-    MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate;
+        {
+            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
+            if (SELECT_CASE_var == DataPlant::iCommonPipeType::No) {
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::No;
 
-    if (LoopSide == SupplySide) {
-        TempSecOutTankOut = TankOutletTemp;
-        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp;
-    } else {
-        TempPriOutTankOut = TankOutletTemp;
-        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp;
-    }
+            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::Single) { // Uncontrolled ('single') common pipe
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::Single;
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantCommonPipe(CurLoopNum).Flow,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PlantCommonPipe(CurLoopNum).Temp,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Flow Direction Status",
+                                    OutputProcessor::Unit::None,
+                                    PlantCommonPipe(CurLoopNum).FlowDir,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
-    // first do mass balances and find common pipe flow rate and direction
-    if (MdotPri > MdotSec) {
-        MdotPriRCLeg = MdotPri - MdotSec;
-        if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
-            MdotPriRCLeg = 0.0;
-            CPFlowDir = NoRecircFlow;
-        } else {
-            CPFlowDir = PrimaryRecirc;
+                if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
+                    // If/when the model supports variable-pumping primary, this can be removed.
+                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
+                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
+                }
+
+            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Primary Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantCommonPipe(CurLoopNum).PriCPLegFlow,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Secondary Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantCommonPipe(CurLoopNum).SecCPLegFlow,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Primary to Secondary Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantCommonPipe(CurLoopNum).PriToSecFlow,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                SetupOutputVariable(state,
+                                    "Plant Common Pipe Secondary to Primary Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantCommonPipe(CurLoopNum).SecToPriFlow,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+
+                // check type of pump on supply side inlet
+                if (first_supply_component_typenum == TypeOf_PumpConstantSpeed) {
+                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
+                } else if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
+                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
+                    // If/when the model supports variable-pumping primary, this can be removed.
+                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
+                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
+                }
+                // check type of pump on demand side inlet
+                if (first_demand_component_typenum == TypeOf_PumpConstantSpeed) {
+                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
+                } else if (first_demand_component_typenum == TypeOf_PumpVariableSpeed) {
+                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
+                }
+            }
         }
-        MdotSecRCLeg = 0.0;
-        CommonPipeTemp = TempPriOutTankOut;
-    } else if (MdotPri < MdotSec) {
-        MdotSecRCLeg = MdotSec - MdotPri;
-        if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
-            MdotSecRCLeg = 0.0;
-            CPFlowDir = NoRecircFlow;
-        } else {
-            CPFlowDir = SecondaryRecirc;
-        }
-        MdotPriRCLeg = 0.0;
-        CommonPipeTemp = TempSecOutTankOut;
-    } else { // equal
-        MdotPriRCLeg = 0.0;
-        MdotSecRCLeg = 0.0;
-        CPFlowDir = NoRecircFlow;
-        CommonPipeTemp = (TempPriOutTankOut + TempSecOutTankOut) / 2.0;
     }
 
-    // now calculate inlet temps
-
-    if (MdotSec > 0.0) {
-        TempSecInlet = (MdotPri * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut - MdotPriRCLeg * TempPriOutTankOut) / (MdotSec);
-    } else {
-        TempSecInlet = TempPriOutTankOut;
-    }
-    if (MdotPri > 0.0) {
-        TempPriInlet = (MdotSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut - MdotSecRCLeg * TempSecOutTankOut) / (MdotPri);
-    } else {
-        TempPriInlet = TempSecOutTankOut;
-    }
-
-    // Update the Common Pipe Data structure for reporting purposes.
-    PlantCommonPipe(LoopNum).Flow = max(MdotPriRCLeg, MdotSecRCLeg);
-    PlantCommonPipe(LoopNum).Temp = CommonPipeTemp;
-    PlantCommonPipe(LoopNum).FlowDir = CPFlowDir;
-    state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
-    state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
-
-    if (LoopSide == SupplySide) {
-        MixedOutletTemp = TempPriInlet;
-    } else {
-        MixedOutletTemp = TempSecInlet;
-    }
+    state.dataHVACInterfaceMgr->CommonPipeSetupFinished = true;
 }
 
 void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const LoopSide, Real64 const TankOutletTemp)
@@ -1218,124 +1057,285 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const 
     state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
 }
 
-void SetupCommonPipes(EnergyPlusData &state)
+void ManageSingleCommonPipe(EnergyPlusData &state,
+                            int const LoopNum,           // plant loop number
+                            int const LoopSide,          // plant loop side number
+                            Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
+                            Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
+)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Griffith
-    //       DATE WRITTEN   Jan. 2010
-    //       MODIFIED       B. Griffith Oct. 2011
-    //       RE-ENGINEERED  na
+    //       AUTHOR         Sankaranarayanan K P
+    //       DATE WRITTEN   November 2006
+    //       MODIFIED       B. Griffith, Jan 2010 clean up setup to allow mixing common pipe modes
+    //                      B. Griffith, Mar 2010 add LoopNum arg and simplify
+    //       RE-ENGINEERED  D. Fisher, Sept. 2010
+    //                      B. Griffith, Oct 2011, major rewrite for plant upgrade
 
     // PURPOSE OF THIS SUBROUTINE:
-    // collect allocation, outputs, and other set up for common pipes
+    // To determine the conditions in common pipe viz., the flow flow temperature and direction of flow.
+
+    // METHODOLOGY EMPLOYED:
+    // Determine the flow on both sides of the common pipe. Decide if flow is coming into common pipe
+    // or going out of common pipe. After that determine which interface calls the subroutine, i.e. if
+    // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
+    // accordingly.
 
     // Using/Aliasing
     using namespace DataPlant;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CurLoopNum; // local do loop counter
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS
+    Real64 MdotPri(0.0);      // flow rate on primary side kg/s
+    Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
+    Real64 MdotPriRCLeg(0.0); // flow rate of primary recirculation thru common pipe kg/s
+    Real64 MdotSecRCLeg(0.0); // flow rate of secondary recirculation thru common pipe kg/s
+    Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
+    Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
+    Real64 TempPriOutTankOut(0.0);
+    Real64 TempSecOutTankOut(0.0);
+    int NodeNumPriOut(0);
+    int NodeNumSecOut(0);
+    int NodeNumPriIn(0);
+    int NodeNumSecIn(0);
+    int CPFlowDir; // flow direction in single common pipe
+    Real64 CommonPipeTemp;
 
     auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
+    auto &MyEnvrnFlag(state.dataHVACInterfaceMgr->MyEnvrnFlag_SingleCommonPipe);
 
-    PlantCommonPipe.allocate(state.dataPlnt->TotNumLoops);
-
-    for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
-
-        // reference to easily lookup the first item once
-        auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).TypeOf_Num);
-        auto &first_supply_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).TypeOf_Num);
-
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
-            if (SELECT_CASE_var == DataPlant::iCommonPipeType::No) {
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::No;
-
-            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::Single) { // Uncontrolled ('single') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::Single;
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).Flow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Temperature",
-                                    OutputProcessor::Unit::C,
-                                    PlantCommonPipe(CurLoopNum).Temp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Flow Direction Status",
-                                    OutputProcessor::Unit::None,
-                                    PlantCommonPipe(CurLoopNum).FlowDir,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-
-                if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
-                    // If/when the model supports variable-pumping primary, this can be removed.
-                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Primary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).PriCPLegFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Secondary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).SecCPLegFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Primary to Secondary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).PriToSecFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Secondary to Primary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).SecToPriFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-
-                // check type of pump on supply side inlet
-                if (first_supply_component_typenum == TypeOf_PumpConstantSpeed) {
-                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
-                } else if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
-                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
-                    // If/when the model supports variable-pumping primary, this can be removed.
-                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
-                }
-                // check type of pump on demand side inlet
-                if (first_demand_component_typenum == TypeOf_PumpConstantSpeed) {
-                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
-                } else if (first_demand_component_typenum == TypeOf_PumpVariableSpeed) {
-                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
-                }
-            }
-        }
+    // One time call to set up report variables and set common pipe 'type' flag
+    if (state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe) {
+        if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
+        MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
+        state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe = false;
     }
 
-    state.dataHVACInterfaceMgr->CommonPipeSetupFinished = true;
+    // fill local node indexes
+    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn;
+    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut;
+    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
+    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumOut;
+
+    if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
+        PlantCommonPipe(LoopNum).Flow = 0.0;
+        PlantCommonPipe(LoopNum).Temp = 0.0;
+        PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
+        MyEnvrnFlag(LoopNum) = false;
+    }
+    if (!state.dataGlobal->BeginEnvrnFlag) {
+        MyEnvrnFlag(LoopNum) = true;
+    }
+
+    // every time inits
+    MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate;
+    MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate;
+
+    if (LoopSide == SupplySide) {
+        TempSecOutTankOut = TankOutletTemp;
+        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp;
+    } else {
+        TempPriOutTankOut = TankOutletTemp;
+        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp;
+    }
+
+    // first do mass balances and find common pipe flow rate and direction
+    if (MdotPri > MdotSec) {
+        MdotPriRCLeg = MdotPri - MdotSec;
+        if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
+            MdotPriRCLeg = 0.0;
+            CPFlowDir = NoRecircFlow;
+        } else {
+            CPFlowDir = PrimaryRecirc;
+        }
+        MdotSecRCLeg = 0.0;
+        CommonPipeTemp = TempPriOutTankOut;
+    } else if (MdotPri < MdotSec) {
+        MdotSecRCLeg = MdotSec - MdotPri;
+        if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
+            MdotSecRCLeg = 0.0;
+            CPFlowDir = NoRecircFlow;
+        } else {
+            CPFlowDir = SecondaryRecirc;
+        }
+        MdotPriRCLeg = 0.0;
+        CommonPipeTemp = TempSecOutTankOut;
+    } else { // equal
+        MdotPriRCLeg = 0.0;
+        MdotSecRCLeg = 0.0;
+        CPFlowDir = NoRecircFlow;
+        CommonPipeTemp = (TempPriOutTankOut + TempSecOutTankOut) / 2.0;
+    }
+
+    // now calculate inlet temps
+
+    if (MdotSec > 0.0) {
+        TempSecInlet = (MdotPri * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut - MdotPriRCLeg * TempPriOutTankOut) / (MdotSec);
+    } else {
+        TempSecInlet = TempPriOutTankOut;
+    }
+    if (MdotPri > 0.0) {
+        TempPriInlet = (MdotSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut - MdotSecRCLeg * TempSecOutTankOut) / (MdotPri);
+    } else {
+        TempPriInlet = TempSecOutTankOut;
+    }
+
+    // Update the Common Pipe Data structure for reporting purposes.
+    PlantCommonPipe(LoopNum).Flow = max(MdotPriRCLeg, MdotSecRCLeg);
+    PlantCommonPipe(LoopNum).Temp = CommonPipeTemp;
+    PlantCommonPipe(LoopNum).FlowDir = CPFlowDir;
+    state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
+    state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
+
+    if (LoopSide == SupplySide) {
+        MixedOutletTemp = TempPriInlet;
+    } else {
+        MixedOutletTemp = TempSecInlet;
+    }
+}
+
+void UpdateCommonPipe(
+    EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, DataPlant::iCommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   September 2001
+    //       MODIFIED       Simon Rees, July 2007
+    //                      Brent Griffith, Feb. 2010, add LoopNum arg
+    //       RE-ENGINEERED  Brent Griffith, Sept 2010, generalize for both loop sides
+    //                                           add pump heat from other loop
+    //                      B.Griffith and L.Gu, Oct 2011, solve via analytical soln, use average over timestep
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine calculates the new loop side inlet temperature
+    // based on the previous temperature of the mixed tank, mass flow rate and the new
+    // outlet temperature on the supply side.  The temperature does not
+    // pass directly across because the loop has some capacitance. It is
+    // called separately but used for both supply-to-demand, and demand-to-supply
+
+    // METHODOLOGY EMPLOYED:
+    // This uses a analytical solution for changes in the
+    // fluid loop temperature.  The user defines some volume of fluid
+    // for the loop which gets converted to a fixed amount of mass.
+    // The loop side inlet node is modeled as the outlet of a fully mixed
+    // tank. Note that this routine is called repeatedly to re calculate
+    // loop capacitance based on current plant conditions
+
+    // REFERENCES:
+    // na
+
+    // Using/Aliasing
+    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    using DataPlant::DemandSide;
+    using FluidProperties::GetSpecificHeatGlycol;
+
+    // Locals
+    // SUBROUTINE ARGUMENTS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("UpdateCommonPipe");
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int TankOutletLoopSide;    // inlet loopsidenumber
+    int TankInletNode;         // inlet loop side outlet node
+    int TankOutletNode;        // inlet loop side outlet node
+    Real64 TankInletTemp;      // temporary variable
+    Real64 LastTankOutletTemp; // temporary variable
+    Real64 Cp;                 // specific heat
+    Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
+
+    Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
+    Real64 TimeStepSeconds;
+    Real64 MassFlowRate;
+    Real64 PumpHeat;
+    Real64 ThisTankMass;
+    Real64 TankFinalTemp;
+    Real64 TankAverageTemp;
+
+    // find tank inlet and outlet nodes
+    TankOutletLoopSide = 3 - TankInletLoopSide;
+    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
+    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
+
+    TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
+
+    if (TankInletLoopSide == DataPlant::DemandSide) {
+        // for common pipe loops, assume 75% of plant loop volume is on the demand side
+        FracTotLoopMass = 0.25;
+    } else {
+        FracTotLoopMass = 0.75;
+    }
+
+    // This needs to be based on time to deal with system downstepping and repeated timesteps
+    TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
+    }
+
+    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
+
+    // calculate the specific heat for the capacitance calculation
+    Cp = GetSpecificHeatGlycol(
+        state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LastTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+
+    // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
+
+    // calculate new loop inlet temperature.  The calculation is a simple 'tank' (thermal capacitance) calculation that includes:
+    //--half of loop mass.  The other half is accounted for at the other half loop interface
+    //--pump heat.  Pump heat for a single loop setpoint with pumps only on the supply side is added at the supply side inlet.
+    // Pump heat for a dual setpoint loop is added to each loop side inlet
+    // The previous inlet side temp,'ThisLoopSideTankOutletTemp' is used to prevent accumulation of pump heat during iterations.
+    // The placement of the 'tank' for common pipes is *after* the outlet node and *before* the flow split or flow mixing.
+    // This requires no logical check in the code since for purposes of temperature calculations, it is identical to the
+    // no common pipe case.
+    // calculation is separated because for common pipe, a different split for mass fraction is applied
+    // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
+    TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
+    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
+    ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
+
+    if (ThisTankMass <= 0.0) { // no mass, no plant loop volume
+        if (MassFlowRate > 0.0) {
+            TankFinalTemp = TankInletTemp + PumpHeat / (MassFlowRate * Cp);
+            TankAverageTemp = (TankFinalTemp + LastTankOutletTemp) / 2.0;
+        } else {
+            TankFinalTemp = LastTankOutletTemp;
+            TankAverageTemp = LastTankOutletTemp;
+        }
+
+    } else { // tank has mass
+        if (MassFlowRate > 0.0) {
+            TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
+                                std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds) +
+                            (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
+            TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
+                                   (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
+                                   (1.0 - std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)) / TimeStepSeconds +
+                               (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
+        } else {
+
+            TankFinalTemp = PumpHeat / (ThisTankMass * Cp) * TimeStepSeconds + LastTankOutletTemp;
+            TankAverageTemp = (TankFinalTemp + LastTankOutletTemp) / 2.0;
+        }
+    }
+    // Common Pipe Simulation
+    if (CommonPipeType == DataPlant::iCommonPipeType::Single) {
+        ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
+        // 2-way (controlled) common pipe simulation
+    } else if (CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
+
+        ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
+        MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
+    }
+
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet = TankFinalTemp;
+
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TankTemp = TankAverageTemp;
 }
 
 } // namespace EnergyPlus::HVACInterfaceManager

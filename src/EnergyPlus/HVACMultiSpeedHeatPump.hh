@@ -312,12 +312,6 @@ namespace HVACMultiSpeedHeatPump {
                         Real64 &OnOffAirFlowRatio      // Ratio of compressor ON airflow to average airflow over timestep
     );
 
-    //******************************************************************************
-
-    void SizeMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
-
-    //******************************************************************************
-
     void ControlMSHPOutput(EnergyPlusData &state,
                            int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
@@ -332,38 +326,6 @@ namespace HVACMultiSpeedHeatPump {
                            Real64 &SupHeaterLoad          // Supplemental heater load [W]
     );
 
-    void ControlMSHPSupHeater(EnergyPlusData &state,
-                              int const MSHeatPumpNum,       // Unit index of engine driven heat pump
-                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                              int const CompOp,              // compressor operation; 1=on, 0=off
-                              int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
-                              Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                              int const FullOutput,          // unit full output when compressor is operating [W]vvvv
-                              int const SpeedNum,            // Speed number
-                              Real64 SpeedRatio,             // unit speed ratio for DX coils
-                              Real64 PartLoadFrac,           // unit part load fraction
-                              Real64 OnOffAirFlowRatio,      // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad          // Supplemental heater load [W]
-
-    );
-
-    void ControlMSHPOutputEMS(EnergyPlusData &state,
-                              int const MSHeatPumpNum,       // Unit index of engine driven heat pump
-                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                              int const CompOp,              // compressor operation; 1=on, 0=off
-                              int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
-                              Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                              Real64 const SpeedVal,         // continuous speed value
-                              int &SpeedNum,                 // discrete speed level
-                              Real64 &SpeedRatio,            // unit speed ratio for DX coils
-                              Real64 &PartLoadFrac,          // unit part load fraction
-                              Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad          // Supplemental heater load [W]
-
-    );
-
-    //******************************************************************************
-
     void CalcMSHeatPump(EnergyPlusData &state,
                         int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // Flag for 1st HVAC iteration
@@ -377,27 +339,10 @@ namespace HVACMultiSpeedHeatPump {
                         Real64 &SupHeaterLoad          // supplemental heater load (W)
     );
 
-    //******************************************************************************
-
     Real64 MSHPCyclingResidual(EnergyPlusData &state,
                                Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par // par(1) = MSHPNum
     );
-
-    //******************************************************************************
-
-    Real64 MSHPVarSpeedResidual(EnergyPlusData &state,
-                                Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1D<Real64> const &Par // par(1) = MSHPNum
-    );
-
-    //******************************************************************************
-
-    void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
-
-    //******************************************************************************
-
-    void ReportMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
     void MSHPHeatRecovery(EnergyPlusData &state,
                           int const MSHeatPumpNum); // Number of the current electric MSHP being simulated

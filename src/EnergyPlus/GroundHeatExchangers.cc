@@ -126,8 +126,6 @@ constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
 constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
-//******************************************************************************
-
 GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
 {
     // Check for duplicates
@@ -265,8 +263,6 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
         ShowFatalError(state, "Errors found in processing input for " + this->moduleName);
     }
 }
-
-//******************************************************************************
 
 GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
 {
@@ -452,8 +448,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     }
 }
 
-//******************************************************************************
-
 GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
 {
     // Check for duplicates
@@ -472,8 +466,6 @@ GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName
     this->dl_j = 0.0;
 }
 
-//******************************************************************************
-
 GLHEVertArray::GLHEVertArray(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
 {
     // Check for duplicates
@@ -489,8 +481,6 @@ GLHEVertArray::GLHEVertArray(EnergyPlusData &state, std::string const &objName, 
     this->numBHinYDirection = j["number_of_boreholes_in_y_direction"].get<int>();
     this->bhSpacing = j["borehole_spacing"].get<Real64>();
 }
-
-//******************************************************************************
 
 GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
 {
@@ -539,8 +529,6 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     }
 }
 
-//******************************************************************************
-
 GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
 {
 
@@ -577,8 +565,6 @@ GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, 
     this->pipe.innerRadius = this->pipe.innerDia / 2;
 }
 
-//******************************************************************************
-
 std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
@@ -591,8 +577,6 @@ std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string c
 
     return nullptr;
 }
-
-//******************************************************************************
 
 std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string const &objectName)
 {
@@ -607,8 +591,6 @@ std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string c
     return nullptr;
 }
 
-//******************************************************************************
-
 std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
@@ -621,8 +603,6 @@ std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string c
 
     return nullptr;
 }
-
-//******************************************************************************
 
 std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, std::string const &objectName)
 {
@@ -637,7 +617,45 @@ std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, st
     return nullptr;
 }
 
-//******************************************************************************
+void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF)
+{
+    for (auto &thisBH : thisRF->myBorholes) {
+
+        // Using Simpson's rule the number of points (n+1) must be odd, therefore an even number of panels is required
+        // Starting from i = 0 to i <= NumPanels produces an odd number of points
+        constexpr int numPanels_i = 50;
+        constexpr int numPanels_ii = 50;
+        constexpr int numPanels_j = 560;
+
+        thisBH->dl_i = thisBH->props->bhLength / numPanels_i;
+        for (int i = 0; i <= numPanels_i; ++i) {
+            MyCartesian newPoint;
+            newPoint.x = thisBH->xLoc;
+            newPoint.y = thisBH->yLoc;
+            newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_i);
+            thisBH->pointLocations_i.push_back(newPoint);
+        }
+
+        thisBH->dl_ii = thisBH->props->bhLength / numPanels_ii;
+        for (int i = 0; i <= numPanels_ii; ++i) {
+            MyCartesian newPoint;
+            // For case when bh is being compared to itself, shift points by 1 radius in the horizontal plane
+            newPoint.x = thisBH->xLoc + (thisBH->props->bhDiameter / 2.0) / sqrt(2.0);
+            newPoint.y = thisBH->yLoc + (thisBH->props->bhDiameter / 2.0) / (-sqrt(2.0));
+            newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_ii);
+            thisBH->pointLocations_ii.push_back(newPoint);
+        }
+
+        thisBH->dl_j = thisBH->props->bhLength / numPanels_j;
+        for (int i = 0; i <= numPanels_j; ++i) {
+            MyCartesian newPoint;
+            newPoint.x = thisBH->xLoc;
+            newPoint.y = thisBH->yLoc;
+            newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_j);
+            thisBH->pointLocations_j.push_back(newPoint);
+        }
+    }
+}
 
 std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorObjectFromArray(EnergyPlusData &state,
                                                                               std::shared_ptr<GLHEVertArray> const &arrayObjectPtr)
@@ -671,8 +689,6 @@ std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorObjectFromArray(En
     state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisRF);
     return thisRF;
 }
-
-//******************************************************************************
 
 std::shared_ptr<GLHEResponseFactors>
 BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect)
@@ -747,56 +763,10 @@ BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector
     return thisRF;
 }
 
-//******************************************************************************
-
-void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF)
-{
-    for (auto &thisBH : thisRF->myBorholes) {
-
-        // Using Simpson's rule the number of points (n+1) must be odd, therefore an even number of panels is required
-        // Starting from i = 0 to i <= NumPanels produces an odd number of points
-        constexpr int numPanels_i = 50;
-        constexpr int numPanels_ii = 50;
-        constexpr int numPanels_j = 560;
-
-        thisBH->dl_i = thisBH->props->bhLength / numPanels_i;
-        for (int i = 0; i <= numPanels_i; ++i) {
-            MyCartesian newPoint;
-            newPoint.x = thisBH->xLoc;
-            newPoint.y = thisBH->yLoc;
-            newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_i);
-            thisBH->pointLocations_i.push_back(newPoint);
-        }
-
-        thisBH->dl_ii = thisBH->props->bhLength / numPanels_ii;
-        for (int i = 0; i <= numPanels_ii; ++i) {
-            MyCartesian newPoint;
-            // For case when bh is being compared to itself, shift points by 1 radius in the horizontal plane
-            newPoint.x = thisBH->xLoc + (thisBH->props->bhDiameter / 2.0) / sqrt(2.0);
-            newPoint.y = thisBH->yLoc + (thisBH->props->bhDiameter / 2.0) / (-sqrt(2.0));
-            newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_ii);
-            thisBH->pointLocations_ii.push_back(newPoint);
-        }
-
-        thisBH->dl_j = thisBH->props->bhLength / numPanels_j;
-        for (int i = 0; i <= numPanels_j; ++i) {
-            MyCartesian newPoint;
-            newPoint.x = thisBH->xLoc;
-            newPoint.y = thisBH->yLoc;
-            newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_j);
-            thisBH->pointLocations_j.push_back(newPoint);
-        }
-    }
-}
-
-//******************************************************************************
-
 void GLHEBase::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
 {
     this->initGLHESimVars(state);
 }
-
-//******************************************************************************
 
 void GLHEBase::simulate(EnergyPlusData &state,
                         [[maybe_unused]] const PlantLocation &calledFromLocation,
@@ -818,8 +788,6 @@ void GLHEBase::simulate(EnergyPlusData &state,
         this->updateGHX(state);
     }
 }
-
-//******************************************************************************
 
 PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string const &objectName)
 {
@@ -847,8 +815,6 @@ PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, s
     return nullptr;
 }
 
-//******************************************************************************
-
 std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian const &point_j)
 {
     std::vector<Real64> sumVals;
@@ -874,8 +840,6 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
     return retVals;
 }
 
-//******************************************************************************
-
 Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &currTime)
 {
     Real64 pointToPointResponse = erfc(dists[0] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[0];
@@ -883,8 +847,6 @@ Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &cu
 
     return pointToPointResponse - pointToReflectedResponse;
 }
-
-//******************************************************************************
 
 Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
 {
@@ -916,8 +878,6 @@ Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSi
 
     return (bh_j->dl_j / 3.0) * sum_f;
 }
-
-//******************************************************************************
 
 Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
 {
@@ -972,8 +932,6 @@ Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std
     }
 }
 
-//******************************************************************************
-
 void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
 {
     switch (this->gFuncCalcMethod) {
@@ -987,8 +945,6 @@ void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
         assert(false);
     }
 }
-
-//******************************************************************************
 
 void GLHEVert::calcUniformBHWallTempGFunctions(EnergyPlusData &state)
 {
@@ -1012,8 +968,6 @@ void GLHEVert::calcUniformBHWallTempGFunctions(EnergyPlusData &state)
         gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, nSegments, true, state.dataGlobal->numThread);
 }
 
-//******************************************************************************
-
 void GLHEVert::calcGFunctions(EnergyPlusData &state)
 {
 
@@ -1031,8 +985,6 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
         writeGLHECacheToFile(state);
     }
 }
-
-//******************************************************************************
 
 void GLHEVert::setupTimeVectors()
 {
@@ -1075,8 +1027,6 @@ void GLHEVert::setupTimeVectors()
     }
 }
 
-//******************************************************************************
-
 void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
 {
     DisplayString(state, "Initializing GroundHeatExchanger:System: " + this->name);
@@ -1098,8 +1048,6 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
         DisplayString(state, "...progress: " + ss.str() + "%");
     }
 }
-
-//******************************************************************************
 
 void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 {
@@ -1373,8 +1321,6 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     } // end timestep loop
 }
 
-//******************************************************************************
-
 std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
 {
     // from: https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm#C.2B.2B
@@ -1397,8 +1343,6 @@ std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vect
 
     return d;
 }
-
-//******************************************************************************
 
 void GLHEVert::combineShortAndLongTimestepGFunctions()
 {
@@ -1444,8 +1388,6 @@ void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
     }
 }
 
-//******************************************************************************
-
 void GLHEVert::makeThisGLHECacheStruct()
 {
     // For convenience
@@ -1476,8 +1418,6 @@ void GLHEVert::makeThisGLHECacheStruct()
         d_bh["Y-Location"] = thisBH->yLoc;
     }
 }
-
-//******************************************************************************
 
 void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 {
@@ -1510,8 +1450,6 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     }
 }
 
-//******************************************************************************
-
 void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
 {
 
@@ -1533,8 +1471,6 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
     }
     FileSystem::writeFile<FileSystem::FileTypes::GLHE>(state.dataStrGlobals->outputGLHEFilePath, cached_json, 2);
 }
-
-//******************************************************************************
 
 void GLHESlinky::calcGFunctions(EnergyPlusData &state)
 {
@@ -1706,19 +1642,13 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     } // NT time
 }
 
-//******************************************************************************
-
 void GLHESlinky::makeThisGLHECacheStruct()
 {
 }
 
-//******************************************************************************
-
 void GLHESlinky::readCacheFileAndCompareWithThisGLHECache([[maybe_unused]] EnergyPlusData &state)
 {
 }
-
-//******************************************************************************
 
 Real64
 GLHESlinky::nearFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta, Real64 const t)
@@ -1754,8 +1684,6 @@ GLHESlinky::nearFieldResponseFunction(int const m, int const n, int const m1, in
     }
 }
 
-//******************************************************************************
-
 Real64 GLHESlinky::midFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const t)
 {
     // SUBROUTINE INFORMATION:
@@ -1778,8 +1706,6 @@ Real64 GLHESlinky::midFieldResponseFunction(int const m, int const n, int const 
 
     return 4 * pow_2(DataGlobalConstants::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
 }
-
-//******************************************************************************
 
 Real64 GLHESlinky::distance(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta)
 {
@@ -1822,8 +1748,6 @@ Real64 GLHESlinky::distance(int const m, int const n, int const m1, int const n1
     }
 }
 
-//******************************************************************************
-
 Real64 GLHESlinky::distanceToFictRing(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta)
 {
     // SUBROUTINE INFORMATION:
@@ -1856,8 +1780,6 @@ Real64 GLHESlinky::distanceToFictRing(int const m, int const n, int const m1, in
            0.5 * std::sqrt(pow_2(x - xOut) + pow_2(this->Y0(m1) - this->Y0(m)) + pow_2(z - zOut));
 }
 
-//******************************************************************************
-
 Real64 GLHESlinky::distToCenter(int const m, int const n, int const m1, int const n1)
 {
     // SUBROUTINE INFORMATION:
@@ -1871,8 +1793,6 @@ Real64 GLHESlinky::distToCenter(int const m, int const n, int const m1, int cons
 
     return std::sqrt(pow_2(this->X0(n) - this->X0(n1)) + pow_2(this->Y0(m) - this->Y0(m1)));
 }
-
-//******************************************************************************
 
 inline bool GLHEBase::isEven(int const val)
 {
@@ -1891,8 +1811,6 @@ inline bool GLHEBase::isEven(int const val)
         return false;
     }
 }
-
-//******************************************************************************
 
 Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1, Real64 const t, Real64 const eta, Real64 const J0)
 {
@@ -1939,8 +1857,6 @@ Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1
     return (h / 3) * sumIntF;
 }
 
-//******************************************************************************
-
 Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int const n1, Real64 const t, int const I0, int const J0)
 {
     // SUBROUTINE INFORMATION:
@@ -1985,8 +1901,6 @@ Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int co
     return (h / 3) * sumIntF;
 }
 
-//******************************************************************************
-
 void GLHEVert::getAnnualTimeConstant()
 {
     // SUBROUTINE INFORMATION:
@@ -2004,8 +1918,6 @@ void GLHEVert::getAnnualTimeConstant()
     this->timeSSFactor = this->timeSS * 8760.0;
 }
 
-//******************************************************************************
-
 void GLHESlinky::getAnnualTimeConstant()
 {
     // SUBROUTINE INFORMATION:
@@ -2019,8 +1931,6 @@ void GLHESlinky::getAnnualTimeConstant()
 
     this->timeSSFactor = 1.0;
 }
-
-//******************************************************************************
 
 void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
 {
@@ -2327,8 +2237,6 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
     this->aveFluidTemp = fluidAveTemp;
 }
 
-//******************************************************************************
-
 void GLHEBase::updateGHX(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -2377,8 +2285,6 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
         ++this->numErrorCalls;
     }
 }
-
-//******************************************************************************
 
 void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
 {
@@ -2445,8 +2351,6 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
         this->prevHour = state.dataGroundHeatExchanger->locHourOfDay;
     }
 }
-
-//******************************************************************************
 
 void GetGroundHeatExchangerInput(EnergyPlusData &state)
 {
@@ -2607,8 +2511,6 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
     }
 }
 
-//******************************************************************************
-
 void GLHEBase::setupOutput(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
@@ -2662,8 +2564,6 @@ void GLHEBase::setupOutput(EnergyPlusData &state)
                         this->name);
 }
 
-//******************************************************************************
-
 Real64 GLHEVert::calcBHAverageResistance(EnergyPlusData &state)
 {
     // Calculates the average thermal resistance of the borehole using the first-order multipole method.
@@ -2684,8 +2584,6 @@ Real64 GLHEVert::calcBHAverageResistance(EnergyPlusData &state)
 
     return (1 / (4 * DataGlobalConstants::Pi * this->grout.k)) * (beta + final_term_1 - final_term_2);
 }
-
-//******************************************************************************
 
 Real64 GLHEVert::calcBHTotalInternalResistance(EnergyPlusData &state)
 {
@@ -2709,8 +2607,6 @@ Real64 GLHEVert::calcBHTotalInternalResistance(EnergyPlusData &state)
     return (1 / (DataGlobalConstants::Pi * this->grout.k)) * (beta + final_term_1 - final_term_2);
 }
 
-//******************************************************************************
-
 Real64 GLHEVert::calcBHGroutResistance(EnergyPlusData &state)
 {
     // Calculates grout resistance. Use for validation.
@@ -2722,8 +2618,6 @@ Real64 GLHEVert::calcBHGroutResistance(EnergyPlusData &state)
 
     return calcBHAverageResistance(state) - calcPipeResistance(state) / 2.0;
 }
-
-//******************************************************************************
 
 Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
 {
@@ -2751,8 +2645,6 @@ Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
     }
 }
 
-//******************************************************************************
-
 Real64 GLHEVert::calcPipeConductionResistance()
 {
     // Calculates the thermal resistance of a pipe, in [K/(W/m)].
@@ -2762,8 +2654,6 @@ Real64 GLHEVert::calcPipeConductionResistance()
 
     return log(this->pipe.outDia / this->pipe.innerDia) / (2 * DataGlobalConstants::Pi * this->pipe.k);
 }
-
-//******************************************************************************
 
 Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
 {
@@ -2817,8 +2707,6 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     return 1 / (h * DataGlobalConstants::Pi * this->pipe.innerDia);
 }
 
-//******************************************************************************
-
 Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
 {
     // Calculates the friction factor in smooth tubes
@@ -2844,8 +2732,6 @@ Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
     }
 }
 
-//******************************************************************************
-
 Real64 GLHEVert::calcPipeResistance(EnergyPlusData &state)
 {
     // Calculates the combined conduction and convection pipe resistance
@@ -2857,8 +2743,6 @@ Real64 GLHEVert::calcPipeResistance(EnergyPlusData &state)
 
     return calcPipeConductionResistance() + calcPipeConvectionResistance(state);
 }
-
-//******************************************************************************
 
 Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
 {
@@ -2929,8 +2813,6 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
 
     return Rcond + Rconv;
 }
-
-//******************************************************************************
 
 Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
 ) const
@@ -3027,8 +2909,6 @@ Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) 
     }
 }
 
-//******************************************************************************
-
 Real64 GLHESlinky::getGFunc(Real64 const time)
 {
     // SUBROUTINE INFORMATION:
@@ -3045,8 +2925,6 @@ Real64 GLHESlinky::getGFunc(Real64 const time)
 
     return interpGFunc(LNTTS);
 }
-
-//******************************************************************************
 
 Real64 GLHEVert::getGFunc(Real64 const time)
 {
@@ -3070,8 +2948,6 @@ Real64 GLHEVert::getGFunc(Real64 const time)
 
     return gFuncVal;
 }
-
-//******************************************************************************
 
 void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 {
@@ -3123,8 +2999,6 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
 }
 
-//******************************************************************************
-
 void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime)
 {
 
@@ -3153,8 +3027,6 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
     this->prevHour = 1;
 }
 
-//******************************************************************************
-
 void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
@@ -3172,8 +3044,6 @@ void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 void GLHEVert::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
-
-//******************************************************************************
 
 void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 {
@@ -3210,8 +3080,6 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
 }
 
-//******************************************************************************
-
 void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 {
 
@@ -3240,8 +3108,6 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
     this->prevHour = 1;
 }
 
-//******************************************************************************
-
 void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
     using DataPlant::TypeOf_GrndHtExchgSlinky;
@@ -3258,7 +3124,5 @@ void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 void GLHESlinky::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
-
-//******************************************************************************
 
 } // namespace EnergyPlus::GroundHeatExchangers

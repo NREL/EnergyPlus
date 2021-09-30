@@ -98,6 +98,34 @@ namespace HVACHXAssistedCoolingCoil {
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
 
+    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum) // index for HXAssistedCoolingCoil
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Raustad, FSEC
+        //       DATE WRITTEN   Sep 2003
+        //       MODIFIED       R. Raustad, June 2007 now using FullLoadOutletConditions from DX Coil data structure
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //  This subroutine is for initializations of the HXAssistedCoolingCoil components
+
+        // METHODOLOGY EMPLOYED:
+        //  Uses the status flags to trigger initializations.
+
+        // Do these initializations every time
+        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate =
+            state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum).MassFlowRate;
+
+        if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            state.dataDXCoils->DXCoilFullLoadOutAirTemp(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
+            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
+        } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num ==
+                   DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+            //
+        }
+    }
+
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
                                   std::string_view HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,       // FirstHVACIteration flag
@@ -206,7 +234,6 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    // Get Input Section of the Module
     //******************************************************************************
 
     void GetHXAssistedCoolingCoilInput(EnergyPlusData &state)
@@ -881,40 +908,6 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    // End of Get Input subroutines for this Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum) // index for HXAssistedCoolingCoil
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   Sep 2003
-        //       MODIFIED       R. Raustad, June 2007 now using FullLoadOutletConditions from DX Coil data structure
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //  This subroutine is for initializations of the HXAssistedCoolingCoil components
-
-        // METHODOLOGY EMPLOYED:
-        //  Uses the status flags to trigger initializations.
-
-        // Do these initializations every time
-        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate =
-            state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum).MassFlowRate;
-
-        if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            state.dataDXCoils->DXCoilFullLoadOutAirTemp(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
-            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
-        } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num ==
-                   DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-            //
-        }
-    }
-
     // End Initialization Section of the Module
     //******************************************************************************
 
@@ -1118,11 +1111,8 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
-                                            [[maybe_unused]] std::string const &CompType,
-                                            std::string_view CompName,
-                                            Real64 &Value,
-                                            int &CompIndex)
+    void CheckHXAssistedCoolingCoilSchedule(
+        EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:

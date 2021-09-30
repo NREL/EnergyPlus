@@ -3120,11 +3120,7 @@ namespace HeatingCoils {
         }
     }
 
-    void CheckHeatingCoilSchedule(EnergyPlusData &state,
-                                  std::string const &CompType,
-                                  std::string_view CompName,
-                                  Real64 &Value,
-                                  int &CompIndex)
+    void CheckHeatingCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:

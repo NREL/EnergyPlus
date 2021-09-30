@@ -125,48 +125,17 @@ namespace HVACDXHeatPumpSystem {
                              Optional<Real64> QTotOut = _               // the total cooling output of unit
     );
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetDXHeatPumpSystemInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
-
-    // Beginning of Initialization subroutines for the Module
-    // *****************************************************************************
-
-    void InitDXHeatPumpSystem(EnergyPlusData &state,
-                              int const DXSystemNum,                    // number of the current DX Sys being simulated
-                              int const AirLoopNum,                     // number of the current air loop being simulated
-                              Optional_int_const OAUnitNum = _,         // number of the current outdoor air unit being simulated
-                              Optional<Real64 const> OAUCoilOutTemp = _ // the coil inlet temperature of OutdoorAirUnit
-    );
-
-    // End of Initialization subroutines for the Module
-    // *****************************************************************************
-
-    // Beginning of Calculation subroutines for the DXCoolingSystem Module
-    // *****************************************************************************
-
-    void ControlDXHeatingSystem(EnergyPlusData &state,
-                                int const DXSystemNum,        // index to DXSystem
-                                bool const FirstHVACIteration // First HVAC iteration flag
-    );
 
     Real64 DXHeatingCoilResidual(EnergyPlusData &state,
                                  Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
-    //******************************************************************************
-
     Real64 VSCoilCyclingResidual(EnergyPlusData &state,
                                  Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     );
-
-    //******************************************************************************
 
     Real64 VSCoilSpeedResidual(EnergyPlusData &state,
                                Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)

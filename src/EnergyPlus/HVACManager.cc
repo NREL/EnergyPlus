@@ -122,6 +122,89 @@ using namespace DataHVACGlobals;
 using namespace DataLoopNode;
 using namespace DataAirLoop;
 
+void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Apparently someone who doesn't believe in documenting.
+    //       DATE WRITTEN   ???
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // Using/Aliasing
+    using namespace DataHeatBalance;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int ZoneNum;
+    int ListNum;
+    int GroupNum;
+    int Mult;
+
+    auto &ZoneList(state.dataHeatBal->ZoneList);
+    auto &ZoneGroup(state.dataHeatBal->ZoneGroup);
+    auto &ListSNLoadHeatEnergy(state.dataHeatBal->ListSNLoadHeatEnergy);
+    auto &ListSNLoadCoolEnergy(state.dataHeatBal->ListSNLoadCoolEnergy);
+    auto &ListSNLoadHeatRate(state.dataHeatBal->ListSNLoadHeatRate);
+    auto &ListSNLoadCoolRate(state.dataHeatBal->ListSNLoadCoolRate);
+
+    // Sum ZONE LIST and ZONE GROUP report variables
+    ListSNLoadHeatEnergy = 0.0;
+    ListSNLoadCoolEnergy = 0.0;
+    ListSNLoadHeatRate = 0.0;
+    ListSNLoadCoolRate = 0.0;
+
+    for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
+        for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
+            Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
+            ListSNLoadHeatEnergy(ListNum) += state.dataHeatBal->SNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ListSNLoadCoolEnergy(ListNum) += state.dataHeatBal->SNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ListSNLoadHeatRate(ListNum) += state.dataHeatBal->SNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ListSNLoadCoolRate(ListNum) += state.dataHeatBal->SNLoadCoolRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+        } // ZoneNum
+    }     // ListNum
+
+    for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
+        Mult = state.dataHeatBal->ZoneGroup(GroupNum).Multiplier;
+        state.dataHeatBal->GroupSNLoadHeatEnergy(GroupNum) = ListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->GroupSNLoadCoolEnergy(GroupNum) = ListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->GroupSNLoadHeatRate(GroupNum) = ListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->GroupSNLoadCoolRate(GroupNum) = ListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
+    } // GroupNum
+}
+
+void UpdateZoneInletConvergenceLog(EnergyPlusData &state)
+{
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int ZoneNum;
+    int NodeIndex;
+    int NodeNum;
+    Array1D<Real64> tmpRealARR(DataConvergParams::ConvergLogStackDepth);
+
+    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+
+        for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
+            NodeNum = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum;
+
+            tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
+            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) = state.dataLoopNodes->Node(NodeNum).HumRat;
+            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio({2, DataConvergParams::ConvergLogStackDepth}) =
+                tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
+
+            tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
+            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) =
+                state.dataLoopNodes->Node(NodeNum).MassFlowRate;
+            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate({2, DataConvergParams::ConvergLogStackDepth}) =
+                tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
+
+            tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
+            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = state.dataLoopNodes->Node(NodeNum).Temp;
+            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature({2, DataConvergParams::ConvergLogStackDepth}) =
+                tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
+        }
+    }
+}
+
 void ManageHVAC(EnergyPlusData &state)
 {
 
@@ -1838,174 +1921,6 @@ void SimHVAC(EnergyPlusData &state)
     }
 }
 
-void SimSelectedEquipment(EnergyPlusData &state,
-                          bool &SimAirLoops,         // True when the air loops need to be (re)simulated
-                          bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
-                          bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
-                          bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
-                          bool &SimElecCircuits,     // True when electric circuits need to be (re)simulated
-                          bool &FirstHVACIteration,  // True when solution technique on first iteration
-                          bool const LockPlantFlows)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Russ Taylor, Rick Strand
-    //       DATE WRITTEN   May 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine receives the flags from SimHVAC which determines
-    // which middle-level managers must be called.
-
-    // METHODOLOGY EMPLOYED:
-    // Each flag is checked and the appropriate manager is then called.
-
-    // Using/Aliasing
-    using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-    using NonZoneEquipmentManager::ManageNonZoneEquipment;
-    using PlantManager::ManagePlantLoops;
-    using PlantUtilities::AnyPlantLoopSidesNeedSim;
-    using PlantUtilities::ResetAllPlantInterConnectFlags;
-    using PlantUtilities::SetAllFlowLocks;
-    using SimAirServingZones::ManageAirLoops;
-    using ZoneEquipmentManager::ManageZoneEquipment;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxAir(5); // Iteration Max for Air Simulation Iterations
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int IterAir; // counts iterations to enforce maximum iteration limit
-
-    IterAir = 0;
-
-    // Set all plant flow locks to UNLOCKED to allow air side components to operate properly
-    // This requires that the plant flow resolver carefully set the min/max avail limits on
-    //  air side components to ensure they request within bounds.
-    if (LockPlantFlows) {
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Locked);
-    } else {
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
-    }
-    ResetAllPlantInterConnectFlags(state);
-
-    if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACMgr->MyEnvrnFlag2) {
-        // Following comment is incorrect!  (LKL) Even the first time through this does more than read in data.
-        // Zone equipment data needs to be read in before air loop data to allow the
-        // determination of which zones are connected to which air loops.
-        // This call of ManageZoneEquipment does nothing except force the
-        // zone equipment data to be read in.
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-        state.dataHVACMgr->MyEnvrnFlag2 = false;
-    }
-    if (!state.dataGlobal->BeginEnvrnFlag) {
-        state.dataHVACMgr->MyEnvrnFlag2 = true;
-    }
-
-    if (FirstHVACIteration) {
-        state.dataHVACMgr->RepIterAir = 0;
-        // Call AirflowNetwork simulation to calculate air flows and pressures
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            ManageAirflowNetworkBalance(state, FirstHVACIteration);
-        }
-        ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-        state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
-        SimAirLoops = true; // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
-        state.dataHVACGlobal->AirLoopsSimOnce = true; // air loops simulated once for this environment
-        ResetTerminalUnitFlowLimits(state);
-        state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-        SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
-        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
-            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-
-        ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
-
-        state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
-        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
-            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-    } else {
-        state.dataHVACMgr->FlowResolutionNeeded = false;
-        while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
-            ++IterAir; // Increment the iteration counter
-            // Call AirflowNetwork simulation to calculate air flows and pressures
-            ResimulateAirZone = false;
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
-            }
-            if (SimAirLoops) {
-                ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-                SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
-            }
-
-            // make sure flow resolution gets done
-            if (state.dataHVACMgr->FlowResolutionNeeded) {
-                SimZoneEquipment = true;
-            }
-            if (SimZoneEquipment) {
-                if ((IterAir == 1) && (!state.dataHVACMgr->FlowMaxAvailAlreadyReset)) { // don't do reset if already done in FirstHVACIteration
-                    // ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
-                    state.dataHVACMgr->FlowResolutionNeeded = true;
-                } else {
-                    ResolveAirLoopFlowLimits(state);
-                    state.dataHVACMgr->FlowResolutionNeeded = false;
-                }
-                ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-                SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
-            }
-            state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
-
-            //      IterAir = IterAir + 1   ! Increment the iteration counter
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
-                    SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
-                    SimZoneEquipment = true;
-                }
-            }
-        }
-
-        state.dataHVACMgr->RepIterAir += IterAir;
-        if (IterAir > MaxAir) {
-            state.dataConvergeParams->AirLoopConvergFail = 1;
-        } else {
-            state.dataConvergeParams->AirLoopConvergFail = 0;
-        }
-        // Check to see if any components have been locked out. If so, SimAirLoops will be reset to TRUE.
-        ResolveLockoutFlags(state, SimAirLoops);
-
-        if (SimNonZoneEquipment) {
-            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
-            SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
-        }
-
-        if (SimElecCircuits) {
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
-                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-        }
-
-        if (!SimPlantLoops) {
-            // check to see if any air side component may have requested plant resim
-            if (AnyPlantLoopSidesNeedSim(state)) {
-                SimPlantLoops = true;
-            }
-        }
-
-        if (SimPlantLoops) {
-            ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
-        }
-
-        if (SimElecCircuits) {
-            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
-                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
-        }
-    }
-}
-
 void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
 {
 
@@ -2202,6 +2117,174 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     }
 }
 
+void SimSelectedEquipment(EnergyPlusData &state,
+                          bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+                          bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
+                          bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
+                          bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
+                          bool &SimElecCircuits,     // True when electric circuits need to be (re)simulated
+                          bool &FirstHVACIteration,  // True when solution technique on first iteration
+                          bool const LockPlantFlows)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Russ Taylor, Rick Strand
+    //       DATE WRITTEN   May 1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine receives the flags from SimHVAC which determines
+    // which middle-level managers must be called.
+
+    // METHODOLOGY EMPLOYED:
+    // Each flag is checked and the appropriate manager is then called.
+
+    // Using/Aliasing
+    using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
+    using NonZoneEquipmentManager::ManageNonZoneEquipment;
+    using PlantManager::ManagePlantLoops;
+    using PlantUtilities::AnyPlantLoopSidesNeedSim;
+    using PlantUtilities::ResetAllPlantInterConnectFlags;
+    using PlantUtilities::SetAllFlowLocks;
+    using SimAirServingZones::ManageAirLoops;
+    using ZoneEquipmentManager::ManageZoneEquipment;
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    int const MaxAir(5); // Iteration Max for Air Simulation Iterations
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int IterAir; // counts iterations to enforce maximum iteration limit
+
+    IterAir = 0;
+
+    // Set all plant flow locks to UNLOCKED to allow air side components to operate properly
+    // This requires that the plant flow resolver carefully set the min/max avail limits on
+    //  air side components to ensure they request within bounds.
+    if (LockPlantFlows) {
+        SetAllFlowLocks(state, DataPlant::iFlowLock::Locked);
+    } else {
+        SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
+    }
+    ResetAllPlantInterConnectFlags(state);
+
+    if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACMgr->MyEnvrnFlag2) {
+        // Following comment is incorrect!  (LKL) Even the first time through this does more than read in data.
+        // Zone equipment data needs to be read in before air loop data to allow the
+        // determination of which zones are connected to which air loops.
+        // This call of ManageZoneEquipment does nothing except force the
+        // zone equipment data to be read in.
+        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        state.dataHVACMgr->MyEnvrnFlag2 = false;
+    }
+    if (!state.dataGlobal->BeginEnvrnFlag) {
+        state.dataHVACMgr->MyEnvrnFlag2 = true;
+    }
+
+    if (FirstHVACIteration) {
+        state.dataHVACMgr->RepIterAir = 0;
+        // Call AirflowNetwork simulation to calculate air flows and pressures
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            ManageAirflowNetworkBalance(state, FirstHVACIteration);
+        }
+        ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+        state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
+        SimAirLoops = true; // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
+        state.dataHVACGlobal->AirLoopsSimOnce = true; // air loops simulated once for this environment
+        ResetTerminalUnitFlowLimits(state);
+        state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
+        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
+        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
+
+        ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+
+        state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
+    } else {
+        state.dataHVACMgr->FlowResolutionNeeded = false;
+        while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
+            ++IterAir; // Increment the iteration counter
+            // Call AirflowNetwork simulation to calculate air flows and pressures
+            ResimulateAirZone = false;
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
+            }
+            if (SimAirLoops) {
+                ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+            }
+
+            // make sure flow resolution gets done
+            if (state.dataHVACMgr->FlowResolutionNeeded) {
+                SimZoneEquipment = true;
+            }
+            if (SimZoneEquipment) {
+                if ((IterAir == 1) && (!state.dataHVACMgr->FlowMaxAvailAlreadyReset)) { // don't do reset if already done in FirstHVACIteration
+                    // ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
+                    state.dataHVACMgr->FlowResolutionNeeded = true;
+                } else {
+                    ResolveAirLoopFlowLimits(state);
+                    state.dataHVACMgr->FlowResolutionNeeded = false;
+                }
+                ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+                SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+            }
+            state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
+
+            //      IterAir = IterAir + 1   ! Increment the iteration counter
+            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
+                    SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
+                    SimZoneEquipment = true;
+                }
+            }
+        }
+
+        state.dataHVACMgr->RepIterAir += IterAir;
+        if (IterAir > MaxAir) {
+            state.dataConvergeParams->AirLoopConvergFail = 1;
+        } else {
+            state.dataConvergeParams->AirLoopConvergFail = 0;
+        }
+        // Check to see if any components have been locked out. If so, SimAirLoops will be reset to TRUE.
+        ResolveLockoutFlags(state, SimAirLoops);
+
+        if (SimNonZoneEquipment) {
+            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+            SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+        }
+
+        if (SimElecCircuits) {
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
+        }
+
+        if (!SimPlantLoops) {
+            // check to see if any air side component may have requested plant resim
+            if (AnyPlantLoopSidesNeedSim(state)) {
+                SimPlantLoops = true;
+            }
+        }
+
+        if (SimPlantLoops) {
+            ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+        }
+
+        if (SimElecCircuits) {
+            state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+                state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
+        }
+    }
+}
+
 void ResetHVACControl(EnergyPlusData &state)
 {
 
@@ -2271,56 +2354,6 @@ void ResetNodeData(EnergyPlusData &state)
             e.Density = 0.0;
         }
     }
-}
-
-void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Apparently someone who doesn't believe in documenting.
-    //       DATE WRITTEN   ???
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    using namespace DataHeatBalance;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNum;
-    int ListNum;
-    int GroupNum;
-    int Mult;
-
-    auto &ZoneList(state.dataHeatBal->ZoneList);
-    auto &ZoneGroup(state.dataHeatBal->ZoneGroup);
-    auto &ListSNLoadHeatEnergy(state.dataHeatBal->ListSNLoadHeatEnergy);
-    auto &ListSNLoadCoolEnergy(state.dataHeatBal->ListSNLoadCoolEnergy);
-    auto &ListSNLoadHeatRate(state.dataHeatBal->ListSNLoadHeatRate);
-    auto &ListSNLoadCoolRate(state.dataHeatBal->ListSNLoadCoolRate);
-
-    // Sum ZONE LIST and ZONE GROUP report variables
-    ListSNLoadHeatEnergy = 0.0;
-    ListSNLoadCoolEnergy = 0.0;
-    ListSNLoadHeatRate = 0.0;
-    ListSNLoadCoolRate = 0.0;
-
-    for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
-        for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
-            Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
-            ListSNLoadHeatEnergy(ListNum) += state.dataHeatBal->SNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ListSNLoadCoolEnergy(ListNum) += state.dataHeatBal->SNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ListSNLoadHeatRate(ListNum) += state.dataHeatBal->SNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ListSNLoadCoolRate(ListNum) += state.dataHeatBal->SNLoadCoolRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-        } // ZoneNum
-    }     // ListNum
-
-    for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
-        Mult = state.dataHeatBal->ZoneGroup(GroupNum).Multiplier;
-        state.dataHeatBal->GroupSNLoadHeatEnergy(GroupNum) = ListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->GroupSNLoadCoolEnergy(GroupNum) = ListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->GroupSNLoadHeatRate(GroupNum) = ListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->GroupSNLoadCoolRate(GroupNum) = ListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
-    } // GroupNum
 }
 
 void ReportInfiltrations(EnergyPlusData &state)
@@ -3121,39 +3154,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                     }
                 }
             }
-        }
-    }
-}
-
-void UpdateZoneInletConvergenceLog(EnergyPlusData &state)
-{
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNum;
-    int NodeIndex;
-    int NodeNum;
-    Array1D<Real64> tmpRealARR(DataConvergParams::ConvergLogStackDepth);
-
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-
-        for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
-            NodeNum = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum;
-
-            tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
-            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) = state.dataLoopNodes->Node(NodeNum).HumRat;
-            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio({2, DataConvergParams::ConvergLogStackDepth}) =
-                tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-
-            tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
-            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) =
-                state.dataLoopNodes->Node(NodeNum).MassFlowRate;
-            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate({2, DataConvergParams::ConvergLogStackDepth}) =
-                tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-
-            tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
-            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = state.dataLoopNodes->Node(NodeNum).Temp;
-            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature({2, DataConvergParams::ConvergLogStackDepth}) =
-                tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
         }
     }
 }

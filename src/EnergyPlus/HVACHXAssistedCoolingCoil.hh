@@ -119,8 +119,6 @@ namespace HVACHXAssistedCoolingCoil {
 
     void GetHXAssistedCoolingCoilInput(EnergyPlusData &state);
 
-    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
-
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                                    int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,           // FirstHVACIteration flag
@@ -135,11 +133,8 @@ namespace HVACHXAssistedCoolingCoil {
     void GetHXDXCoilIndex(
         EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 
-    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
-                                            std::string const &CompType,
-                                            std::string_view CompName,
-                                            Real64 &Value,
-                                            int &CompIndex);
+    void
+    CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
 
     Real64 GetCoilCapacity(EnergyPlusData &state,
                            std::string const &CoilType, // must match coil types in this module

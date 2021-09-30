@@ -839,6 +839,105 @@ void ValidateComponent(EnergyPlusData &state,
     }
 }
 
+void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height to gap width
+                             Real64 const Tilt,   // Tilt of gap, degrees
+                             Real64 const Tso,    // Temperature of gap surface closest to outside (K)
+                             Real64 const Tsi,    // Temperature of gap surface closest to zone (K)
+                             Real64 const Gr,     // Gap gas Grashof number
+                             Real64 &gNu          // Gap gas Nusselt number
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Adapted by B. Griffith from Fred Winkelmann's from NusseltNumber in WindowManager.cc
+    //       DATE WRITTEN   September 2001
+    //       MODIFIED       B. Griffith November 2004  (same models but slightly different for general use)
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Finds the Nusselt number for air-filled gaps between isothermal solid layers.
+
+    // METHODOLOGY EMPLOYED:
+    // Based on methodology in Chapter 5 of the July 18, 2001 draft of ISO 15099,
+    // "Thermal Performance of Windows, Doors and Shading Devices--Detailed Calculations."
+    // The equation numbers below correspond to those in the standard.
+
+    // REFERENCES:
+    // Window5 source code; ISO 15099
+
+    // Using/Aliasing
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    Real64 const Pr(0.71); // Prandtl number for air
+
+    // INTERFACE BLOCK SPECIFICATIONS
+
+    // DERIVED TYPE DEFINITIONS
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS
+    Real64 Ra;     // Rayleigh number
+    Real64 gnu901; // Nusselt number temporary variables for
+    Real64 gnu902;
+    Real64 gnu90;
+    Real64 gnu601;
+    Real64 gnu602; // different tilt and Ra ranges
+    Real64 gnu60;
+    Real64 gnu601a;
+    Real64 gnua;
+    Real64 gnub;
+    Real64 cra; // Temporary variables
+    Real64 a;
+    Real64 b;
+    Real64 g;
+    Real64 ang;
+    Real64 tiltr;
+
+    tiltr = Tilt * DataGlobalConstants::DegToRadians;
+    Ra = Gr * Pr;
+
+    if (Ra > 2.0e6) {
+
+        // write(*,*)' error, outside range of Rayleigh number'
+    }
+
+    if (Ra <= 1.0e4) {
+        gnu901 = 1.0 + 1.7596678e-10 * std::pow(Ra, 2.2984755); // eq. 51
+    }
+    if (Ra > 1.0e4 && Ra <= 5.0e4) gnu901 = 0.028154 * std::pow(Ra, 0.4134); // eq. 50
+    if (Ra > 5.0e4) gnu901 = 0.0673838 * std::pow(Ra, 1.0 / 3.0);            // eq. 49
+
+    gnu902 = 0.242 * std::pow(Ra / AspRat, 0.272); // eq. 52
+    gnu90 = max(gnu901, gnu902);
+
+    if (Tso > Tsi) {                                 // window heated from above
+        gNu = 1.0 + (gnu90 - 1.0) * std::sin(tiltr); // eq. 53
+    } else {                                         // window heated from below
+        if (Tilt >= 60.0) {
+            g = 0.5 * std::pow(1.0 + std::pow(Ra / 3160.0, 20.6), -0.1);     // eq. 47
+            gnu601a = 1.0 + pow_7(0.0936 * std::pow(Ra, 0.314) / (1.0 + g)); // eq. 45
+            gnu601 = std::pow(gnu601a, 0.142857);
+
+            // For any aspect ratio
+            gnu602 = (0.104 + 0.175 / AspRat) * std::pow(Ra, 0.283); // eq. 46
+            gnu60 = max(gnu601, gnu602);
+
+            // linear interpolation for layers inclined at angles between 60 and 90 deg
+            gNu = ((90.0 - Tilt) * gnu60 + (Tilt - 60.0) * gnu90) / 30.0;
+        }
+        if (Tilt < 60.0) { // eq. 42
+            cra = Ra * std::cos(tiltr);
+            a = 1.0 - 1708.0 / cra;
+            b = std::pow(cra / 5830.0, 0.33333) - 1.0;
+            gnua = (std::abs(a) + a) / 2.0;
+            gnub = (std::abs(b) + b) / 2.0;
+            ang = 1708.0 * std::pow(std::sin(1.8 * tiltr), 1.6);
+            gNu = 1.0 + 1.44 * gnua * (1.0 - ang / cra) + gnub;
+        }
+    }
+}
+
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
@@ -1100,107 +1199,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (present(VdotBuoyRpt)) VdotBuoyRpt = VdotThermal;
 }
 
-//****************************************************************************
-
-void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height to gap width
-                             Real64 const Tilt,   // Tilt of gap, degrees
-                             Real64 const Tso,    // Temperature of gap surface closest to outside (K)
-                             Real64 const Tsi,    // Temperature of gap surface closest to zone (K)
-                             Real64 const Gr,     // Gap gas Grashof number
-                             Real64 &gNu          // Gap gas Nusselt number
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Adapted by B. Griffith from Fred Winkelmann's from NusseltNumber in WindowManager.cc
-    //       DATE WRITTEN   September 2001
-    //       MODIFIED       B. Griffith November 2004  (same models but slightly different for general use)
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Finds the Nusselt number for air-filled gaps between isothermal solid layers.
-
-    // METHODOLOGY EMPLOYED:
-    // Based on methodology in Chapter 5 of the July 18, 2001 draft of ISO 15099,
-    // "Thermal Performance of Windows, Doors and Shading Devices--Detailed Calculations."
-    // The equation numbers below correspond to those in the standard.
-
-    // REFERENCES:
-    // Window5 source code; ISO 15099
-
-    // Using/Aliasing
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Pr(0.71); // Prandtl number for air
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS
-    Real64 Ra;     // Rayleigh number
-    Real64 gnu901; // Nusselt number temporary variables for
-    Real64 gnu902;
-    Real64 gnu90;
-    Real64 gnu601;
-    Real64 gnu602; // different tilt and Ra ranges
-    Real64 gnu60;
-    Real64 gnu601a;
-    Real64 gnua;
-    Real64 gnub;
-    Real64 cra; // Temporary variables
-    Real64 a;
-    Real64 b;
-    Real64 g;
-    Real64 ang;
-    Real64 tiltr;
-
-    tiltr = Tilt * DataGlobalConstants::DegToRadians;
-    Ra = Gr * Pr;
-
-    if (Ra > 2.0e6) {
-
-        // write(*,*)' error, outside range of Rayleigh number'
-    }
-
-    if (Ra <= 1.0e4) {
-        gnu901 = 1.0 + 1.7596678e-10 * std::pow(Ra, 2.2984755); // eq. 51
-    }
-    if (Ra > 1.0e4 && Ra <= 5.0e4) gnu901 = 0.028154 * std::pow(Ra, 0.4134); // eq. 50
-    if (Ra > 5.0e4) gnu901 = 0.0673838 * std::pow(Ra, 1.0 / 3.0);            // eq. 49
-
-    gnu902 = 0.242 * std::pow(Ra / AspRat, 0.272); // eq. 52
-    gnu90 = max(gnu901, gnu902);
-
-    if (Tso > Tsi) {                                 // window heated from above
-        gNu = 1.0 + (gnu90 - 1.0) * std::sin(tiltr); // eq. 53
-    } else {                                         // window heated from below
-        if (Tilt >= 60.0) {
-            g = 0.5 * std::pow(1.0 + std::pow(Ra / 3160.0, 20.6), -0.1);     // eq. 47
-            gnu601a = 1.0 + pow_7(0.0936 * std::pow(Ra, 0.314) / (1.0 + g)); // eq. 45
-            gnu601 = std::pow(gnu601a, 0.142857);
-
-            // For any aspect ratio
-            gnu602 = (0.104 + 0.175 / AspRat) * std::pow(Ra, 0.283); // eq. 46
-            gnu60 = max(gnu601, gnu602);
-
-            // linear interpolation for layers inclined at angles between 60 and 90 deg
-            gNu = ((90.0 - Tilt) * gnu60 + (Tilt - 60.0) * gnu90) / 30.0;
-        }
-        if (Tilt < 60.0) { // eq. 42
-            cra = Ra * std::cos(tiltr);
-            a = 1.0 - 1708.0 / cra;
-            b = std::pow(cra / 5830.0, 0.33333) - 1.0;
-            gnua = (std::abs(a) + a) / 2.0;
-            gnub = (std::abs(b) + b) / 2.0;
-            ang = 1708.0 * std::pow(std::sin(1.8 * tiltr), 1.6);
-            gNu = 1.0 + 1.44 * gnua * (1.0 - ang / cra) + gnub;
-        }
-    }
-}
-
 void CalcBasinHeaterPower(EnergyPlusData &state,
                           Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
                           int const SchedulePtr,     // Pointer to basin heater schedule
@@ -1260,100 +1258,6 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
             Power = max(0.0, Capacity * (SetPointTemp - state.dataEnvrn->OutDryBulbTemp));
         }
     }
-}
-
-void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   March 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine tests supply, return and overall air path integrity.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // COMPILER-GENERATED INTERFACE MODULE: Thu Sep 29 07:54:46 2011
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-    int Loop1;
-    int Loop2;
-    int Loop3;
-    int Count;
-    int TestNode;
-    bool errFlag;
-    Array2D_int ValRetAPaths;
-    Array2D_int NumRAPNodes;
-    Array2D_int ValSupAPaths;
-    Array2D_int NumSAPNodes;
-
-    NumSAPNodes.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    NumRAPNodes.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    ValRetAPaths.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    ValSupAPaths.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    NumSAPNodes = 0;
-    NumRAPNodes = 0;
-    ValRetAPaths = 0;
-    ValSupAPaths = 0;
-
-    TestSupplyAirPathIntegrity(state, errFlag);
-    if (errFlag) ErrFound = true;
-    TestReturnAirPathIntegrity(state, errFlag, ValRetAPaths);
-    if (errFlag) ErrFound = true;
-
-    // Final tests, look for duplicate nodes
-    for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
-        if (ValRetAPaths(1, Loop) != 0) continue;
-        if (state.dataAirLoop->AirToZoneNodeInfo(Loop).NumReturnNodes <= 0) continue;
-        ValRetAPaths(1, Loop) = state.dataAirLoop->AirToZoneNodeInfo(Loop).ZoneEquipReturnNodeNum(1);
-    }
-
-    for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
-        for (Loop1 = 1; Loop1 <= state.dataLoopNodes->NumOfNodes; ++Loop1) {
-            TestNode = ValRetAPaths(Loop1, Loop);
-            Count = 0;
-            for (Loop2 = 1; Loop2 <= NumPrimaryAirSys; ++Loop2) {
-                for (Loop3 = 1; Loop3 <= state.dataLoopNodes->NumOfNodes; ++Loop3) {
-                    if (Loop2 == Loop && Loop1 == Loop3) continue; // Don't count test node
-                    if (ValRetAPaths(Loop3, Loop2) == 0) break;
-                    if (ValRetAPaths(Loop3, Loop2) == TestNode) ++Count;
-                }
-            }
-            if (Count > 0) {
-                ShowSevereError(state, "Duplicate Node detected in Return Air Paths");
-                ShowContinueError(state, "Test Node=" + state.dataLoopNodes->NodeID(TestNode));
-                ShowContinueError(state, "In Air Path=" + state.dataAirLoop->AirToZoneNodeInfo(Loop).AirLoopName);
-                ErrFound = true;
-            }
-        }
-    }
-
-    NumSAPNodes.deallocate();
-    NumRAPNodes.deallocate();
-    ValRetAPaths.deallocate();
-    ValSupAPaths.deallocate();
 }
 
 void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
@@ -2025,6 +1929,100 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     } else {
         ShowMessage(state, "All Return Air Paths passed integrity testing");
     }
+}
+
+void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   March 2003
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine tests supply, return and overall air path integrity.
+
+    // METHODOLOGY EMPLOYED:
+    // na
+
+    // REFERENCES:
+    // na
+
+    // Using/Aliasing
+    using namespace DataLoopNode;
+    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // COMPILER-GENERATED INTERFACE MODULE: Thu Sep 29 07:54:46 2011
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Loop;
+    int Loop1;
+    int Loop2;
+    int Loop3;
+    int Count;
+    int TestNode;
+    bool errFlag;
+    Array2D_int ValRetAPaths;
+    Array2D_int NumRAPNodes;
+    Array2D_int ValSupAPaths;
+    Array2D_int NumSAPNodes;
+
+    NumSAPNodes.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
+    NumRAPNodes.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
+    ValRetAPaths.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
+    ValSupAPaths.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
+    NumSAPNodes = 0;
+    NumRAPNodes = 0;
+    ValRetAPaths = 0;
+    ValSupAPaths = 0;
+
+    TestSupplyAirPathIntegrity(state, errFlag);
+    if (errFlag) ErrFound = true;
+    TestReturnAirPathIntegrity(state, errFlag, ValRetAPaths);
+    if (errFlag) ErrFound = true;
+
+    // Final tests, look for duplicate nodes
+    for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
+        if (ValRetAPaths(1, Loop) != 0) continue;
+        if (state.dataAirLoop->AirToZoneNodeInfo(Loop).NumReturnNodes <= 0) continue;
+        ValRetAPaths(1, Loop) = state.dataAirLoop->AirToZoneNodeInfo(Loop).ZoneEquipReturnNodeNum(1);
+    }
+
+    for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
+        for (Loop1 = 1; Loop1 <= state.dataLoopNodes->NumOfNodes; ++Loop1) {
+            TestNode = ValRetAPaths(Loop1, Loop);
+            Count = 0;
+            for (Loop2 = 1; Loop2 <= NumPrimaryAirSys; ++Loop2) {
+                for (Loop3 = 1; Loop3 <= state.dataLoopNodes->NumOfNodes; ++Loop3) {
+                    if (Loop2 == Loop && Loop1 == Loop3) continue; // Don't count test node
+                    if (ValRetAPaths(Loop3, Loop2) == 0) break;
+                    if (ValRetAPaths(Loop3, Loop2) == TestNode) ++Count;
+                }
+            }
+            if (Count > 0) {
+                ShowSevereError(state, "Duplicate Node detected in Return Air Paths");
+                ShowContinueError(state, "Test Node=" + state.dataLoopNodes->NodeID(TestNode));
+                ShowContinueError(state, "In Air Path=" + state.dataAirLoop->AirToZoneNodeInfo(Loop).AirLoopName);
+                ErrFound = true;
+            }
+        }
+    }
+
+    NumSAPNodes.deallocate();
+    NumRAPNodes.deallocate();
+    ValRetAPaths.deallocate();
+    ValSupAPaths.deallocate();
 }
 
 void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}

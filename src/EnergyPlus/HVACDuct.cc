@@ -78,97 +78,7 @@ namespace HVACDuct {
     // conditions to the outlet node. The function of a duct component is to allow the
     // definition of a bypass branch: a branch must contain at least 1 component.
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
     using namespace DataLoopNode;
-
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
-
-    // <name Public routines, optionally name Private routines within this module>
-
-    // Object Data
-
-    // Functions
-
-    void SimDuct(EnergyPlusData &state,
-                 std::string_view CompName,                      // name of the duct component
-                 [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
-                 int &CompIndex                                  // index of duct component
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   17May2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Manage the simulation of a duct component
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DuctNum; // index of duct being simulated
-
-        if (state.dataHVACDuct->GetInputFlag) {
-            GetDuctInput(state);
-            state.dataHVACDuct->GetInputFlag = false;
-        }
-
-        // Get the duct component index
-        if (CompIndex == 0) {
-            DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
-            if (DuctNum == 0) {
-                ShowFatalError(state, "SimDuct: Component not found=" + std::string{CompName});
-            }
-            CompIndex = DuctNum;
-        } else {
-            DuctNum = CompIndex;
-            if (DuctNum > state.dataHVACDuct->NumDucts || DuctNum < 1) {
-                ShowFatalError(state,
-                               format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}",
-                                      DuctNum,
-                                      state.dataHVACDuct->NumDucts,
-                                      CompName));
-            }
-            if (state.dataHVACDuct->CheckEquipName(DuctNum)) {
-                if (CompName != state.dataHVACDuct->Duct(DuctNum).Name) {
-                    ShowFatalError(state,
-                                   format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
-                                          DuctNum,
-                                          CompName,
-                                          state.dataHVACDuct->Duct(DuctNum).Name));
-                }
-                state.dataHVACDuct->CheckEquipName(DuctNum) = false;
-            }
-        }
-
-        InitDuct(state, DuctNum);
-
-        CalcDuct(DuctNum);
-
-        UpdateDuct(state, DuctNum);
-
-        ReportDuct(DuctNum);
-    }
 
     void GetDuctInput(EnergyPlusData &state)
     {
@@ -418,6 +328,69 @@ namespace HVACDuct {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
+    }
+
+    void SimDuct(EnergyPlusData &state,
+                 std::string_view CompName,                      // name of the duct component
+                 [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex                                  // index of duct component
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manage the simulation of a duct component
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int DuctNum; // index of duct being simulated
+
+        if (state.dataHVACDuct->GetInputFlag) {
+            GetDuctInput(state);
+            state.dataHVACDuct->GetInputFlag = false;
+        }
+
+        // Get the duct component index
+        if (CompIndex == 0) {
+            DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
+            if (DuctNum == 0) {
+                ShowFatalError(state, "SimDuct: Component not found=" + std::string{CompName});
+            }
+            CompIndex = DuctNum;
+        } else {
+            DuctNum = CompIndex;
+            if (DuctNum > state.dataHVACDuct->NumDucts || DuctNum < 1) {
+                ShowFatalError(state,
+                               format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}",
+                                      DuctNum,
+                                      state.dataHVACDuct->NumDucts,
+                                      CompName));
+            }
+            if (state.dataHVACDuct->CheckEquipName(DuctNum)) {
+                if (CompName != state.dataHVACDuct->Duct(DuctNum).Name) {
+                    ShowFatalError(state,
+                                   format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
+                                          DuctNum,
+                                          CompName,
+                                          state.dataHVACDuct->Duct(DuctNum).Name));
+                }
+                state.dataHVACDuct->CheckEquipName(DuctNum) = false;
+            }
+        }
+
+        InitDuct(state, DuctNum);
+
+        CalcDuct(DuctNum);
+
+        UpdateDuct(state, DuctNum);
+
+        ReportDuct(DuctNum);
     }
 
 } // namespace HVACDuct

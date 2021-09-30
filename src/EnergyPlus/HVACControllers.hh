@@ -258,8 +258,6 @@ namespace HVACControllers {
 
     void GetControllerInput(EnergyPlusData &state);
 
-    void ResetController(EnergyPlusData &state, int ControlNum, bool DoWarmRestartFlag, bool &IsConvergedFlag);
-
     void InitController(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
 
     void SizeController(EnergyPlusData &state, int ControlNum);
@@ -272,28 +270,7 @@ namespace HVACControllers {
                               std::string const &ControllerName // used when errors occur
     );
 
-    void FindRootSimpleController(EnergyPlusData &state,
-                                  int ControlNum,
-                                  bool FirstHVACIteration,
-                                  bool &IsConvergedFlag,
-                                  bool &IsUpToDateFlag,
-                                  std::string const &ControllerName // used when errors occur
-    );
-
-    void CheckSimpleController(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
-
-    bool CheckMinActiveController(EnergyPlusData &state, int ControlNum);
-
-    bool CheckMaxActiveController(EnergyPlusData &state, int ControlNum);
-
     void CheckTempAndHumRatCtrl(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
-
-    void SaveSimpleController(EnergyPlusData &state, int ControlNum, bool FirstHVACIteration, bool IsConvergedFlag);
-
-    void UpdateController(EnergyPlusData &state, int ControlNum);
-
-    void ExitCalcController(
-        EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, ControllerMode Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
 
     void TrackAirLoopControllers(EnergyPlusData &state,
                                  int AirLoopNum,
@@ -309,37 +286,10 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics(EnergyPlusData &state);
 
-    void WriteAirLoopStatistics(EnergyPlusData &state,
-                                InputOutputFile &statisticsFile,
-                                DefinePrimaryAirSystem const &ThisPrimaryAirSystem,
-                                AirLoopStatsType const &ThisAirLoopStats);
-
-    void SetupAirLoopControllersTracer(EnergyPlusData &state, int AirLoopNum);
-
     void TraceAirLoopControllers(
         EnergyPlusData &state, bool FirstHVACIteration, int AirLoopNum, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
 
-    void TraceIterationStamp(
-        EnergyPlusData &state, InputOutputFile &TraceFile, bool FirstHVACIteration, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
-
     void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum);
-
-    void SetupIndividualControllerTracer(EnergyPlusData &state, int ControlNum);
-
-    void TraceIndividualController(EnergyPlusData &state,
-                                   int ControlNum,
-                                   bool FirstHVACIteration,
-                                   int AirLoopPass,
-                                   DataHVACControllers::ControllerOperation Operation, // Operation to execute
-                                   bool IsConvergedFlag);
-
-    std::string CreateHVACTimeString(EnergyPlusData &state);
-
-    std::string CreateHVACStepFullString(EnergyPlusData &state);
-
-    std::string MakeHVACTimeIntervalString(EnergyPlusData &state);
-
-    void CheckControllerListOrder(EnergyPlusData &state);
 
     void CheckCoilWaterInletNode(EnergyPlusData &state,
                                  int WaterInletNodeNum, // input actuator node number

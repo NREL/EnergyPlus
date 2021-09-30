@@ -79,23 +79,13 @@ namespace HVACManager {
                               bool &FirstHVACIteration,  // True when solution technique on first iteration
                               bool const LockPlantFlows);
 
-    void ResetTerminalUnitFlowLimits(EnergyPlusData &state);
-
-    void ResolveAirLoopFlowLimits(EnergyPlusData &state);
-
-    void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
-
     void ResetHVACControl(EnergyPlusData &state);
 
     void ResetNodeData(EnergyPlusData &state);
 
-    void UpdateZoneListAndGroupLoads(EnergyPlusData &state);
-
     void ReportAirHeatBalance(EnergyPlusData &state);
 
     void SetHeatToReturnAirFlag(EnergyPlusData &state);
-
-    void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
 
     void CheckAirLoopFlowBalance(EnergyPlusData &state);
 

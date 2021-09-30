@@ -260,11 +260,7 @@ namespace HeatingCoils {
 
     void GetCoilIndex(EnergyPlusData &state, std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound);
 
-    void CheckHeatingCoilSchedule(EnergyPlusData &state,
-                                  std::string const &CompType,
-                                  std::string_view CompName,
-                                  Real64 &Value,
-                                  int &CompIndex);
+    void CheckHeatingCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
 
     Real64 GetCoilCapacity(EnergyPlusData &state,
                            std::string const &CoilType, // must match coil types in this module

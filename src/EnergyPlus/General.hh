@@ -344,23 +344,6 @@ namespace General {
                            bool &ErrorsFound,
                            Optional_int PYear = _);
 
-    void DetermineDateTokens(EnergyPlusData &state,
-                             std::string const &String,
-                             int &NumTokens,                     // Number of tokens found in string
-                             int &TokenDay,                      // Value of numeric field found
-                             int &TokenMonth,                    // Value of Month field found (1=Jan, 2=Feb, etc)
-                             int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
-                             bool &ErrorsFound,                  // Set to true if cannot process this string as a date
-                             Optional_int TokenYear = _          // Value of Year if one appears to be present and this argument is present
-    );
-
-    void ValidateMonthDay(EnergyPlusData &state,
-                          std::string const &String, // REAL(r64) string being processed
-                          int Day,
-                          int Month,
-                          bool &ErrorsFound);
-
     int OrdinalDay(int Month,        // Month, 1..12
                    int Day,          // Day of Month, not validated by month
                    int LeapYearValue // 1 if leap year indicated, 0 if not

@@ -199,16 +199,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Optional<Real64> VdotWindRpt = _,
                                   Optional<Real64> VdotBuoyRpt = _);
 
-//****************************************************************************
-
-void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height to gap width
-                             Real64 const Tilt,   // Tilt of gap, degrees
-                             Real64 const Tso,    // Temperature of gap surface closest to outside (K)
-                             Real64 const Tsi,    // Temperature of gap surface closest to zone (K)
-                             Real64 const Gr,     // Gap gas Grashof number
-                             Real64 &gNu          // Gap gas Nusselt number
-);
-
 void CalcBasinHeaterPower(EnergyPlusData &state,
                           Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
                           int const SchedulePtr,     // Pointer to basin heater schedule
@@ -217,10 +207,6 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
 );
 
 void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
-
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
-
-void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_int ValRetAPaths);
 
 void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                        Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
