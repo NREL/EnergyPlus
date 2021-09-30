@@ -1587,7 +1587,7 @@ namespace SteamCoils {
     // Utility subroutines for the SteamCoil Module
 
     int GetSteamCoilIndex(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -1620,7 +1620,7 @@ namespace SteamCoils {
         }
 
         if (IndexNum == 0) {
-            ShowSevereError(state, "GetSteamCoilIndex: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("GetSteamCoilIndex: Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
         }
 
@@ -2019,7 +2019,7 @@ namespace SteamCoils {
     }
 
     int GetCoilSteamOutletNode(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+                               std::string_view CoilType,   // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     )

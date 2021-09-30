@@ -6029,7 +6029,7 @@ void CheckWaterCoilSchedule(EnergyPlusData &state,
 }
 
 Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+                               std::string_view CoilType,   // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
 )
@@ -6071,7 +6071,7 @@ Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
     }
 
     if (WhichCoil == 0) {
-        ShowSevereError(state, "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+        ShowSevereError(state, format("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
         ShowContinueError(state, "... Max Water Flow rate returned as -1000.");
         ErrorsFound = true;
         MaxWaterFlowRate = -1000.0;
@@ -6081,7 +6081,7 @@ Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
 }
 
 int GetCoilInletNode(EnergyPlusData &state,
-                     std::string const &CoilType, // must match coil types in this module
+                     std::string_view CoilType,   // must match coil types in this module
                      std::string const &CoilName, // must match coil names for the coil type
                      bool &ErrorsFound            // set to true if problem
 )
@@ -6123,7 +6123,7 @@ int GetCoilInletNode(EnergyPlusData &state,
     }
 
     if (WhichCoil == 0) {
-        ShowSevereError(state, "GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+        ShowSevereError(state, format("GetCoilInletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
         ErrorsFound = true;
         NodeNumber = 0;
     }
@@ -6132,7 +6132,7 @@ int GetCoilInletNode(EnergyPlusData &state,
 }
 
 int GetCoilOutletNode(EnergyPlusData &state,
-                      std::string const &CoilType, // must match coil types in this module
+                      std::string_view CoilType,   // must match coil types in this module
                       std::string const &CoilName, // must match coil names for the coil type
                       bool &ErrorsFound            // set to true if problem
 )
@@ -6174,9 +6174,9 @@ int GetCoilOutletNode(EnergyPlusData &state,
     }
 
     if (WhichCoil == 0) {
-        ShowSevereError(state,
-                        "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName +
-                            "\" when accessing coil outlet node number.");
+        ShowSevereError(
+            state,
+            format("GetCoilOutletNode: Could not find Coil, Type=\"{}\" Name=\"{}\" when accessing coil outlet node number.", CoilType, CoilName));
         ErrorsFound = true;
         NodeNumber = 0;
     }
@@ -6185,7 +6185,7 @@ int GetCoilOutletNode(EnergyPlusData &state,
 }
 
 int GetCoilWaterInletNode(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
 )
@@ -6227,7 +6227,7 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
     }
 
     if (WhichCoil == 0) {
-        ShowSevereError(state, "GetCoilWaterInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+        ShowSevereError(state, format("GetCoilWaterInletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
         ErrorsFound = true;
         NodeNumber = 0;
     }
@@ -6236,7 +6236,7 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
 }
 
 int GetCoilWaterOutletNode(EnergyPlusData &state,
-                           std::string const &CoilType, // must match coil types in this module
+                           std::string_view CoilType,   // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
 )
@@ -6278,7 +6278,7 @@ int GetCoilWaterOutletNode(EnergyPlusData &state,
     }
 
     if (WhichCoil == 0) {
-        ShowSevereError(state, "GetCoilWaterOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+        ShowSevereError(state, format("GetCoilWaterOutletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
         ErrorsFound = true;
         NodeNumber = 0;
     }
@@ -6730,7 +6730,7 @@ Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil 
 }
 
 int GetWaterCoilIndex(EnergyPlusData &state,
-                      std::string const &CoilType, // must match coil types in this module
+                      std::string_view CoilType,   // must match coil types in this module
                       std::string const &CoilName, // must match coil names for the coil type
                       bool &ErrorsFound            // set to true if problem
 )
@@ -6768,7 +6768,7 @@ int GetWaterCoilIndex(EnergyPlusData &state,
     }
 
     if (IndexNum == 0) {
-        ShowSevereError(state, "GetWaterCoilIndex: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+        ShowSevereError(state, format("GetWaterCoilIndex: Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
         ErrorsFound = true;
     }
 

@@ -175,7 +175,7 @@ namespace SteamCoils {
     void ReportSteamCoil(EnergyPlusData &state, int const CoilNum);
 
     int GetSteamCoilIndex(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -230,7 +230,7 @@ namespace SteamCoils {
     );
 
     int GetCoilSteamOutletNode(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+                               std::string_view CoilType,   // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
