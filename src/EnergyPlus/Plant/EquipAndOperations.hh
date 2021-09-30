@@ -128,7 +128,7 @@ struct OperationData
     // Members
     std::string Name;               // The name of each item in the list
     std::string TypeOf;             // The 'keyWord' identifying each item in the list
-    DataPlant::OpScheme Type;   // Op scheme type (from keyword)
+    DataPlant::OpScheme Type;       // Op scheme type (from keyword)
     std::string Sched;              // The name of the schedule associated with the list
     int SchedPtr;                   // ALLOCATABLE to the schedule (for valid schedules)
     bool Available;                 // TRUE = designated component or operation scheme available

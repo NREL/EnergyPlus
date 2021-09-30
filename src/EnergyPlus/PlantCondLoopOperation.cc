@@ -150,7 +150,6 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // Local values from the PlantLoop()%LoopSide()%Branch()%Comp() data structure
     int NumEquipLists; // number of equipment lists
     // Error control flags
-    bool foundlist; // equipment list found
     int NumCompsOnList;
     int CompIndex;
     int EquipBranchNum;
@@ -189,12 +188,18 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     auto &this_op_scheme(state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr));
 
     // Load the 'range variable' according to the type of control scheme specified
-    if ((CurSchemeType == OpScheme::Uncontrolled) || (CurSchemeType == OpScheme::CompSetPtBased)) {
+    switch (CurSchemeType) {
+    case (OpScheme::Uncontrolled):
+    case (OpScheme::CompSetPtBased): {
         // No RangeVariable specified for these types
-    } else if (CurSchemeType == OpScheme::EMS) {
+        break;
+    }
+    case (OpScheme::EMS): {
         InitLoadDistribution(state, FirstHVACIteration);
         // No RangeVariable specified for these types
-    } else if (CurSchemeType == OpScheme::HeatingRB) {
+        break;
+    }
+    case (OpScheme::HeatingRB): {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand < SmallLoad) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -203,7 +208,9 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             return;
         }
         RangeVariable = LoopDemand;
-    } else if (CurSchemeType == OpScheme::CoolingRB) {
+        break;
+    }
+    case (OpScheme::CoolingRB): {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand > (-1.0 * SmallLoad)) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -212,39 +219,57 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             return;
         }
         RangeVariable = LoopDemand;
-    } else if (CurSchemeType == OpScheme::DryBulbRB) {
+        break;
+    }
+    case (OpScheme::DryBulbRB): {
         RangeVariable = state.dataEnvrn->OutDryBulbTemp;
-    } else if (CurSchemeType == OpScheme::WetBulbRB) {
+        break;
+    }
+    case (OpScheme::WetBulbRB): {
         RangeVariable = state.dataEnvrn->OutWetBulbTemp;
-    } else if (CurSchemeType == OpScheme::RelHumRB) {
+        break;
+    }
+    case (OpScheme::RelHumRB): {
         RangeVariable = state.dataEnvrn->OutRelHum;
-    } else if (CurSchemeType == OpScheme::DewPointRB) {
+        break;
+    }
+    case (OpScheme::DewPointRB): {
         RangeVariable = state.dataEnvrn->OutDewPointTemp;
-    } else if ((CurSchemeType == OpScheme::DryBulbTDB) || (CurSchemeType == OpScheme::WetBulbTDB) ||
-               (CurSchemeType == OpScheme::DewPointTDB)) {
+        break;
+    }
+    case (OpScheme::DryBulbTDB):
+    case (OpScheme::WetBulbTDB):
+    case (OpScheme::DewPointTDB): {
         RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
-    } else {
+        break;
+    }
+    default: {
         // No controls specified.  This is a fatal error
         ShowFatalError(state,
                        "Invalid Operation Scheme Type Requested=" + state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
                            ", in ManagePlantLoadDistribution");
     }
+    }
 
-    // Find the proper list within the specified scheme
-    foundlist = false;
-    if (CurSchemeType == OpScheme::Uncontrolled) {
+    switch (CurSchemeType) {
+    case (OpScheme::Uncontrolled): {
         //!***what else do we do with 'uncontrolled' equipment?
         // There's an equipment list...but I think the idea is to just
         // Set one component to run in an 'uncontrolled' way (whatever that means!)
-
-    } else if (CurSchemeType == OpScheme::CompSetPtBased) {
+        break;
+    }
+    case (OpScheme::CompSetPtBased): {
         // check for EMS Control
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
-    } else if (CurSchemeType == OpScheme::EMS) {
+        break;
+    }
+    case (OpScheme::EMS): {
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
-    } else { // it's a range based control type with multiple equipment lists
+        break;
+    }
+    default: { // it's a range based control type with multiple equipment lists
         CurListNum = 0;
         for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
             // setpointers to 'PlantLoop()%OpScheme()...'structure
@@ -289,6 +314,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
         }
 
     } // End of range based schemes
+    }
 }
 
 // Beginning of GetInput subroutines for the Module
@@ -3175,8 +3201,8 @@ void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
 //********************************
 
 Real64 FindRangeVariable(EnergyPlusData &state,
-                         int const LoopNum,                    // PlantLoop data structure loop counter
-                         int const CurSchemePtr,               // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
+                         int const LoopNum,                // PlantLoop data structure loop counter
+                         int const CurSchemePtr,           // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                          DataPlant::OpScheme CurSchemeType // identifier set in PlantData
 )
 {

@@ -324,7 +324,7 @@ namespace DataPlant {
                             break;
                         }
                         case (DataPlant::OpScheme::Unassigned): { //~ Uninitialized, this should be sufficient place to
-                                                                      // catch for this on other branches
+                                                                  // catch for this on other branches
                             // throw fatal error
                             ShowSevereError(
                                 state, "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
@@ -1825,7 +1825,7 @@ namespace DataPlant {
                 case DataPlant::OpScheme::CompSetPtBased:
                 case DataPlant::OpScheme::FreeRejection: //~ other control types
                     EncounteredNonLBObjDuringPass2 = true;
-                    goto components2_end;           // don't do anymore components on this branch
+                    goto components2_end;       // don't do anymore components on this branch
                 case DataPlant::OpScheme::Pump: //~ pump
                     PumpLocation.loopNum = this->myLoopNum;
                     PumpLocation.loopSideNum = this->myLoopSideNum;
@@ -1838,7 +1838,7 @@ namespace DataPlant {
                     }
                     break;
                 case (OpScheme::HeatingRB):
-                case (OpScheme::CoolingRB): {        //~ load range based
+                case (OpScheme::CoolingRB): {            //~ load range based
                     if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
                         PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                             this->myLoopNum,
@@ -1974,7 +1974,7 @@ namespace DataPlant {
             switch (this_comp.CurOpSchemeType) {
             case (OpScheme::HeatingRB):
             case (OpScheme::CoolingRB): { //~ load range based
-                break;                        // Don't do anything for load based components
+                break;                    // Don't do anything for load based components
             }
 
             default: {
@@ -1992,7 +1992,7 @@ namespace DataPlant {
             switch (this_comp.CurOpSchemeType) {
             case (OpScheme::HeatingRB):
             case (OpScheme::CoolingRB): { //~ load range based
-                break;                        // Don't do anything for load based components
+                break;                    // Don't do anything for load based components
             }
             default: {
                 // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
