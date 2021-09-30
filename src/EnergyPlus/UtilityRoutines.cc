@@ -312,32 +312,6 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItemInStdArray(std::string &InputString, gsl::span<const std::string_view> ListOfItems)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up a string in a similar list of
-        // items and returns the index of the item in the list, if
-        // found.  This routine is case insensitive.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        for (size_t Count = 0; Count < ListOfItems.size(); ++Count) {
-            if (InputString == ListOfItems[Count]) return Count;
-        }
-
-        for (size_t Count = 0; Count < ListOfItems.size(); ++Count) {
-            if (equali(InputString, ListOfItems[Count])) return Count;
-        }
-        return 0; // Not found
-    }
-
     std::string MakeUPPERCase(std::string_view const InputString)
     {
 
