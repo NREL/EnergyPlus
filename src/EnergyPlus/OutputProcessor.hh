@@ -596,11 +596,6 @@ namespace OutputProcessor {
 
     std::string reportingFrequency(ReportingFrequency reportingInterval);
 
-    void ProduceMinMaxString(std::string &String,          // Current value
-                             int DateValue,                // Date of min/max
-                             ReportingFrequency ReportFreq // Reporting Frequency
-    );
-
     // TODO: GET RID OF THESE REDIMENSIONS
     inline void ReallocateIntegerArray(Array1D_int &Array,
                                        int &ArrayMax,     // Current and resultant dimension for Array
@@ -623,12 +618,6 @@ namespace OutputProcessor {
     StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::SOVStoreType const &VariableTypeKey);
 
     std::string standardVariableTypeKey(StoreType VariableType);
-
-    // *****************************************************************************
-    // The following routines implement Energy Meters in EnergyPlus.
-    // *****************************************************************************
-
-    void InitializeMeters(EnergyPlusData &state);
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -655,12 +644,6 @@ namespace OutputProcessor {
                       int RepVarNum,                    // Number of this report variable
                       int &MeterArrayPtr,               // Output set of Pointers to Meters
                       bool &ErrorsFound                 // True if errors in this call
-    );
-
-    void AttachCustomMeters(EnergyPlusData &state,
-                            int RepVarNum,      // Number of this report variable
-                            int &MeterArrayPtr, // Input/Output set of Pointers to Meters
-                            int MeterIndex      // Which meter this is
     );
 
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
@@ -710,16 +693,6 @@ namespace OutputProcessor {
 
     std::string DateToStringWithMonth(int codedDate); // word containing encoded month, day, hour, minute
 
-    void ReportMeterDetails(EnergyPlusData &state);
-
-    // *****************************************************************************
-    // End of routines for Energy Meters implementation in EnergyPlus.
-    // *****************************************************************************
-
-    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName);
-
-    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpTypeName);
-
     void WriteTimeStampFormatData(EnergyPlusData &state,
                                   InputOutputFile &outputFile,
                                   ReportingFrequency reportingInterval,   // Reporting frequency.
@@ -735,12 +708,6 @@ namespace OutputProcessor {
                                   Optional_int_const DST = _,             // A flag indicating whether daylight savings time is observed
                                   Optional_string_const DayType = _       // The day tied for the data (e.g., Monday)
     );
-
-    void WriteYearlyTimeStamp(EnergyPlusData &state,
-                              InputOutputFile &outputFile,
-                              std::string const &reportIDString, // The ID of the time stamp
-                              std::string const &yearOfSimChr,   // the year of the simulation
-                              bool writeToSQL);
 
     void WriteReportVariableDictionaryItem(EnergyPlusData &state,
                                            ReportingFrequency reportingInterval, // The reporting interval (e.g., hourly, daily)
@@ -767,11 +734,6 @@ namespace OutputProcessor {
                                   OutputProcessor::Unit const &unit, // The variables units
                                   bool cumulativeMeterFlag,          // A flag indicating cumulative data
                                   bool meterFileOnlyFlag             // A flag indicating whether the data is to be written to standard output
-    );
-
-    void WriteRealVariableOutput(EnergyPlusData &state,
-                                 RealVariables &realVar,       // Real variable to write out
-                                 ReportingFrequency reportType // The report type or interval (e.g., hourly)
     );
 
     void WriteReportRealData(EnergyPlusData &state,
@@ -817,11 +779,6 @@ namespace OutputProcessor {
                           int32_t repValue              // The variable's value
     );
 
-    void WriteIntegerVariableOutput(EnergyPlusData &state,
-                                    IntegerVariables &intVar,     // Integer variable to write out
-                                    ReportingFrequency reportType // The report type (i.e., the reporting interval)
-    );
-
     void WriteReportIntegerData(EnergyPlusData &state,
                                 int reportID,                         // The variable's reporting ID
                                 std::string const &reportIDString,    // The variable's reporting ID (character)
@@ -836,8 +793,6 @@ namespace OutputProcessor {
     );
 
     int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName); // the meter name
-
-    std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter); // the meter
 
     void SetInternalVariableValue(EnergyPlusData &state,
                                   OutputProcessor::VariableType varType, // 1=integer, 2=real, 3=meter
@@ -929,8 +884,6 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
                             int MeterNumber,                           // Which Meter Number (from GetMeterIndex)
                             OutputProcessor::TimeStepType TimeStepType // Whether this is zone of HVAC
 );
-
-void IncrementInstMeterCache(EnergyPlusData &state);
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
                                 OutputProcessor::VariableType varType, // 1=integer, 2=real, 3=meter

@@ -176,12 +176,8 @@ namespace OutputReportPredefined {
 
     std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName);
 
-    void incrementTableEntry(EnergyPlusData &state);
-
     void AddCompSizeTableEntry(
         EnergyPlusData &state, std::string_view FieldType, std::string_view FieldName, std::string_view FieldDescription, Real64 const FieldValue);
-
-    void AddShadowRelateTableEntry(EnergyPlusData &state, int const castingField, int const receivingField, int const receivingKind);
 
     int
     newPreDefReport(EnergyPlusData &state, std::string_view inReportName, std::string_view inReportAbrev, std::string_view inReportNamewithSpaces);

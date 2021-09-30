@@ -136,20 +136,22 @@ namespace OutputProcessor {
         state.dataOutputProcessor->IVariableTypes.redimension(state.dataOutputProcessor->MaxIVariable += IVarAllocInc);
     }
 
-    void InitializeOutput(EnergyPlusData &state)
+    void InitializeMeters(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   December 1998
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2001
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine initializes the OutputProcessor data structures.
+        // This subroutine creates the set of meters in EnergyPlus.  In this initial
+        // implementation, it is a static set of meters.
 
         // METHODOLOGY EMPLOYED:
-        // na
+        // Allocate the static set.  Use "AddMeter" with appropriate arguments that will
+        // allow expansion later.
 
         // REFERENCES:
         // na
@@ -157,6 +159,7 @@ namespace OutputProcessor {
         // USE STATEMENTS:
         // na
 
+        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
 
@@ -170,6 +173,21 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
+    }
+
+    void InitializeOutput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   December 1998
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine initializes the OutputProcessor data structures.
 
         auto &op(state.dataOutputProcessor);
 
@@ -950,49 +968,39 @@ namespace OutputProcessor {
         return "Unknown";
     }
 
-    // *****************************************************************************
-    // The following routines implement Energy Meters in EnergyPlus.
-    // *****************************************************************************
-
-    void InitializeMeters(EnergyPlusData &state)
+    void AttachCustomMeters(EnergyPlusData &state,
+                            int const RepVarNum, // Number of this report variable
+                            int &MeterArrayPtr,  // Input/Output set of Pointers to Meters
+                            int const MeterIndex // Which meter this is
+    )
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2001
+        //       DATE WRITTEN   January 2006
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine creates the set of meters in EnergyPlus.  In this initial
-        // implementation, it is a static set of meters.
-
-        // METHODOLOGY EMPLOYED:
-        // Allocate the static set.  Use "AddMeter" with appropriate arguments that will
-        // allow expansion later.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
+        // This subroutine determines which meters this variable will be on (if any),
+        // sets up the meter pointer arrays, and returns a index value to this array which
+        // is stored with the variable.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto &op(state.dataOutputProcessor);
 
-        state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
+        if (MeterArrayPtr == 0) {
+            op->VarMeterArrays.redimension(++op->NumVarMeterArrays);
+            MeterArrayPtr = op->NumVarMeterArrays;
+            op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters = 0;
+            op->VarMeterArrays(op->NumVarMeterArrays).RepVariable = RepVarNum;
+            op->VarMeterArrays(op->NumVarMeterArrays).OnMeters = 0;
+            op->VarMeterArrays(op->NumVarMeterArrays).OnCustomMeters.allocate(1);
+            op->VarMeterArrays(op->NumVarMeterArrays).NumOnCustomMeters = 1;
+        } else { // MeterArrayPtr set
+            op->VarMeterArrays(MeterArrayPtr).OnCustomMeters.redimension(++op->VarMeterArrays(MeterArrayPtr).NumOnCustomMeters);
+        }
+        op->VarMeterArrays(MeterArrayPtr).OnCustomMeters(op->VarMeterArrays(MeterArrayPtr).NumOnCustomMeters) = MeterIndex;
     }
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound)
@@ -1895,6 +1903,98 @@ namespace OutputProcessor {
         }
     }
 
+    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
+    {
+
+        auto &op(state.dataOutputProcessor);
+
+        bool Found = false;
+        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
+
+                for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {
+                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).spaceTypeName(endUseSpTypeNum), EndUseSpaceTypeName)) {
+                        // Space type already exists, no further action required
+                        Found = true;
+                        break;
+                    }
+                }
+
+                if (!Found) {
+                    // Add the space type by reallocating the array
+                    int numSpTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
+                    op->EndUseCategory(EndUseNum).spaceTypeName.redimension(numSpTypes + 1);
+
+                    op->EndUseCategory(EndUseNum).numSpaceTypes = numSpTypes + 1;
+                    op->EndUseCategory(EndUseNum).spaceTypeName(numSpTypes + 1) = EndUseSpaceTypeName;
+
+                    if (op->EndUseCategory(EndUseNum).numSpaceTypes > op->maxNumEndUseSpaceTypes) {
+                        op->maxNumEndUseSpaceTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
+                    }
+
+                    Found = true;
+                }
+                break;
+            }
+        }
+
+        if (!Found) {
+            ShowSevereError(state, "Nonexistent end use passed to addEndUseSpaceType=" + EndUseName);
+        }
+    }
+
+    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   February 2006
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine manages the list of subcategories for each end-use category.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int EndUseSubNum;
+        int NumSubs;
+        auto &op(state.dataOutputProcessor);
+
+        bool Found = false;
+        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
+
+                for (EndUseSubNum = 1; EndUseSubNum <= op->EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
+                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).SubcategoryName(EndUseSubNum), EndUseSubName)) {
+                        // Subcategory already exists, no further action required
+                        Found = true;
+                        break;
+                    }
+                }
+
+                if (!Found) {
+                    // Add the subcategory by reallocating the array
+                    NumSubs = op->EndUseCategory(EndUseNum).NumSubcategories;
+                    op->EndUseCategory(EndUseNum).SubcategoryName.redimension(NumSubs + 1);
+
+                    op->EndUseCategory(EndUseNum).NumSubcategories = NumSubs + 1;
+                    op->EndUseCategory(EndUseNum).SubcategoryName(NumSubs + 1) = EndUseSubName;
+
+                    if (op->EndUseCategory(EndUseNum).NumSubcategories > op->MaxNumSubcategories) {
+                        op->MaxNumSubcategories = op->EndUseCategory(EndUseNum).NumSubcategories;
+                    }
+
+                    Found = true;
+                }
+                break;
+            }
+        }
+
+        if (!Found) {
+            ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
+        }
+    }
+
     void AttachMeters(EnergyPlusData &state,
                       OutputProcessor::Unit const &MtrUnits, // Units for this meter
                       std::string &ResourceType,             // Electricity, Gas, etc.
@@ -2013,41 +2113,6 @@ namespace OutputProcessor {
                 }
             }
         }
-    }
-
-    void AttachCustomMeters(EnergyPlusData &state,
-                            int const RepVarNum, // Number of this report variable
-                            int &MeterArrayPtr,  // Input/Output set of Pointers to Meters
-                            int const MeterIndex // Which meter this is
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine determines which meters this variable will be on (if any),
-        // sets up the meter pointer arrays, and returns a index value to this array which
-        // is stored with the variable.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
-
-        if (MeterArrayPtr == 0) {
-            op->VarMeterArrays.redimension(++op->NumVarMeterArrays);
-            MeterArrayPtr = op->NumVarMeterArrays;
-            op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters = 0;
-            op->VarMeterArrays(op->NumVarMeterArrays).RepVariable = RepVarNum;
-            op->VarMeterArrays(op->NumVarMeterArrays).OnMeters = 0;
-            op->VarMeterArrays(op->NumVarMeterArrays).OnCustomMeters.allocate(1);
-            op->VarMeterArrays(op->NumVarMeterArrays).NumOnCustomMeters = 1;
-        } else { // MeterArrayPtr set
-            op->VarMeterArrays(MeterArrayPtr).OnCustomMeters.redimension(++op->VarMeterArrays(MeterArrayPtr).NumOnCustomMeters);
-        }
-        op->VarMeterArrays(MeterArrayPtr).OnCustomMeters(op->VarMeterArrays(MeterArrayPtr).NumOnCustomMeters) = MeterIndex;
     }
 
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
@@ -3061,6 +3126,18 @@ namespace OutputProcessor {
         }
     }
 
+    void WriteYearlyTimeStamp(EnergyPlusData &state,
+                              InputOutputFile &outputFile,
+                              std::string const &reportIDString, // The ID of the time stamp
+                              std::string const &yearOfSimChr,   // the year of the simulation
+                              bool writeToSQL)
+    {
+        print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
+        if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
+        }
+    }
+
     void ReportYRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL)
     {
 
@@ -3654,100 +3731,6 @@ namespace OutputProcessor {
         }
     }
 
-    // *****************************************************************************
-    // End of routines for Energy Meters implementation in EnergyPlus.
-    // *****************************************************************************
-
-    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   February 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages the list of subcategories for each end-use category.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EndUseSubNum;
-        int NumSubs;
-        auto &op(state.dataOutputProcessor);
-
-        bool Found = false;
-        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
-            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
-
-                for (EndUseSubNum = 1; EndUseSubNum <= op->EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
-                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).SubcategoryName(EndUseSubNum), EndUseSubName)) {
-                        // Subcategory already exists, no further action required
-                        Found = true;
-                        break;
-                    }
-                }
-
-                if (!Found) {
-                    // Add the subcategory by reallocating the array
-                    NumSubs = op->EndUseCategory(EndUseNum).NumSubcategories;
-                    op->EndUseCategory(EndUseNum).SubcategoryName.redimension(NumSubs + 1);
-
-                    op->EndUseCategory(EndUseNum).NumSubcategories = NumSubs + 1;
-                    op->EndUseCategory(EndUseNum).SubcategoryName(NumSubs + 1) = EndUseSubName;
-
-                    if (op->EndUseCategory(EndUseNum).NumSubcategories > op->MaxNumSubcategories) {
-                        op->MaxNumSubcategories = op->EndUseCategory(EndUseNum).NumSubcategories;
-                    }
-
-                    Found = true;
-                }
-                break;
-            }
-        }
-
-        if (!Found) {
-            ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
-        }
-    }
-    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
-    {
-
-        auto &op(state.dataOutputProcessor);
-
-        bool Found = false;
-        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
-            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
-
-                for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {
-                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).spaceTypeName(endUseSpTypeNum), EndUseSpaceTypeName)) {
-                        // Space type already exists, no further action required
-                        Found = true;
-                        break;
-                    }
-                }
-
-                if (!Found) {
-                    // Add the space type by reallocating the array
-                    int numSpTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
-                    op->EndUseCategory(EndUseNum).spaceTypeName.redimension(numSpTypes + 1);
-
-                    op->EndUseCategory(EndUseNum).numSpaceTypes = numSpTypes + 1;
-                    op->EndUseCategory(EndUseNum).spaceTypeName(numSpTypes + 1) = EndUseSpaceTypeName;
-
-                    if (op->EndUseCategory(EndUseNum).numSpaceTypes > op->maxNumEndUseSpaceTypes) {
-                        op->maxNumEndUseSpaceTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
-                    }
-
-                    Found = true;
-                }
-                break;
-            }
-        }
-
-        if (!Found) {
-            ShowSevereError(state, "Nonexistent end use passed to addEndUseSpaceType=" + EndUseName);
-        }
-    }
     void WriteTimeStampFormatData(
         EnergyPlusData &state,
         InputOutputFile &outputFile,
@@ -3914,18 +3897,6 @@ namespace OutputProcessor {
                     "Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
             }
             break;
-        }
-    }
-
-    void WriteYearlyTimeStamp(EnergyPlusData &state,
-                              InputOutputFile &outputFile,
-                              std::string const &reportIDString, // The ID of the time stamp
-                              std::string const &yearOfSimChr,   // the year of the simulation
-                              bool writeToSQL)
-    {
-        print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
-        if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
         }
     }
 
@@ -7141,6 +7112,34 @@ Real64 GetCurrentMeterValue(EnergyPlusData &state, int const MeterNumber) // Whi
     return CurrentMeterValue;
 }
 
+void IncrementInstMeterCache(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Jason Glazer
+    //       DATE WRITTEN   January 2013
+    //       MODIFIED
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Manage the InstMeterCache array
+
+    // METHODOLOGY EMPLOYED:
+    // When the array grows to large, double it.
+
+    auto &op(state.dataOutputProcessor);
+
+    if (!allocated(op->InstMeterCache)) {
+        op->InstMeterCache.dimension(op->InstMeterCacheSizeInc, 0); // zero the entire array
+        op->InstMeterCacheLastUsed = 1;
+    } else {
+        ++op->InstMeterCacheLastUsed;
+        // if larger than current size grow the array
+        if (op->InstMeterCacheLastUsed > op->InstMeterCacheSize) {
+            op->InstMeterCache.redimension(op->InstMeterCacheSize += op->InstMeterCacheSizeInc, 0);
+        }
+    }
+}
+
 Real64 GetInstantMeterValue(EnergyPlusData &state,
                             int const MeterNumber,                             // Which Meter Number (from GetMeterIndex)
                             OutputProcessor::TimeStepType const t_timeStepType // Whether this is zone of HVAC
@@ -7295,34 +7294,6 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
     }
 
     return InstantMeterValue;
-}
-
-void IncrementInstMeterCache(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Jason Glazer
-    //       DATE WRITTEN   January 2013
-    //       MODIFIED
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Manage the InstMeterCache array
-
-    // METHODOLOGY EMPLOYED:
-    // When the array grows to large, double it.
-
-    auto &op(state.dataOutputProcessor);
-
-    if (!allocated(op->InstMeterCache)) {
-        op->InstMeterCache.dimension(op->InstMeterCacheSizeInc, 0); // zero the entire array
-        op->InstMeterCacheLastUsed = 1;
-    } else {
-        ++op->InstMeterCacheLastUsed;
-        // if larger than current size grow the array
-        if (op->InstMeterCacheLastUsed > op->InstMeterCacheSize) {
-            op->InstMeterCache.redimension(op->InstMeterCacheSize += op->InstMeterCacheSizeInc, 0);
-        }
-    }
 }
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,

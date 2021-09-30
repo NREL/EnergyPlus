@@ -74,10 +74,7 @@ namespace OutAirNodeManager {
                                   int NodeNumber, // Number of node to check to see if in Outside Air list
                                   bool &Okay      // True if found, false if not
     );
-    void SetOANodeValues(EnergyPlusData &state,
-                         int NodeNum,  // Number of node to check to see if in Outside Air list
-                         bool InitCall // True if Init calls, false if CheckAndAddAirNodeNumber calls
-    );
+
 } // namespace OutAirNodeManager
 
 struct OutAirNodeManagerData : BaseGlobalStruct

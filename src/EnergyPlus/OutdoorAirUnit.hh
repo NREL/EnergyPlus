@@ -258,8 +258,6 @@ namespace OutdoorAirUnit {
                             bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeOutdoorAirUnit(EnergyPlusData &state, int OAUnitNum);
-
     void CalcOutdoorAirUnit(EnergyPlusData &state,
                             int &OAUnitNum,           // number of the current unit being simulated
                             int ZoneNum,              // number of zone being served
@@ -268,27 +266,11 @@ namespace OutdoorAirUnit {
                             Real64 &LatOutputProvided // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void SimZoneOutAirUnitComps(EnergyPlusData &state, int OAUnitNum, bool FirstHVACIteration);
-
-    void SimOutdoorAirEquipComps(EnergyPlusData &state,
-                                 int OAUnitNum,                // actual outdoor air unit num
-                                 std::string const &EquipType, // the component type
-                                 std::string const &EquipName, // the component Name
-                                 int EquipNum,
-                                 CompType CompTypeNum, // Component Type -- Integerized for this module
-                                 bool FirstHVACIteration,
-                                 int &CompIndex,
-                                 bool Sim // if TRUE, simulate component
-    );
-
     void CalcOAUnitCoilComps(EnergyPlusData &state,
                              int CompNum, // actual outdoor air unit num
                              bool FirstHVACIteration,
                              int EquipIndex, // Component Type -- Integerized for this module
                              Real64 &LoadMet);
-
-    void ReportOutdoorAirUnit(EnergyPlusData &state,
-                              int OAUnitNum); // Index for the outdoor air unit under consideration within the derived types
 
     int GetOutdoorAirUnitOutAirNode(EnergyPlusData &state, int OAUnitNum);
 

@@ -1282,6 +1282,53 @@ namespace OutputReportPredefined {
         s->pdchIllumOccuHourBright = newPreDefColumn(state, s->pdstIllumOccuHours, "Bright (>500 lux) [hr]");
     }
 
+    void incrementTableEntry(EnergyPlusData &state)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason Glazer
+        //       DATE WRITTEN   August 2006
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   Manages the resizing of the TableEntry Array
+
+        // METHODOLOGY EMPLOYED:
+        //   Simple assignments to public variables.
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        if (!allocated(state.dataOutRptPredefined->tableEntry)) {
+            state.dataOutRptPredefined->tableEntry.allocate(sizeIncrement);
+            state.dataOutRptPredefined->sizeTableEntry = sizeIncrement;
+            state.dataOutRptPredefined->numTableEntry = 1;
+        } else {
+            ++state.dataOutRptPredefined->numTableEntry;
+            // if larger than current size grow the array
+            if (state.dataOutRptPredefined->numTableEntry > state.dataOutRptPredefined->sizeTableEntry) {
+                state.dataOutRptPredefined->tableEntry.redimension(
+                    state.dataOutRptPredefined->sizeTableEntry *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+            }
+        }
+    }
+
     void PreDefTableEntry(
         EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
     {
@@ -1445,53 +1492,6 @@ namespace OutputReportPredefined {
             }
         }
         return "NOT FOUND";
-    }
-
-    void incrementTableEntry(EnergyPlusData &state)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   August 2006
-        //       MODIFIED
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   Manages the resizing of the TableEntry Array
-
-        // METHODOLOGY EMPLOYED:
-        //   Simple assignments to public variables.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (!allocated(state.dataOutRptPredefined->tableEntry)) {
-            state.dataOutRptPredefined->tableEntry.allocate(sizeIncrement);
-            state.dataOutRptPredefined->sizeTableEntry = sizeIncrement;
-            state.dataOutRptPredefined->numTableEntry = 1;
-        } else {
-            ++state.dataOutRptPredefined->numTableEntry;
-            // if larger than current size grow the array
-            if (state.dataOutRptPredefined->numTableEntry > state.dataOutRptPredefined->sizeTableEntry) {
-                state.dataOutRptPredefined->tableEntry.redimension(
-                    state.dataOutRptPredefined->sizeTableEntry *=
-                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
-            }
-        }
     }
 
     void AddCompSizeTableEntry(
