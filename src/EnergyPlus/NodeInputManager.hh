@@ -109,13 +109,6 @@ namespace NodeInputManager {
 
     void SetupNodeVarsForReporting(EnergyPlusData &state);
 
-    void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true when requested Node List not found, unchanged otherwise
-
-    int AssignNodeNumber(EnergyPlusData &state,
-                         std::string const &Name,                         // Name for assignment
-                         DataLoopNode::NodeFluidType const NodeFluidType, // must be valid
-                         bool &ErrorsFound);
-
     int GetOnlySingleNode(EnergyPlusData &state,
                           std::string const &NodeName,
                           bool &errFlag,

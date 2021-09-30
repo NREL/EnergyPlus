@@ -137,6 +137,61 @@ Real64 CalcDepthFromPeriod(EnergyPlusData &state,
     return PenetrationDepth;
 }
 
+void ReportMoistureBalanceEMPD(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Lixing Gu
+    //       DATE WRITTEN   August 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine gives a detailed report to the user about
+    // EMPD Properties of each construction.
+
+    // Using/Aliasing
+    using General::ScanForReports;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    bool DoReport;
+
+    int ConstrNum;
+    int MatNum;
+
+    ScanForReports(state, "Constructions", DoReport, "Constructions");
+
+    if (!DoReport) return;
+    //   Write Descriptions
+    print(state.files.eio,
+          "{}",
+          "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
+          "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
+          "Coating Thickness {m}\n");
+
+    for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+        if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
+        MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
+        if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
+            static constexpr std::string_view Format_700(
+                " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
+            print(state.files.eio,
+                  Format_700,
+                  state.dataConstruction->Construct(ConstrNum).Name,
+                  state.dataMaterial->Material(MatNum).Name,
+                  state.dataMaterial->Material(MatNum).EMPDmu,
+                  state.dataMaterial->Material(MatNum).MoistACoeff,
+                  state.dataMaterial->Material(MatNum).MoistBCoeff,
+                  state.dataMaterial->Material(MatNum).MoistCCoeff,
+                  state.dataMaterial->Material(MatNum).MoistDCoeff,
+                  state.dataMaterial->Material(MatNum).EMPDSurfaceDepth,
+                  state.dataMaterial->Material(MatNum).EMPDDeepDepth,
+                  state.dataMaterial->Material(MatNum).EMPDmuCoating,
+                  state.dataMaterial->Material(MatNum).EMPDCoatingThickness);
+        }
+    }
+}
+
 void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 {
 
@@ -726,61 +781,6 @@ void UpdateMoistureBalanceEMPD(EnergyPlusData &state, int const SurfNum) // Surf
     state.dataMstBalEMPD->RVSurfaceOld(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);
     state.dataMstBalEMPD->RVdeepOld(SurfNum) = state.dataMstBalEMPD->RVDeepLayer(SurfNum);
     state.dataMstBalEMPD->RVSurfLayerOld(SurfNum) = state.dataMstBalEMPD->RVSurfLayer(SurfNum);
-}
-
-void ReportMoistureBalanceEMPD(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Lixing Gu
-    //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This routine gives a detailed report to the user about
-    // EMPD Properties of each construction.
-
-    // Using/Aliasing
-    using General::ScanForReports;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool DoReport;
-
-    int ConstrNum;
-    int MatNum;
-
-    ScanForReports(state, "Constructions", DoReport, "Constructions");
-
-    if (!DoReport) return;
-    //   Write Descriptions
-    print(state.files.eio,
-          "{}",
-          "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
-          "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
-          "Coating Thickness {m}\n");
-
-    for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-        if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
-        MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-        if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
-            static constexpr std::string_view Format_700(
-                " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
-            print(state.files.eio,
-                  Format_700,
-                  state.dataConstruction->Construct(ConstrNum).Name,
-                  state.dataMaterial->Material(MatNum).Name,
-                  state.dataMaterial->Material(MatNum).EMPDmu,
-                  state.dataMaterial->Material(MatNum).MoistACoeff,
-                  state.dataMaterial->Material(MatNum).MoistBCoeff,
-                  state.dataMaterial->Material(MatNum).MoistCCoeff,
-                  state.dataMaterial->Material(MatNum).MoistDCoeff,
-                  state.dataMaterial->Material(MatNum).EMPDSurfaceDepth,
-                  state.dataMaterial->Material(MatNum).EMPDDeepDepth,
-                  state.dataMaterial->Material(MatNum).EMPDmuCoating,
-                  state.dataMaterial->Material(MatNum).EMPDCoatingThickness);
-        }
-    }
 }
 
 } // namespace EnergyPlus::MoistureBalanceEMPDManager

@@ -257,10 +257,6 @@ namespace IntegratedHeatPump {
 
     void SizeIHP(EnergyPlusData &state, int const CoilNum);
 
-    void InitializeIHP(EnergyPlusData &state, int const DXCoilNum);
-
-    void UpdateIHP(EnergyPlusData &state, int const DXCoilNum);
-
     void DecideWorkMode(EnergyPlusData &state,
                         int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]

@@ -78,25 +78,6 @@ namespace MatrixDataManager {
     // METHODOLOGY EMPLOYED:
     // Basic calls to InputProcessor, series of simple get and set routines
 
-    // REFERENCES:
-    // none
-
-    // OTHER NOTES:
-    // first implemented for complex fenestration
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // todo, flush out the following routines, see CurveManager for patterns
-    // PUBLIC GetMatrixValue
-    // PUBLIC GetMatrixCheck
-    // PUBLIC GetMatrixType
-    // PUBLIC GetMatrixMinMaxValues
-    // PUBLIC SetMatrixOutputMinMaxValues
-    // PUBLIC GetMatrixName
-
     // Object Data
 
 // MSVC was complaining that it detected a divide by zero in the Row = (El - 1) / NumCols + 1 line, indicating it thought NumCols was zero

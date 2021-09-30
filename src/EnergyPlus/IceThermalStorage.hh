@@ -264,13 +264,6 @@ namespace IceThermalStorage {
         void setupOutputVars(EnergyPlusData &state);
     };
 
-    void GetIceStorageInput(EnergyPlusData &state);
-
-    Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
-                                  Real64 Tout, // ice storage unit outlet (setpoint) temperature
-                                  Real64 Tfr   // freezing temperature
-    );
-
     Real64 CalcQstar(EnergyPlusData &state,
                      int CurveIndex,                 // curve index
                      enum CurveVars CurveIndVarType, // independent variable type for ice storage
@@ -278,10 +271,6 @@ namespace IceThermalStorage {
                      Real64 LMTDstar,                // normalized log mean temperature difference across the ice storage unit
                      Real64 MassFlowstar             // normalized mass flow rate through the ice storage unit
     );
-
-    Real64 TempSItoIP(Real64 Temp);
-
-    Real64 TempIPtoSI(Real64 Temp);
 
     void UpdateIceFractions(EnergyPlusData &state);
 

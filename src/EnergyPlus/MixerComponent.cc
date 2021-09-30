@@ -79,6 +79,241 @@ namespace EnergyPlus::MixerComponent {
 // Using/Aliasing
 using namespace DataLoopNode;
 
+void InitAirMixer(EnergyPlusData &state, int const MixerNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard J. Liesen
+    //       DATE WRITTEN   March 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine is for  initializations of the Mixer Components.
+
+    // METHODOLOGY EMPLOYED:
+    // Uses the status flags to trigger events.
+
+    // REFERENCES:
+    // na
+
+    // USE STATEMENTS:
+    // na
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int InletNode;
+    int NodeNum;
+
+    // Do the following initializations (every time step): This should be the info from
+    // the previous components outlets or the node data in this section.
+
+    // Transfer the node data to MixerCond data structure
+    for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
+
+        InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(NodeNum);
+        // Set all of the inlet mass flow variables from the nodes
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+        // Set all of the inlet state variables from the inlet nodes
+        state.dataMixerComponent->MixerCond(MixerNum).InletTemp(NodeNum) = state.dataLoopNodes->Node(InletNode).Temp;
+        state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(NodeNum) = state.dataLoopNodes->Node(InletNode).HumRat;
+        state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(NodeNum) = state.dataLoopNodes->Node(InletNode).Enthalpy;
+        state.dataMixerComponent->MixerCond(MixerNum).InletPressure(NodeNum) = state.dataLoopNodes->Node(InletNode).Press;
+    }
+}
+
+void CalcAirMixer(EnergyPlusData &state, int &MixerNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard J. Liesen
+    //       DATE WRITTEN   March 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // Using/Aliasing
+    using Psychrometrics::PsyTdbFnHW;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int InletNodeNum;
+
+    // Reset the totals to zero before they are summed.
+    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate = 0.0;
+    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail = 0.0;
+    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail = 0.0;
+    state.dataMixerComponent->MixerCond(MixerNum).OutletTemp = 0.0;
+    state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat = 0.0;
+    state.dataMixerComponent->MixerCond(MixerNum).OutletPressure = 0.0;
+    state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy = 0.0;
+
+    for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate +=
+            state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum);
+        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail +=
+            state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(InletNodeNum);
+        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail +=
+            state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail(InletNodeNum);
+    }
+
+    if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
+
+        // Mass balance on moisture to get outlet air humidity ratio
+
+        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+            state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat +=
+                state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) *
+                state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(InletNodeNum) /
+                state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+        }
+
+        // "Momentum balance" to get outlet air pressure
+
+        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+            state.dataMixerComponent->MixerCond(MixerNum).OutletPressure +=
+                state.dataMixerComponent->MixerCond(MixerNum).InletPressure(InletNodeNum) *
+                state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
+                state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+        }
+
+        // Energy balance to get outlet air enthalpy
+
+        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+            state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy +=
+                state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(InletNodeNum) *
+                state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
+                state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+        }
+
+        // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
+
+        state.dataMixerComponent->MixerCond(MixerNum).OutletTemp =
+            PsyTdbFnHW(state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy, state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat);
+
+    } else {
+        // Mass Flow in air loop is zero and loop is not operating.
+        // Arbitrarily set the output to the first inlet leg
+        state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat = state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(1);
+        state.dataMixerComponent->MixerCond(MixerNum).OutletPressure = state.dataMixerComponent->MixerCond(MixerNum).InletPressure(1);
+        state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy = state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(1);
+        state.dataMixerComponent->MixerCond(MixerNum).OutletTemp = state.dataMixerComponent->MixerCond(MixerNum).InletTemp(1);
+    }
+
+    // make sure MassFlowRateMaxAvail is >= MassFlowRate
+    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail = max(
+        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail, state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate);
+}
+
+void UpdateAirMixer(EnergyPlusData &state, int const MixerNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard J. Liesen
+    //       DATE WRITTEN   March 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int OutletNode;
+    int InletNode;
+    int InletNodeNum;
+
+    OutletNode = state.dataMixerComponent->MixerCond(MixerNum).OutletNode;
+    InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(1); // For now use first inlet node
+
+    // Set the outlet air nodes of the Mixer
+    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail;
+    state.dataLoopNodes->Node(OutletNode).Temp = state.dataMixerComponent->MixerCond(MixerNum).OutletTemp;
+    state.dataLoopNodes->Node(OutletNode).HumRat = state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat;
+    state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy;
+    state.dataLoopNodes->Node(OutletNode).Press = state.dataMixerComponent->MixerCond(MixerNum).OutletPressure;
+    // Set the outlet nodes for properties that just pass through & not used
+    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
+            // CO2 balance to get outlet air CO2
+            state.dataLoopNodes->Node(OutletNode).CO2 = 0.0;
+            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+                state.dataLoopNodes->Node(OutletNode).CO2 +=
+                    state.dataLoopNodes->Node(state.dataMixerComponent->MixerCond(MixerNum).InletNode(InletNodeNum)).CO2 *
+                    state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
+                    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+            }
+        } else {
+            state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+        }
+    }
+
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
+            // Generic contaminant balance to get outlet air CO2
+            state.dataLoopNodes->Node(OutletNode).GenContam = 0.0;
+            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+                state.dataLoopNodes->Node(OutletNode).GenContam +=
+                    state.dataLoopNodes->Node(state.dataMixerComponent->MixerCond(MixerNum).InletNode(InletNodeNum)).GenContam *
+                    state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
+                    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+            }
+        } else {
+            state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+        }
+    }
+}
+
+void ReportMixer([[maybe_unused]] int const MixerNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard J. Liesen
+    //       DATE WRITTEN   March 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine needs a description.
+
+    // METHODOLOGY EMPLOYED:
+    // Needs description, as appropriate.
+
+    // REFERENCES:
+    // na
+
+    // USE STATEMENTS:
+    // na
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // na
+
+    // Write(*,*)=MixerCond(MixerNum)%MixerPower    Still needs to report the Mixer power from this component
+}
+
 void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
 
@@ -141,9 +376,6 @@ void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompInde
     // Report the current Mixer
     ReportMixer(MixerNum);
 }
-
-// Get Input Section of the Module
-//******************************************************************************
 
 void GetMixerInput(EnergyPlusData &state)
 {
@@ -312,291 +544,6 @@ void GetMixerInput(EnergyPlusData &state)
     }
 }
 
-// End of Get Input subroutines for the HB Module
-//******************************************************************************
-
-// Beginning Initialization Section of the Module
-//******************************************************************************
-
-void InitAirMixer(EnergyPlusData &state, int const MixerNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard J. Liesen
-    //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is for  initializations of the Mixer Components.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the status flags to trigger events.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
-    int NodeNum;
-
-    // Do the following initializations (every time step): This should be the info from
-    // the previous components outlets or the node data in this section.
-
-    // Transfer the node data to MixerCond data structure
-    for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
-
-        InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(NodeNum);
-        // Set all of the inlet mass flow variables from the nodes
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
-        // Set all of the inlet state variables from the inlet nodes
-        state.dataMixerComponent->MixerCond(MixerNum).InletTemp(NodeNum) = state.dataLoopNodes->Node(InletNode).Temp;
-        state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(NodeNum) = state.dataLoopNodes->Node(InletNode).HumRat;
-        state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(NodeNum) = state.dataLoopNodes->Node(InletNode).Enthalpy;
-        state.dataMixerComponent->MixerCond(MixerNum).InletPressure(NodeNum) = state.dataLoopNodes->Node(InletNode).Press;
-    }
-}
-
-// End Initialization Section of the Module
-//******************************************************************************
-
-// Begin Algorithm Section of the Module
-//******************************************************************************
-
-void CalcAirMixer(EnergyPlusData &state, int &MixerNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard J. Liesen
-    //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine needs a description.
-
-    // METHODOLOGY EMPLOYED:
-    // Needs description, as appropriate.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using Psychrometrics::PsyTdbFnHW;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNodeNum;
-
-    // Reset the totals to zero before they are summed.
-    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate = 0.0;
-    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail = 0.0;
-    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail = 0.0;
-    state.dataMixerComponent->MixerCond(MixerNum).OutletTemp = 0.0;
-    state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat = 0.0;
-    state.dataMixerComponent->MixerCond(MixerNum).OutletPressure = 0.0;
-    state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy = 0.0;
-
-    for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate +=
-            state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum);
-        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail +=
-            state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(InletNodeNum);
-        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail +=
-            state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail(InletNodeNum);
-    }
-
-    if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
-
-        // Mass balance on moisture to get outlet air humidity ratio
-
-        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-            state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat +=
-                state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) *
-                state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(InletNodeNum) /
-                state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-        }
-
-        // "Momentum balance" to get outlet air pressure
-
-        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-            state.dataMixerComponent->MixerCond(MixerNum).OutletPressure +=
-                state.dataMixerComponent->MixerCond(MixerNum).InletPressure(InletNodeNum) *
-                state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
-                state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-        }
-
-        // Energy balance to get outlet air enthalpy
-
-        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-            state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy +=
-                state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(InletNodeNum) *
-                state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
-                state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-        }
-
-        // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
-
-        state.dataMixerComponent->MixerCond(MixerNum).OutletTemp =
-            PsyTdbFnHW(state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy, state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat);
-
-    } else {
-        // Mass Flow in air loop is zero and loop is not operating.
-        // Arbitrarily set the output to the first inlet leg
-        state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat = state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(1);
-        state.dataMixerComponent->MixerCond(MixerNum).OutletPressure = state.dataMixerComponent->MixerCond(MixerNum).InletPressure(1);
-        state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy = state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(1);
-        state.dataMixerComponent->MixerCond(MixerNum).OutletTemp = state.dataMixerComponent->MixerCond(MixerNum).InletTemp(1);
-    }
-
-    // make sure MassFlowRateMaxAvail is >= MassFlowRate
-    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail = max(
-        state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail, state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate);
-}
-
-// End Algorithm Section of the Module
-// *****************************************************************************
-
-// Beginning of Update subroutines for the Mixer Module
-// *****************************************************************************
-
-void UpdateAirMixer(EnergyPlusData &state, int const MixerNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard J. Liesen
-    //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
-    int InletNodeNum;
-
-    OutletNode = state.dataMixerComponent->MixerCond(MixerNum).OutletNode;
-    InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(1); // For now use first inlet node
-
-    // Set the outlet air nodes of the Mixer
-    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail;
-    state.dataLoopNodes->Node(OutletNode).Temp = state.dataMixerComponent->MixerCond(MixerNum).OutletTemp;
-    state.dataLoopNodes->Node(OutletNode).HumRat = state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat;
-    state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy;
-    state.dataLoopNodes->Node(OutletNode).Press = state.dataMixerComponent->MixerCond(MixerNum).OutletPressure;
-    // Set the outlet nodes for properties that just pass through & not used
-    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
-
-    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
-            // CO2 balance to get outlet air CO2
-            state.dataLoopNodes->Node(OutletNode).CO2 = 0.0;
-            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-                state.dataLoopNodes->Node(OutletNode).CO2 +=
-                    state.dataLoopNodes->Node(state.dataMixerComponent->MixerCond(MixerNum).InletNode(InletNodeNum)).CO2 *
-                    state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
-                    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-            }
-        } else {
-            state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
-        }
-    }
-
-    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
-            // Generic contaminant balance to get outlet air CO2
-            state.dataLoopNodes->Node(OutletNode).GenContam = 0.0;
-            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-                state.dataLoopNodes->Node(OutletNode).GenContam +=
-                    state.dataLoopNodes->Node(state.dataMixerComponent->MixerCond(MixerNum).InletNode(InletNodeNum)).GenContam *
-                    state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
-                    state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-            }
-        } else {
-            state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
-        }
-    }
-}
-
-//        End of Update subroutines for the Mixer Module
-// *****************************************************************************
-
-// Beginning of Reporting subroutines for the Mixer Module
-// *****************************************************************************
-
-void ReportMixer([[maybe_unused]] int const MixerNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard J. Liesen
-    //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine needs a description.
-
-    // METHODOLOGY EMPLOYED:
-    // Needs description, as appropriate.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    // Write(*,*)=MixerCond(MixerNum)%MixerPower    Still needs to report the Mixer power from this component
-}
-
-//        End of Reporting subroutines for the Mixer Module
-
-// Beginning of Utility subroutines for the Mixer Component
-// *****************************************************************************
-
 void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType)
 {
 
@@ -653,8 +600,5 @@ int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
 
     return thisMixer;
 }
-
-// End of Utility subroutines for the Mixer Component
-// *****************************************************************************
 
 } // namespace EnergyPlus::MixerComponent

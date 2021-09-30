@@ -85,10 +85,6 @@ namespace MoistureBalanceEMPDManager {
     };
 
     // Functions
-    Real64 CalcDepthFromPeriod(EnergyPlusData &state,
-                               Real64 period,                          // in seconds
-                               Material::MaterialProperties const &mat // material
-    );
 
     void GetMoistureBalanceEMPDInput(EnergyPlusData &state);
 
@@ -102,8 +98,6 @@ namespace MoistureBalanceEMPDManager {
     );
 
     void UpdateMoistureBalanceEMPD(EnergyPlusData &state, int SurfNum); // Surface number
-
-    void ReportMoistureBalanceEMPD(EnergyPlusData &state);
 
 } // namespace MoistureBalanceEMPDManager
 

@@ -65,28 +65,7 @@ struct EnergyPlusData;
 
 namespace MatrixDataManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // INTEGER, PARAMETER :: OneDimensional = 1
     int constexpr TwoDimensional = 2;
-    // INTEGER, PARAMETER :: ThreeDimensional = 3
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // todo, flush out the following routines, see CurveManager for patterns
-    // PUBLIC GetMatrixValue
-    // PUBLIC GetMatrixCheck
-    // PUBLIC GetMatrixType
-    // PUBLIC GetMatrixMinMaxValues
-    // PUBLIC SetMatrixOutputMinMaxValues
-    // PUBLIC GetMatrixName
 
     // Types
 
@@ -95,21 +74,13 @@ namespace MatrixDataManager {
         // Members
         std::string Name; // Matrix Name
         int MatrixType;
-        // REAL(r64), DIMENSION(:), ALLOCATABLE     :: Mat1D ! hold data if one dimensional
-        Array2D<Real64> Mat2D; // hold data if two dimensional
-        // REAL(r64), DIMENSION(:,:,:), Allocatable :: Mat3D ! hold data if three dimensional
+        Array2D<Real64> Mat2D; // hold data if two-dimensional
 
         // Default Constructor
         MatrixDataStruct() : MatrixType(0)
         {
         }
     };
-
-    // Object Data
-
-    // Functions
-
-    void GetMatrixInput(EnergyPlusData &state);
 
     int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName);
 

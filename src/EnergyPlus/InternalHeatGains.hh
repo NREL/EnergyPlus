@@ -68,23 +68,9 @@ namespace InternalHeatGains {
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
 
-    void setupIHGZonesAndSpaces(EnergyPlusData &state,
-                                const std::string objectType,
-                                EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
-                                int &numInputObjects,
-                                int &numGainInstances,
-                                bool &errors,
-                                const bool zoneListNotAllowed = false);
-
-    void setupIHGOutputs(EnergyPlusData &state);
-
     void InitInternalHeatGains(EnergyPlusData &state);
 
-    void CheckReturnAirHeatGain(EnergyPlusData &state);
-
     void CalcZoneITEq(EnergyPlusData &state);
-
-    void ReportInternalHeatGains(EnergyPlusData &state);
 
     Real64 GetDesignLightingLevelForZone(EnergyPlusData &state, int const WhichZone); // name of zone
 
@@ -149,25 +135,6 @@ namespace InternalHeatGains {
                                             int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                             const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                             Real64 &SumReturnAirGainRate);
-
-    void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
-                                           int const SpaceNum, // space index pointer for which space to sum gains for
-                                           Real64 &SumRadGainRate);
-
-    void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
-                                          int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                          const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                          Real64 &SumRadiationGainRate,
-                                          int const spaceIndex = 0); // space index pointer, sum gains only for this space
-
-    void SumAllInternalLatentGains(EnergyPlusData &state,
-                                   int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                   Real64 &SumLatentGainRate);
-
-    // Added for hybrid model -- calculate the latent gain from all sources except for people
-    void SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
-                                               int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                               Real64 &SumLatentGainRateExceptPeople);
 
     void SumInternalLatentGainsByTypes(EnergyPlusData &state,
                                        int const ZoneNum,              // zone index pointer for which zone to sum gains for

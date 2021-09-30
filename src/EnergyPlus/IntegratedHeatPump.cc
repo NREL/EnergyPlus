@@ -71,6 +71,175 @@ namespace EnergyPlus::IntegratedHeatPump {
 // Using/Aliasing
 using namespace DataLoopNode;
 
+void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
+{
+    // Obtains and Allocates AS-IHP related parameters from input file
+    if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
+        GetIHPInput(state);
+        state.dataIntegratedHP->GetCoilsInputFlag = false;
+    }
+
+    if (DXCoilNum > static_cast<int>(state.dataIntegratedHP->IntegratedHeatPumps.size()) || DXCoilNum < 1) {
+        ShowFatalError(state,
+                       format("InitializeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                              DXCoilNum,
+                              state.dataIntegratedHP->IntegratedHeatPumps.size()));
+    }
+
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = 0.0;             // air loop mass flow rate [kg/s]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = 0.0; // water loop mass flow rate [kg/s]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0;            // total cooling rate [w]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate = 0.0;       // total water heating rate [w]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0;       // total space heating rate [w]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower = 0.0;                  // total power consumption  [w]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0;             // total latent cooling rate [w]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource = 0.0;                     // source energy rate, [w]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Energy = 0.0;                      // total electric energy consumption [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalCooling = 0.0;      // total cooling energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalHeating = 0.0;      // total heating energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalWaterHeating = 0.0; // total heating energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLatent = 0.0;                // total latent energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergySource = 0.0;                // total source energy
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCOP = 0.0;
+}
+
+void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
+{
+    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
+    int VSCoilIndex(0);
+    Real64 ReportingConstant(0.0);
+    Real64 TotalDelivery(0.0);
+
+    // Obtains and Allocates AS-IHP related parameters from input file
+    if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
+        GetIHPInput(state);
+        state.dataIntegratedHP->GetCoilsInputFlag = false;
+    }
+
+    if (DXCoilNum > static_cast<int>(state.dataIntegratedHP->IntegratedHeatPumps.size()) || DXCoilNum < 1) {
+        ShowFatalError(state,
+                       format("UpdateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                              DXCoilNum,
+                              state.dataIntegratedHP->IntegratedHeatPumps.size()));
+    }
+
+    switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
+    case IHPOperationMode::SCMode:
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal;             // total cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate = 0.0; // total water heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power; // total power consumption  [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLatent; // total latent cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
+        break;
+    case IHPOperationMode::SHMode:
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0;      // total cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate = 0.0; // total water heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // total space heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power;            // total power consumption  [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0; // total latent cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
+        break;
+    case IHPOperationMode::DWHMode:
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0; // total cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource;                // total water heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power;            // total power consumption  [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0; // total latent cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // source energy rate, [w]
+        break;
+    case IHPOperationMode::SCWHMatchSCMode:
+    case IHPOperationMode::SCWHMatchWHMode:
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // total cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource;                // total water heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power; // total power consumption  [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLatent;  // total latent cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource = 0.0; // source energy rate, [w]
+        break;
+    case IHPOperationMode::SCDWHMode:
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal;             // total cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power; // total power consumption  [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLatent; // total latent cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
+
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // total water heating rate [w]
+
+        break;
+    case IHPOperationMode::SHDWHElecHeatOffMode:
+    case IHPOperationMode::SHDWHElecHeatOnMode:
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0; // total cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // total space heating rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power;            // total power consumption  [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0; // total latent cooling rate [w]
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
+
+        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
+            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // total water heating rate [w]
+
+        break;
+    case IHPOperationMode::IdleMode:
+    default:
+        break;
+    }
+
+    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Energy =
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower * ReportingConstant; // total electric energy consumption
+    // [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalCooling =
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate * ReportingConstant; // total cooling energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalHeating =
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate * ReportingConstant; // total heating energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalWaterHeating =
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate * ReportingConstant; // total heating energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLatent =
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad * ReportingConstant; // total latent energy [J]
+    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergySource =
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource * ReportingConstant; // total source energy
+
+    if (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower > 0.0) {
+        TotalDelivery = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate +
+                        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate +
+                        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate;
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCOP =
+            TotalDelivery / state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower;
+    }
+}
+
 void SimIHP(EnergyPlusData &state,
             std::string_view CompName,     // Coil Name
             int &CompIndex,                // Index for Component name
@@ -2229,175 +2398,6 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     };
 
     state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = true;
-}
-
-void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
-{
-    // Obtains and Allocates AS-IHP related parameters from input file
-    if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
-        GetIHPInput(state);
-        state.dataIntegratedHP->GetCoilsInputFlag = false;
-    }
-
-    if (DXCoilNum > static_cast<int>(state.dataIntegratedHP->IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-        ShowFatalError(state,
-                       format("InitializeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
-                              DXCoilNum,
-                              state.dataIntegratedHP->IntegratedHeatPumps.size()));
-    }
-
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = 0.0;             // air loop mass flow rate [kg/s]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate = 0.0; // water loop mass flow rate [kg/s]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0;            // total cooling rate [w]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate = 0.0;       // total water heating rate [w]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0;       // total space heating rate [w]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower = 0.0;                  // total power consumption  [w]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0;             // total latent cooling rate [w]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource = 0.0;                     // source energy rate, [w]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Energy = 0.0;                      // total electric energy consumption [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalCooling = 0.0;      // total cooling energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalHeating = 0.0;      // total heating energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalWaterHeating = 0.0; // total heating energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLatent = 0.0;                // total latent energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergySource = 0.0;                // total source energy
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCOP = 0.0;
-}
-
-void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
-{
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    int VSCoilIndex(0);
-    Real64 ReportingConstant(0.0);
-    Real64 TotalDelivery(0.0);
-
-    // Obtains and Allocates AS-IHP related parameters from input file
-    if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
-        GetIHPInput(state);
-        state.dataIntegratedHP->GetCoilsInputFlag = false;
-    }
-
-    if (DXCoilNum > static_cast<int>(state.dataIntegratedHP->IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-        ShowFatalError(state,
-                       format("UpdateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
-                              DXCoilNum,
-                              state.dataIntegratedHP->IntegratedHeatPumps.size()));
-    }
-
-    switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
-    case IHPOperationMode::SCMode:
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal;             // total cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate = 0.0; // total water heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power; // total power consumption  [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLatent; // total latent cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
-        break;
-    case IHPOperationMode::SHMode:
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0;      // total cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate = 0.0; // total water heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // total space heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power;            // total power consumption  [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0; // total latent cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
-        break;
-    case IHPOperationMode::DWHMode:
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0; // total cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource;                // total water heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power;            // total power consumption  [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0; // total latent cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // source energy rate, [w]
-        break;
-    case IHPOperationMode::SCWHMatchSCMode:
-    case IHPOperationMode::SCWHMatchWHMode:
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // total cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource;                // total water heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power; // total power consumption  [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLatent;  // total latent cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource = 0.0; // source energy rate, [w]
-        break;
-    case IHPOperationMode::SCDWHMode:
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal;             // total cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate = 0.0; // total space heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power; // total power consumption  [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLatent; // total latent cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
-
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // total water heating rate [w]
-
-        break;
-    case IHPOperationMode::SHDWHElecHeatOffMode:
-    case IHPOperationMode::SHDWHElecHeatOnMode:
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate = 0.0; // total cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QLoadTotal; // total space heating rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).Power;            // total power consumption  [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad = 0.0; // total latent cooling rate [w]
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // source energy rate, [w]
-
-        VSCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate =
-            state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).QSource; // total water heating rate [w]
-
-        break;
-    case IHPOperationMode::IdleMode:
-    default:
-        break;
-    }
-
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Energy =
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower * ReportingConstant; // total electric energy consumption
-                                                                                               // [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalCooling =
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate * ReportingConstant; // total cooling energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalHeating =
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate * ReportingConstant; // total heating energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalWaterHeating =
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate * ReportingConstant; // total heating energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLatent =
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad * ReportingConstant; // total latent energy [J]
-    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergySource =
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource * ReportingConstant; // total source energy
-
-    if (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower > 0.0) {
-        TotalDelivery = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate +
-                        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate +
-                        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCOP =
-            TotalDelivery / state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower;
-    }
 }
 
 void DecideWorkMode(EnergyPlusData &state,

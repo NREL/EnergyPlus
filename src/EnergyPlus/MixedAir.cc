@@ -62,13 +62,11 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
@@ -77,7 +75,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
@@ -189,7 +186,7 @@ int GetOAController(EnergyPlusData &state, std::string const &OAName)
     return CurrentOAController;
 }
 
-void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
+void InitOutsideAirSys(EnergyPlusData &state, int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -199,191 +196,46 @@ void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName,
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
-    // Manage the outside air system
+    // Initialize the OutsideAirSys data structure
 
-    if (state.dataMixedAir->GetOASysInputFlag) {
-        GetOutsideAirSysInputs(state);
-        state.dataMixedAir->GetOASysInputFlag = false;
-    }
+    // METHODOLOGY EMPLOYED:
 
-    if (OASysNum == 0) {
-        OASysNum = UtilityRoutines::FindItemInList(OASysName, state.dataAirLoop->OutsideAirSys);
-        if (OASysNum == 0) {
-            ShowFatalError(state, "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName);
-        }
-    }
+    // REFERENCES:
 
-    InitOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
+    // Using/Aliasing
+    using namespace DataLoopNode;
 
-    SimOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
-}
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS
 
-void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
-{
-    int CompNum;
-    auto &CompType = state.dataMixedAir->CompType;
-    auto &CompName = state.dataMixedAir->CompName;
-    bool ReSim(false);
-    bool Sim(true);
-    bool OAHeatCoil(false);
-    bool OACoolCoil(false);
-    bool OAHX(false);
+    // SUBROUTINE PARAMETER DEFINITIONS:
 
-    for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
-        CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
-        CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
-        SimOAComponent(state,
-                       CompType,
-                       CompName,
-                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
-                       FirstHVACIteration,
-                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
-                       AirLoopNum,
-                       Sim,
-                       OASysNum,
-                       OAHeatCoil,
-                       OACoolCoil,
-                       OAHX);
-        if (OAHX) ReSim = true;
-    }
-    // if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
-    // in reverse order to propagate the air flow and conditions out the relief air path to the relief air
-    // exit node
-    if (ReSim) {
-        for (CompNum = state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents - 1; CompNum >= 1; --CompNum) {
-            CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
-            CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
-            SimOAComponent(state,
-                           CompType,
-                           CompName,
-                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
-                           FirstHVACIteration,
-                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
-                           AirLoopNum,
-                           Sim,
-                           OASysNum,
-                           OAHeatCoil,
-                           OACoolCoil,
-                           OAHX);
-        }
-        // now simulate again propagate current temps back through OA system
-        for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
-            CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
-            CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
-            SimOAComponent(state,
-                           CompType,
-                           CompName,
-                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
-                           FirstHVACIteration,
-                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
-                           AirLoopNum,
-                           Sim,
-                           OASysNum,
-                           OAHeatCoil,
-                           OACoolCoil,
-                           OAHX);
-        }
-    }
-}
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   Oct 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Simulate the controllers and components in the outside air system.
+    // DERIVED TYPE DEFINITIONS
+    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CompNum;
-    // INTEGER :: CtrlNum
-    int OAMixerNum;
-    int OAControllerNum;                           // OA controller index in OAController
-    auto &CompType = state.dataMixedAir->CompType; // Tuned Made static
-    auto &CompName = state.dataMixedAir->CompName; // Tuned Made static
-    bool FatalErrorFlag(false);
 
-    // SimOutsideAirSys can handle only 1 controller right now.  This must be
-    // an Outside Air Controller.  This is because of the lack of iteration
-    // and convergence control in the following code.
-    //  DO CtrlNum=1,OutsideAirSys(OASysNum)%NumControllers
-    //    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
-    //    CALL SimOAController(CtrlName,FirstHVACIteration)
-    //  END DO
-    state.dataSize->CurOASysNum = OASysNum;
-    auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
-    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
-        SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
-    }
-    SimOASysComponents(state, OASysNum, FirstHVACIteration, AirLoopNum);
+    //        if ( BeginEnvrnFlag && FirstHVACIteration ) {
+    //        }
 
-    if (state.dataMixedAir->MyOneTimeErrorFlag(OASysNum)) {
-        if (CurrentOASystem.NumControllers - CurrentOASystem.NumSimpleControllers > 1) {
-            ShowWarningError(
-                state, "AirLoopHVAC:OutdoorAirSystem " + CurrentOASystem.Name + " has more than 1 outside air controller; only the 1st will be used");
-        }
-        for (CompNum = 1; CompNum <= CurrentOASystem.NumComponents; ++CompNum) {
-            CompType = CurrentOASystem.ComponentType(CompNum);
-            CompName = CurrentOASystem.ComponentName(CompNum);
-            if (UtilityRoutines::SameString(CompType, "OutdoorAir:Mixer")) {
-                OAMixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixedAir->OAMixer);
-                OAControllerNum = CurrentOASystem.OAControllerIndex;
-                if (state.dataMixedAir->OAController(OAControllerNum).MixNode != state.dataMixedAir->OAMixer(OAMixerNum).MixNode) {
-                    ShowSevereError(state,
-                                    "The mixed air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
-                    ShowContinueError(state,
-                                      "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" +
-                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
-                    ShowContinueError(state,
-                                      "Controller:OutdoorAir mixed air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).MixNode) + "\".");
-                    ShowContinueError(state,
-                                      "OutdoorAir:Mixer mixed air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).MixNode) + "\".");
-                    FatalErrorFlag = true;
-                }
-                if (state.dataMixedAir->OAController(OAControllerNum).RelNode != state.dataMixedAir->OAMixer(OAMixerNum).RelNode) {
-                    ShowSevereError(
-                        state, "The relief air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
-                    ShowContinueError(state,
-                                      "should be the same node as the relief air node of OutdoorAir:Mixer=\"" +
-                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
-                    ShowContinueError(state,
-                                      "Controller:OutdoorAir relief air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RelNode) + "\".");
-                    ShowContinueError(state,
-                                      "OutdoorAir:Mixer relief air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RelNode) + "\".");
-                    FatalErrorFlag = true;
-                }
-                if (state.dataMixedAir->OAController(OAControllerNum).RetNode != state.dataMixedAir->OAMixer(OAMixerNum).RetNode) {
-                    ShowSevereError(
-                        state, "The return air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
-                    ShowContinueError(state,
-                                      "should be the same node as the return air node of OutdoorAir:Mixer=\"" +
-                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
-                    ShowContinueError(state,
-                                      "Controller:OutdoorAir return air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RetNode) + "\".");
-                    ShowContinueError(state,
-                                      "OutdoorAir:Mixer return air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RetNode) + "\".");
-                    FatalErrorFlag = true;
-                }
-            }
-        }
-        state.dataMixedAir->MyOneTimeErrorFlag(OASysNum) = false;
-        if (FatalErrorFlag) ShowFatalError(state, "Previous severe error(s) cause program termination");
+    //        if ( BeginDayFlag ) {
+    //        }
+
+    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
+
+    if (state.dataMixedAir->initOASysFlag(OASysNum)) {
+        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum = OASysNum;
+        state.dataMixedAir->initOASysFlag(OASysNum) = false;
     }
 
-    state.dataSize->CurOASysNum = 0;
-    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
-        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
+    // Each time step
+    if (FirstHVACIteration) {
     }
+
+    // Each iteration
 }
 
 void SimOAComponent(EnergyPlusData &state,
@@ -782,6 +634,404 @@ void SimOAComponent(EnergyPlusData &state,
     }
 }
 
+void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+{
+    int CompNum;
+    auto &CompType = state.dataMixedAir->CompType;
+    auto &CompName = state.dataMixedAir->CompName;
+    bool ReSim(false);
+    bool Sim(true);
+    bool OAHeatCoil(false);
+    bool OACoolCoil(false);
+    bool OAHX(false);
+
+    for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
+        CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
+        CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
+        SimOAComponent(state,
+                       CompType,
+                       CompName,
+                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
+                       FirstHVACIteration,
+                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
+                       AirLoopNum,
+                       Sim,
+                       OASysNum,
+                       OAHeatCoil,
+                       OACoolCoil,
+                       OAHX);
+        if (OAHX) ReSim = true;
+    }
+    // if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
+    // in reverse order to propagate the air flow and conditions out the relief air path to the relief air
+    // exit node
+    if (ReSim) {
+        for (CompNum = state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents - 1; CompNum >= 1; --CompNum) {
+            CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
+            CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
+            SimOAComponent(state,
+                           CompType,
+                           CompName,
+                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
+                           FirstHVACIteration,
+                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
+                           AirLoopNum,
+                           Sim,
+                           OASysNum,
+                           OAHeatCoil,
+                           OACoolCoil,
+                           OAHX);
+        }
+        // now simulate again propagate current temps back through OA system
+        for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
+            CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
+            CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
+            SimOAComponent(state,
+                           CompType,
+                           CompName,
+                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
+                           FirstHVACIteration,
+                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
+                           AirLoopNum,
+                           Sim,
+                           OASysNum,
+                           OAHeatCoil,
+                           OACoolCoil,
+                           OAHX);
+        }
+    }
+}
+
+void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   Oct 1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Simulate the controllers and components in the outside air system.
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int CompNum;
+    // INTEGER :: CtrlNum
+    int OAMixerNum;
+    int OAControllerNum;                           // OA controller index in OAController
+    auto &CompType = state.dataMixedAir->CompType; // Tuned Made static
+    auto &CompName = state.dataMixedAir->CompName; // Tuned Made static
+    bool FatalErrorFlag(false);
+
+    // SimOutsideAirSys can handle only 1 controller right now.  This must be
+    // an Outside Air Controller.  This is because of the lack of iteration
+    // and convergence control in the following code.
+    //  DO CtrlNum=1,OutsideAirSys(OASysNum)%NumControllers
+    //    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
+    //    CALL SimOAController(CtrlName,FirstHVACIteration)
+    //  END DO
+    state.dataSize->CurOASysNum = OASysNum;
+    auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
+    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
+        SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
+    }
+    SimOASysComponents(state, OASysNum, FirstHVACIteration, AirLoopNum);
+
+    if (state.dataMixedAir->MyOneTimeErrorFlag(OASysNum)) {
+        if (CurrentOASystem.NumControllers - CurrentOASystem.NumSimpleControllers > 1) {
+            ShowWarningError(
+                state, "AirLoopHVAC:OutdoorAirSystem " + CurrentOASystem.Name + " has more than 1 outside air controller; only the 1st will be used");
+        }
+        for (CompNum = 1; CompNum <= CurrentOASystem.NumComponents; ++CompNum) {
+            CompType = CurrentOASystem.ComponentType(CompNum);
+            CompName = CurrentOASystem.ComponentName(CompNum);
+            if (UtilityRoutines::SameString(CompType, "OutdoorAir:Mixer")) {
+                OAMixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixedAir->OAMixer);
+                OAControllerNum = CurrentOASystem.OAControllerIndex;
+                if (state.dataMixedAir->OAController(OAControllerNum).MixNode != state.dataMixedAir->OAMixer(OAMixerNum).MixNode) {
+                    ShowSevereError(state,
+                                    "The mixed air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
+                    ShowContinueError(state,
+                                      "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" +
+                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
+                    ShowContinueError(state,
+                                      "Controller:OutdoorAir mixed air node=\"" +
+                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).MixNode) + "\".");
+                    ShowContinueError(state,
+                                      "OutdoorAir:Mixer mixed air node=\"" +
+                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).MixNode) + "\".");
+                    FatalErrorFlag = true;
+                }
+                if (state.dataMixedAir->OAController(OAControllerNum).RelNode != state.dataMixedAir->OAMixer(OAMixerNum).RelNode) {
+                    ShowSevereError(
+                        state, "The relief air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
+                    ShowContinueError(state,
+                                      "should be the same node as the relief air node of OutdoorAir:Mixer=\"" +
+                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
+                    ShowContinueError(state,
+                                      "Controller:OutdoorAir relief air node=\"" +
+                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RelNode) + "\".");
+                    ShowContinueError(state,
+                                      "OutdoorAir:Mixer relief air node=\"" +
+                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RelNode) + "\".");
+                    FatalErrorFlag = true;
+                }
+                if (state.dataMixedAir->OAController(OAControllerNum).RetNode != state.dataMixedAir->OAMixer(OAMixerNum).RetNode) {
+                    ShowSevereError(
+                        state, "The return air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
+                    ShowContinueError(state,
+                                      "should be the same node as the return air node of OutdoorAir:Mixer=\"" +
+                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
+                    ShowContinueError(state,
+                                      "Controller:OutdoorAir return air node=\"" +
+                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RetNode) + "\".");
+                    ShowContinueError(state,
+                                      "OutdoorAir:Mixer return air node=\"" +
+                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RetNode) + "\".");
+                    FatalErrorFlag = true;
+                }
+            }
+        }
+        state.dataMixedAir->MyOneTimeErrorFlag(OASysNum) = false;
+        if (FatalErrorFlag) ShowFatalError(state, "Previous severe error(s) cause program termination");
+    }
+
+    state.dataSize->CurOASysNum = 0;
+    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
+        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
+    }
+}
+
+void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   Oct 1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Manage the outside air system
+
+    if (state.dataMixedAir->GetOASysInputFlag) {
+        GetOutsideAirSysInputs(state);
+        state.dataMixedAir->GetOASysInputFlag = false;
+    }
+
+    if (OASysNum == 0) {
+        OASysNum = UtilityRoutines::FindItemInList(OASysName, state.dataAirLoop->OutsideAirSys);
+        if (OASysNum == 0) {
+            ShowFatalError(state, "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName);
+        }
+    }
+
+    InitOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
+
+    SimOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
+}
+
+void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   Oct 1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Initialize the OAMixer data structure with input node data
+
+    // Using/Aliasing
+    using namespace DataLoopNode;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int RetNode;
+    int InletNode;
+    int RelNode;
+
+    RetNode = state.dataMixedAir->OAMixer(OAMixerNum).RetNode;
+    InletNode = state.dataMixedAir->OAMixer(OAMixerNum).InletNode;
+    RelNode = state.dataMixedAir->OAMixer(OAMixerNum).RelNode;
+
+    if (state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration) {
+    }
+
+    if (state.dataGlobal->BeginDayFlag) {
+    }
+
+    if (FirstHVACIteration) {
+    }
+
+    // Each iteration
+
+    // Return air stream data
+    state.dataMixedAir->OAMixer(OAMixerNum).RetTemp = state.dataLoopNodes->Node(RetNode).Temp;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy = state.dataLoopNodes->Node(RetNode).Enthalpy;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetPressure = state.dataLoopNodes->Node(RetNode).Press;
+    state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate = state.dataLoopNodes->Node(RetNode).MassFlowRate;
+    // Outside air stream data
+    state.dataMixedAir->OAMixer(OAMixerNum).OATemp = state.dataLoopNodes->Node(InletNode).Temp;
+    state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+    state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
+    state.dataMixedAir->OAMixer(OAMixerNum).OAPressure = state.dataLoopNodes->Node(InletNode).Press;
+    state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+    // Relief air data
+    state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataLoopNodes->Node(RelNode).MassFlowRate;
+}
+
+void CalcOAMixer(EnergyPlusData &state, int const OAMixerNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   Oct 1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Calculate the mixed air flow and conditions
+
+    // Using/Aliasing
+    using Psychrometrics::PsyTdbFnHW;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 RecircMassFlowRate;
+    Real64 RecircPressure;
+    Real64 RecircEnthalpy;
+    Real64 RecircHumRat;
+
+    // Define a recirculation mass flow rate
+    RecircMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate - state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
+    // In certain low flow conditions the return air mass flow rate can be below the outside air value established
+    //  by the user.  This check will ensure that this condition does not result in unphysical air properties.
+    if (RecircMassFlowRate < 0.0) {
+        RecircMassFlowRate = 0.0;
+        state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate;
+    }
+
+    // Pass through the return air conditions to the relief air stream.  The return air is "split" to
+    // the relief air and the recirculation air.
+    state.dataMixedAir->OAMixer(OAMixerNum).RelTemp = state.dataMixedAir->OAMixer(OAMixerNum).RetTemp;
+    state.dataMixedAir->OAMixer(OAMixerNum).RelHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
+    state.dataMixedAir->OAMixer(OAMixerNum).RelEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
+    state.dataMixedAir->OAMixer(OAMixerNum).RelPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
+    RecircPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
+    RecircEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
+    RecircHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
+    // The recirculation air and the outside air are mixed to form the mixed air stream
+    state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate + RecircMassFlowRate;
+    // Check for zero flow
+    if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
+        state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
+        state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
+        state.dataMixedAir->OAMixer(OAMixerNum).MixPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
+        state.dataMixedAir->OAMixer(OAMixerNum).MixTemp = state.dataMixedAir->OAMixer(OAMixerNum).RetTemp;
+        return;
+    }
+
+    state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy =
+        (RecircMassFlowRate * RecircEnthalpy +
+         state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy) /
+        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+    state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat = (RecircMassFlowRate * RecircHumRat + state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate *
+                                                                                                 state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat) /
+                                                        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+    state.dataMixedAir->OAMixer(OAMixerNum).MixPressure =
+        (RecircMassFlowRate * RecircPressure +
+         state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataMixedAir->OAMixer(OAMixerNum).OAPressure) /
+        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+    // Mixed air temperature is calculated from the mixed air enthalpy and humidity ratio.
+    state.dataMixedAir->OAMixer(OAMixerNum).MixTemp =
+        PsyTdbFnHW(state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat);
+}
+
+void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   Oct 1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Move the results of CalcOAMixer to the affected nodes
+
+    // METHODOLOGY EMPLOYED:
+
+    // REFERENCES:
+
+    // Using/Aliasing
+    using namespace DataLoopNode;
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int MixNode;
+    int RelNode;
+    int RetNode;
+
+    MixNode = state.dataMixedAir->OAMixer(OAMixerNum).MixNode;
+    RelNode = state.dataMixedAir->OAMixer(OAMixerNum).RelNode;
+    RetNode = state.dataMixedAir->OAMixer(OAMixerNum).RetNode;
+    // Move mixed air data to the mixed air node
+    state.dataLoopNodes->Node(MixNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+    state.dataLoopNodes->Node(MixNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).MixTemp;
+    state.dataLoopNodes->Node(MixNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat;
+    state.dataLoopNodes->Node(MixNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy;
+    state.dataLoopNodes->Node(MixNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).MixPressure;
+    state.dataLoopNodes->Node(MixNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+    // Move the relief air data to the relief air node
+    state.dataLoopNodes->Node(RelNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
+    state.dataLoopNodes->Node(RelNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).RelTemp;
+    state.dataLoopNodes->Node(RelNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).RelHumRat;
+    state.dataLoopNodes->Node(RelNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RelEnthalpy;
+    state.dataLoopNodes->Node(RelNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).RelPressure;
+    state.dataLoopNodes->Node(RelNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
+
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        state.dataLoopNodes->Node(RelNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
+        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
+            state.dataLoopNodes->Node(MixNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
+        } else {
+            state.dataLoopNodes->Node(MixNode).CO2 =
+                ((state.dataLoopNodes->Node(RetNode).MassFlowRate - state.dataLoopNodes->Node(RelNode).MassFlowRate) *
+                     state.dataLoopNodes->Node(RetNode).CO2 +
+                 state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorCO2) /
+                state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+        }
+    }
+
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        state.dataLoopNodes->Node(RelNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
+        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
+            state.dataLoopNodes->Node(MixNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
+        } else {
+            state.dataLoopNodes->Node(MixNode).GenContam =
+                ((state.dataLoopNodes->Node(RetNode).MassFlowRate - state.dataLoopNodes->Node(RelNode).MassFlowRate) *
+                     state.dataLoopNodes->Node(RetNode).GenContam +
+                 state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorGC) /
+                state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+        }
+    }
+}
+
+void ReportOAMixer([[maybe_unused]] int const OAMixerNum)
+{
+}
+
 void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex)
 {
 
@@ -862,7 +1112,6 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
     state.dataMixedAir->OAController(OAControllerNum).UpdateOAController(state);
 }
 
-// Get Input Section of the Module
 //******************************************************************************
 
 void GetOutsideAirSysInputs(EnergyPlusData &state)
@@ -1241,6 +1490,24 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     state.dataMixedAir->GetOASysInputFlag = false;
+}
+
+void AllocateOAControllers(EnergyPlusData &state)
+{
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
+
+    if (state.dataMixedAir->AllocateOAControllersFlag) {
+        state.dataMixedAir->NumOAControllers =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::OAController)));
+        state.dataMixedAir->NumERVControllers =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::ERVController)));
+        state.dataMixedAir->NumOAControllers += state.dataMixedAir->NumERVControllers;
+        state.dataMixedAir->OAController.allocate(state.dataMixedAir->NumOAControllers);
+        state.dataMixedAir->OAControllerUniqueNames.reserve(static_cast<unsigned>(state.dataMixedAir->NumOAControllers));
+        state.dataMixedAir->AllocateOAControllersFlag = false;
+    }
 }
 
 void GetOAControllerInputs(EnergyPlusData &state)
@@ -2051,24 +2318,6 @@ void GetOAControllerInputs(EnergyPlusData &state)
     }
 }
 
-void AllocateOAControllers(EnergyPlusData &state)
-{
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
-
-    if (state.dataMixedAir->AllocateOAControllersFlag) {
-        state.dataMixedAir->NumOAControllers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::OAController)));
-        state.dataMixedAir->NumERVControllers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::ERVController)));
-        state.dataMixedAir->NumOAControllers += state.dataMixedAir->NumERVControllers;
-        state.dataMixedAir->OAController.allocate(state.dataMixedAir->NumOAControllers);
-        state.dataMixedAir->OAControllerUniqueNames.reserve(static_cast<unsigned>(state.dataMixedAir->NumOAControllers));
-        state.dataMixedAir->AllocateOAControllersFlag = false;
-    }
-}
-
 void GetOAMixerInputs(EnergyPlusData &state)
 {
 
@@ -2641,64 +2890,6 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
 
     state.dataMixedAir->OAController(OutAirNum).MixedAirSPMNum =
         GetMixedAirNumWithCoilFreezingCheck(state, state.dataMixedAir->OAController(OutAirNum).MixNode);
-}
-
-// End of Get Input subroutines for the Module
-//******************************************************************************
-
-// Beginning Initialization Section of the Module
-//******************************************************************************
-
-void InitOutsideAirSys(EnergyPlusData &state, int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   Oct 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Initialize the OutsideAirSys data structure
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    //        if ( BeginEnvrnFlag && FirstHVACIteration ) {
-    //        }
-
-    //        if ( BeginDayFlag ) {
-    //        }
-
-    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
-
-    if (state.dataMixedAir->initOASysFlag(OASysNum)) {
-        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum = OASysNum;
-        state.dataMixedAir->initOASysFlag(OASysNum) = false;
-    }
-
-    // Each time step
-    if (FirstHVACIteration) {
-    }
-
-    // Each iteration
 }
 
 void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
@@ -3568,78 +3759,9 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 } // namespace MixedAir
 
-void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   Oct 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Initialize the OAMixer data structure with input node data
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int RetNode;
-    int InletNode;
-    int RelNode;
-
-    RetNode = state.dataMixedAir->OAMixer(OAMixerNum).RetNode;
-    InletNode = state.dataMixedAir->OAMixer(OAMixerNum).InletNode;
-    RelNode = state.dataMixedAir->OAMixer(OAMixerNum).RelNode;
-
-    if (state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration) {
-    }
-
-    if (state.dataGlobal->BeginDayFlag) {
-    }
-
-    if (FirstHVACIteration) {
-    }
-
-    // Each iteration
-
-    // Return air stream data
-    state.dataMixedAir->OAMixer(OAMixerNum).RetTemp = state.dataLoopNodes->Node(RetNode).Temp;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy = state.dataLoopNodes->Node(RetNode).Enthalpy;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetPressure = state.dataLoopNodes->Node(RetNode).Press;
-    state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate = state.dataLoopNodes->Node(RetNode).MassFlowRate;
-    // Outside air stream data
-    state.dataMixedAir->OAMixer(OAMixerNum).OATemp = state.dataLoopNodes->Node(InletNode).Temp;
-    state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-    state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
-    state.dataMixedAir->OAMixer(OAMixerNum).OAPressure = state.dataLoopNodes->Node(InletNode).Press;
-    state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-    // Relief air data
-    state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataLoopNodes->Node(RelNode).MassFlowRate;
-}
-
-// End of Initialization Section of the Module
 //******************************************************************************
 
-// Beginning Calculation Section of the Module
 //******************************************************************************
-
 void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration)
 {
 
@@ -4606,6 +4728,161 @@ void VentilationMechanicalProps::CalcMechVentController(
     }
 }
 
+Real64 MixedAirControlTempResidual(EnergyPlusData &state,
+                                   Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                   Array1D<Real64> const &Par // par(1) = mixed node number
+)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   April, 2003
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculates residual function TMixSetPoint - TMix.
+    // Economizer damper position (OASignal) is being varied to zero the residual.
+
+    // METHODOLOGY EMPLOYED:
+    // Using a mass and energy balance at the mixed air node, calculates the
+    // mixed air temperature given the outside air damper position.
+
+    // REFERENCES:
+
+    // Using/Aliasing
+    using Psychrometrics::PsyTdbFnHW;
+
+    // Return value
+    Real64 Residuum; // residual to be minimized to zero
+
+    // Argument array dimensioning
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // par(2) = return node number
+    // par(3) = outside air node number
+    // par(4) = mixed air flow rate
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int MixNode;               // mixed air node number
+    int RetNode;               // return air node number
+    int OANode;                // outside air node number
+    Real64 MixMassFlowRate;    // mixed air mass flow rare [kg/s]
+    Real64 OAMassFlowRate;     // outside air mass flow rate [kg/s]
+    Real64 RecircMassFlowRate; // recirculated air mass flow rate [kg/s]
+    Real64 RecircEnth;         // recirculated air specific enthalpy [J/kg]
+    Real64 RecircHumRat;       // recirculated air humidity ratio [kg water/kg dry air]
+    Real64 MixEnth;            // mixed air specific enthalpy [J/kg]
+    Real64 MixHumRat;          // mixed air humidity ratio [kg water/kg dry air]
+    Real64 MixTemp;            // mixed air temperature [C]
+
+    MixNode = int(Par(1));
+    RetNode = int(Par(2));
+    OANode = int(Par(3));
+    MixMassFlowRate = Par(4);
+
+    OAMassFlowRate = OASignal * MixMassFlowRate;
+    RecircMassFlowRate = max(MixMassFlowRate - OAMassFlowRate, 0.0);
+    RecircEnth = state.dataLoopNodes->Node(RetNode).Enthalpy;
+    RecircHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
+    MixEnth = (RecircMassFlowRate * RecircEnth + OAMassFlowRate * state.dataLoopNodes->Node(OANode).Enthalpy) / MixMassFlowRate;
+    MixHumRat = (RecircMassFlowRate * RecircHumRat + OAMassFlowRate * state.dataLoopNodes->Node(OANode).HumRat) / MixMassFlowRate;
+    MixTemp = PsyTdbFnHW(MixEnth, MixHumRat);
+    Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - MixTemp;
+
+    return Residuum;
+}
+
+Real64 MultiCompControlTempResidual(EnergyPlusData &state,
+                                    Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                    Array1D<Real64> const &Par // par(1) = mixed node number
+)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         R. Raustad
+    //       DATE WRITTEN   Nov, 2016
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculates residual function TMixSetPoint - TMix.
+    // Economizer damper position (OASignal) is being varied to zero the residual.
+
+    // METHODOLOGY EMPLOYED:
+    // Simulate the OA System to determine actual mixed air condition, calculates the
+    // mixed air temperature given the outside air damper position.
+
+    // REFERENCES:
+
+    // Using/Aliasing
+    using Psychrometrics::PsyTdbFnHW;
+
+    // Return value
+    Real64 Residuum; // residual to be minimized to zero
+
+    // Argument array dimensioning
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // pao(1) = mixed air node number
+    // par(2) = relief air node number
+    // par(3) = outside air node number
+    // par(4) = mixed air flow rate
+    // par(5) = FirstHVACIteration
+    // par(6) = AirLoopNum index
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int MixNode;            // mixed air node number
+    int RelNode;            // return air node number
+    int OANode;             // outside air node number
+    Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
+    Real64 OAMassFlowRate;  // outside air mass flow rate [kg/s]
+    Real64 ExhMassFlow;
+    bool FirstHVACIteration;
+    int AirloopNum;
+    int OASysNum;
+
+    MixNode = int(Par(1));
+    RelNode = int(Par(2));
+    OANode = int(Par(3));
+    MixMassFlowRate = Par(4);
+    FirstHVACIteration = (Par(5) == 1.0);
+    AirloopNum = int(Par(6));
+    OASysNum = state.dataAirLoop->AirLoopControlInfo(AirloopNum).OASysNum;
+    ExhMassFlow = state.dataAirLoop->AirLoopControlInfo(AirloopNum).ZoneExhMassFlow;
+
+    OAMassFlowRate = max(ExhMassFlow, OASignal * MixMassFlowRate);
+    state.dataLoopNodes->Node(OANode).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
+    state.dataLoopNodes->Node(RelNode).MassFlowRate =
+        max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
+
+    SimOASysComponents(state, OASysNum, FirstHVACIteration, AirloopNum);
+
+    Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - state.dataLoopNodes->Node(MixNode).Temp;
+
+    return Residuum;
+}
+
 void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
                                          int const AirLoopNum,
                                          Real64 const OutAirMinFrac,
@@ -4616,8 +4893,8 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     using General::SolveRoot;
     using SetPointManager::GetCoilFreezingCheckFlag;
 
-    int const MaxIte(500);                 // Maximum number of iterations
-    Real64 const Acc(0.0001);              // Accuracy of result
+    int constexpr MaxIte(500);             // Maximum number of iterations
+    Real64 constexpr Acc(0.0001);          // Accuracy of result
     bool AirLoopEconoLockout;              // Economizer lockout flag
     bool AirLoopNightVent;                 // Night Ventilation flag for air loop
     bool EconomizerOperationFlag;          // TRUE if OA economizer is active
@@ -4985,91 +5262,9 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         this->HighHumCtrlActive = false;
     }
 }
-void CalcOAMixer(EnergyPlusData &state, int const OAMixerNum)
-{
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   Oct 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Calculate the mixed air flow and conditions
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyTdbFnHW;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RecircMassFlowRate;
-    Real64 RecircPressure;
-    Real64 RecircEnthalpy;
-    Real64 RecircHumRat;
-
-    // Define a recirculation mass flow rate
-    RecircMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate - state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
-    // In certain low flow conditions the return air mass flow rate can be below the outside air value established
-    //  by the user.  This check will ensure that this condition does not result in unphysical air properties.
-    if (RecircMassFlowRate < 0.0) {
-        RecircMassFlowRate = 0.0;
-        state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate;
-    }
-
-    // Pass through the return air conditions to the relief air stream.  The return air is "split" to
-    // the relief air and the recirculation air.
-    state.dataMixedAir->OAMixer(OAMixerNum).RelTemp = state.dataMixedAir->OAMixer(OAMixerNum).RetTemp;
-    state.dataMixedAir->OAMixer(OAMixerNum).RelHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
-    state.dataMixedAir->OAMixer(OAMixerNum).RelEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
-    state.dataMixedAir->OAMixer(OAMixerNum).RelPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
-    RecircPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
-    RecircEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
-    RecircHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
-    // The recirculation air and the outside air are mixed to form the mixed air stream
-    state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate + RecircMassFlowRate;
-    // Check for zero flow
-    if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
-        state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
-        state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
-        state.dataMixedAir->OAMixer(OAMixerNum).MixPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
-        state.dataMixedAir->OAMixer(OAMixerNum).MixTemp = state.dataMixedAir->OAMixer(OAMixerNum).RetTemp;
-        return;
-    }
-
-    state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy =
-        (RecircMassFlowRate * RecircEnthalpy +
-         state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy) /
-        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-    state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat = (RecircMassFlowRate * RecircHumRat + state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate *
-                                                                                                 state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat) /
-                                                        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-    state.dataMixedAir->OAMixer(OAMixerNum).MixPressure =
-        (RecircMassFlowRate * RecircPressure +
-         state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataMixedAir->OAMixer(OAMixerNum).OAPressure) /
-        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-    // Mixed air temperature is calculated from the mixed air enthalpy and humidity ratio.
-    state.dataMixedAir->OAMixer(OAMixerNum).MixTemp =
-        PsyTdbFnHW(state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat);
-}
-
-// End of Calculation/Simulation Section of the Module
 //******************************************************************************
 
-// Beginning Sizing Section of the Module
 //******************************************************************************
 
 void OAControllerProps::SizeOAController(EnergyPlusData &state)
@@ -5220,10 +5415,8 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
     }
 }
 
-// End of Sizing Section of the Module
 //******************************************************************************
 
-// Beginning Update/Reporting Section of the Module
 //******************************************************************************
 
 void OAControllerProps::UpdateOAController(EnergyPlusData &state)
@@ -5295,253 +5488,6 @@ void OAControllerProps::UpdateOAController(EnergyPlusData &state)
         state.dataLoopNodes->Node(RetAirNodeNum).MassFlowRate = state.dataLoopNodes->Node(this->RetNode).MassFlowRate;
         state.dataLoopNodes->Node(RetAirNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(this->RetNode).MassFlowRate;
     }
-}
-
-void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   Oct 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Move the results of CalcOAMixer to the affected nodes
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MixNode;
-    int RelNode;
-    int RetNode;
-
-    MixNode = state.dataMixedAir->OAMixer(OAMixerNum).MixNode;
-    RelNode = state.dataMixedAir->OAMixer(OAMixerNum).RelNode;
-    RetNode = state.dataMixedAir->OAMixer(OAMixerNum).RetNode;
-    // Move mixed air data to the mixed air node
-    state.dataLoopNodes->Node(MixNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-    state.dataLoopNodes->Node(MixNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).MixTemp;
-    state.dataLoopNodes->Node(MixNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat;
-    state.dataLoopNodes->Node(MixNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy;
-    state.dataLoopNodes->Node(MixNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).MixPressure;
-    state.dataLoopNodes->Node(MixNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-    // Move the relief air data to the relief air node
-    state.dataLoopNodes->Node(RelNode).MassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
-    state.dataLoopNodes->Node(RelNode).Temp = state.dataMixedAir->OAMixer(OAMixerNum).RelTemp;
-    state.dataLoopNodes->Node(RelNode).HumRat = state.dataMixedAir->OAMixer(OAMixerNum).RelHumRat;
-    state.dataLoopNodes->Node(RelNode).Enthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RelEnthalpy;
-    state.dataLoopNodes->Node(RelNode).Press = state.dataMixedAir->OAMixer(OAMixerNum).RelPressure;
-    state.dataLoopNodes->Node(RelNode).MassFlowRateMaxAvail = state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
-
-    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(RelNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
-        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
-            state.dataLoopNodes->Node(MixNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
-        } else {
-            state.dataLoopNodes->Node(MixNode).CO2 =
-                ((state.dataLoopNodes->Node(RetNode).MassFlowRate - state.dataLoopNodes->Node(RelNode).MassFlowRate) *
-                     state.dataLoopNodes->Node(RetNode).CO2 +
-                 state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorCO2) /
-                state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-        }
-    }
-
-    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(RelNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
-        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
-            state.dataLoopNodes->Node(MixNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
-        } else {
-            state.dataLoopNodes->Node(MixNode).GenContam =
-                ((state.dataLoopNodes->Node(RetNode).MassFlowRate - state.dataLoopNodes->Node(RelNode).MassFlowRate) *
-                     state.dataLoopNodes->Node(RetNode).GenContam +
-                 state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorGC) /
-                state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
-        }
-    }
-}
-
-void ReportOAMixer([[maybe_unused]] int const OAMixerNum)
-{
-
-    // SUBROUTINE ARGUMENT DEFINITIONS
-}
-
-// End of Sizing Section of the Module
-//******************************************************************************
-
-// Beginning Utility Section of the Module
-//******************************************************************************
-
-Real64 MixedAirControlTempResidual(EnergyPlusData &state,
-                                   Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
-                                   Array1D<Real64> const &Par // par(1) = mixed node number
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   April, 2003
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function TMixSetPoint - TMix.
-    // Economizer damper position (OASignal) is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Using a mass and energy balance at the mixed air node, calculates the
-    // mixed air temperature given the outside air damper position.
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyTdbFnHW;
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // par(2) = return node number
-    // par(3) = outside air node number
-    // par(4) = mixed air flow rate
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int MixNode;               // mixed air node number
-    int RetNode;               // return air node number
-    int OANode;                // outside air node number
-    Real64 MixMassFlowRate;    // mixed air mass flow rare [kg/s]
-    Real64 OAMassFlowRate;     // outside air mass flow rate [kg/s]
-    Real64 RecircMassFlowRate; // recirculated air mass flow rate [kg/s]
-    Real64 RecircEnth;         // recirculated air specific enthalpy [J/kg]
-    Real64 RecircHumRat;       // recirculated air humidity ratio [kg water/kg dry air]
-    Real64 MixEnth;            // mixed air specific enthalpy [J/kg]
-    Real64 MixHumRat;          // mixed air humidity ratio [kg water/kg dry air]
-    Real64 MixTemp;            // mixed air temperature [C]
-
-    MixNode = int(Par(1));
-    RetNode = int(Par(2));
-    OANode = int(Par(3));
-    MixMassFlowRate = Par(4);
-
-    OAMassFlowRate = OASignal * MixMassFlowRate;
-    RecircMassFlowRate = max(MixMassFlowRate - OAMassFlowRate, 0.0);
-    RecircEnth = state.dataLoopNodes->Node(RetNode).Enthalpy;
-    RecircHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
-    MixEnth = (RecircMassFlowRate * RecircEnth + OAMassFlowRate * state.dataLoopNodes->Node(OANode).Enthalpy) / MixMassFlowRate;
-    MixHumRat = (RecircMassFlowRate * RecircHumRat + OAMassFlowRate * state.dataLoopNodes->Node(OANode).HumRat) / MixMassFlowRate;
-    MixTemp = PsyTdbFnHW(MixEnth, MixHumRat);
-    Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - MixTemp;
-
-    return Residuum;
-}
-
-Real64 MultiCompControlTempResidual(EnergyPlusData &state,
-                                    Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
-                                    Array1D<Real64> const &Par // par(1) = mixed node number
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         R. Raustad
-    //       DATE WRITTEN   Nov, 2016
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function TMixSetPoint - TMix.
-    // Economizer damper position (OASignal) is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Simulate the OA System to determine actual mixed air condition, calculates the
-    // mixed air temperature given the outside air damper position.
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyTdbFnHW;
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // pao(1) = mixed air node number
-    // par(2) = relief air node number
-    // par(3) = outside air node number
-    // par(4) = mixed air flow rate
-    // par(5) = FirstHVACIteration
-    // par(6) = AirLoopNum index
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int MixNode;            // mixed air node number
-    int RelNode;            // return air node number
-    int OANode;             // outside air node number
-    Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
-    Real64 OAMassFlowRate;  // outside air mass flow rate [kg/s]
-    Real64 ExhMassFlow;
-    bool FirstHVACIteration;
-    int AirloopNum;
-    int OASysNum;
-
-    MixNode = int(Par(1));
-    RelNode = int(Par(2));
-    OANode = int(Par(3));
-    MixMassFlowRate = Par(4);
-    FirstHVACIteration = (Par(5) == 1.0);
-    AirloopNum = int(Par(6));
-    OASysNum = state.dataAirLoop->AirLoopControlInfo(AirloopNum).OASysNum;
-    ExhMassFlow = state.dataAirLoop->AirLoopControlInfo(AirloopNum).ZoneExhMassFlow;
-
-    OAMassFlowRate = max(ExhMassFlow, OASignal * MixMassFlowRate);
-    state.dataLoopNodes->Node(OANode).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
-    state.dataLoopNodes->Node(RelNode).MassFlowRate =
-        max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
-
-    SimOASysComponents(state, OASysNum, FirstHVACIteration, AirloopNum);
-
-    Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - state.dataLoopNodes->Node(MixNode).Temp;
-
-    return Residuum;
 }
 
 Array1D_int GetOAMixerNodeNumbers(EnergyPlusData &state,

@@ -84,6 +84,227 @@ using namespace BranchNodeConnections;
 
 constexpr const char *fluidNameSteam("STEAM");
 
+int AssignNodeNumber(EnergyPlusData &state,
+                     std::string const &Name,                         // Name for assignment
+                     DataLoopNode::NodeFluidType const NodeFluidType, // must be valid
+                     bool &ErrorsFound)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   September 1999
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This function assigns a node number to this name.
+
+    // METHODOLOGY EMPLOYED:
+    // Look to see if a name has already been entered.  Use the index of
+    // the array as the node number, if there.
+
+    // Return value
+    int AssignNodeNumber;
+
+    if (NodeFluidType != DataLoopNode::NodeFluidType::Air && NodeFluidType != DataLoopNode::NodeFluidType::Water &&
+        NodeFluidType != DataLoopNode::NodeFluidType::Electric && NodeFluidType != DataLoopNode::NodeFluidType::Steam &&
+        NodeFluidType != DataLoopNode::NodeFluidType::blank) {
+        ShowSevereError(state, format("AssignNodeNumber: Invalid FluidType={}", NodeFluidType));
+        ErrorsFound = true;
+        ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
+    }
+
+    int NumNode = 0;
+    if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
+        NumNode = UtilityRoutines::FindItemInList(
+            Name, state.dataLoopNodes->NodeID({1, state.dataNodeInputMgr->NumOfUniqueNodeNames}), state.dataNodeInputMgr->NumOfUniqueNodeNames);
+        if (NumNode > 0) {
+            AssignNodeNumber = NumNode;
+            ++state.dataNodeInputMgr->NodeRef(NumNode);
+            if (NodeFluidType != DataLoopNode::NodeFluidType::blank) {
+                if (state.dataLoopNodes->Node(NumNode).FluidType != NodeFluidType &&
+                    state.dataLoopNodes->Node(NumNode).FluidType != DataLoopNode::NodeFluidType::blank) {
+                    ShowSevereError(state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NumNode));
+                    ShowContinueError(
+                        state,
+                        "Existing Fluid type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NumNode).FluidType)) +
+                            ", Requested Fluid Type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(NodeFluidType)));
+                    ErrorsFound = true;
+                }
+            }
+            if (state.dataLoopNodes->Node(NumNode).FluidType == DataLoopNode::NodeFluidType::blank) {
+                state.dataLoopNodes->Node(NumNode).FluidType = NodeFluidType;
+            }
+        } else {
+            ++state.dataNodeInputMgr->NumOfUniqueNodeNames;
+            state.dataLoopNodes->NumOfNodes = state.dataNodeInputMgr->NumOfUniqueNodeNames;
+
+            state.dataLoopNodes->Node.redimension(state.dataLoopNodes->NumOfNodes);
+            state.dataLoopNodes->NodeID.redimension({0, state.dataLoopNodes->NumOfNodes});
+            state.dataNodeInputMgr->NodeRef.redimension(state.dataLoopNodes->NumOfNodes);
+            state.dataLoopNodes->MarkedNode.redimension(state.dataLoopNodes->NumOfNodes);
+            state.dataLoopNodes->NodeSetpointCheck.redimension(state.dataLoopNodes->NumOfNodes);
+            // Set new item in Node
+            state.dataLoopNodes->Node(state.dataLoopNodes->NumOfNodes).FluidType = NodeFluidType;
+            state.dataNodeInputMgr->NodeRef(state.dataLoopNodes->NumOfNodes) = 0;
+            state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
+
+            AssignNodeNumber = state.dataNodeInputMgr->NumOfUniqueNodeNames;
+        }
+    } else {
+        state.dataLoopNodes->Node.allocate(1);
+        state.dataLoopNodes->Node(1).FluidType = NodeFluidType;
+        // Allocate takes care of defining
+        state.dataLoopNodes->NumOfNodes = 1;
+        state.dataLoopNodes->NodeID.allocate({0, 1});
+        state.dataNodeInputMgr->NodeRef.allocate(1);
+        state.dataLoopNodes->MarkedNode.allocate(1);
+        state.dataLoopNodes->NodeSetpointCheck.allocate(1);
+
+        state.dataNodeInputMgr->NumOfUniqueNodeNames = 1;
+        state.dataLoopNodes->NodeID(0) = "Undefined";
+        state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
+        AssignNodeNumber = 1;
+        state.dataNodeInputMgr->NodeRef(1) = 0;
+    }
+
+    return AssignNodeNumber;
+}
+
+void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   September 1999
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine gets the Node Lists from the IDF and fills the
+    // Node List Data Structure.
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("GetNodeListsInput: ");
+    static std::string const CurrentModuleObject("NodeList");
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Loop;       // Loop Variable
+    int Loop1;      // Loop Variable
+    int Loop2;      // Loop Variable
+    int NumAlphas;  // Number of alphas in IDF item
+    int NumNumbers; // Number of numerics in IDF item
+    int IOStatus;   // IOStatus for IDF item (not checked)
+    int NCount;     // Actual number of node lists
+    bool flagError; // true when error node list name should be output
+    Array1D_string cAlphas;
+    Array1D<Real64> rNumbers;
+
+    bool localErrorsFound(false);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
+    cAlphas.allocate(NumAlphas);
+    rNumbers.allocate(NumNumbers);
+    state.dataNodeInputMgr->NumOfNodeLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataNodeInputMgr->NodeLists.allocate(state.dataNodeInputMgr->NumOfNodeLists);
+    for (int i = 1; i <= state.dataNodeInputMgr->NumOfNodeLists; ++i) {
+        state.dataNodeInputMgr->NodeLists(i).Name.clear();
+        state.dataNodeInputMgr->NodeLists(i).NumOfNodesInList = 0;
+    }
+
+    NCount = 0;
+    for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
+        if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
+
+        ++NCount;
+        state.dataNodeInputMgr->NodeLists(NCount).Name = cAlphas(1);
+        state.dataNodeInputMgr->NodeLists(NCount).NodeNames.allocate(NumAlphas - 1);
+        state.dataNodeInputMgr->NodeLists(NCount).NodeNames = "";
+        state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers.allocate(NumAlphas - 1);
+        state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers = 0;
+        state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
+        if (NumAlphas <= 1) {
+            if (NumAlphas == 1) {
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+            } else {
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
+            }
+            localErrorsFound = true;
+            continue;
+        }
+        //  Put all in, then determine unique
+        for (Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1) {
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
+            if (cAlphas(Loop1 + 1).empty()) {
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
+                --state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList;
+                if (state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList <= 0) {
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                    localErrorsFound = true;
+                    break;
+                }
+                continue;
+            }
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(
+                state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), DataLoopNode::NodeFluidType::blank, localErrorsFound);
+            if (UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1),
+                                            state.dataNodeInputMgr->NodeLists(NCount).Name)) {
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
+                ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
+                localErrorsFound = true;
+            }
+        }
+        // Error on any duplicates
+        flagError = true;
+        for (Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop1) {
+            for (Loop2 = Loop1 + 1; Loop2 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop2) {
+                if (state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) != state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))
+                    continue;
+                if (flagError) { // only list nodelist name once
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
+                    flagError = false;
+                }
+                ShowContinueError(state,
+                                  format("...list item={}, \"{}\", duplicate list item={}, \"{}\".",
+                                         Loop1,
+                                         state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1)),
+                                         Loop2,
+                                         state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))));
+                localErrorsFound = true;
+            }
+        }
+    }
+
+    for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
+        for (Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumOfNodesInList; ++Loop2) {
+            for (Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop1) {
+                if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
+                if (!UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2),
+                                                 state.dataNodeInputMgr->NodeLists(Loop1).Name))
+                    continue;
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name +
+                                    "\", invalid node name in list.");
+                ShowContinueError(
+                    state,
+                    format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop2, state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2)));
+                ShowContinueError(state, "... NodeList=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name + "\", is duplicated.");
+                ShowContinueError(state, "... Items in NodeLists must not be the name of another NodeList.");
+                localErrorsFound = true;
+            }
+        }
+    }
+
+    cAlphas.deallocate();
+    rNumbers.deallocate();
+
+    if (localErrorsFound) {
+        ShowFatalError(state, std::string{RoutineName} + CurrentModuleObject + ": Error getting input - causes termination.");
+        ErrorsFound = true;
+    }
+}
+
 void GetNodeNums(EnergyPlusData &state,
                  std::string const &Name,                                   // Name for which to obtain information
                  int &NumNodes,                                             // Number of nodes accompanying this Name
@@ -518,227 +739,6 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
             }
         }
     }
-}
-
-void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1999
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine gets the Node Lists from the IDF and fills the
-    // Node List Data Structure.
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("GetNodeListsInput: ");
-    static std::string const CurrentModuleObject("NodeList");
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;       // Loop Variable
-    int Loop1;      // Loop Variable
-    int Loop2;      // Loop Variable
-    int NumAlphas;  // Number of alphas in IDF item
-    int NumNumbers; // Number of numerics in IDF item
-    int IOStatus;   // IOStatus for IDF item (not checked)
-    int NCount;     // Actual number of node lists
-    bool flagError; // true when error node list name should be output
-    Array1D_string cAlphas;
-    Array1D<Real64> rNumbers;
-
-    bool localErrorsFound(false);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
-    cAlphas.allocate(NumAlphas);
-    rNumbers.allocate(NumNumbers);
-    state.dataNodeInputMgr->NumOfNodeLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataNodeInputMgr->NodeLists.allocate(state.dataNodeInputMgr->NumOfNodeLists);
-    for (int i = 1; i <= state.dataNodeInputMgr->NumOfNodeLists; ++i) {
-        state.dataNodeInputMgr->NodeLists(i).Name.clear();
-        state.dataNodeInputMgr->NodeLists(i).NumOfNodesInList = 0;
-    }
-
-    NCount = 0;
-    for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(
-            state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
-        if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
-
-        ++NCount;
-        state.dataNodeInputMgr->NodeLists(NCount).Name = cAlphas(1);
-        state.dataNodeInputMgr->NodeLists(NCount).NodeNames.allocate(NumAlphas - 1);
-        state.dataNodeInputMgr->NodeLists(NCount).NodeNames = "";
-        state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers.allocate(NumAlphas - 1);
-        state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers = 0;
-        state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
-        if (NumAlphas <= 1) {
-            if (NumAlphas == 1) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
-            } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
-            }
-            localErrorsFound = true;
-            continue;
-        }
-        //  Put all in, then determine unique
-        for (Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1) {
-            state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
-            if (cAlphas(Loop1 + 1).empty()) {
-                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
-                --state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList;
-                if (state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList <= 0) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
-                    localErrorsFound = true;
-                    break;
-                }
-                continue;
-            }
-            state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(
-                state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), DataLoopNode::NodeFluidType::blank, localErrorsFound);
-            if (UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1),
-                                            state.dataNodeInputMgr->NodeLists(NCount).Name)) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
-                ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
-                localErrorsFound = true;
-            }
-        }
-        // Error on any duplicates
-        flagError = true;
-        for (Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop1) {
-            for (Loop2 = Loop1 + 1; Loop2 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop2) {
-                if (state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) != state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))
-                    continue;
-                if (flagError) { // only list nodelist name once
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
-                    flagError = false;
-                }
-                ShowContinueError(state,
-                                  format("...list item={}, \"{}\", duplicate list item={}, \"{}\".",
-                                         Loop1,
-                                         state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1)),
-                                         Loop2,
-                                         state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))));
-                localErrorsFound = true;
-            }
-        }
-    }
-
-    for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
-        for (Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumOfNodesInList; ++Loop2) {
-            for (Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop1) {
-                if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
-                if (!UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2),
-                                                 state.dataNodeInputMgr->NodeLists(Loop1).Name))
-                    continue;
-                ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name +
-                                    "\", invalid node name in list.");
-                ShowContinueError(
-                    state,
-                    format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop2, state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2)));
-                ShowContinueError(state, "... NodeList=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name + "\", is duplicated.");
-                ShowContinueError(state, "... Items in NodeLists must not be the name of another NodeList.");
-                localErrorsFound = true;
-            }
-        }
-    }
-
-    cAlphas.deallocate();
-    rNumbers.deallocate();
-
-    if (localErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + CurrentModuleObject + ": Error getting input - causes termination.");
-        ErrorsFound = true;
-    }
-}
-
-int AssignNodeNumber(EnergyPlusData &state,
-                     std::string const &Name,                         // Name for assignment
-                     DataLoopNode::NodeFluidType const NodeFluidType, // must be valid
-                     bool &ErrorsFound)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1999
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function assigns a node number to this name.
-
-    // METHODOLOGY EMPLOYED:
-    // Look to see if a name has already been entered.  Use the index of
-    // the array as the node number, if there.
-
-    // Return value
-    int AssignNodeNumber;
-
-    if (NodeFluidType != DataLoopNode::NodeFluidType::Air && NodeFluidType != DataLoopNode::NodeFluidType::Water &&
-        NodeFluidType != DataLoopNode::NodeFluidType::Electric && NodeFluidType != DataLoopNode::NodeFluidType::Steam &&
-        NodeFluidType != DataLoopNode::NodeFluidType::blank) {
-        ShowSevereError(state, format("AssignNodeNumber: Invalid FluidType={}", NodeFluidType));
-        ErrorsFound = true;
-        ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
-    }
-
-    int NumNode = 0;
-    if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
-        NumNode = UtilityRoutines::FindItemInList(
-            Name, state.dataLoopNodes->NodeID({1, state.dataNodeInputMgr->NumOfUniqueNodeNames}), state.dataNodeInputMgr->NumOfUniqueNodeNames);
-        if (NumNode > 0) {
-            AssignNodeNumber = NumNode;
-            ++state.dataNodeInputMgr->NodeRef(NumNode);
-            if (NodeFluidType != DataLoopNode::NodeFluidType::blank) {
-                if (state.dataLoopNodes->Node(NumNode).FluidType != NodeFluidType &&
-                    state.dataLoopNodes->Node(NumNode).FluidType != DataLoopNode::NodeFluidType::blank) {
-                    ShowSevereError(state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NumNode));
-                    ShowContinueError(
-                        state,
-                        "Existing Fluid type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NumNode).FluidType)) +
-                            ", Requested Fluid Type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(NodeFluidType)));
-                    ErrorsFound = true;
-                }
-            }
-            if (state.dataLoopNodes->Node(NumNode).FluidType == DataLoopNode::NodeFluidType::blank) {
-                state.dataLoopNodes->Node(NumNode).FluidType = NodeFluidType;
-            }
-        } else {
-            ++state.dataNodeInputMgr->NumOfUniqueNodeNames;
-            state.dataLoopNodes->NumOfNodes = state.dataNodeInputMgr->NumOfUniqueNodeNames;
-
-            state.dataLoopNodes->Node.redimension(state.dataLoopNodes->NumOfNodes);
-            state.dataLoopNodes->NodeID.redimension({0, state.dataLoopNodes->NumOfNodes});
-            state.dataNodeInputMgr->NodeRef.redimension(state.dataLoopNodes->NumOfNodes);
-            state.dataLoopNodes->MarkedNode.redimension(state.dataLoopNodes->NumOfNodes);
-            state.dataLoopNodes->NodeSetpointCheck.redimension(state.dataLoopNodes->NumOfNodes);
-            // Set new item in Node
-            state.dataLoopNodes->Node(state.dataLoopNodes->NumOfNodes).FluidType = NodeFluidType;
-            state.dataNodeInputMgr->NodeRef(state.dataLoopNodes->NumOfNodes) = 0;
-            state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
-
-            AssignNodeNumber = state.dataNodeInputMgr->NumOfUniqueNodeNames;
-        }
-    } else {
-        state.dataLoopNodes->Node.allocate(1);
-        state.dataLoopNodes->Node(1).FluidType = NodeFluidType;
-        // Allocate takes care of defining
-        state.dataLoopNodes->NumOfNodes = 1;
-        state.dataLoopNodes->NodeID.allocate({0, 1});
-        state.dataNodeInputMgr->NodeRef.allocate(1);
-        state.dataLoopNodes->MarkedNode.allocate(1);
-        state.dataLoopNodes->NodeSetpointCheck.allocate(1);
-
-        state.dataNodeInputMgr->NumOfUniqueNodeNames = 1;
-        state.dataLoopNodes->NodeID(0) = "Undefined";
-        state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
-        AssignNodeNumber = 1;
-        state.dataNodeInputMgr->NodeRef(1) = 0;
-    }
-
-    return AssignNodeNumber;
 }
 
 int GetOnlySingleNode(EnergyPlusData &state,

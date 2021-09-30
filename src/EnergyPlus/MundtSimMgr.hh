@@ -135,45 +135,6 @@ namespace MundtSimMgr {
 
     void ManageMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
-    //*****************************************************************************************
-
-    void InitMundtModel(EnergyPlusData &state);
-
-    //*****************************************************************************************
-
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
-
-    //*****************************************************************************************
-
-    void SetupMundtModel(EnergyPlusData &state,
-                         int ZoneNum,      // index number for the specified zone
-                         bool &ErrorsFound // true if problems setting up model
-    );
-
-    //*****************************************************************************************
-
-    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    //*****************************************************************************************
-
-    void SetNodeResult(EnergyPlusData &state,
-                       int NodeID,       // node ID
-                       Real64 TempResult // temperature for the specified air node
-    );
-
-    //*****************************************************************************************
-
-    void SetSurfTmeanAir(EnergyPlusData &state,
-                         int SurfID,    // surface ID
-                         Real64 TeffAir // temperature of air node adjacent to the specified surface
-    );
-
-    //*****************************************************************************************
-
-    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
-
-    //*****************************************************************************************
-
 } // namespace MundtSimMgr
 
 struct MundtSimMgrData : BaseGlobalStruct

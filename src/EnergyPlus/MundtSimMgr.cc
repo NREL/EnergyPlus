@@ -100,51 +100,6 @@ namespace MundtSimMgr {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Chanvit Chantrasrisalai
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   manage the Mundt model
-
-        auto &MundtFirstTimeFlag = state.dataHeatBal->MundtFirstTimeFlag;
-        bool ErrorsFound;
-
-        // initialize Mundt model data
-        if (MundtFirstTimeFlag) {
-            InitMundtModel(state);
-            MundtFirstTimeFlag = false;
-        }
-
-        // identify the current zone index for zones using Mundt model
-        state.dataMundtSimMgr->MundtZoneNum = state.dataMundtSimMgr->ZoneData(ZoneNum).MundtZoneIndex;
-
-        // transfer data from surface domain to air domain for the specified zone
-        GetSurfHBDataForMundtModel(state, ZoneNum);
-
-        // use the Mundt model only for cooling case
-        if ((state.dataMundtSimMgr->SupplyAirVolumeRate > 0.0001) && (state.dataMundtSimMgr->QsysCoolTot > 0.0001)) {
-
-            // setup Mundt model
-            ErrorsFound = false;
-            SetupMundtModel(state, ZoneNum, ErrorsFound);
-            if (ErrorsFound) ShowFatalError(state, "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination.");
-
-            // perform Mundt model calculations
-            CalcMundtModel(state, ZoneNum);
-        }
-
-        // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForMundtModel(state, ZoneNum);
-    }
-
-    //*****************************************************************************************
-
     void InitMundtModel(EnergyPlusData &state)
     {
 
@@ -319,7 +274,191 @@ namespace MundtSimMgr {
         state.dataMundtSimMgr->FloorSurf.allocate(MaxNumOfFloorSurfs);
     }
 
-    //*****************************************************************************************
+    void SetNodeResult(EnergyPlusData &state,
+                       int const NodeID,       // node ID
+                       Real64 const TempResult // temperature for the specified air node
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   September 2002
+        //       RE-ENGINEERED  April 2003, Weixiu Kong, EnergyPlus Implementation
+        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   provide set routine for reporting results
+        //   to AirDataManager from air model
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // na
+
+        state.dataMundtSimMgr->LineNode(NodeID, state.dataMundtSimMgr->MundtZoneNum).Temp = TempResult;
+    }
+
+    void SetSurfTmeanAir(EnergyPlusData &state,
+                         int const SurfID,    // surface ID
+                         Real64 const TeffAir // temperature of air node adjacent to the specified surface
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   September 2002
+        //       RE-ENGINEERED  April 2003, Wiexiu Kong, EnergyPlus Implementation
+        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   provide set routine for air model prediction of
+        //   effective air for single surface
+
+        state.dataMundtSimMgr->MundtAirSurf(SurfID, state.dataMundtSimMgr->MundtZoneNum).TMeanAir = TeffAir;
+    }
+
+    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   September 2001
+        //       RE-ENGINEERED  July 2003, EnergyPlus Implementation (CC)
+        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   Compute the simplified version of Mundt and store results in Air data Manager
+        //   argument passing is plentiful but are IN and nothing out.
+        //   these variables are scaler conditions at current HB day,timestep, and iteration
+        //   This subroutine is USE'ed by heat balance driver (top level module)
+
+        // METHODOLOGY EMPLOYED:
+        //   apply Mundt's simple model for delta Temp head-foot and update values in Air data manager.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 TAirFoot;        // air temperature at the floor
+        Real64 TAirCeil;        // air temperature at the ceiling
+        Real64 TLeaving;        // air temperature leaving zone (= return air temp)
+        Real64 TControlPoint;   // air temperature at thermostat
+        Real64 Slope;           // vertical air temperature gradient (slope) from Mundt equations
+        Real64 QequipConvFloor; // convective gain at the floor due to internal heat sources
+        Real64 QSensInfilFloor; // convective gain at the floor due to infiltration
+        Real64 FloorSumHAT;     // sum of hci*area*temp at the floor
+        Real64 FloorSumHA;      // sum of hci*area at the floor
+        Real64 TThisNode;       // dummy variable for air node temp
+        int NodeNum;            // index for air nodes
+        int SurfNum;            // index for surfaces
+        int SurfCounted;        // number of surfaces assciated with an air node
+
+        //   apply floor splits
+        QequipConvFloor = state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) * state.dataMundtSimMgr->ConvIntGain;
+        QSensInfilFloor = -state.dataRoomAirMod->InfiltratFloorSplit(ZoneNum) * state.dataMundtSimMgr->QventCool;
+
+        // Begin computations for Mundt model
+
+        // do summations for floor surfaces of this zone
+        FloorSumHAT = 0.0;
+        FloorSumHA = 0.0;
+        for (auto const &s : state.dataMundtSimMgr->FloorSurf) {
+            FloorSumHAT += s.Area * s.Hc * s.Temp;
+            FloorSumHA += s.Area * s.Hc;
+        }
+
+        // Eq 2.2 in ASHRAE RP 1222 Final report
+        TAirFoot =
+            ((state.dataMundtSimMgr->ZoneAirDensity * CpAir * state.dataMundtSimMgr->SupplyAirVolumeRate * state.dataMundtSimMgr->SupplyAirTemp) +
+             (FloorSumHAT) + QequipConvFloor + QSensInfilFloor) /
+            ((state.dataMundtSimMgr->ZoneAirDensity * CpAir * state.dataMundtSimMgr->SupplyAirVolumeRate) + (FloorSumHA));
+
+        // prevent dividing by zero due to zero cooling load (or zero supply air flow rate)
+        if (state.dataMundtSimMgr->QsysCoolTot <= 0.0) {
+            TLeaving = state.dataMundtSimMgr->SupplyAirTemp;
+        } else {
+            // Eq 2.3 in ASHRAE RP 1222 Final report
+            TLeaving =
+                (state.dataMundtSimMgr->QsysCoolTot / (state.dataMundtSimMgr->ZoneAirDensity * CpAir * state.dataMundtSimMgr->SupplyAirVolumeRate)) +
+                state.dataMundtSimMgr->SupplyAirTemp;
+        }
+
+        // Eq 2.4 in ASHRAE RP 1222 Final report
+        Slope = (TLeaving - TAirFoot) /
+                (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
+                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtFootAirID, state.dataMundtSimMgr->MundtZoneNum).Height);
+        // check slope
+        if (Slope > MaxSlope) {
+            Slope = MaxSlope;
+            TAirFoot = TLeaving -
+                       (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
+                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtFootAirID, state.dataMundtSimMgr->MundtZoneNum).Height));
+        }
+        if (Slope < MinSlope) { // pretty much vertical
+            Slope = MinSlope;
+            TAirFoot = TLeaving;
+        }
+
+        // Eq 2.4 in ASHRAE RP 1222 Final report
+        TAirCeil =
+            TLeaving - (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
+                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtCeilAirID, state.dataMundtSimMgr->MundtZoneNum).Height));
+
+        TControlPoint =
+            TLeaving - (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
+                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Height));
+
+        // determine air node temperatures in this zone
+        SetNodeResult(state, state.dataMundtSimMgr->SupplyNodeID, state.dataMundtSimMgr->SupplyAirTemp);
+        SetNodeResult(state, state.dataMundtSimMgr->ReturnNodeID, TLeaving);
+        SetNodeResult(state, state.dataMundtSimMgr->MundtCeilAirID, TAirCeil);
+        SetNodeResult(state, state.dataMundtSimMgr->MundtFootAirID, TAirFoot);
+        SetNodeResult(state, state.dataMundtSimMgr->TstatNodeID, TControlPoint);
+
+        for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->NumFloorSurfs; ++SurfNum) {
+            SetSurfTmeanAir(state, state.dataMundtSimMgr->FloorSurfSetIDs(SurfNum), TAirFoot);
+        }
+
+        SurfCounted = count(state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtCeilAirID, state.dataMundtSimMgr->MundtZoneNum).SurfMask);
+        state.dataMundtSimMgr->TheseSurfIDs =
+            pack(state.dataMundtSimMgr->ID1dSurf,
+                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtCeilAirID, state.dataMundtSimMgr->MundtZoneNum).SurfMask);
+        for (SurfNum = 1; SurfNum <= SurfCounted; ++SurfNum) {
+            SetSurfTmeanAir(state, state.dataMundtSimMgr->TheseSurfIDs(SurfNum), TAirCeil);
+        }
+
+        for (NodeNum = 1; NodeNum <= state.dataMundtSimMgr->NumRoomNodes; ++NodeNum) {
+            TThisNode =
+                TLeaving -
+                (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
+                          state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->RoomNodeIDs(NodeNum), state.dataMundtSimMgr->MundtZoneNum).Height));
+            SetNodeResult(state, state.dataMundtSimMgr->RoomNodeIDs(NodeNum), TThisNode);
+            SurfCounted =
+                count(state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->RoomNodeIDs(NodeNum), state.dataMundtSimMgr->MundtZoneNum).SurfMask);
+            state.dataMundtSimMgr->TheseSurfIDs =
+                pack(state.dataMundtSimMgr->ID1dSurf,
+                     state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->RoomNodeIDs(NodeNum), state.dataMundtSimMgr->MundtZoneNum).SurfMask);
+            for (SurfNum = 1; SurfNum <= SurfCounted; ++SurfNum) {
+                SetSurfTmeanAir(state, state.dataMundtSimMgr->TheseSurfIDs(SurfNum), TThisNode);
+            }
+        }
+    }
 
     void GetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
@@ -449,8 +588,6 @@ namespace MundtSimMgr {
         }
     }
 
-    //*****************************************************************************************
-
     void SetupMundtModel(EnergyPlusData &state,
                          int const ZoneNum, // index number for the specified zone
                          bool &ErrorsFound  // true if problems setting up model
@@ -546,200 +683,6 @@ namespace MundtSimMgr {
         }
     }
 
-    //*****************************************************************************************
-
-    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   September 2001
-        //       RE-ENGINEERED  July 2003, EnergyPlus Implementation (CC)
-        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   Compute the simplified version of Mundt and store results in Air data Manager
-        //   argument passing is plentiful but are IN and nothing out.
-        //   these variables are scaler conditions at current HB day,timestep, and iteration
-        //   This subroutine is USE'ed by heat balance driver (top level module)
-
-        // METHODOLOGY EMPLOYED:
-        //   apply Mundt's simple model for delta Temp head-foot and update values in Air data manager.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 TAirFoot;        // air temperature at the floor
-        Real64 TAirCeil;        // air temperature at the ceiling
-        Real64 TLeaving;        // air temperature leaving zone (= return air temp)
-        Real64 TControlPoint;   // air temperature at thermostat
-        Real64 Slope;           // vertical air temperature gradient (slope) from Mundt equations
-        Real64 QequipConvFloor; // convective gain at the floor due to internal heat sources
-        Real64 QSensInfilFloor; // convective gain at the floor due to infiltration
-        Real64 FloorSumHAT;     // sum of hci*area*temp at the floor
-        Real64 FloorSumHA;      // sum of hci*area at the floor
-        Real64 TThisNode;       // dummy variable for air node temp
-        int NodeNum;            // index for air nodes
-        int SurfNum;            // index for surfaces
-        int SurfCounted;        // number of surfaces assciated with an air node
-
-        //   apply floor splits
-        QequipConvFloor = state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) * state.dataMundtSimMgr->ConvIntGain;
-        QSensInfilFloor = -state.dataRoomAirMod->InfiltratFloorSplit(ZoneNum) * state.dataMundtSimMgr->QventCool;
-
-        // Begin computations for Mundt model
-
-        // do summations for floor surfaces of this zone
-        FloorSumHAT = 0.0;
-        FloorSumHA = 0.0;
-        for (auto const &s : state.dataMundtSimMgr->FloorSurf) {
-            FloorSumHAT += s.Area * s.Hc * s.Temp;
-            FloorSumHA += s.Area * s.Hc;
-        }
-
-        // Eq 2.2 in ASHRAE RP 1222 Final report
-        TAirFoot =
-            ((state.dataMundtSimMgr->ZoneAirDensity * CpAir * state.dataMundtSimMgr->SupplyAirVolumeRate * state.dataMundtSimMgr->SupplyAirTemp) +
-             (FloorSumHAT) + QequipConvFloor + QSensInfilFloor) /
-            ((state.dataMundtSimMgr->ZoneAirDensity * CpAir * state.dataMundtSimMgr->SupplyAirVolumeRate) + (FloorSumHA));
-
-        // prevent dividing by zero due to zero cooling load (or zero supply air flow rate)
-        if (state.dataMundtSimMgr->QsysCoolTot <= 0.0) {
-            TLeaving = state.dataMundtSimMgr->SupplyAirTemp;
-        } else {
-            // Eq 2.3 in ASHRAE RP 1222 Final report
-            TLeaving =
-                (state.dataMundtSimMgr->QsysCoolTot / (state.dataMundtSimMgr->ZoneAirDensity * CpAir * state.dataMundtSimMgr->SupplyAirVolumeRate)) +
-                state.dataMundtSimMgr->SupplyAirTemp;
-        }
-
-        // Eq 2.4 in ASHRAE RP 1222 Final report
-        Slope = (TLeaving - TAirFoot) /
-                (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
-                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtFootAirID, state.dataMundtSimMgr->MundtZoneNum).Height);
-        // check slope
-        if (Slope > MaxSlope) {
-            Slope = MaxSlope;
-            TAirFoot = TLeaving -
-                       (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
-                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtFootAirID, state.dataMundtSimMgr->MundtZoneNum).Height));
-        }
-        if (Slope < MinSlope) { // pretty much vertical
-            Slope = MinSlope;
-            TAirFoot = TLeaving;
-        }
-
-        // Eq 2.4 in ASHRAE RP 1222 Final report
-        TAirCeil =
-            TLeaving - (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
-                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtCeilAirID, state.dataMundtSimMgr->MundtZoneNum).Height));
-
-        TControlPoint =
-            TLeaving - (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
-                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Height));
-
-        // determine air node temperatures in this zone
-        SetNodeResult(state, state.dataMundtSimMgr->SupplyNodeID, state.dataMundtSimMgr->SupplyAirTemp);
-        SetNodeResult(state, state.dataMundtSimMgr->ReturnNodeID, TLeaving);
-        SetNodeResult(state, state.dataMundtSimMgr->MundtCeilAirID, TAirCeil);
-        SetNodeResult(state, state.dataMundtSimMgr->MundtFootAirID, TAirFoot);
-        SetNodeResult(state, state.dataMundtSimMgr->TstatNodeID, TControlPoint);
-
-        for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->NumFloorSurfs; ++SurfNum) {
-            SetSurfTmeanAir(state, state.dataMundtSimMgr->FloorSurfSetIDs(SurfNum), TAirFoot);
-        }
-
-        SurfCounted = count(state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtCeilAirID, state.dataMundtSimMgr->MundtZoneNum).SurfMask);
-        state.dataMundtSimMgr->TheseSurfIDs =
-            pack(state.dataMundtSimMgr->ID1dSurf,
-                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->MundtCeilAirID, state.dataMundtSimMgr->MundtZoneNum).SurfMask);
-        for (SurfNum = 1; SurfNum <= SurfCounted; ++SurfNum) {
-            SetSurfTmeanAir(state, state.dataMundtSimMgr->TheseSurfIDs(SurfNum), TAirCeil);
-        }
-
-        for (NodeNum = 1; NodeNum <= state.dataMundtSimMgr->NumRoomNodes; ++NodeNum) {
-            TThisNode =
-                TLeaving -
-                (Slope * (state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->ReturnNodeID, state.dataMundtSimMgr->MundtZoneNum).Height -
-                          state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->RoomNodeIDs(NodeNum), state.dataMundtSimMgr->MundtZoneNum).Height));
-            SetNodeResult(state, state.dataMundtSimMgr->RoomNodeIDs(NodeNum), TThisNode);
-            SurfCounted =
-                count(state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->RoomNodeIDs(NodeNum), state.dataMundtSimMgr->MundtZoneNum).SurfMask);
-            state.dataMundtSimMgr->TheseSurfIDs =
-                pack(state.dataMundtSimMgr->ID1dSurf,
-                     state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->RoomNodeIDs(NodeNum), state.dataMundtSimMgr->MundtZoneNum).SurfMask);
-            for (SurfNum = 1; SurfNum <= SurfCounted; ++SurfNum) {
-                SetSurfTmeanAir(state, state.dataMundtSimMgr->TheseSurfIDs(SurfNum), TThisNode);
-            }
-        }
-    }
-
-    //*****************************************************************************************
-
-    void SetNodeResult(EnergyPlusData &state,
-                       int const NodeID,       // node ID
-                       Real64 const TempResult // temperature for the specified air node
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   September 2002
-        //       RE-ENGINEERED  April 2003, Weixiu Kong, EnergyPlus Implementation
-        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   provide set routine for reporting results
-        //   to AirDataManager from air model
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        state.dataMundtSimMgr->LineNode(NodeID, state.dataMundtSimMgr->MundtZoneNum).Temp = TempResult;
-    }
-
-    //*****************************************************************************************
-
-    void SetSurfTmeanAir(EnergyPlusData &state,
-                         int const SurfID,    // surface ID
-                         Real64 const TeffAir // temperature of air node adjacent to the specified surface
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   September 2002
-        //       RE-ENGINEERED  April 2003, Wiexiu Kong, EnergyPlus Implementation
-        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   provide set routine for air model prediction of
-        //   effective air for single surface
-
-        state.dataMundtSimMgr->MundtAirSurf(SurfID, state.dataMundtSimMgr->MundtZoneNum).TMeanAir = TeffAir;
-    }
-
-    //*****************************************************************************************
-
     void SetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
@@ -827,6 +770,49 @@ namespace MundtSimMgr {
             // set flag to indicate that Mundt model is NOT used for this zone at the present time
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
         }
+    }
+
+    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Chanvit Chantrasrisalai
+        //       DATE WRITTEN   July 2003
+        //       MODIFIED       February 2004, fix allocate-deallocate problem (CC)
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   manage the Mundt model
+
+        auto &MundtFirstTimeFlag = state.dataHeatBal->MundtFirstTimeFlag;
+        bool ErrorsFound;
+
+        // initialize Mundt model data
+        if (MundtFirstTimeFlag) {
+            InitMundtModel(state);
+            MundtFirstTimeFlag = false;
+        }
+
+        // identify the current zone index for zones using Mundt model
+        state.dataMundtSimMgr->MundtZoneNum = state.dataMundtSimMgr->ZoneData(ZoneNum).MundtZoneIndex;
+
+        // transfer data from surface domain to air domain for the specified zone
+        GetSurfHBDataForMundtModel(state, ZoneNum);
+
+        // use the Mundt model only for cooling case
+        if ((state.dataMundtSimMgr->SupplyAirVolumeRate > 0.0001) && (state.dataMundtSimMgr->QsysCoolTot > 0.0001)) {
+
+            // setup Mundt model
+            ErrorsFound = false;
+            SetupMundtModel(state, ZoneNum, ErrorsFound);
+            if (ErrorsFound) ShowFatalError(state, "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination.");
+
+            // perform Mundt model calculations
+            CalcMundtModel(state, ZoneNum);
+        }
+
+        // transfer data from air domain back to surface domain for the specified zone
+        SetSurfHBDataForMundtModel(state, ZoneNum);
     }
 
     //*****************************************************************************************

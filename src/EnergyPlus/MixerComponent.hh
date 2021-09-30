@@ -99,55 +99,12 @@ namespace MixerComponent {
 
     void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetMixerInput(EnergyPlusData &state);
 
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitAirMixer(EnergyPlusData &state, int MixerNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void CalcAirMixer(EnergyPlusData &state, int &MixerNum);
-
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Mixer Module
-    // *****************************************************************************
-
-    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum);
-
-    //        End of Update subroutines for the Mixer Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Mixer Module
-    // *****************************************************************************
-
-    void ReportMixer(int MixerNum);
-
-    //        End of Reporting subroutines for the Mixer Module
-    // *****************************************************************************
-
-    // Beginning of Utility subroutines for the Mixer Component
-    // *****************************************************************************
     void GetZoneMixerIndex(
         EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
     int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
-
-    // End of Utility subroutines for the Mixer Component
-    // *****************************************************************************
 
 } // namespace MixerComponent
 
