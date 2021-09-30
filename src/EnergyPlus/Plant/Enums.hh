@@ -64,11 +64,11 @@ int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop f
 // it does make flow requests (for s/m resolution)
 
 // Parameters for scheme types
-// Used in TYPE(OperationData)%OpSchemeType
-// As in PlantLoop(:)%OpScheme(:)%OpSchemeType
+// Used in TYPE(OperationData)%Type
+// As in PlantLoop(:)%OpScheme(:)%Type
 // Also in PlantLoop()LoopSide()Branch()Comp()%CurOpSchemeType
 // this may be changed later...
-enum OpSchemeType
+enum class OpSchemeType
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
     Unassigned = -1,

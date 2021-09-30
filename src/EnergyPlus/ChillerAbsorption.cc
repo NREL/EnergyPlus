@@ -1648,7 +1648,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                              .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
-                             .CurOpSchemeType == DataPlant::CompSetPtBased) ||
+                             .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else {
@@ -1660,7 +1660,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                              .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
-                             .CurOpSchemeType == DataPlant::CompSetPtBased) ||
+                             .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     } else {
