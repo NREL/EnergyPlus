@@ -134,6 +134,68 @@ using namespace ScheduleManager;
 
 constexpr const char *fluidNameSteam("STEAM");
 
+void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum) // number of the current AC unit being simulated
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard Raustad
+    //       DATE WRITTEN   July 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Fills some of the report variables for the packaged terminal heat pump
+
+    // METHODOLOGY EMPLOYED:
+    // NA
+
+    // REFERENCES:
+    // na
+
+    // USE STATEMENTS:
+    // NA
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    // na
+
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+    // na
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 ReportingConstant;
+
+    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate * ReportingConstant;
+    state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate * ReportingConstant;
+    state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate * ReportingConstant;
+    state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate * ReportingConstant;
+    state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate * ReportingConstant;
+    state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate * ReportingConstant;
+    state.dataPTHP->PTUnit(PTUnitNum).ElecConsumption = state.dataPTHP->PTUnit(PTUnitNum).ElecPower * ReportingConstant;
+
+    // adjust fan report variable to represent how the SZVAV model performs
+    if (state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel) {
+        state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio =
+            state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate /
+            max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
+    }
+
+    if (state.dataPTHP->PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+        if (!state.dataGlobal->SysSizingCalc) {
+            DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataPTHP->PTUnit(PTUnitNum).FirstPass);
+        }
+    }
+
+    state.dataHVACGlobal->OnOffFanPartLoadFraction =
+        1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+}
+
 void SimPackagedTerminalUnit(EnergyPlusData &state,
                              std::string_view CompName,     // name of the packaged terminal heat pump
                              int const ZoneNum,             // number of zone being served
@@ -238,6 +300,314 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
     ReportPTUnit(state, PTUnitNum);
 
     state.dataSize->ZoneEqDXCoil = false;
+}
+
+void ControlPTUnitOutput(EnergyPlusData &state,
+                         int const PTUnitNum,           // Unit index in fan coil array
+                         bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                         int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                         Real64 const QZnReq,           // cooling or heating output needed by zone [W]
+                         int const ZoneNum,             // Index to zone number
+                         Real64 &PartLoadFrac,          // unit part load fraction
+                         Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                         Real64 &SupHeaterLoad,         // Supplemental heater load [W]
+                         bool &HXUnitOn                 // flag to enable heat exchanger
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard Raustad
+    //       DATE WRITTEN   July 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Determine the part load fraction of the heat pump for this time step.
+
+    // METHODOLOGY EMPLOYED:
+    // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
+
+    // Using/Aliasing
+    using General::SolveRoot;
+
+    using HeatingCoils::SimulateHeatingCoilComponents;
+    using PlantUtilities::SetComponentFlowRate;
+    using Psychrometrics::PsyCpAirFnW;
+    using SteamCoils::SimulateSteamCoilComponents;
+    using WaterCoils::SimulateWaterCoilComponents;
+
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    Real64 mdot; // coil fluid mass flow rate (kg/s)
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    int const MaxIte(500);    // maximum number of iterations
+    Real64 const MinPLF(0.0); // minimum part load factor allowed
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 FullOutput;   // unit full output when compressor is operating [W]
+    Real64 TempOutput;   // unit output when iteration limit exceeded [W]
+    Real64 NoCompOutput; // output when no active compressor [W]
+    Real64 ErrorToler;   // error tolerance
+    int SolFla;          // Flag of RegulaFalsi solver
+    auto &ControlPTUnitOutputPar = state.dataPTHP->ControlPTUnitOutputPar;
+    Real64 CpAir;              // air specific heat
+    Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
+    Real64 TempMinPLR;
+    Real64 TempMaxPLR;
+    bool ContinueIter;
+
+    SupHeaterLoad = 0.0;
+    PartLoadFrac = 0.0;
+
+    if (state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum == 0) {
+        OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
+    } else {
+        OutsideDryBulbTemp = state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum).Temp;
+    }
+
+    if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
+
+    // If no heating or cooling required the coils needs to be off
+    if (!state.dataPTHP->HeatingLoad && !state.dataPTHP->CoolingLoad) {
+        return;
+    }
+
+    // Get result when DX coil is off
+    state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // set SZVAV model variable
+    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+
+    // Get full load result
+    PartLoadFrac = 1.0;
+    state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 1.0; // set SZVAV model variable
+    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+
+    if (state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel) {
+
+        if ((state.dataPTHP->CoolingLoad && FullOutput < QZnReq) || (state.dataPTHP->HeatingLoad && FullOutput > QZnReq)) {
+            if ((state.dataPTHP->CoolingLoad && NoCompOutput < QZnReq) || (state.dataPTHP->HeatingLoad && NoCompOutput > QZnReq)) {
+                PartLoadFrac = 0.0;
+                state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // set SZVAV model variable
+            } else {
+                int AirLoopNum = 0;
+                int CompressorOnFlag = 0;
+                auto &SZVAVModel(state.dataPTHP->PTUnit(PTUnitNum));
+                // seems like passing these (arguments 2-n) as an array (similar to ControlPTUnitOutputPar) would make this more uniform across
+                // different models
+                SZVAVModel::calcSZVAVModel(state,
+                                           SZVAVModel,
+                                           PTUnitNum,
+                                           FirstHVACIteration,
+                                           state.dataPTHP->CoolingLoad,
+                                           state.dataPTHP->HeatingLoad,
+                                           QZnReq,
+                                           OnOffAirFlowRatio,
+                                           HXUnitOn,
+                                           AirLoopNum,
+                                           PartLoadFrac,
+                                           CompressorOnFlag);
+            }
+        }
+
+    } else {
+
+        if (state.dataPTHP->CoolingLoad) {
+            // Since we are cooling, we expect FullOutput < NoCompOutput
+            // Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
+            if (FullOutput >= NoCompOutput) {
+                PartLoadFrac = 0.0;
+                return;
+            }
+            // If the QZnReq <= FullOutput the unit needs to run full out
+            if (QZnReq <= FullOutput) {
+                PartLoadFrac = 1.0;
+                return;
+            }
+            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+                ErrorToler = 0.001;
+            } else {
+                ErrorToler = state.dataPTHP->PTUnit(PTUnitNum).CoolConvergenceTol; // Error tolerance for convergence from input deck
+            }
+        } else {
+            // Since we are heating, we expect FullOutput > NoCompOutput
+            // Check that this is the case; if not set PartLoadFrac = 0.0 (off)
+            if (FullOutput <= NoCompOutput) {
+                PartLoadFrac = 0.0;
+                // may need supplemental heating so don't return in heating mode
+                //    RETURN
+            }
+            // If the QZnReq >= FullOutput the unit needs to run full out
+            if (QZnReq >= FullOutput && state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
+                PartLoadFrac = 1.0;
+                // may need supplemental heating so don't return in heating mode
+                //    RETURN
+            }
+            ErrorToler = state.dataPTHP->PTUnit(PTUnitNum).HeatConvergenceTol; // Error tolerance for convergence from input deck
+        }
+
+        // Calculate the part load fraction
+
+        if ((state.dataPTHP->HeatingLoad && QZnReq < FullOutput) || (state.dataPTHP->CoolingLoad && QZnReq > FullOutput)) {
+
+            ControlPTUnitOutputPar(1) = PTUnitNum;
+            ControlPTUnitOutputPar(2) = ZoneNum;
+            if (FirstHVACIteration) {
+                ControlPTUnitOutputPar(3) = 1.0;
+            } else {
+                ControlPTUnitOutputPar(3) = 0.0;
+            }
+            ControlPTUnitOutputPar(4) = OpMode;
+            ControlPTUnitOutputPar(5) = QZnReq;
+            ControlPTUnitOutputPar(6) = OnOffAirFlowRatio;
+            ControlPTUnitOutputPar(7) = SupHeaterLoad;
+            if (HXUnitOn) {
+                ControlPTUnitOutputPar(8) = 1.0;
+            } else {
+                ControlPTUnitOutputPar(8) = 0.0;
+            }
+            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, 0.0, 1.0, ControlPTUnitOutputPar);
+            if (SolFla == -1) {
+                //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
+                TempMaxPLR = -0.1;
+                ContinueIter = true;
+                while (ContinueIter && TempMaxPLR < 1.0) {
+                    TempMaxPLR += 0.1;
+                    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, TempMaxPLR, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                    if (state.dataPTHP->HeatingLoad && TempOutput > QZnReq) ContinueIter = false;
+                    if (state.dataPTHP->CoolingLoad && TempOutput < QZnReq) ContinueIter = false;
+                }
+                TempMinPLR = TempMaxPLR;
+                ContinueIter = true;
+                while (ContinueIter && TempMinPLR > 0.0) {
+                    TempMinPLR -= 0.01;
+                    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, TempMinPLR, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                    if (state.dataPTHP->HeatingLoad && TempOutput < QZnReq) ContinueIter = false;
+                    if (state.dataPTHP->CoolingLoad && TempOutput > QZnReq) ContinueIter = false;
+                }
+                SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, ControlPTUnitOutputPar);
+                if (SolFla == -1) {
+                    if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
+                        CalcPTUnit(
+                            state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                        if (state.dataPTHP->PTUnit(PTUnitNum).IterErrIndex == 0) {
+                            ShowWarningError(state,
+                                             state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                            ShowContinueError(
+                                state,
+                                format(" Iteration limit exceeded calculating packaged terminal unit part-load ratio, maximum iterations = {}",
+                                       MaxIte));
+                            ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadFrac));
+                            ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
+                                                           "\" - Iteration limit exceeded error continues...",
+                                                       state.dataPTHP->PTUnit(PTUnitNum).IterErrIndex,
+                                                       TempOutput,
+                                                       TempOutput,
+                                                       _,
+                                                       "{W}",
+                                                       "{W}");
+                    }
+                } else if (SolFla == -2) {
+                    if (!FirstHVACIteration) {
+                        ShowWarningError(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                        ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
+                        ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
+                        ShowContinueErrorTimeStamp(state, "");
+                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                    }
+                    PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
+                }
+            } else if (SolFla == -2) {
+                if (!FirstHVACIteration) {
+                    ShowWarningError(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
+                    ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
+                    ShowContinueErrorTimeStamp(state, "");
+                    if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                }
+                PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
+            }
+        }
+    }
+    // if the DX heating coil cannot meet the load, trim with supplemental heater
+    // occurs with constant fan mode when compressor is on or off
+    // occurs with cycling fan mode when compressor PLR is equal to 1
+    if (state.dataPTHP->HeatingLoad && QZnReq > FullOutput && state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
+        PartLoadFrac = 1.0;
+        if (OutsideDryBulbTemp <= state.dataPTHP->PTUnit(PTUnitNum).MaxOATSupHeat) {
+            SupHeaterLoad = QZnReq - FullOutput;
+        } else {
+            SupHeaterLoad = 0.0;
+        }
+        CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+    }
+
+    // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
+    if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
+        if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp > state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat &&
+            SupHeaterLoad > 0.0) {
+
+            // If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
+            SupHeaterLoad = 0.0;
+            {
+                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
+                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
+                    SimulateHeatingCoilComponents(state,
+                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                  FirstHVACIteration,
+                                                  SupHeaterLoad,
+                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                } else if (SELECT_CASE_var == Coil_HeatingWater) {
+                    mdot = 0.0;
+                    SetComponentFlowRate(state,
+                                         mdot,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                    SimulateWaterCoilComponents(state,
+                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                FirstHVACIteration,
+                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                SupHeaterLoad,
+                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                                PartLoadFrac);
+                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
+                    mdot = 0.0;
+                    SetComponentFlowRate(state,
+                                         mdot,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                    SimulateSteamCoilComponents(state,
+                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                FirstHVACIteration,
+                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                SupHeaterLoad);
+                }
+            }
+
+            //     If the outlet temperature is below the maximum supplemental heater supply air temperature, reduce the load passed to
+            //     the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
+            //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
+            //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
+            if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp < state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat) {
+                CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).HumRat);
+                SupHeaterLoad =
+                    state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
+                    (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat - state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp);
+
+            } else {
+                SupHeaterLoad = 0.0;
+            }
+        }
+    }
 }
 
 void SimPTUnit(EnergyPlusData &state,
@@ -5904,314 +6274,6 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     state.dataSize->DataScalableCapSizingON = false;
 }
 
-void ControlPTUnitOutput(EnergyPlusData &state,
-                         int const PTUnitNum,           // Unit index in fan coil array
-                         bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                         int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
-                         Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                         int const ZoneNum,             // Index to zone number
-                         Real64 &PartLoadFrac,          // unit part load fraction
-                         Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                         Real64 &SupHeaterLoad,         // Supplemental heater load [W]
-                         bool &HXUnitOn                 // flag to enable heat exchanger
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard Raustad
-    //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Determine the part load fraction of the heat pump for this time step.
-
-    // METHODOLOGY EMPLOYED:
-    // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
-
-    // Using/Aliasing
-    using General::SolveRoot;
-
-    using HeatingCoils::SimulateHeatingCoilComponents;
-    using PlantUtilities::SetComponentFlowRate;
-    using Psychrometrics::PsyCpAirFnW;
-    using SteamCoils::SimulateSteamCoilComponents;
-    using WaterCoils::SimulateWaterCoilComponents;
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    Real64 mdot; // coil fluid mass flow rate (kg/s)
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500);    // maximum number of iterations
-    Real64 const MinPLF(0.0); // minimum part load factor allowed
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 FullOutput;   // unit full output when compressor is operating [W]
-    Real64 TempOutput;   // unit output when iteration limit exceeded [W]
-    Real64 NoCompOutput; // output when no active compressor [W]
-    Real64 ErrorToler;   // error tolerance
-    int SolFla;          // Flag of RegulaFalsi solver
-    auto &ControlPTUnitOutputPar = state.dataPTHP->ControlPTUnitOutputPar;
-    Real64 CpAir;              // air specific heat
-    Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
-    Real64 TempMinPLR;
-    Real64 TempMaxPLR;
-    bool ContinueIter;
-
-    SupHeaterLoad = 0.0;
-    PartLoadFrac = 0.0;
-
-    if (state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum == 0) {
-        OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
-    } else {
-        OutsideDryBulbTemp = state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum).Temp;
-    }
-
-    if (GetCurrentScheduleValue(state, state.dataPTHP->PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
-
-    // If no heating or cooling required the coils needs to be off
-    if (!state.dataPTHP->HeatingLoad && !state.dataPTHP->CoolingLoad) {
-        return;
-    }
-
-    // Get result when DX coil is off
-    state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // set SZVAV model variable
-    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-
-    // Get full load result
-    PartLoadFrac = 1.0;
-    state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 1.0; // set SZVAV model variable
-    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-
-    if (state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel) {
-
-        if ((state.dataPTHP->CoolingLoad && FullOutput < QZnReq) || (state.dataPTHP->HeatingLoad && FullOutput > QZnReq)) {
-            if ((state.dataPTHP->CoolingLoad && NoCompOutput < QZnReq) || (state.dataPTHP->HeatingLoad && NoCompOutput > QZnReq)) {
-                PartLoadFrac = 0.0;
-                state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // set SZVAV model variable
-            } else {
-                int AirLoopNum = 0;
-                int CompressorOnFlag = 0;
-                auto &SZVAVModel(state.dataPTHP->PTUnit(PTUnitNum));
-                // seems like passing these (arguments 2-n) as an array (similar to ControlPTUnitOutputPar) would make this more uniform across
-                // different models
-                SZVAVModel::calcSZVAVModel(state,
-                                           SZVAVModel,
-                                           PTUnitNum,
-                                           FirstHVACIteration,
-                                           state.dataPTHP->CoolingLoad,
-                                           state.dataPTHP->HeatingLoad,
-                                           QZnReq,
-                                           OnOffAirFlowRatio,
-                                           HXUnitOn,
-                                           AirLoopNum,
-                                           PartLoadFrac,
-                                           CompressorOnFlag);
-            }
-        }
-
-    } else {
-
-        if (state.dataPTHP->CoolingLoad) {
-            // Since we are cooling, we expect FullOutput < NoCompOutput
-            // Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
-            if (FullOutput >= NoCompOutput) {
-                PartLoadFrac = 0.0;
-                return;
-            }
-            // If the QZnReq <= FullOutput the unit needs to run full out
-            if (QZnReq <= FullOutput) {
-                PartLoadFrac = 1.0;
-                return;
-            }
-            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
-                ErrorToler = 0.001;
-            } else {
-                ErrorToler = state.dataPTHP->PTUnit(PTUnitNum).CoolConvergenceTol; // Error tolerance for convergence from input deck
-            }
-        } else {
-            // Since we are heating, we expect FullOutput > NoCompOutput
-            // Check that this is the case; if not set PartLoadFrac = 0.0 (off)
-            if (FullOutput <= NoCompOutput) {
-                PartLoadFrac = 0.0;
-                // may need supplemental heating so don't return in heating mode
-                //    RETURN
-            }
-            // If the QZnReq >= FullOutput the unit needs to run full out
-            if (QZnReq >= FullOutput && state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
-                PartLoadFrac = 1.0;
-                // may need supplemental heating so don't return in heating mode
-                //    RETURN
-            }
-            ErrorToler = state.dataPTHP->PTUnit(PTUnitNum).HeatConvergenceTol; // Error tolerance for convergence from input deck
-        }
-
-        // Calculate the part load fraction
-
-        if ((state.dataPTHP->HeatingLoad && QZnReq < FullOutput) || (state.dataPTHP->CoolingLoad && QZnReq > FullOutput)) {
-
-            ControlPTUnitOutputPar(1) = PTUnitNum;
-            ControlPTUnitOutputPar(2) = ZoneNum;
-            if (FirstHVACIteration) {
-                ControlPTUnitOutputPar(3) = 1.0;
-            } else {
-                ControlPTUnitOutputPar(3) = 0.0;
-            }
-            ControlPTUnitOutputPar(4) = OpMode;
-            ControlPTUnitOutputPar(5) = QZnReq;
-            ControlPTUnitOutputPar(6) = OnOffAirFlowRatio;
-            ControlPTUnitOutputPar(7) = SupHeaterLoad;
-            if (HXUnitOn) {
-                ControlPTUnitOutputPar(8) = 1.0;
-            } else {
-                ControlPTUnitOutputPar(8) = 0.0;
-            }
-            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, 0.0, 1.0, ControlPTUnitOutputPar);
-            if (SolFla == -1) {
-                //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
-                TempMaxPLR = -0.1;
-                ContinueIter = true;
-                while (ContinueIter && TempMaxPLR < 1.0) {
-                    TempMaxPLR += 0.1;
-                    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, TempMaxPLR, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-                    if (state.dataPTHP->HeatingLoad && TempOutput > QZnReq) ContinueIter = false;
-                    if (state.dataPTHP->CoolingLoad && TempOutput < QZnReq) ContinueIter = false;
-                }
-                TempMinPLR = TempMaxPLR;
-                ContinueIter = true;
-                while (ContinueIter && TempMinPLR > 0.0) {
-                    TempMinPLR -= 0.01;
-                    CalcPTUnit(state, PTUnitNum, FirstHVACIteration, TempMinPLR, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-                    if (state.dataPTHP->HeatingLoad && TempOutput < QZnReq) ContinueIter = false;
-                    if (state.dataPTHP->CoolingLoad && TempOutput > QZnReq) ContinueIter = false;
-                }
-                SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, ControlPTUnitOutputPar);
-                if (SolFla == -1) {
-                    if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
-                        CalcPTUnit(
-                            state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-                        if (state.dataPTHP->PTUnit(PTUnitNum).IterErrIndex == 0) {
-                            ShowWarningError(state,
-                                             state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
-                            ShowContinueError(
-                                state,
-                                format(" Iteration limit exceeded calculating packaged terminal unit part-load ratio, maximum iterations = {}",
-                                       MaxIte));
-                            ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadFrac));
-                            ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
-                        }
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
-                                                           "\" - Iteration limit exceeded error continues...",
-                                                       state.dataPTHP->PTUnit(PTUnitNum).IterErrIndex,
-                                                       TempOutput,
-                                                       TempOutput,
-                                                       _,
-                                                       "{W}",
-                                                       "{W}");
-                    }
-                } else if (SolFla == -2) {
-                    if (!FirstHVACIteration) {
-                        ShowWarningError(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
-                        ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
-                        ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
-                        ShowContinueErrorTimeStamp(state, "");
-                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
-                    }
-                    PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
-                }
-            } else if (SolFla == -2) {
-                if (!FirstHVACIteration) {
-                    ShowWarningError(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
-                    ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
-                    ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
-                    ShowContinueErrorTimeStamp(state, "");
-                    if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
-                }
-                PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
-            }
-        }
-    }
-    // if the DX heating coil cannot meet the load, trim with supplemental heater
-    // occurs with constant fan mode when compressor is on or off
-    // occurs with cycling fan mode when compressor PLR is equal to 1
-    if (state.dataPTHP->HeatingLoad && QZnReq > FullOutput && state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
-        PartLoadFrac = 1.0;
-        if (OutsideDryBulbTemp <= state.dataPTHP->PTUnit(PTUnitNum).MaxOATSupHeat) {
-            SupHeaterLoad = QZnReq - FullOutput;
-        } else {
-            SupHeaterLoad = 0.0;
-        }
-        CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-    }
-
-    // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
-    if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
-        if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp > state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat &&
-            SupHeaterLoad > 0.0) {
-
-            // If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
-            SupHeaterLoad = 0.0;
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
-                    SimulateWaterCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                                PartLoadFrac);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad);
-                }
-            }
-
-            //     If the outlet temperature is below the maximum supplemental heater supply air temperature, reduce the load passed to
-            //     the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
-            //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
-            //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
-            if (state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp < state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat) {
-                CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).HumRat);
-                SupHeaterLoad =
-                    state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
-                    (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat - state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp);
-
-            } else {
-                SupHeaterLoad = 0.0;
-            }
-        }
-    }
-}
-
 void CalcPTUnit(EnergyPlusData &state,
                 int const PTUnitNum,           // Unit index in fan coil array
                 bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
@@ -7236,68 +7298,6 @@ void SetAverageAirFlow(EnergyPlusData &state,
         }
         OnOffAirFlowRatio = 0.0;
     }
-}
-
-void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum) // number of the current AC unit being simulated
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard Raustad
-    //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Fills some of the report variables for the packaged terminal heat pump
-
-    // METHODOLOGY EMPLOYED:
-    // NA
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // NA
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ReportingConstant;
-
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate * ReportingConstant;
-    state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate * ReportingConstant;
-    state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate * ReportingConstant;
-    state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate * ReportingConstant;
-    state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate * ReportingConstant;
-    state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergy = state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate * ReportingConstant;
-    state.dataPTHP->PTUnit(PTUnitNum).ElecConsumption = state.dataPTHP->PTUnit(PTUnitNum).ElecPower * ReportingConstant;
-
-    // adjust fan report variable to represent how the SZVAV model performs
-    if (state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel) {
-        state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio =
-            state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate /
-            max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow);
-    }
-
-    if (state.dataPTHP->PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-        if (!state.dataGlobal->SysSizingCalc) {
-            DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataPTHP->PTUnit(PTUnitNum).FirstPass);
-        }
-    }
-
-    state.dataHVACGlobal->OnOffFanPartLoadFraction =
-        1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
 }
 
 int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)

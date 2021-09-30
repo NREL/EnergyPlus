@@ -111,6 +111,1072 @@ namespace Photovoltaics {
     // Using/Aliasing
     using namespace DataPhotovoltaics;
 
+    void CalcSimplePV(EnergyPlusData &state, int const thisPV)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   Jan. 2004
+        //       MODIFIED       B. Griffith, Aug. 2008
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // calculate the electricity production using a simple PV model
+
+        // Using/Aliasing
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        using ScheduleManager::GetCurrentScheduleValue;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int ThisSurf; // working index ptr to Surface arrays
+        Real64 Eff;   // working variable for solar electric efficiency
+
+        ThisSurf = state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr;
+
+        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > state.dataPhotovoltaic->MinIrradiance) {
+
+            // get efficiency
+            {
+                auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.EfficencyInputMode);
+
+                if (SELECT_CASE_var == Efficiency::Fixed) {
+
+                    Eff = state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.PVEfficiency;
+
+                } else if (SELECT_CASE_var == Efficiency::Scheduled) { // get from schedule
+
+                    Eff = GetCurrentScheduleValue(state, state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.EffSchedPtr);
+                    state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.PVEfficiency = Eff;
+
+                } else {
+                    Eff = 0.0; // Suppress uninitialized warning
+                    ShowSevereError(state, "caught bad Mode in Generator:Photovoltaic:Simple use FIXED or SCHEDULED efficiency mode");
+                }
+            }
+
+            state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower =
+                state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.AreaCol * Eff *
+                state.dataHeatBal->SurfQRadSWOutIncident(
+                    ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
+
+            // store sink term in appropriate place for surface heat transfer itegration
+            state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower;
+
+            // array energy, power * timestep
+            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy =
+                state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
+            state.dataPhotovoltaic->PVarray(thisPV).Report.ArrayEfficiency = Eff;
+        } else { // not enough incident solar, zero things out
+
+            state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = 0.0;
+            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy = 0.0;
+            state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower = 0.0;
+            state.dataPhotovoltaic->PVarray(thisPV).Report.ArrayEfficiency = 0.0;
+        }
+    }
+
+    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         David Bradley
+        //       DATE WRITTEN   April 2003
+        //       MODIFIED       BG March 2007 reworked for CR7109 (reverse DD testing)
+        //                      B. Griffith, Aug. 2008 reworked for new, single-PV-generator data structure
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine initializes the PV arrays during simulation. It performs both start of
+        // simulation initializations and start of timestep initializations. The structure of the
+        // subroutine was taken from InitBaseboard.
+
+        // Using/Aliasing
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
+
+        // perform the one time initializations
+        if (state.dataPhotovoltaicState->MyOneTimeFlag) {
+            // initialize the environment and sizing flags
+            state.dataPhotovoltaicState->MyEnvrnFlag.dimension(state.dataPhotovoltaic->NumPVs, true);
+            state.dataPhotovoltaicState->MyOneTimeFlag = false;
+        }
+
+        // Do the Begin Environment initializations
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataPhotovoltaicState->MyEnvrnFlag(PVnum)) {
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK =
+                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK =
+                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+            state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = false;
+        }
+
+        if (!state.dataGlobal->BeginEnvrnFlag) {
+            state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = true;
+        }
+
+        // Do the beginning of every time step initializations
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+        if (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
+            // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK;
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.TimeElapsed = TimeElapsed;
+        }
+
+        if (any_gt(state.dataHeatBal->SurfQRadSWOutIncident, 0.0)) {
+            //  Determine the amount of radiation incident on each PV
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation =
+                state.dataHeatBal->SurfQRadSWOutIncident(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr); //[W/m2]
+        } else {
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
+        }
+    }
+
+    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         <author>
+        //       DATE WRITTEN   <date_written>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // object oriented "Get" routine for collector surface temperature
+
+        // METHODOLOGY EMPLOYED:
+        // access derived type
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        TsColl = state.dataSurface->ExtVentedCavity(VentModNum).Tbaffle;
+    }
+
+    void NEWTON(EnergyPlusData &state,
+                Real64 &XX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
+                Real64 const &II, // Autodesk Aliased to XX in some calls
+                Real64 const &VV, // Autodesk Aliased to XX in some calls
+                Real64 const IO,
+                Real64 const IL,
+                Real64 const RSER,
+                Real64 const AA,
+                Real64 const XS,
+                Real64 const EPS)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
+        //       DATE WRITTEN   March 2001
+        //       MODIFIED       D. Bradley for use with EnergyPlus
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine uses the Newton-Raphson method to solve a non linear equation with one variable.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int COUNT;
+        Real64 ERR;
+        Real64 X0;
+
+        COUNT = 0;
+        XX = XS;
+        ERR = 1.0;
+        while ((ERR > EPS) && (COUNT <= 10)) {
+            X0 = XX;
+            XX -= FXX(state, II, VV, IL, IO, RSER, AA) / DER(state, II, VV, IO, RSER, AA);
+            ++COUNT;
+            ERR = std::abs((XX - X0) / X0);
+        }
+    }
+
+    void CalcTRNSYSPV(EnergyPlusData &state,
+                      int const PVnum,   // BTG added intent
+                      bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         D. Bradley
+        //       DATE WRITTEN   April 2003
+        //       MODIFIED       B. Griffith, February 2008-- added support for inverter
+        //                      multipliers, and building integrated heat transfer
+        //                      B. Griffith, Aug. 2008 reworked for new, single-PV-generator data structure
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine simulates the PV performance.
+
+        using TranspiredCollector::GetUTSCTsColl;
+
+        Real64 const EPS(0.001);
+        Real64 const ERR(0.001);
+        Real64 const MinInsolation(30.0);
+        int const KMAX(100);
+        Real64 const EtaIni(0.10); // initial value of eta
+        Real64 DummyErr;
+        Real64 ETA;
+        Real64 Tambient;
+        Real64 EtaOld;
+        Real64 ILRef;
+        Real64 AARef;
+        Real64 IORef;
+        Real64 SeriesResistance;
+        Real64 IL;
+        Real64 AA;
+        Real64 IO;
+        Real64 ISCG1;
+        Real64 ISC;
+        Real64 VOCG1;
+        Real64 VOC;
+        Real64 VLEFT;
+        Real64 VRIGHT;
+        Real64 VM;
+        Real64 IM;
+        Real64 PM;
+        Real64 IA;
+        Real64 ISCA;
+        Real64 VA;
+        Real64 VOCA;
+        Real64 PA;
+        int CC;
+        int K;
+        Real64 CellTemp(0.0); // cell temperature in Kelvin
+        Real64 CellTempC;     // cell temperature in degrees C
+
+        // if the cell temperature mode is 2, convert the timestep to seconds
+        if (state.dataPhotovoltaicState->firstTime &&
+            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::DecoupledUllebergDynamic) {
+            state.dataPhotovoltaicState->PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
+        }
+        state.dataPhotovoltaicState->firstTime = false;
+
+        // place the shunt resistance into its common block
+        state.dataPhotovoltaic->ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
+
+        // convert ambient temperature from C to K
+        Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+
+        if ((state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
+
+            // set initial values for eta iteration loop
+            DummyErr = 2.0 * ERR;
+            CC = 1;
+            EtaOld = EtaIni;
+
+            // Begin DO WHILE loop - until the error tolerance is reached.
+            ETA = 0.0;
+            while (DummyErr > ERR) {
+
+                {
+                    auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
+                    if (SELECT_CASE_var == CellIntegration::Decoupled) {
+                        //  cell temperature based on energy balance
+                        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef =
+                            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha *
+                            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTInsolation /
+                            (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTCellTemp -
+                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTAmbTemp);
+                        CellTemp = Tambient + (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation *
+                                               state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha /
+                                               state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef) *
+                                                  (1.0 - ETA / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha);
+                    } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
+                        //  cell temperature based on energy balance with thermal capacity effects
+                        CellTemp = Tambient +
+                                   (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
+                                       std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
+                                                state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
+                                                state.dataPhotovoltaicState->PVTimeStep) +
+                                   (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha - ETA) *
+                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
+                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef *
+                                       (1.0 - std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
+                                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
+                                                       state.dataPhotovoltaicState->PVTimeStep));
+                    } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
+                        CellTemp =
+                            state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                    } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
+                        GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
+                        CellTemp += DataGlobalConstants::KelvinConv;
+                    } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
+                        GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
+                        CellTemp += DataGlobalConstants::KelvinConv;
+                    } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
+                        // get PVT model result for cell temp..
+                    }
+                }
+
+                //  reference parameters
+                ILRef = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefIsc;
+                AARef = (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefVoc *
+                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature -
+                         state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc +
+                         state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.SemiConductorBandgap *
+                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.CellsInSeries) /
+                        (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefIsc *
+                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature / ILRef -
+                         3.0);
+                IORef = ILRef * std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc / AARef);
+
+                //  series resistance
+                SeriesResistance =
+                    (AARef * std::log(1.0 - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Imp / ILRef) -
+                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Vmp + state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc) /
+                    state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Imp;
+
+                //  temperature depencence
+                IL = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
+                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefInsolation *
+                     (ILRef + state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefIsc *
+                                  (CellTemp - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature));
+                Real64 const cell_temp_ratio(CellTemp / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature);
+                AA = AARef * cell_temp_ratio;
+                IO = IORef * pow_3(cell_temp_ratio) *
+                     std::exp(state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.SemiConductorBandgap *
+                              state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.CellsInSeries / AARef *
+                              (1.0 - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature / CellTemp));
+
+                //  compute short curcuit current and open circuit voltage
+
+                //   NEWTON --> ISC  (STARTVALUE: ISCG1 - BASED ON IL=ISC)
+                ISCG1 = IL;
+                NEWTON(state, ISC, FUN, FI, ISC, DataPrecisionGlobals::constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
+
+                //   NEWTON --> VOC  (STARTVALUE: VOCG1 - BASED ON IM=0.0)
+                VOCG1 = (std::log(IL / IO) + 1.0) * AA;
+                NEWTON(state, VOC, FUN, FV, DataPrecisionGlobals::constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
+
+                //  maximum power point tracking
+
+                //   SEARCH --> VM AT MAXIMUM POWER POINT
+                VLEFT = 0.0;
+                VRIGHT = VOC;
+                SEARCH(state, VLEFT, VRIGHT, VM, K, IO, IL, SeriesResistance, AA, EPS, KMAX);
+
+                //   POWER --> IM & PM AT MAXIMUM POWER POINT
+                POWER(state, IO, IL, SeriesResistance, AA, EPS, IM, VM, PM);
+
+                // calculate overall PV module efficiency
+                ETA =
+                    PM / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Area;
+                DummyErr = std::abs((ETA - EtaOld) / EtaOld);
+                EtaOld = ETA;
+                ++CC;
+
+            } // while
+
+        } else {
+            // if there is no incident radiation or if the control switch is 'Off'
+            {
+                auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
+                if (SELECT_CASE_var == CellIntegration::Decoupled) {
+                    CellTemp = Tambient;
+                } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
+                    CellTemp = Tambient + (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
+                                              std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
+                                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
+                                                       state.dataPhotovoltaicState->PVTimeStep);
+                } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
+                    CellTemp =
+                        state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
+                } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
+                    GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
+                    CellTemp += DataGlobalConstants::KelvinConv;
+                } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
+                    GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
+                    CellTemp += DataGlobalConstants::KelvinConv;
+                } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
+                    // get PVT model result for cell temp.. //Bug CellTemp not set but used below
+                } else {
+                    assert(false);
+                }
+            }
+
+            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
+            IM = 0.0;  // module current
+            VM = 0.0;  // module voltage
+            PM = 0.0;  // module power
+            ETA = 0.0; // module efficiency
+            ISC = 0.0;
+            VOC = 0.0;
+        }
+
+        // convert cell temperature back to C
+        CellTempC = CellTemp - DataGlobalConstants::KelvinConv;
+
+        // calculate array based outputs (so far, the outputs are module based
+        IA = state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * IM;
+        ISCA = state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * ISC;
+        VA = state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries * VM;
+        VOCA = state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries * VOC;
+        PA = IA * VA;
+
+        // Place local variables into the reporting structure
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayCurrent = IA;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayVoltage = VA;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayPower = PA;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower = PA;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayEfficiency = ETA;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency = ETA;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTemp = CellTempC;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp = CellTempC;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK = CellTemp;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayIsc = ISCA;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc = ISCA;
+        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayVoc = VOCA;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc = VOCA;
+        state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink = PA;
+    }
+
+    Real64 SandiaModuleTemperature(Real64 const Ibc, // beam radiation on collector plane, W/m2
+                                   Real64 const Idc, // Diffuse radiation on collector plane, W/m2
+                                   Real64 const Ws,  // wind speed, m/s
+                                   Real64 const Ta,  // ambient temperature, degC
+                                   Real64 const fd,  // fraction of Idc used (empirical constant)
+                                   Real64 const a,   // empirical constant
+                                   Real64 const b    // empirical constant
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   unknown
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B.Griffith December 2003
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns back-of-module temperature, deg C
+
+        // METHODOLOGY EMPLOYED:
+        // apply sandia temperature model, This is module temp or back of
+        // of the panel.  A seperate correction handles delta T for actual cell
+
+        // REFERENCES:
+        // from G. Barker's TRNSYS implementation
+        // Equations (10)  in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
+        //   predicted performance of building integrated photovoltaics,
+        //   Solar 2002, Sunrise on the Reliable Energy Economy,
+        //   June 15-19, 2002, Reno, NV.
+
+        // Return value
+        Real64 SandiaModuleTemperature;
+
+        Real64 E; // total irradiance working variable
+
+        E = Ibc + fd * Idc;
+
+        SandiaModuleTemperature = E * std::exp(a + b * Ws) + Ta;
+
+        return SandiaModuleTemperature;
+    }
+
+    Real64 SandiaTcellFromTmodule(Real64 const Tm,  // module temperature (deg C)
+                                  Real64 const Ibc, // beam radiation on collector plane, W/m2
+                                  Real64 const Idc, // Diffuse radiation on collector plane, W/m2
+                                  Real64 const fd,  // fraction of Idc used (empirical constant)
+                                  Real64 const DT0  // (Tc-Tm) at E=1000 W/m2 (empirical constant known as delta T), deg C
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   unknown
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith Jan 2004 F77 -> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns cell temperature, deg C
+
+        // METHODOLOGY EMPLOYED:
+        // This is for the Sandia model method of determining cell temperatures
+        // module temperature differs from solar cell temperature
+        // because panel temperatures are not uniform
+
+        // REFERENCES:
+        // Equations (11) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
+        //   predicted performance of building integrated photovoltaics,
+        //   Solar 2002, Sunrise on the Reliable Energy Economy,
+        //   June 15-19, 2002, Reno, NV.
+
+        // Return value
+        Real64 SandiaTcellFromTmodule;
+
+        Real64 E; // total irradiance working variable
+
+        E = Ibc + fd * Idc;
+
+        SandiaTcellFromTmodule = Tm + (E / 1000.0) * DT0;
+
+        return SandiaTcellFromTmodule;
+    }
+
+    Real64 SandiaF1(Real64 const AMa, // absolute air mass
+                    Real64 const a0,  // empirical constant, module-specific
+                    Real64 const a1,  // empirical constant, module-specific
+                    Real64 const a2,  // empirical constant, module-specific
+                    Real64 const a3,  // empirical constant, module-specific
+                    Real64 const a4   // empirical constant, module-specific
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffit F77-> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns the result of Sandia Air Mass function
+        //  "AMa-Function" for solar spectral influence
+
+        // METHODOLOGY EMPLOYED:
+        // <description>
+
+        // REFERENCES:
+        // Equation (8) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
+        //   predicted performance of building integrated photovoltaics,
+        //   Solar 2002, Sunrise on the Reliable Energy Economy,
+        //   June 15-19, 2002, Reno, NV.
+
+        // Return value
+        Real64 SandiaF1;
+
+        Real64 const F1(a0 + a1 * AMa + a2 * pow_2(AMa) + a3 * pow_3(AMa) + a4 * pow_4(AMa));
+
+        if (F1 > 0.0) {
+            SandiaF1 = F1;
+        } else {
+            SandiaF1 = 0.0;
+        }
+
+        return SandiaF1;
+    }
+
+    Real64 SandiaF2(Real64 const IncAng, // incidence angle (deg)
+                    Real64 const b0,     // empirical module-specific constants
+                    Real64 const b1,     // empirical module-specific constants
+                    Real64 const b2,     // empirical module-specific constants
+                    Real64 const b3,     // empirical module-specific constants
+                    Real64 const b4,     // empirical module-specific constants
+                    Real64 const b5      // empirical module-specific constants
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith Jan 2004 F77-> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // C Returns Sandia F2 function
+
+        // REFERENCES:
+        // Equation (9) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
+        //   predicted performance of building integrated photovoltaics,
+        //   Solar 2002, Sunrise on the Reliable Energy Economy,
+        //   June 15-19, 2002, Reno, NV.
+
+        // Return value
+        Real64 SandiaF2;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 F2; // working variable for function result
+
+        F2 = b0 + b1 * IncAng + b2 * pow_2(IncAng) + b3 * pow_3(IncAng) + b4 * pow_4(IncAng) + b5 * pow_5(IncAng);
+
+        if (F2 > 0.0) {
+            SandiaF2 = F2;
+        } else {
+            SandiaF2 = 0.0;
+        }
+
+        return SandiaF2;
+    }
+
+    Real64 SandiaImp(Real64 const Tc,   // cell temperature (degC)
+                     Real64 const Ee,   // effective irradiance (W/m2)
+                     Real64 const Imp0, // current at MPP at SRC (1000 W/m2, 25 C) (A)
+                     Real64 const aImp, // Imp temperature coefficient (degC^-1)
+                     Real64 const C0,   // empirical module-specific constants
+                     Real64 const C1    // empirical module-specific constants
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith F77 -> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns current at maximum power point (A)
+
+        // REFERENCES:
+        // Equation (3) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
+        //   predicted performance of building integrated photovoltaics,
+        //   Solar 2002, Sunrise on the Reliable Energy Economy,
+        //   June 15-19, 2002, Reno, NV.
+
+        // Return value
+        Real64 SandiaImp;
+
+        SandiaImp = Imp0 * (C0 * Ee + C1 * pow_2(Ee)) * (1.0 + aImp * (Tc - 25));
+        // why hardwire T0 at 25.0?  can this change? seems okay, fewer args
+        return SandiaImp;
+    }
+
+    Real64 SandiaIsc(Real64 const Tc,   // cell temperature (deg C)
+                     Real64 const Isc0, // Isc at Tc=25 C, Ic=1000 W/m2 (A)
+                     Real64 const Ibc,  // beam radiation on collector plane (W/m2)
+                     Real64 const Idc,  // Diffuse radiation on collector plane (W/m2)
+                     Real64 const F1,   // Sandia F1 function for air mass effects
+                     Real64 const F2,   // Sandia F2 function of incidence angle
+                     Real64 const fd,   // module-specific empirical constant
+                     Real64 const aIsc  // Isc temperature coefficient (degC^-1)
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <date_written>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith Jan 2004 F77 -> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns Short-Circuit Current
+
+        // REFERENCES:
+        // Equation (1) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
+        //   predicted performance of building integrated photovoltaics,
+        //   Solar 2002, Sunrise on the Reliable Energy Economy,
+        //   June 15-19, 2002, Reno, NV.
+
+        // Return value
+        Real64 SandiaIsc;
+
+        // SandiaIsc=Isc0*((Ibc*F1*F2+fd*Idc)/1000.0)*(1.0+aIsc*(Tc-25.0))
+        // Barkers original (above) changed to match publish eq. (1) in reference
+        SandiaIsc = Isc0 * F1 * ((Ibc * F2 + fd * Idc) / 1000.0) * (1.0 + aIsc * (Tc - 25.0));
+
+        // why hardwire E0 at 1000.0 ?, can this change? seems okay
+
+        return SandiaIsc;
+    }
+
+    Real64 SandiaIx(Real64 const Tc,   // cell temperature (deg C)
+                    Real64 const Ee,   // effective irradiance
+                    Real64 const Ix0,  // Ix at SRC (1000 W/m2, 25 C) (A)
+                    Real64 const aIsc, // Isc temp coefficient (/C)
+                    Real64 const aImp, // Imp temp coefficient (/C)
+                    Real64 const C4,   // empirical module-specific constants
+                    Real64 const C5    // empirical module-specific constants
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith, Jan 2004 F77 -> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns current "Ix" at V=0.5*Voc (A)
+
+        // REFERENCES:
+        // Equation 9 in King et al. nov 20003
+
+        // Return value
+        Real64 SandiaIx;
+
+        SandiaIx = Ix0 * (C4 * Ee + C5 * pow_2(Ee)) * (1.0 + ((aIsc + aImp) / 2.0 * (Tc - 25.0)));
+
+        return SandiaIx;
+    }
+
+    Real64 SandiaIxx(Real64 const Tc,   // cell temperature (deg C)
+                     Real64 const Ee,   // effective irradiance (W/m2 ?)
+                     Real64 const Ixx0, // Ixx at SRC (1000 W/m2, 25 C) (A)
+                     Real64 const aImp, // Imp temp coefficient (/C)
+                     Real64 const C6,   // empirical module-specific constants
+                     Real64 const C7    // empirical module-specific constants
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith Jan2004 F77 to f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns current "Ix" at V=0.5*(Voc+Vmp) (A)
+
+        // REFERENCES:
+        // Equation 10 in King et al nov. 2003
+
+        // Return value
+        Real64 SandiaIxx;
+
+        SandiaIxx = Ixx0 * (C6 * Ee + C7 * pow_2(Ee)) * (1.0 + aImp * (Tc - 25.0));
+
+        return SandiaIxx;
+    }
+
+    Real64 SandiaVmp(Real64 const Tc,          // cell temperature (deg C)
+                     Real64 const Ee,          // effective irradiance
+                     Real64 const Vmp0,        // Vmp at SRC (1000 W/m2, 25 C) (V)
+                     Real64 const NcellSer,    // # cells in series
+                     Real64 const DiodeFactor, // module-specIFic empirical constant
+                     Real64 const BVmp0,       // Vmp temperature coefficient (V/C)
+                     Real64 const mBVmp,       // change in BVmp with irradiance
+                     Real64 const C2,          // empirical module-specific constants
+                     Real64 const C3           // empirical module-specific constants
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith, Jan 2004, F77 -> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns Voltage at Max. Power Point (V)
+
+        // METHODOLOGY EMPLOYED:
+        // <description>
+
+        // REFERENCES:
+        // Equation 4 in King et al Nov. 2003
+
+        // Return value
+        Real64 SandiaVmp;
+
+        Real64 dTc;
+        Real64 BVmpEe;
+
+        if (Ee > 0.0) {
+            // following is equation 8 in King et al. nov. 2003
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
+
+            BVmpEe = BVmp0 + mBVmp * (1.0 - Ee);
+
+            SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log(Ee) + C3 * NcellSer * pow_2(dTc * std::log(Ee)) + BVmpEe * (Tc - 25.0);
+        } else {
+            SandiaVmp = 0.0;
+        }
+
+        return SandiaVmp;
+    }
+
+    Real64 SandiaVoc(Real64 const Tc,          // cell temperature (deg C)
+                     Real64 const Ee,          // effective irradiance
+                     Real64 const Voc0,        // Voc at SRC (1000 W/m2, 25 C) (V)
+                     Real64 const NcellSer,    // # cells in series
+                     Real64 const DiodeFactor, // module-specIFic empirical constant
+                     Real64 const BVoc0,       // Voc temperature coefficient (V/C)
+                     Real64 const mBVoc        // change in BVoc with irradiance
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B Griffith Jan 2004 F77 -> f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns Open-Circuit Voltage (V)
+
+        // Return value
+        Real64 SandiaVoc;
+
+        Real64 dTc;    // working variable
+        Real64 BVocEe; // working variable
+
+        if (Ee > 0.0) {
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
+            BVocEe = BVoc0 + mBVoc * (1.0 - Ee);
+
+            SandiaVoc = Voc0 + NcellSer * dTc * std::log(Ee) + BVocEe * (Tc - 25.0);
+        } else {
+            SandiaVoc = 0.0;
+        }
+
+        return SandiaVoc;
+    }
+
+    Real64 SandiaEffectiveIrradiance(Real64 const Tc,   // cell temperature (deg C)
+                                     Real64 const Isc,  // short-circuit current under operating conditions (A)
+                                     Real64 const Isc0, // reference Isc at Tc=25 C, Ic=1000 W/m2 (A)
+                                     Real64 const aIsc  // Isc temperature coefficient (degC^-1)
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. Barker
+        //       DATE WRITTEN   <unknown>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith Jan 2004, F77 to f90
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns "effective irradiance", used in calculation of Imp, Voc, Ix, Ixx
+
+        // Return value
+        Real64 SandiaEffectiveIrradiance;
+
+        SandiaEffectiveIrradiance = Isc / (1.0 + aIsc * (Tc - 25.0)) / Isc0;
+
+        return SandiaEffectiveIrradiance;
+    }
+
+    void CalcSandiaPV(EnergyPlusData &state,
+                      int const PVnum,   // ptr to current PV system
+                      bool const RunFlag // controls if generator is scheduled *ON*
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith , (derived from Greg Barker's TRNSYS type101 for SANDIA PV model)
+        //       DATE WRITTEN   Jan 2004
+        //       MODIFIED       B. Griffith, Aug. 2008 reworked for new, single-PV-generator data structure
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculate various PV system peformance indicies at the current timestep
+
+        // METHODOLOGY EMPLOYED:
+        //  adapted code from a set of F77 routines by G. Barker that implement the model
+        //  This routines works on a single photovoltaic object of the type 'GENERATOR:PV:SANDIA'
+        //  Each major model equation has its own function (in this module)
+
+        // REFERENCES:
+        // King, David L. . Photovoltaic module and array performance characterization methods for all
+        //   system operating conditions. Pro. NREL/SNL Photovoltaics Program Review, AIP Press, Lakewood CO
+        //   Sandia National Laboratories
+
+        // Davis, M.W., A.H. Fanney, and B.P. Dougherty. Measured versus predicted performance of Building
+        //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
+
+        // Using/Aliasing
+        using TranspiredCollector::GetUTSCTsColl;
+
+        int ThisSurf; // working variable for indexing surfaces
+        Real64 Ee;
+
+        ThisSurf = state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr;
+
+        //   get input from elsewhere in Energyplus for the current point in the simulation
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam = state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/m2)from DataHeatBalance
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse =
+            state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) - state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IncidenceAngle =
+            std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians; // (deg) from dataHeatBalance
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.ZenithAngle =
+            std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                              //(degrees),
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf);    //(deg. C)
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->SurfOutWindSpeed(ThisSurf); // (m/s)
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                     // from DataEnvironment via USE
+
+        if (((state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) >
+             state.dataPhotovoltaic->MinIrradiance) &&
+            (RunFlag)) {
+
+            // first determine PV cell temperatures depending on model
+            {
+                auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
+
+                if (SELECT_CASE_var == CellIntegration::Decoupled) { // Sandia module temperature model for rack mounted PVs
+                    // Calculate back-of-module temperature:
+                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback =
+                        SandiaModuleTemperature(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed,
+                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb,
+                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a,
+                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b);
+
+                    // Calculate cell temperature:
+                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
+                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
+
+                } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
+                    // get back-of-module temperature from elsewhere in EnergyPlus
+                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback =
+                        state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr);
+
+                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
+                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
+
+                } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
+                    GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
+
+                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
+                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
+
+                } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
+                    GetExtVentedCavityTsColl(
+                        state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
+
+                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
+                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
+
+                } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
+                    // add calls to PVT models here
+
+                } else {
+                    ShowSevereError(state, "Sandia PV Simulation Temperature Modeling Mode Error in " + state.dataPhotovoltaic->PVarray(PVnum).Name);
+                }
+            }
+
+            // Calculate Air Mass function
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.AMa = AbsoluteAirMass(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.ZenithAngle,
+                                                                                   state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude);
+
+            // Calculate F1 polynomial function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F1 = SandiaF1(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.AMa,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_0,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_1,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_2,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_3,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_4);
+
+            // Calculate F2 polynomial function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F2 = SandiaF2(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IncidenceAngle,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_0,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_1,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_2,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_3,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_4,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_5);
+
+            // Calculate short-circuit current function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc = SandiaIsc(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Isc0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F1,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F2,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aIsc);
+
+            // Calculate effective irradiance function:
+            Ee = SandiaEffectiveIrradiance(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Isc0,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aIsc);
+            // Calculate Imp function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp = SandiaImp(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                                                             Ee,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Imp0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aImp,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_1);
+
+            // Calculate Voc function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc = SandiaVoc(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                                                             Ee,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Voc0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.NcellSer,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DiodeFactor,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.BVoc0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.mBVoc);
+
+            // Calculate Vmp: voltagea at maximum powerpoint
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp = SandiaVmp(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                                                             Ee,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Vmp0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.NcellSer,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DiodeFactor,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.BVmp0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.mBVmp,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_2,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_3);
+
+            // Calculate Ix function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ix = SandiaIx(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                                                           Ee,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Ix0,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aIsc,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aImp,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_4,
+                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_5);
+
+            // Calculate Vx function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vx = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc / 2.0;
+
+            // Calculate Ixx function:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ixx = SandiaIxx(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
+                                                                             Ee,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Ixx0,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aImp,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_6,
+                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_7);
+            // Calculate Vxx :
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vxx =
+                0.5 * (state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc + state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp);
+
+            // Calculate Pmp, single module: power at maximum powerpoint
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp =
+                state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp * state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp; // W
+
+            // Calculate PV efficiency at maximum power point
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.EffMax =
+                state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp /
+                (state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) /
+                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Acoll;
+
+            // Scale to NumStrings and NumSeries:
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp *=
+                state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc *= state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ix *= state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ixx *= state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vx *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vxx *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.SurfaceSink = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp;
+        } else { // Ibeam+Idiff < MaxIrradiance or not RunFlag
+            // so zero things.
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.EffMax = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell = state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback = state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.AMa = 999.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F1 = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F2 = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ix = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vx = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ixx = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vxx = 0.0;
+            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.SurfaceSink = 0.0;
+        } // Ibeam+Idiff > MinIrradiance and runflag
+
+        // update calculations to report variables
+        state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.EffMax;
+        state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.SurfaceSink;
+    }
+
     void SimPVGenerator(EnergyPlusData &state,
                         [[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
                         std::string const &GeneratorName,                   // user specified name of Generator
@@ -229,7 +1295,53 @@ namespace Photovoltaics {
         }
     }
 
-    // *************
+    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // object-oriented "Get" routine for establishing correct integer index from outside this module
+
+        // METHODOLOGY EMPLOYED:
+        // mine Surface derived type for correct index/number of surface
+        // mine  ExtVentedCavity derived type that has the surface.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int CavNum;   // temporary
+        int ThisSurf; // temporary
+        int thisCav;
+        bool Found;
+
+        if (SurfacePtr == 0) {
+            // should be trapped already
+            ShowFatalError(state, "Invalid surface passed to GetExtVentedCavityIndex");
+        }
+
+        CavNum = 0;
+        Found = false;
+        for (thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
+            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
+                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
+                    Found = true;
+                    CavNum = thisCav;
+                }
+            }
+        }
+
+        if (!Found) {
+            ShowFatalError(state,
+                           "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
+                               state.dataSurface->Surface(SurfacePtr).Name);
+        } else {
+
+            VentCavIndex = CavNum;
+        }
+    }
 
     void GetPVInput(EnergyPlusData &state)
     {
@@ -781,70 +1893,28 @@ namespace Photovoltaics {
         return GetPVZone;
     }
 
-    // **************************************
-
-    void CalcSimplePV(EnergyPlusData &state, int const thisPV)
+    void SetVentedModuleQdotSource(EnergyPlusData &state,
+                                   int const VentModNum,
+                                   Real64 const QSource // source term in Watts
+    )
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Jan. 2004
-        //       MODIFIED       B. Griffith, Aug. 2008
+        //       DATE WRITTEN   Janauray 2004
+        //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // calculate the electricity production using a simple PV model
+        // object oriented "Set" routine for updating sink term without exposing variables
+
+        // METHODOLOGY EMPLOYED:
+        // update derived type with new data , turn power into W/m2
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-        using ScheduleManager::GetCurrentScheduleValue;
+        using namespace DataSurfaces;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ThisSurf; // working index ptr to Surface arrays
-        Real64 Eff;   // working variable for solar electric efficiency
-
-        ThisSurf = state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr;
-
-        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > state.dataPhotovoltaic->MinIrradiance) {
-
-            // get efficiency
-            {
-                auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.EfficencyInputMode);
-
-                if (SELECT_CASE_var == Efficiency::Fixed) {
-
-                    Eff = state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.PVEfficiency;
-
-                } else if (SELECT_CASE_var == Efficiency::Scheduled) { // get from schedule
-
-                    Eff = GetCurrentScheduleValue(state, state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.EffSchedPtr);
-                    state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.PVEfficiency = Eff;
-
-                } else {
-                    Eff = 0.0; // Suppress uninitialized warning
-                    ShowSevereError(state, "caught bad Mode in Generator:Photovoltaic:Simple use FIXED or SCHEDULED efficiency mode");
-                }
-            }
-
-            state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower =
-                state.dataPhotovoltaic->PVarray(thisPV).SimplePVModule.AreaCol * Eff *
-                state.dataHeatBal->SurfQRadSWOutIncident(
-                    ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
-
-            // store sink term in appropriate place for surface heat transfer itegration
-            state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower;
-
-            // array energy, power * timestep
-            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy =
-                state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
-            state.dataPhotovoltaic->PVarray(thisPV).Report.ArrayEfficiency = Eff;
-        } else { // not enough incident solar, zero things out
-
-            state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = 0.0;
-            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy = 0.0;
-            state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower = 0.0;
-            state.dataPhotovoltaic->PVarray(thisPV).Report.ArrayEfficiency = 0.0;
-        }
+        state.dataSurface->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataSurface->ExtVentedCavity(VentModNum).ProjArea;
     }
 
     void ReportPV(EnergyPlusData &state, int const PVnum)
@@ -897,565 +1967,6 @@ namespace Photovoltaics {
         }
     }
 
-    // *************
-
-    void CalcSandiaPV(EnergyPlusData &state,
-                      int const PVnum,   // ptr to current PV system
-                      bool const RunFlag // controls if generator is scheduled *ON*
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith , (derived from Greg Barker's TRNSYS type101 for SANDIA PV model)
-        //       DATE WRITTEN   Jan 2004
-        //       MODIFIED       B. Griffith, Aug. 2008 reworked for new, single-PV-generator data structure
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculate various PV system peformance indicies at the current timestep
-
-        // METHODOLOGY EMPLOYED:
-        //  adapted code from a set of F77 routines by G. Barker that implement the model
-        //  This routines works on a single photovoltaic object of the type 'GENERATOR:PV:SANDIA'
-        //  Each major model equation has its own function (in this module)
-
-        // REFERENCES:
-        // King, David L. . Photovoltaic module and array performance characterization methods for all
-        //   system operating conditions. Pro. NREL/SNL Photovoltaics Program Review, AIP Press, Lakewood CO
-        //   Sandia National Laboratories
-
-        // Davis, M.W., A.H. Fanney, and B.P. Dougherty. Measured versus predicted performance of Building
-        //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
-
-        // Using/Aliasing
-        using TranspiredCollector::GetUTSCTsColl;
-
-        int ThisSurf; // working variable for indexing surfaces
-        Real64 Ee;
-
-        ThisSurf = state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr;
-
-        //   get input from elsewhere in Energyplus for the current point in the simulation
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam = state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/m2)from DataHeatBalance
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse =
-            state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) - state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IncidenceAngle =
-            std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians; // (deg) from dataHeatBalance
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.ZenithAngle =
-            std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                              //(degrees),
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf);    //(deg. C)
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->SurfOutWindSpeed(ThisSurf); // (m/s)
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                     // from DataEnvironment via USE
-
-        if (((state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) >
-             state.dataPhotovoltaic->MinIrradiance) &&
-            (RunFlag)) {
-
-            // first determine PV cell temperatures depending on model
-            {
-                auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
-
-                if (SELECT_CASE_var == CellIntegration::Decoupled) { // Sandia module temperature model for rack mounted PVs
-                    // Calculate back-of-module temperature:
-                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback =
-                        SandiaModuleTemperature(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed,
-                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb,
-                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a,
-                                                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b);
-
-                    // Calculate cell temperature:
-                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
-
-                } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
-                    // get back-of-module temperature from elsewhere in EnergyPlus
-                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback =
-                        state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr);
-
-                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
-
-                } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
-                    GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
-
-                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
-
-                } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
-                    GetExtVentedCavityTsColl(
-                        state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
-
-                    state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                               state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
-
-                } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
-                    // add calls to PVT models here
-
-                } else {
-                    ShowSevereError(state, "Sandia PV Simulation Temperature Modeling Mode Error in " + state.dataPhotovoltaic->PVarray(PVnum).Name);
-                }
-            }
-
-            // Calculate Air Mass function
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.AMa = AbsoluteAirMass(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.ZenithAngle,
-                                                                                   state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude);
-
-            // Calculate F1 polynomial function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F1 = SandiaF1(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.AMa,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_0,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_1,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_2,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_3,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.a_4);
-
-            // Calculate F2 polynomial function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F2 = SandiaF2(state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IncidenceAngle,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_0,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_1,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_2,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_3,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_4,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.b_5);
-
-            // Calculate short-circuit current function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc = SandiaIsc(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Isc0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F1,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F2,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aIsc);
-
-            // Calculate effective irradiance function:
-            Ee = SandiaEffectiveIrradiance(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Isc0,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aIsc);
-            // Calculate Imp function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp = SandiaImp(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                                                             Ee,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Imp0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aImp,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_1);
-
-            // Calculate Voc function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc = SandiaVoc(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                                                             Ee,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Voc0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.NcellSer,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DiodeFactor,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.BVoc0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.mBVoc);
-
-            // Calculate Vmp: voltagea at maximum powerpoint
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp = SandiaVmp(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                                                             Ee,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Vmp0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.NcellSer,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DiodeFactor,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.BVmp0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.mBVmp,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_2,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_3);
-
-            // Calculate Ix function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ix = SandiaIx(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                                                           Ee,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Ix0,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aIsc,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aImp,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_4,
-                                                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_5);
-
-            // Calculate Vx function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vx = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc / 2.0;
-
-            // Calculate Ixx function:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ixx = SandiaIxx(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell,
-                                                                             Ee,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Ixx0,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.aImp,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_6,
-                                                                             state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.c_7);
-            // Calculate Vxx :
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vxx =
-                0.5 * (state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc + state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp);
-
-            // Calculate Pmp, single module: power at maximum powerpoint
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp =
-                state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp * state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp; // W
-
-            // Calculate PV efficiency at maximum power point
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.EffMax =
-                state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp /
-                (state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) /
-                state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.Acoll;
-
-            // Scale to NumStrings and NumSeries:
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp *=
-                state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc *= state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ix *= state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ixx *= state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vx *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vxx *= state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.SurfaceSink = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp;
-        } else { // Ibeam+Idiff < MaxIrradiance or not RunFlag
-            // so zero things.
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vmp = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Imp = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.EffMax = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell = state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback = state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.AMa = 999.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F1 = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.F2 = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ix = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vx = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Ixx = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Vxx = 0.0;
-            state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.SurfaceSink = 0.0;
-        } // Ibeam+Idiff > MinIrradiance and runflag
-
-        // update calculations to report variables
-        state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Pmp;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Isc;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Voc;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.EffMax;
-        state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink = state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.SurfaceSink;
-    }
-
-    // ********************
-    // begin routines for Equivalent one-diode model by Bradley/Ulleberg
-
-    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         David Bradley
-        //       DATE WRITTEN   April 2003
-        //       MODIFIED       BG March 2007 reworked for CR7109 (reverse DD testing)
-        //                      B. Griffith, Aug. 2008 reworked for new, single-PV-generator data structure
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine initializes the PV arrays during simulation. It performs both start of
-        // simulation initializations and start of timestep initializations. The structure of the
-        // subroutine was taken from InitBaseboard.
-
-        // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
-
-        // perform the one time initializations
-        if (state.dataPhotovoltaicState->MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            state.dataPhotovoltaicState->MyEnvrnFlag.dimension(state.dataPhotovoltaic->NumPVs, true);
-            state.dataPhotovoltaicState->MyOneTimeFlag = false;
-        }
-
-        // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && state.dataPhotovoltaicState->MyEnvrnFlag(PVnum)) {
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK =
-                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK =
-                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-            state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = false;
-        }
-
-        if (!state.dataGlobal->BeginEnvrnFlag) {
-            state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = true;
-        }
-
-        // Do the beginning of every time step initializations
-        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-        if (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
-            // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK;
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.TimeElapsed = TimeElapsed;
-        }
-
-        if (any_gt(state.dataHeatBal->SurfQRadSWOutIncident, 0.0)) {
-            //  Determine the amount of radiation incident on each PV
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation =
-                state.dataHeatBal->SurfQRadSWOutIncident(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr); //[W/m2]
-        } else {
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
-        }
-    }
-
-    // *************
-
-    void CalcTRNSYSPV(EnergyPlusData &state,
-                      int const PVnum,   // BTG added intent
-                      bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         D. Bradley
-        //       DATE WRITTEN   April 2003
-        //       MODIFIED       B. Griffith, February 2008-- added support for inverter
-        //                      multipliers, and building integrated heat transfer
-        //                      B. Griffith, Aug. 2008 reworked for new, single-PV-generator data structure
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine simulates the PV performance.
-
-        using TranspiredCollector::GetUTSCTsColl;
-
-        Real64 const EPS(0.001);
-        Real64 const ERR(0.001);
-        Real64 const MinInsolation(30.0);
-        int const KMAX(100);
-        Real64 const EtaIni(0.10); // initial value of eta
-        Real64 DummyErr;
-        Real64 ETA;
-        Real64 Tambient;
-        Real64 EtaOld;
-        Real64 ILRef;
-        Real64 AARef;
-        Real64 IORef;
-        Real64 SeriesResistance;
-        Real64 IL;
-        Real64 AA;
-        Real64 IO;
-        Real64 ISCG1;
-        Real64 ISC;
-        Real64 VOCG1;
-        Real64 VOC;
-        Real64 VLEFT;
-        Real64 VRIGHT;
-        Real64 VM;
-        Real64 IM;
-        Real64 PM;
-        Real64 IA;
-        Real64 ISCA;
-        Real64 VA;
-        Real64 VOCA;
-        Real64 PA;
-        int CC;
-        int K;
-        Real64 CellTemp(0.0); // cell temperature in Kelvin
-        Real64 CellTempC;     // cell temperature in degrees C
-
-        // if the cell temperature mode is 2, convert the timestep to seconds
-        if (state.dataPhotovoltaicState->firstTime &&
-            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::DecoupledUllebergDynamic) {
-            state.dataPhotovoltaicState->PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
-        }
-        state.dataPhotovoltaicState->firstTime = false;
-
-        // place the shunt resistance into its common block
-        state.dataPhotovoltaic->ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
-
-        // convert ambient temperature from C to K
-        Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-
-        if ((state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
-
-            // set initial values for eta iteration loop
-            DummyErr = 2.0 * ERR;
-            CC = 1;
-            EtaOld = EtaIni;
-
-            // Begin DO WHILE loop - until the error tolerance is reached.
-            ETA = 0.0;
-            while (DummyErr > ERR) {
-
-                {
-                    auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
-                    if (SELECT_CASE_var == CellIntegration::Decoupled) {
-                        //  cell temperature based on energy balance
-                        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef =
-                            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha *
-                            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTInsolation /
-                            (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTCellTemp -
-                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.NOCTAmbTemp);
-                        CellTemp = Tambient + (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation *
-                                               state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha /
-                                               state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef) *
-                                                  (1.0 - ETA / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha);
-                    } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
-                        //  cell temperature based on energy balance with thermal capacity effects
-                        CellTemp = Tambient +
-                                   (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
-                                       std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
-                                                state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
-                                                state.dataPhotovoltaicState->PVTimeStep) +
-                                   (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TauAlpha - ETA) *
-                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
-                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef *
-                                       (1.0 - std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
-                                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
-                                                       state.dataPhotovoltaicState->PVTimeStep));
-                    } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
-                        CellTemp =
-                            state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-                    } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
-                        GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
-                        CellTemp += DataGlobalConstants::KelvinConv;
-                    } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
-                        GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                        CellTemp += DataGlobalConstants::KelvinConv;
-                    } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
-                        // get PVT model result for cell temp..
-                    }
-                }
-
-                //  reference parameters
-                ILRef = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefIsc;
-                AARef = (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefVoc *
-                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature -
-                         state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc +
-                         state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.SemiConductorBandgap *
-                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.CellsInSeries) /
-                        (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefIsc *
-                             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature / ILRef -
-                         3.0);
-                IORef = ILRef * std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc / AARef);
-
-                //  series resistance
-                SeriesResistance =
-                    (AARef * std::log(1.0 - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Imp / ILRef) -
-                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Vmp + state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefVoc) /
-                    state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Imp;
-
-                //  temperature depencence
-                IL = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation /
-                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefInsolation *
-                     (ILRef + state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.TempCoefIsc *
-                                  (CellTemp - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature));
-                Real64 const cell_temp_ratio(CellTemp / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature);
-                AA = AARef * cell_temp_ratio;
-                IO = IORef * pow_3(cell_temp_ratio) *
-                     std::exp(state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.SemiConductorBandgap *
-                              state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.CellsInSeries / AARef *
-                              (1.0 - state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.RefTemperature / CellTemp));
-
-                //  compute short curcuit current and open circuit voltage
-
-                //   NEWTON --> ISC  (STARTVALUE: ISCG1 - BASED ON IL=ISC)
-                ISCG1 = IL;
-                NEWTON(state, ISC, FUN, FI, ISC, DataPrecisionGlobals::constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
-
-                //   NEWTON --> VOC  (STARTVALUE: VOCG1 - BASED ON IM=0.0)
-                VOCG1 = (std::log(IL / IO) + 1.0) * AA;
-                NEWTON(state, VOC, FUN, FV, DataPrecisionGlobals::constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
-
-                //  maximum power point tracking
-
-                //   SEARCH --> VM AT MAXIMUM POWER POINT
-                VLEFT = 0.0;
-                VRIGHT = VOC;
-                SEARCH(state, VLEFT, VRIGHT, VM, K, IO, IL, SeriesResistance, AA, EPS, KMAX);
-
-                //   POWER --> IM & PM AT MAXIMUM POWER POINT
-                POWER(state, IO, IL, SeriesResistance, AA, EPS, IM, VM, PM);
-
-                // calculate overall PV module efficiency
-                ETA =
-                    PM / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Area;
-                DummyErr = std::abs((ETA - EtaOld) / EtaOld);
-                EtaOld = ETA;
-                ++CC;
-
-            } // while
-
-        } else {
-            // if there is no incident radiation or if the control switch is 'Off'
-            {
-                auto const SELECT_CASE_var(state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode);
-                if (SELECT_CASE_var == CellIntegration::Decoupled) {
-                    CellTemp = Tambient;
-                } else if (SELECT_CASE_var == CellIntegration::DecoupledUllebergDynamic) {
-                    CellTemp = Tambient + (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
-                                              std::exp(-state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatLossCoef /
-                                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity *
-                                                       state.dataPhotovoltaicState->PVTimeStep);
-                } else if (SELECT_CASE_var == CellIntegration::SurfaceOutsideFace) {
-                    CellTemp =
-                        state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
-                } else if (SELECT_CASE_var == CellIntegration::TranspiredCollector) {
-                    GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
-                    CellTemp += DataGlobalConstants::KelvinConv;
-                } else if (SELECT_CASE_var == CellIntegration::ExteriorVentedCavity) {
-                    GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                    CellTemp += DataGlobalConstants::KelvinConv;
-                } else if (SELECT_CASE_var == CellIntegration::PVTSolarCollector) {
-                    // get PVT model result for cell temp.. //Bug CellTemp not set but used below
-                } else {
-                    assert(false);
-                }
-            }
-
-            state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
-            IM = 0.0;  // module current
-            VM = 0.0;  // module voltage
-            PM = 0.0;  // module power
-            ETA = 0.0; // module efficiency
-            ISC = 0.0;
-            VOC = 0.0;
-        }
-
-        // convert cell temperature back to C
-        CellTempC = CellTemp - DataGlobalConstants::KelvinConv;
-
-        // calculate array based outputs (so far, the outputs are module based
-        IA = state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * IM;
-        ISCA = state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * ISC;
-        VA = state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries * VM;
-        VOCA = state.dataPhotovoltaic->PVarray(PVnum).NumModNSeries * VOC;
-        PA = IA * VA;
-
-        // Place local variables into the reporting structure
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayCurrent = IA;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayVoltage = VA;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayPower = PA;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower = PA;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayEfficiency = ETA;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency = ETA;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTemp = CellTempC;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp = CellTempC;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK = CellTemp;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayIsc = ISCA;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc = ISCA;
-        state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.ArrayVoc = VOCA;
-        state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc = VOCA;
-        state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink = PA;
-    }
-
     void POWER(EnergyPlusData &state,
                Real64 const IO,   // passed in from CalcPV
                Real64 const IL,   // passed in from CalcPV
@@ -1484,45 +1995,6 @@ namespace Photovoltaics {
         IG1 = IL - IO * std::exp(VV / AA - 1.0);
         NEWTON(state, II, FUN, FI, II, VV, IO, IL, RSER, AA, IG1, EPS);
         PP = II * VV;
-    }
-
-    void NEWTON(EnergyPlusData &state,
-                Real64 &XX,
-                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
-                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
-                Real64 const &II, // Autodesk Aliased to XX in some calls
-                Real64 const &VV, // Autodesk Aliased to XX in some calls
-                Real64 const IO,
-                Real64 const IL,
-                Real64 const RSER,
-                Real64 const AA,
-                Real64 const XS,
-                Real64 const EPS)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       D. Bradley for use with EnergyPlus
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine uses the Newton-Raphson method to solve a non linear equation with one variable.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int COUNT;
-        Real64 ERR;
-        Real64 X0;
-
-        COUNT = 0;
-        XX = XS;
-        ERR = 1.0;
-        while ((ERR > EPS) && (COUNT <= 10)) {
-            X0 = XX;
-            XX -= FXX(state, II, VV, IL, IO, RSER, AA) / DER(state, II, VV, IO, RSER, AA);
-            ++COUNT;
-            ERR = std::abs((XX - X0) / X0);
-        }
     }
 
     void SEARCH(EnergyPlusData &state,
@@ -1717,95 +2189,6 @@ namespace Photovoltaics {
         return FV;
     }
 
-    // End routines for Equivalent One-Diode model as implemented by Bradley
-    //************************************************************************
-
-    // Begin supporting routines for Sandia PV model
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaModuleTemperature(Real64 const Ibc, // beam radiation on collector plane, W/m2
-                                   Real64 const Idc, // Diffuse radiation on collector plane, W/m2
-                                   Real64 const Ws,  // wind speed, m/s
-                                   Real64 const Ta,  // ambient temperature, degC
-                                   Real64 const fd,  // fraction of Idc used (empirical constant)
-                                   Real64 const a,   // empirical constant
-                                   Real64 const b    // empirical constant
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   unknown
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B.Griffith December 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns back-of-module temperature, deg C
-
-        // METHODOLOGY EMPLOYED:
-        // apply sandia temperature model, This is module temp or back of
-        // of the panel.  A seperate correction handles delta T for actual cell
-
-        // REFERENCES:
-        // from G. Barker's TRNSYS implementation
-        // Equations (10)  in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
-        //   predicted performance of building integrated photovoltaics,
-        //   Solar 2002, Sunrise on the Reliable Energy Economy,
-        //   June 15-19, 2002, Reno, NV.
-
-        // Return value
-        Real64 SandiaModuleTemperature;
-
-        Real64 E; // total irradiance working variable
-
-        E = Ibc + fd * Idc;
-
-        SandiaModuleTemperature = E * std::exp(a + b * Ws) + Ta;
-
-        return SandiaModuleTemperature;
-    }
-
-    // -------------------------------------------------------------------------------
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaTcellFromTmodule(Real64 const Tm,  // module temperature (deg C)
-                                  Real64 const Ibc, // beam radiation on collector plane, W/m2
-                                  Real64 const Idc, // Diffuse radiation on collector plane, W/m2
-                                  Real64 const fd,  // fraction of Idc used (empirical constant)
-                                  Real64 const DT0  // (Tc-Tm) at E=1000 W/m2 (empirical constant known as delta T), deg C
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   unknown
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith Jan 2004 F77 -> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns cell temperature, deg C
-
-        // METHODOLOGY EMPLOYED:
-        // This is for the Sandia model method of determining cell temperatures
-        // module temperature differs from solar cell temperature
-        // because panel temperatures are not uniform
-
-        // REFERENCES:
-        // Equations (11) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
-        //   predicted performance of building integrated photovoltaics,
-        //   Solar 2002, Sunrise on the Reliable Energy Economy,
-        //   June 15-19, 2002, Reno, NV.
-
-        // Return value
-        Real64 SandiaTcellFromTmodule;
-
-        Real64 E; // total irradiance working variable
-
-        E = Ibc + fd * Idc;
-
-        SandiaTcellFromTmodule = Tm + (E / 1000.0) * DT0;
-
-        return SandiaTcellFromTmodule;
-    }
-
     // -------------------------------------------------------------------------------
 
     Real64 SandiaCellTemperature(Real64 const Ibc, // beam radiation on collector plane W/m2
@@ -1854,31 +2237,6 @@ namespace Photovoltaics {
 
     // -------------------------------------------------------------------------------
 
-    Real64 SandiaEffectiveIrradiance(Real64 const Tc,   // cell temperature (deg C)
-                                     Real64 const Isc,  // short-circuit current under operating conditions (A)
-                                     Real64 const Isc0, // reference Isc at Tc=25 C, Ic=1000 W/m2 (A)
-                                     Real64 const aIsc  // Isc temperature coefficient (degC^-1)
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith Jan 2004, F77 to f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns "effective irradiance", used in calculation of Imp, Voc, Ix, Ixx
-
-        // Return value
-        Real64 SandiaEffectiveIrradiance;
-
-        SandiaEffectiveIrradiance = Isc / (1.0 + aIsc * (Tc - 25.0)) / Isc0;
-
-        return SandiaEffectiveIrradiance;
-    }
-
-    // -------------------------------------------------------------------------------
-
     Real64 AbsoluteAirMass(Real64 const SolZen,  // solar zenith angle (deg)
                            Real64 const Altitude // site altitude (m)
     )
@@ -1905,414 +2263,6 @@ namespace Photovoltaics {
 
         return AbsoluteAirMass;
     }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaF1(Real64 const AMa, // absolute air mass
-                    Real64 const a0,  // empirical constant, module-specific
-                    Real64 const a1,  // empirical constant, module-specific
-                    Real64 const a2,  // empirical constant, module-specific
-                    Real64 const a3,  // empirical constant, module-specific
-                    Real64 const a4   // empirical constant, module-specific
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffit F77-> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns the result of Sandia Air Mass function
-        //  "AMa-Function" for solar spectral influence
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // Equation (8) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
-        //   predicted performance of building integrated photovoltaics,
-        //   Solar 2002, Sunrise on the Reliable Energy Economy,
-        //   June 15-19, 2002, Reno, NV.
-
-        // Return value
-        Real64 SandiaF1;
-
-        Real64 const F1(a0 + a1 * AMa + a2 * pow_2(AMa) + a3 * pow_3(AMa) + a4 * pow_4(AMa));
-
-        if (F1 > 0.0) {
-            SandiaF1 = F1;
-        } else {
-            SandiaF1 = 0.0;
-        }
-
-        return SandiaF1;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaF2(Real64 const IncAng, // incidence angle (deg)
-                    Real64 const b0,     // empirical module-specific constants
-                    Real64 const b1,     // empirical module-specific constants
-                    Real64 const b2,     // empirical module-specific constants
-                    Real64 const b3,     // empirical module-specific constants
-                    Real64 const b4,     // empirical module-specific constants
-                    Real64 const b5      // empirical module-specific constants
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith Jan 2004 F77-> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // C Returns Sandia F2 function
-
-        // REFERENCES:
-        // Equation (9) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
-        //   predicted performance of building integrated photovoltaics,
-        //   Solar 2002, Sunrise on the Reliable Energy Economy,
-        //   June 15-19, 2002, Reno, NV.
-
-        // Return value
-        Real64 SandiaF2;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 F2; // working variable for function result
-
-        F2 = b0 + b1 * IncAng + b2 * pow_2(IncAng) + b3 * pow_3(IncAng) + b4 * pow_4(IncAng) + b5 * pow_5(IncAng);
-
-        if (F2 > 0.0) {
-            SandiaF2 = F2;
-        } else {
-            SandiaF2 = 0.0;
-        }
-
-        return SandiaF2;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaImp(Real64 const Tc,   // cell temperature (degC)
-                     Real64 const Ee,   // effective irradiance (W/m2)
-                     Real64 const Imp0, // current at MPP at SRC (1000 W/m2, 25 C) (A)
-                     Real64 const aImp, // Imp temperature coefficient (degC^-1)
-                     Real64 const C0,   // empirical module-specific constants
-                     Real64 const C1    // empirical module-specific constants
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith F77 -> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns current at maximum power point (A)
-
-        // REFERENCES:
-        // Equation (3) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
-        //   predicted performance of building integrated photovoltaics,
-        //   Solar 2002, Sunrise on the Reliable Energy Economy,
-        //   June 15-19, 2002, Reno, NV.
-
-        // Return value
-        Real64 SandiaImp;
-
-        SandiaImp = Imp0 * (C0 * Ee + C1 * pow_2(Ee)) * (1.0 + aImp * (Tc - 25));
-        // why hardwire T0 at 25.0?  can this change? seems okay, fewer args
-        return SandiaImp;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaIsc(Real64 const Tc,   // cell temperature (deg C)
-                     Real64 const Isc0, // Isc at Tc=25 C, Ic=1000 W/m2 (A)
-                     Real64 const Ibc,  // beam radiation on collector plane (W/m2)
-                     Real64 const Idc,  // Diffuse radiation on collector plane (W/m2)
-                     Real64 const F1,   // Sandia F1 function for air mass effects
-                     Real64 const F2,   // Sandia F2 function of incidence angle
-                     Real64 const fd,   // module-specific empirical constant
-                     Real64 const aIsc  // Isc temperature coefficient (degC^-1)
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith Jan 2004 F77 -> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns Short-Circuit Current
-
-        // REFERENCES:
-        // Equation (1) in Davis, M.W., A.H. Fanney, B.P. Dougherty. Measured versus
-        //   predicted performance of building integrated photovoltaics,
-        //   Solar 2002, Sunrise on the Reliable Energy Economy,
-        //   June 15-19, 2002, Reno, NV.
-
-        // Return value
-        Real64 SandiaIsc;
-
-        // SandiaIsc=Isc0*((Ibc*F1*F2+fd*Idc)/1000.0)*(1.0+aIsc*(Tc-25.0))
-        // Barkers original (above) changed to match publish eq. (1) in reference
-        SandiaIsc = Isc0 * F1 * ((Ibc * F2 + fd * Idc) / 1000.0) * (1.0 + aIsc * (Tc - 25.0));
-
-        // why hardwire E0 at 1000.0 ?, can this change? seems okay
-
-        return SandiaIsc;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaIx(Real64 const Tc,   // cell temperature (deg C)
-                    Real64 const Ee,   // effective irradiance
-                    Real64 const Ix0,  // Ix at SRC (1000 W/m2, 25 C) (A)
-                    Real64 const aIsc, // Isc temp coefficient (/C)
-                    Real64 const aImp, // Imp temp coefficient (/C)
-                    Real64 const C4,   // empirical module-specific constants
-                    Real64 const C5    // empirical module-specific constants
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith, Jan 2004 F77 -> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns current "Ix" at V=0.5*Voc (A)
-
-        // REFERENCES:
-        // Equation 9 in King et al. nov 20003
-
-        // Return value
-        Real64 SandiaIx;
-
-        SandiaIx = Ix0 * (C4 * Ee + C5 * pow_2(Ee)) * (1.0 + ((aIsc + aImp) / 2.0 * (Tc - 25.0)));
-
-        return SandiaIx;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaIxx(Real64 const Tc,   // cell temperature (deg C)
-                     Real64 const Ee,   // effective irradiance (W/m2 ?)
-                     Real64 const Ixx0, // Ixx at SRC (1000 W/m2, 25 C) (A)
-                     Real64 const aImp, // Imp temp coefficient (/C)
-                     Real64 const C6,   // empirical module-specific constants
-                     Real64 const C7    // empirical module-specific constants
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith Jan2004 F77 to f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns current "Ix" at V=0.5*(Voc+Vmp) (A)
-
-        // REFERENCES:
-        // Equation 10 in King et al nov. 2003
-
-        // Return value
-        Real64 SandiaIxx;
-
-        SandiaIxx = Ixx0 * (C6 * Ee + C7 * pow_2(Ee)) * (1.0 + aImp * (Tc - 25.0));
-
-        return SandiaIxx;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaVmp(Real64 const Tc,          // cell temperature (deg C)
-                     Real64 const Ee,          // effective irradiance
-                     Real64 const Vmp0,        // Vmp at SRC (1000 W/m2, 25 C) (V)
-                     Real64 const NcellSer,    // # cells in series
-                     Real64 const DiodeFactor, // module-specIFic empirical constant
-                     Real64 const BVmp0,       // Vmp temperature coefficient (V/C)
-                     Real64 const mBVmp,       // change in BVmp with irradiance
-                     Real64 const C2,          // empirical module-specific constants
-                     Real64 const C3           // empirical module-specific constants
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G. Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith, Jan 2004, F77 -> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns Voltage at Max. Power Point (V)
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // Equation 4 in King et al Nov. 2003
-
-        // Return value
-        Real64 SandiaVmp;
-
-        Real64 dTc;
-        Real64 BVmpEe;
-
-        if (Ee > 0.0) {
-            // following is equation 8 in King et al. nov. 2003
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
-
-            BVmpEe = BVmp0 + mBVmp * (1.0 - Ee);
-
-            SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log(Ee) + C3 * NcellSer * pow_2(dTc * std::log(Ee)) + BVmpEe * (Tc - 25.0);
-        } else {
-            SandiaVmp = 0.0;
-        }
-
-        return SandiaVmp;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    Real64 SandiaVoc(Real64 const Tc,          // cell temperature (deg C)
-                     Real64 const Ee,          // effective irradiance
-                     Real64 const Voc0,        // Voc at SRC (1000 W/m2, 25 C) (V)
-                     Real64 const NcellSer,    // # cells in series
-                     Real64 const DiodeFactor, // module-specIFic empirical constant
-                     Real64 const BVoc0,       // Voc temperature coefficient (V/C)
-                     Real64 const mBVoc        // change in BVoc with irradiance
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         G Barker
-        //       DATE WRITTEN   <unknown>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B Griffith Jan 2004 F77 -> f90
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns Open-Circuit Voltage (V)
-
-        // Return value
-        Real64 SandiaVoc;
-
-        Real64 dTc;    // working variable
-        Real64 BVocEe; // working variable
-
-        if (Ee > 0.0) {
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
-            BVocEe = BVoc0 + mBVoc * (1.0 - Ee);
-
-            SandiaVoc = Voc0 + NcellSer * dTc * std::log(Ee) + BVocEe * (Tc - 25.0);
-        } else {
-            SandiaVoc = 0.0;
-        }
-
-        return SandiaVoc;
-    }
-
-    void SetVentedModuleQdotSource(EnergyPlusData &state,
-                                   int const VentModNum,
-                                   Real64 const QSource // source term in Watts
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Janauray 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Set" routine for updating sink term without exposing variables
-
-        // METHODOLOGY EMPLOYED:
-        // update derived type with new data , turn power into W/m2
-
-        // Using/Aliasing
-        using namespace DataSurfaces;
-
-        state.dataSurface->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataSurface->ExtVentedCavity(VentModNum).ProjArea;
-    }
-
-    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   January 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Get" routine for establishing correct integer index from outside this module
-
-        // METHODOLOGY EMPLOYED:
-        // mine Surface derived type for correct index/number of surface
-        // mine  ExtVentedCavity derived type that has the surface.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CavNum;   // temporary
-        int ThisSurf; // temporary
-        int thisCav;
-        bool Found;
-
-        if (SurfacePtr == 0) {
-            // should be trapped already
-            ShowFatalError(state, "Invalid surface passed to GetExtVentedCavityIndex");
-        }
-
-        CavNum = 0;
-        Found = false;
-        for (thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
-                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
-                    Found = true;
-                    CavNum = thisCav;
-                }
-            }
-        }
-
-        if (!Found) {
-            ShowFatalError(state,
-                           "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
-                               state.dataSurface->Surface(SurfacePtr).Name);
-        } else {
-
-            VentCavIndex = CavNum;
-        }
-    }
-
-    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Get" routine for collector surface temperature
-
-        // METHODOLOGY EMPLOYED:
-        // access derived type
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        TsColl = state.dataSurface->ExtVentedCavity(VentModNum).Tbaffle;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    //     EnergyPlus V1.2 and beyond include models for photovoltaic calculations called
-    //     Generator:Photovoltaic:Simple and Generator:PV:Sandia implemented by the Center for
-    //     Buildings and Thermal Systems, National Renewable Energy Laboratory, 1617 Cole Blvd
-    //     MS 2722, Golden, CO, 80401
-
-    //     EnergyPlus v1.1.1 and beyond includes model for Photovoltaic calculations, now
-    //     referred to as the Generator:PV:Equivalent One-Diode model developed by Thermal Energy
-    //     System Specialists, 2916 Marketplace Drive, Suite 104, Madison, WI 53719;
-    //     Tel: (608) 274-2577
 
 } // namespace Photovoltaics
 

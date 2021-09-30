@@ -259,8 +259,6 @@ namespace PipeHeatTransfer {
         static void CalcZonePipesHeatGain(EnergyPlusData &state);
     };
 
-    void GetPipesHeatTransfer(EnergyPlusData &state);
-
 } // namespace PipeHeatTransfer
 
 struct PipeHeatTransferData : BaseGlobalStruct

@@ -222,8 +222,6 @@ namespace PlantHeatExchangerFluidToFluid {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    void GetFluidHeatExchangerInput(EnergyPlusData &state);
-
 } // namespace PlantHeatExchangerFluidToFluid
 
 struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct

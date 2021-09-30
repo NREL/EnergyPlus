@@ -138,251 +138,14 @@ namespace PlantPipingSystemsManager {
         state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
-    {
-        // Process the input data for circuits if it hasn't been done already
-        if (state.dataPlantPipingSysMgr->GetInputFlag) {
-            GetPipingSystemsAndGroundDomainsInput(state);
-            state.dataPlantPipingSysMgr->GetInputFlag = false;
-        }
-        // Now look for this particular pipe in the list
-        for (auto &circuit : state.dataPlantPipingSysMgr->circuits) {
-            if (circuit.Name == objectName) {
-                return &circuit;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state,
-                       "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    void Circuit::simulate(EnergyPlusData &state,
-                           [[maybe_unused]] const PlantLocation &calledFromLocation,
-                           [[maybe_unused]] bool const FirstHVACIteration,
-                           [[maybe_unused]] Real64 &CurLoad,
-                           [[maybe_unused]] bool const RunFlag)
-    {
-        // Retrieve the parent domain index for this pipe circuit
-        auto &thisDomain(state.dataPlantPipingSysMgr->domains[this->ParentDomainIndex]);
-
-        // Do any initialization here
-        thisDomain.InitPipingSystems(state, this);
-
-        // Update the temperature field
-        thisDomain.PerformIterationLoop(state, this);
-
-        // Update outlet nodes, etc.
-        thisDomain.UpdatePipingSystems(state, this);
-    }
-
-    void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Matt Mitchell
-        //       DATE WRITTEN   Spring 2014
-        //       MODIFIED       by Sushobhit Acharya, March 2015
-        //       RE-ENGINEERED  na
-
-        // Read input if necessary
-        if (state.dataPlantPipingSysMgr->GetInputFlag) {
-            GetPipingSystemsAndGroundDomainsInput(state);
-            state.dataPlantPipingSysMgr->GetInputFlag = false;
-        }
-
-        for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
-
-            // if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
-            if (thisDomain.HasAPipeCircuit) continue;
-
-            if (thisDomain.DomainNeedsToBeMeshed) {
-                thisDomain.developMesh(state);
-            }
-
-            thisDomain.DomainNeedsToBeMeshed = false;
-
-            // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
-            // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
-            // which would be carried over from the previous environment
-            thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
-            thisDomain.Cur.CurSimTimeSeconds =
-                ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                 (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
-                DataGlobalConstants::SecInHour;
-
-            // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
-            if ((state.dataGlobal->BeginSimFlag && thisDomain.BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
-
-                thisDomain.DoOneTimeInitializations(state, nullptr);
-
-                if (thisDomain.HasZoneCoupledSlab) {
-                    int Xmax = ubound(thisDomain.Cells, 1);
-                    // int yMax = ubound( thisDomain.Cells, 2 );
-                    int Zmax = ubound(thisDomain.Cells, 3);
-
-                    thisDomain.WeightingFactor.allocate({0, Xmax}, {0, Zmax});
-                    thisDomain.WeightedHeatFlux.allocate({0, Xmax}, {0, Zmax});
-                }
-
-                thisDomain.BeginSimInit = false;
-                thisDomain.BeginSimEnvironment = false;
-            }
-            if (!state.dataGlobal->BeginSimFlag) thisDomain.BeginSimInit = true;
-            if (!state.dataGlobal->BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
-
-            // Reset the heat fluxes if domain update has been completed
-            if (thisDomain.ResetHeatFluxFlag) {
-                thisDomain.AggregateHeatFlux = 0;
-                thisDomain.AggregateWallHeatFlux = 0;
-                thisDomain.AggregateFloorHeatFlux = 0;
-                thisDomain.NumHeatFlux = 0;
-                thisDomain.ResetHeatFluxFlag = false;
-            }
-
-            if (!initOnly) {
-                // Aggregate the heat flux
-                // Zone-coupled slab
-                if (thisDomain.HasZoneCoupledSlab) {
-                    thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
-                    thisDomain.NumHeatFlux += 1;
-                    thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
-                } else { // Coupled basement
-
-                    // basement walls
-                    thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
-                    // basement floor
-                    thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
-
-                    thisDomain.NumHeatFlux += 1;
-                    thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
-                    thisDomain.FloorHeatFlux = thisDomain.AggregateFloorHeatFlux / thisDomain.NumHeatFlux;
-                }
-
-                // Aggregate the heat flux
-                // Zone-coupled slab
-                if (thisDomain.HasZoneCoupledSlab) {
-                    thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
-                    thisDomain.NumHeatFlux += 1;
-                    thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
-                } else if (thisDomain.HasZoneCoupledBasement) { // Coupled basement
-                    // basement walls
-                    thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
-                    // basement floor
-                    thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
-
-                    thisDomain.NumHeatFlux += 1;
-                    thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
-                    thisDomain.FloorHeatFlux = thisDomain.AggregateFloorHeatFlux / thisDomain.NumHeatFlux;
-                }
-
-                // Zone-coupled slab
-                if (thisDomain.HasZoneCoupledSlab) {
-
-                    thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
-
-                    Real64 ZoneTemp = 0.0;
-
-                    // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
-                    for (auto &z : thisDomain.ZoneCoupledSurfaces) {
-                        int ZoneNum = z.Zone;
-                        ZoneTemp += state.dataHeatBalFanSys->ZTAV(ZoneNum);
-                    }
-
-                    ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();
-                    Real64 AvgSlabTemp = thisDomain.GetAverageTempByType(state, CellType::ZoneGroundInterface);
-
-                    int yMax = ubound(thisDomain.Cells, 2);
-
-                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
-                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
-                            // Zone interface cells
-                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
-                                thisDomain.WeightingFactor(X, Z) =
-                                    std::abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) / (ZoneTemp - AvgSlabTemp));
-                            }
-                        }
-                    }
-
-                    // Set initial weighted heat flux
-                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
-                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
-                            // Zone interface cells
-                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
-                                thisDomain.WeightedHeatFlux(X, Z) = thisDomain.WeightingFactor(X, Z) * thisDomain.HeatFlux;
-                            }
-                        }
-                    }
-
-                    // Weighted heat flux and uniform heat flux balance energy may not balance exactly
-                    // Calculate difference and adjust
-                    thisDomain.TotalEnergyUniformHeatFlux = thisDomain.HeatFlux * thisDomain.SlabArea * thisDomain.Cur.CurSimTimeStepSize;
-                    thisDomain.TotalEnergyWeightedHeatFlux = 0.0;
-
-                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
-                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
-                            // Zone interface cells
-                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
-                                auto &cell(thisDomain.Cells(X, yMax, Z));
-                                thisDomain.TotalEnergyWeightedHeatFlux +=
-                                    thisDomain.WeightedHeatFlux(X, Z) * cell.width() * cell.depth() * thisDomain.Cur.CurSimTimeStepSize;
-                            }
-                        }
-                    }
-
-                    thisDomain.HeatFluxWeightingFactor = thisDomain.TotalEnergyWeightedHeatFlux / thisDomain.TotalEnergyUniformHeatFlux;
-                    thisDomain.TotalEnergyWeightedHeatFlux = 0.0;
-
-                    // Finally, adjust the weighted heat flux so that energy balances
-                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
-                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
-                            // Zone interface cells
-                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
-                                auto &cell(thisDomain.Cells(X, yMax, Z));
-                                thisDomain.WeightedHeatFlux(X, Z) = thisDomain.WeightedHeatFlux(X, Z) / thisDomain.HeatFluxWeightingFactor;
-                                thisDomain.TotalEnergyWeightedHeatFlux +=
-                                    thisDomain.WeightedHeatFlux(X, Z) * cell.width() * cell.depth() * thisDomain.Cur.CurSimTimeStepSize;
-                            }
-                        }
-                    }
-
-                } else { // Coupled basement
-                    thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
-                    thisDomain.FloorHeatFlux = thisDomain.AggregateFloorHeatFlux / thisDomain.NumHeatFlux;
-                }
-
-                // Shift history arrays only if necessary
-                if (std::abs(thisDomain.Cur.CurSimTimeSeconds - thisDomain.Cur.PrevSimTimeSeconds) > 1.0e-6) {
-                    thisDomain.Cur.PrevSimTimeSeconds = thisDomain.Cur.CurSimTimeSeconds;
-                    thisDomain.ShiftTemperaturesForNewTimeStep();
-                    thisDomain.DomainNeedsSimulation = true;
-                }
-                thisDomain.PerformIterationLoop(state);
-            }
-        }
-
-        if (state.dataPlantPipingSysMgr->WriteEIOFlag) {
-            // Write eio header
-            static constexpr std::string_view DomainCellsToEIOHeader(
-                "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
-            print(state.files.eio, DomainCellsToEIOHeader);
-
-            // Write eio data
-            for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
-                static constexpr std::string_view DomainCellsToEIO("{},{:5},{:5},{:5}\n");
-                print(state.files.eio,
-                      DomainCellsToEIO,
-                      thisDomain.Name,
-                      thisDomain.NumDomainCells,
-                      thisDomain.NumGroundSurfCells,
-                      thisDomain.NumInsulationCells);
-            }
-            state.dataPlantPipingSysMgr->WriteEIOFlag = false;
-        }
-    }
-
-    void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state)
+    void IssueSevereInputFieldError(EnergyPlusData &state,
+                                    std::string_view const RoutineName,
+                                    std::string const &ObjectName,
+                                    std::string const &InstanceName,
+                                    std::string_view FieldName,
+                                    Real64 const FieldEntry,
+                                    std::string const &Condition,
+                                    bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -391,90 +154,32 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static constexpr std::string_view RoutineName("GetPipingSystemsAndGroundDomainsInput");
+        ShowSevereError(
+            state,
+            format(R"({}:{}="{}", invalid {}="{:.3T}", Condition: {})", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
+        ErrorsFound = true;
+    }
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+    void IssueSevereInputFieldError(EnergyPlusData &state,
+                                    std::string_view const RoutineName,
+                                    std::string const &ObjectName,
+                                    std::string const &InstanceName,
+                                    std::string_view FieldName,
+                                    std::string const &FieldEntry,
+                                    std::string const &Condition,
+                                    bool &ErrorsFound)
+    {
 
-        // Read number of objects and allocate main data structures - first domains
-        int NumGeneralizedDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
-        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
-        int NumZoneCoupledDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
-        int NumBasements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
-        int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
-        state.dataPlantPipingSysMgr->domains.resize(TotalNumDomains);
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   Summer 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-        // then circuits
-        int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
-
-        // Read in raw inputs, don't try to interpret dependencies yet
-        ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
-        // ReadPipeCircuitInputs(ErrorsFound);
-        ReadHorizontalTrenchInputs(state, NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
-
-        // This is heavily dependent on the order of the domains in the main array.
-        ReadZoneCoupledDomainInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains, ErrorsFound);
-
-        // This is heavily dependent on the order of the domains in the main array.
-        ReadBasementInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements, ErrorsFound);
-
-        // Report errors that are purely input problems
-        if (ErrorsFound) ShowFatalError(state, std::string{RoutineName} + ": Preceding input errors cause program termination.");
-
-        // Setup output variables
-        SetupPipingSystemOutputVariables(state);
-
-        // Validate DOMAIN-CIRCUIT cross references
-        for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
-
-            // Convenience
-            auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
-
-            // validate pipe domain-circuit name-to-index references
-            for (auto &thisCircuit : thisDomain.circuits) {
-                thisCircuit->ParentDomainIndex = DomainNum;
-            }
-
-            // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
-            //                                INPUT WAS MEASURED FROM GROUND SURFACE
-            for (auto &thisCircuit : thisDomain.circuits) {
-                for (auto &thisSegment : thisCircuit->pipeSegments) {
-                    thisSegment->PipeLocation.Y = thisDomain.Extents.yMax - thisSegment->PipeLocation.Y;
-                }
-            }
-
-            // correct segment locations for: BASEMENT X SHIFT
-            if (thisDomain.HasBasement && thisDomain.BasementZone.ShiftPipesByWidth) {
-                for (auto &thisCircuit : thisDomain.circuits) {
-                    for (auto &thisSegment : thisCircuit->pipeSegments) {
-                        thisSegment->PipeLocation.X += thisDomain.BasementZone.Width;
-                    }
-                }
-            }
-
-            // now we will have good values of pipe segment locations, we can validate them
-            for (auto &thisCircuit : thisDomain.circuits) {
-                // check to make sure it isn't outside the domain
-                for (auto &thisSegment : thisCircuit->pipeSegments) {
-                    if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
-                        (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
-                        ShowSevereError(state,
-                                        "PipingSystems::" + std::string{RoutineName} +
-                                            ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
-                        ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
-                        ShowContinueError(
-                            state,
-                            format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )", thisSegment->PipeLocation.X, thisSegment->PipeLocation.Y));
-                    }
-                } // segment loop
-            }     // circuit loop
-
-        } // domain loop
-
-        // If we encountered any other errors that we couldn't handle separately than stop now
-        if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
-        }
+        ShowSevereError(state,
+                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + std::string{FieldName} + "=\"" +
+                            FieldEntry + "\", Condition: " + Condition);
+        ErrorsFound = true;
     }
 
     void ReadGeneralDomainInputs(EnergyPlusData &state, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound)
@@ -794,6 +499,606 @@ namespace PlantPipingSystemsManager {
             // Initialize ground temperature model and get pointer reference
             thisDomain.groundTempModel = GetGroundTempModelAndInit(state, groundTempType, groundTempName);
         }
+    }
+
+    void ReadHorizontalTrenchInputs(EnergyPlusData &state,
+                                    int const StartingDomainNumForHorizontal,
+                                    int const StartingCircuitNumForHorizontal,
+                                    bool &ErrorsFound)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   September 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NumAlphas;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers; // Number of Numbers for each GetObjectItem call
+        int IOStatus;   // Used in GetObjectItem
+
+        // initialize these counters properly so they can be incremented within the DO loop
+        int DomainCtr = StartingDomainNumForHorizontal - 1;
+        int CircuitCtr = StartingCircuitNumForHorizontal - 1;
+
+        // For each horizontal, we need to process the inputs into a local array of derived type,
+        //  then resolve each one, creating definitions for a pipe domain, pipe circuit, and series of pipe segments
+        // This way, the outer get input routines can handle it as though they were generalized routines
+
+        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+
+        // Read in all pipe segments
+        for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
+
+            // Increment the domain and circuit counters here
+            ++DomainCtr;
+            ++CircuitCtr;
+
+            // Read all inputs for this pipe segment
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     ObjName_HorizTrench,
+                                                                     HorizontalGHXCtr,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+
+            auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
+
+            // Get the name, validate
+            std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+
+            int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(3));
+            Real64 const thisInterPipeSpacing = state.dataIPShortCut->rNumericArgs(4);
+            Real64 const thisBurialDepth = state.dataIPShortCut->rNumericArgs(7);
+
+            //******* We'll first set up the domain ********
+            // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
+            thisDomain.IsActuallyPartOfAHorizontalTrench = true;
+            thisDomain.Name = format("HorizontalTrenchDomain{:4}", HorizontalGHXCtr);
+            thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
+            thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
+            thisDomain.Extents.zMax = state.dataIPShortCut->rNumericArgs(2);
+
+            // set up the mesh with some default parameters
+            thisDomain.Mesh.X.RegionMeshCount = 4;
+            thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::Uniform;
+            thisDomain.Mesh.Y.RegionMeshCount = 4;
+            thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::Uniform;
+            thisDomain.Mesh.Z.RegionMeshCount = 4;
+            thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
+
+            // Soil properties
+            thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(8);
+            thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(9);
+            thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(10);
+
+            // Moisture properties
+            thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(14) / 100.0;
+            thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(15) / 100.0;
+
+            // Other parameters
+            thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
+            thisDomain.SimControls.MaxIterationsPerTS = 250;
+
+            // additional evapotranspiration parameter, min/max validated by IP
+            thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(16);
+
+            //******* We'll next set up the circuit ********
+            // then we can loop through and allow the factory to be called and carry on
+            thisDomain.circuits.push_back(Circuit::factory(state, thisTrenchName, ErrorsFound));
+
+            // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
+            // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
+            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(5));
+
+            //******* Then we'll do the segments *******!
+            for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
+                Segment segment;
+                segment.Name = format("HorizontalTrenchCircuit{}Segment{}", HorizontalGHXCtr, ThisCircuitPipeSegmentCounter);
+                segment.IsActuallyPartOfAHorizontalTrench = true;
+                segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * thisInterPipeSpacing, thisBurialDepth);
+
+                if (mod(ThisCircuitPipeSegmentCounter, 2) != 0) {
+                    segment.FlowDirection = SegmentFlow::IncreasingZ;
+                } else {
+                    segment.FlowDirection = SegmentFlow::DecreasingZ;
+                }
+                // add it to the main segment array so it has a place to live
+                state.dataPlantPipingSysMgr->segments.push_back(segment);
+            }
+
+            // now that they are in the main vector, add them here
+            int const newSizeSegmentVector = static_cast<int>(state.dataPlantPipingSysMgr->segments.size());
+            for (int segmentIndexToGrab = newSizeSegmentVector - NumPipeSegments; segmentIndexToGrab < newSizeSegmentVector; ++segmentIndexToGrab) {
+                thisDomain.circuits[0]->pipeSegments.push_back(&state.dataPlantPipingSysMgr->segments[segmentIndexToGrab]);
+            }
+        }
+    }
+
+    void SetupPipingSystemOutputVariables(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   September 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        for (auto &thisSegment : state.dataPlantPipingSysMgr->segments) {
+
+            if (!thisSegment.IsActuallyPartOfAHorizontalTrench) {
+
+                SetupOutputVariable(state,
+                                    "Pipe Segment Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisSegment.InletTemperature,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisSegment.Name);
+                SetupOutputVariable(state,
+                                    "Pipe Segment Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisSegment.OutletTemperature,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisSegment.Name);
+
+                SetupOutputVariable(state,
+                                    "Pipe Segment Fluid Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    thisSegment.FluidHeatLoss,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisSegment.Name);
+            }
+        }
+
+        for (auto &thisCircuit : state.dataPlantPipingSysMgr->circuits) {
+
+            if (!thisCircuit.IsActuallyPartOfAHorizontalTrench) {
+
+                SetupOutputVariable(state,
+                                    "Pipe Circuit Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    thisCircuit.CurCircuitFlowRate,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+
+                SetupOutputVariable(state,
+                                    "Pipe Circuit Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCircuit.InletTemperature,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+                SetupOutputVariable(state,
+                                    "Pipe Circuit Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCircuit.OutletTemperature,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+
+                SetupOutputVariable(state,
+                                    "Pipe Circuit Fluid Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    thisCircuit.FluidHeatLoss,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+
+            } else { // it is a horizontal trench
+
+                SetupOutputVariable(state,
+                                    "Ground Heat Exchanger Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    thisCircuit.CurCircuitFlowRate,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+
+                SetupOutputVariable(state,
+                                    "Ground Heat Exchanger Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCircuit.InletTemperature,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+                SetupOutputVariable(state,
+                                    "Ground Heat Exchanger Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCircuit.OutletTemperature,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+
+                SetupOutputVariable(state,
+                                    "Ground Heat Exchanger Fluid Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    thisCircuit.FluidHeatLoss,
+                                    OutputProcessor::SOVTimeStepType::Plant,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    thisCircuit.Name);
+            }
+        }
+    }
+
+    void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   Summer 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        static constexpr std::string_view RoutineName("GetPipingSystemsAndGroundDomainsInput");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+
+        // Read number of objects and allocate main data structures - first domains
+        int NumGeneralizedDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
+        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+        int NumZoneCoupledDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
+        int NumBasements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
+        int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
+        state.dataPlantPipingSysMgr->domains.resize(TotalNumDomains);
+
+        // then circuits
+        int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
+
+        // Read in raw inputs, don't try to interpret dependencies yet
+        ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
+        // ReadPipeCircuitInputs(ErrorsFound);
+        ReadHorizontalTrenchInputs(state, NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
+
+        // This is heavily dependent on the order of the domains in the main array.
+        ReadZoneCoupledDomainInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains, ErrorsFound);
+
+        // This is heavily dependent on the order of the domains in the main array.
+        ReadBasementInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements, ErrorsFound);
+
+        // Report errors that are purely input problems
+        if (ErrorsFound) ShowFatalError(state, std::string{RoutineName} + ": Preceding input errors cause program termination.");
+
+        // Setup output variables
+        SetupPipingSystemOutputVariables(state);
+
+        // Validate DOMAIN-CIRCUIT cross references
+        for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
+
+            // Convenience
+            auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
+
+            // validate pipe domain-circuit name-to-index references
+            for (auto &thisCircuit : thisDomain.circuits) {
+                thisCircuit->ParentDomainIndex = DomainNum;
+            }
+
+            // correct segment locations for: INTERNAL DATA STRUCTURE Y VALUE MEASURED FROM BOTTOM OF DOMAIN,
+            //                                INPUT WAS MEASURED FROM GROUND SURFACE
+            for (auto &thisCircuit : thisDomain.circuits) {
+                for (auto &thisSegment : thisCircuit->pipeSegments) {
+                    thisSegment->PipeLocation.Y = thisDomain.Extents.yMax - thisSegment->PipeLocation.Y;
+                }
+            }
+
+            // correct segment locations for: BASEMENT X SHIFT
+            if (thisDomain.HasBasement && thisDomain.BasementZone.ShiftPipesByWidth) {
+                for (auto &thisCircuit : thisDomain.circuits) {
+                    for (auto &thisSegment : thisCircuit->pipeSegments) {
+                        thisSegment->PipeLocation.X += thisDomain.BasementZone.Width;
+                    }
+                }
+            }
+
+            // now we will have good values of pipe segment locations, we can validate them
+            for (auto &thisCircuit : thisDomain.circuits) {
+                // check to make sure it isn't outside the domain
+                for (auto &thisSegment : thisCircuit->pipeSegments) {
+                    if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
+                        (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
+                        ShowSevereError(state,
+                                        "PipingSystems::" + std::string{RoutineName} +
+                                            ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
+                        ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
+                        ShowContinueError(
+                            state,
+                            format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )", thisSegment->PipeLocation.X, thisSegment->PipeLocation.Y));
+                    }
+                } // segment loop
+            }     // circuit loop
+
+        } // domain loop
+
+        // If we encountered any other errors that we couldn't handle separately than stop now
+        if (ErrorsFound) {
+            ShowFatalError(state, std::string{RoutineName} + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
+        }
+    }
+
+    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+    {
+        // Process the input data for circuits if it hasn't been done already
+        if (state.dataPlantPipingSysMgr->GetInputFlag) {
+            GetPipingSystemsAndGroundDomainsInput(state);
+            state.dataPlantPipingSysMgr->GetInputFlag = false;
+        }
+        // Now look for this particular pipe in the list
+        for (auto &circuit : state.dataPlantPipingSysMgr->circuits) {
+            if (circuit.Name == objectName) {
+                return &circuit;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(state,
+                       "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void Circuit::simulate(EnergyPlusData &state,
+                           [[maybe_unused]] const PlantLocation &calledFromLocation,
+                           [[maybe_unused]] bool const FirstHVACIteration,
+                           [[maybe_unused]] Real64 &CurLoad,
+                           [[maybe_unused]] bool const RunFlag)
+    {
+        // Retrieve the parent domain index for this pipe circuit
+        auto &thisDomain(state.dataPlantPipingSysMgr->domains[this->ParentDomainIndex]);
+
+        // Do any initialization here
+        thisDomain.InitPipingSystems(state, this);
+
+        // Update the temperature field
+        thisDomain.PerformIterationLoop(state, this);
+
+        // Update outlet nodes, etc.
+        thisDomain.UpdatePipingSystems(state, this);
+    }
+
+    void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Matt Mitchell
+        //       DATE WRITTEN   Spring 2014
+        //       MODIFIED       by Sushobhit Acharya, March 2015
+        //       RE-ENGINEERED  na
+
+        // Read input if necessary
+        if (state.dataPlantPipingSysMgr->GetInputFlag) {
+            GetPipingSystemsAndGroundDomainsInput(state);
+            state.dataPlantPipingSysMgr->GetInputFlag = false;
+        }
+
+        for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
+
+            // if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
+            if (thisDomain.HasAPipeCircuit) continue;
+
+            if (thisDomain.DomainNeedsToBeMeshed) {
+                thisDomain.developMesh(state);
+            }
+
+            thisDomain.DomainNeedsToBeMeshed = false;
+
+            // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
+            // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
+            // which would be carried over from the previous environment
+            thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+            thisDomain.Cur.CurSimTimeSeconds =
+                ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                 (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
+                DataGlobalConstants::SecInHour;
+
+            // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
+            if ((state.dataGlobal->BeginSimFlag && thisDomain.BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
+
+                thisDomain.DoOneTimeInitializations(state, nullptr);
+
+                if (thisDomain.HasZoneCoupledSlab) {
+                    int Xmax = ubound(thisDomain.Cells, 1);
+                    // int yMax = ubound( thisDomain.Cells, 2 );
+                    int Zmax = ubound(thisDomain.Cells, 3);
+
+                    thisDomain.WeightingFactor.allocate({0, Xmax}, {0, Zmax});
+                    thisDomain.WeightedHeatFlux.allocate({0, Xmax}, {0, Zmax});
+                }
+
+                thisDomain.BeginSimInit = false;
+                thisDomain.BeginSimEnvironment = false;
+            }
+            if (!state.dataGlobal->BeginSimFlag) thisDomain.BeginSimInit = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
+
+            // Reset the heat fluxes if domain update has been completed
+            if (thisDomain.ResetHeatFluxFlag) {
+                thisDomain.AggregateHeatFlux = 0;
+                thisDomain.AggregateWallHeatFlux = 0;
+                thisDomain.AggregateFloorHeatFlux = 0;
+                thisDomain.NumHeatFlux = 0;
+                thisDomain.ResetHeatFluxFlag = false;
+            }
+
+            if (!initOnly) {
+                // Aggregate the heat flux
+                // Zone-coupled slab
+                if (thisDomain.HasZoneCoupledSlab) {
+                    thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
+                    thisDomain.NumHeatFlux += 1;
+                    thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
+                } else { // Coupled basement
+
+                    // basement walls
+                    thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
+                    // basement floor
+                    thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
+
+                    thisDomain.NumHeatFlux += 1;
+                    thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
+                    thisDomain.FloorHeatFlux = thisDomain.AggregateFloorHeatFlux / thisDomain.NumHeatFlux;
+                }
+
+                // Aggregate the heat flux
+                // Zone-coupled slab
+                if (thisDomain.HasZoneCoupledSlab) {
+                    thisDomain.AggregateHeatFlux += thisDomain.GetZoneInterfaceHeatFlux(state);
+                    thisDomain.NumHeatFlux += 1;
+                    thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
+                } else if (thisDomain.HasZoneCoupledBasement) { // Coupled basement
+                    // basement walls
+                    thisDomain.AggregateWallHeatFlux += thisDomain.GetBasementWallHeatFlux(state);
+                    // basement floor
+                    thisDomain.AggregateFloorHeatFlux += thisDomain.GetBasementFloorHeatFlux(state);
+
+                    thisDomain.NumHeatFlux += 1;
+                    thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
+                    thisDomain.FloorHeatFlux = thisDomain.AggregateFloorHeatFlux / thisDomain.NumHeatFlux;
+                }
+
+                // Zone-coupled slab
+                if (thisDomain.HasZoneCoupledSlab) {
+
+                    thisDomain.HeatFlux = thisDomain.AggregateHeatFlux / thisDomain.NumHeatFlux;
+
+                    Real64 ZoneTemp = 0.0;
+
+                    // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
+                    for (auto &z : thisDomain.ZoneCoupledSurfaces) {
+                        int ZoneNum = z.Zone;
+                        ZoneTemp += state.dataHeatBalFanSys->ZTAV(ZoneNum);
+                    }
+
+                    ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();
+                    Real64 AvgSlabTemp = thisDomain.GetAverageTempByType(state, CellType::ZoneGroundInterface);
+
+                    int yMax = ubound(thisDomain.Cells, 2);
+
+                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
+                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
+                            // Zone interface cells
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
+                                thisDomain.WeightingFactor(X, Z) =
+                                    std::abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) / (ZoneTemp - AvgSlabTemp));
+                            }
+                        }
+                    }
+
+                    // Set initial weighted heat flux
+                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
+                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
+                            // Zone interface cells
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
+                                thisDomain.WeightedHeatFlux(X, Z) = thisDomain.WeightingFactor(X, Z) * thisDomain.HeatFlux;
+                            }
+                        }
+                    }
+
+                    // Weighted heat flux and uniform heat flux balance energy may not balance exactly
+                    // Calculate difference and adjust
+                    thisDomain.TotalEnergyUniformHeatFlux = thisDomain.HeatFlux * thisDomain.SlabArea * thisDomain.Cur.CurSimTimeStepSize;
+                    thisDomain.TotalEnergyWeightedHeatFlux = 0.0;
+
+                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
+                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
+                            // Zone interface cells
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
+                                auto &cell(thisDomain.Cells(X, yMax, Z));
+                                thisDomain.TotalEnergyWeightedHeatFlux +=
+                                    thisDomain.WeightedHeatFlux(X, Z) * cell.width() * cell.depth() * thisDomain.Cur.CurSimTimeStepSize;
+                            }
+                        }
+                    }
+
+                    thisDomain.HeatFluxWeightingFactor = thisDomain.TotalEnergyWeightedHeatFlux / thisDomain.TotalEnergyUniformHeatFlux;
+                    thisDomain.TotalEnergyWeightedHeatFlux = 0.0;
+
+                    // Finally, adjust the weighted heat flux so that energy balances
+                    for (int Z = lbound(thisDomain.Cells, 3); Z <= ubound(thisDomain.Cells, 3); ++Z) {
+                        for (int X = lbound(thisDomain.Cells, 1); X <= ubound(thisDomain.Cells, 1); ++X) {
+                            // Zone interface cells
+                            if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
+                                auto &cell(thisDomain.Cells(X, yMax, Z));
+                                thisDomain.WeightedHeatFlux(X, Z) = thisDomain.WeightedHeatFlux(X, Z) / thisDomain.HeatFluxWeightingFactor;
+                                thisDomain.TotalEnergyWeightedHeatFlux +=
+                                    thisDomain.WeightedHeatFlux(X, Z) * cell.width() * cell.depth() * thisDomain.Cur.CurSimTimeStepSize;
+                            }
+                        }
+                    }
+
+                } else { // Coupled basement
+                    thisDomain.WallHeatFlux = thisDomain.AggregateWallHeatFlux / thisDomain.NumHeatFlux;
+                    thisDomain.FloorHeatFlux = thisDomain.AggregateFloorHeatFlux / thisDomain.NumHeatFlux;
+                }
+
+                // Shift history arrays only if necessary
+                if (std::abs(thisDomain.Cur.CurSimTimeSeconds - thisDomain.Cur.PrevSimTimeSeconds) > 1.0e-6) {
+                    thisDomain.Cur.PrevSimTimeSeconds = thisDomain.Cur.CurSimTimeSeconds;
+                    thisDomain.ShiftTemperaturesForNewTimeStep();
+                    thisDomain.DomainNeedsSimulation = true;
+                }
+                thisDomain.PerformIterationLoop(state);
+            }
+        }
+
+        if (state.dataPlantPipingSysMgr->WriteEIOFlag) {
+            // Write eio header
+            static constexpr std::string_view DomainCellsToEIOHeader(
+                "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
+            print(state.files.eio, DomainCellsToEIOHeader);
+
+            // Write eio data
+            for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
+                static constexpr std::string_view DomainCellsToEIO("{},{:5},{:5},{:5}\n");
+                print(state.files.eio,
+                      DomainCellsToEIO,
+                      thisDomain.Name,
+                      thisDomain.NumDomainCells,
+                      thisDomain.NumGroundSurfCells,
+                      thisDomain.NumInsulationCells);
+            }
+            state.dataPlantPipingSysMgr->WriteEIOFlag = false;
+        }
+    }
+
+    void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
+                                        std::string_view FieldName,
+                                        std::string const &UserInputField,
+                                        std::string const &ObjectName)
+    {
+
+        ShowSevereError(state, "Invalid " + std::string{FieldName} + "=" + UserInputField + " was found in: " + ObjectName);
+        ShowContinueError(
+            state, "The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
+        ShowContinueError(state, "  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
+        ShowContinueError(
+            state, "Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
+    }
+
+    int GetSurfaceCountForOSCM(EnergyPlusData &state, int const OSCMIndex)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   Summer 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        int RetVal = 0;
+        for (int SurfCtr = 1; SurfCtr <= isize(state.dataSurface->Surface); ++SurfCtr) {
+            if (state.dataSurface->Surface(SurfCtr).OSCMPtr == OSCMIndex) ++RetVal;
+        }
+        return RetVal;
     }
 
     void ReadZoneCoupledDomainInputs(EnergyPlusData &state, int const StartingDomainNumForZone, int const NumZoneCoupledDomains, bool &ErrorsFound)
@@ -1429,20 +1734,6 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
-                                        std::string_view FieldName,
-                                        std::string const &UserInputField,
-                                        std::string const &ObjectName)
-    {
-
-        ShowSevereError(state, "Invalid " + std::string{FieldName} + "=" + UserInputField + " was found in: " + ObjectName);
-        ShowContinueError(
-            state, "The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
-        ShowContinueError(state, "  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
-        ShowContinueError(
-            state, "Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
-    }
-
     void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound)
     {
 
@@ -1691,45 +1982,6 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    Segment *Segment::factory(EnergyPlusData &state, std::string segmentName)
-    {
-        if (state.dataPlantPipingSysMgr->GetSegmentInputFlag) {
-            bool errorsFound = false;
-            ReadPipeSegmentInputs(state, errorsFound);
-            state.dataPlantPipingSysMgr->GetSegmentInputFlag = false;
-        }
-        // Now look for this particular segment in the list
-        for (auto &segment : state.dataPlantPipingSysMgr->segments) {
-            if (segment.Name == segmentName) {
-                return &segment;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state,
-                       "PipeSegmentInfoFactory: Error getting inputs for segment named: " + segmentName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    Circuit *Circuit::factory(EnergyPlusData &state, std::string circuitName, bool &errorsFound)
-    {
-        if (state.dataPlantPipingSysMgr->GetCircuitInputFlag) {
-            ReadPipeCircuitInputs(state, errorsFound);
-            state.dataPlantPipingSysMgr->GetCircuitInputFlag = false;
-        }
-        // Now look for this particular segment in the list
-        for (auto &circuit : state.dataPlantPipingSysMgr->circuits) {
-            if (circuit.Name == circuitName) {
-                return &circuit;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state,
-                       "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + circuitName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
     void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound)
     {
 
@@ -1801,235 +2053,43 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void ReadHorizontalTrenchInputs(EnergyPlusData &state,
-                                    int const StartingDomainNumForHorizontal,
-                                    int const StartingCircuitNumForHorizontal,
-                                    bool &ErrorsFound)
+    Segment *Segment::factory(EnergyPlusData &state, std::string segmentName)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   September 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;  // Number of Alphas for each GetObjectItem call
-        int NumNumbers; // Number of Numbers for each GetObjectItem call
-        int IOStatus;   // Used in GetObjectItem
-
-        // initialize these counters properly so they can be incremented within the DO loop
-        int DomainCtr = StartingDomainNumForHorizontal - 1;
-        int CircuitCtr = StartingCircuitNumForHorizontal - 1;
-
-        // For each horizontal, we need to process the inputs into a local array of derived type,
-        //  then resolve each one, creating definitions for a pipe domain, pipe circuit, and series of pipe segments
-        // This way, the outer get input routines can handle it as though they were generalized routines
-
-        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
-
-        // Read in all pipe segments
-        for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
-
-            // Increment the domain and circuit counters here
-            ++DomainCtr;
-            ++CircuitCtr;
-
-            // Read all inputs for this pipe segment
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     ObjName_HorizTrench,
-                                                                     HorizontalGHXCtr,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-
-            auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
-
-            // Get the name, validate
-            std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
-
-            int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(3));
-            Real64 const thisInterPipeSpacing = state.dataIPShortCut->rNumericArgs(4);
-            Real64 const thisBurialDepth = state.dataIPShortCut->rNumericArgs(7);
-
-            //******* We'll first set up the domain ********
-            // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
-            thisDomain.IsActuallyPartOfAHorizontalTrench = true;
-            thisDomain.Name = format("HorizontalTrenchDomain{:4}", HorizontalGHXCtr);
-            thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
-            thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
-            thisDomain.Extents.zMax = state.dataIPShortCut->rNumericArgs(2);
-
-            // set up the mesh with some default parameters
-            thisDomain.Mesh.X.RegionMeshCount = 4;
-            thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::Uniform;
-            thisDomain.Mesh.Y.RegionMeshCount = 4;
-            thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::Uniform;
-            thisDomain.Mesh.Z.RegionMeshCount = 4;
-            thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::Uniform;
-
-            // Soil properties
-            thisDomain.GroundProperties.Conductivity = state.dataIPShortCut->rNumericArgs(8);
-            thisDomain.GroundProperties.Density = state.dataIPShortCut->rNumericArgs(9);
-            thisDomain.GroundProperties.SpecificHeat = state.dataIPShortCut->rNumericArgs(10);
-
-            // Moisture properties
-            thisDomain.Moisture.Theta_liq = state.dataIPShortCut->rNumericArgs(14) / 100.0;
-            thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(15) / 100.0;
-
-            // Other parameters
-            thisDomain.SimControls.Convergence_CurrentToPrevIteration = 0.001;
-            thisDomain.SimControls.MaxIterationsPerTS = 250;
-
-            // additional evapotranspiration parameter, min/max validated by IP
-            thisDomain.Moisture.GroundCoverCoefficient = state.dataIPShortCut->rNumericArgs(16);
-
-            //******* We'll next set up the circuit ********
-            // then we can loop through and allow the factory to be called and carry on
-            thisDomain.circuits.push_back(Circuit::factory(state, thisTrenchName, ErrorsFound));
-
-            // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
-            // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-            thisDomain.groundTempModel = GetGroundTempModelAndInit(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(5));
-
-            //******* Then we'll do the segments *******!
-            for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
-                Segment segment;
-                segment.Name = format("HorizontalTrenchCircuit{}Segment{}", HorizontalGHXCtr, ThisCircuitPipeSegmentCounter);
-                segment.IsActuallyPartOfAHorizontalTrench = true;
-                segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * thisInterPipeSpacing, thisBurialDepth);
-
-                if (mod(ThisCircuitPipeSegmentCounter, 2) != 0) {
-                    segment.FlowDirection = SegmentFlow::IncreasingZ;
-                } else {
-                    segment.FlowDirection = SegmentFlow::DecreasingZ;
-                }
-                // add it to the main segment array so it has a place to live
-                state.dataPlantPipingSysMgr->segments.push_back(segment);
-            }
-
-            // now that they are in the main vector, add them here
-            int const newSizeSegmentVector = static_cast<int>(state.dataPlantPipingSysMgr->segments.size());
-            for (int segmentIndexToGrab = newSizeSegmentVector - NumPipeSegments; segmentIndexToGrab < newSizeSegmentVector; ++segmentIndexToGrab) {
-                thisDomain.circuits[0]->pipeSegments.push_back(&state.dataPlantPipingSysMgr->segments[segmentIndexToGrab]);
+        if (state.dataPlantPipingSysMgr->GetSegmentInputFlag) {
+            bool errorsFound = false;
+            ReadPipeSegmentInputs(state, errorsFound);
+            state.dataPlantPipingSysMgr->GetSegmentInputFlag = false;
+        }
+        // Now look for this particular segment in the list
+        for (auto &segment : state.dataPlantPipingSysMgr->segments) {
+            if (segment.Name == segmentName) {
+                return &segment;
             }
         }
+        // If we didn't find it, fatal
+        ShowFatalError(state,
+                       "PipeSegmentInfoFactory: Error getting inputs for segment named: " + segmentName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SetupPipingSystemOutputVariables(EnergyPlusData &state)
+    Circuit *Circuit::factory(EnergyPlusData &state, std::string circuitName, bool &errorsFound)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   September 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        for (auto &thisSegment : state.dataPlantPipingSysMgr->segments) {
-
-            if (!thisSegment.IsActuallyPartOfAHorizontalTrench) {
-
-                SetupOutputVariable(state,
-                                    "Pipe Segment Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisSegment.InletTemperature,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisSegment.Name);
-                SetupOutputVariable(state,
-                                    "Pipe Segment Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisSegment.OutletTemperature,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisSegment.Name);
-
-                SetupOutputVariable(state,
-                                    "Pipe Segment Fluid Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    thisSegment.FluidHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisSegment.Name);
+        if (state.dataPlantPipingSysMgr->GetCircuitInputFlag) {
+            ReadPipeCircuitInputs(state, errorsFound);
+            state.dataPlantPipingSysMgr->GetCircuitInputFlag = false;
+        }
+        // Now look for this particular segment in the list
+        for (auto &circuit : state.dataPlantPipingSysMgr->circuits) {
+            if (circuit.Name == circuitName) {
+                return &circuit;
             }
         }
-
-        for (auto &thisCircuit : state.dataPlantPipingSysMgr->circuits) {
-
-            if (!thisCircuit.IsActuallyPartOfAHorizontalTrench) {
-
-                SetupOutputVariable(state,
-                                    "Pipe Circuit Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    thisCircuit.CurCircuitFlowRate,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-
-                SetupOutputVariable(state,
-                                    "Pipe Circuit Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisCircuit.InletTemperature,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-                SetupOutputVariable(state,
-                                    "Pipe Circuit Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisCircuit.OutletTemperature,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-
-                SetupOutputVariable(state,
-                                    "Pipe Circuit Fluid Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    thisCircuit.FluidHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-
-            } else { // it is a horizontal trench
-
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    thisCircuit.CurCircuitFlowRate,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisCircuit.InletTemperature,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisCircuit.OutletTemperature,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Fluid Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    thisCircuit.FluidHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::Plant,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    thisCircuit.Name);
-            }
-        }
+        // If we didn't find it, fatal
+        ShowFatalError(state,
+                       "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + circuitName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void Domain::SetupZoneCoupledOutputVariables(EnergyPlusData &state)
@@ -2219,66 +2279,6 @@ namespace PlantPipingSystemsManager {
         int OutletNodeNum = thisCircuit->OutletNodeNum;
         auto const &out_cell(thisCircuit->CircuitOutletCell);
         state.dataLoopNodes->Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y, out_cell.Z).PipeCellData.Fluid.Temperature;
-    }
-
-    void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string_view const RoutineName,
-                                    std::string const &ObjectName,
-                                    std::string const &InstanceName,
-                                    std::string_view FieldName,
-                                    std::string const &FieldEntry,
-                                    std::string const &Condition,
-                                    bool &ErrorsFound)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        ShowSevereError(state,
-                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + std::string{FieldName} + "=\"" +
-                            FieldEntry + "\", Condition: " + Condition);
-        ErrorsFound = true;
-    }
-
-    void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string_view const RoutineName,
-                                    std::string const &ObjectName,
-                                    std::string const &InstanceName,
-                                    std::string_view FieldName,
-                                    Real64 const FieldEntry,
-                                    std::string const &Condition,
-                                    bool &ErrorsFound)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        ShowSevereError(
-            state,
-            format(R"({}:{}="{}", invalid {}="{:.3T}", Condition: {})", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
-        ErrorsFound = true;
-    }
-
-    int GetSurfaceCountForOSCM(EnergyPlusData &state, int const OSCMIndex)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        int RetVal = 0;
-        for (int SurfCtr = 1; SurfCtr <= isize(state.dataSurface->Surface); ++SurfCtr) {
-            if (state.dataSurface->Surface(SurfCtr).OSCMPtr == OSCMIndex) ++RetVal;
-        }
-        return RetVal;
     }
 
     std::vector<int> GetSurfaceIndecesForOSCM(EnergyPlusData &state, int const OSCMIndex)
@@ -5082,94 +5082,6 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void Domain::PerformPipeCellSimulation(Circuit *thisCircuit, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        for (int Iter = 1; Iter <= thisCircuit->MaxIterationsPerTS; ++Iter) {
-
-            //'shift all the pipe related temperatures for the next internal pipe iteration
-            ShiftPipeTemperaturesForNewIteration(ThisCell);
-
-            //'simulate the funny interface soil cell between the radial and cartesian systems
-            this->SimulateRadialToCartesianInterface(ThisCell);
-
-            //'simulate the outermost radial slice
-            SimulateOuterMostRadialSoilSlice(thisCircuit, ThisCell);
-
-            //'we only need to simulate these if they actually exist!
-            if (!ThisCell.PipeCellData.Soil.empty()) {
-
-                //'simulate all interior radial slices
-                SimulateAllInteriorRadialSoilSlices(ThisCell);
-
-                //'simulate the innermost radial soil slice
-                SimulateInnerMostRadialSoilSlice(thisCircuit, ThisCell);
-            }
-
-            if (thisCircuit->HasInsulation) {
-                SimulateRadialInsulationCell(ThisCell);
-            }
-
-            //'simulate the pipe cell
-            SimulateRadialPipeCell(thisCircuit, ThisCell);
-
-            //'simulate the water cell
-            SimulateFluidCell(thisCircuit, ThisCell, FlowRate, EnteringTemp);
-
-            //'check convergence
-            if (IsConverged_PipeCurrentToPrevIteration(thisCircuit, ThisCell)) break; // potential diff source
-        }
-    }
-
-    void Domain::SimulateRadialToCartesianInterface(CartesianCell &cell)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::vector<Direction> const Directions = {Direction::NegativeX, Direction::NegativeY, Direction::PositiveX, Direction::PositiveY};
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Numerator = 0.0;
-        Real64 Denominator = 0.0;
-
-        //'add effects from this cell history
-        Numerator += cell.Temperature_PrevTimeStep;
-        ++Denominator;
-
-        //'add effects from outermost radial cell
-        auto &outerRadialCell = cell.PipeCellData.Soil.back();
-        Real64 OutermostRadialCellOuterRadius = outerRadialCell.OuterRadius;
-        Real64 OutermostRadialCellRadialCentroid = outerRadialCell.RadialCentroid;
-        Real64 OutermostRadialCellTemperature = outerRadialCell.Temperature;
-        Real64 Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) /
-                            (2.0 * DataGlobalConstants::Pi * cell.depth() * cell.Properties.Conductivity);
-        Numerator += (cell.Beta / Resistance) * OutermostRadialCellTemperature;
-        Denominator += (cell.Beta / Resistance);
-
-        //'add effects from neighboring Cartesian cells
-        for (auto &curDirection : Directions) {
-            Real64 AdiabaticMultiplier = 1.0;
-            Real64 NeighborTemp = 0.0;
-            this->EvaluateNeighborCharacteristics(cell, curDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
-            Numerator += AdiabaticMultiplier * (cell.Beta / Resistance) * NeighborTemp;
-            Denominator += AdiabaticMultiplier * (cell.Beta / Resistance);
-        }
-
-        //'calculate the new temperature
-        cell.Temperature = Numerator / Denominator;
-    }
-
     void SimulateOuterMostRadialSoilSlice(Circuit *thisCircuit, CartesianCell &cell)
     {
 
@@ -5520,6 +5432,94 @@ namespace PlantPipingSystemsManager {
 
         //'calculate new temperature
         cell.PipeCellData.Fluid.Temperature = Numerator / Denominator;
+    }
+
+    void Domain::PerformPipeCellSimulation(Circuit *thisCircuit, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   Summer 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        for (int Iter = 1; Iter <= thisCircuit->MaxIterationsPerTS; ++Iter) {
+
+            //'shift all the pipe related temperatures for the next internal pipe iteration
+            ShiftPipeTemperaturesForNewIteration(ThisCell);
+
+            //'simulate the funny interface soil cell between the radial and cartesian systems
+            this->SimulateRadialToCartesianInterface(ThisCell);
+
+            //'simulate the outermost radial slice
+            SimulateOuterMostRadialSoilSlice(thisCircuit, ThisCell);
+
+            //'we only need to simulate these if they actually exist!
+            if (!ThisCell.PipeCellData.Soil.empty()) {
+
+                //'simulate all interior radial slices
+                SimulateAllInteriorRadialSoilSlices(ThisCell);
+
+                //'simulate the innermost radial soil slice
+                SimulateInnerMostRadialSoilSlice(thisCircuit, ThisCell);
+            }
+
+            if (thisCircuit->HasInsulation) {
+                SimulateRadialInsulationCell(ThisCell);
+            }
+
+            //'simulate the pipe cell
+            SimulateRadialPipeCell(thisCircuit, ThisCell);
+
+            //'simulate the water cell
+            SimulateFluidCell(thisCircuit, ThisCell, FlowRate, EnteringTemp);
+
+            //'check convergence
+            if (IsConverged_PipeCurrentToPrevIteration(thisCircuit, ThisCell)) break; // potential diff source
+        }
+    }
+
+    void Domain::SimulateRadialToCartesianInterface(CartesianCell &cell)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   Summer 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::vector<Direction> const Directions = {Direction::NegativeX, Direction::NegativeY, Direction::PositiveX, Direction::PositiveY};
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 Numerator = 0.0;
+        Real64 Denominator = 0.0;
+
+        //'add effects from this cell history
+        Numerator += cell.Temperature_PrevTimeStep;
+        ++Denominator;
+
+        //'add effects from outermost radial cell
+        auto &outerRadialCell = cell.PipeCellData.Soil.back();
+        Real64 OutermostRadialCellOuterRadius = outerRadialCell.OuterRadius;
+        Real64 OutermostRadialCellRadialCentroid = outerRadialCell.RadialCentroid;
+        Real64 OutermostRadialCellTemperature = outerRadialCell.Temperature;
+        Real64 Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) /
+                            (2.0 * DataGlobalConstants::Pi * cell.depth() * cell.Properties.Conductivity);
+        Numerator += (cell.Beta / Resistance) * OutermostRadialCellTemperature;
+        Denominator += (cell.Beta / Resistance);
+
+        //'add effects from neighboring Cartesian cells
+        for (auto &curDirection : Directions) {
+            Real64 AdiabaticMultiplier = 1.0;
+            Real64 NeighborTemp = 0.0;
+            this->EvaluateNeighborCharacteristics(cell, curDirection, NeighborTemp, Resistance, AdiabaticMultiplier);
+            Numerator += AdiabaticMultiplier * (cell.Beta / Resistance) * NeighborTemp;
+            Denominator += AdiabaticMultiplier * (cell.Beta / Resistance);
+        }
+
+        //'calculate the new temperature
+        cell.Temperature = Numerator / Denominator;
     }
 
     void Domain::DoOneTimeInitializations(EnergyPlusData &state, Circuit *thisCircuit)

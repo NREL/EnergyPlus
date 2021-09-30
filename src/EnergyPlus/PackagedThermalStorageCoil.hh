@@ -427,65 +427,6 @@ namespace PackagedThermalStorageCoil {
                     Optional<Real64 const> PartLoadRatio = _ // part load ratio (for single speed cycling unit)
     );
 
-    void GetTESCoilInput(EnergyPlusData &state);
-
-    void InitTESCoil(EnergyPlusData &state, int &TESCoilNum);
-
-    void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum);
-
-    void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum);
-
-    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
-
-    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
-
-    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
-
-    void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum);
-
-    void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, Real64 const PartLoadRatio);
-
-    void UpdateTEStorage(EnergyPlusData &state, int const TESCoilNum);
-
-    void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum);
-
-    void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum);
-
-    void ControlTESIceStorageTankCoil(EnergyPlusData &state,
-                                      std::string const &CoilName,
-                                      int CoilIndex,
-                                      std::string SystemType,
-                                      int const FanOpMode,
-                                      Real64 const DesiredOutletTemp,
-                                      Real64 const DesiredOutletHumRat,
-                                      Real64 &PartLoadFrac,
-                                      int &TESOpMode,
-                                      HVACUnitaryBypassVAV::DehumidControl &ControlType,
-                                      int &SensPLRIter,
-                                      int &SensPLRIterIndex,
-                                      int &SensPLRFail,
-                                      int &SensPLRFailIndex,
-                                      int &LatPLRIter,
-                                      int &LatPLRIterIndex,
-                                      int &LatPLRFail,
-                                      int &LatPLRFailIndex);
-
-    Real64 TESCoilResidualFunction(EnergyPlusData &state,
-                                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                   Array1D<Real64> const &Par  // par(1) = DX coil number
-    );
-
-    Real64 TESCoilHumRatResidualFunction(EnergyPlusData &state,
-                                         Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                         Array1D<Real64> const &Par  // par(1) = DX coil number
-    );
-
-    void UpdateColdWeatherProtection(EnergyPlusData &state, int const TESCoilNum);
-
-    void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum);
-
-    void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
-
     void GetTESCoilIndex(
         EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 

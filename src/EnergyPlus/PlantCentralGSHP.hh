@@ -427,10 +427,6 @@ namespace PlantCentralGSHP {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    void GetWrapperInput(EnergyPlusData &state);
-
-    void GetChillerHeaterInput(EnergyPlusData &state);
-
 } // namespace PlantCentralGSHP
 
 struct PlantCentralGSHPData : BaseGlobalStruct

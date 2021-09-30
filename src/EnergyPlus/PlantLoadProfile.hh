@@ -127,9 +127,6 @@ namespace PlantLoadProfile {
         void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
-    // This could be static inside the class
-    void GetPlantProfileInput(EnergyPlusData &state);
-
 } // namespace PlantLoadProfile
 
 struct PlantLoadProfileData : BaseGlobalStruct

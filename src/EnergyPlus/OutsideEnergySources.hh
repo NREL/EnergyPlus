@@ -117,10 +117,6 @@ namespace OutsideEnergySources {
         void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
-    void GetOutsideEnergySourcesInput(EnergyPlusData &state);
-
-    void InitSimVars(int EnergySourceNum, Real64 MyLoad);
-
 } // namespace OutsideEnergySources
 
 struct OutsideEnergySourcesData : BaseGlobalStruct

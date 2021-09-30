@@ -70,47 +70,12 @@ namespace PlantCondLoopOperation {
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
                                      bool &LoadDistributionWasPerformed);
 
-    void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK);
-
-    void GetOperationSchemeInput(EnergyPlusData &state);
-
-    void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
-                                           std::string &CurrentModuleObject, // for ease in renaming
-                                           int const NumSchemes,             // May be set here and passed on
-                                           int const LoopNum,                // May be set here and passed on
-                                           int const SchemeNum,              // May be set here and passed on
-                                           bool &ErrorsFound                 // May be set here and passed on
-    );
-
-    void FindDeltaTempRangeInput(EnergyPlusData &state,
-                                 std::string &CurrentModuleObject, // for ease in renaming
-                                 int const NumSchemes,             // May be set here and passed on
-                                 int const LoopNum,                // May be set here and passed on
-                                 int const SchemeNum,              // May be set here and passed on
-                                 bool &ErrorsFound                 // May be set here and passed on
-    );
-
-    void LoadEquipList(EnergyPlusData &state,
-                       int const LoopNum,   // May be set here and passed on
-                       int const SchemeNum, // May be set here and passed on
-                       int const ListNum,   // May be set here and passed on
-                       bool &ErrorsFound    // May be set here and passed on
-    );
-
     void FindCompSPInput(EnergyPlusData &state,
                          std::string &CurrentModuleObject, // for ease in renaming
                          int const NumSchemes,             // May be set here and passed on
                          int const LoopNum,                // May be set here and passed on
                          int const SchemeNum,              // May be set here and passed on
                          bool &ErrorsFound                 // May be set here and passed on
-    );
-
-    void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
-                                     std::string &CurrentModuleObject, // for ease in renaming
-                                     int const NumSchemes,             // May be set here and passed on
-                                     int const LoopNum,                // May be set here and passed on
-                                     int const SchemeNum,              // May be set here and passed on
-                                     bool &ErrorsFound                 // May be set here and passed on
     );
 
     void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration);
@@ -123,63 +88,7 @@ namespace PlantCondLoopOperation {
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand);
 
-    void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
-                                                       int const LoopNum,         // component topology
-                                                       int const CurOpSchemePtr,  // current active operation scheme
-                                                       int const CurEquipListPtr, // current equipment list
-                                                       Real64 &ChangeInLoad       // positive magnitude of load change
-    );
-
-    void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                       int const LoopNum,     // component topology
-                                       int const LoopSideNum, // component topology
-                                       int const BranchNum,   // component topology
-                                       int const CompNum,     // component topology
-                                       Real64 &ChangeInLoad   // positive magnitude of load change
-    );
-
-    void FindCompSPLoad(EnergyPlusData &state,
-                        int const LoopNum,
-                        int const LoopSideNum,
-                        int const BranchNum,
-                        int const CompNum,
-                        int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
-    );
-
-    void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
-                                        int const LoopNum,
-                                        int const LoopSideNum,
-                                        int const BranchNum,
-                                        int const CompNum,
-                                        int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
-                                        int const CurSchemePtr,
-                                        Real64 const LoopDemand,
-                                        Real64 &RemLoopDemand);
-
-    Real64 FindRangeVariable(EnergyPlusData &state,
-                             int const LoopNum,      // PlantLoop data structure loop counter
-                             int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
-                             int const CurSchemeType // identifier set in PlantData
-    );
-
-    void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
-
-    void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum);
-
-    void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
-
     void SetupPlantEMSActuators(EnergyPlusData &state);
-
-    void ActivateEMSControls(
-        EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
-
-    void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
-                                         int const LoopNum,
-                                         int const LoopSideNum,
-                                         int const BranchNum,
-                                         int const CompNum,
-                                         Real64 &ChangeInLoad // positive magnitude of load change
-    );
 
 } // namespace PlantCondLoopOperation
 

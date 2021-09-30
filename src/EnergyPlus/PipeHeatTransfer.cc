@@ -119,68 +119,6 @@ using DataPlant::TypeOf_PipeUnderground;
 
 // Functions
 
-PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
-{
-    // Process the input data for pipes if it hasn't been done already
-    if (state.dataPipeHT->GetPipeInputFlag) {
-        GetPipesHeatTransfer(state);
-        state.dataPipeHT->GetPipeInputFlag = false;
-    }
-    // Now look for this particular pipe in the list
-    for (auto &pipe : state.dataPipeHT->PipeHT) {
-        if (pipe.TypeOf == objectType && pipe.Name == objectName) {
-            return &pipe;
-        }
-    }
-    // If we didn't find it, fatal
-    ShowFatalError(state, "PipeHTFactory: Error getting inputs for pipe named: " + objectName);
-    // Shut up the compiler
-    return nullptr;
-}
-
-void PipeHTData::simulate(EnergyPlusData &state,
-                          [[maybe_unused]] const PlantLocation &calledFromLocation,
-                          bool const FirstHVACIteration,
-                          [[maybe_unused]] Real64 &CurLoad,
-                          [[maybe_unused]] bool const RunFlag)
-{
-    this->InitPipesHeatTransfer(state, FirstHVACIteration);
-    // make the calculations
-    for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= state.dataPipeHT->nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == iEnvrnPtr::GroundEnv) {
-                this->CalcBuriedPipeSoil(state);
-            } else {
-                this->CalcPipesHeatTransfer(state);
-            }
-        }
-        this->PushInnerTimeStepArrays();
-    }
-    // update variables
-    this->UpdatePipesHeatTransfer(state);
-    // update report variables
-    this->ReportPipesHeatTransfer(state);
-}
-
-void PipeHTData::PushInnerTimeStepArrays()
-{
-    if (this->EnvironmentPtr == iEnvrnPtr::GroundEnv) {
-        for (int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
-            for (int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
-                for (int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
-                    // This will store the old 'current' values as the new 'previous values'  This allows
-                    // us to use the previous time array as history terms in the equations
-                    this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex);
-                }
-            }
-        }
-    }
-    // Then update the Hanby near pipe model temperatures
-    this->PreviousFluidTemp = this->FluidTemp;
-    this->PreviousPipeTemp = this->PipeTemp;
-}
-
 void GetPipesHeatTransfer(EnergyPlusData &state)
 {
 
@@ -813,6 +751,68 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
     }
+}
+
+PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+{
+    // Process the input data for pipes if it hasn't been done already
+    if (state.dataPipeHT->GetPipeInputFlag) {
+        GetPipesHeatTransfer(state);
+        state.dataPipeHT->GetPipeInputFlag = false;
+    }
+    // Now look for this particular pipe in the list
+    for (auto &pipe : state.dataPipeHT->PipeHT) {
+        if (pipe.TypeOf == objectType && pipe.Name == objectName) {
+            return &pipe;
+        }
+    }
+    // If we didn't find it, fatal
+    ShowFatalError(state, "PipeHTFactory: Error getting inputs for pipe named: " + objectName);
+    // Shut up the compiler
+    return nullptr;
+}
+
+void PipeHTData::simulate(EnergyPlusData &state,
+                          [[maybe_unused]] const PlantLocation &calledFromLocation,
+                          bool const FirstHVACIteration,
+                          [[maybe_unused]] Real64 &CurLoad,
+                          [[maybe_unused]] bool const RunFlag)
+{
+    this->InitPipesHeatTransfer(state, FirstHVACIteration);
+    // make the calculations
+    for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= state.dataPipeHT->nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
+        {
+            auto const SELECT_CASE_var(this->EnvironmentPtr);
+            if (SELECT_CASE_var == iEnvrnPtr::GroundEnv) {
+                this->CalcBuriedPipeSoil(state);
+            } else {
+                this->CalcPipesHeatTransfer(state);
+            }
+        }
+        this->PushInnerTimeStepArrays();
+    }
+    // update variables
+    this->UpdatePipesHeatTransfer(state);
+    // update report variables
+    this->ReportPipesHeatTransfer(state);
+}
+
+void PipeHTData::PushInnerTimeStepArrays()
+{
+    if (this->EnvironmentPtr == iEnvrnPtr::GroundEnv) {
+        for (int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
+            for (int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
+                for (int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
+                    // This will store the old 'current' values as the new 'previous values'  This allows
+                    // us to use the previous time array as history terms in the equations
+                    this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex);
+                }
+            }
+        }
+    }
+    // Then update the Hanby near pipe model temperatures
+    this->PreviousFluidTemp = this->FluidTemp;
+    this->PreviousPipeTemp = this->PipeTemp;
 }
 
 void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,

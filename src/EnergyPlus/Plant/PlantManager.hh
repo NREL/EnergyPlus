@@ -97,10 +97,6 @@ namespace PlantManager {
 
     void SetupInitialPlantCallingOrder(EnergyPlusData &state);
 
-    void RevisePlantCallingOrder(EnergyPlusData &state);
-
-    int FindLoopSideInCallingOrder(EnergyPlusData &state, int LoopNum, int LoopSide);
-
     void SetupBranchControlTypes(EnergyPlusData &state);
 
     void CheckIfAnyPlant(EnergyPlusData &state);

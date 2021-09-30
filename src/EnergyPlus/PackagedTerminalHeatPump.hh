@@ -374,18 +374,6 @@ namespace PackagedTerminalHeatPump {
 
     void SizePTUnit(EnergyPlusData &state, int PTUnitNum);
 
-    void ControlPTUnitOutput(EnergyPlusData &state,
-                             int PTUnitNum,             // Unit index in fan coil array
-                             bool FirstHVACIteration,   // flag for 1st HVAC iteration in the time step
-                             int OpMode,                // operating mode: CycFanCycCoil | ContFanCycCoil
-                             Real64 QZnReq,             // cooling or heating output needed by zone [W]
-                             int ZoneNum,               // Index to zone number
-                             Real64 &PartLoadFrac,      // unit part load fraction
-                             Real64 &OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                             Real64 &SupHeaterLoad,     // Supplemental heater load [W]
-                             bool &HXUnitOn             // flag to enable heat exchanger
-    );
-
     void CalcPTUnit(EnergyPlusData &state,
                     int PTUnitNum,             // Unit index in fan coil array
                     bool FirstHVACIteration,   // flag for 1st HVAC iteration in the time step
@@ -409,11 +397,6 @@ namespace PackagedTerminalHeatPump {
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     );
 
-    Real64 SupSATResidual(EnergyPlusData &state,
-                          Real64 &TempSupHeater,     // supplemental heater load at maximum SAT
-                          Array1D<Real64> const &Par // par(1) = PTUnitNum
-    );
-
     Real64 PLRResidual(EnergyPlusData &state,
                        Real64 PartLoadFrac,       // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1D<Real64> const &Par // par(1) = PTUnitNum
@@ -425,8 +408,6 @@ namespace PackagedTerminalHeatPump {
                            Real64 &OnOffAirFlowRatio // ratio of compressor ON airflow to average airflow over timestep
     );
 
-    void ReportPTUnit(EnergyPlusData &state, int PTUnitNum); // number of the current AC unit being simulated
-
     int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
 
     int GetPTUnitOutAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
@@ -434,8 +415,6 @@ namespace PackagedTerminalHeatPump {
     int GetPTUnitReturnAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
 
     int GetPTUnitMixedAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
-
-    //******************************************************************************
 
     void SimVariableSpeedHP(EnergyPlusData &state,
                             int PTUnitNum,             // number of the current engine driven Heat Pump being simulated
@@ -447,9 +426,6 @@ namespace PackagedTerminalHeatPump {
                             int OpMode,                // operating mode: CycFanCycCoil | ContFanCycCoil
                             bool HXUnitOn              // flag to enable heat exchanger
     );
-
-    //******************************************************************************
-    //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
                            int PTUnitNum,             // Unit index in fan coil array
@@ -467,23 +443,15 @@ namespace PackagedTerminalHeatPump {
                            bool HXUnitOn              // flag to enable heat exchanger
     );
 
-    //******************************************************************************
-
-    //******************************************************************************
-
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
                                Real64 PartLoadFrac,       // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par // par(1) = FurnaceNum
     );
 
-    //******************************************************************************
-
     Real64 VSHPSpeedResidual(EnergyPlusData &state,
                              Real64 SpeedRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                              Array1D<Real64> const &Par // par(1) = MSHPNum
     );
-
-    //******************************************************************************
 
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               int PTUnitNum,             // Unit index in fan coil array

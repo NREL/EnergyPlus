@@ -91,77 +91,6 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
 
 std::string const ComponentClassName("HeatExchanger:FluidToFluid");
 
-PlantComponent *HeatExchangerStruct::factory(EnergyPlusData &state, std::string const &objectName)
-{
-    // Process the input data for heat exchangers if it hasn't been done already
-    if (state.dataPlantHXFluidToFluid->GetInput) {
-        GetFluidHeatExchangerInput(state);
-        state.dataPlantHXFluidToFluid->GetInput = false;
-    }
-    // Now look for this particular object
-    for (auto &obj : state.dataPlantHXFluidToFluid->FluidHX) {
-        if (obj.Name == objectName) {
-            return &obj;
-        }
-    }
-    // If we didn't find it, fatal
-    ShowFatalError(state, "LocalPlantFluidHXFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-    // Shut up the compiler
-    return nullptr; // LCOV_EXCL_LINE
-}
-
-void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
-{
-    this->initialize(state);
-}
-
-void HeatExchangerStruct::getDesignCapacities(
-    EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
-{
-    if (calledFromLocation.loopNum == this->DemandSideLoop.loopNum) {
-        MinLoad = 0.0;
-        MaxLoad = this->DemandSideLoop.MaxLoad;
-        OptLoad = this->DemandSideLoop.MaxLoad * 0.9;
-    } else if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
-        this->size(state); // only call sizing from the loop that sizes are based on
-        MinLoad = 0.0;
-        MaxLoad = this->SupplySideLoop.MaxLoad;
-        OptLoad = this->SupplySideLoop.MaxLoad * 0.9;
-    }
-}
-
-void HeatExchangerStruct::simulate(EnergyPlusData &state,
-                                   const PlantLocation &calledFromLocation,
-                                   bool const FirstHVACIteration,
-                                   Real64 &CurLoad,
-                                   [[maybe_unused]] bool const RunFlag)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Griffith
-    //       DATE WRITTEN   November 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Main entry point and simulation manager for heat exchanger
-
-    this->initialize(state);
-
-    // for op scheme led HXs, only call controls if called from Loop Supply Side
-    if ((this->ControlMode == iCtrlType::OperationSchemeModulated) || (this->ControlMode == iCtrlType::OperationSchemeOnOff)) {
-        if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
-            this->control(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
-        }
-    } else {
-        this->control(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
-    }
-
-    this->calculate(state,
-                    state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate,
-                    state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate);
-}
-
 void GetFluidHeatExchangerInput(EnergyPlusData &state)
 {
 
@@ -527,6 +456,77 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     if (ErrorsFound) {
         ShowFatalError(state, std::string{RoutineName} + "Errors found in processing " + cCurrentModuleObject + " input.");
     }
+}
+
+PlantComponent *HeatExchangerStruct::factory(EnergyPlusData &state, std::string const &objectName)
+{
+    // Process the input data for heat exchangers if it hasn't been done already
+    if (state.dataPlantHXFluidToFluid->GetInput) {
+        GetFluidHeatExchangerInput(state);
+        state.dataPlantHXFluidToFluid->GetInput = false;
+    }
+    // Now look for this particular object
+    for (auto &obj : state.dataPlantHXFluidToFluid->FluidHX) {
+        if (obj.Name == objectName) {
+            return &obj;
+        }
+    }
+    // If we didn't find it, fatal
+    ShowFatalError(state, "LocalPlantFluidHXFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+    // Shut up the compiler
+    return nullptr; // LCOV_EXCL_LINE
+}
+
+void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+{
+    this->initialize(state);
+}
+
+void HeatExchangerStruct::getDesignCapacities(
+    EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+{
+    if (calledFromLocation.loopNum == this->DemandSideLoop.loopNum) {
+        MinLoad = 0.0;
+        MaxLoad = this->DemandSideLoop.MaxLoad;
+        OptLoad = this->DemandSideLoop.MaxLoad * 0.9;
+    } else if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
+        this->size(state); // only call sizing from the loop that sizes are based on
+        MinLoad = 0.0;
+        MaxLoad = this->SupplySideLoop.MaxLoad;
+        OptLoad = this->SupplySideLoop.MaxLoad * 0.9;
+    }
+}
+
+void HeatExchangerStruct::simulate(EnergyPlusData &state,
+                                   const PlantLocation &calledFromLocation,
+                                   bool const FirstHVACIteration,
+                                   Real64 &CurLoad,
+                                   [[maybe_unused]] bool const RunFlag)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         B. Griffith
+    //       DATE WRITTEN   November 2012
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Main entry point and simulation manager for heat exchanger
+
+    this->initialize(state);
+
+    // for op scheme led HXs, only call controls if called from Loop Supply Side
+    if ((this->ControlMode == iCtrlType::OperationSchemeModulated) || (this->ControlMode == iCtrlType::OperationSchemeOnOff)) {
+        if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
+            this->control(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
+        }
+    } else {
+        this->control(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
+    }
+
+    this->calculate(state,
+                    state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate,
+                    state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate);
 }
 
 void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)

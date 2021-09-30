@@ -96,6 +96,605 @@ namespace EnergyPlus::PlantCentralGSHP {
 //  which in turn calls the electric PlantCentralGSHP model. The PlantCentralGSHP model is based on
 //  polynomial fits of chiller/heater or heat pump performance data.
 
+void GetChillerHeaterInput(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR:          Kyung Tae Yun, Mississippi State University
+    //       DATE WRITTEN:    Feb 2013
+
+    // PURPOSE OF THIS SUBROUTINE:
+    //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
+
+    bool CHErrorsFound(false);         // True when input errors are found
+    bool FoundNegValue(false);         // Used to evaluate PLFFPLR curve objects
+    int NumAlphas;                     // Number of elements in the alpha array
+    int NumNums;                       // Number of elements in the numeric array
+    int IOStat;                        // IO Status when calling get input subroutine
+    Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
+
+    state.dataIPShortCut->cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
+    state.dataPlantCentralGSHP->numChillerHeaters =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+
+    if (state.dataPlantCentralGSHP->numChillerHeaters <= 0) {
+        ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+        CHErrorsFound = true;
+    }
+
+    // Allocate temporary ChillerHeater and ChillerHeaterReport arrays
+    if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) state.dataPlantCentralGSHP->ChillerHeater.deallocate();
+    state.dataPlantCentralGSHP->ChillerHeater.allocate(state.dataPlantCentralGSHP->numChillerHeaters);
+
+    // Load arrays with electric EIR chiller data
+    for (int ChillerHeaterNum = 1; ChillerHeaterNum <= state.dataPlantCentralGSHP->numChillerHeaters; ++ChillerHeaterNum) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 ChillerHeaterNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = state.dataIPShortCut->cAlphaArgs(4);
+
+        // Performance curves
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX =
+            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX == 0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX =
+            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX == 0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX =
+            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX == 0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = state.dataIPShortCut->cAlphaArgs(8);
+
+        // Performance curves
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX =
+            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9));
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX == 0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX =
+            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10));
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX == 0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX =
+            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX == 0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
+            CHErrorsFound = true;
+        }
+
+        if (state.dataIPShortCut->cAlphaArgs(2) == "CONSTANTFLOW") {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = false;
+        } else if (state.dataIPShortCut->cAlphaArgs(2) == "VARIABLEFLOW") {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = false;
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = true;
+        } else { // Assume a constant flow chiller if none is specified
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = false;
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+            ShowContinueError(state, "simulation assumes CONSTANTFLOW and continues..");
+        }
+
+        if (ChillerHeaterNum > 1) {
+            if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow !=
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum - 1).ConstantFlow) {
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
+                ShowWarningError(state,
+                                 "Water flow mode is different from the other chiller heater(s) " + state.dataIPShortCut->cCurrentModuleObject + '=' +
+                                     state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+                ShowContinueError(state, "Simulation assumes CONSTANTFLOW and continues..");
+            }
+        }
+
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondenserType = iCondType::WaterCooled;
+        } else {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
+            ShowContinueError(state, "Valid entries is WaterCooled");
+            CHErrorsFound = true;
+        }
+
+        // Chiller rated performance data
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling = state.dataIPShortCut->rNumericArgs(1);
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling == DataSizing::AutoSize) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized = true;
+        }
+        if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state,
+                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
+            CHErrorsFound = true;
+        }
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling = state.dataIPShortCut->rNumericArgs(2);
+        if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state,
+                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling = state.dataIPShortCut->rNumericArgs(3);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling = state.dataIPShortCut->rNumericArgs(4);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling = state.dataIPShortCut->rNumericArgs(5);
+
+        // Reference Heating Mode Ratios for Capacity and Power
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = state.dataIPShortCut->rNumericArgs(6);
+        if (state.dataIPShortCut->rNumericArgs(6) == 0.0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state,
+                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)));
+            CHErrorsFound = true;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio = state.dataIPShortCut->rNumericArgs(7);
+        if (state.dataIPShortCut->rNumericArgs(7) == 0.0) {
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state,
+                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
+            CHErrorsFound = true;
+        }
+
+        if (!state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapClgHtg =
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio *
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling;
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =
+                (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling /
+                 state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling) *
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio;
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPClgHtg =
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapClgHtg /
+                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
+        }
+
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg = state.dataIPShortCut->rNumericArgs(8);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg = state.dataIPShortCut->rNumericArgs(9);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg = state.dataIPShortCut->rNumericArgs(10);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(11);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRate = state.dataIPShortCut->rNumericArgs(12);
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRate == DataSizing::AutoSize) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRateWasAutoSized = true;
+        }
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRate = state.dataIPShortCut->rNumericArgs(13);
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRate == DataSizing::AutoSize) {
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRateWasAutoSized = true;
+        }
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).DesignHotWaterVolFlowRate = state.dataIPShortCut->rNumericArgs(14);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff = state.dataIPShortCut->rNumericArgs(15);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OptPartLoadRatCooling = state.dataIPShortCut->rNumericArgs(16);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OptPartLoadRatClgHtg = state.dataIPShortCut->rNumericArgs(17);
+        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac = state.dataIPShortCut->rNumericArgs(18);
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac <= 0.0)
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac = 1.0;
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff < 0.0 ||
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff > 1.0) {
+            ShowSevereError(state, "GetCurveInput: For " + state.dataIPShortCut->cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->rNumericArgs(14)));
+            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be greater than or equal to zero");
+            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be less than or equal to one");
+            CHErrorsFound = true;
+        }
+
+        // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX > 0) {
+            Real64 CurveVal = CurveManager::CurveValue(state,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
+            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
+                ShowContinueError(state,
+                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
+                                      state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX > 0) {
+            Real64 CurveVal = CurveManager::CurveValue(state,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
+            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
+                ShowContinueError(state,
+                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
+                                      state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
+            Real64 CurveVal =
+                CurveManager::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, 1.0);
+
+            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
+                ShowContinueError(state,
+                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
+                                      state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
+            FoundNegValue = false;
+            for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
+                Real64 CurveValTmp = CurveManager::CurveValue(
+                    state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, double(CurveCheck / 10.0));
+                if (CurveValTmp < 0.0) FoundNegValue = true;
+                CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
+            }
+            if (FoundNegValue) {
+                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
+                ShowContinueError(state, "for " + state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
+                ShowContinueError(state, "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
+
+                ShowContinueError(state, fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ",")));
+
+                CHErrorsFound = true;
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX > 0) {
+            Real64 CurveVal = CurveManager::CurveValue(state,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
+            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
+                ShowContinueError(state,
+                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
+                                      state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX > 0) {
+            Real64 CurveVal = CurveManager::CurveValue(state,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
+                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
+            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
+                ShowContinueError(state,
+                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
+                                      state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
+            Real64 CurveVal =
+                CurveManager::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, 1.0);
+
+            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
+                ShowContinueError(state,
+                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
+                                      state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
+            }
+        }
+
+        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
+            FoundNegValue = false;
+            for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
+                Real64 CurveValTmp = CurveManager::CurveValue(
+                    state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, double(CurveCheck / 10.0));
+                if (CurveValTmp < 0.0) FoundNegValue = true;
+                CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
+            }
+            if (FoundNegValue) {
+                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
+                ShowContinueError(state, "for " + state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
+                ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
+
+                const auto curve_output = fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
+                ShowContinueError(state, curve_output);
+
+                CHErrorsFound = true;
+            }
+        }
+
+        CurveManager::GetCurveMinMaxValues(state,
+                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
+                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatClgHtg,
+                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatClgHtg);
+
+        CurveManager::GetCurveMinMaxValues(state,
+                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
+                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatCooling,
+                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatCooling);
+    }
+
+    if (CHErrorsFound) {
+        ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+    }
+}
+
+void GetWrapperInput(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR:          Yunzhi Huang and Daeho Kang, PNNL
+    //       DATE WRITTEN:    Feb 2013
+
+    // PURPOSE OF THIS SUBROUTINE:
+    //  This routine will get the input required by the Wrapper model.
+
+    bool ErrorsFound(false); // True when input errors are found
+    int NumAlphas;           // Number of elements in the alpha array
+    int NumNums;             // Number of elements in the numeric array
+    int IOStat;              // IO Status when calling get input subroutine
+
+    state.dataIPShortCut->cCurrentModuleObject = "CentralHeatPumpSystem";
+    state.dataPlantCentralGSHP->numWrappers =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+
+    if (state.dataPlantCentralGSHP->numWrappers <= 0) {
+        ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+    }
+
+    state.dataPlantCentralGSHP->Wrapper.allocate(state.dataPlantCentralGSHP->numWrappers);
+
+    // Load arrays with electric EIR chiller data
+    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 WrapperNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+
+        // initialize nth chiller heater index (including identical units) for current wrapper
+        int NumChHtrPerWrapper = 0;
+        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
+            continue;
+        }
+
+        if (state.dataIPShortCut->cAlphaArgs(2) == "SMARTMIXING") {
+            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode = iCondType::SmartMixing;
+        }
+
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWInletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(3),
+                                                ErrorsFound,
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(4),
+                                                ErrorsFound,
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state,
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(3),
+                                           state.dataIPShortCut->cAlphaArgs(4),
+                                           "Chilled Water Nodes");
+
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEInletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(5),
+                                                ErrorsFound,
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Secondary,
+                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(6),
+                                                ErrorsFound,
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Secondary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state,
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(5),
+                                           state.dataIPShortCut->cAlphaArgs(6),
+                                           "GLHE Nodes");
+
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWInletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(7),
+                                                ErrorsFound,
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Tertiary,
+                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(8),
+                                                ErrorsFound,
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Tertiary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state,
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(7),
+                                           state.dataIPShortCut->cAlphaArgs(8),
+                                           "Hot Water Nodes");
+
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).AncillaryPower = state.dataIPShortCut->rNumericArgs(1);
+        if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+            state.dataPlantCentralGSHP->Wrapper(WrapperNum).SchedPtr = 0;
+        } else {
+            state.dataPlantCentralGSHP->Wrapper(WrapperNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
+        }
+
+        int NumberOfComp = (NumAlphas - 9) / 3;
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).NumOfComp = NumberOfComp;
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp.allocate(NumberOfComp);
+
+        if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).NumOfComp == 0) {
+            ShowSevereError(state,
+                            "GetWrapperInput: No component names on " + state.dataIPShortCut->cCurrentModuleObject + '=' +
+                                state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name);
+            ErrorsFound = true;
+        } else {
+            int Comp = 0;
+            for (int loop = 10; loop <= NumAlphas; loop += 3) {
+                ++Comp;
+                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType =
+                    state.dataIPShortCut->cAlphaArgs(loop);
+                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName = state.dataIPShortCut->cAlphaArgs(loop + 1);
+                if (state.dataIPShortCut->lAlphaFieldBlanks(loop + 2)) {
+                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr =
+                        ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(loop + 2));
+                }
+                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum =
+                    state.dataIPShortCut->rNumericArgs(1 + Comp);
+                if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType ==
+                    "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
+
+                    // count number of chiller heaters (including identical units) for current wrapper
+                    if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum > 1) {
+                        NumChHtrPerWrapper += state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum;
+                    } else {
+                        ++NumChHtrPerWrapper;
+                    }
+
+                    // count total number of chiller heaters (not including identical units) for ALL wrappers
+                    ++state.dataPlantCentralGSHP->numChillerHeaters;
+                }
+            }
+
+            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeaterNums = NumChHtrPerWrapper;
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state,
+                           "GetWrapperInput: Invalid " + state.dataIPShortCut->cCurrentModuleObject +
+                               " Input, preceding condition(s) cause termination.");
+        }
+
+        // ALLOCATE ARRAYS
+        if ((state.dataPlantCentralGSHP->numChillerHeaters == 0) &&
+            (state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode == iCondType::SmartMixing)) {
+            ShowFatalError(state,
+                           "SmartMixing Control Mode in object " + state.dataIPShortCut->cCurrentModuleObject + " : " +
+                               state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name +
+                               " need to apply to ChillerHeaterPerformance:Electric:EIR object(s).");
+        }
+    }
+
+    if (state.dataPlantCentralGSHP->numChillerHeaters > 0) {
+
+        for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
+            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeater.allocate(state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeaterNums);
+        }
+        GetChillerHeaterInput(state);
+    }
+
+    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
+        int ChillerHeaterNum = 0; // initialize nth chiller heater index (including identical units) for current wrapper
+        for (int Comp = 1; Comp <= state.dataPlantCentralGSHP->Wrapper(WrapperNum).NumOfComp; ++Comp) {
+            if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType ==
+                "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
+                std::string CompName = state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName;
+                int CompIndex = UtilityRoutines::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
+                // User may enter invalid name rather than selecting one from the object list
+                if (CompIndex <= 0) {
+                    ShowSevereError(state, "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + std::string{CompName});
+                    ShowContinueError(state, "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list.");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
+                }
+                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectIndex = CompIndex;
+                if (state.dataPlantCentralGSHP->ChillerHeater(CompIndex).VariableFlow) {
+                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).VariableFlowCH = true;
+                }
+                for (int i_CH = 1; i_CH <= state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum; ++i_CH) {
+                    // increment nth chiller heater index (including identical units) for current wrapper
+                    ++ChillerHeaterNum;
+                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum) =
+                        state.dataPlantCentralGSHP->ChillerHeater(CompIndex);
+                }
+            }
+        }
+    }
+
+    // Release memory from temporary arrays; values now copied into their associated Wrapper in above loop
+    if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) state.dataPlantCentralGSHP->ChillerHeater.deallocate();
+
+    // Set up output variables
+    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
+    } // End of wrapper count
+}
+
 PlantComponent *WrapperSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data
@@ -545,246 +1144,6 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     }
 }
 
-void GetWrapperInput(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR:          Yunzhi Huang and Daeho Kang, PNNL
-    //       DATE WRITTEN:    Feb 2013
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //  This routine will get the input required by the Wrapper model.
-
-    bool ErrorsFound(false); // True when input errors are found
-    int NumAlphas;           // Number of elements in the alpha array
-    int NumNums;             // Number of elements in the numeric array
-    int IOStat;              // IO Status when calling get input subroutine
-
-    state.dataIPShortCut->cCurrentModuleObject = "CentralHeatPumpSystem";
-    state.dataPlantCentralGSHP->numWrappers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
-
-    if (state.dataPlantCentralGSHP->numWrappers <= 0) {
-        ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
-    }
-
-    state.dataPlantCentralGSHP->Wrapper.allocate(state.dataPlantCentralGSHP->numWrappers);
-
-    // Load arrays with electric EIR chiller data
-    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 WrapperNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 _,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-
-        // initialize nth chiller heater index (including identical units) for current wrapper
-        int NumChHtrPerWrapper = 0;
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
-            continue;
-        }
-
-        if (state.dataIPShortCut->cAlphaArgs(2) == "SMARTMIXING") {
-            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode = iCondType::SmartMixing;
-        }
-
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(3),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Primary,
-                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(4),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Primary,
-                                                DataLoopNode::ObjectIsNotParent);
-        BranchNodeConnections::TestCompSet(state,
-                                           state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(3),
-                                           state.dataIPShortCut->cAlphaArgs(4),
-                                           "Chilled Water Nodes");
-
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(5),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Secondary,
-                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(6),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Secondary,
-                                                DataLoopNode::ObjectIsNotParent);
-        BranchNodeConnections::TestCompSet(state,
-                                           state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(5),
-                                           state.dataIPShortCut->cAlphaArgs(6),
-                                           "GLHE Nodes");
-
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(7),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Tertiary,
-                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(8),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Tertiary,
-                                                DataLoopNode::ObjectIsNotParent);
-        BranchNodeConnections::TestCompSet(state,
-                                           state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaArgs(7),
-                                           state.dataIPShortCut->cAlphaArgs(8),
-                                           "Hot Water Nodes");
-
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).AncillaryPower = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-            state.dataPlantCentralGSHP->Wrapper(WrapperNum).SchedPtr = 0;
-        } else {
-            state.dataPlantCentralGSHP->Wrapper(WrapperNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
-        }
-
-        int NumberOfComp = (NumAlphas - 9) / 3;
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).NumOfComp = NumberOfComp;
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp.allocate(NumberOfComp);
-
-        if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).NumOfComp == 0) {
-            ShowSevereError(state,
-                            "GetWrapperInput: No component names on " + state.dataIPShortCut->cCurrentModuleObject + '=' +
-                                state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name);
-            ErrorsFound = true;
-        } else {
-            int Comp = 0;
-            for (int loop = 10; loop <= NumAlphas; loop += 3) {
-                ++Comp;
-                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType =
-                    state.dataIPShortCut->cAlphaArgs(loop);
-                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName = state.dataIPShortCut->cAlphaArgs(loop + 1);
-                if (state.dataIPShortCut->lAlphaFieldBlanks(loop + 2)) {
-                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                } else {
-                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr =
-                        ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(loop + 2));
-                }
-                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum =
-                    state.dataIPShortCut->rNumericArgs(1 + Comp);
-                if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType ==
-                    "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
-
-                    // count number of chiller heaters (including identical units) for current wrapper
-                    if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum > 1) {
-                        NumChHtrPerWrapper += state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum;
-                    } else {
-                        ++NumChHtrPerWrapper;
-                    }
-
-                    // count total number of chiller heaters (not including identical units) for ALL wrappers
-                    ++state.dataPlantCentralGSHP->numChillerHeaters;
-                }
-            }
-
-            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeaterNums = NumChHtrPerWrapper;
-        }
-
-        if (ErrorsFound) {
-            ShowFatalError(state,
-                           "GetWrapperInput: Invalid " + state.dataIPShortCut->cCurrentModuleObject +
-                               " Input, preceding condition(s) cause termination.");
-        }
-
-        // ALLOCATE ARRAYS
-        if ((state.dataPlantCentralGSHP->numChillerHeaters == 0) &&
-            (state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode == iCondType::SmartMixing)) {
-            ShowFatalError(state,
-                           "SmartMixing Control Mode in object " + state.dataIPShortCut->cCurrentModuleObject + " : " +
-                               state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name +
-                               " need to apply to ChillerHeaterPerformance:Electric:EIR object(s).");
-        }
-    }
-
-    if (state.dataPlantCentralGSHP->numChillerHeaters > 0) {
-
-        for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeater.allocate(state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeaterNums);
-        }
-        GetChillerHeaterInput(state);
-    }
-
-    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-        int ChillerHeaterNum = 0; // initialize nth chiller heater index (including identical units) for current wrapper
-        for (int Comp = 1; Comp <= state.dataPlantCentralGSHP->Wrapper(WrapperNum).NumOfComp; ++Comp) {
-            if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType ==
-                "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
-                std::string CompName = state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName;
-                int CompIndex = UtilityRoutines::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
-                // User may enter invalid name rather than selecting one from the object list
-                if (CompIndex <= 0) {
-                    ShowSevereError(state, "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + std::string{CompName});
-                    ShowContinueError(state, "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list.");
-                    ShowFatalError(state, "Program terminates due to preceding condition.");
-                }
-                state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectIndex = CompIndex;
-                if (state.dataPlantCentralGSHP->ChillerHeater(CompIndex).VariableFlow) {
-                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).VariableFlowCH = true;
-                }
-                for (int i_CH = 1; i_CH <= state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum; ++i_CH) {
-                    // increment nth chiller heater index (including identical units) for current wrapper
-                    ++ChillerHeaterNum;
-                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum) =
-                        state.dataPlantCentralGSHP->ChillerHeater(CompIndex);
-                }
-            }
-        }
-    }
-
-    // Release memory from temporary arrays; values now copied into their associated Wrapper in above loop
-    if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) state.dataPlantCentralGSHP->ChillerHeater.deallocate();
-
-    // Set up output variables
-    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-    } // End of wrapper count
-}
-
 void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
@@ -1154,365 +1513,6 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
         } // End of individual chiller heater count for current wrapper
 
     } // End of individual chiller heater output
-}
-
-void GetChillerHeaterInput(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR:          Kyung Tae Yun, Mississippi State University
-    //       DATE WRITTEN:    Feb 2013
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
-
-    bool CHErrorsFound(false);         // True when input errors are found
-    bool FoundNegValue(false);         // Used to evaluate PLFFPLR curve objects
-    int NumAlphas;                     // Number of elements in the alpha array
-    int NumNums;                       // Number of elements in the numeric array
-    int IOStat;                        // IO Status when calling get input subroutine
-    Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
-
-    state.dataIPShortCut->cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-    state.dataPlantCentralGSHP->numChillerHeaters =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
-
-    if (state.dataPlantCentralGSHP->numChillerHeaters <= 0) {
-        ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
-        CHErrorsFound = true;
-    }
-
-    // Allocate temporary ChillerHeater and ChillerHeaterReport arrays
-    if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) state.dataPlantCentralGSHP->ChillerHeater.deallocate();
-    state.dataPlantCentralGSHP->ChillerHeater.allocate(state.dataPlantCentralGSHP->numChillerHeaters);
-
-    // Load arrays with electric EIR chiller data
-    for (int ChillerHeaterNum = 1; ChillerHeaterNum <= state.dataPlantCentralGSHP->numChillerHeaters; ++ChillerHeaterNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 ChillerHeaterNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 _,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = state.dataIPShortCut->cAlphaArgs(4);
-
-        // Performance curves
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = state.dataIPShortCut->cAlphaArgs(8);
-
-        // Performance curves
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
-            CHErrorsFound = true;
-        }
-
-        if (state.dataIPShortCut->cAlphaArgs(2) == "CONSTANTFLOW") {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = false;
-        } else if (state.dataIPShortCut->cAlphaArgs(2) == "VARIABLEFLOW") {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = false;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = true;
-        } else { // Assume a constant flow chiller if none is specified
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = false;
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-            ShowContinueError(state, "simulation assumes CONSTANTFLOW and continues..");
-        }
-
-        if (ChillerHeaterNum > 1) {
-            if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow !=
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum - 1).ConstantFlow) {
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
-                ShowWarningError(state,
-                                 "Water flow mode is different from the other chiller heater(s) " + state.dataIPShortCut->cCurrentModuleObject + '=' +
-                                     state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Simulation assumes CONSTANTFLOW and continues..");
-            }
-        }
-
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondenserType = iCondType::WaterCooled;
-        } else {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
-            ShowContinueError(state, "Valid entries is WaterCooled");
-            CHErrorsFound = true;
-        }
-
-        // Chiller rated performance data
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling == DataSizing::AutoSize) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized = true;
-        }
-        if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state,
-                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            CHErrorsFound = true;
-        }
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state,
-                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling = state.dataIPShortCut->rNumericArgs(3);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling = state.dataIPShortCut->rNumericArgs(4);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling = state.dataIPShortCut->rNumericArgs(5);
-
-        // Reference Heating Mode Ratios for Capacity and Power
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = state.dataIPShortCut->rNumericArgs(6);
-        if (state.dataIPShortCut->rNumericArgs(6) == 0.0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state,
-                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio = state.dataIPShortCut->rNumericArgs(7);
-        if (state.dataIPShortCut->rNumericArgs(7) == 0.0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state,
-                              format("Entered in {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
-            CHErrorsFound = true;
-        }
-
-        if (!state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapClgHtg =
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio *
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =
-                (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling /
-                 state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling) *
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPClgHtg =
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapClgHtg /
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg = state.dataIPShortCut->rNumericArgs(8);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg = state.dataIPShortCut->rNumericArgs(9);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg = state.dataIPShortCut->rNumericArgs(10);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(11);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRate = state.dataIPShortCut->rNumericArgs(12);
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRate == DataSizing::AutoSize) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRateWasAutoSized = true;
-        }
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRate = state.dataIPShortCut->rNumericArgs(13);
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRate == DataSizing::AutoSize) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRateWasAutoSized = true;
-        }
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).DesignHotWaterVolFlowRate = state.dataIPShortCut->rNumericArgs(14);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff = state.dataIPShortCut->rNumericArgs(15);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OptPartLoadRatCooling = state.dataIPShortCut->rNumericArgs(16);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OptPartLoadRatClgHtg = state.dataIPShortCut->rNumericArgs(17);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac = state.dataIPShortCut->rNumericArgs(18);
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac <= 0.0)
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac = 1.0;
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff < 0.0 ||
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff > 1.0) {
-            ShowSevereError(state, "GetCurveInput: For " + state.dataIPShortCut->cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->rNumericArgs(14)));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be greater than or equal to zero");
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be less than or equal to one");
-            CHErrorsFound = true;
-        }
-
-        // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
-                                      state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
-                                      state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-            Real64 CurveVal =
-                CurveManager::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, 1.0);
-
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
-                                      state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-            FoundNegValue = false;
-            for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                Real64 CurveValTmp = CurveManager::CurveValue(
-                    state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, double(CurveCheck / 10.0));
-                if (CurveValTmp < 0.0) FoundNegValue = true;
-                CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
-            }
-            if (FoundNegValue) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
-                ShowContinueError(state, "for " + state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
-                ShowContinueError(state, "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-
-                ShowContinueError(state, fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ",")));
-
-                CHErrorsFound = true;
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
-                                      state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
-                                      state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-            Real64 CurveVal =
-                CurveManager::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, 1.0);
-
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  "(+ or - 10%) at reference conditions for " + state.dataIPShortCut->cCurrentModuleObject + "= " +
-                                      state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-            FoundNegValue = false;
-            for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                Real64 CurveValTmp = CurveManager::CurveValue(
-                    state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, double(CurveCheck / 10.0));
-                if (CurveValTmp < 0.0) FoundNegValue = true;
-                CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
-            }
-            if (FoundNegValue) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
-                ShowContinueError(state, "for " + state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
-                ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-
-                const auto curve_output = fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
-                ShowContinueError(state, curve_output);
-
-                CHErrorsFound = true;
-            }
-        }
-
-        CurveManager::GetCurveMinMaxValues(state,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatClgHtg,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatClgHtg);
-
-        CurveManager::GetCurveMinMaxValues(state,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatCooling,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatCooling);
-    }
-
-    if (CHErrorsFound) {
-        ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
-    }
 }
 
 void WrapperSpecs::initialize(EnergyPlusData &state,

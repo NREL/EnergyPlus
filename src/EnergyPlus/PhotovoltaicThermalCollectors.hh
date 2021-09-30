@@ -187,8 +187,6 @@ namespace PhotovoltaicThermalCollectors {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    void GetPVTcollectorsInput(EnergyPlusData &state);
-
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
     int getPVTindexFromName(EnergyPlusData &state, std::string_view name);

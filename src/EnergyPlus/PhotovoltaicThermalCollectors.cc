@@ -107,44 +107,6 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
-    {
-        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
-            GetPVTcollectorsInput(state);
-            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
-        }
-
-        for (auto &thisComp : state.dataPhotovoltaicThermalCollector->PVT) {
-            if (thisComp.Name == objectName) {
-                return &thisComp;
-            }
-        }
-
-        // If we didn't find it, fatal
-        ShowFatalError(state, "Solar Thermal Collector Factory: Error getting inputs for object named: " + std::string{objectName});
-        // Shut up the compiler
-        return nullptr;
-    }
-
-    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
-    {
-        this->initialize(state, true);
-        this->size(state);
-    }
-
-    void PVTCollectorStruct::simulate(EnergyPlusData &state,
-                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                      bool const FirstHVACIteration,
-                                      [[maybe_unused]] Real64 &CurLoad,
-                                      [[maybe_unused]] bool const RunFlag)
-    {
-
-        this->initialize(state, FirstHVACIteration);
-        this->control(state);
-        this->calculate(state);
-        this->update(state);
-    }
-
     void GetPVTcollectorsInput(EnergyPlusData &state)
     {
 
@@ -424,6 +386,44 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         if (allocated(tmpSimplePVTperf)) tmpSimplePVTperf.deallocate();
+    }
+
+    PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
+    {
+        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
+            GetPVTcollectorsInput(state);
+            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
+        }
+
+        for (auto &thisComp : state.dataPhotovoltaicThermalCollector->PVT) {
+            if (thisComp.Name == objectName) {
+                return &thisComp;
+            }
+        }
+
+        // If we didn't find it, fatal
+        ShowFatalError(state, "Solar Thermal Collector Factory: Error getting inputs for object named: " + std::string{objectName});
+        // Shut up the compiler
+        return nullptr;
+    }
+
+    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    {
+        this->initialize(state, true);
+        this->size(state);
+    }
+
+    void PVTCollectorStruct::simulate(EnergyPlusData &state,
+                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                      bool const FirstHVACIteration,
+                                      [[maybe_unused]] Real64 &CurLoad,
+                                      [[maybe_unused]] bool const RunFlag)
+    {
+
+        this->initialize(state, FirstHVACIteration);
+        this->control(state);
+        this->calculate(state);
+        this->update(state);
     }
 
     void PVTCollectorStruct::setupReportVars(EnergyPlusData &state)

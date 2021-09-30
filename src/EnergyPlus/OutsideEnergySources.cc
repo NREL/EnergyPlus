@@ -86,52 +86,6 @@ namespace EnergyPlus::OutsideEnergySources {
 // PURPOSE OF THIS MODULE:
 // Module containing the routines dealing with the OutsideEnergySources
 
-PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
-{
-    // Process the input data for outside energy sources if it hasn't been done already
-    if (state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag) {
-        GetOutsideEnergySourcesInput(state);
-        state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag = false;
-    }
-    // Now look for this particular pipe in the list
-    for (auto &source : state.dataOutsideEnergySrcs->EnergySource) {
-        if (source.EnergyType == objectType && source.Name == objectName) {
-            return &source;
-        }
-    }
-    // If we didn't find it, fatal
-    ShowFatalError(state, "OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
-    // Shut up the compiler
-    return nullptr; // LCOV_EXCL_LINE
-}
-
-void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state,
-                                        [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                        [[maybe_unused]] bool FirstHVACIteration,
-                                        Real64 &CurLoad,
-                                        bool RunFlag)
-{
-    this->initialize(state, CurLoad);
-    this->calculate(state, RunFlag, CurLoad);
-}
-
-void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
-{
-    this->initialize(state, 0.0);
-    this->size(state);
-}
-
-void OutsideEnergySourceSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
-                                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                                   Real64 &MaxLoad,
-                                                   Real64 &MinLoad,
-                                                   Real64 &OptLoad)
-{
-    MinLoad = 0.0;
-    MaxLoad = this->NomCap;
-    OptLoad = this->NomCap;
-}
-
 void GetOutsideEnergySourcesInput(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -267,6 +221,52 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                        "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject +
                            ", Preceding condition caused termination.");
     }
+}
+
+PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
+{
+    // Process the input data for outside energy sources if it hasn't been done already
+    if (state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag) {
+        GetOutsideEnergySourcesInput(state);
+        state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag = false;
+    }
+    // Now look for this particular pipe in the list
+    for (auto &source : state.dataOutsideEnergySrcs->EnergySource) {
+        if (source.EnergyType == objectType && source.Name == objectName) {
+            return &source;
+        }
+    }
+    // If we didn't find it, fatal
+    ShowFatalError(state, "OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
+    // Shut up the compiler
+    return nullptr; // LCOV_EXCL_LINE
+}
+
+void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state,
+                                        [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                        [[maybe_unused]] bool FirstHVACIteration,
+                                        Real64 &CurLoad,
+                                        bool RunFlag)
+{
+    this->initialize(state, CurLoad);
+    this->calculate(state, RunFlag, CurLoad);
+}
+
+void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
+{
+    this->initialize(state, 0.0);
+    this->size(state);
+}
+
+void OutsideEnergySourceSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                                   Real64 &MaxLoad,
+                                                   Real64 &MinLoad,
+                                                   Real64 &OptLoad)
+{
+    MinLoad = 0.0;
+    MaxLoad = this->NomCap;
+    OptLoad = this->NomCap;
 }
 
 void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)

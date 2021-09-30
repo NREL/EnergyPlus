@@ -980,51 +980,13 @@ namespace PlantPipingSystemsManager {
 
     void CheckIfAnyBasements(EnergyPlusData &state);
 
-    void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state);
-
-    void ReadGeneralDomainInputs(EnergyPlusData &state, const int IndexStart, const int NumGeneralizedDomains, bool &ErrorsFound);
-
     void ReadZoneCoupledDomainInputs(EnergyPlusData &state, const int StartingDomainNumForZone, const int NumZoneCoupledDomains, bool &ErrorsFound);
 
     void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
 
     bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum);
 
-    void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
-                                        std::string_view FieldName,
-                                        std::string const &UserInputField,
-                                        std::string const &ObjectName);
-
     void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound);
-
-    void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound);
-
-    void ReadHorizontalTrenchInputs(EnergyPlusData &state,
-                                    const int StartingDomainNumForHorizontal,
-                                    const int StartingCircuitNumForHorizontal,
-                                    bool &ErrorsFound);
-
-    void SetupPipingSystemOutputVariables(EnergyPlusData &state);
-
-    void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string_view const RoutineName,
-                                    std::string const &ObjectName,
-                                    std::string const &InstanceName,
-                                    std::string_view FieldName,
-                                    std::string const &FieldEntry,
-                                    std::string const &Condition,
-                                    bool &ErrorsFound);
-
-    void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string_view const RoutineName,
-                                    std::string const &ObjectName,
-                                    std::string const &InstanceName,
-                                    std::string_view FieldName,
-                                    Real64 FieldEntry,
-                                    std::string const &Condition,
-                                    bool &ErrorsFound);
-
-    int GetSurfaceCountForOSCM(EnergyPlusData &state, int OSCMIndex);
 
     std::vector<int> GetSurfaceIndecesForOSCM(EnergyPlusData &state, int OSCMIndex);
 
@@ -1040,23 +1002,7 @@ namespace PlantPipingSystemsManager {
         return ((r >= lower) && (r < upper));
     }
 
-    void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
-
     std::vector<Real64> CreateBoundaryList(std::vector<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
-
-    void SimulateOuterMostRadialSoilSlice(Circuit *thisCircuit, CartesianCell &ThisCell);
-
-    void SimulateAllInteriorRadialSoilSlices(CartesianCell &ThisCell);
-
-    void SimulateInnerMostRadialSoilSlice(Circuit *thisCircuit, CartesianCell &ThisCell);
-
-    void SimulateRadialInsulationCell(CartesianCell &ThisCell);
-
-    void SimulateRadialPipeCell(Circuit *thisCircuit, CartesianCell &ThisCell);
-
-    void SimulateFluidCell(Circuit *thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringFluidTemp);
-
-    bool IsConverged_PipeCurrentToPrevIteration(Circuit *thisCircuit, CartesianCell const &CellToCheck);
 
 } // namespace PlantPipingSystemsManager
 
