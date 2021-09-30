@@ -78,11 +78,7 @@ namespace HeatBalanceAirManager {
 
     void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state);
 
-    void initializeForExternalHVACManager(EnergyPlusData &state);
-
     void CalcHeatBalanceAir(EnergyPlusData &state);
-
-    void ReportZoneMeanAirTemp(EnergyPlusData &state);
 
 } // namespace HeatBalanceAirManager
 

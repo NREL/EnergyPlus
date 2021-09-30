@@ -118,31 +118,6 @@ namespace HeatBalanceHAMTManager {
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
 
-    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Phillip Biddulph
-        //       DATE WRITTEN   June 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Manages the Heat and Moisture Transfer calculations.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &OneTimeFlag = state.dataHeatBalHAMTMgr->OneTimeFlag;
-
-        if (OneTimeFlag) {
-            OneTimeFlag = false;
-            DisplayString(state, "Initialising Heat and Moisture Transfer Model");
-            GetHeatBalHAMTInput(state);
-            InitHeatBalHAMT(state);
-        }
-
-        CalcHeatBalHAMT(state, SurfNum, SurfTempInTmp, TempSurfOutTmp);
-    }
-
     void GetHeatBalHAMTInput(EnergyPlusData &state)
     {
 
@@ -1053,6 +1028,54 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
+    Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Phillip Biddulph
+        //       DATE WRITTEN   June 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Convert Relative Humidity and Temperature to Vapor Pressure
+
+        // Return value
+        Real64 RHtoVP;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 VPSat;
+
+        VPSat = PsyPsatFnTemp(state, Temperature);
+
+        RHtoVP = RH * VPSat;
+
+        return RHtoVP;
+    }
+
+    Real64 WVDC(Real64 const Temperature, Real64 const ambp)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Phillip Biddulph
+        //       DATE WRITTEN   June 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // To calculate the Water Vapor Diffusion Coefficient in air
+        // using the temperature and ambient atmospheric pressure
+
+        // REFERENCES:
+        // K?zel, H.M. (1995) Simultaneous Heat and Moisture Transport in Building Components.
+        // One- and two-dimensional calculation using simple parameters. IRB Verlag 1995
+
+        // Return value
+        Real64 WVDC;
+
+        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv, 0.81)) / ambp;
+
+        return WVDC;
+    }
+
     void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
     {
         // SUBROUTINE INFORMATION:
@@ -1527,6 +1550,31 @@ namespace HeatBalanceHAMTManager {
             SurfTempInP / (461.52 * (state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
     }
 
+    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Phillip Biddulph
+        //       DATE WRITTEN   June 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manages the Heat and Moisture Transfer calculations.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto &OneTimeFlag = state.dataHeatBalHAMTMgr->OneTimeFlag;
+
+        if (OneTimeFlag) {
+            OneTimeFlag = false;
+            DisplayString(state, "Initialising Heat and Moisture Transfer Model");
+            GetHeatBalHAMTInput(state);
+            InitHeatBalHAMT(state);
+        }
+
+        CalcHeatBalHAMT(state, SurfNum, SurfTempInTmp, TempSurfOutTmp);
+    }
+
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)
     {
         // SUBROUTINE INFORMATION:
@@ -1628,54 +1676,6 @@ namespace HeatBalanceHAMTManager {
             // return gradient if required
             outgrad = mygrad;
         }
-    }
-
-    Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Phillip Biddulph
-        //       DATE WRITTEN   June 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Convert Relative Humidity and Temperature to Vapor Pressure
-
-        // Return value
-        Real64 RHtoVP;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 VPSat;
-
-        VPSat = PsyPsatFnTemp(state, Temperature);
-
-        RHtoVP = RH * VPSat;
-
-        return RHtoVP;
-    }
-
-    Real64 WVDC(Real64 const Temperature, Real64 const ambp)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Phillip Biddulph
-        //       DATE WRITTEN   June 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // To calculate the Water Vapor Diffusion Coefficient in air
-        // using the temperature and ambient atmospheric pressor
-
-        // REFERENCES:
-        // K?zel, H.M. (1995) Simultaneous Heat and Moisture Transport in Building Components.
-        // One- and two-dimensional calculation using simple parameters. IRB Verlag 1995
-
-        // Return value
-        Real64 WVDC;
-
-        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv, 0.81)) / ambp;
-
-        return WVDC;
     }
 
     //                                 COPYRIGHT NOTICE

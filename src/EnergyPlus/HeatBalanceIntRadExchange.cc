@@ -459,6 +459,98 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
+    void GetInputViewFactorsbyName(EnergyPlusData &state,
+                                   std::string const &EnclosureName, // Needed to check for user input view factors.
+                                   int const N,                      // NUMBER OF SURFACES
+                                   Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+                                   const Array1D_int &SPtr,          // pointer to actual surface number
+                                   bool &NoUserInputF,               // Flag signifying no input F's for this
+                                   bool &ErrorsFound                 // True when errors are found in number of fields vs max args
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Curt Pedersen
+        //       DATE WRITTEN   September 2005
+        //       MODIFIED       Linda Lawrie;September 2010
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
+
+        // Using/Aliasing
+
+        // Argument array dimensioning
+        F.dim(N, N);
+        EP_SIZE_CHECK(SPtr, N);
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int UserFZoneIndex;
+        int NumAlphas;
+        int NumNums;
+        int IOStat;
+        int index;
+        int numinx1;
+        int inx1;
+        int inx2;
+        Array1D_string enclosureSurfaceNames;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        NoUserInputF = true;
+        UserFZoneIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+            state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_or_space_or_spacelist_name", EnclosureName);
+
+        if (UserFZoneIndex > 0) {
+            enclosureSurfaceNames.allocate(N);
+            for (index = 1; index <= N; ++index) {
+                enclosureSurfaceNames(index) = state.dataSurface->Surface(SPtr(index)).Name;
+            }
+            NoUserInputF = false;
+
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     "ZoneProperty:UserViewFactors:BySurfaceName",
+                                                                     UserFZoneIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+
+            F = 0.0;
+            numinx1 = 0;
+            if (NumNums < pow_2(N)) {
+                ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
+                ShowContinueError(state,
+                                  format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a "
+                                         "zero view factor.",
+                                         NumNums,
+                                         pow_2(N)));
+            }
+
+            for (index = 2; index <= NumAlphas; index += 2) {
+                inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
+                inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
+                if (inx1 == 0) {
+                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ErrorsFound = true;
+                }
+                if (inx2 == 0) {
+                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError(state,
+                                      "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                    ErrorsFound = true;
+                }
+                ++numinx1;
+                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(numinx1);
+            }
+
+            enclosureSurfaceNames.deallocate();
+        }
+    }
+
     void InitInteriorRadExchange(EnergyPlusData &state)
     {
 
@@ -1296,98 +1388,6 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void GetInputViewFactorsbyName(EnergyPlusData &state,
-                                   std::string const &EnclosureName, // Needed to check for user input view factors.
-                                   int const N,                      // NUMBER OF SURFACES
-                                   Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   const Array1D_int &SPtr,          // pointer to actual surface number
-                                   bool &NoUserInputF,               // Flag signifying no input F's for this
-                                   bool &ErrorsFound                 // True when errors are found in number of fields vs max args
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Curt Pedersen
-        //       DATE WRITTEN   September 2005
-        //       MODIFIED       Linda Lawrie;September 2010
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
-
-        // Using/Aliasing
-
-        // Argument array dimensioning
-        F.dim(N, N);
-        EP_SIZE_CHECK(SPtr, N);
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int UserFZoneIndex;
-        int NumAlphas;
-        int NumNums;
-        int IOStat;
-        int index;
-        int numinx1;
-        int inx1;
-        int inx2;
-        Array1D_string enclosureSurfaceNames;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        NoUserInputF = true;
-        UserFZoneIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-            state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_or_space_or_spacelist_name", EnclosureName);
-
-        if (UserFZoneIndex > 0) {
-            enclosureSurfaceNames.allocate(N);
-            for (index = 1; index <= N; ++index) {
-                enclosureSurfaceNames(index) = state.dataSurface->Surface(SPtr(index)).Name;
-            }
-            NoUserInputF = false;
-
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     "ZoneProperty:UserViewFactors:BySurfaceName",
-                                                                     UserFZoneIndex,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-
-            F = 0.0;
-            numinx1 = 0;
-            if (NumNums < pow_2(N)) {
-                ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
-                ShowContinueError(state,
-                                  format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a "
-                                         "zero view factor.",
-                                         NumNums,
-                                         pow_2(N)));
-            }
-
-            for (index = 2; index <= NumAlphas; index += 2) {
-                inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
-                inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
-                if (inx1 == 0) {
-                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
-                    ErrorsFound = true;
-                }
-                if (inx2 == 0) {
-                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state,
-                                      "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
-                    ErrorsFound = true;
-                }
-                ++numinx1;
-                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(numinx1);
-            }
-
-            enclosureSurfaceNames.deallocate();
-        }
-    }
-
     void CalcApproximateViewFactors(EnergyPlusData &state,
                                     int const N,                    // NUMBER OF SURFACES
                                     const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
@@ -1813,6 +1813,110 @@ namespace HeatBalanceIntRadExchange {
         return false;
     }
 
+    void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
+                           Array2<Real64> &I  // Returned as inverse matrix
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jakob Asmundsson
+        //       DATE WRITTEN   January 1999
+        //       MODIFIED       September 2000 (RKS for EnergyPlus)
+        //       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance/memory tuning rewrite
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // To find the inverse of Matrix, using partial pivoting.
+
+        // METHODOLOGY EMPLOYED:
+        // Inverse is found using partial pivoting and Gauss elimination
+
+        // REFERENCES:
+        // Any Linear Algebra book
+
+        // Validation
+        assert(A.square());
+        assert(A.I1() == A.I2());
+        assert(equal_dimensions(A, I));
+
+        // Initialization
+        int const l(A.l1());
+        int const u(A.u1());
+        int const n(u - l + 1);
+        I.to_identity(); // I starts out as identity
+
+        // Could do row scaling here to improve condition and then check min pivot isn't too small
+
+        // Compute in-place LU decomposition of [A|I] with row pivoting
+        for (int i = l; i <= u; ++i) {
+
+            // Find pivot row in column i below diagonal
+            int iPiv = i;
+            Real64 aPiv(std::abs(A(i, i)));
+            auto ik(A.index(i, i + 1));
+            for (int k = i + 1; k <= u; ++k, ++ik) {
+                Real64 const aAki(std::abs(A[ik])); // [ ik ] == ( i, k )
+                if (aAki > aPiv) {
+                    iPiv = k;
+                    aPiv = aAki;
+                }
+            }
+            assert(aPiv != 0.0); //? Is zero pivot possible for some user inputs? If so if test/handler needed
+
+            // Swap row i with pivot row
+            if (iPiv != i) {
+                auto ji(A.index(l, i));    // [ ji ] == ( j, i )
+                auto pj(A.index(l, iPiv)); // [ pj ] == ( j, iPiv )
+                for (int j = l; j <= u; ++j, ji += n, pj += n) {
+                    Real64 const Aij(A[ji]);
+                    A[ji] = A[pj];
+                    A[pj] = Aij;
+                    Real64 const Iij(I[ji]);
+                    I[ji] = I[pj];
+                    I[pj] = Iij;
+                }
+            }
+
+            // Put multipliers in column i and reduce block below A(i,i)
+            Real64 const Aii_inv(1.0 / A(i, i));
+            for (int k = i + 1; k <= u; ++k) {
+                Real64 const multiplier(A(i, k) * Aii_inv);
+                A(i, k) = multiplier;
+                if (multiplier != 0.0) {
+                    auto ji(A.index(i + 1, i)); // [ ji ] == ( j, i )
+                    auto jk(A.index(i + 1, k)); // [ jk ] == ( j, k )
+                    for (int j = i + 1; j <= u; ++j, ji += n, jk += n) {
+                        A[jk] -= multiplier * A[ji];
+                    }
+                    ji = A.index(l, i);
+                    jk = A.index(l, k);
+                    for (int j = l; j <= u; ++j, ji += n, jk += n) {
+                        Real64 const Iij(I[ji]);
+                        if (Iij != 0.0) {
+                            I[jk] -= multiplier * Iij;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Perform back-substitution on [U|I] to put inverse in I
+        for (int k = u; k >= l; --k) {
+            Real64 const Akk_inv(1.0 / A(k, k));
+            auto jk(A.index(l, k)); // [ jk ] == ( j, k )
+            for (int j = l; j <= u; ++j, jk += n) {
+                I[jk] *= Akk_inv;
+            }
+            auto ik(A.index(k, l));             // [ ik ] == ( i, k )
+            for (int i = l; i < k; ++i, ++ik) { // Eliminate kth column entries from I in rows above k
+                Real64 const Aik(A[ik]);
+                auto ji(A.index(l, i)); // [ ji ] == ( j, i )
+                auto jk(A.index(l, k)); // [ jk ] == ( k, j )
+                for (int j = l; j <= u; ++j, ji += n, jk += n) {
+                    I[ji] -= Aik * I[jk];
+                }
+            }
+        }
+    }
+
     void CalcScriptF(EnergyPlusData &state,
                      int const N,              // Number of surfaces
                      Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
@@ -1922,110 +2026,6 @@ namespace HeatBalanceIntRadExchange {
                 } else {
                     //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
                     ScriptF[m] = EMISS_fac * Cinverse[l]; // [ l ] == ( i, j ), [ m ] == ( j, i )
-                }
-            }
-        }
-    }
-
-    void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
-                           Array2<Real64> &I  // Returned as inverse matrix
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jakob Asmundsson
-        //       DATE WRITTEN   January 1999
-        //       MODIFIED       September 2000 (RKS for EnergyPlus)
-        //       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance/memory tuning rewrite
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // To find the inverse of Matrix, using partial pivoting.
-
-        // METHODOLOGY EMPLOYED:
-        // Inverse is found using partial pivoting and Gauss elimination
-
-        // REFERENCES:
-        // Any Linear Algebra book
-
-        // Validation
-        assert(A.square());
-        assert(A.I1() == A.I2());
-        assert(equal_dimensions(A, I));
-
-        // Initialization
-        int const l(A.l1());
-        int const u(A.u1());
-        int const n(u - l + 1);
-        I.to_identity(); // I starts out as identity
-
-        // Could do row scaling here to improve condition and then check min pivot isn't too small
-
-        // Compute in-place LU decomposition of [A|I] with row pivoting
-        for (int i = l; i <= u; ++i) {
-
-            // Find pivot row in column i below diagonal
-            int iPiv = i;
-            Real64 aPiv(std::abs(A(i, i)));
-            auto ik(A.index(i, i + 1));
-            for (int k = i + 1; k <= u; ++k, ++ik) {
-                Real64 const aAki(std::abs(A[ik])); // [ ik ] == ( i, k )
-                if (aAki > aPiv) {
-                    iPiv = k;
-                    aPiv = aAki;
-                }
-            }
-            assert(aPiv != 0.0); //? Is zero pivot possible for some user inputs? If so if test/handler needed
-
-            // Swap row i with pivot row
-            if (iPiv != i) {
-                auto ji(A.index(l, i));    // [ ji ] == ( j, i )
-                auto pj(A.index(l, iPiv)); // [ pj ] == ( j, iPiv )
-                for (int j = l; j <= u; ++j, ji += n, pj += n) {
-                    Real64 const Aij(A[ji]);
-                    A[ji] = A[pj];
-                    A[pj] = Aij;
-                    Real64 const Iij(I[ji]);
-                    I[ji] = I[pj];
-                    I[pj] = Iij;
-                }
-            }
-
-            // Put multipliers in column i and reduce block below A(i,i)
-            Real64 const Aii_inv(1.0 / A(i, i));
-            for (int k = i + 1; k <= u; ++k) {
-                Real64 const multiplier(A(i, k) * Aii_inv);
-                A(i, k) = multiplier;
-                if (multiplier != 0.0) {
-                    auto ji(A.index(i + 1, i)); // [ ji ] == ( j, i )
-                    auto jk(A.index(i + 1, k)); // [ jk ] == ( j, k )
-                    for (int j = i + 1; j <= u; ++j, ji += n, jk += n) {
-                        A[jk] -= multiplier * A[ji];
-                    }
-                    ji = A.index(l, i);
-                    jk = A.index(l, k);
-                    for (int j = l; j <= u; ++j, ji += n, jk += n) {
-                        Real64 const Iij(I[ji]);
-                        if (Iij != 0.0) {
-                            I[jk] -= multiplier * Iij;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Perform back-substitution on [U|I] to put inverse in I
-        for (int k = u; k >= l; --k) {
-            Real64 const Akk_inv(1.0 / A(k, k));
-            auto jk(A.index(l, k)); // [ jk ] == ( j, k )
-            for (int j = l; j <= u; ++j, jk += n) {
-                I[jk] *= Akk_inv;
-            }
-            auto ik(A.index(k, l));             // [ ik ] == ( i, k )
-            for (int i = l; i < k; ++i, ++ik) { // Eliminate kth column entries from I in rows above k
-                Real64 const Aik(A[ik]);
-                auto ji(A.index(l, i)); // [ ji ] == ( j, i )
-                auto jk(A.index(l, k)); // [ jk ] == ( k, j )
-                for (int j = l; j <= u; ++j, ji += n, jk += n) {
-                    I[ji] -= Aik * I[jk];
                 }
             }
         }

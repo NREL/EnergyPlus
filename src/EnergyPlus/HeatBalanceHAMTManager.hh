@@ -121,40 +121,10 @@ namespace HeatBalanceHAMTManager {
 
     void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp);
 
-    void GetHeatBalHAMTInput(EnergyPlusData &state);
-
-    void InitHeatBalHAMT(EnergyPlusData &state);
-
-    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp);
-
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
     void interp(
         int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
-
-    Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
-
-    Real64 WVDC(Real64 const Temperature, Real64 const ambp);
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) University College London 2007.  All rights
-    //     reserved.
-
-    //     UCL LEGAL NOTICE
-    //     Neither UCL, members of UCL nor any person or organisation acting on
-    //     behalf of either:
-
-    //     A. Makes any warranty of representation, express or implied with
-    //        respect to the accuracy, completeness, or usefulness of the
-    //        information contained in this program, including any warranty of
-    //        merchantability or fitness of any purpose with respect to the
-    //        program, or that the use of any information disclosed in this
-    //        program may not infringe privately-owned rights, or
-
-    //     B. Assumes any liability with respect to the use of, or for any and
-    //        all damages resulting from the use of the program or any portion
-    //        thereof or any information disclosed therein.
 
 } // namespace HeatBalanceHAMTManager
 

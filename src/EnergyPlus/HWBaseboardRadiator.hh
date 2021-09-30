@@ -184,36 +184,11 @@ namespace HWBaseboardRadiator {
                         Real64 &PowerMet,
                         int &CompIndex);
 
-    void GetHWBaseboardInput(EnergyPlusData &state);
-
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
-
-    void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
-
     void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
-
-    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBRadGains(EnergyPlusData &state);
-
-    void ReportHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
-
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
-    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,       // type index
-                                          std::string const &BaseboardName, // component name
-                                          int const EquipFlowCtrl,          // Flow control mode for the equipment
-                                          int const LoopNum,                // Plant loop index for where called from
-                                          int const LoopSide,               // Plant loop side index for where called from
-                                          int &CompIndex,                   // Chiller number pointer
-                                          bool const FirstHVACIteration,
-                                          bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
-    );
-
-    //*****************************************************************************************
 
 } // namespace HWBaseboardRadiator
 

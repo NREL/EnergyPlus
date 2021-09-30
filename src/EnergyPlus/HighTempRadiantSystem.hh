@@ -164,31 +164,9 @@ namespace HighTempRadiantSystem {
 
     void GetHighTempRadiantSystem(EnergyPlusData &state, bool &ErrorsFound); // Error flag if problems encountered on reading user input
 
-    void InitHighTempRadiantSystem(EnergyPlusData &state,
-                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                                   int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
-    );
-
     void SizeHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum);
 
-    void CalcHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum); // name of the low temperature radiant system
-
-    void CalcHighTempRadiantSystemSP(EnergyPlusData &state,
-                                     bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
-                                     int const RadSysNum            // name of the low temperature radiant system
-    );
-
-    void UpdateHighTempRadiantSystem(EnergyPlusData &state,
-                                     int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
-                                     Real64 &LoadMet      // load met by the radiant system, in Watts
-    );
-
     void UpdateHTRadSourceValAvg(EnergyPlusData &state, bool &HighTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
-
-    void DistributeHTRadGains(EnergyPlusData &state);
-
-    void ReportHighTempRadiantSystem(EnergyPlusData &state,
-                                     int RadSysNum); // Index for the low temperature radiant system under consideration within the derived types
 
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
@@ -198,7 +176,7 @@ struct HighTempRadiantSystemData : BaseGlobalStruct
 {
 
     // Standard, run-of-the-mill variables...
-    int NumOfHighTempRadSys = 0;          // Number of hydronic low tempererature radiant systems
+    int NumOfHighTempRadSys = 0;          // Number of hydronic low temperature radiant systems
     Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
     Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source

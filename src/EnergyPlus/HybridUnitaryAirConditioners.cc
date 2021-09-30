@@ -73,6 +73,65 @@
 
 namespace EnergyPlus::HybridUnitaryAirConditioners {
 
+void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                          int const UnitNum,              // unit number
+                                          int const ZoneNum,              // number of zone being served
+                                          Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling negitive
+                                          Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
+)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Spencer Maxwell Dutton
+    //       DATE WRITTEN   October 2017
+    //       MODIFIED
+    //       RE-ENGINEERED  na
+
+    using namespace DataLoopNode;
+    using namespace Psychrometrics;
+
+    Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
+
+    Real64 ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum)
+                                 .RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
+    Real64 ZoneHeatingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum)
+                                 .RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
+    Real64 OutputRequiredToHumidify =
+        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
+            .OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
+
+    Real64 OutputRequiredToDehumidify =
+        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
+            .OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
+
+    SensibleOutputProvided = 0;
+    LatentOutputProvided = 0;
+    // taking class members out of the object and then using them in the calcualtion is odd but its for clarity with unit testing.
+    EnvDryBulbT = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp; // degrees C
+    AirTempRoom = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;    // degrees C
+    EnvRelHumm = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
+    RoomRelHum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;       // RH
+
+    bool UseOccSchFlag = true;
+    bool UseMinOASchFlag = true;
+
+    DesignMinVR = DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+                                                                ZoneNum,
+                                                                UseOccSchFlag,
+                                                                UseMinOASchFlag); //[m3/s]
+    Real64 DesignMinVRMassFlow = 0;
+    if (state.dataEnvrn->StdRhoAir > 1) {
+        DesignMinVRMassFlow = DesignMinVR * state.dataEnvrn->StdRhoAir;
+    } else {
+        DesignMinVRMassFlow = DesignMinVR * 1.225;
+    }
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).doStep(
+        state, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
+    SensibleOutputProvided = -state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
+
+    LatentOutputProvided = -state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass; // dehumidification negative kg/s
+}
+
 // Begin routines for zone HVAC Hybrid Evaporative cooler unit
 void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
                                          std::string_view CompName,      // name of the packaged terminal heat pump
@@ -328,65 +387,6 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
                       state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
                       state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
                       "InitZoneHybridUnitaryAirConditioners");
-}
-
-void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                          int const UnitNum,              // unit number
-                                          int const ZoneNum,              // number of zone being served
-                                          Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling negitive
-                                          Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
-)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Spencer Maxwell Dutton
-    //       DATE WRITTEN   October 2017
-    //       MODIFIED
-    //       RE-ENGINEERED  na
-
-    using namespace DataLoopNode;
-    using namespace Psychrometrics;
-
-    Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
-
-    Real64 ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum)
-                                 .RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
-    Real64 ZoneHeatingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum)
-                                 .RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
-    Real64 OutputRequiredToHumidify =
-        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
-            .OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
-
-    Real64 OutputRequiredToDehumidify =
-        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
-            .OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
-
-    SensibleOutputProvided = 0;
-    LatentOutputProvided = 0;
-    // taking class members out of the object and then using them in the calcualtion is odd but its for clarity with unit testing.
-    EnvDryBulbT = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp; // degrees C
-    AirTempRoom = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;    // degrees C
-    EnvRelHumm = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
-    RoomRelHum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;       // RH
-
-    bool UseOccSchFlag = true;
-    bool UseMinOASchFlag = true;
-
-    DesignMinVR = DataSizing::calcDesignSpecificationOutdoorAir(state,
-                                                                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
-                                                                ZoneNum,
-                                                                UseOccSchFlag,
-                                                                UseMinOASchFlag); //[m3/s]
-    Real64 DesignMinVRMassFlow = 0;
-    if (state.dataEnvrn->StdRhoAir > 1) {
-        DesignMinVRMassFlow = DesignMinVR * state.dataEnvrn->StdRhoAir;
-    } else {
-        DesignMinVRMassFlow = DesignMinVR * 1.225;
-    }
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).doStep(
-        state, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
-    SensibleOutputProvided = -state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
-
-    LatentOutputProvided = -state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass; // dehumidification negative kg/s
 }
 
 void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int const UnitNum)

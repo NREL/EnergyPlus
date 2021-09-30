@@ -98,26 +98,6 @@ namespace EvaporativeFluidCoolers {
     std::string const cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
     std::string const cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
 
-    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
-    {
-        // Process the input data if it hasn't been done already
-        if (state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag) {
-            GetEvapFluidCoolerInput(state);
-            state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag = false;
-        }
-
-        // Now look for this particular object
-        for (auto &thisEFC : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
-            if ((thisEFC.TypeOf_Num == objectType) && (thisEFC.Name == objectName)) {
-                return &thisEFC;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state, "LocalEvapFluidCoolerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
     void GetEvapFluidCoolerInput(EnergyPlusData &state)
     {
 
@@ -888,6 +868,26 @@ namespace EvaporativeFluidCoolers {
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found in getting evaporative fluid cooler input.");
         }
+    }
+
+    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+    {
+        // Process the input data if it hasn't been done already
+        if (state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag) {
+            GetEvapFluidCoolerInput(state);
+            state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag = false;
+        }
+
+        // Now look for this particular object
+        for (auto &thisEFC : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
+            if ((thisEFC.TypeOf_Num == objectType) && (thisEFC.Name == objectName)) {
+                return &thisEFC;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(state, "LocalEvapFluidCoolerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void EvapFluidCoolerSpecs::setupOutputVars(EnergyPlusData &state)

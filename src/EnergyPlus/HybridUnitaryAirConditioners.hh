@@ -83,13 +83,6 @@ namespace HybridUnitaryAirConditioners {
                                               int ZoneNum  // number of zone being served
     );
 
-    void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                              int UnitNum,                    // unit number
-                                              int ZoneNum,                    // number of zone being served
-                                              Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
-                                              Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
-    );
-
     void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int UnitNum);
 
     int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int UnitNum);

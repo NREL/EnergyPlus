@@ -240,10 +240,7 @@ namespace Fans {
 
     void GetFanInput(EnergyPlusData &state);
 
-    void InitFan(EnergyPlusData &state,
-                 int FanNum,
-                 bool FirstHVACIteration
-    );
+    void InitFan(EnergyPlusData &state, int FanNum, bool FirstHVACIteration);
 
     void SizeFan(EnergyPlusData &state, int FanNum);
 

@@ -154,41 +154,6 @@ namespace HVACSingleDuctInduc {
 
     void GetIndUnits(EnergyPlusData &state);
 
-    void InitIndUnit(EnergyPlusData &state,
-                     int const IUNum,              // number of the current induction unit being simulated
-                     bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
-    );
-
-    void SizeIndUnit(EnergyPlusData &state, int const IUNum);
-
-    void SimFourPipeIndUnit(EnergyPlusData &state,
-                            int const IUNum,              // number of the current unit being simulated
-                            int const ZoneNum,            // number of zone being served
-                            int const ZoneNodeNum,        // zone node number
-                            bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-    );
-
-    void CalcFourPipeIndUnit(EnergyPlusData &state,
-                             int const IUNum,               // Unit index
-                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                             int const ZoneNode,            // zone node number
-                             Real64 const HWFlow,           // hot water flow (kg/s)
-                             Real64 const CWFlow,           // cold water flow (kg/s)
-                             Real64 &LoadMet                // load met by unit (watts)
-    );
-
-    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state,
-                                     Real64 const HWFlow,       // hot water flow rate in kg/s
-                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
-    );
-
-    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state,
-                                     Real64 const CWFlow,       // cold water flow rate in kg/s
-                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
-    );
-
-    // ========================= Utilities =======================
-
     bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 
 } // namespace HVACSingleDuctInduc

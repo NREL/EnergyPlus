@@ -122,10 +122,6 @@ namespace HybridModel {
         }
     };
 
-    // Object Data
-
-    // Functions
-
     void GetHybridModelZone(EnergyPlusData &state);
 
 } // namespace HybridModel

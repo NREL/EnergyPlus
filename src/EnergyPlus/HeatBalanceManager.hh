@@ -91,23 +91,13 @@ namespace HeatBalanceManager {
 
     void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool CheckValidSimulationObjects(EnergyPlusData &state);
-
     void SetPreConstructionInputParameters(EnergyPlusData &state);
 
     void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
-
     void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
-    void ValidateMaterialRoughness(EnergyPlusData &state,
-                                   int const MaterNum,           // Which Material number being validated.
-                                   std::string const &Roughness, // Roughness String
-                                   bool &ErrorsFound             // If errors found
-    );
 
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -118,8 +108,6 @@ namespace HeatBalanceManager {
     void GetSpaceData(EnergyPlusData &state, bool &ErrorsFound);
 
     int GetGeneralSpaceTypeNum(EnergyPlusData &state);
-
-    void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void ProcessZoneData(EnergyPlusData &state,
                          std::string const &cCurrentModuleObject,
@@ -145,51 +133,18 @@ namespace HeatBalanceManager {
 
     void CheckWarmupConvergence(EnergyPlusData &state);
 
-    void ReportWarmupConvergence(EnergyPlusData &state);
-
     void UpdateWindowFaceTempsNonBSDFWin(EnergyPlusData &state);
 
     void ReportHeatBalance(EnergyPlusData &state);
 
-    void OpenShadingFile(EnergyPlusData &state);
-
     void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
-    void SearchWindow5DataFile(EnergyPlusData &state,
-                               fs::path const &DesiredFilePath,            // File path (or just name) that contains the Window5 constructions.
-                               std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
-                               bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
-                               bool &EOFonFile,                            // True if EOF during file read
-                               bool &ErrorsFound                           // True if there is a problem with the entry requested from the data file
-    );
-
-    void SetStormWindowControl(EnergyPlusData &state);
-
-    void CreateFCfactorConstructions(EnergyPlusData &state,
-                                     int &ConstrNum,   // Counter for Constructions
-                                     bool &ErrorsFound // If errors found in input
-    );
 
     void CreateAirBoundaryConstructions(EnergyPlusData &state,
                                         int &ConstrNum,   // Counter for Constructions
                                         bool &ErrorsFound // If errors found in input
     );
 
-    void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
-
-    void CheckScheduledSurfaceGains(EnergyPlusData &state, int const ZoneNum); // Zone number for which error check will be performed
-
-    void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
-
     void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int &MaterNum);
-
-    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
-                                               int &MaterNum, // num of material items thus far
-                                               bool &ErrorsFound);
-
-    void SetupComplexFenestrationStateInput(EnergyPlusData &state,
-                                            int &ConstrNum, // num of construction items thus far
-                                            bool &ErrorsFound);
 
     void InitConductionTransferFunctions(EnergyPlusData &state);
 

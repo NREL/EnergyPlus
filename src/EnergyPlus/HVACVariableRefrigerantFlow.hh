@@ -901,10 +901,6 @@ namespace HVACVariableRefrigerantFlow {
 
     void InitVRF(EnergyPlusData &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
-    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
-
-    void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
-
     void SimVRF(EnergyPlusData &state,
                 int VRFTUNum,
                 bool FirstHVACIteration,
@@ -925,15 +921,6 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUReturnAirNode(EnergyPlusData &state, int const VRFTUNum);
 
-    void getVRFTUZoneLoad(
-        EnergyPlusData &state, int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
-
-    void ReportVRFTerminalUnit(EnergyPlusData &state, int VRFTUNum); // index to VRF terminal unit
-
-    void ReportVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
-
-    void UpdateVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
-
     void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent);
 
     Real64 PLRResidual(EnergyPlusData &state,
@@ -945,40 +932,6 @@ namespace HVACVariableRefrigerantFlow {
                            int VRFTUNum,             // Unit index
                            Real64 PartLoadRatio,     // unit part load ratio
                            Real64 &OnOffAirFlowRatio // ratio of compressor ON airflow to average airflow over timestep
-    );
-
-    void InitializeOperatingMode(EnergyPlusData &state,
-                                 bool FirstHVACIteration,  // flag for first time through HVAC systems
-                                 int VRFCond,              // Condenser Unit index
-                                 int TUListNum,            // Condenser Unit terminal unit list
-                                 Real64 &OnOffAirFlowRatio // ratio of on to off flow rate
-    );
-
-    void LimitTUCapacity(EnergyPlusData &state,
-                         int VRFCond,                     // Condenser Unit index
-                         int NumTUInList,                 // Number of terminal units in list
-                         Real64 StartingCapacity,         // temporary variable holding condenser capacity [W]
-                         const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
-                         Real64 &MaxLimit,                // Maximum terminal unit capacity for coils in same operating mode [W]
-                         Real64 AltCapacity,              // temporary variable holding heat recovery capacity [W]
-                         const Array1D<Real64> &AltArray, // Array of coil capacities of heat recovery [W]
-                         Real64 &AltLimit                 // Maximum terminal unit capacity of heat recovery coils [W]
-    );
-
-    void LimitCoilCapacity(int NumTUInList,                 // Number of terminal units in list
-                           Real64 TotalCapacity,            // temporary variable holding condenser capacity [W]
-                           const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
-                           Real64 &MaxLimit                 // Maximum terminal unit capacity for coils in same operating mode [W]
-    );
-
-    Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state,
-                                           Real64 FanSpdRatio,        // fan speed ratio of VRF VAV TU
-                                           Array1D<Real64> const &Par // par(1) = VRFTUNum
-    );
-
-    Real64 VRFOUTeResidual_FluidTCtrl(EnergyPlusData &state,
-                                      Real64 Te,                 // outdoor unit evaporating temperature
-                                      Array1D<Real64> const &Par // par(1) = VRFTUNum
     );
 
     Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,

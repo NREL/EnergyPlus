@@ -88,24 +88,6 @@ namespace HeatBalanceIntRadExchange {
                                bool &ErrorsFound                        // True when errors are found
     );
 
-    void GetInputViewFactors(EnergyPlusData &state,
-                             std::string const &EnclosureName, // Needed to check for user input view factors.
-                             int const N,                      // NUMBER OF SURFACES
-                             Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             const Array1D_int &SPtr,          // pointer to actual surface number
-                             bool &NoUserInputF,               // Flag signifying no input F's for this
-                             bool &ErrorsFound                 // True when errors are found in number of fields vs max args
-    );
-
-    void GetInputViewFactorsbyName(EnergyPlusData &state,
-                                   std::string const &ZoneName, // Needed to check for user input view factors.
-                                   int const N,                 // NUMBER OF SURFACES
-                                   Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   const Array1D_int &SPtr,     // pointer to actual surface number
-                                   bool &NoUserInputF,          // Flag signifying no input F's for this
-                                   bool &ErrorsFound            // True when errors are found in number of fields vs max args
-    );
-
     void CalcApproximateViewFactors(EnergyPlusData &state,
                                     int const N,                    // NUMBER OF SURFACES
                                     const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
@@ -152,10 +134,6 @@ namespace HeatBalanceIntRadExchange {
                 Array1D<Real64> &EMISS, // VECTOR OF SURFACE EMISSIVITIES
                 Array1D<Real64> &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
                 Array1D<Real64> &Fp     // VECTOR OF OPPENHEIM RESISTNACE VALUES
-    );
-
-    void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
-                           Array2<Real64> &I  // Returned as inverse matrix
     );
 
     int GetRadiantSystemSurface(EnergyPlusData &state,

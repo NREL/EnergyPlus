@@ -285,10 +285,6 @@ namespace EvaporativeFluidCoolers {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    // Object Data
-
-    void GetEvapFluidCoolerInput(EnergyPlusData &state);
-
 } // namespace EvaporativeFluidCoolers
 
 struct EvaporativeFluidCoolersData : BaseGlobalStruct

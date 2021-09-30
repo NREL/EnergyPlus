@@ -181,34 +181,7 @@ namespace HeatingCoils {
                                        Optional<Real64 const> SpeedRatio = _ // Speed ratio of MultiStage heating coil
     );
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetHeatingCoilInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration, Real64 const QCoilRequired);
-
-    void SizeHeatingCoil(EnergyPlusData &state, int const CoilNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void CalcElectricHeatingCoil(EnergyPlusData &state,
-                                 int const CoilNum, // index to heating coil
-                                 Real64 &QCoilReq,
-                                 Real64 &QCoilActual,       // coil load actually delivered (W)
-                                 int const FanOpMode,       // fan operating mode
-                                 Real64 const PartLoadRatio // part-load ratio of heating coil
-    );
 
     void CalcMultiStageElectricHeatingCoil(EnergyPlusData &state,
                                            int &CoilNum,            // the number of the electric heating coil to be simulated
@@ -218,14 +191,6 @@ namespace HeatingCoils {
                                            int const FanOpMode      // Fan operation mode
     );
 
-    void CalcFuelHeatingCoil(EnergyPlusData &state,
-                             int const CoilNum, // index to heating coil
-                             Real64 const QCoilReq,
-                             Real64 &QCoilActual,       // coil load actually delivered (W)
-                             int const FanOpMode,       // fan operating mode
-                             Real64 const PartLoadRatio // part-load ratio of heating coil
-    );
-
     void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
                                       int &CoilNum,            // the number of the Gas heating coil to be simulated
                                       Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
@@ -233,30 +198,6 @@ namespace HeatingCoils {
                                       int const StageNum,      // Speed number
                                       int const FanOpMode      // Fan operation mode
     );
-
-    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state,
-                                      int const CoilNum,     // index to desuperheater heating coil
-                                      Real64 const QCoilReq, // load requested by the simulation for load based control [W]
-                                      Real64 &QCoilActual    // coil load actually delivered
-    );
-
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum);
-
-    //        End of Update subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const coilIsSuppHeater);
-
-    //        End of Reporting subroutines for the HeatingCoil Module
 
     void GetCoilIndex(EnergyPlusData &state, std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound);
 
