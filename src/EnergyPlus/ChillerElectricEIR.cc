@@ -1987,7 +1987,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                      .LoopSide(this->CWLoopSideNum)
                      .Branch(this->CWBranchNum)
                      .Comp(this->CWCompNum)
-                     .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                     .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                 (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                 // there will be a valid setpoint on outlet
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
@@ -2000,7 +2000,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                      .LoopSide(this->CWLoopSideNum)
                      .Branch(this->CWBranchNum)
                      .Comp(this->CWCompNum)
-                     .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                     .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                 (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                 // there will be a valid setpoint on outlet
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
@@ -2071,7 +2071,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     // Only perform this check for temperature setpoint control
     if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).CurOpSchemeType ==
-        DataPlant::OpSchemeType::CompSetPtBased) {
+        DataPlant::OpScheme::CompSetPtBased) {
         // Calculate water side load
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2114,7 +2114,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                                                        RoutineName);
 
     if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).CurOpSchemeType ==
-        DataPlant::OpSchemeType::CompSetPtBased) {
+        DataPlant::OpScheme::CompSetPtBased) {
         this->PossibleSubcooling = false;
     } else {
         this->PossibleSubcooling = true;

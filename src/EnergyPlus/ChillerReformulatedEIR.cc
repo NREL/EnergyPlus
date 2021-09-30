@@ -2141,7 +2141,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
-                 DataPlant::OpSchemeType::CompSetPtBased) ||
+                 DataPlant::OpScheme::CompSetPtBased) ||
                 (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                 // there will be a valid setpoint on outlet
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
@@ -2151,7 +2151,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
-                 DataPlant::OpSchemeType::CompSetPtBased) ||
+                 DataPlant::OpScheme::CompSetPtBased) ||
                 (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                 // there will be a valid setpoint on outlet
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
@@ -2239,7 +2239,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     // If FlowLock is True (1),  the new resolved plant loop mdot is used
     if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = !(state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
-                                     DataPlant::OpSchemeType::CompSetPtBased);
+                                     DataPlant::OpScheme::CompSetPtBased);
 
         Real64 EvapDeltaTemp(0.0); // Evaporator temperature difference [C]
 
@@ -2767,7 +2767,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
         if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
-                 DataPlant::OpSchemeType::CompSetPtBased) ||
+                 DataPlant::OpScheme::CompSetPtBased) ||
                 (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                 // there will be a valid setpoint on outlet
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
@@ -2777,7 +2777,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
         } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
-                 DataPlant::OpSchemeType::CompSetPtBased) ||
+                 DataPlant::OpScheme::CompSetPtBased) ||
                 (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                 // there will be a valid setpoint on outlet
                 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;

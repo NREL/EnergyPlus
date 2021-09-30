@@ -161,7 +161,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
     auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
     auto &comp(loop_side.Branch(BranchIndex).Comp(CompIndex));
 
-    if (comp.CurOpSchemeType == DataPlant::OpSchemeType::Demand) {
+    if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         // store flow request on inlet node
         state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = CompFlow;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail =
@@ -285,7 +285,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
         ShowFatalError(state, "SetComponentFlowRate: Flow lock out of range"); // DEBUG error...should never get here LCOV_EXCL_LINE
     }
 
-    if (comp.CurOpSchemeType == DataPlant::OpSchemeType::Demand) {
+    if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
             if (std::abs(MdotOldRequest - state.dataLoopNodes->Node(InletNode).MassFlowRateRequest) >
                 DataBranchAirLoopPlant::MassFlowTolerance) { // demand comp changed its flow request
@@ -460,9 +460,9 @@ Real64 RegulateCondenserCompFlowReqOp(
 
         switch (CompOpScheme) {
 
-        case (DataPlant::OpSchemeType::HeatingRB):
-        case (DataPlant::OpSchemeType::CoolingRB):
-        case (DataPlant::OpSchemeType::CompSetPtBased): { // These provide meaningful MyLoad values
+        case (DataPlant::OpScheme::HeatingRB):
+        case (DataPlant::OpScheme::CoolingRB):
+        case (DataPlant::OpScheme::CompSetPtBased): { // These provide meaningful MyLoad values
             if (std::abs(CompCurLoad) > ZeroLoad) {
                 FlowVal = TentativeFlowRequest;
             } else { // no load

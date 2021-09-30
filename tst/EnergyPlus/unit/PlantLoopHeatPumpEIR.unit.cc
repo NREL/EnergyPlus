@@ -1196,20 +1196,20 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 
     // set up the plant setpoint conditions and test for single setpoint operation
     PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     state->dataLoopNodes->Node(5).TempSetPoint = 2.718;
     EXPECT_NEAR(3.141, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CoolingRB;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
     EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
 
     // test for dual setpoint operation
     PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     state->dataLoopNodes->Node(5).TempSetPointHi = 5.436;
     EXPECT_NEAR(6.282, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CoolingRB;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
     EXPECT_NEAR(5.436, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
 }
 
@@ -1501,7 +1501,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1635,7 +1635,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1864,7 +1864,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
@@ -1981,7 +1981,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
@@ -2688,17 +2688,17 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     // set up the plant setpoint conditions and test for single setpoint operation
     PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     state->dataLoopNodes->Node(5).TempSetPoint = 2.718;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CoolingRB;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
 
     // test for dual setpoint operation
     PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     state->dataLoopNodes->Node(5).TempSetPointHi = 5.436;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CoolingRB;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
 
     state->dataHVACGlobal->TimeStepSys = 60;
 
@@ -2752,7 +2752,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -2853,7 +2853,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;

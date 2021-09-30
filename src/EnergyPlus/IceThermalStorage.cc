@@ -174,7 +174,7 @@ namespace IceThermalStorage {
         // then reset CurLoad to original EquipDemand.
         // Allow negative CurLoad.  For cold storage this means the storage should
         // charge, for hot storage, this means the storage should discharge.
-        if (thisComp.CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) {
+        if (thisComp.CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) {
             Real64 localCurLoad = thisComp.EquipDemand;
             if (localCurLoad != 0) RunFlag = true;
         }

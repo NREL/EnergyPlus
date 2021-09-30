@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // if the component's ON flag is false, then it should return zero flow request no matter the other values
     thisComponent.ON = false;
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::HeatingRB; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::CoolingRB; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::Uncontrolled; // NOT meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // if the component's ON flag is true, then it needs to make decisions
     thisComponent.ON = true;
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::HeatingRB; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::CoolingRB; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::CompSetPtBased; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::OpSchemeType::Uncontrolled; // NOT meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);

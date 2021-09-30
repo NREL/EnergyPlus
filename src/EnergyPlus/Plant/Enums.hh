@@ -68,7 +68,7 @@ int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop f
 // As in PlantLoop(:)%OpScheme(:)%Type
 // Also in PlantLoop()LoopSide()Branch()Comp()%CurOpSchemeType
 // this may be changed later...
-enum class OpSchemeType
+enum class OpScheme
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
     Unassigned = -1,

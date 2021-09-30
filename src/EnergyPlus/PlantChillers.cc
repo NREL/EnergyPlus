@@ -1598,7 +1598,7 @@ namespace PlantChillers {
                                              .LoopSide(this->CWLoopSideNum)
                                              .Branch(this->CWLoopSideNum)
                                              .Comp(this->CWCompNum)
-                                             .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased);
+                                             .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased);
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
             Real64 FRAC;
             if (OperPartLoadRat < this->MinPartLoadRat) {
@@ -1746,7 +1746,7 @@ namespace PlantChillers {
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWLoopSideNum)
                                  .Comp(this->CWCompNum)
-                                 .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                                 .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else {
@@ -1759,7 +1759,7 @@ namespace PlantChillers {
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWLoopSideNum)
                                  .Comp(this->CWCompNum)
-                                 .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                                 .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         } else {
@@ -3895,7 +3895,7 @@ namespace PlantChillers {
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
-                                 .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                                 .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else {
@@ -3908,7 +3908,7 @@ namespace PlantChillers {
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
-                                 .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                                 .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         } else {
@@ -5984,7 +5984,7 @@ namespace PlantChillers {
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
-                                 .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                                 .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else {
@@ -5997,7 +5997,7 @@ namespace PlantChillers {
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
-                                 .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                                 .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                         } else {
@@ -7382,7 +7382,7 @@ namespace PlantChillers {
                          .LoopSide(this->CWLoopSideNum)
                          .Branch(this->CWBranchNum)
                          .Comp(this->CWCompNum)
-                         .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                         .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                     TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                 } else {
@@ -7394,7 +7394,7 @@ namespace PlantChillers {
                          .LoopSide(this->CWLoopSideNum)
                          .Branch(this->CWBranchNum)
                          .Comp(this->CWCompNum)
-                         .CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) ||
+                         .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                     TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 } else {

@@ -233,8 +233,8 @@ namespace DataPlant {
 
             {
                 switch (this_component.CurOpSchemeType) {
-                case (OpSchemeType::HeatingRB):
-                case (OpSchemeType::CoolingRB): { //~ load range based
+                case (OpScheme::HeatingRB):
+                case (OpScheme::CoolingRB): { //~ load range based
                     if (EncounteredNonLRBAfterLRB) {
                         // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
                         ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
@@ -246,16 +246,16 @@ namespace DataPlant {
                     }
                     break;
                 }
-                case (DataPlant::OpSchemeType::Pump): { //~ pump
+                case (DataPlant::OpScheme::Pump): { //~ pump
                     // For now this is just a placeholder, because I think pumps will be available anywhere,
                     //  and they won't affect the load distribution
                     break;
                 }
-                case (DataPlant::OpSchemeType::NoControl): { //~ Such as pipes
+                case (DataPlant::OpScheme::NoControl): { //~ Such as pipes
                     // For now this is just a placeholder, because these components shouldn't cause a problem anywhere...
                     break;
                 }
-                case (DataPlant::OpSchemeType::Unassigned): { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
+                case (DataPlant::OpScheme::Unassigned): { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
                     // throw fatal
                     ShowSevereError(state,
                                     "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
@@ -300,8 +300,8 @@ namespace DataPlant {
 
                     {
                         switch (this_component.CurOpSchemeType) {
-                        case (OpSchemeType::HeatingRB):
-                        case (OpSchemeType::CoolingRB): { //~ load range based
+                        case (OpScheme::HeatingRB):
+                        case (OpScheme::CoolingRB): { //~ load range based
                             if (EncounteredNonLRBAfterLRB) {
                                 // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
                                 ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
@@ -314,16 +314,16 @@ namespace DataPlant {
                             break;
                         }
 
-                        case (DataPlant::OpSchemeType::NoControl): { //~ Such as pipes
+                        case (DataPlant::OpScheme::NoControl): { //~ Such as pipes
                             // For now this is just a placeholder, because these components shouldn't cause a problem anywhere...
                             break;
                         }
-                        case (DataPlant::OpSchemeType::Pump): { //~ pump
+                        case (DataPlant::OpScheme::Pump): { //~ pump
                             // For now this is just a placeholder, because I think pumps will be available anywhere,
                             //  and they won't affect the load distribution
                             break;
                         }
-                        case (DataPlant::OpSchemeType::Unassigned): { //~ Uninitialized, this should be sufficient place to
+                        case (DataPlant::OpScheme::Unassigned): { //~ Uninitialized, this should be sufficient place to
                                                                       // catch for this on other branches
                             // throw fatal error
                             ShowSevereError(
@@ -1725,18 +1725,18 @@ namespace DataPlant {
                 auto const CurOpSchemeType(this_comp.CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
-                case DataPlant::OpSchemeType::WSEcon: //~ coils
+                case DataPlant::OpScheme::WSEcon: //~ coils
                     this_comp.MyLoad = UpdatedDemandToLoopSetPoint;
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
-                case DataPlant::OpSchemeType::Pump: //~ pump
+                case DataPlant::OpScheme::Pump: //~ pump
                     if (this->BranchPumpsExist) {
                         SimulateSinglePump(state, this_comp.location, branch.RequestedMassFlow);
                     } else {
                         SimulateSinglePump(state, this_comp.location, FlowRequest);
                     }
                     break;
-                case DataPlant::OpSchemeType::CompSetPtBased:
+                case DataPlant::OpScheme::CompSetPtBased:
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                         this->myLoopNum,
                                                                         this->myLoopSideNum,
@@ -1749,7 +1749,7 @@ namespace DataPlant {
                                                                         LoadDistributionWasPerformed);
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
-                case DataPlant::OpSchemeType::EMS:
+                case DataPlant::OpScheme::EMS:
                     if (this->myLoopSideNum == DataPlant::SupplySide) {
                         int const curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
                         int const OpSchemePtr = this_comp.OpScheme(curCompOpSchemePtr).OpSchemePtr;
@@ -1767,8 +1767,8 @@ namespace DataPlant {
                                                                         LoadDistributionWasPerformed);
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
-                case (OpSchemeType::HeatingRB):
-                case (OpSchemeType::CoolingRB): { //~ load range based
+                case (OpScheme::HeatingRB):
+                case (OpScheme::CoolingRB): { //~ load range based
                     EncounteredLRBObjDuringPass1 = true;
                     goto components_end; // don't do any more components on this branch
                     break;
@@ -1818,15 +1818,15 @@ namespace DataPlant {
                 auto const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
-                case DataPlant::OpSchemeType::NoControl: //~ pipes, for example
+                case DataPlant::OpScheme::NoControl: //~ pipes, for example
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
-                case DataPlant::OpSchemeType::Demand:
-                case DataPlant::OpSchemeType::CompSetPtBased:
-                case DataPlant::OpSchemeType::FreeRejection: //~ other control types
+                case DataPlant::OpScheme::Demand:
+                case DataPlant::OpScheme::CompSetPtBased:
+                case DataPlant::OpScheme::FreeRejection: //~ other control types
                     EncounteredNonLBObjDuringPass2 = true;
                     goto components2_end;           // don't do anymore components on this branch
-                case DataPlant::OpSchemeType::Pump: //~ pump
+                case DataPlant::OpScheme::Pump: //~ pump
                     PumpLocation.loopNum = this->myLoopNum;
                     PumpLocation.loopSideNum = this->myLoopSideNum;
                     PumpLocation.branchNum = BranchCounter;
@@ -1837,8 +1837,8 @@ namespace DataPlant {
                         SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
-                case (OpSchemeType::HeatingRB):
-                case (OpSchemeType::CoolingRB): {        //~ load range based
+                case (OpScheme::HeatingRB):
+                case (OpScheme::CoolingRB): {        //~ load range based
                     if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
                         PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                             this->myLoopNum,
@@ -1889,10 +1889,10 @@ namespace DataPlant {
                 auto const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
-                case DataPlant::OpSchemeType::Demand: //~ coils
+                case DataPlant::OpScheme::Demand: //~ coils
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
-                case DataPlant::OpSchemeType::Pump: //~ pump
+                case DataPlant::OpScheme::Pump: //~ pump
                     PumpLocation.loopNum = this->myLoopNum;
                     PumpLocation.loopSideNum = this->myLoopSideNum;
                     PumpLocation.branchNum = BranchCounter;
@@ -1903,8 +1903,8 @@ namespace DataPlant {
                         SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
-                case (OpSchemeType::HeatingRB):
-                case (OpSchemeType::CoolingRB): { //~ load range based
+                case (OpScheme::HeatingRB):
+                case (OpScheme::CoolingRB): { //~ load range based
                     ShowFatalError(state, "Encountered Load Based Object after other components, invalid.");
                     break;
                 }
@@ -1972,8 +1972,8 @@ namespace DataPlant {
         if (this->FlowLock == DataPlant::FlowLock::Unlocked) {
 
             switch (this_comp.CurOpSchemeType) {
-            case (OpSchemeType::HeatingRB):
-            case (OpSchemeType::CoolingRB): { //~ load range based
+            case (OpScheme::HeatingRB):
+            case (OpScheme::CoolingRB): { //~ load range based
                 break;                        // Don't do anything for load based components
             }
 
@@ -1990,8 +1990,8 @@ namespace DataPlant {
             // For locked flow just use the mass flow rate
 
             switch (this_comp.CurOpSchemeType) {
-            case (OpSchemeType::HeatingRB):
-            case (OpSchemeType::CoolingRB): { //~ load range based
+            case (OpScheme::HeatingRB):
+            case (OpScheme::CoolingRB): { //~ load range based
                 break;                        // Don't do anything for load based components
             }
             default: {

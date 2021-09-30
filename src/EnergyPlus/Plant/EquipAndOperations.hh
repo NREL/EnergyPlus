@@ -128,7 +128,7 @@ struct OperationData
     // Members
     std::string Name;               // The name of each item in the list
     std::string TypeOf;             // The 'keyWord' identifying each item in the list
-    DataPlant::OpSchemeType Type;   // Op scheme type (from keyword)
+    DataPlant::OpScheme Type;   // Op scheme type (from keyword)
     std::string Sched;              // The name of the schedule associated with the list
     int SchedPtr;                   // ALLOCATABLE to the schedule (for valid schedules)
     bool Available;                 // TRUE = designated component or operation scheme available
@@ -147,7 +147,7 @@ struct OperationData
 
     // Default Constructor
     OperationData()
-        : Type(DataPlant::OpSchemeType::Unassigned), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
+        : Type(DataPlant::OpScheme::Unassigned), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
           ReferenceNodeNumber(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1),
           EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
     {

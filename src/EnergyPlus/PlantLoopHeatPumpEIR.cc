@@ -123,14 +123,14 @@ Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state
     auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
     auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
     if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-        if (thisLoadComp.CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) {
+        if (thisLoadComp.CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) {
             // there will be a valid set-point on outlet
             return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
         } else { // use plant loop overall set-point
             return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
         }
     } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-        if (thisLoadComp.CurOpSchemeType == DataPlant::OpSchemeType::CompSetPtBased) {
+        if (thisLoadComp.CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) {
             // there will be a valid set-point on outlet
             return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
         } else { // use plant loop overall set-point
