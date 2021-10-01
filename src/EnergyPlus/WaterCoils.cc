@@ -6287,7 +6287,7 @@ int GetCoilWaterOutletNode(EnergyPlusData &state,
 }
 
 void SetCoilDesFlow(EnergyPlusData &state,
-                    std::string const &CoilType, // must match coil types in this module
+                    std::string_view CoilType,   // must match coil types in this module
                     std::string const &CoilName, // must match coil names for the coil type
                     Real64 const CoilDesFlow,    // coil volumetric air flow rate [m3/s]
                     bool &ErrorsFound            // set to true if problem
@@ -6323,7 +6323,7 @@ void SetCoilDesFlow(EnergyPlusData &state,
                 // WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
             }
         } else {
-            ShowSevereError(state, "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
         }
     }

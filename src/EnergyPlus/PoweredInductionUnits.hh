@@ -72,12 +72,16 @@ namespace PoweredInductionUnits {
     // coil types in this module
     enum class iHCoilType
     {
-        Unassigned,
+        Unassigned = -1,
         Gas,
         Electric,
         SimpleHeating,
         SteamAirHeating,
+        Num
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNamesUC{
+        "COIL:HEATING:FUEL", "COIL:HEATING:ELECTRIC", "COIL:HEATING:WATER", "COIL:HEATING:STEAM"};
 
     struct PowIndUnitData
     {
@@ -111,7 +115,6 @@ namespace PoweredInductionUnits {
         int Fan_Num;              // index for fan type
         int Fan_Index;            // store index for this fan
         int FanAvailSchedPtr;     // index to fan availability schedule
-        std::string HCoilType;    // type of heating coil component
         iHCoilType HCoilType_Num; // index for heating coil type
         DataPlant::PlantEquipmentType HCoil_PlantTypeNum;
         std::string HCoil; // name of heating coil component
