@@ -121,35 +121,7 @@ namespace RuntimeLanguageProcessor {
 
     void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state);
 
-    void ParseStack(EnergyPlusData &state, int StackNum);
-
-    int AddInstruction(EnergyPlusData &state,
-                       int StackNum,
-                       int LineNum,
-                       DataRuntimeLanguage::ErlKeywordParam Keyword,
-                       Optional_int_const Argument1 = _, // Erl variable index
-                       Optional_int_const Argument2 = _);
-
-    void AddError(EnergyPlusData &state,
-                  int StackNum,            // index pointer to location in ErlStack structure
-                  int LineNum,             // Erl program line number
-                  std::string const &Error // error message to be added to ErlStack
-    );
-
     ErlValueType EvaluateStack(EnergyPlusData &state, int StackNum);
-
-    void WriteTrace(EnergyPlusData &state, int StackNum, int InstructionNum, ErlValueType const &ReturnValue, bool seriousErrorFound);
-
-    void ParseExpression(EnergyPlusData &state,
-                         std::string const &InString, // String of expression text written in the Runtime Language
-                         int StackNum,                // Parent StackNum??
-                         int &ExpressionNum,          // index of expression in structure
-                         std::string const &Line      // Actual line from string
-    );
-
-    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int NumTokensIN, int StackNum, std::string const &ParsingString);
-
-    int NewExpression(EnergyPlusData &state);
 
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
@@ -179,19 +151,15 @@ namespace RuntimeLanguageProcessor {
 
     ErlValueType StringValue(std::string const &String);
 
-    std::string ValueToString(ErlValueType const &Value);
-
     int FindEMSVariable(EnergyPlusData &state,
                         std::string const &VariableName, // variable name in Erl
                         int StackNum);
 
     int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int StackNum, Optional<ErlValueType const> Value = _);
 
-    void SetupPossibleOperators(EnergyPlusData &state);
-
     void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
                                          int varNum,  // The variable index to be written during run time
-                                         Real64 value // The real time value of the vairable to be set
+                                         Real64 value // The real time value of the variable to be set
     );
 
     void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,

@@ -81,6 +81,59 @@ namespace ReturnAirPathManager {
     using DataZoneEquipment::ZoneMixer_Type;
     using DataZoneEquipment::ZoneReturnPlenum_Type;
 
+    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR:          Russ Taylor
+        //       DATE WRITTEN:    Nov 1997
+
+        // PURPOSE OF THIS SUBROUTINE: This subroutine
+
+        // METHODOLOGY EMPLOYED:
+
+        // REFERENCES:
+
+        // USE STATEMENTS:
+
+        // Using/Aliasing
+        using MixerComponent::SimAirMixer;
+        using ZonePlenum::SimAirZonePlenum;
+
+        // Locals
+        int ComponentNum;
+
+        for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
+
+            {
+                auto const SELECT_CASE_var(state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType_Num(ComponentNum));
+
+                if (SELECT_CASE_var == ZoneMixer_Type) { // 'AirLoopHVAC:ZoneMixer'
+
+                    if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
+                          state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                        SimAirMixer(state,
+                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
+                    }
+
+                } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
+
+                    SimAirZonePlenum(state,
+                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                     ZoneReturnPlenum_Type,
+                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
+
+                } else {
+                    ShowSevereError(state,
+                                    "Invalid AirLoopHVAC:ReturnPath Component=" +
+                                        state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
+                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
+                    ShowFatalError(state, "Preceding condition causes termination.");
+                }
+            }
+        }
+    }
+
     void SimReturnAirPath(EnergyPlusData &state)
     {
 
@@ -121,9 +174,6 @@ namespace ReturnAirPathManager {
         int NumNums;
         int IOStat;
         int Counter;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool ErrorsFound( false );
-        ////////////////////////////////////////////////////////////////////////////////////
         bool IsNotOK; // Flag to verify name
 
         bool ErrorsFound = false;
@@ -209,89 +259,6 @@ namespace ReturnAirPathManager {
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination.");
         }
-    }
-
-    void InitReturnAirPath([[maybe_unused]] int &ReturnAirPathNum)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Russ Taylor
-        //       DATE WRITTEN:    Nov 1997
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-    }
-
-    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Russ Taylor
-        //       DATE WRITTEN:    Nov 1997
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Using/Aliasing
-        using MixerComponent::SimAirMixer;
-        using ZonePlenum::SimAirZonePlenum;
-
-        // Locals
-        int ComponentNum;
-
-        for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
-
-            {
-                auto const SELECT_CASE_var(state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType_Num(ComponentNum));
-
-                if (SELECT_CASE_var == ZoneMixer_Type) { // 'AirLoopHVAC:ZoneMixer'
-
-                    if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirMixer(state,
-                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-                    }
-
-                } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
-
-                    SimAirZonePlenum(state,
-                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                     ZoneReturnPlenum_Type,
-                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-
-                } else {
-                    ShowSevereError(state,
-                                    "Invalid AirLoopHVAC:ReturnPath Component=" +
-                                        state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
-                    ShowFatalError(state, "Preceding condition causes termination.");
-                }
-            }
-        }
-    }
-
-    void ReportReturnAirPath([[maybe_unused]] int &ReturnAirPathNum)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Russ Taylor
-        //       DATE WRITTEN:    Nov 1997
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
     }
 
 } // namespace ReturnAirPathManager

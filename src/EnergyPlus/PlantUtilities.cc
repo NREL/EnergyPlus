@@ -640,6 +640,46 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int const LoopNum
     }
 }
 
+void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number of loop
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   November 2011
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine will display (with continue error messages) the branch/component
+    // structure of the given loop.
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    std::string DemandSupply;
+    int LSN; // LoopSide counter
+    int BrN; // Branch counter
+    int CpN; // Component (on branch) counter
+
+    for (LSN = DataPlant::DemandSide; LSN <= DataPlant::SupplySide; ++LSN) {
+        if (LSN == DataPlant::DemandSide) {
+            DemandSupply = "Demand";
+        } else if (LSN == DataPlant::SupplySide) {
+            DemandSupply = "Supply";
+        } else {
+            DemandSupply = "Unknown";
+        }
+        ShowContinueError(state, DemandSupply + " Branches:");
+        for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).TotalBranches; ++BrN) {
+            ShowContinueError(state, "  " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Name);
+            ShowContinueError(state, "    Components on Branch:");
+            for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).TotalComponents; ++CpN) {
+                ShowContinueError(state,
+                                  "      " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).TypeOf + ':' +
+                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).Name);
+            }
+        }
+    }
+}
+
 void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int const LoopSideNum)
 {
 
@@ -1901,46 +1941,6 @@ void SetAllPlantSimFlagsToValue(EnergyPlusData &state, bool const Value)
         auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
         this_loop.LoopSide(DataPlant::DemandSide).SimLoopSideNeeded = Value;
         this_loop.LoopSide(DataPlant::SupplySide).SimLoopSideNeeded = Value;
-    }
-}
-
-void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number of loop
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   November 2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This routine will display (with continue error messages) the branch/component
-    // structure of the given loop.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string DemandSupply;
-    int LSN; // LoopSide counter
-    int BrN; // Branch counter
-    int CpN; // Component (on branch) counter
-
-    for (LSN = DataPlant::DemandSide; LSN <= DataPlant::SupplySide; ++LSN) {
-        if (LSN == DataPlant::DemandSide) {
-            DemandSupply = "Demand";
-        } else if (LSN == DataPlant::SupplySide) {
-            DemandSupply = "Supply";
-        } else {
-            DemandSupply = "Unknown";
-        }
-        ShowContinueError(state, DemandSupply + " Branches:");
-        for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).TotalBranches; ++BrN) {
-            ShowContinueError(state, "  " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Name);
-            ShowContinueError(state, "    Components on Branch:");
-            for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).TotalComponents; ++CpN) {
-                ShowContinueError(state,
-                                  "      " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).TypeOf + ':' +
-                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).Name);
-            }
-        }
     }
 }
 

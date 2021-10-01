@@ -411,24 +411,9 @@ namespace PollutionModule {
 
     void SetupPollutionCalculations(EnergyPlusData &state);
 
-    void GetPollutionFactorInput(EnergyPlusData &state);
-
     void SetupPollutionMeterReporting(EnergyPlusData &state);
 
     void CheckPollutionMeterReporting(EnergyPlusData &state);
-
-    void CheckFFSchedule(EnergyPlusData &state,
-                         std::string const &currentModuleObject, // the module Object
-                         std::string const &resourceType,        // resource type (Natural Gas, etc)
-                         std::string const &fieldName,           // Actual field name
-                         std::string const &ScheduleName,        // Schedule Name as input
-                         int &SchedulePtr,                       // Schedule Index
-                         bool &ErrorsFound                       // true if errors found
-    );
-
-    void CalcPollution(EnergyPlusData &state);
-
-    void ReadEnergyMeters(EnergyPlusData &state);
 
     void GetFuelFactorInfo(EnergyPlusData &state,
                            std::string const &fuelName,  // input fuel name  (standard from Tabular reports)

@@ -48,7 +48,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
 
@@ -96,35 +95,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
 using namespace DataRoomAirModel;
 
 // Functions
-
-void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   January 2004/Aug 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //  manage the user-defined air temp. distribution model
-
-    // METHODOLOGY EMPLOYED:
-    // calls subroutines
-
-    // transfer data from surface domain to air domain for the specified zone
-    InitTempDistModel(state, ZoneNum);
-
-    GetSurfHBDataForTempDistModel(state, ZoneNum);
-
-    // perform TempDist model calculations
-    CalcTempDistModel(state, ZoneNum);
-
-    // transfer data from air domain back to surface domain for the specified zone
-    SetSurfHBDataForTempDistModel(state, ZoneNum);
-}
-
-//****************************************************
 
 void InitTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {
@@ -191,188 +161,34 @@ void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         state.dataHeatBalFanSys->MAT(ZoneNum); // this is lagged from previous corrector result
 }
 
-//*****************************************************************************************
-
-void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   August 2005
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // figure out which pattern is scheduled and call
-    // appropriate subroutine
-
-    // Using/Aliasing
-    using General::FindNumberInList;
-    using ScheduleManager::GetCurrentScheduleValue;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // unused    INTEGER    :: thisZoneInfo
-    Real64 AvailTest;
-    int CurntPatternKey;
-    int CurPatrnID;
-
-    // first determine availability
-    AvailTest = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID);
-
-    if ((AvailTest != 1.0) || (!state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).IsUsed)) {
-        // model not to be used. Use complete mixing method
-
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
-        for (auto &e : state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf)
-            e.TadjacentAir = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
-
-        return;
-
-    } else { // choose pattern and call subroutine
-
-        CurntPatternKey = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID);
-
-        CurPatrnID = FindNumberInList(CurntPatternKey, state.dataRoomAirMod->RoomAirPattern, &TemperaturePatternStruct::PatrnID);
-
-        if (CurPatrnID == 0) {
-            // throw error here ? way to test schedules before getting to this point?
-            ShowFatalError(state, format("User defined room air pattern index not found: {}", CurntPatternKey));
-            return;
-        }
-
-        {
-            auto const SELECT_CASE_var(state.dataRoomAirMod->RoomAirPattern(CurPatrnID).PatternMode);
-
-            if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern) {
-
-                FigureConstGradPattern(state, CurPatrnID, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern) {
-
-                FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern) {
-
-                FigureHeightPattern(state, CurPatrnID, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern) {
-
-                FigureSurfMapPattern(state, CurPatrnID, ZoneNum);
-
-            } else {
-                // should not come here
-            }
-        }
-
-    } // availability control construct
-}
-
-void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B Griffith
+    //       AUTHOR         B. Griffith
     //       DATE WRITTEN   August 2005
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // main calculation routine for surface pattern
-
-    // METHODOLOGY EMPLOYED:
-    // simple polling and applying prescribed
-    // delta Tai's to current mean air temp
-    // on a surface by surface basis
-
-    // Using/Aliasing
-    using General::FindNumberInList;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 Tmean;
-    int found;
-    int i;
+    Real64 Tmean;        // MAT
+    int i;               // loop counter
+    Real64 Grad;         // vertical temperature gradient
+    Real64 ZetaTmean;    // non-dimens. height for MAT, 0.5
+    Real64 thisZeta;     // temporary non-dimens height
+    Real64 DeltaHeight;  // temporary height difference
+    Real64 tempDeltaTai; // temporary Delta Tai
 
     Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).GradPatrn.Gradient;
+
+    ZetaTmean = 0.5; // by definition,
 
     for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
-        // cycle through zone surfaces and look for match
-        found = FindNumberInList(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).SurfID,
-                                 state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.SurfID,
-                                 state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.NumSurfs);
-        if (found != 0) { // if surf is in map then assign, else give it MAT
-            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir =
-                state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.DeltaTai(found) + Tmean;
-        } else {
-            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = Tmean;
-        }
-    }
-
-    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
-    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
-    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
-}
-
-void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B Griffith
-    //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // calculate the pattern for non-dimensional vertical profile
-
-    // METHODOLOGY EMPLOYED:
-    // treat profile as lookup table and interpolate
-
-    // Using/Aliasing
-    using FluidProperties::FindArrayIndex;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 Tmean;
-    int lowSideID;
-    int highSideID;
-    Real64 thisZeta;
-    int i;
-    Real64 lowSideZeta;
-    Real64 hiSideZeta;
-    Real64 fractBtwn;
-    Real64 tmpDeltaTai;
-
-    tmpDeltaTai = 0.0;
-    Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
-
-    for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
-
         thisZeta = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
-        lowSideID = FindArrayIndex(thisZeta, state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn);
-        highSideID = lowSideID + 1;
-        if (lowSideID == 0) lowSideID = 1; // protect against array bounds
-
-        lowSideZeta = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(lowSideID);
-        if (highSideID <= isize(state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn)) {
-            hiSideZeta = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(highSideID);
-        } else { // trap array bounds
-            hiSideZeta = lowSideZeta;
-        }
-        if ((hiSideZeta - lowSideZeta) != 0.0) {
-            fractBtwn = (thisZeta - lowSideZeta) / (hiSideZeta - lowSideZeta);
-            tmpDeltaTai = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID) +
-                          fractBtwn * (state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(highSideID) -
-                                       state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID));
-
-        } else { // would divide by zero, using low side value
-
-            tmpDeltaTai = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID);
-        }
-
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tmpDeltaTai + Tmean;
-
-    } // surfaces in this zone
+        DeltaHeight = -1.0 * (ZetaTmean - thisZeta) * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight;
+        tempDeltaTai = DeltaHeight * Grad;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tempDeltaTai + Tmean;
+    }
 
     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
@@ -569,60 +385,45 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
 
     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = Grad;
 }
-Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
-                          Real64 UpperBound,  // RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale
-                          Real64 HiGradient,  // RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient
-                          Real64 LowerBound,  // RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale
-                          Real64 LowGradient  // RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient
-)
-{
-    Real64 Grad;
-    if (DryBulbTemp >= UpperBound) {
-        Grad = HiGradient;
 
-    } else if (DryBulbTemp <= LowerBound) {
-
-        Grad = LowGradient;
-    } else { // interpolate
-
-        if ((UpperBound - LowerBound) == 0.0) {
-            // bad user input. should be trapped during get input in RoomAirManager.cc
-            Grad = LowGradient;
-        } else {
-
-            Grad = LowGradient + ((DryBulbTemp - LowerBound) / (UpperBound - LowerBound)) * (HiGradient - LowGradient);
-        }
-    }
-    return Grad;
-}
-
-void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
+void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Griffith
+    //       AUTHOR         B Griffith
     //       DATE WRITTEN   August 2005
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    Real64 Tmean;        // MAT
-    int i;               // loop counter
-    Real64 Grad;         // vertical temperature gradient
-    Real64 ZetaTmean;    // non-dimens. height for MAT, 0.5
-    Real64 thisZeta;     // temporary non-dimens height
-    Real64 DeltaHeight;  // temporary height difference
-    Real64 tempDeltaTai; // temporary Delta Tai
+    // PURPOSE OF THIS SUBROUTINE:
+    // main calculation routine for surface pattern
+
+    // METHODOLOGY EMPLOYED:
+    // simple polling and applying prescribed
+    // delta Tai's to current mean air temp
+    // on a surface by surface basis
+
+    // Using/Aliasing
+    using General::FindNumberInList;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 Tmean;
+    int found;
+    int i;
 
     Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
-    Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).GradPatrn.Gradient;
-
-    ZetaTmean = 0.5; // by definition,
 
     for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
-        thisZeta = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
-        DeltaHeight = -1.0 * (ZetaTmean - thisZeta) * state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneHeight;
-        tempDeltaTai = DeltaHeight * Grad;
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tempDeltaTai + Tmean;
+        // cycle through zone surfaces and look for match
+        found = FindNumberInList(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).SurfID,
+                                 state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.SurfID,
+                                 state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.NumSurfs);
+        if (found != 0) { // if surf is in map then assign, else give it MAT
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir =
+                state.dataRoomAirMod->RoomAirPattern(PattrnID).MapPatrn.DeltaTai(found) + Tmean;
+        } else {
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = Tmean;
+        }
     }
 
     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
@@ -630,132 +431,146 @@ void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const
     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
 }
 
-//*****************************************************************************************
-
-Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // index in main Surface array
+void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
 {
-    // FUNCTION INFORMATION:
-    //       AUTHOR         B.Griffith
-    //       DATE WRITTEN   aug 2005, Jan2004
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         B Griffith
+    //       DATE WRITTEN   August 2005
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // return a non-dimensional height zeta
+    // PURPOSE OF THIS SUBROUTINE:
+    // calculate the pattern for non-dimensional vertical profile
 
     // METHODOLOGY EMPLOYED:
-    // figure average floor height (follows code in surfacegeometry.cc
-    // use ceiling height from Zone structure
-    // non dimensionalize surface's centroid's Z value
+    // treat profile as lookup table and interpolate
 
     // Using/Aliasing
-    using DataVectorTypes::Vector;
+    using FluidProperties::FindArrayIndex;
 
-    // Return value
-    Real64 FigureNDheightInZone;
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 Tmean;
+    int lowSideID;
+    int highSideID;
+    Real64 thisZeta;
+    int i;
+    Real64 lowSideZeta;
+    Real64 hiSideZeta;
+    Real64 fractBtwn;
+    Real64 tmpDeltaTai;
 
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const TolValue(0.0001);
+    tmpDeltaTai = 0.0;
+    Tmean = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int thisZone;
-    Real64 ZoneZorig;
-    Real64 ZoneCeilHeight;
-    Real64 Zcm;
-    Real64 SurfMinZ;
-    Real64 SurfMaxZ;
-    Real64 Zeta;
-    Real64 FloorCount;
-    Real64 ZFlrAvg;
-    Real64 ZMax;
-    Real64 ZMin;
-    int Count;
-    int SurfNum;
-    Real64 Z1;
-    Real64 Z2;
+    for (i = 1; i <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
 
-    // Get the centroid height for the surface
-    Zcm = state.dataSurface->Surface(thisHBsurf).Centroid.z;
-    thisZone = state.dataSurface->Surface(thisHBsurf).Zone;
+        thisZeta = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).Zeta;
+        lowSideID = FindArrayIndex(thisZeta, state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn);
+        highSideID = lowSideID + 1;
+        if (lowSideID == 0) lowSideID = 1; // protect against array bounds
 
-    // this next Do block is copied from SurfaceGeometry.cc with modification for just floor Z
-    // used find floor z.
-    FloorCount = 0.0;
-    ZFlrAvg = 0.0;
-    ZMax = 0.0;
-    ZMin = 0.0;
-    Count = 0;
-    for (SurfNum = state.dataHeatBal->Zone(thisZone).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(thisZone).HTSurfaceLast; ++SurfNum) {
-        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
-            // Use Average Z for surface, more important for roofs than floors...
-            ++FloorCount;
-            Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-            Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-            ZFlrAvg += (Z1 + Z2) / 2.0;
+        lowSideZeta = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(lowSideID);
+        if (highSideID <= isize(state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn)) {
+            hiSideZeta = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.ZetaPatrn(highSideID);
+        } else { // trap array bounds
+            hiSideZeta = lowSideZeta;
         }
-        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
-            // Use Wall calculation in case no floor in zone
-            ++Count;
-            if (Count == 1) {
-                ZMax = state.dataSurface->Surface(SurfNum).Vertex(1).z;
-                ZMin = ZMax;
-            }
-            ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
-            ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+        if ((hiSideZeta - lowSideZeta) != 0.0) {
+            fractBtwn = (thisZeta - lowSideZeta) / (hiSideZeta - lowSideZeta);
+            tmpDeltaTai = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID) +
+                          fractBtwn * (state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(highSideID) -
+                                       state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID));
+
+        } else { // would divide by zero, using low side value
+
+            tmpDeltaTai = state.dataRoomAirMod->RoomAirPattern(PattrnID).VertPatrn.DeltaTaiPatrn(lowSideID);
         }
-    }
-    if (FloorCount > 0.0) {
-        ZFlrAvg /= FloorCount;
-    } else {
-        ZFlrAvg = ZMin;
-    }
-    ZoneZorig = ZFlrAvg; // Z floor  [M]
-    ZoneCeilHeight = state.dataHeatBal->Zone(thisZone).CeilingHeight;
 
-    // first check if some basic things are reasonable
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = tmpDeltaTai + Tmean;
 
-    SurfMinZ = minval(state.dataSurface->Surface(thisHBsurf).Vertex, &Vector::z);
-    SurfMaxZ = maxval(state.dataSurface->Surface(thisHBsurf).Vertex, &Vector::z);
+    } // surfaces in this zone
 
-    if (SurfMinZ < (ZoneZorig - TolValue)) {
-        if (state.dataGlobal->DisplayExtraWarnings) {
-            ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-            ShowContinueError(
-                state, "too low surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
-            ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
-            ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
-        } else {
-            ++state.dataErrTracking->TotalRoomAirPatternTooLow;
-        }
-    }
-
-    if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
-        if (state.dataGlobal->DisplayExtraWarnings) {
-            ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-            ShowContinueError(
-                state, " too high surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
-            ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
-            ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
-        } else {
-            ++state.dataErrTracking->TotalRoomAirPatternTooHigh;
-        }
-    }
-
-    // non dimensionalize.
-    Zeta = (Zcm - ZoneZorig) / ZoneCeilHeight;
-    // bound so that floors and ceiling are just in from endpoints.
-
-    if (Zeta > 0.99) Zeta = 0.99;
-
-    if (Zeta < 0.01) Zeta = 0.01;
-
-    FigureNDheightInZone = Zeta;
-
-    return FigureNDheightInZone;
+    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTstat + Tmean;
+    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTleaving + Tmean;
+    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
 }
 
-//***************************************************
+void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+{
 
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Brent Griffith
+    //       DATE WRITTEN   August 2005
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // figure out which pattern is scheduled and call
+    // appropriate subroutine
+
+    // Using/Aliasing
+    using General::FindNumberInList;
+    using ScheduleManager::GetCurrentScheduleValue;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // unused    INTEGER    :: thisZoneInfo
+    Real64 AvailTest;
+    int CurntPatternKey;
+    int CurPatrnID;
+
+    // first determine availability
+    AvailTest = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID);
+
+    if ((AvailTest != 1.0) || (!state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).IsUsed)) {
+        // model not to be used. Use complete mixing method
+
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+        for (auto &e : state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf)
+            e.TadjacentAir = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean;
+
+        return;
+
+    } else { // choose pattern and call subroutine
+
+        CurntPatternKey = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID);
+
+        CurPatrnID = FindNumberInList(CurntPatternKey, state.dataRoomAirMod->RoomAirPattern, &TemperaturePatternStruct::PatrnID);
+
+        if (CurPatrnID == 0) {
+            // throw error here ? way to test schedules before getting to this point?
+            ShowFatalError(state, format("User defined room air pattern index not found: {}", CurntPatternKey));
+            return;
+        }
+
+        {
+            auto const SELECT_CASE_var(state.dataRoomAirMod->RoomAirPattern(CurPatrnID).PatternMode);
+
+            if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern) {
+
+                FigureConstGradPattern(state, CurPatrnID, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern) {
+
+                FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern) {
+
+                FigureHeightPattern(state, CurPatrnID, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern) {
+
+                FigureSurfMapPattern(state, CurPatrnID, ZoneNum);
+
+            } else {
+                // should not come here
+            }
+        }
+
+    } // availability control construct
+}
 void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {
 
@@ -957,6 +772,180 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     }
 }
 
-//*****************************************************************************************
+void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Brent Griffith
+    //       DATE WRITTEN   January 2004/Aug 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    //  manage the user-defined air temp. distribution model
+
+    // METHODOLOGY EMPLOYED:
+    // calls subroutines
+
+    // transfer data from surface domain to air domain for the specified zone
+    InitTempDistModel(state, ZoneNum);
+
+    GetSurfHBDataForTempDistModel(state, ZoneNum);
+
+    // perform TempDist model calculations
+    CalcTempDistModel(state, ZoneNum);
+
+    // transfer data from air domain back to surface domain for the specified zone
+    SetSurfHBDataForTempDistModel(state, ZoneNum);
+}
+
+Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
+                          Real64 UpperBound,  // RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale
+                          Real64 HiGradient,  // RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient
+                          Real64 LowerBound,  // RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale
+                          Real64 LowGradient  // RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient
+)
+{
+    Real64 Grad;
+    if (DryBulbTemp >= UpperBound) {
+        Grad = HiGradient;
+
+    } else if (DryBulbTemp <= LowerBound) {
+
+        Grad = LowGradient;
+    } else { // interpolate
+
+        if ((UpperBound - LowerBound) == 0.0) {
+            // bad user input. should be trapped during get input in RoomAirManager.cc
+            Grad = LowGradient;
+        } else {
+
+            Grad = LowGradient + ((DryBulbTemp - LowerBound) / (UpperBound - LowerBound)) * (HiGradient - LowGradient);
+        }
+    }
+    return Grad;
+}
+
+Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // index in main Surface array
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         B.Griffith
+    //       DATE WRITTEN   aug 2005, Jan2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // return a non-dimensional height zeta
+
+    // METHODOLOGY EMPLOYED:
+    // figure average floor height (follows code in surfacegeometry.cc
+    // use ceiling height from Zone structure
+    // non dimensionalize surface's centroid's Z value
+
+    // Using/Aliasing
+    using DataVectorTypes::Vector;
+
+    // Return value
+    Real64 FigureNDheightInZone;
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    Real64 const TolValue(0.0001);
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int thisZone;
+    Real64 ZoneZorig;
+    Real64 ZoneCeilHeight;
+    Real64 Zcm;
+    Real64 SurfMinZ;
+    Real64 SurfMaxZ;
+    Real64 Zeta;
+    Real64 FloorCount;
+    Real64 ZFlrAvg;
+    Real64 ZMax;
+    Real64 ZMin;
+    int Count;
+    int SurfNum;
+    Real64 Z1;
+    Real64 Z2;
+
+    // Get the centroid height for the surface
+    Zcm = state.dataSurface->Surface(thisHBsurf).Centroid.z;
+    thisZone = state.dataSurface->Surface(thisHBsurf).Zone;
+
+    // this next Do block is copied from SurfaceGeometry.cc with modification for just floor Z
+    // used find floor z.
+    FloorCount = 0.0;
+    ZFlrAvg = 0.0;
+    ZMax = 0.0;
+    ZMin = 0.0;
+    Count = 0;
+    for (SurfNum = state.dataHeatBal->Zone(thisZone).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(thisZone).HTSurfaceLast; ++SurfNum) {
+        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
+            // Use Average Z for surface, more important for roofs than floors...
+            ++FloorCount;
+            Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+            Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+            ZFlrAvg += (Z1 + Z2) / 2.0;
+        }
+        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
+            // Use Wall calculation in case no floor in zone
+            ++Count;
+            if (Count == 1) {
+                ZMax = state.dataSurface->Surface(SurfNum).Vertex(1).z;
+                ZMin = ZMax;
+            }
+            ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+            ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+        }
+    }
+    if (FloorCount > 0.0) {
+        ZFlrAvg /= FloorCount;
+    } else {
+        ZFlrAvg = ZMin;
+    }
+    ZoneZorig = ZFlrAvg; // Z floor  [M]
+    ZoneCeilHeight = state.dataHeatBal->Zone(thisZone).CeilingHeight;
+
+    // first check if some basic things are reasonable
+
+    SurfMinZ = minval(state.dataSurface->Surface(thisHBsurf).Vertex, &Vector::z);
+    SurfMaxZ = maxval(state.dataSurface->Surface(thisHBsurf).Vertex, &Vector::z);
+
+    if (SurfMinZ < (ZoneZorig - TolValue)) {
+        if (state.dataGlobal->DisplayExtraWarnings) {
+            ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+            ShowContinueError(
+                state, "too low surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
+            ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
+            ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
+        } else {
+            ++state.dataErrTracking->TotalRoomAirPatternTooLow;
+        }
+    }
+
+    if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
+        if (state.dataGlobal->DisplayExtraWarnings) {
+            ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+            ShowContinueError(
+                state, " too high surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
+            ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
+            ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
+        } else {
+            ++state.dataErrTracking->TotalRoomAirPatternTooHigh;
+        }
+    }
+
+    // non dimensionalize.
+    Zeta = (Zcm - ZoneZorig) / ZoneCeilHeight;
+    // bound so that floors and ceiling are just in from endpoints.
+
+    if (Zeta > 0.99) Zeta = 0.99;
+
+    if (Zeta < 0.01) Zeta = 0.01;
+
+    FigureNDheightInZone = Zeta;
+
+    return FigureNDheightInZone;
+}
 
 } // namespace EnergyPlus::RoomAirModelUserTempPattern

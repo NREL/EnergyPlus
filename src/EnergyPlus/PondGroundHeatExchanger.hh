@@ -151,8 +151,6 @@ namespace PondGroundHeatExchanger {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    void GetPondGroundHeatExchanger(EnergyPlusData &state);
-
 } // namespace PondGroundHeatExchanger
 
 struct PondGroundHeatExchangerData : BaseGlobalStruct

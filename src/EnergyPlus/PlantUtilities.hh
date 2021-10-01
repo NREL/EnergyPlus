@@ -212,8 +212,6 @@ namespace PlantUtilities {
 
     void SetAllPlantSimFlagsToValue(EnergyPlusData &state, bool Value);
 
-    void ShowBranchesOnLoop(EnergyPlusData &state, int LoopNum); // Loop number of loop
-
     int MyPlantSizingIndex(EnergyPlusData &state,
                            std::string const &CompType,          // component description
                            std::string_view CompName,            // user name of component

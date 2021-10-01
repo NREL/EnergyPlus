@@ -127,39 +127,6 @@ void PondGroundHeatExchangerData::simulate(EnergyPlusData &state,
     this->UpdatePondGroundHeatExchanger(state);
 }
 
-PlantComponent *PondGroundHeatExchangerData::factory(EnergyPlusData &state, std::string const &objectName)
-{
-    if (state.dataPondGHE->GetInputFlag) {
-        GetPondGroundHeatExchanger(state);
-        state.dataPondGHE->GetInputFlag = false;
-    }
-    for (auto &ghx : state.dataPondGHE->PondGHE) {
-        if (ghx.Name == objectName) {
-            return &ghx;
-        }
-    }
-    // If we didn't find it, fatal
-    ShowFatalError(state, "Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
-    // Shut up the compiler
-    return nullptr;
-}
-
-void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
-{
-    this->InitPondGroundHeatExchanger(state, true);
-}
-
-void PondGroundHeatExchangerData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
-                                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                                      Real64 &MaxLoad,
-                                                      Real64 &MinLoad,
-                                                      Real64 &OptLoad)
-{
-    MaxLoad = this->DesignCapacity;
-    MinLoad = 0.0;
-    OptLoad = this->DesignCapacity;
-}
-
 void GetPondGroundHeatExchanger(EnergyPlusData &state)
 {
 
@@ -341,6 +308,39 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
     }
+}
+
+PlantComponent *PondGroundHeatExchangerData::factory(EnergyPlusData &state, std::string const &objectName)
+{
+    if (state.dataPondGHE->GetInputFlag) {
+        GetPondGroundHeatExchanger(state);
+        state.dataPondGHE->GetInputFlag = false;
+    }
+    for (auto &ghx : state.dataPondGHE->PondGHE) {
+        if (ghx.Name == objectName) {
+            return &ghx;
+        }
+    }
+    // If we didn't find it, fatal
+    ShowFatalError(state, "Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
+    // Shut up the compiler
+    return nullptr;
+}
+
+void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+{
+    this->InitPondGroundHeatExchanger(state, true);
+}
+
+void PondGroundHeatExchangerData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                                      Real64 &MaxLoad,
+                                                      Real64 &MinLoad,
+                                                      Real64 &OptLoad)
+{
+    MaxLoad = this->DesignCapacity;
+    MinLoad = 0.0;
+    OptLoad = this->DesignCapacity;
 }
 
 void PondGroundHeatExchangerData::setupOutputVars(EnergyPlusData &state)

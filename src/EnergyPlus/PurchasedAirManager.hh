@@ -337,11 +337,7 @@ namespace PurchasedAirManager {
 
     void GetPurchasedAir(EnergyPlusData &state);
 
-    void InitPurchasedAir(EnergyPlusData &state,
-                          int PurchAirNum,
-                          bool FirstHVACIteration,
-                          int ControlledZoneNum,
-                          int ActualZoneNum);
+    void InitPurchasedAir(EnergyPlusData &state, int PurchAirNum, bool FirstHVACIteration, int ControlledZoneNum, int ActualZoneNum);
 
     void SizePurchasedAir(EnergyPlusData &state, int PurchAirNum);
 
@@ -352,12 +348,6 @@ namespace PurchasedAirManager {
                            int ControlledZoneNum,
                            int ActualZoneNum);
 
-    void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
-                                   int PurchAirNum,       // index to ideal loads unit
-                                   int ActualZoneNum,     // index to actual zone number
-                                   Real64 &OAMassFlowRate // outside air mass flow rate [kg/s] from volume flow using std density
-    );
-
     void CalcPurchAirMixedAir(EnergyPlusData &state,
                               int PurchAirNum,           // index to ideal loads unit
                               Real64 OAMassFlowRate,     // outside air mass flow rate [kg/s]
@@ -367,10 +357,6 @@ namespace PurchasedAirManager {
                               Real64 &MixedAirEnthalpy,  // Mixed air enthalpy [J/kg]
                               OpMode OperatingMode       // current operating mode, Off, Heating, Cooling, or DeadBand
     );
-
-    void UpdatePurchasedAir(EnergyPlusData &state, int PurchAirNum, bool FirstHVACIteration);
-
-    void ReportPurchasedAir(EnergyPlusData &state, int PurchAirNum);
 
     Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int PurchAirNum);
 
@@ -383,8 +369,6 @@ namespace PurchasedAirManager {
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
 
     bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
-
-    void InitializePlenumArrays(EnergyPlusData &state, int PurchAirNum);
 
 } // namespace PurchasedAirManager
 

@@ -257,25 +257,7 @@ namespace Pumps {
 
     void GetPumpInput(EnergyPlusData &state);
 
-    void InitializePumps(EnergyPlusData &state, int const PumpNum);
-
-    void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const PumpNum);
-
-    void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
-
     void SizePump(EnergyPlusData &state, int const PumpNum);
-
-    void ReportPumps(EnergyPlusData &state, int const PumpNum);
-
-    void PumpDataForTable(EnergyPlusData &state, int const NumPump);
-
-    void GetRequiredMassFlowRate(EnergyPlusData &state,
-                                 int const LoopNum,
-                                 int const PumpNum,
-                                 Real64 const InletNodeMassFlowRate,
-                                 Real64 &ActualFlowRate,
-                                 Real64 &PumpMinMassFlowRateVFDRange,
-                                 Real64 &PumpMaxMassFlowRateVFDRange);
 
 } // namespace Pumps
 

@@ -84,53 +84,6 @@ namespace PlantValves {
 
     using namespace DataLoopNode;
 
-    PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName)
-    {
-        // Process the input data for valves if it hasn't been done already
-        if (state.dataPlantValves->GetTemperingValves) {
-            GetPlantValvesInput(state);
-            state.dataPlantValves->GetTemperingValves = false;
-        }
-        // Now look for this particular pipe in the list
-        for (auto &valve : state.dataPlantValves->TemperValve) {
-            if (valve.Name == objectName) {
-                return &valve;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state,
-                       "TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    void TemperValveData::simulate(EnergyPlusData &state,
-                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                   [[maybe_unused]] bool FirstHVACIteration,
-                                   [[maybe_unused]] Real64 &CurLoad,
-                                   [[maybe_unused]] bool RunFlag)
-    {
-        this->initialize(state);
-        this->calculate(state);
-        PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
-        Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
-        if (this->LoopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(
-                state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
-        }
-    }
-
-    void TemperValveData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
-                                              [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                              Real64 &MaxLoad,
-                                              Real64 &MinLoad,
-                                              Real64 &OptLoad)
-    {
-        MaxLoad = 0.0;
-        MinLoad = 0.0;
-        OptLoad = 0.0;
-    }
-
     void GetPlantValvesInput(EnergyPlusData &state)
     {
 
@@ -243,6 +196,53 @@ namespace PlantValves {
         if (ErrorsFound) {
             ShowFatalError(state, "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
         }
+    }
+
+    PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName)
+    {
+        // Process the input data for valves if it hasn't been done already
+        if (state.dataPlantValves->GetTemperingValves) {
+            GetPlantValvesInput(state);
+            state.dataPlantValves->GetTemperingValves = false;
+        }
+        // Now look for this particular pipe in the list
+        for (auto &valve : state.dataPlantValves->TemperValve) {
+            if (valve.Name == objectName) {
+                return &valve;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(state,
+                       "TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void TemperValveData::simulate(EnergyPlusData &state,
+                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                   [[maybe_unused]] bool FirstHVACIteration,
+                                   [[maybe_unused]] Real64 &CurLoad,
+                                   [[maybe_unused]] bool RunFlag)
+    {
+        this->initialize(state);
+        this->calculate(state);
+        PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
+        Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
+        if (this->LoopNum > 0) {
+            PlantUtilities::SetComponentFlowRate(
+                state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        }
+    }
+
+    void TemperValveData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                              [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                              Real64 &MaxLoad,
+                                              Real64 &MinLoad,
+                                              Real64 &OptLoad)
+    {
+        MaxLoad = 0.0;
+        MinLoad = 0.0;
+        OptLoad = 0.0;
     }
 
     void TemperValveData::initialize(EnergyPlusData &state)

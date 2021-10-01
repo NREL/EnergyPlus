@@ -70,24 +70,6 @@ namespace PlantPressureSystem {
                                Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );
 
-    void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);
-
-    void BranchPressureDrop(EnergyPlusData &state,
-                            int LoopNum,     // Plant Loop Index
-                            int LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
-                            int BranchNum    // Branch Index on LoopSide LoopSideNum
-    );
-
-    void UpdatePressureDrop(EnergyPlusData &state, int LoopNum);
-
-    void DistributePressureOnBranch(EnergyPlusData &state, int LoopNum, int LoopSideNum, int BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
-
-    void PassPressureAcrossMixer(EnergyPlusData &state, int LoopNum, int LoopSideNum, Real64 &MixerPressure, int NumBranchesOnLoopSide);
-
-    void PassPressureAcrossSplitter(EnergyPlusData &state, int LoopNum, int LoopSideNum, Real64 &SplitterInletPressure);
-
-    void PassPressureAcrossInterface(EnergyPlusData &state, int LoopNum);
-
     Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
                                      int LoopNum,            // - Index of which plant/condenser loop is being simulated
                                      Real64 SystemMassFlow,  // - Initial "guess" at system mass flow rate [kg/s]

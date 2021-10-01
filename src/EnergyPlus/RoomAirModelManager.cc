@@ -103,119 +103,530 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
+    void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Weixiu Kong
-        //       DATE WRITTEN   April 2003
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   August 2001
+        //       RE-ENGINEERED  April 2003, Weixiu Kong
         //       MODIFIED       July 2003, CC
         //                      Jan 2004, CC
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        //     manage room air models.
+        //     Get AirNode data for all zones at once
+
+        // METHODOLOGY EMPLOYED:
+        //     Use input processer to get input from idf file
 
         // Using/Aliasing
-        using CrossVentMgr::ManageUCSDCVModel;
-        using DisplacementVentMgr::ManageUCSDDVModel;
-        using MundtSimMgr::ManageMundtModel;
-        using RoomAirModelAirflowNetwork::SimRoomAirModelAirflowNetwork;
-        using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
-        using UFADManager::ManageUCSDUFModels;
 
-        if (state.dataRoomAirModelMgr->GetAirModelData) {
-            GetAirModelDatas(state);
-            state.dataRoomAirModelMgr->GetAirModelData = false;
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NumAlphas; // States which alpha value to read from a
+        // "Number" line
+        int NumNumbers;       // Number of numbers encountered
+        int Status;           // Notes if there was an error in processing the input
+        int AirNodeNum;       // Index number for air nodes
+        int ZoneNum;          // Index number for zones
+        int NumSurfsInvolved; // Number of surfaces involved with air nodes
+        int SurfCount;        // Number of surfaces involved with air nodes
+        // (used for checking error)
+        int SurfNum;     // Index number for surfaces
+        int SurfFirst;   // Index number for first surface of zones
+        int NumOfSurfs;  // Index number for last surface of zones
+        int ListSurfNum; // Index number of surfaces listed in the air node object
+        bool SurfNeeded;
+
+        if (!state.dataRoomAirMod->MundtModelUsed) return;
+
+        // Initialize default values for air nodes
+        state.dataRoomAirMod->TotNumOfZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAirMod->TotNumOfAirNodes = 0;
+        state.dataRoomAirMod->TotNumOfZoneAirNodes = 0;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        cCurrentModuleObject = "RoomAir:Node";
+        state.dataRoomAirMod->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        if (state.dataRoomAirMod->TotNumOfAirNodes <= 0) {
+            // no air node object is found, terminate the program
+            ShowSevereError(state, "No " + cCurrentModuleObject + " objects found in input.");
+            ShowContinueError(state, "The OneNodeDisplacementVentilation model requires " + cCurrentModuleObject + " objects");
+            ErrorsFound = true;
+            return;
+        } else {
+            // air node objects are found so allocate airnode variable
+            state.dataRoomAirMod->AirNode.allocate(state.dataRoomAirMod->TotNumOfAirNodes);
         }
 
-        if (state.dataRoomAirMod->UCSDModelUsed) {
-            SharedDVCVUFDataInit(state, ZoneNum);
+        for (AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
+
+            // get air node objects
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     AirNodeNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     _,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
+            state.dataRoomAirMod->AirNode(AirNodeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+
+            state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName = state.dataIPShortCut->cAlphaArgs(3); // Zone name
+            state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr =
+                UtilityRoutines::FindItemInList(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone);
+            if (state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ErrorsFound = true;
+            } else {
+                ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
+                NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+                state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask.allocate(NumOfSurfs);
+            }
+
+            {
+                auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
+                if (nodeType == "INLET") {
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAirNode;
+                } else if (nodeType == "FLOOR") {
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAirNode;
+                } else if (nodeType == "CONTROL") {
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAirNode;
+                } else if (nodeType == "CEILING") {
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAirNode;
+                } else if (nodeType == "MUNDTROOM") {
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAirNode;
+                } else if (nodeType == "RETURN") {
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAirNode;
+                } else {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ErrorsFound = true;
+                }
+            }
+
+            state.dataRoomAirMod->AirNode(AirNodeNum).Height = state.dataIPShortCut->rNumericArgs(1); // Air node height
+            NumSurfsInvolved = NumAlphas - 3;                                                         // Number of surfaces involved with air nodes
+
+            // Initialize
+            state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask = false;
+
+            if (NumSurfsInvolved <= 0) {
+
+                // report severe error since the following air nodes require surfaces associated with them
+                {
+                    auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
+                    if (nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" ||
+                        nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4") {
+                        // terminate the program due to a severe error in the specified input
+                        ShowSevereError(state,
+                                        "GetAirNodeData: " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                            "\" invalid air node specification.");
+                        ShowContinueError(state,
+                                          "Mundt Room Air Model: No surface names specified.  Air node=\"" +
+                                              state.dataRoomAirMod->AirNode(AirNodeNum).Name + " requires name of surfaces associated with it.");
+                        ErrorsFound = true;
+                    } else {
+                    }
+                }
+
+            } else {
+
+                // initialize
+                SurfNeeded = true;
+
+                // report warning error since the following air nodes do not require surfaces associated with them
+                // and assign .FALSE. to 'SurfNeeded'
+                {
+                    auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
+                    if (nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" ||
+                        nodeType == "PLUME3") {
+                        ShowWarningError(
+                            state, "GetAirNodeData: " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid linkage");
+                        ShowContinueError(state,
+                                          "Mundt Room Air Model: No surface names needed.  Air node=\"" +
+                                              state.dataRoomAirMod->AirNode(AirNodeNum).Name + " does not relate to any surfaces.");
+                        SurfNeeded = false;
+                    } else {
+                    }
+                }
+
+                if (SurfNeeded) {
+
+                    // this air node is in this zone; hence, first get name of all surfaces in this zone
+                    ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
+                    SurfFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
+                    NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+
+                    // terminate the program due to a severe error in the specified input
+                    if ((NumSurfsInvolved) > NumOfSurfs) {
+                        ShowFatalError(state,
+                                       "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " +
+                                           state.dataRoomAirMod->AirNode(AirNodeNum).Name + " is greater than number of surfaces in " +
+                                           state.dataHeatBal->Zone(ZoneNum).Name);
+                        return;
+                    }
+
+                    // relate surfaces to this air node and check to see whether surface names are specified correctly or not
+                    SurfCount = 0;
+                    --SurfFirst;
+                    for (ListSurfNum = 4; ListSurfNum <= NumAlphas; ++ListSurfNum) {
+                        for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
+                            if (state.dataIPShortCut->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfFirst + SurfNum).Name) {
+                                state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask(SurfNum) = true;
+                                ++SurfCount;
+                            }
+                        }
+                    }
+
+                    // report warning error since surface names are specified correctly
+                    if ((NumSurfsInvolved) != SurfCount) {
+                        ShowWarningError(state,
+                                         "GetAirNodeData: Mundt Room Air Model: Some surface names specified for " +
+                                             state.dataRoomAirMod->AirNode(AirNodeNum).Name + " are not in " + state.dataHeatBal->Zone(ZoneNum).Name);
+                    }
+                }
+            }
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
+        // get number of air nodes in each zone
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
+            // this zone uses other air model so skip the rest
+            if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) continue;
 
-                ManageUserDefinedPatterns(state, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) { // Mixing air model
-                                                                                    // do nothing
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) { // Mundt air model
-                // simulate room airflow using Mundt model
-                ManageMundtModel(state, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) { // UCDV Displacement Ventilation model
-                // simulate room airflow using UCSDDV model
-                ManageUCSDDVModel(state, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) { // UCSD Cross Ventilation model
-                // simulate room airflow using UCSDDV model
-                ManageUCSDCVModel(state, ZoneNum);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
-                // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFI);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD exterior zone model
-                // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFE);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) { // RoomAirflowNetwork zone model
-                // simulate room airflow using the AirflowNetwork - based model
-                SimRoomAirModelAirflowNetwork(state, ZoneNum);
-
-            } else { // mixing air model
-                     // do nothing
+            // this zone uses a nodal air model so get number of air nodes in each zone
+            for (AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
+                if (UtilityRoutines::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone(ZoneNum).Name)) {
+                    ++state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum);
+                }
             }
         }
     }
 
-    //*****************************************************************************************
-
-    void GetAirModelDatas(EnergyPlusData &state)
+    void GetMundtData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   March 2005
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   August 2001
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED  April 2003, Weixiu Kong
+        //                      July 2003, CC
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This routine "gets" all the data for the "RoomAir" models by calling individual
-        // routines.
+        //     Get Mundt model controls for all zones at once
+
+        // METHODOLOGY EMPLOYED:
+        //     Use input processer to get input from idf file
+
+        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound;
+        int NumAlphas;
+        int NumNumbers;       // Number of numbers encountered
+        int Status;           // Notes if there was an error in processing the input
+        int ControlNum;       // Index number
+        int NumOfMundtContrl; // Number of Mundt Model Controls
+        int ZoneNum;          // Index number for zones
 
-        ErrorsFound = false;
-        // get air node input data for all zones
-        GetAirNodeData(state, ErrorsFound);
+        if (!state.dataRoomAirMod->MundtModelUsed) return;
 
-        // get mundt model controls for all zones
-        GetMundtData(state, ErrorsFound);
+        // Initialize default values for Mundt model controls
+        state.dataRoomAirMod->ConvectiveFloorSplit.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAirMod->InfiltratFloorSplit.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAirMod->ConvectiveFloorSplit = 0.0;
+        state.dataRoomAirMod->InfiltratFloorSplit = 0.0;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
+        NumOfMundtContrl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (NumOfMundtContrl > state.dataGlobal->NumOfZones) {
+            ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
+            ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
+            ErrorsFound = true;
+        }
 
-        // get airflow network model info for all zones
-        GetRoomAirflowNetworkData(state, ErrorsFound);
+        if (NumOfMundtContrl == 0) {
+            ShowWarningError(state, "No " + cCurrentModuleObject + " objects found, program assumes no convection or infiltration gains near floors");
+            return;
+        }
 
-        // get UCSDDV model controls for all zones
-        GetDisplacementVentData(state, ErrorsFound);
+        // this zone uses Mundt model so get Mundt Model Control
+        // loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
+        for (ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ControlNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     _,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+            if (ZoneNum == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Not a valid zone name.");
+                ErrorsFound = true;
+                continue;
+            }
+            if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) {
+                ShowSevereError(
+                    state, "Zone specified=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Air Model type is not OneNodeDisplacementVentilation.");
+                ShowContinueError(
+                    state, format("Air Model Type for zone={}", ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
+                ErrorsFound = true;
+                continue;
+            }
+            state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) = state.dataIPShortCut->rNumericArgs(1);
+            state.dataRoomAirMod->InfiltratFloorSplit(ZoneNum) = state.dataIPShortCut->rNumericArgs(2);
+        }
+    }
 
-        // get UCSDCV model controls for all zones
-        GetCrossVentData(state, ErrorsFound);
+    void GetDisplacementVentData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
+    {
 
-        // get BTG's user-defined patterns for all zones
-        GetUserDefinedPatternData(state, ErrorsFound);
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         G. Carrilho da Graca
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED
+        //       RE-ENGINEERED
 
-        // get UCSD UFAD interior zone model controls for all zones
-        // get UCSD UFAD exterior zone model controls for all zones
-        GetUFADZoneData(state, ErrorsFound);
+        // PURPOSE OF THIS SUBROUTINE:
+        //  Get UCSD Displacement ventilation model controls for all zones at once
 
-        if (ErrorsFound) {
-            ShowFatalError(state, "GetAirModelData: Errors found getting air model input.  Program terminates.");
+        // METHODOLOGY EMPLOYED:
+        // Use input processor to get input from idf file
+
+        // Using/Aliasing
+        using namespace ScheduleManager;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int IOStat;
+        int NumAlpha;
+        int NumNumber;
+        int Loop;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        if (!state.dataRoomAirMod->UCSDModelUsed) return;
+        cCurrentModuleObject = "RoomAirSettings:ThreeNodeDisplacementVentilation";
+        state.dataRoomAirMod->TotUCSDDV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        if (state.dataRoomAirMod->TotUCSDDV <= 0) return;
+
+        state.dataRoomAirMod->ZoneUCSDDV.allocate(state.dataRoomAirMod->TotUCSDDV);
+
+        for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDDV; ++Loop) {
+
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            // First is Zone Name
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+            if (state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Zone Name not found.");
+                ErrorsFound = true;
+            } else {
+                state.dataRoomAirMod->IsZoneDV(state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr) = true;
+            }
+            // Second Alpha is Schedule Name
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            if (state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsPtr == 0) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, " Schedule name must be input.");
+                    ErrorsFound = true;
+                } else {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, "Schedule name was not found.");
+                    ErrorsFound = true;
+                }
+            }
+
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).NumPlumesPerOcc = state.dataIPShortCut->rNumericArgs(1);
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).ThermostatHeight = state.dataIPShortCut->rNumericArgs(2);
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).ComfortHeight = state.dataIPShortCut->rNumericArgs(3);
+            state.dataRoomAirMod->ZoneUCSDDV(Loop).TempTrigger = state.dataIPShortCut->rNumericArgs(4);
+        }
+    }
+
+    void GetCrossVentData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         G. Carrilho da Graca
+        //       DATE WRITTEN   October 2004
+        //       MODIFIED
+        //       RE-ENGINEERED
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //  Get UCSD Cross ventilation model controls for all zones at once
+
+        // METHODOLOGY EMPLOYED:
+        // Use input processor to get input from idf file
+
+        // Using/Aliasing
+        using namespace ScheduleManager;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int IOStat;
+        int NumAlpha;
+        int NumNumber;
+        int Loop;
+        int Loop2;
+        int ThisZone;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        if (!state.dataRoomAirMod->UCSDModelUsed) return;
+        cCurrentModuleObject = "RoomAirSettings:CrossVentilation";
+        state.dataRoomAirMod->TotUCSDCV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        if (state.dataRoomAirMod->TotUCSDCV <= 0) return;
+
+        state.dataRoomAirMod->ZoneUCSDCV.allocate(state.dataRoomAirMod->TotUCSDCV);
+
+        for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDCV; ++Loop) {
+
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            // First is Zone Name
+            state.dataRoomAirMod->ZoneUCSDCV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+            if (state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Zone name was not found.");
+                ErrorsFound = true;
+            } else {
+                state.dataRoomAirMod->IsZoneCV(state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) = true;
+            }
+            // Second Alpha is Schedule Name
+            state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            if (state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsPtr == 0) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, "Schedule name field is blank.");
+                    ErrorsFound = true;
+                } else {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, "Schedule name was not found.");
+                    ErrorsFound = true;
+                }
+            }
+
+            // Third Alpha is a string: JET or RECIRCULATION
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Jet;
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Recirculation;
+            } else {
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
+            }
+
+            for (Loop2 = 1; Loop2 <= state.dataHeatBal->TotPeople; ++Loop2) {
+                if (state.dataHeatBal->People(Loop2).ZonePtr != state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) continue;
+                if (state.dataHeatBal->People(Loop2).Fanger) {
+                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {
+                        if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                            ShowSevereError(state,
+                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                            ShowContinueError(state,
+                                              "Airflow region used for thermal comfort evaluation is required for Zone=" +
+                                                  state.dataIPShortCut->cAlphaArgs(1));
+                            ShowContinueError(state, "Field is blank, please choose Jet or Recirculation.");
+                            ErrorsFound = true;
+                        } else {
+                            ShowSevereError(state,
+                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                            ShowContinueError(state,
+                                              "Airflow region used for thermal comfort evaluation is required for Zone=" +
+                                                  state.dataIPShortCut->cAlphaArgs(1));
+                            ShowContinueError(state, "Please choose Jet or Recirculation.");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+
+            ThisZone = state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr;
+            if (ThisZone == 0) continue;
+
+            // Following depend on valid zone
+
+            Loop2 = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr).Name,
+                                                    state.dataAirflowNetwork->MultizoneZoneData,
+                                                    &AirflowNetwork::MultizoneZoneProp::ZoneName);
+            if (Loop2 == 0) {
+                ShowSevereError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "AirflowNetwork airflow model must be active in this zone");
+                ErrorsFound = true;
+            }
+
+            // If a crack is used it must have an air flow coefficient = 0.5
+            for (Loop2 = 1; Loop2 <= state.dataAirflowNetwork->NumOfLinksMultiZone; ++Loop2) {
+                state.dataRoomAirModelMgr->NodeNum1 = state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).NodeNums[0];
+                state.dataRoomAirModelMgr->NodeNum2 = state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).NodeNums[1];
+                if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).SurfNum).Zone == ThisZone ||
+                    (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum == ThisZone &&
+                     state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum > 0) ||
+                    (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum > 0 &&
+                     state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum == ThisZone)) {
+                    state.dataRoomAirModelMgr->CompNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(Loop2).CompNum;
+                    state.dataRoomAirModelMgr->TypeNum = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).TypeNum;
+                    if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).CompTypeNum ==
+                        AirflowNetwork::iComponentTypeNum::SCR) {
+                        if (state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent != 0.50) {
+                            state.dataRoomAirMod->AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+                            ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                            ShowWarningError(state, "Roomair model will not be applied for Zone=" + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                            ShowContinueError(
+                                state,
+                                format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}",
+                                       state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent));
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -637,535 +1048,6 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   August 2001
-        //       RE-ENGINEERED  April 2003, Weixiu Kong
-        //       MODIFIED       July 2003, CC
-        //                      Jan 2004, CC
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //     Get AirNode data for all zones at once
-
-        // METHODOLOGY EMPLOYED:
-        //     Use input processer to get input from idf file
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas; // States which alpha value to read from a
-        // "Number" line
-        int NumNumbers;       // Number of numbers encountered
-        int Status;           // Notes if there was an error in processing the input
-        int AirNodeNum;       // Index number for air nodes
-        int ZoneNum;          // Index number for zones
-        int NumSurfsInvolved; // Number of surfaces involved with air nodes
-        int SurfCount;        // Number of surfaces involved with air nodes
-        // (used for checking error)
-        int SurfNum;     // Index number for surfaces
-        int SurfFirst;   // Index number for first surface of zones
-        int NumOfSurfs;  // Index number for last surface of zones
-        int ListSurfNum; // Index number of surfaces listed in the air node object
-        bool SurfNeeded;
-
-        if (!state.dataRoomAirMod->MundtModelUsed) return;
-
-        // Initialize default values for air nodes
-        state.dataRoomAirMod->TotNumOfZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAirMod->TotNumOfAirNodes = 0;
-        state.dataRoomAirMod->TotNumOfZoneAirNodes = 0;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "RoomAir:Node";
-        state.dataRoomAirMod->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-
-        if (state.dataRoomAirMod->TotNumOfAirNodes <= 0) {
-            // no air node object is found, terminate the program
-            ShowSevereError(state, "No " + cCurrentModuleObject + " objects found in input.");
-            ShowContinueError(state, "The OneNodeDisplacementVentilation model requires " + cCurrentModuleObject + " objects");
-            ErrorsFound = true;
-            return;
-        } else {
-            // air node objects are found so allocate airnode variable
-            state.dataRoomAirMod->AirNode.allocate(state.dataRoomAirMod->TotNumOfAirNodes);
-        }
-
-        for (AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
-
-            // get air node objects
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     AirNodeNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-            state.dataRoomAirMod->AirNode(AirNodeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-
-            state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName = state.dataIPShortCut->cAlphaArgs(3); // Zone name
-            state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone);
-            if (state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ErrorsFound = true;
-            } else {
-                ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
-                NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
-                state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask.allocate(NumOfSurfs);
-            }
-
-            {
-                auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
-                if (nodeType == "INLET") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAirNode;
-                } else if (nodeType == "FLOOR") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAirNode;
-                } else if (nodeType == "CONTROL") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAirNode;
-                } else if (nodeType == "CEILING") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAirNode;
-                } else if (nodeType == "MUNDTROOM") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAirNode;
-                } else if (nodeType == "RETURN") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAirNode;
-                } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ErrorsFound = true;
-                }
-            }
-
-            state.dataRoomAirMod->AirNode(AirNodeNum).Height = state.dataIPShortCut->rNumericArgs(1); // Air node height
-            NumSurfsInvolved = NumAlphas - 3;                                                         // Number of surfaces involved with air nodes
-
-            // Initialize
-            state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask = false;
-
-            if (NumSurfsInvolved <= 0) {
-
-                // report severe error since the following air nodes require surfaces associated with them
-                {
-                    auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
-                    if (nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" ||
-                        nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4") {
-                        // terminate the program due to a severe error in the specified input
-                        ShowSevereError(state,
-                                        "GetAirNodeData: " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\" invalid air node specification.");
-                        ShowContinueError(state,
-                                          "Mundt Room Air Model: No surface names specified.  Air node=\"" +
-                                              state.dataRoomAirMod->AirNode(AirNodeNum).Name + " requires name of surfaces associated with it.");
-                        ErrorsFound = true;
-                    } else {
-                    }
-                }
-
-            } else {
-
-                // initialize
-                SurfNeeded = true;
-
-                // report warning error since the following air nodes do not require surfaces associated with them
-                // and assign .FALSE. to 'SurfNeeded'
-                {
-                    auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
-                    if (nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" ||
-                        nodeType == "PLUME3") {
-                        ShowWarningError(
-                            state, "GetAirNodeData: " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid linkage");
-                        ShowContinueError(state,
-                                          "Mundt Room Air Model: No surface names needed.  Air node=\"" +
-                                              state.dataRoomAirMod->AirNode(AirNodeNum).Name + " does not relate to any surfaces.");
-                        SurfNeeded = false;
-                    } else {
-                    }
-                }
-
-                if (SurfNeeded) {
-
-                    // this air node is in this zone; hence, first get name of all surfaces in this zone
-                    ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
-                    SurfFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
-                    NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
-
-                    // terminate the program due to a severe error in the specified input
-                    if ((NumSurfsInvolved) > NumOfSurfs) {
-                        ShowFatalError(state,
-                                       "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " +
-                                           state.dataRoomAirMod->AirNode(AirNodeNum).Name + " is greater than number of surfaces in " +
-                                           state.dataHeatBal->Zone(ZoneNum).Name);
-                        return;
-                    }
-
-                    // relate surfaces to this air node and check to see whether surface names are specified correctly or not
-                    SurfCount = 0;
-                    --SurfFirst;
-                    for (ListSurfNum = 4; ListSurfNum <= NumAlphas; ++ListSurfNum) {
-                        for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                            if (state.dataIPShortCut->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfFirst + SurfNum).Name) {
-                                state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask(SurfNum) = true;
-                                ++SurfCount;
-                            }
-                        }
-                    }
-
-                    // report warning error since surface names are specified correctly
-                    if ((NumSurfsInvolved) != SurfCount) {
-                        ShowWarningError(state,
-                                         "GetAirNodeData: Mundt Room Air Model: Some surface names specified for " +
-                                             state.dataRoomAirMod->AirNode(AirNodeNum).Name + " are not in " + state.dataHeatBal->Zone(ZoneNum).Name);
-                    }
-                }
-            }
-        }
-
-        // get number of air nodes in each zone
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-
-            // this zone uses other air model so skip the rest
-            if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) continue;
-
-            // this zone uses a nodal air model so get number of air nodes in each zone
-            for (AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
-                if (UtilityRoutines::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone(ZoneNum).Name)) {
-                    ++state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum);
-                }
-            }
-        }
-    }
-
-    //*****************************************************************************************
-
-    void GetMundtData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   August 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  April 2003, Weixiu Kong
-        //                      July 2003, CC
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //     Get Mundt model controls for all zones at once
-
-        // METHODOLOGY EMPLOYED:
-        //     Use input processer to get input from idf file
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;
-        int NumNumbers;       // Number of numbers encountered
-        int Status;           // Notes if there was an error in processing the input
-        int ControlNum;       // Index number
-        int NumOfMundtContrl; // Number of Mundt Model Controls
-        int ZoneNum;          // Index number for zones
-
-        if (!state.dataRoomAirMod->MundtModelUsed) return;
-
-        // Initialize default values for Mundt model controls
-        state.dataRoomAirMod->ConvectiveFloorSplit.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAirMod->InfiltratFloorSplit.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAirMod->ConvectiveFloorSplit = 0.0;
-        state.dataRoomAirMod->InfiltratFloorSplit = 0.0;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
-        NumOfMundtContrl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumOfMundtContrl > state.dataGlobal->NumOfZones) {
-            ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
-            ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
-            ErrorsFound = true;
-        }
-
-        if (NumOfMundtContrl == 0) {
-            ShowWarningError(state, "No " + cCurrentModuleObject + " objects found, program assumes no convection or infiltration gains near floors");
-            return;
-        }
-
-        // this zone uses Mundt model so get Mundt Model Control
-        // loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
-        for (ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ControlNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
-            if (ZoneNum == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Not a valid zone name.");
-                ErrorsFound = true;
-                continue;
-            }
-            if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) {
-                ShowSevereError(
-                    state, "Zone specified=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Air Model type is not OneNodeDisplacementVentilation.");
-                ShowContinueError(
-                    state, format("Air Model Type for zone={}", ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
-                ErrorsFound = true;
-                continue;
-            }
-            state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) = state.dataIPShortCut->rNumericArgs(1);
-            state.dataRoomAirMod->InfiltratFloorSplit(ZoneNum) = state.dataIPShortCut->rNumericArgs(2);
-        }
-    }
-
-    void GetDisplacementVentData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         G. Carrilho da Graca
-        //       DATE WRITTEN   January 2004
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //  Get UCSD Displacement ventilation model controls for all zones at once
-
-        // METHODOLOGY EMPLOYED:
-        // Use input processor to get input from idf file
-
-        // Using/Aliasing
-        using namespace ScheduleManager;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStat;
-        int NumAlpha;
-        int NumNumber;
-        int Loop;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        if (!state.dataRoomAirMod->UCSDModelUsed) return;
-        cCurrentModuleObject = "RoomAirSettings:ThreeNodeDisplacementVentilation";
-        state.dataRoomAirMod->TotUCSDDV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-
-        if (state.dataRoomAirMod->TotUCSDDV <= 0) return;
-
-        state.dataRoomAirMod->ZoneUCSDDV.allocate(state.dataRoomAirMod->TotUCSDDV);
-
-        for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDDV; ++Loop) {
-
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            // First is Zone Name
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
-            if (state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Zone Name not found.");
-                ErrorsFound = true;
-            } else {
-                state.dataRoomAirMod->IsZoneDV(state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr) = true;
-            }
-            // Second Alpha is Schedule Name
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsName = state.dataIPShortCut->cAlphaArgs(2);
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-            if (state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsPtr == 0) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, " Schedule name must be input.");
-                    ErrorsFound = true;
-                } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule name was not found.");
-                    ErrorsFound = true;
-                }
-            }
-
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).NumPlumesPerOcc = state.dataIPShortCut->rNumericArgs(1);
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).ThermostatHeight = state.dataIPShortCut->rNumericArgs(2);
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).ComfortHeight = state.dataIPShortCut->rNumericArgs(3);
-            state.dataRoomAirMod->ZoneUCSDDV(Loop).TempTrigger = state.dataIPShortCut->rNumericArgs(4);
-        }
-    }
-
-    void GetCrossVentData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         G. Carrilho da Graca
-        //       DATE WRITTEN   October 2004
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //  Get UCSD Cross ventilation model controls for all zones at once
-
-        // METHODOLOGY EMPLOYED:
-        // Use input processor to get input from idf file
-
-        // Using/Aliasing
-        using namespace ScheduleManager;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStat;
-        int NumAlpha;
-        int NumNumber;
-        int Loop;
-        int Loop2;
-        int ThisZone;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        if (!state.dataRoomAirMod->UCSDModelUsed) return;
-        cCurrentModuleObject = "RoomAirSettings:CrossVentilation";
-        state.dataRoomAirMod->TotUCSDCV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-
-        if (state.dataRoomAirMod->TotUCSDCV <= 0) return;
-
-        state.dataRoomAirMod->ZoneUCSDCV.allocate(state.dataRoomAirMod->TotUCSDCV);
-
-        for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDCV; ++Loop) {
-
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            // First is Zone Name
-            state.dataRoomAirMod->ZoneUCSDCV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
-            if (state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Zone name was not found.");
-                ErrorsFound = true;
-            } else {
-                state.dataRoomAirMod->IsZoneCV(state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) = true;
-            }
-            // Second Alpha is Schedule Name
-            state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsName = state.dataIPShortCut->cAlphaArgs(2);
-            state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-            if (state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsPtr == 0) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule name field is blank.");
-                    ErrorsFound = true;
-                } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule name was not found.");
-                    ErrorsFound = true;
-                }
-            }
-
-            // Third Alpha is a string: JET or RECIRCULATION
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Jet;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Recirculation;
-            } else {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
-            }
-
-            for (Loop2 = 1; Loop2 <= state.dataHeatBal->TotPeople; ++Loop2) {
-                if (state.dataHeatBal->People(Loop2).ZonePtr != state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) continue;
-                if (state.dataHeatBal->People(Loop2).Fanger) {
-                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {
-                        if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                            ShowContinueError(state,
-                                              "Airflow region used for thermal comfort evaluation is required for Zone=" +
-                                                  state.dataIPShortCut->cAlphaArgs(1));
-                            ShowContinueError(state, "Field is blank, please choose Jet or Recirculation.");
-                            ErrorsFound = true;
-                        } else {
-                            ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                            ShowContinueError(state,
-                                              "Airflow region used for thermal comfort evaluation is required for Zone=" +
-                                                  state.dataIPShortCut->cAlphaArgs(1));
-                            ShowContinueError(state, "Please choose Jet or Recirculation.");
-                            ErrorsFound = true;
-                        }
-                    }
-                }
-            }
-
-            ThisZone = state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr;
-            if (ThisZone == 0) continue;
-
-            // Following depend on valid zone
-
-            Loop2 = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr).Name,
-                                                    state.dataAirflowNetwork->MultizoneZoneData,
-                                                    &AirflowNetwork::MultizoneZoneProp::ZoneName);
-            if (Loop2 == 0) {
-                ShowSevereError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "AirflowNetwork airflow model must be active in this zone");
-                ErrorsFound = true;
-            }
-
-            // If a crack is used it must have an air flow coefficient = 0.5
-            for (Loop2 = 1; Loop2 <= state.dataAirflowNetwork->NumOfLinksMultiZone; ++Loop2) {
-                state.dataRoomAirModelMgr->NodeNum1 = state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).NodeNums[0];
-                state.dataRoomAirModelMgr->NodeNum2 = state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).NodeNums[1];
-                if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(Loop2).SurfNum).Zone == ThisZone ||
-                    (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum == ThisZone &&
-                     state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum > 0) ||
-                    (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum > 0 &&
-                     state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum == ThisZone)) {
-                    state.dataRoomAirModelMgr->CompNum = state.dataAirflowNetwork->AirflowNetworkLinkageData(Loop2).CompNum;
-                    state.dataRoomAirModelMgr->TypeNum = state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).TypeNum;
-                    if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).CompTypeNum ==
-                        AirflowNetwork::iComponentTypeNum::SCR) {
-                        if (state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent != 0.50) {
-                            state.dataRoomAirMod->AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
-                            ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                            ShowWarningError(state, "Roomair model will not be applied for Zone=" + state.dataIPShortCut->cAlphaArgs(1) + '.');
-                            ShowContinueError(
-                                state,
-                                format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}",
-                                       state.dataAirflowNetwork->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     void GetUFADZoneData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
     {
 
@@ -1347,6 +1229,120 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->ZoneUCSDUE(Loop).D_Kc = state.dataIPShortCut->rNumericArgs(12);
             // 13th number is Coefficient E in formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
             state.dataRoomAirMod->ZoneUCSDUE(Loop).E_Kc = state.dataIPShortCut->rNumericArgs(13);
+        }
+    }
+
+    void GetAirModelData(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   March 2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine "gets" all the data for the "RoomAir" models by calling individual
+        // routines.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool ErrorsFound;
+
+        ErrorsFound = false;
+        // get air node input data for all zones
+        GetAirNodeData(state, ErrorsFound);
+
+        // get mundt model controls for all zones
+        GetMundtData(state, ErrorsFound);
+
+        // get airflow network model info for all zones
+        GetRoomAirflowNetworkData(state, ErrorsFound);
+
+        // get UCSDDV model controls for all zones
+        GetDisplacementVentData(state, ErrorsFound);
+
+        // get UCSDCV model controls for all zones
+        GetCrossVentData(state, ErrorsFound);
+
+        // get BTG's user-defined patterns for all zones
+        GetUserDefinedPatternData(state, ErrorsFound);
+
+        // get UCSD UFAD interior zone model controls for all zones
+        // get UCSD UFAD exterior zone model controls for all zones
+        GetUFADZoneData(state, ErrorsFound);
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "GetAirModelData: Errors found getting air model input.  Program terminates.");
+        }
+    }
+
+    void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Weixiu Kong
+        //       DATE WRITTEN   April 2003
+        //       MODIFIED       July 2003, CC
+        //                      Jan 2004, CC
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //     manage room air models.
+
+        // Using/Aliasing
+        using CrossVentMgr::ManageUCSDCVModel;
+        using DisplacementVentMgr::ManageUCSDDVModel;
+        using MundtSimMgr::ManageMundtModel;
+        using RoomAirModelAirflowNetwork::SimRoomAirModelAirflowNetwork;
+        using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
+        using UFADManager::ManageUCSDUFModels;
+
+        if (state.dataRoomAirModelMgr->GetAirModelData) {
+            GetAirModelData(state);
+            state.dataRoomAirModelMgr->GetAirModelData = false;
+        }
+
+        if (state.dataRoomAirMod->UCSDModelUsed) {
+            SharedDVCVUFDataInit(state, ZoneNum);
+        }
+
+        {
+            auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
+
+            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
+
+                ManageUserDefinedPatterns(state, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) { // Mixing air model
+                                                                                    // do nothing
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) { // Mundt air model
+                // simulate room airflow using Mundt model
+                ManageMundtModel(state, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) { // UCDV Displacement Ventilation model
+                // simulate room airflow using UCSDDV model
+                ManageUCSDDVModel(state, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) { // UCSD Cross Ventilation model
+                // simulate room airflow using UCSDDV model
+                ManageUCSDCVModel(state, ZoneNum);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
+                // simulate room airflow using the UCSDUFI model
+                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFI);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD exterior zone model
+                // simulate room airflow using the UCSDUFE model
+                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFE);
+
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) { // RoomAirflowNetwork zone model
+                // simulate room airflow using the AirflowNetwork - based model
+                SimRoomAirModelAirflowNetwork(state, ZoneNum);
+
+            } else { // mixing air model
+                     // do nothing
+            }
         }
     }
 
@@ -3010,7 +3006,7 @@ namespace RoomAirModelManager {
 
         // Obtains and Allocates RoomAirSettings : AirflowNetwork
         if (state.dataRoomAirModelMgr->GetAirModelData) {
-            GetAirModelDatas(state);
+            GetAirModelData(state);
             state.dataRoomAirModelMgr->GetAirModelData = false;
         }
 
@@ -3241,8 +3237,6 @@ namespace RoomAirModelManager {
 
         return EquipFind;
     }
-
-    //*****************************************************************************************
 
 } // namespace RoomAirModelManager
 

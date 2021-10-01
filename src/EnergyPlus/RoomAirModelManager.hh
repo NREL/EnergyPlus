@@ -61,20 +61,6 @@ namespace RoomAirModelManager {
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
 
-    void GetAirModelDatas(EnergyPlusData &state);
-
-    void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    void GetMundtData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    void GetDisplacementVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    void GetCrossVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    void GetUFADZoneData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
     void SharedDVCVUFDataInit(EnergyPlusData &state, int &ZoneNum);
 
     void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine

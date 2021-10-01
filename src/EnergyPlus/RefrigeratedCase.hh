@@ -1715,18 +1715,6 @@ namespace RefrigeratedCase {
 
     void ManageRefrigeratedCaseRacks(EnergyPlusData &state);
 
-    void GetRefrigerationInput(EnergyPlusData &state);
-
-    void SetupReportInput(EnergyPlusData &state);
-
-    void InitRefrigeration(EnergyPlusData &state);
-
-    void InitRefrigerationPlantConnections(EnergyPlusData &state);
-
-    void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
-
-    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state);
-
     void GetRefrigeratedRackIndex(EnergyPlusData &state,
                                   std::string const &Name,
                                   int &IndexPtr,
@@ -1734,10 +1722,6 @@ namespace RefrigeratedCase {
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
-
-    void ReportRefrigerationComponents(EnergyPlusData &state);
-
-    void SumZoneImpacts(EnergyPlusData &state);
 
     void CheckRefrigerationInput(EnergyPlusData &state);
 
@@ -1750,17 +1734,7 @@ namespace RefrigeratedCase {
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
 
-    void FinalRateCoils(EnergyPlusData &state,
-                        bool DeRate,                  // True if compressor rack or secondary ht exchanger unable to provide capacity
-                        iSourceType SystemSourceType, // SecondarySystem or DetailedSystem
-                        int SystemID,                 // ID for Secondary loop or detailed system calling for derate
-                        Real64 InitialTotalLoad,      // Load on system or secondary loop as initially calculated [W]
-                        Real64 AvailableTotalLoad     // Load that system or secondary loop is able to serve [W]
-    );
-
     void FigureRefrigerationZoneGains(EnergyPlusData &state);
-
-    void ZeroHVACValues(EnergyPlusData &state);
 
 } // namespace RefrigeratedCase
 

@@ -96,50 +96,6 @@ namespace EnergyPlus::PlantPressureSystem {
 // Using/Aliasing
 using namespace DataBranchAirLoopPlant;
 
-void SimPressureDropSystem(EnergyPlusData &state,
-                           int const LoopNum,                       // Plant Loop to update pressure information
-                           bool const FirstHVACIteration,           // System flag
-                           DataPlant::iPressureCall const CallType, // Enumerated call type
-                           Optional_int_const LoopSideNum,          // Loop side num for specific branch simulation
-                           Optional_int_const BranchNum             // Branch num for specific branch simulation
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Edwin Lee
-    //       DATE WRITTEN   August 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This routine is the public interface for pressure system simulation
-    // Calls are made to private components as needed
-
-    // METHODOLOGY EMPLOYED:
-    // Standard EnergyPlus methodology
-
-    // Using/Aliasing
-
-    // Exit out of any calculation routines if we don't do pressure simulation for this loop
-    if ((state.dataPlnt->PlantLoop(LoopNum).PressureSimType == DataPlant::iPressSimType::NoPressure) &&
-        ((CallType == DataPlant::iPressureCall::Calc) || (CallType == DataPlant::iPressureCall::Update)))
-        return;
-
-    // Pass to another routine based on calling flag
-    {
-        auto const SELECT_CASE_var(CallType);
-        if (SELECT_CASE_var == DataPlant::iPressureCall::Init) {
-            InitPressureDrop(state, LoopNum, FirstHVACIteration);
-        } else if (SELECT_CASE_var == DataPlant::iPressureCall::Calc) {
-            BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
-        } else if (SELECT_CASE_var == DataPlant::iPressureCall::Update) {
-            UpdatePressureDrop(state, LoopNum);
-        } else {
-            // Calling routines should only use the three possible keywords here
-        }
-    }
-}
-
 void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const FirstHVACIteration)
 {
 
@@ -446,6 +402,172 @@ void BranchPressureDrop(EnergyPlusData &state,
     }
 }
 
+void DistributePressureOnBranch(
+    EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Edwin Lee
+    //       DATE WRITTEN   August 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Apply proper pressure to nodes along branch
+
+    // METHODOLOGY EMPLOYED:
+    // Move backward through components, passing pressure upstream
+    // Account for branch pressure drop at branch inlet node
+    // Update PlantLoop(:)%LoopSide(:)%Branch(:)%PressureDrop Variable
+
+    // Using/Aliasing
+    using DataPlant::DemandSide;
+    using DataPlant::SupplySide;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int CompNum;
+    int NumCompsOnBranch;
+    Real64 TempBranchPressureDrop;
+
+    // Initialize
+    TempBranchPressureDrop = 0.0;
+    BranchPressureDrop = 0.0;
+    NumCompsOnBranch = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp);
+
+    // Retrieve temporary branch pressure drop
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
+        TempBranchPressureDrop = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureDrop;
+    }
+
+    // If the last component on the branch is the pump, then check if a pressure drop is detected and set the flag and leave
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).isPump()) {
+        PumpFound = true;
+        if (TempBranchPressureDrop != 0.0) {
+            ShowSevereError(state, "Error in plant pressure simulation for plant loop: " + state.dataPlnt->PlantLoop(LoopNum).Name);
+            if (LoopNum == DemandSide) {
+                ShowContinueError(
+                    state, "Occurs for demand side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
+            } else if (LoopNum == SupplySide) {
+                ShowContinueError(
+                    state, "Occurs for supply side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
+            }
+            ShowContinueError(state, "Branch contains only a single pump component, yet also a pressure drop component.");
+            ShowContinueError(state, "Either add a second component to this branch after the pump, or move pressure drop data.");
+            ShowFatalError(state, "Preceding pressure drop error causes program termination");
+        }
+        return;
+    }
+
+    // Assign official branch pressure drop
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
+        BranchPressureDrop = TempBranchPressureDrop;
+    }
+
+    // Otherwise update the inlet node of the last component on the branch with this corrected pressure
+    // This essentially sets all the pressure drop on the branch to be accounted for on the last component
+    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumIn).Press =
+        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumOut)
+            .Press +
+        BranchPressureDrop;
+
+    // Then Smear any internal nodes with this new node pressure by working backward through
+    // all but the last component, and passing node pressure upstream
+    if (NumCompsOnBranch > 1) {
+        for (CompNum = NumCompsOnBranch - 1; CompNum >= 1; --CompNum) {
+
+            // If this component is a pump, stop passing pressure upstream, and set flag to true for calling routine
+            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).isPump()) {
+                PumpFound = true;
+                break;
+            }
+
+            // Otherwise just pass pressure upstream and move on
+            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn).Press =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut).Press;
+        }
+    }
+}
+
+void PassPressureAcrossMixer(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Edwin Lee
+    //       DATE WRITTEN   August 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Set mixer inlet pressures, or in other words, set mixer inlet branch outlet pressures
+
+    // METHODOLOGY EMPLOYED:
+    // Set outlet node pressures for all parallel branches on this LoopSide
+    // Note that this is extremely simple, but is set to it's own routine to allow for clarity
+    //  when possible expansion occurs during further development
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int BranchNum;
+
+    for (BranchNum = 2; BranchNum <= NumBranchesOnLoopSide - 1; ++BranchNum) {
+        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut).Press = MixerPressure;
+    }
+}
+
+void PassPressureAcrossSplitter(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &SplitterInletPressure)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Edwin Lee
+    //       DATE WRITTEN   August 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Set the splitter inlet pressure in anticipation of the inlet branch pressure being simulated
+
+    // METHODOLOGY EMPLOYED:
+    // Set outlet node of LoopSide inlet branch to splitter pressure
+    // Note that this is extremely simple, but is set to it's own routine to allow for clarity
+    //  when possible expansion occurs during further development
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    int const InletBranchNum(1);
+
+    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(InletBranchNum).NodeNumOut).Press =
+        SplitterInletPressure;
+}
+
+void PassPressureAcrossInterface(EnergyPlusData &state, int const LoopNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Edwin Lee
+    //       DATE WRITTEN   August 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Pass pressure backward across plant demand inlet/supply outlet interface
+
+    // METHODOLOGY EMPLOYED:
+    // Set outlet node pressure of supply side equal to inlet node pressure of demand side
+    // Note that this is extremely simple, but is set to it's own routine to allow for clarity
+    //  when possible expansion occurs during further development
+
+    // Using/Aliasing
+    using DataPlant::DemandSide;
+    using DataPlant::SupplySide;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int DemandInletNodeNum;
+    int SupplyOutletNodeNum;
+
+    DemandInletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
+    SupplyOutletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut;
+
+    state.dataLoopNodes->Node(SupplyOutletNodeNum).Press = state.dataLoopNodes->Node(DemandInletNodeNum).Press;
+}
+
 void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
 {
 
@@ -634,8 +756,13 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
     state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK = EffectiveLoopKValue;
 }
 
-void DistributePressureOnBranch(
-    EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
+void SimPressureDropSystem(EnergyPlusData &state,
+                           int const LoopNum,                       // Plant Loop to update pressure information
+                           bool const FirstHVACIteration,           // System flag
+                           DataPlant::iPressureCall const CallType, // Enumerated call type
+                           Optional_int_const LoopSideNum,          // Loop side num for specific branch simulation
+                           Optional_int_const BranchNum             // Branch num for specific branch simulation
+)
 {
 
     // SUBROUTINE INFORMATION:
@@ -645,162 +772,35 @@ void DistributePressureOnBranch(
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Apply proper pressure to nodes along branch
+    // This routine is the public interface for pressure system simulation
+    // Calls are made to private components as needed
 
     // METHODOLOGY EMPLOYED:
-    // Move backward through components, passing pressure upstream
-    // Account for branch pressure drop at branch inlet node
-    // Update PlantLoop(:)%LoopSide(:)%Branch(:)%PressureDrop Variable
+    // Standard EnergyPlus methodology
 
     // Using/Aliasing
-    using DataPlant::DemandSide;
-    using DataPlant::SupplySide;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CompNum;
-    int NumCompsOnBranch;
-    Real64 TempBranchPressureDrop;
-
-    // Initialize
-    TempBranchPressureDrop = 0.0;
-    BranchPressureDrop = 0.0;
-    NumCompsOnBranch = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp);
-
-    // Retrieve temporary branch pressure drop
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
-        TempBranchPressureDrop = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureDrop;
-    }
-
-    // If the last component on the branch is the pump, then check if a pressure drop is detected and set the flag and leave
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).isPump()) {
-        PumpFound = true;
-        if (TempBranchPressureDrop != 0.0) {
-            ShowSevereError(state, "Error in plant pressure simulation for plant loop: " + state.dataPlnt->PlantLoop(LoopNum).Name);
-            if (LoopNum == DemandSide) {
-                ShowContinueError(
-                    state, "Occurs for demand side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
-            } else if (LoopNum == SupplySide) {
-                ShowContinueError(
-                    state, "Occurs for supply side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
-            }
-            ShowContinueError(state, "Branch contains only a single pump component, yet also a pressure drop component.");
-            ShowContinueError(state, "Either add a second component to this branch after the pump, or move pressure drop data.");
-            ShowFatalError(state, "Preceding pressure drop error causes program termination");
-        }
+    // Exit out of any calculation routines if we don't do pressure simulation for this loop
+    if ((state.dataPlnt->PlantLoop(LoopNum).PressureSimType == DataPlant::iPressSimType::NoPressure) &&
+        ((CallType == DataPlant::iPressureCall::Calc) || (CallType == DataPlant::iPressureCall::Update)))
         return;
-    }
 
-    // Assign official branch pressure drop
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
-        BranchPressureDrop = TempBranchPressureDrop;
-    }
-
-    // Otherwise update the inlet node of the last component on the branch with this corrected pressure
-    // This essentially sets all the pressure drop on the branch to be accounted for on the last component
-    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumIn).Press =
-        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumOut)
-            .Press +
-        BranchPressureDrop;
-
-    // Then Smear any internal nodes with this new node pressure by working backward through
-    // all but the last component, and passing node pressure upstream
-    if (NumCompsOnBranch > 1) {
-        for (CompNum = NumCompsOnBranch - 1; CompNum >= 1; --CompNum) {
-
-            // If this component is a pump, stop passing pressure upstream, and set flag to true for calling routine
-            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).isPump()) {
-                PumpFound = true;
-                break;
-            }
-
-            // Otherwise just pass pressure upstream and move on
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn).Press =
-                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut).Press;
+    // Pass to another routine based on calling flag
+    {
+        auto const SELECT_CASE_var(CallType);
+        if (SELECT_CASE_var == DataPlant::iPressureCall::Init) {
+            InitPressureDrop(state, LoopNum, FirstHVACIteration);
+        } else if (SELECT_CASE_var == DataPlant::iPressureCall::Calc) {
+            BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
+        } else if (SELECT_CASE_var == DataPlant::iPressureCall::Update) {
+            UpdatePressureDrop(state, LoopNum);
+        } else {
+            // Calling routines should only use the three possible keywords here
         }
     }
-}
-
-void PassPressureAcrossMixer(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Edwin Lee
-    //       DATE WRITTEN   August 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Set mixer inlet pressures, or in other words, set mixer inlet branch outlet pressures
-
-    // METHODOLOGY EMPLOYED:
-    // Set outlet node pressures for all parallel branches on this LoopSide
-    // Note that this is extremely simple, but is set to it's own routine to allow for clarity
-    //  when possible expansion occurs during further development
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int BranchNum;
-
-    for (BranchNum = 2; BranchNum <= NumBranchesOnLoopSide - 1; ++BranchNum) {
-        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut).Press = MixerPressure;
-    }
-}
-
-void PassPressureAcrossSplitter(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &SplitterInletPressure)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Edwin Lee
-    //       DATE WRITTEN   August 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Set the splitter inlet pressure in anticipation of the inlet branch pressure being simulated
-
-    // METHODOLOGY EMPLOYED:
-    // Set outlet node of LoopSide inlet branch to splitter pressure
-    // Note that this is extremely simple, but is set to it's own routine to allow for clarity
-    //  when possible expansion occurs during further development
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const InletBranchNum(1);
-
-    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(InletBranchNum).NodeNumOut).Press =
-        SplitterInletPressure;
 }
 
 //=================================================================================================!
-
-void PassPressureAcrossInterface(EnergyPlusData &state, int const LoopNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Edwin Lee
-    //       DATE WRITTEN   August 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Pass pressure backward across plant demand inlet/supply outlet interface
-
-    // METHODOLOGY EMPLOYED:
-    // Set outlet node pressure of supply side equal to inlet node pressure of demand side
-    // Note that this is extremely simple, but is set to it's own routine to allow for clarity
-    //  when possible expansion occurs during further development
-
-    // Using/Aliasing
-    using DataPlant::DemandSide;
-    using DataPlant::SupplySide;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int DemandInletNodeNum;
-    int SupplyOutletNodeNum;
-
-    DemandInletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
-    SupplyOutletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut;
-
-    state.dataLoopNodes->Node(SupplyOutletNodeNum).Press = state.dataLoopNodes->Node(DemandInletNodeNum).Press;
-}
 
 Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
                                  int const LoopNum,            // - Index of which plant/condenser loop is being simulated

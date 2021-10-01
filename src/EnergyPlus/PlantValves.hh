@@ -112,8 +112,6 @@ namespace PlantValves {
         void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
-    void GetPlantValvesInput(EnergyPlusData &state);
-
 } // namespace PlantValves
 
 struct PlantValvesData : BaseGlobalStruct

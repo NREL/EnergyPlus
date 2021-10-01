@@ -59,60 +59,11 @@ struct EnergyPlusData;
 
 namespace RoomAirModelUserTempPattern {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // see DataRoomAir
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE TempDistSimMgr
-
-    // main subsroutine
-
-    // get input routines are in RoomAirManager.cc
-
-    // Routines for transferring data between Heat Balance and Air model domains
-
-    // Routines for actual calculations in TempDist model
-
-    // Functions
-
     void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    //****************************************************
-
-    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    //*****************************************************************************************
-
-    void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
-
-    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
-
-    void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, Real64 UpperBound, Real64 HiGradient, Real64 LowerBound, Real64 LowGradient);
 
-    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
-
-    //*****************************************************************************************
-
     Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf); // index in main Surface array
-
-    //***************************************************
-
-    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    //*****************************************************************************************
 
 } // namespace RoomAirModelUserTempPattern
 

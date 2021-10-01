@@ -125,6 +125,152 @@ using Psychrometrics::PsyWFnTdbRhPb;
 // used to prevent dividing by near zero
 Real64 constexpr SmallDeltaHumRat(0.00025);
 
+void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         M. J. Witte
+    //       DATE WRITTEN   Sep 2011
+    //       MODIFIED       R. Raustad, July 2017, added return plenum
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update node data for Ideal Loads (purchased air) system
+
+    // USE STATEMENTS:
+    using ZonePlenum::SimAirZonePlenum;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // na
+    bool FirstCall;
+    bool SupPathInletChanged;
+
+    FirstCall = true;            // just used to avoid redundant calulations
+    SupPathInletChanged = false; // don't care if something changes
+
+    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+
+    if (PurchAir(PurchAirNum).ReturnPlenumIndex > 0) {
+
+        // if connected to a return plenum, set the flag that this ideal loads air system was simulated
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex)
+            .IsSimulated(PurchAir(PurchAirNum).PurchAirArrayIndex) = true;
+
+        // if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air plenum
+        if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
+            SimAirZonePlenum(state,
+                             PurchAir(PurchAirNum).ReturnPlenumName,
+                             DataZoneEquipment::ZoneReturnPlenum_Type,
+                             PurchAir(PurchAirNum).ReturnPlenumIndex,
+                             FirstHVACIteration,
+                             FirstCall,
+                             SupPathInletChanged);
+            // reset this plenums flags for next iteration
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated = false;
+        }
+    }
+}
+
+void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Russ Taylor
+    //       DATE WRITTEN   Nov 1997
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Calculate values of report variables, if necessary.
+
+    // Using/Aliasing
+    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
+    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 ReportingConstant;
+
+    // Sort out heating and cooling rates
+    PurchAir(PurchAirNum).SenHeatRate = max(PurchAir(PurchAirNum).SenCoilLoad, 0.0);
+    PurchAir(PurchAirNum).SenCoolRate = std::abs(min(PurchAir(PurchAirNum).SenCoilLoad, 0.0));
+    PurchAir(PurchAirNum).LatHeatRate = max(PurchAir(PurchAirNum).LatCoilLoad, 0.0);
+    PurchAir(PurchAirNum).LatCoolRate = std::abs(min(PurchAir(PurchAirNum).LatCoilLoad, 0.0));
+    PurchAir(PurchAirNum).TotHeatRate = PurchAir(PurchAirNum).SenHeatRate + PurchAir(PurchAirNum).LatHeatRate;
+    PurchAir(PurchAirNum).TotCoolRate = PurchAir(PurchAirNum).SenCoolRate + PurchAir(PurchAirNum).LatCoolRate;
+
+    PurchAir(PurchAirNum).ZoneSenHeatRate = max(PurchAir(PurchAirNum).SenOutputToZone, 0.0);
+    PurchAir(PurchAirNum).ZoneSenCoolRate = std::abs(min(PurchAir(PurchAirNum).SenOutputToZone, 0.0));
+    PurchAir(PurchAirNum).ZoneLatHeatRate = max(PurchAir(PurchAirNum).LatOutputToZone, 0.0);
+    PurchAir(PurchAirNum).ZoneLatCoolRate = std::abs(min(PurchAir(PurchAirNum).LatOutputToZone, 0.0));
+    PurchAir(PurchAirNum).ZoneTotHeatRate = PurchAir(PurchAirNum).ZoneSenHeatRate + PurchAir(PurchAirNum).ZoneLatHeatRate;
+    PurchAir(PurchAirNum).ZoneTotCoolRate = PurchAir(PurchAirNum).ZoneSenCoolRate + PurchAir(PurchAirNum).ZoneLatCoolRate;
+
+    // Sort out outdoor air "loads"
+    // OASenOutput = Outdoor air sensible output relative to zone conditions [W], <0 means OA is cooler than zone air
+    // OALatOutput  = Outdoor air latent output relative to zone conditions [W], <0 means OA is drier than zone air
+    if (PurchAir(PurchAirNum).SenCoilLoad > 0.0) { // Heating is active
+        PurchAir(PurchAirNum).OASenHeatRate = std::abs(min(PurchAir(PurchAirNum).OASenOutput, 0.0));
+    } else {
+        PurchAir(PurchAirNum).OASenHeatRate = 0.0;
+    }
+    if (PurchAir(PurchAirNum).SenCoilLoad < 0.0) { // Cooling is active
+        PurchAir(PurchAirNum).OASenCoolRate = max(PurchAir(PurchAirNum).OASenOutput, 0.0);
+    } else {
+        PurchAir(PurchAirNum).OASenCoolRate = 0.0;
+    }
+    if (PurchAir(PurchAirNum).LatCoilLoad > 0.0) { // Humidification is active
+        PurchAir(PurchAirNum).OALatHeatRate = std::abs(min(PurchAir(PurchAirNum).OALatOutput, 0.0));
+    } else {
+        PurchAir(PurchAirNum).OALatHeatRate = 0.0;
+    }
+    if (PurchAir(PurchAirNum).LatCoilLoad < 0.0) { // Dehumidification is active
+        PurchAir(PurchAirNum).OALatCoolRate = max(PurchAir(PurchAirNum).OALatOutput, 0.0);
+    } else {
+        PurchAir(PurchAirNum).OALatCoolRate = 0.0;
+    }
+
+    PurchAir(PurchAirNum).OATotHeatRate = PurchAir(PurchAirNum).OASenHeatRate + PurchAir(PurchAirNum).OALatHeatRate;
+    PurchAir(PurchAirNum).OATotCoolRate = PurchAir(PurchAirNum).OASenCoolRate + PurchAir(PurchAirNum).OALatCoolRate;
+
+    PurchAir(PurchAirNum).HtRecSenHeatRate = max(PurchAir(PurchAirNum).HtRecSenOutput, 0.0);
+    PurchAir(PurchAirNum).HtRecSenCoolRate = std::abs(min(PurchAir(PurchAirNum).HtRecSenOutput, 0.0));
+    PurchAir(PurchAirNum).HtRecLatHeatRate = max(PurchAir(PurchAirNum).HtRecLatOutput, 0.0);
+    PurchAir(PurchAirNum).HtRecLatCoolRate = std::abs(min(PurchAir(PurchAirNum).HtRecLatOutput, 0.0));
+    PurchAir(PurchAirNum).HtRecTotHeatRate = PurchAir(PurchAirNum).HtRecSenHeatRate + PurchAir(PurchAirNum).HtRecLatHeatRate;
+    PurchAir(PurchAirNum).HtRecTotCoolRate = PurchAir(PurchAirNum).HtRecSenCoolRate + PurchAir(PurchAirNum).HtRecLatCoolRate;
+
+    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+
+    PurchAir(PurchAirNum).SenHeatEnergy = PurchAir(PurchAirNum).SenHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).SenCoolEnergy = PurchAir(PurchAirNum).SenCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).LatHeatEnergy = PurchAir(PurchAirNum).LatHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).LatCoolEnergy = PurchAir(PurchAirNum).LatCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).TotHeatEnergy = PurchAir(PurchAirNum).TotHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).TotCoolEnergy = PurchAir(PurchAirNum).TotCoolRate * ReportingConstant;
+
+    PurchAir(PurchAirNum).ZoneSenHeatEnergy = PurchAir(PurchAirNum).ZoneSenHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).ZoneSenCoolEnergy = PurchAir(PurchAirNum).ZoneSenCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).ZoneLatHeatEnergy = PurchAir(PurchAirNum).ZoneLatHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).ZoneLatCoolEnergy = PurchAir(PurchAirNum).ZoneLatCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).ZoneTotHeatEnergy = PurchAir(PurchAirNum).ZoneTotHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).ZoneTotCoolEnergy = PurchAir(PurchAirNum).ZoneTotCoolRate * ReportingConstant;
+
+    PurchAir(PurchAirNum).OASenHeatEnergy = PurchAir(PurchAirNum).OASenHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).OASenCoolEnergy = PurchAir(PurchAirNum).OASenCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).OALatHeatEnergy = PurchAir(PurchAirNum).OALatHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).OALatCoolEnergy = PurchAir(PurchAirNum).OALatCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).OATotHeatEnergy = PurchAir(PurchAirNum).OATotHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).OATotCoolEnergy = PurchAir(PurchAirNum).OATotCoolRate * ReportingConstant;
+
+    PurchAir(PurchAirNum).HtRecSenHeatEnergy = PurchAir(PurchAirNum).HtRecSenHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).HtRecSenCoolEnergy = PurchAir(PurchAirNum).HtRecSenCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).HtRecLatHeatEnergy = PurchAir(PurchAirNum).HtRecLatHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).HtRecLatCoolEnergy = PurchAir(PurchAirNum).HtRecLatCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).HtRecTotHeatEnergy = PurchAir(PurchAirNum).HtRecTotHeatRate * ReportingConstant;
+    PurchAir(PurchAirNum).HtRecTotCoolEnergy = PurchAir(PurchAirNum).HtRecTotCoolRate * ReportingConstant;
+}
+
 void SimPurchasedAir(EnergyPlusData &state,
                      std::string const &PurchAirName,
                      Real64 &SysOutputProvided,
@@ -1165,6 +1311,214 @@ void GetPurchasedAir(EnergyPlusData &state)
     }
 }
 
+void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         R Raustad
+    //       DATE WRITTEN   July  2017
+
+    // PURPOSE OF THIS FUNCTION:
+    // to initialize arrays needed to manage ideal load air system used with return plenums
+    //
+    // Example:
+    // NumPlenumArrays = 2 (same as there are two ZoneHVAC:ReturnPlenums objects connected to two or more ideal loads air systems
+    // In this example ideal loads air system #4 is not connected to a zone return plenum
+    //
+    // ZoneHVAC:ReturnPlenum( 1 ) = ReturnPlenum1 is not connected to any ideal loads air systems
+    // ZoneHVAC:ReturnPlenum( 2 ) = ReturnPlenum2 is connected to PurchAirPlenumArrays( 1 )
+    // ZoneHVAC:ReturnPlenum( 3 ) = ReturnPlenum3 is connected to PurchAirPlenumArrays( 2 )
+    //
+    // PurchAirPlenumArrays( 1 )
+    //   PurchAirPlenumArrays( 1 ).NumPurchAir = 2, there are 2 ideal loads air systems connected to this plenum
+    //      PurchAirPlenumArrays( 1 ).PurchAirArray( 1 ) = 1, ideal loads air system #1 is attached to this plenum
+    //      PurchAirPlenumArrays( 1 ).PurchAirArray( 2 ) = 3, ideal loads air system #3 is attached to this plenum
+    //      PurchAirPlenumArrays( 1 ).IsSimulated( 1 ) = true, ideal loads air system #1 has been simulated this iteration
+    //      PurchAirPlenumArrays( 1 ).IsSimulated( 2 ) = false, ideal loads air system #3 has not yet been simulated this iteration
+    //
+    //      Ideal loads air sytems keep track of which plenum they are connected to
+    //      PurchAir( 1 ).PlenumArrayIndex = 1
+    //      PurchAir( 1 ).ReturnPlenumName = ReturnPlenum2;
+    //      PurchAir( 3 ).PlenumArrayIndex = 1
+    //      PurchAir( 3 ).ReturnPlenumName = ReturnPlenum2;
+    //
+    //      The ideal loads air sytems also keep track of which item they are in the int and bool arrays
+    //      PurchAir( 1 ).PurchAirArrayIndex = 1
+    //      PurchAir( 3 ).PurchAirArrayIndex = 2
+    //
+    // PurchAirPlenumArrays( 2 )
+    //   PurchAirPlenumArrays( 2 ).NumPurchAir = 3, there are 3 ideal loads air systems connected to this plenum
+    //      PurchAirPlenumArrays( 2 ).PurchAirArray( 1 ) = 2, ideal loads air system #2 is attached to this plenum
+    //      PurchAirPlenumArrays( 2 ).PurchAirArray( 2 ) = 5, ideal loads air system #5 is attached to this plenum
+    //      PurchAirPlenumArrays( 2 ).PurchAirArray( 3 ) = 6, ideal loads air system #6 is attached to this plenum
+    //      PurchAirPlenumArrays( 2 ).IsSimulated( 1 ) = true, ideal loads air system #4 has been simulated this iteration
+    //      PurchAirPlenumArrays( 2 ).IsSimulated( 2 ) = false, ideal loads air system #5 has not yet been simulated this iteration
+    //      PurchAirPlenumArrays( 2 ).IsSimulated( 3 ) = false, ideal loads air system #6 has not yet been simulated this iteration
+    //
+    //      Ideal loads air sytems keep track of which plenum they are connected to
+    //      PurchAir( 2 ).PlenumArrayIndex = 2;
+    //      PurchAir( 2 ).ReturnPlenumName = ReturnPlenum3;
+    //      PurchAir( 5 ).PlenumArrayIndex = 2;
+    //      PurchAir( 5 ).ReturnPlenumName = ReturnPlenum3;
+    //      PurchAir( 6 ).PlenumArrayIndex = 2;
+    //      PurchAir( 6 ).ReturnPlenumName = ReturnPlenum3;
+    //
+    //      The ideal loads air sytems also keep track of which item they are in the int and bool arrays
+    //      PurchAir( 2 ).PurchAirArrayIndex = 1;
+    //      PurchAir( 5 ).PurchAirArrayIndex = 2;
+    //      PurchAir( 6 ).PurchAirArrayIndex = 3;
+    //
+    //      Given these connections, the data in the IsSimulated array can be set (or checked) according to this syntax:
+    //
+    //      Each time an ideal loads air system is simulated the IsSimulated flag is set to true
+    //      PurchAirPlenumArrays( PurchAir( PurchNum ).PlenumArrayIndex ).IsSimulated( PurchAir( PurchNum ).PurchAirArrayIndex ) = true;
+    //
+    //     if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air return plenum (once per set of
+    //     ideal loads systems) if ( all( PurchAirPlenumArrays( PurchAir( PurchAirNum ).ReturnPlenumIndex ).IsSimulated ) ) {
+    //         SimAirZonePlenum( PurchAir( PurchAirNum ).ReturnPlenumName, DataZoneEquipment::ZoneReturnPlenum_Type, PurchAir( PurchAirNum
+    //         ).ReturnPlenumIndex, FirstHVACIteration, FirstCall, SupPathInletChanged ); reset all IsSimulated flags for next iteration
+    //         PurchAirPlenumArrays( PurchAir( PurchAirNum ).ReturnPlenumIndex ).IsSimulated = false;
+    //     }
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int ReturnPlenumIndex;        // index to ZoneHVAC:ReturnPlenum object
+    int ReturnPlenumNum;          // loop counter
+    bool PlenumNotFound;          // logical to determine if same plenum is used by other ideal loads air systems
+    int Loop;                     // loop counters
+    int Loop2;                    // loop counters
+    Array1D_int TempPurchArray;   // temporary array used for dynamic allocation
+    Array1D_bool TempIsSimulated; // temporary array used for dynamic allocation
+
+    // index to ZoneHVAC:ReturnPlenum object
+    ReturnPlenumIndex = state.dataPurchasedAirMgr->PurchAir(PurchAirNum).ReturnPlenumIndex;
+    PlenumNotFound = true;
+
+    // if first time through, set up arrays
+    if (!state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocated()) {
+
+        // the ideal loads air system keeps track of which item this system is in a list
+        state.dataPurchasedAirMgr->PurchAir(PurchAirNum).PurchAirArrayIndex = 1;
+        // keep track of how many arrays (i.e., how many different plenums are attached to different ideal loads air systems
+        state.dataPurchasedAirMgr->NumPlenumArrays = 1;
+
+        // allocate new array
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
+        // set counter for how many ideal loads air systems are attached to this plenum
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).NumPurchAir =
+            1; // keeps track of how many ideal loads air system are connected to this return plenum
+        // keep track of which plenum this is ( i.e., PurchAirPlenumArrays(1) is ZoneHVAC:ReturnPlenum #4 )
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).ReturnPlenumIndex =
+            ReturnPlenumIndex; // stores index of return plenum (e.g., 4 of 5)
+        // allocate array holding index to one or more ideal loads air systems
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray.allocate(1);
+        // allocate boolean to keep track of whether or not this ideal loads air system has been simulated
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated.allocate(1);
+        // save the data
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray(1) = PurchAirNum;
+        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated(1) = false;
+
+    } else {
+
+        // find the correct index to PurchAirPlenumArrays
+        for (ReturnPlenumNum = 1; ReturnPlenumNum <= state.dataPurchasedAirMgr->NumPlenumArrays; ++ReturnPlenumNum) {
+            if (ReturnPlenumIndex != state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).ReturnPlenumIndex) continue;
+
+            // allocate temporary arrays and save existing data
+            TempPurchArray.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
+            TempIsSimulated.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
+            // these are the  member arrays in an existing PurchAirPlenumArrays
+            TempPurchArray = state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).PurchAirArray;
+            TempIsSimulated = state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).IsSimulated;
+
+            // if this array has been used before, we need to increase member array space to save new PurchAir data
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir += 1;
+            // save the location of this ideal loads air system in the member arrays
+            state.dataPurchasedAirMgr->PurchAir(PurchAirNum).PurchAirArrayIndex =
+                state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir;
+
+            // allocate more space, this will wipe out data previously stored
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
+                .PurchAirArray.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
+                .IsSimulated.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
+
+            // re-initialize previous data
+            for (Loop = 1; Loop < state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir; ++Loop) {
+                state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).PurchAirArray(Loop) = TempPurchArray(Loop);
+                state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).IsSimulated(Loop) = TempIsSimulated(Loop);
+            }
+            // delete temporary array
+            TempPurchArray.deallocate();
+            TempIsSimulated.deallocate();
+
+            // save new data in expanded member array
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
+                .PurchAirArray(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir) = PurchAirNum;
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
+                .IsSimulated(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir) = false;
+
+            PlenumNotFound = false;
+            break;
+        }
+
+        if (PlenumNotFound) {
+
+            // need to allocate additional space for new plenum array
+            // keep track of how many arrays (i.e., how many different plenums are attached to different ideal loads air systems)
+            state.dataPurchasedAirMgr->NumPlenumArrays += 1;
+
+            // allocate temporary array and save existing data
+            state.dataPurchasedAirMgr->TempPurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
+            for (Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
+                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir =
+                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir;
+                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).ReturnPlenumIndex =
+                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).ReturnPlenumIndex;
+                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).PurchAirArray.allocate(
+                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir);
+                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).IsSimulated.allocate(
+                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir);
+                for (Loop2 = 1; Loop2 <= state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir; ++Loop2) {
+                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).PurchAirArray(Loop2) =
+                        state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).PurchAirArray(Loop2);
+                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).IsSimulated(Loop2) =
+                        state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).IsSimulated(Loop2);
+                }
+            }
+
+            // delete primary array (probably could just re-allocate, but this is only done a few times per simulation)
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays.deallocate();
+            // reallocate to new size
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
+
+            // allocate member arrays to same size as before
+            for (Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
+                state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).PurchAirArray.allocate(
+                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir);
+                state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).IsSimulated.allocate(
+                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir);
+            }
+
+            // save the data
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays = state.dataPurchasedAirMgr->TempPurchAirPlenumArrays;
+            // delete temporary data
+            state.dataPurchasedAirMgr->TempPurchAirPlenumArrays.deallocate();
+
+            // save the index to where this ideal loads air system data is stored
+            state.dataPurchasedAirMgr->PurchAir(PurchAirNum).PurchAirArrayIndex = 1;
+            // save the number of ideal loads air systems stored in these arrays
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).NumPurchAir = 1;
+            // save the index the the ZoneHVAC:ReturnPlenum
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).ReturnPlenumIndex = ReturnPlenumIndex;
+            // allocate member array and store data
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray.allocate(1);
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray(1) = PurchAirNum;
+            // allocate member array and store data
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated.allocate(1);
+            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated(1) = false;
+        }
+    }
+}
+
 void InitPurchasedAir(EnergyPlusData &state,
                       int const PurchAirNum,
                       [[maybe_unused]] bool const FirstHVACIteration,
@@ -2067,6 +2421,59 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     //      END IF
 }
 
+void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
+                               int const PurchAirNum,   // index to ideal loads unit
+                               int const ActualZoneNum, // index to actual zone number
+                               Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         M. Witte (GARD)
+    //       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Calculates the amount of outside air required based on optional user input.
+    // Zone multipliers have been applied in GetInput.
+
+    // METHODOLOGY EMPLOYED:
+    // User input defines method used to calculate OA.
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people
+    Real64 OAVolumeFlowRate; // outside air flow rate (m3/s)
+
+    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+
+    if (PurchAir(PurchAirNum).OutdoorAir) {
+
+        if (PurchAir(PurchAirNum).DCVType == DCV::OccupancySchedule) {
+            UseOccSchFlag = true;
+        } else {
+            UseOccSchFlag = false;
+        }
+        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+            state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+        OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
+
+        // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
+        if (PurchAir(PurchAirNum).DCVType == DCV::CO2SetPoint) {
+            OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
+        }
+
+        if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;
+
+    } else { // No outdoor air
+        OAMassFlowRate = 0.0;
+    }
+    PurchAir(PurchAirNum).MinOAMassFlowRate = OAMassFlowRate;
+}
+
 void CalcPurchAirLoads(EnergyPlusData &state,
                        int const PurchAirNum,
                        Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
@@ -2944,59 +3351,6 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     state.dataLoopNodes->Node(RecircNodeNum).MassFlowRate = SupplyMassFlowRate;
 }
 
-void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
-                               int const PurchAirNum,   // index to ideal loads unit
-                               int const ActualZoneNum, // index to actual zone number
-                               Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         M. Witte (GARD)
-    //       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Calculates the amount of outside air required based on optional user input.
-    // Zone multipliers have been applied in GetInput.
-
-    // METHODOLOGY EMPLOYED:
-    // User input defines method used to calculate OA.
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people
-    Real64 OAVolumeFlowRate; // outside air flow rate (m3/s)
-
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
-
-    if (PurchAir(PurchAirNum).OutdoorAir) {
-
-        if (PurchAir(PurchAirNum).DCVType == DCV::OccupancySchedule) {
-            UseOccSchFlag = true;
-        } else {
-            UseOccSchFlag = false;
-        }
-        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
-            state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
-        OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
-
-        // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
-        if (PurchAir(PurchAirNum).DCVType == DCV::CO2SetPoint) {
-            OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
-        }
-
-        if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;
-
-    } else { // No outdoor air
-        OAMassFlowRate = 0.0;
-    }
-    PurchAir(PurchAirNum).MinOAMassFlowRate = OAMassFlowRate;
-}
-
 void CalcPurchAirMixedAir(EnergyPlusData &state,
                           int const PurchAirNum,           // index to ideal loads unit
                           Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
@@ -3115,152 +3469,6 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
         PurchAir(PurchAirNum).HtRecSenOutput = 0.0;
         PurchAir(PurchAirNum).HtRecLatOutput = 0.0;
     }
-}
-
-void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         M. J. Witte
-    //       DATE WRITTEN   Sep 2011
-    //       MODIFIED       R. Raustad, July 2017, added return plenum
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update node data for Ideal Loads (purchased air) system
-
-    // USE STATEMENTS:
-    using ZonePlenum::SimAirZonePlenum;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-    bool FirstCall;
-    bool SupPathInletChanged;
-
-    FirstCall = true;            // just used to avoid redundant calulations
-    SupPathInletChanged = false; // don't care if something changes
-
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
-
-    if (PurchAir(PurchAirNum).ReturnPlenumIndex > 0) {
-
-        // if connected to a return plenum, set the flag that this ideal loads air system was simulated
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex)
-            .IsSimulated(PurchAir(PurchAirNum).PurchAirArrayIndex) = true;
-
-        // if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air plenum
-        if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
-            SimAirZonePlenum(state,
-                             PurchAir(PurchAirNum).ReturnPlenumName,
-                             DataZoneEquipment::ZoneReturnPlenum_Type,
-                             PurchAir(PurchAirNum).ReturnPlenumIndex,
-                             FirstHVACIteration,
-                             FirstCall,
-                             SupPathInletChanged);
-            // reset this plenums flags for next iteration
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated = false;
-        }
-    }
-}
-
-void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Russ Taylor
-    //       DATE WRITTEN   Nov 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Calculate values of report variables, if necessary.
-
-    // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ReportingConstant;
-
-    // Sort out heating and cooling rates
-    PurchAir(PurchAirNum).SenHeatRate = max(PurchAir(PurchAirNum).SenCoilLoad, 0.0);
-    PurchAir(PurchAirNum).SenCoolRate = std::abs(min(PurchAir(PurchAirNum).SenCoilLoad, 0.0));
-    PurchAir(PurchAirNum).LatHeatRate = max(PurchAir(PurchAirNum).LatCoilLoad, 0.0);
-    PurchAir(PurchAirNum).LatCoolRate = std::abs(min(PurchAir(PurchAirNum).LatCoilLoad, 0.0));
-    PurchAir(PurchAirNum).TotHeatRate = PurchAir(PurchAirNum).SenHeatRate + PurchAir(PurchAirNum).LatHeatRate;
-    PurchAir(PurchAirNum).TotCoolRate = PurchAir(PurchAirNum).SenCoolRate + PurchAir(PurchAirNum).LatCoolRate;
-
-    PurchAir(PurchAirNum).ZoneSenHeatRate = max(PurchAir(PurchAirNum).SenOutputToZone, 0.0);
-    PurchAir(PurchAirNum).ZoneSenCoolRate = std::abs(min(PurchAir(PurchAirNum).SenOutputToZone, 0.0));
-    PurchAir(PurchAirNum).ZoneLatHeatRate = max(PurchAir(PurchAirNum).LatOutputToZone, 0.0);
-    PurchAir(PurchAirNum).ZoneLatCoolRate = std::abs(min(PurchAir(PurchAirNum).LatOutputToZone, 0.0));
-    PurchAir(PurchAirNum).ZoneTotHeatRate = PurchAir(PurchAirNum).ZoneSenHeatRate + PurchAir(PurchAirNum).ZoneLatHeatRate;
-    PurchAir(PurchAirNum).ZoneTotCoolRate = PurchAir(PurchAirNum).ZoneSenCoolRate + PurchAir(PurchAirNum).ZoneLatCoolRate;
-
-    // Sort out outdoor air "loads"
-    // OASenOutput = Outdoor air sensible output relative to zone conditions [W], <0 means OA is cooler than zone air
-    // OALatOutput  = Outdoor air latent output relative to zone conditions [W], <0 means OA is drier than zone air
-    if (PurchAir(PurchAirNum).SenCoilLoad > 0.0) { // Heating is active
-        PurchAir(PurchAirNum).OASenHeatRate = std::abs(min(PurchAir(PurchAirNum).OASenOutput, 0.0));
-    } else {
-        PurchAir(PurchAirNum).OASenHeatRate = 0.0;
-    }
-    if (PurchAir(PurchAirNum).SenCoilLoad < 0.0) { // Cooling is active
-        PurchAir(PurchAirNum).OASenCoolRate = max(PurchAir(PurchAirNum).OASenOutput, 0.0);
-    } else {
-        PurchAir(PurchAirNum).OASenCoolRate = 0.0;
-    }
-    if (PurchAir(PurchAirNum).LatCoilLoad > 0.0) { // Humidification is active
-        PurchAir(PurchAirNum).OALatHeatRate = std::abs(min(PurchAir(PurchAirNum).OALatOutput, 0.0));
-    } else {
-        PurchAir(PurchAirNum).OALatHeatRate = 0.0;
-    }
-    if (PurchAir(PurchAirNum).LatCoilLoad < 0.0) { // Dehumidification is active
-        PurchAir(PurchAirNum).OALatCoolRate = max(PurchAir(PurchAirNum).OALatOutput, 0.0);
-    } else {
-        PurchAir(PurchAirNum).OALatCoolRate = 0.0;
-    }
-
-    PurchAir(PurchAirNum).OATotHeatRate = PurchAir(PurchAirNum).OASenHeatRate + PurchAir(PurchAirNum).OALatHeatRate;
-    PurchAir(PurchAirNum).OATotCoolRate = PurchAir(PurchAirNum).OASenCoolRate + PurchAir(PurchAirNum).OALatCoolRate;
-
-    PurchAir(PurchAirNum).HtRecSenHeatRate = max(PurchAir(PurchAirNum).HtRecSenOutput, 0.0);
-    PurchAir(PurchAirNum).HtRecSenCoolRate = std::abs(min(PurchAir(PurchAirNum).HtRecSenOutput, 0.0));
-    PurchAir(PurchAirNum).HtRecLatHeatRate = max(PurchAir(PurchAirNum).HtRecLatOutput, 0.0);
-    PurchAir(PurchAirNum).HtRecLatCoolRate = std::abs(min(PurchAir(PurchAirNum).HtRecLatOutput, 0.0));
-    PurchAir(PurchAirNum).HtRecTotHeatRate = PurchAir(PurchAirNum).HtRecSenHeatRate + PurchAir(PurchAirNum).HtRecLatHeatRate;
-    PurchAir(PurchAirNum).HtRecTotCoolRate = PurchAir(PurchAirNum).HtRecSenCoolRate + PurchAir(PurchAirNum).HtRecLatCoolRate;
-
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-    PurchAir(PurchAirNum).SenHeatEnergy = PurchAir(PurchAirNum).SenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).SenCoolEnergy = PurchAir(PurchAirNum).SenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).LatHeatEnergy = PurchAir(PurchAirNum).LatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).LatCoolEnergy = PurchAir(PurchAirNum).LatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).TotHeatEnergy = PurchAir(PurchAirNum).TotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).TotCoolEnergy = PurchAir(PurchAirNum).TotCoolRate * ReportingConstant;
-
-    PurchAir(PurchAirNum).ZoneSenHeatEnergy = PurchAir(PurchAirNum).ZoneSenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneSenCoolEnergy = PurchAir(PurchAirNum).ZoneSenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneLatHeatEnergy = PurchAir(PurchAirNum).ZoneLatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneLatCoolEnergy = PurchAir(PurchAirNum).ZoneLatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneTotHeatEnergy = PurchAir(PurchAirNum).ZoneTotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneTotCoolEnergy = PurchAir(PurchAirNum).ZoneTotCoolRate * ReportingConstant;
-
-    PurchAir(PurchAirNum).OASenHeatEnergy = PurchAir(PurchAirNum).OASenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).OASenCoolEnergy = PurchAir(PurchAirNum).OASenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).OALatHeatEnergy = PurchAir(PurchAirNum).OALatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).OALatCoolEnergy = PurchAir(PurchAirNum).OALatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).OATotHeatEnergy = PurchAir(PurchAirNum).OATotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).OATotCoolEnergy = PurchAir(PurchAirNum).OATotCoolRate * ReportingConstant;
-
-    PurchAir(PurchAirNum).HtRecSenHeatEnergy = PurchAir(PurchAirNum).HtRecSenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecSenCoolEnergy = PurchAir(PurchAirNum).HtRecSenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecLatHeatEnergy = PurchAir(PurchAirNum).HtRecLatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecLatCoolEnergy = PurchAir(PurchAirNum).HtRecLatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecTotHeatEnergy = PurchAir(PurchAirNum).HtRecTotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecTotCoolEnergy = PurchAir(PurchAirNum).HtRecTotCoolRate * ReportingConstant;
 }
 
 Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNum)
@@ -3412,214 +3620,6 @@ bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPl
     }
 
     return CheckPurchasedAirForReturnPlenum;
-}
-
-void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         R Raustad
-    //       DATE WRITTEN   July  2017
-
-    // PURPOSE OF THIS FUNCTION:
-    // to initialize arrays needed to manage ideal load air system used with return plenums
-    //
-    // Example:
-    // NumPlenumArrays = 2 (same as there are two ZoneHVAC:ReturnPlenums objects connected to two or more ideal loads air systems
-    // In this example ideal loads air system #4 is not connected to a zone return plenum
-    //
-    // ZoneHVAC:ReturnPlenum( 1 ) = ReturnPlenum1 is not connected to any ideal loads air systems
-    // ZoneHVAC:ReturnPlenum( 2 ) = ReturnPlenum2 is connected to PurchAirPlenumArrays( 1 )
-    // ZoneHVAC:ReturnPlenum( 3 ) = ReturnPlenum3 is connected to PurchAirPlenumArrays( 2 )
-    //
-    // PurchAirPlenumArrays( 1 )
-    //   PurchAirPlenumArrays( 1 ).NumPurchAir = 2, there are 2 ideal loads air systems connected to this plenum
-    //      PurchAirPlenumArrays( 1 ).PurchAirArray( 1 ) = 1, ideal loads air system #1 is attached to this plenum
-    //      PurchAirPlenumArrays( 1 ).PurchAirArray( 2 ) = 3, ideal loads air system #3 is attached to this plenum
-    //      PurchAirPlenumArrays( 1 ).IsSimulated( 1 ) = true, ideal loads air system #1 has been simulated this iteration
-    //      PurchAirPlenumArrays( 1 ).IsSimulated( 2 ) = false, ideal loads air system #3 has not yet been simulated this iteration
-    //
-    //      Ideal loads air sytems keep track of which plenum they are connected to
-    //      PurchAir( 1 ).PlenumArrayIndex = 1
-    //      PurchAir( 1 ).ReturnPlenumName = ReturnPlenum2;
-    //      PurchAir( 3 ).PlenumArrayIndex = 1
-    //      PurchAir( 3 ).ReturnPlenumName = ReturnPlenum2;
-    //
-    //      The ideal loads air sytems also keep track of which item they are in the int and bool arrays
-    //      PurchAir( 1 ).PurchAirArrayIndex = 1
-    //      PurchAir( 3 ).PurchAirArrayIndex = 2
-    //
-    // PurchAirPlenumArrays( 2 )
-    //   PurchAirPlenumArrays( 2 ).NumPurchAir = 3, there are 3 ideal loads air systems connected to this plenum
-    //      PurchAirPlenumArrays( 2 ).PurchAirArray( 1 ) = 2, ideal loads air system #2 is attached to this plenum
-    //      PurchAirPlenumArrays( 2 ).PurchAirArray( 2 ) = 5, ideal loads air system #5 is attached to this plenum
-    //      PurchAirPlenumArrays( 2 ).PurchAirArray( 3 ) = 6, ideal loads air system #6 is attached to this plenum
-    //      PurchAirPlenumArrays( 2 ).IsSimulated( 1 ) = true, ideal loads air system #4 has been simulated this iteration
-    //      PurchAirPlenumArrays( 2 ).IsSimulated( 2 ) = false, ideal loads air system #5 has not yet been simulated this iteration
-    //      PurchAirPlenumArrays( 2 ).IsSimulated( 3 ) = false, ideal loads air system #6 has not yet been simulated this iteration
-    //
-    //      Ideal loads air sytems keep track of which plenum they are connected to
-    //      PurchAir( 2 ).PlenumArrayIndex = 2;
-    //      PurchAir( 2 ).ReturnPlenumName = ReturnPlenum3;
-    //      PurchAir( 5 ).PlenumArrayIndex = 2;
-    //      PurchAir( 5 ).ReturnPlenumName = ReturnPlenum3;
-    //      PurchAir( 6 ).PlenumArrayIndex = 2;
-    //      PurchAir( 6 ).ReturnPlenumName = ReturnPlenum3;
-    //
-    //      The ideal loads air sytems also keep track of which item they are in the int and bool arrays
-    //      PurchAir( 2 ).PurchAirArrayIndex = 1;
-    //      PurchAir( 5 ).PurchAirArrayIndex = 2;
-    //      PurchAir( 6 ).PurchAirArrayIndex = 3;
-    //
-    //      Given these connections, the data in the IsSimulated array can be set (or checked) according to this syntax:
-    //
-    //      Each time an ideal loads air system is simulated the IsSimulated flag is set to true
-    //      PurchAirPlenumArrays( PurchAir( PurchNum ).PlenumArrayIndex ).IsSimulated( PurchAir( PurchNum ).PurchAirArrayIndex ) = true;
-    //
-    //     if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air return plenum (once per set of
-    //     ideal loads systems) if ( all( PurchAirPlenumArrays( PurchAir( PurchAirNum ).ReturnPlenumIndex ).IsSimulated ) ) {
-    //         SimAirZonePlenum( PurchAir( PurchAirNum ).ReturnPlenumName, DataZoneEquipment::ZoneReturnPlenum_Type, PurchAir( PurchAirNum
-    //         ).ReturnPlenumIndex, FirstHVACIteration, FirstCall, SupPathInletChanged ); reset all IsSimulated flags for next iteration
-    //         PurchAirPlenumArrays( PurchAir( PurchAirNum ).ReturnPlenumIndex ).IsSimulated = false;
-    //     }
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int ReturnPlenumIndex;        // index to ZoneHVAC:ReturnPlenum object
-    int ReturnPlenumNum;          // loop counter
-    bool PlenumNotFound;          // logical to determine if same plenum is used by other ideal loads air systems
-    int Loop;                     // loop counters
-    int Loop2;                    // loop counters
-    Array1D_int TempPurchArray;   // temporary array used for dynamic allocation
-    Array1D_bool TempIsSimulated; // temporary array used for dynamic allocation
-
-    // index to ZoneHVAC:ReturnPlenum object
-    ReturnPlenumIndex = state.dataPurchasedAirMgr->PurchAir(PurchAirNum).ReturnPlenumIndex;
-    PlenumNotFound = true;
-
-    // if first time through, set up arrays
-    if (!state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocated()) {
-
-        // the ideal loads air system keeps track of which item this system is in a list
-        state.dataPurchasedAirMgr->PurchAir(PurchAirNum).PurchAirArrayIndex = 1;
-        // keep track of how many arrays (i.e., how many different plenums are attached to different ideal loads air systems
-        state.dataPurchasedAirMgr->NumPlenumArrays = 1;
-
-        // allocate new array
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
-        // set counter for how many ideal loads air systems are attached to this plenum
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).NumPurchAir =
-            1; // keeps track of how many ideal loads air system are connected to this return plenum
-        // keep track of which plenum this is ( i.e., PurchAirPlenumArrays(1) is ZoneHVAC:ReturnPlenum #4 )
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).ReturnPlenumIndex =
-            ReturnPlenumIndex; // stores index of return plenum (e.g., 4 of 5)
-        // allocate array holding index to one or more ideal loads air systems
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray.allocate(1);
-        // allocate boolean to keep track of whether or not this ideal loads air system has been simulated
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated.allocate(1);
-        // save the data
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray(1) = PurchAirNum;
-        state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated(1) = false;
-
-    } else {
-
-        // find the correct index to PurchAirPlenumArrays
-        for (ReturnPlenumNum = 1; ReturnPlenumNum <= state.dataPurchasedAirMgr->NumPlenumArrays; ++ReturnPlenumNum) {
-            if (ReturnPlenumIndex != state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).ReturnPlenumIndex) continue;
-
-            // allocate temporary arrays and save existing data
-            TempPurchArray.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
-            TempIsSimulated.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
-            // these are the  member arrays in an existing PurchAirPlenumArrays
-            TempPurchArray = state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).PurchAirArray;
-            TempIsSimulated = state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).IsSimulated;
-
-            // if this array has been used before, we need to increase member array space to save new PurchAir data
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir += 1;
-            // save the location of this ideal loads air system in the member arrays
-            state.dataPurchasedAirMgr->PurchAir(PurchAirNum).PurchAirArrayIndex =
-                state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir;
-
-            // allocate more space, this will wipe out data previously stored
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
-                .PurchAirArray.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
-                .IsSimulated.allocate(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir);
-
-            // re-initialize previous data
-            for (Loop = 1; Loop < state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir; ++Loop) {
-                state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).PurchAirArray(Loop) = TempPurchArray(Loop);
-                state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).IsSimulated(Loop) = TempIsSimulated(Loop);
-            }
-            // delete temporary array
-            TempPurchArray.deallocate();
-            TempIsSimulated.deallocate();
-
-            // save new data in expanded member array
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
-                .PurchAirArray(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir) = PurchAirNum;
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum)
-                .IsSimulated(state.dataPurchasedAirMgr->PurchAirPlenumArrays(ReturnPlenumNum).NumPurchAir) = false;
-
-            PlenumNotFound = false;
-            break;
-        }
-
-        if (PlenumNotFound) {
-
-            // need to allocate additional space for new plenum array
-            // keep track of how many arrays (i.e., how many different plenums are attached to different ideal loads air systems)
-            state.dataPurchasedAirMgr->NumPlenumArrays += 1;
-
-            // allocate temporary array and save existing data
-            state.dataPurchasedAirMgr->TempPurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
-            for (Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
-                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir =
-                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir;
-                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).ReturnPlenumIndex =
-                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).ReturnPlenumIndex;
-                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).PurchAirArray.allocate(
-                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir);
-                state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).IsSimulated.allocate(
-                    state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir);
-                for (Loop2 = 1; Loop2 <= state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).NumPurchAir; ++Loop2) {
-                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).PurchAirArray(Loop2) =
-                        state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).PurchAirArray(Loop2);
-                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).IsSimulated(Loop2) =
-                        state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).IsSimulated(Loop2);
-                }
-            }
-
-            // delete primary array (probably could just re-allocate, but this is only done a few times per simulation)
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays.deallocate();
-            // reallocate to new size
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays.allocate(state.dataPurchasedAirMgr->NumPlenumArrays);
-
-            // allocate member arrays to same size as before
-            for (Loop = 1; Loop < state.dataPurchasedAirMgr->NumPlenumArrays; ++Loop) {
-                state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).PurchAirArray.allocate(
-                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir);
-                state.dataPurchasedAirMgr->PurchAirPlenumArrays(Loop).IsSimulated.allocate(
-                    state.dataPurchasedAirMgr->TempPurchAirPlenumArrays(Loop).NumPurchAir);
-            }
-
-            // save the data
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays = state.dataPurchasedAirMgr->TempPurchAirPlenumArrays;
-            // delete temporary data
-            state.dataPurchasedAirMgr->TempPurchAirPlenumArrays.deallocate();
-
-            // save the index to where this ideal loads air system data is stored
-            state.dataPurchasedAirMgr->PurchAir(PurchAirNum).PurchAirArrayIndex = 1;
-            // save the number of ideal loads air systems stored in these arrays
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).NumPurchAir = 1;
-            // save the index the the ZoneHVAC:ReturnPlenum
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).ReturnPlenumIndex = ReturnPlenumIndex;
-            // allocate member array and store data
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray.allocate(1);
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).PurchAirArray(1) = PurchAirNum;
-            // allocate member array and store data
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated.allocate(1);
-            state.dataPurchasedAirMgr->PurchAirPlenumArrays(state.dataPurchasedAirMgr->NumPlenumArrays).IsSimulated(1) = false;
-        }
-    }
 }
 
 } // namespace EnergyPlus::PurchasedAirManager

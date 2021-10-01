@@ -63,12 +63,6 @@ namespace ReturnAirPathManager {
 
     void GetReturnAirPathInput(EnergyPlusData &state);
 
-    void InitReturnAirPath(int &ReturnAirPathNum);
-
-    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum);
-
-    void ReportReturnAirPath(int &ReturnAirPathNum);
-
 } // namespace ReturnAirPathManager
 
 struct ReturnAirPathMgr : BaseGlobalStruct
