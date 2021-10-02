@@ -913,13 +913,13 @@ namespace CrossVentMgr {
             }
         }
 
-        SumAllInternalConvectionGains(state, ZoneNum, ConvGains);
+        ConvGains = SumAllInternalConvectionGains(state, ZoneNum);
         ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                      state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
+            RetAirConvGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
             ConvGains += RetAirConvGain;
         }
 

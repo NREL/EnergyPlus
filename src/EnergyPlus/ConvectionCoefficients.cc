@@ -2985,12 +2985,12 @@ CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness const Roughness, //
     Real64 CalcASHRAESimpExtConvectCoeff;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    static Array1D<Real64> const D({0, 5}, {11.58, 12.49, 10.79, 8.23, 10.22, 8.23});
-    static Array1D<Real64> const E({0, 5}, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
-    static Array1D<Real64> const F({0, 5}, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
+    constexpr static std::array<Real64, 6> D = {11.58, 12.49, 10.79, 8.23, 10.22, 8.23};
+    constexpr static std::array<Real64, 6> E = {5.894, 4.065, 4.192, 4.00, 3.100, 3.33};
+    constexpr static std::array<Real64, 6> F = {0.0, 0.028, 0.0, -0.057, 0.0, -0.036};
 
     CalcASHRAESimpExtConvectCoeff =
-        D(static_cast<int>(Roughness)) + E(static_cast<int>(Roughness)) * SurfWindSpeed + F(static_cast<int>(Roughness)) * pow_2(SurfWindSpeed);
+        D[static_cast<int>(Roughness)] + E[static_cast<int>(Roughness)] * SurfWindSpeed + F[static_cast<int>(Roughness)] * pow_2(SurfWindSpeed);
 
     return CalcASHRAESimpExtConvectCoeff;
 }
