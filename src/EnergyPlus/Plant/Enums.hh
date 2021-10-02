@@ -50,18 +50,17 @@
 
 namespace EnergyPlus::DataPlant {
 
-// Parameters for loop flow request priority,
-//     used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
-int const LoopFlowStatus_Unknown(21);             // component's status is not yet set
-int const LoopFlowStatus_NeedyAndTurnsLoopOn(22); // component is a "winner" for loop flow requests
-// active valve inside component that modulates flow
-//  gets the loop going under most conditions
-int const LoopFlowStatus_NeedyIfLoopOn(23); // component is a "winner" for loop flow requests
-// but doesn't normally get the loop going to start with
-//  once loop is going, may increase needs, non-zero minimums
-int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop flow requests,
-// but if the loop is on it
-// it does make flow requests (for s/m resolution)
+// Parameters for loop flow request priority, used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
+enum class LoopFlowStatus
+{
+    Unknown = -1,        // component's status is not yet set
+    NeedyAndTurnsLoopOn, // component is a "winner" for loop flow requests active valve inside component that modulates flow gets the loop going under
+                         // most conditions
+    NeedyIfLoopOn, // component is a "winner" for loop flow requests but doesn't normally get the loop going to start with once loop is going, may
+                   // increase needs, non-zero minimums
+    TakesWhatGets, // component is a "loser" for loop flow requests, but if the loop is on it, it does make flow requests (for s/m resolution)
+    NUM
+};
 
 // Parameters for scheme types
 // Used in TYPE(OperationData)%OpSchemeType
@@ -94,14 +93,18 @@ enum OpSchemeType
 
 // Parameters for component character wrt how load gets met (or not)
 //  used in %HowLoadServed to facilitate load dispatch logic
-int const HowMet_Unknown(50);                              // not yet set
-int const HowMet_NoneDemand(51);                           // does not meet a load, demand component
-int const HowMet_PassiveCap(52);                           // Passive machine, does what conditions allow but
-int const HowMet_ByNominalCap(53);                         // MaxLoad, MinLoad, OptLoad should work
-int const HowMet_ByNominalCapLowOutLimit(54);              // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
-int const HowMet_ByNominalCapHiOutLimit(55);               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
-int const HowMet_ByNominalCapFreeCoolCntrl(56);            // HowMet_ByNominalCap with free cool shutdown
-int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl(57); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+enum class HowMet
+{
+    Unknown = -1,                         // not yet set
+    NoneDemand,                           // does not meet a load, demand component
+    PassiveCap,                           // Passive machine, does what conditions allow but
+    ByNominalCap,                         // MaxLoad, MinLoad, OptLoad should work
+    ByNominalCapLowOutLimit,              // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
+    ByNominalCapHiOutLimit,               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
+    ByNominalCapFreeCoolCntrl,            // HowMet_ByNominalCap with free cool shutdown
+    ByNominalCapLowOutLimitFreeCoolCntrl, // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+    NUM
+};
 
 enum class iLoadingScheme
 {
@@ -197,6 +200,17 @@ enum class BrLoopType
     Condenser,
     NoMatch
 };
+
+constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> HowMetTypeNamesUC = {"DEMANDSLOAD",
+                                                                                           "MEETSLOADWITHPASSIVECAPACITY",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITY",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYFREECOOLCONTROL",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMITFREECOOLCONTROL"};
+
+constexpr std::array<std::string_view, static_cast<int>(LoopFlowStatus::NUM)> LoopFlowStatusTypeNamesUC = {
+    "NEEDSFLOWANDTURNSLOOPON", "NEEDSFLOWIFLOOPON", "RECEIVESWHATEVERFLOWAVAILABLE"};
 
 } // namespace EnergyPlus::DataPlant
 

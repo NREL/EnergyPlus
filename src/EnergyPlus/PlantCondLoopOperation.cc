@@ -2824,7 +2824,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         auto const SELECT_CASE_var(this_component.HowLoadServed);
 
         // Chillers
-        if (SELECT_CASE_var == HowMet_ByNominalCapLowOutLimit) { // chillers with lower limit on outlet temperature
+        if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCapLowOutLimit) { // chillers with lower limit on outlet temperature
 
             //- Retrieve data from the plant loop data structure
             CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
@@ -2839,7 +2839,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                 ChangeInLoad = min(ChangeInLoad, QdotTmp);
             }
 
-        } else if (SELECT_CASE_var == HowMet_ByNominalCapFreeCoolCntrl) {
+        } else if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCapFreeCoolCntrl) {
             // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
             // determine if free cooling controls shut off chiller
             TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
@@ -2868,7 +2868,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                 this_component.FreeCoolCntrlShutDown = false;
             }
 
-        } else if (SELECT_CASE_var == HowMet_ByNominalCapLowOutLimitFreeCoolCntrl) {
+        } else if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl) {
             // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
             // determine if free cooling controls shut off chiller
             TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
@@ -2910,7 +2910,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                 }
             }
 
-        } else if (SELECT_CASE_var == HowMet_ByNominalCapHiOutLimit) { // boilers with upper limit on outlet temperature
+        } else if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCapHiOutLimit) { // boilers with upper limit on outlet temperature
             //- Retrieve data from the plant loop data structure
             CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
             ToutHiLimit = this_component.MaxOutletTemp;
@@ -2923,7 +2923,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                 ChangeInLoad = min(ChangeInLoad, QdotTmp);
             }
 
-        } else if (SELECT_CASE_var == HowMet_PassiveCap) { // need to estimate current capacity if more or less passive devices ??
+        } else if (SELECT_CASE_var == DataPlant::HowMet::PassiveCap) { // need to estimate current capacity if more or less passive devices ??
 
         } else {
         }
