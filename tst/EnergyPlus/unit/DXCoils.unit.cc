@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>

@@ -56,7 +56,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>

@@ -172,10 +172,7 @@ namespace DataSizing {
     constexpr int FractionOfAutosizedCoolingCapacity(11);
     constexpr int FractionOfAutosizedHeatingCapacity(12);
 
-    constexpr int NoSizingFactorMode(101);
-    constexpr int GlobalHeatingSizingFactorMode(102);
-    constexpr int GlobalCoolingSizingFactorMode(103);
-    constexpr int LoopComponentSizingFactorMode(104);
+    enum class SizingFactorMode {None, GlobalHeating, GlobalCooling, LoopComponent};
 
     enum class zoneFanPlacement
     {
@@ -878,23 +875,17 @@ namespace DataSizing {
     {
         // Members
         std::string PlantLoopName; // name of PLANT LOOP or CONDENSER LOOP object
-        int LoopType;              // type of loop: 1=heating, 2=cooling, 3=condenser
-        Real64 ExitTemp;           // loop design exit (supply) temperature [C]
-        Real64 DeltaT;             // loop design temperature drop (or rise) [DelK]
-        int ConcurrenceOption;     // sizing option for coincident or noncoincident
-        int NumTimeStepsInAvg;     // number of zone timesteps in the averaging window for coincident plant flow
-        int SizingFactorOption;    // option for what sizing factor to apply
+        int LoopType = 0;              // type of loop: 1=heating, 2=cooling, 3=condenser
+        Real64 ExitTemp = 0.0;           // loop design exit (supply) temperature [C]
+        Real64 DeltaT = 0.0;             // loop design temperature drop (or rise) [DelK]
+        int ConcurrenceOption = 1;     // sizing option for coincident or noncoincident
+        int NumTimeStepsInAvg = 0;     // number of zone timesteps in the averaging window for coincident plant flow
+        SizingFactorMode SizingFactorOption = SizingFactorMode::None;    // option for what sizing factor to apply
         // Calculated
-        Real64 DesVolFlowRate;  // loop design flow rate in m3/s
-        bool VolFlowSizingDone; // flag to indicate when this loop has finished sizing flow rate
-        Real64 PlantSizFac;     // hold the loop and pump sizing factor
+        Real64 DesVolFlowRate = 0.0;  // loop design flow rate in m3/s
+        bool VolFlowSizingDone = false; // flag to indicate when this loop has finished sizing flow rate
+        Real64 PlantSizFac = 1.0;     // hold the loop and pump sizing factor
 
-        // Default Constructor
-        PlantSizingData()
-            : LoopType(0), ExitTemp(0.0), DeltaT(0.0), ConcurrenceOption(1), NumTimeStepsInAvg(0), SizingFactorOption(101), DesVolFlowRate(0.0),
-              VolFlowSizingDone(false), PlantSizFac(1.0)
-        {
-        }
     };
 
     // based on ZoneSizingData but only have member variables that are related to the CheckSum/

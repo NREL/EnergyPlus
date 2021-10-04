@@ -114,7 +114,7 @@ protected:
 
         state->dataSize->PlantSizData.allocate(1);
 
-        state->dataSize->PlantSizData(1).SizingFactorOption = NoSizingFactorMode;
+        state->dataSize->PlantSizData(1).SizingFactorOption = DataSizing::SizingFactorMode::None;
         state->dataSize->PlantSizData(1).DesVolFlowRate = 0.002;
         state->dataSize->PlantSizData(1).DeltaT = 10;
 

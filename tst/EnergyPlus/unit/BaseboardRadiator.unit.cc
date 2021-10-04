@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>

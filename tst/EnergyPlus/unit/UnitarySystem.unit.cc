@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>

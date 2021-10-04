@@ -53,7 +53,7 @@
 // ObjexxFCL Headers
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>

@@ -58,7 +58,7 @@
 #include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>

@@ -96,6 +96,7 @@ set(SRC
     Autosizing/HeatingWaterflowSizing.hh
     Autosizing/SystemAirFlowSizing.cc
     Autosizing/SystemAirFlowSizing.hh
+    Autosizing/Types.hh
     Autosizing/WaterHeatingCapacitySizing.cc
     Autosizing/WaterHeatingCapacitySizing.hh
     Autosizing/WaterHeatingCoilUASizing.cc

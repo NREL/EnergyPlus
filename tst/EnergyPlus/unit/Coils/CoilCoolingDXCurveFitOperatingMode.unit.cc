@@ -50,7 +50,7 @@
 
 // EnergyPlus Headers
 #include "../Coils/CoilCoolingDXFixture.hh"
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>

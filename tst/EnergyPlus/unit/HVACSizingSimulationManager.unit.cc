@@ -91,7 +91,7 @@ protected:
         // setup plant sizing data structure
         state->dataSize->NumPltSizInput = 1;
         state->dataSize->PlantSizData.allocate(state->dataSize->NumPltSizInput);
-        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = NoSizingFactorMode;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = DataSizing::SizingFactorMode::None;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).DesVolFlowRate = 0.002;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).DeltaT = 10;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).ConcurrenceOption = Coincident;
@@ -525,7 +525,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     // this test runs 1 system timestep for each zone timestep
 
     state->dataSize->GlobalCoolSizingFactor = 1.0;
-    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = GlobalCoolingSizingFactorMode;
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = DataSizing::SizingFactorMode::GlobalCooling;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -613,7 +613,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
     state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 2;
     state->dataSize->GlobalHeatSizingFactor = 1.0;
-    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = GlobalHeatingSizingFactorMode;
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = DataSizing::SizingFactorMode::GlobalHeating;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 

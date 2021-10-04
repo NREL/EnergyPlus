@@ -49,6 +49,7 @@
 #define Base_hh_INCLUDED
 
 // EnergyPlus headers
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -58,49 +59,6 @@
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
-
-enum class AutoSizingType
-{
-    // align with DataHVACGlobals so scalable sizing strings can be applied
-    // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
-    ASHRAEMinSATCoolingSizing = 30,
-    ASHRAEMaxSATHeatingSizing = 31,
-    AutoCalculateSizing = 25,
-    CoolingAirFlowSizing = 1,
-    CoolingCapacitySizing = 17,
-    CoolingSHRSizing = 22,
-    CoolingWaterDesAirInletHumRatSizing = 5,
-    CoolingWaterDesAirInletTempSizing = 4,
-    CoolingWaterDesAirOutletHumRatSizing = 8,
-    CoolingWaterDesAirOutletTempSizing = 7,
-    CoolingWaterDesWaterInletTempSizing = 6,
-    CoolingWaterflowSizing = 2,
-    CoolingWaterNumofTubesPerRowSizing = 9,
-    DesiccantDehumidifierBFPerfDataFaceVelocitySizing = 35,
-    HeatingAirFlowSizing = 14,
-    HeatingAirflowUASizing = 15,
-    HeatingCapacitySizing = 18,
-    HeatingCoilDesAirInletHumRatSizing = 34,
-    HeatingCoilDesAirInletTempSizing = 32,
-    HeatingCoilDesAirOutletTempSizing = 33,
-    HeatingDefrostSizing = 23, // not used
-    HeatingWaterDesAirInletHumRatSizing = 11,
-    HeatingWaterDesAirInletTempSizing = 10,
-    HeatingWaterDesCoilLoadUsedForUASizing = 12,
-    HeatingWaterDesCoilWaterVolFlowUsedForUASizing = 13,
-    HeatingWaterflowSizing = 3,
-    MinSATempCoolingSizing = 28, // not used
-    MaxHeaterOutletTempSizing = 24,
-    MaxSATempHeatingSizing = 29, // not used
-    SystemAirFlowSizing = 16,
-    SystemCapacitySizing = 21, // not used
-    WaterHeatingCapacitySizing = 19,
-    WaterHeatingCoilUASizing = 20,
-    ZoneCoolingLoadSizing = 26,
-    ZoneHeatingLoadSizing = 27,
-    Unknown = 0,
-    Num = 35
-};
 
 enum class AutoSizingResultType
 {
@@ -260,10 +218,10 @@ struct BaseSizer
     // public methods
 
     virtual void initializeWithinEP(EnergyPlusData &state,
-                                    std::string_view const _compType,
-                                    std::string_view const _compName,
+                                    std::string_view _compType,
+                                    std::string_view _compName,
                                     bool const &_printWarningFlag,
-                                    std::string_view const _callingRoutine);
+                                    std::string_view _callingRoutine);
 
     virtual Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) = 0;
 

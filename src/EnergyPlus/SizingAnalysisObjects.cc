@@ -440,11 +440,6 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
 
 void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData &state, int const HVACSizingIterCount)
 {
-    using DataSizing::GlobalCoolingSizingFactorMode;
-    using DataSizing::GlobalHeatingSizingFactorMode;
-    using DataSizing::LoopComponentSizingFactorMode;
-    using DataSizing::NoSizingFactorMode;
-
     using namespace DataPlant;
     using namespace OutputReportPredefined;
     using DataHVACGlobals::SmallWaterVolFlow;
@@ -495,13 +490,13 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData &state, int 
 
     // now apply the correct sizing factor depending on input option
     sizingFac = 1.0;
-    if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == NoSizingFactorMode) {
+    if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == DataSizing::SizingFactorMode::None) {
         sizingFac = 1.0;
-    } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == GlobalHeatingSizingFactorMode) {
+    } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == DataSizing::SizingFactorMode::GlobalHeating) {
         sizingFac = state.dataSize->GlobalHeatSizingFactor;
-    } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == GlobalCoolingSizingFactorMode) {
+    } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == DataSizing::SizingFactorMode::GlobalCooling) {
         sizingFac = state.dataSize->GlobalCoolSizingFactor;
-    } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == LoopComponentSizingFactorMode) {
+    } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == DataSizing::SizingFactorMode::LoopComponent) {
         // multiplier used for pumps, often 1.0, from component level sizing fractions
         sizingFac = state.dataPlnt->PlantLoop(plantLoopIndex).LoopSide(SupplySide).Branch(1).PumpSizFac;
     }

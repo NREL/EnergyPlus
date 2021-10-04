@@ -4339,13 +4339,13 @@ void GetPlantSizingInput(EnergyPlusData &state)
             {
                 auto const sizingFactorOption(state.dataIPShortCut->cAlphaArgs(4));
                 if (sizingFactorOption == "NONE") {
-                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = NoSizingFactorMode;
+                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = DataSizing::SizingFactorMode::None;
                 } else if (sizingFactorOption == "GLOBALHEATINGSIZINGFACTOR") {
-                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = GlobalHeatingSizingFactorMode;
+                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = DataSizing::SizingFactorMode::GlobalHeating;
                 } else if (sizingFactorOption == "GLOBALCOOLINGSIZINGFACTOR") {
-                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = GlobalCoolingSizingFactorMode;
+                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = DataSizing::SizingFactorMode::GlobalCooling;
                 } else if (sizingFactorOption == "LOOPCOMPONENTSIZINGFACTOR") {
-                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = LoopComponentSizingFactorMode;
+                    state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = DataSizing::SizingFactorMode::LoopComponent;
                 }
             }
         }

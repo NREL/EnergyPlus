@@ -45,75 +45,54 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BaseSizerWithFanHeatInputs_hh_INCLUDED
-#define BaseSizerWithFanHeatInputs_hh_INCLUDED
-
-#include <EnergyPlus/Autosizing/Types.hh>
-#include <EnergyPlus/Autosizing/Base.hh>
-#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/api/TypeDefs.h>
-#include <string>
+#ifndef ENERGYPLUS_AUTOSIZING_TYPES
+#define ENERGYPLUS_AUTOSIZING_TYPES
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
-
-struct BaseSizerWithFanHeatInputs : BaseSizer
+enum class AutoSizingType
 {
-
-    // fan data
-    Real64 deltaP = 0.0;
-    Real64 motEff = 0.0;
-    Real64 totEff = 0.0;
-    Real64 motInAirFrac = 0.0;
-    bool fanCompModel = false;
-    Real64 fanShaftPow = 0.0;
-    Real64 motInPower = 0.0;
-
-    void getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                    int const &fanEnumType,
-                                    int const &fanIndex,
-                                    Real64 &deltaP,
-                                    Real64 &motEff,
-                                    Real64 &totEff,
-                                    Real64 &motInAirFrac,
-                                    Real64 &fanShaftPow,
-                                    Real64 &motInPower,
-                                    bool &fanCompModel);
-
-    Real64 calcFanDesHeatGain(Real64 &airVolFlow);
-
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string_view const _compType,
-                            std::string_view const _compName,
-                            bool const &_printWarningFlag,
-                            std::string_view const _callingRoutine) override;
-
-    void setDataDesAccountForFanHeat(EnergyPlusData &state, bool flag);
-
-    void clearState()
-    {
-        BaseSizer::clearState();
-        deltaP = 0.0;
-        motEff = 0.0;
-        totEff = 0.0;
-        motInAirFrac = 0.0;
-        fanCompModel = false;
-        fanShaftPow = 0.0;
-        motInPower = 0.0;
-    }
+    // align with DataHVACGlobals so scalable sizing strings can be applied
+    // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
+    ASHRAEMinSATCoolingSizing = 30,
+    ASHRAEMaxSATHeatingSizing = 31,
+    AutoCalculateSizing = 25,
+    CoolingAirFlowSizing = 1,
+    CoolingCapacitySizing = 17,
+    CoolingSHRSizing = 22,
+    CoolingWaterDesAirInletHumRatSizing = 5,
+    CoolingWaterDesAirInletTempSizing = 4,
+    CoolingWaterDesAirOutletHumRatSizing = 8,
+    CoolingWaterDesAirOutletTempSizing = 7,
+    CoolingWaterDesWaterInletTempSizing = 6,
+    CoolingWaterflowSizing = 2,
+    CoolingWaterNumofTubesPerRowSizing = 9,
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizing = 35,
+    HeatingAirFlowSizing = 14,
+    HeatingAirflowUASizing = 15,
+    HeatingCapacitySizing = 18,
+    HeatingCoilDesAirInletHumRatSizing = 34,
+    HeatingCoilDesAirInletTempSizing = 32,
+    HeatingCoilDesAirOutletTempSizing = 33,
+    HeatingDefrostSizing = 23, // not used
+    HeatingWaterDesAirInletHumRatSizing = 11,
+    HeatingWaterDesAirInletTempSizing = 10,
+    HeatingWaterDesCoilLoadUsedForUASizing = 12,
+    HeatingWaterDesCoilWaterVolFlowUsedForUASizing = 13,
+    HeatingWaterflowSizing = 3,
+    MinSATempCoolingSizing = 28, // not used
+    MaxHeaterOutletTempSizing = 24,
+    MaxSATempHeatingSizing = 29, // not used
+    SystemAirFlowSizing = 16,
+    SystemCapacitySizing = 21, // not used
+    WaterHeatingCapacitySizing = 19,
+    WaterHeatingCoilUASizing = 20,
+    ZoneCoolingLoadSizing = 26,
+    ZoneHeatingLoadSizing = 27,
+    Unknown = 0,
+    Num = 35
 };
 
-struct BaseSizerWithFanHeatInputsData : BaseGlobalStruct
-{
-
-    void clear_state() override
-    {
-    }
-};
-
-} // namespace EnergyPlus
+}
 
 #endif
