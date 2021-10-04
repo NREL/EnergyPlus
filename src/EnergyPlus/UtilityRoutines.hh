@@ -594,8 +594,7 @@ namespace UtilityRoutines {
 constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
-        if (sList[i] == s)
-            return i;
+        if (sList[i] == s) return i;
     }
     return -1;
 }

@@ -2155,7 +2155,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     name = objectName;
 
-    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypes, objectType));
+    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypesUC, UtilityRoutines::MakeUPPERCase(objectType)));
     switch (generatorType) {
     case GeneratorType::ICEngine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
