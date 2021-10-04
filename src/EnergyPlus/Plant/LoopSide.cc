@@ -742,9 +742,8 @@ namespace DataPlant {
                 FluidProperties::GetSpecificHeatGlycol(state, thisPlantLoop.FluidName, WeightedInletTemp, thisPlantLoop.FluidIndex, RoutineName);
 
             {
-                auto const SELECT_CASE_var(thisPlantLoop.LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+                if (thisPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     Real64 LoopSetPointTemperature = this->TempSetPoint;
@@ -754,7 +753,7 @@ namespace DataPlant {
                     // Calculate the demand on the loop
                     LoadToLoopSetPoint = SumMdot * Cp * DeltaTemp;
 
-                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (thisPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
 
                     // Get the range of setpoints
                     Real64 LoopSetPointTemperatureHi = state.dataLoopNodes->Node(thisPlantLoop.TempSetPointNodeNum).TempSetPointHi;
@@ -816,9 +815,8 @@ namespace DataPlant {
                 FluidProperties::GetSpecificHeatGlycol(state, thisPlantLoop.FluidName, WeightedInletTemp, thisPlantLoop.FluidIndex, RoutineName);
 
             {
-                auto const SELECT_CASE_var(thisPlantLoop.LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+                if (thisPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     Real64 LoopSetPointTemperature = this->TempSetPoint;
@@ -956,102 +954,103 @@ namespace DataPlant {
                             (loop.CommonPipeType == DataPlant::CommonPipeType::TwoWay)) {
                             // special primary side flow request for two way common pipe
                             int const CompIndex = component.CompNum;
-                            {
-                                auto const SELECT_CASE_var(component.Type);
-                                // remove var speed pumps from this case statement if can set MassFlowRateRequest
-                                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpConstantSpeed) ||
-                                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
-                                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed)) {
-                                    if (CompIndex > 0) {
-                                        ThisBranchFlowRequestNeedIfOn =
-                                            max(ThisBranchFlowRequestNeedIfOn, state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax);
-                                    }
-                                } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankConstantSpeed) {
-                                    if (CompIndex > 0) {
-                                        ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
-                                                                            state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
-                                                                                state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
-                                    }
-                                } else {
-                                    ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
+                            switch (component.Type) {
+                            // remove var speed pumps from this case statement if can set MassFlowRateRequest
+                            case DataPlant::PlantEquipmentType::PumpConstantSpeed:
+                            case DataPlant::PlantEquipmentType::PumpVariableSpeed:
+                            case DataPlant::PlantEquipmentType::PumpBankVariableSpeed:
+                                if (CompIndex > 0) {
+                                    ThisBranchFlowRequestNeedIfOn =
+                                        max(ThisBranchFlowRequestNeedIfOn, state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax);
                                 }
+                                break;
+                            case DataPlant::PlantEquipmentType::PumpBankConstantSpeed:
+                                if (CompIndex > 0) {
+                                    ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
+                                                                        state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
+                                                                            state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
+                                }
+                                break;
+                            default:
+                                ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
+                                break;
                             }
 
                         } else if ((BranchCounter == 1) && (LoopSideCounter == DataPlant::SupplySide) &&
                                    (loop.CommonPipeType == DataPlant::CommonPipeType::Single)) {
                             int const CompIndex = component.CompNum;
-                            {
-                                auto const SELECT_CASE_var(component.Type);
-                                // remove var speed pumps from this case statement if can set MassFlowRateRequest
-                                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpConstantSpeed) ||
-                                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
-                                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed)) {
-                                    if (CompIndex > 0) {
-                                        ThisBranchFlowRequestNeedIfOn =
-                                            max(ThisBranchFlowRequestNeedIfOn, state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax);
-                                    }
-                                } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankConstantSpeed) {
-                                    if (CompIndex > 0) {
-                                        ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
-                                                                            state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
-                                                                                state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
-                                    }
-                                } else {
-                                    ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
+                            switch (component.Type) {
+                            // remove var speed pumps from this case statement if can set MassFlowRateRequest
+                            case DataPlant::PlantEquipmentType::PumpConstantSpeed:
+                            case DataPlant::PlantEquipmentType::PumpVariableSpeed:
+                            case DataPlant::PlantEquipmentType::PumpBankVariableSpeed: {
+                                if (CompIndex > 0) {
+                                    ThisBranchFlowRequestNeedIfOn =
+                                        max(ThisBranchFlowRequestNeedIfOn, state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax);
                                 }
+                                break;
+                            }
+                            case DataPlant::PlantEquipmentType::PumpBankConstantSpeed:
+                                if (CompIndex > 0) {
+                                    ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
+                                                                        state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
+                                                                            state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
+                                }
+                                break;
+                            default:
+                                ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
                             }
                         } else {
                             int const CompIndex = component.CompNum;
-                            {
-                                auto const SELECT_CASE_var(component.Type);
-                                if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
-                                    if (CompIndex > 0) {
-                                        auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
-                                        if (ParallelBranchIndex >= 1) { // branch pump
-                                            if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
-                                                ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
-                                            } else if (loop.CommonPipeType !=
-                                                       DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
-                                                ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
-                                            }
-                                            loop_side.hasConstSpeedBranchPumps = true;
-                                            branch.HasConstantSpeedBranchPump = true;
-                                            branch.ConstantSpeedBranchMassFlow = this_pump.MassFlowRateMax;
-                                        } else { // inlet pump
+                            switch (component.Type) {
+                            case DataPlant::PlantEquipmentType::PumpConstantSpeed:
+                                if (CompIndex > 0) {
+                                    auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
+                                    if (ParallelBranchIndex >= 1) { // branch pump
+                                        if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                                            ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
+                                        } else if (loop.CommonPipeType != DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
                                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
                                         }
+                                        loop_side.hasConstSpeedBranchPumps = true;
+                                        branch.HasConstantSpeedBranchPump = true;
+                                        branch.ConstantSpeedBranchMassFlow = this_pump.MassFlowRateMax;
+                                    } else { // inlet pump
+                                        ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
                                     }
-                                } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankConstantSpeed) {
-                                    if (CompIndex > 0) {
-                                        auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
-                                        if (ParallelBranchIndex >= 1) { // branch pump
-                                            if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
-                                                ThisBranchFlowRequestNeedIfOn =
-                                                    max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
-                                            } else if (loop.CommonPipeType !=
-                                                       DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
-                                                ThisBranchFlowRequestNeedIfOn =
-                                                    max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
-                                            }
-                                            loop_side.hasConstSpeedBranchPumps = true;
-                                            branch.HasConstantSpeedBranchPump = true;
-                                            branch.ConstantSpeedBranchMassFlow = this_pump.MassFlowRateMax / this_pump.NumPumpsInBank;
-                                        } else { // inlet pump
+                                }
+                                break;
+                            case DataPlant::PlantEquipmentType::PumpBankConstantSpeed:
+                                if (CompIndex > 0) {
+                                    auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
+                                    if (ParallelBranchIndex >= 1) { // branch pump
+                                        if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                                            ThisBranchFlowRequestNeedIfOn =
+                                                max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
+                                        } else if (loop.CommonPipeType != DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
                                             ThisBranchFlowRequestNeedIfOn =
                                                 max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
                                         }
+                                        loop_side.hasConstSpeedBranchPumps = true;
+                                        branch.HasConstantSpeedBranchPump = true;
+                                        branch.ConstantSpeedBranchMassFlow = this_pump.MassFlowRateMax / this_pump.NumPumpsInBank;
+                                    } else { // inlet pump
+                                        ThisBranchFlowRequestNeedIfOn =
+                                            max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
                                     }
                                 }
+                                break;
 
                                 // overwrite here for branch pumps
-                                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
-                                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) ||
-                                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpCondensate)) {
-                                    if (component.CompNum > 0) {
-                                        auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
-                                        this_pump.LoopSolverOverwriteFlag = false;
-                                    }
+                            case DataPlant::PlantEquipmentType::PumpVariableSpeed:
+                            case DataPlant::PlantEquipmentType::PumpBankVariableSpeed:
+                            case DataPlant::PlantEquipmentType::PumpCondensate:
+                                if (component.CompNum > 0) {
+                                    auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
+                                    this_pump.LoopSolverOverwriteFlag = false;
                                 }
+                            default:
+                                break;
                             }
                         }
                     }
@@ -1184,14 +1183,16 @@ namespace DataPlant {
                     int const NumCompsOnThisBranch = branch.TotalComponents;
                     for (int CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter) {
                         auto const &component(branch.Comp(CompCounter));
-                        auto const SELECT_CASE_var(component.Type);
-                        if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
-                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) ||
-                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpCondensate)) {
+                        switch (component.Type) {
+                        case DataPlant::PlantEquipmentType::PumpVariableSpeed:
+                        case DataPlant::PlantEquipmentType::PumpBankVariableSpeed:
+                        case DataPlant::PlantEquipmentType::PumpCondensate:
                             if (component.CompNum > 0) {
                                 auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
                                 this_pump.LoopSolverOverwriteFlag = true;
                             }
+                        default:
+                            break;
                         }
                     }
                 }
