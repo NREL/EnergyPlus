@@ -216,16 +216,18 @@ namespace PlantChillers {
             thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisChiller.plantTypeOfNum = DataPlant::PlantEquipmentType::Chiller_Electric;
 
-            if (state.dataIPShortCut->cAlphaArgs(2) == "AIRCOOLED") {
-                thisChiller.CondenserType = DataPlant::CondenserType::AirCooled;
-            } else if (state.dataIPShortCut->cAlphaArgs(2) == "WATERCOOLED") {
-                thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
-            } else if (state.dataIPShortCut->cAlphaArgs(2) == "EVAPORATIVELYCOOLED") {
-                thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
-            } else {
+            thisChiller.CondenserType = static_cast<DataPlant::CondenserType>(
+                getEnumerationValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            switch (thisChiller.CondenserType) {
+            case DataPlant::CondenserType::AirCooled:
+            case DataPlant::CondenserType::WaterCooled:
+            case DataPlant::CondenserType::EvapCooled:
+                break;
+            default: {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
+            }
             }
 
             thisChiller.NomCap = state.dataIPShortCut->rNumericArgs(1);

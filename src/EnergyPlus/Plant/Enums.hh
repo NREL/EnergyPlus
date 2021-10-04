@@ -213,6 +213,7 @@ enum class LoadingScheme
     Uniform,              // Uniform Load Distribution Scheme
     UniformPLR,           // Uniform PLR Load Distribution Scheme
     SequentialUniformPLR, // Sequential Uniform PLR Load Distribution Scheme
+    Num
 };
 
 enum class FlowMode
@@ -221,6 +222,7 @@ enum class FlowMode
     Constant,
     NotModulated,
     LeavingSetpointModulated,
+    Num
 };
 
 enum class CondenserType
@@ -229,7 +231,10 @@ enum class CondenserType
     AirCooled,
     WaterCooled,
     EvapCooled,
+    Num
 };
+
+constexpr std::array<std::string_view, static_cast<int>(CondenserType::Num)> CondenserTypeNamesUC{"AIRCOOLED", "WATERCOOLED", "EVAPORATIVELYCOOLED"};
 
 // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 enum class CriteriaType
