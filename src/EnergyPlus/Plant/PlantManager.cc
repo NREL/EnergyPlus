@@ -875,7 +875,7 @@ void GetPlantInput(EnergyPlusData &state)
                     this_comp.TypeOf = this_comp_type;
                     this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
-                    this_comp.Type = static_cast<PlantEquipmentType>(getEnumerationValue(PlantEquipTypeNamesCC, this_comp_type));
+                    this_comp.Type = static_cast<PlantEquipmentType>(getEnumerationValue(PlantEquipTypeNames, UtilityRoutines::MakeUPPERCase(this_comp_type)));
 
                     switch (this_comp.Type) {
                     case (PlantEquipmentType::Pipe): {
