@@ -2987,7 +2987,7 @@ namespace UnitVentilator {
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
                     } else {
-                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
+                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%Type))
                     }
                 }
 
@@ -3047,7 +3047,7 @@ namespace UnitVentilator {
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
                     } else {
-                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
+                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%Type))
                     }
                 }
 

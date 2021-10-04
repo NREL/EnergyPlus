@@ -7611,7 +7611,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);
-    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.Type);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
 
     state->dataPlnt->TotNumLoops = 2;
@@ -8042,7 +8042,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);
-    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
+    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.Type);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
     EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
     EXPECT_EQ(state->dataSystemAvailabilityManager->SysAvailMgr_NightCycle, thisAvaiManager.MgrType);

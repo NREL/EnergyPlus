@@ -64,6 +64,19 @@ struct EnergyPlusData;
 
 namespace UnitHeater {
 
+    enum class HCoilType
+    {
+        Unassigned = -1,
+        Electric,
+        Gas,
+        WaterHeatingCoil,
+        SteamCoil,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(HCoilType::Num)> HCoilTypeNamesUC{
+        "COIL:HEATING:WATER", "COIL:HEATING:STEAM", "COIL:HEATING:ELECTRIC", "COIL:HEATING:FUEL"};
+
     struct UnitHeaterData
     {
         // Members
@@ -87,7 +100,7 @@ namespace UnitHeater {
         int FanOutletNode;                      // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
         int OpMode;              // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
-        std::string HCoilType;   // type of heating coil (water, gas, electric, etc.)
+        HCoilType Type;          // type of heating coil (water, gas, electric, etc.)
         std::string HCoilTypeCh; // actual object name
         std::string HCoilName;   // name of heating coil
         int HCoil_Index;
@@ -203,10 +216,6 @@ struct UnitHeatersData : BaseGlobalStruct
     std::string const cMO_UnitHeater = "ZoneHVAC:UnitHeater";
 
     // Character parameters for outside air control types:
-    std::string const ElectricCoil = "ElectricCoil";
-    std::string const GasCoil = "GasCoil";
-    std::string const WaterHeatingCoil = "WaterHeatingCoil";
-    std::string const SteamCoil = "SteamCoil";
 
     bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
     int NumOfUnitHeats; // Number of unit heaters in the input file
