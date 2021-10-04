@@ -178,15 +178,10 @@ namespace HeatBalFiniteDiffManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
-
                 {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
-
-                    if (SELECT_CASE_var == "CRANKNICHOLSONSECONDORDER") {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = CrankNicholsonSecondOrder;
-                    } else if (SELECT_CASE_var == "FULLYIMPLICITFIRSTORDER") {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = FullyImplicitFirstOrder;
-                    } else {
+                    state.dataHeatBalFiniteDiffMgr->CondFDSchemeType =
+                        static_cast<CondFDScheme>(getEnumerationValue(CondFDSchemeTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Unassigned) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                             " entered=" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -1222,7 +1217,7 @@ namespace HeatBalFiniteDiffManager {
               "Temperature Convergence Criteria\n");
         print(state.files.eio,
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
-              state.dataHeatBalFiniteDiffMgr->cCondFDSchemeType(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType),
+              CondFDSchemeTypeNamesCC[static_cast<int>(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType)],
               state.dataHeatBalFiniteDiffMgr->SpaceDescritConstant,
               state.dataHeatBal->CondFDRelaxFactorInput,
               state.dataHeatBal->MaxAllowedDelTempCondFD);
@@ -1599,14 +1594,14 @@ namespace HeatBalFiniteDiffManager {
 
                     if (HMovInsul <= 0.0) { // Regular  case
 
-                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) { // Second Order equation
+                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Second Order equation
                             Real64 const Cp_DelX_RhoS_2Delt(Cp * DelX * RhoS / (2.0 * Delt));
                             Real64 const kt_2DelX(kt / (2.0 * DelX));
                             Real64 const hsum(0.5 * (hconvo + hgnd + hrad + hsky));
                             TDT_i = (QRadSWOutFD + Cp_DelX_RhoS_2Delt * TD_i + kt_2DelX * (TDT_p - TD_i + TD(i + 1)) + hgnd * Tgnd +
                                      (hconvo + hrad) * Toa + hsky * Tsky - hsum * TD_i) /
                                     (hsum + kt_2DelX + Cp_DelX_RhoS_2Delt);
-                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // First Order
+                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // First Order
                             Real64 const Two_Delt_DelX(2.0 * Delt_DelX);
                             Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
                             Real64 const Two_Delt_kt(2.0 * Delt * kt);
@@ -1627,10 +1622,10 @@ namespace HeatBalFiniteDiffManager {
                         Real64 const Two_Delt_kt(2.0 * Delt * kt);
 
                         // Wall first node temperature behind Movable insulation
-                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                             TDT_i = (Two_Delt_DelX * (QRadSWOutFD + HMovInsul * TInsulOut) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_p) /
                                     (Two_Delt_DelX * HMovInsul + Two_Delt_kt + Cp_DelX2_RhoS);
-                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                             // Currently same as Crank Nicholson, need fully implicit formulation
                             TDT_i = (Two_Delt_DelX * (QRadSWOutFD + HMovInsul * TInsulOut) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_p) /
                                     (Two_Delt_DelX * HMovInsul + Two_Delt_kt + Cp_DelX2_RhoS);
@@ -1762,11 +1757,11 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const DelX(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
         Real64 const Cp_DelX_RhoS_Delt(Cp * DelX * RhoS / Delt);
-        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) { // Adams-Moulton second order
+        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
             Real64 const inv2DelX(1.0 / (2.0 * DelX));
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA1 * (TD(i + 1) - TD_i + TDT_p) + ktA2 * (TD(i - 1) - TD_i + TDT_m)) * inv2DelX)) /
                     (((ktA1 + ktA2) * inv2DelX) + Cp_DelX_RhoS_Delt);
-        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // Adams-Moulton First order
+        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
             Real64 const invDelX(1.0 / DelX);
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA2 * TDT_m) + (ktA1 * TDT_p)) * invDelX) / (((ktA1 + ktA2) * invDelX) + Cp_DelX_RhoS_Delt);
         } else {
@@ -1930,11 +1925,11 @@ namespace HeatBalFiniteDiffManager {
                     Real64 const Delt_Delx2(Delt * Delx2);
                     Real64 const Cp2_fac(Cp2 * pow_2(Delx2) * RhoS2 * Rlayer);
                     Real64 const Delt_kt2_Rlayer(Delt * kt2 * Rlayer);
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                         TDT_i = (2.0 * Delt_Delx2 * QSSFlux * Rlayer + (Cp2_fac - Delt_Delx2 - Delt_kt2_Rlayer) * TD_i +
                                  Delt_Delx2 * (TD(i - 1) + TDT_m) + Delt_kt2_Rlayer * (TD(i + 1) + TDT_p)) /
                                 (Delt_Delx2 + Delt_kt2_Rlayer + Cp2_fac);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                         Real64 const Two_Delt_Delx2(2.0 * Delt_Delx2);
                         Real64 const Two_Delt_kt2_Rlayer(2.0 * Delt_kt2_Rlayer);
                         TDT_i = (Two_Delt_Delx2 * (QSSFlux * Rlayer + TDT_m) + Cp2_fac * TD_i + Two_Delt_kt2_Rlayer * TDT_p) /
@@ -1994,11 +1989,11 @@ namespace HeatBalFiniteDiffManager {
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Cp1_fac(Cp1 * pow_2(Delx1) * RhoS1 * Rlayer2);
                     Real64 const Delt_kt1_Rlayer2(Delt * kt1 * Rlayer2);
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                         TDT_i = (2.0 * Delt_Delx1 * QSSFlux * Rlayer2 + (Cp1_fac - Delt_Delx1 - Delt_kt1_Rlayer2) * TD_i +
                                  Delt_Delx1 * (TD(i + 1) + TDT_p) + Delt_kt1_Rlayer2 * (TD(i - 1) + TDT_m)) /
                                 (Delt_Delx1 + Delt_kt1_Rlayer2 + Cp1_fac);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                         Real64 const Two_Delt_Delx1(2.0 * Delt_Delx1);
                         Real64 const Two_Delt_kt1_Rlayer2(2.0 * Delt_kt1_Rlayer2);
                         TDT_i = (Two_Delt_Delx1 * (QSSFlux * Rlayer2 + TDT_p) + Cp1_fac * TD_i + Two_Delt_kt1_Rlayer2 * TDT_m) /
@@ -2101,11 +2096,13 @@ namespace HeatBalFiniteDiffManager {
                     Real64 const Cp2_fac(Cp2 * Delx1 * pow_2(Delx2) * RhoS2);
                     Real64 const Cp_fac(Cp1_fac + Cp2_fac);
                     if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
-                        CrankNicholsonSecondOrder) { // Regular Internal Interface Node with Source/sink using Adams Moulton second order
+                        CondFDScheme::CrankNicholsonSecondOrder) { // Regular Internal Interface Node with Source/sink using Adams Moulton second
+                                                                   // order
                         TDT_i = (2.0 * Delt_Delx1 * Delx2 * QSSFlux + (Cp_fac - Delt_sum) * TD_i + Delt_Delx1_kt2 * (TD(i + 1) + TDT_p) +
                                  Delt_Delx2_kt1 * (TD(i - 1) + TDT_m)) /
                                 (Delt_sum + Cp_fac);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // First order adams moulton
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
+                               CondFDScheme::FullyImplicitFirstOrder) { // First order adams moulton
                         TDT_i = (2.0 * (Delt_Delx1 * Delx2 * QSSFlux + Delt_Delx2_kt1 * TDT_m + Delt_Delx1_kt2 * TDT_p) + Cp_fac * TD_i) /
                                 (2.0 * (Delt_Delx2_kt1 + Delt_Delx1_kt2) + Cp_fac);
                     }
@@ -2267,21 +2264,22 @@ namespace HeatBalFiniteDiffManager {
                 Real64 const Delt_kt(Delt * kt);
                 Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
                 if ((surface.ExtBoundCond > 0) && (i == 1)) { // this is for an adiabatic or interzone partition
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) { // Adams-Moulton second order
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
                                  Delt_kt * (TD(i + 1) + TDT(i + 1))) /
                                 (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // Adams-Moulton First order
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
+                               CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
                         Real64 const Two_Delt_kt(2.0 * Delt_kt);
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT(i + 1)) /
                                 (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
                     }
                 } else { // for regular or interzone walls
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
                                  Delt_kt * (TD(i - 1) + TDT_m)) /
                                 (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                         Real64 const Two_Delt_kt(2.0 * Delt_kt);
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_m) /
                                 (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);

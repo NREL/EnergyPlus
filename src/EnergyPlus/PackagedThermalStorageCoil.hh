@@ -77,6 +77,7 @@ namespace PackagedThermalStorageCoil {
     };
 
     // Control Modes
+    // can't change these to enum class since these are used in SetupOutputVariable()
     constexpr int OffMode = 0;
     constexpr int CoolingOnlyMode = 1;
     constexpr int CoolingAndChargeMode = 2;

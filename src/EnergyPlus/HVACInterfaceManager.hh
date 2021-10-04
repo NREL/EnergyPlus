@@ -65,6 +65,7 @@ struct EnergyPlusData;
 namespace HVACInterfaceManager {
 
     // Common Pipe Recirc Flow Directions
+    // can't change these to enum class since these are used in SetupOutputVariable()
     constexpr int NoRecircFlow(0);
     constexpr int PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
     constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet

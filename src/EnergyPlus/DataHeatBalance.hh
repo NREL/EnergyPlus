@@ -133,7 +133,8 @@ namespace DataHeatBalance {
     {
         Unassigned = -1,
         Isotropic,
-        Anisotropic
+        Anisotropic,
+        NUM
     };
 
     // Parameters for ZoneAirSolutionAlgo
@@ -142,7 +143,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         ThirdOrder,
         AnalyticalSolution,
-        EulerMethod
+        EulerMethod,
+        NUM
     };
 
     // Parameter for MRT calculation type
@@ -151,7 +153,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         ZoneAveraged,
         SurfaceWeighted,
-        AngleFactor
+        AngleFactor,
+        NUM
     };
 
     // Parameters for Ventilation
@@ -161,7 +164,8 @@ namespace DataHeatBalance {
         Natural,
         Intake,
         Exhaust,
-        Balanced
+        Balanced,
+        NUM
     };
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
@@ -170,7 +174,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         Indiv,
         Close,
-        Global
+        Global,
+        NUM
     };
 
     // System type, detailed refrigeration or refrigerated case rack
@@ -178,7 +183,8 @@ namespace DataHeatBalance {
     {
         Unassigned = -1,
         Detailed,
-        Rack
+        Rack,
+        NUM
     };
 
     // Refrigeration condenser type
@@ -189,97 +195,259 @@ namespace DataHeatBalance {
         Evap,
         Water,
         Cascade,
-        WaterHeater
+        WaterHeater,
+        NUM
     };
 
     // Parameters for type of infiltration model
-    constexpr int InfiltrationDesignFlowRate(1);
-    constexpr int InfiltrationShermanGrimsrud(2);
-    constexpr int InfiltrationAIM2(3);
+    enum class InfiltrationModelType
+    {
+        Unassigned = -1,
+        DesignFlowRate,
+        ShermanGrimsrud,
+        AIM2,
+        NUM
+    };
 
     // Parameters for type of ventilation model
-    constexpr int VentilationDesignFlowRate(1);
-    constexpr int VentilationWindAndStack(2);
+    enum class VentilationModelType
+    {
+        Unassigned = -1,
+        DesignFlowRate,
+        WindAndStack,
+        NUM
+    };
 
     // Parameters for type of zone air balance model
-    constexpr int AirBalanceNone(0);
-    constexpr int AirBalanceQuadrature(1);
+    enum class AirBalance
+    {
+        Unassigned = -1,
+        None,
+        Quadrature,
+        NUM
+    };
 
     // Parameter for source zone air flow mass balance infiltration treatment
-    constexpr int NoInfiltrationFlow(0);
-    constexpr int AddInfiltrationFlow(1);
-    constexpr int AdjustInfiltrationFlow(2);
-    constexpr int MixingSourceZonesOnly(1);
-    constexpr int AllZones(2);
+    enum class InfiltrationFlow
+    {
+        Unassigned = -1,
+        No,
+        Add,
+        Adjust,
+        NUM
+    };
 
+    enum class InfiltrationZoneType
+    {
+        Unassigned = -1,
+        MixingSourceZonesOnly,
+        AllZones,
+        NUM
+    };
+
+    // zone air flow balancing method
     enum class AdjustmentType
     {
-        // zone air flow balancing method
+        Unassigned = -1,
         AdjustMixingOnly,
         AdjustReturnOnly,
         AdjustMixingThenReturn,
         AdjustReturnThenMixing,
-        NoAdjustReturnAndMixing
+        NoAdjustReturnAndMixing,
+        NUM
     };
-    constexpr int NumZoneIntGainDeviceTypes(54);
 
-    extern Array1D_string const ZoneIntGainDeviceTypes;
-    extern Array1D_string const ccZoneIntGainDeviceTypes;
+    enum class IntGainType
+    {
+        Unassigned = -1,
+        People,
+        Lights,
+        ElectricEquipment,
+        GasEquipment,
+        HotWaterEquipment,
+        SteamEquipment,
+        OtherEquipment,
+        ZoneBaseboardOutdoorTemperatureControlled,
+        ZoneContaminantSourceAndSinkCarbonDioxide,
+        WaterUseEquipment,
+        DaylightingDeviceTubular,
+        WaterHeaterMixed,
+        WaterHeaterStratified,
+        ThermalStorageChilledWaterMixed,
+        ThermalStorageChilledWaterStratified,
+        GeneratorFuelCell,
+        GeneratorMicroCHP,
+        ElectricLoadCenterTransformer,
+        ElectricLoadCenterInverterSimple,
+        ElectricLoadCenterInverterFunctionOfPower,
+        ElectricLoadCenterInverterLookUpTable,
+        ElectricLoadCenterStorageLiIonNmcBattery,
+        ElectricLoadCenterStorageBattery,
+        ElectricLoadCenterStorageSimple,
+        PipeIndoor,
+        RefrigerationCase,
+        RefrigerationCompressorRack,
+        RefrigerationSystemAirCooledCondenser,
+        RefrigerationTransSysAirCooledGasCooler,
+        RefrigerationSystemSuctionPipe,
+        RefrigerationTransSysSuctionPipeMT,
+        RefrigerationTransSysSuctionPipeLT,
+        RefrigerationSecondaryReceiver,
+        RefrigerationSecondaryPipe,
+        RefrigerationWalkIn,
+        Pump_VarSpeed,
+        Pump_ConSpeed,
+        Pump_Cond,
+        PumpBank_VarSpeed,
+        PumpBank_ConSpeed,
+        ZoneContaminantSourceAndSinkGenericContam,
+        PlantComponentUserDefined,
+        CoilUserDefined,
+        ZoneHVACForcedAirUserDefined,
+        AirTerminalUserDefined,
+        PackagedTESCoilTank,
+        ElectricEquipmentITEAirCooled,
+        SecCoolingDXCoilSingleSpeed,
+        SecHeatingDXCoilSingleSpeed,
+        SecCoolingDXCoilTwoSpeed,
+        SecCoolingDXCoilMultiSpeed,
+        SecHeatingDXCoilMultiSpeed,
+        ElectricLoadCenterConverter,
+        FanSystemModel,
+        NUM
+    };
 
-    constexpr int IntGainTypeOf_People(1);
-    constexpr int IntGainTypeOf_Lights(2);
-    constexpr int IntGainTypeOf_ElectricEquipment(3);
-    constexpr int IntGainTypeOf_GasEquipment(4);
-    constexpr int IntGainTypeOf_HotWaterEquipment(5);
-    constexpr int IntGainTypeOf_SteamEquipment(6);
-    constexpr int IntGainTypeOf_OtherEquipment(7);
-    constexpr int IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled(8);
-    constexpr int IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide(9);
-    constexpr int IntGainTypeOf_WaterUseEquipment(10);
-    constexpr int IntGainTypeOf_DaylightingDeviceTubular(11);
-    constexpr int IntGainTypeOf_WaterHeaterMixed(12);
-    constexpr int IntGainTypeOf_WaterHeaterStratified(13);
-    constexpr int IntGainTypeOf_ThermalStorageChilledWaterMixed(14);
-    constexpr int IntGainTypeOf_ThermalStorageChilledWaterStratified(15);
-    constexpr int IntGainTypeOf_GeneratorFuelCell(16);
-    constexpr int IntGainTypeOf_GeneratorMicroCHP(17);
-    constexpr int IntGainTypeOf_ElectricLoadCenterTransformer(18);
-    constexpr int IntGainTypeOf_ElectricLoadCenterInverterSimple(19);
-    constexpr int IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower(20);
-    constexpr int IntGainTypeOf_ElectricLoadCenterInverterLookUpTable(21);
-    constexpr int IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery(22);
-    constexpr int IntGainTypeOf_ElectricLoadCenterStorageBattery(23);
-    constexpr int IntGainTypeOf_ElectricLoadCenterStorageSimple(24);
-    constexpr int IntGainTypeOf_PipeIndoor(25);
-    constexpr int IntGainTypeOf_RefrigerationCase(26);
-    constexpr int IntGainTypeOf_RefrigerationCompressorRack(27);
-    constexpr int IntGainTypeOf_RefrigerationSystemAirCooledCondenser(28);
-    constexpr int IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(29);
-    constexpr int IntGainTypeOf_RefrigerationSystemSuctionPipe(30);
-    constexpr int IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(31);
-    constexpr int IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(32);
-    constexpr int IntGainTypeOf_RefrigerationSecondaryReceiver(33);
-    constexpr int IntGainTypeOf_RefrigerationSecondaryPipe(34);
-    constexpr int IntGainTypeOf_RefrigerationWalkIn(35);
-    constexpr int IntGainTypeOf_Pump_VarSpeed(36);
-    constexpr int IntGainTypeOf_Pump_ConSpeed(37);
-    constexpr int IntGainTypeOf_Pump_Cond(38);
-    constexpr int IntGainTypeOf_PumpBank_VarSpeed(39);
-    constexpr int IntGainTypeOf_PumpBank_ConSpeed(40);
-    constexpr int IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(41);
-    constexpr int IntGainTypeOf_PlantComponentUserDefined(42);
-    constexpr int IntGainTypeOf_CoilUserDefined(43);
-    constexpr int IntGainTypeOf_ZoneHVACForcedAirUserDefined(44);
-    constexpr int IntGainTypeOf_AirTerminalUserDefined(45);
-    constexpr int IntGainTypeOf_PackagedTESCoilTank(46);
-    constexpr int IntGainTypeOf_ElectricEquipmentITEAirCooled(47);
-    constexpr int IntGainTypeOf_SecCoolingDXCoilSingleSpeed(48);
-    constexpr int IntGainTypeOf_SecHeatingDXCoilSingleSpeed(49);
-    constexpr int IntGainTypeOf_SecCoolingDXCoilTwoSpeed(50);
-    constexpr int IntGainTypeOf_SecCoolingDXCoilMultiSpeed(51);
-    constexpr int IntGainTypeOf_SecHeatingDXCoilMultiSpeed(52);
-    constexpr int IntGainTypeOf_ElectricLoadCenterConverter(53);
-    constexpr int IntGainTypeOf_FanSystemModel(54);
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesUC = {
+        "NONE", "ADDINFILTRATIONFLOW", "ADJUSTINFILTRATIONFLOW"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesCC = {
+        "None", "AddInfiltrationFlow", "AdjustInfiltrationFlow"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesUC = {
+        "MIXINGSOURCEZONESONLY", "ALLZONES"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesCC = {
+        "MixingSourceZonesOnly", "AllZones"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesUC = {
+        "ADJUSTMIXINGONLY", "ADJUSTRETURNONLY", "ADJUSTMIXINGTHENRETURN", "ADJUSTRETURNTHENMIXING", "NONE"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesCC = {
+        "AdjustMixingOnly", "AdjustReturnOnly", "AdjustMixingThenReturn", "AdjustReturnThenMixing", "None"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
+        "PEOPLE",
+        "LIGHTS",
+        "ELECTRICEQUIPMENT",
+        "GASEQUIPMENT",
+        "HOTWATEREQUIPMENT",
+        "STEAMEQUIPMENT",
+        "OTHEREQUIPMENT",
+        "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED",
+        "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE",
+        "WATERUSE:EQUIPMENT",
+        "DAYLIGHTINGDEVICE:TUBULAR",
+        "WATERHEATER:MIXED",
+        "WATERHEATER:STRATIFIED",
+        "THERMALSTORAGE:CHILLEDWATER:MIXED",
+        "THERMALSTORAGE:CHILLEDWATER:STRATIFIED",
+        "GENERATOR:FUELCELL",
+        "GENERATOR:MICROCHP",
+        "ELECTRICLOADCENTER:TRANSFORMER",
+        "ELECTRICLOADCENTER:INVERTER:SIMPLE",
+        "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER",
+        "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE",
+        "ELECTRICLOADCENTER:STORAGE:LIIONNMCBATTERY",
+        "ELECTRICLOADCENTER:STORAGE:BATTERY",
+        "ELECTRICLOADCENTER:STORAGE:SIMPLE",
+        "PIPE:INDOOR",
+        "REFRIGERATION:CASE",
+        "REFRIGERATION:COMPRESSORRACK",
+        "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED",
+        "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED",
+        "REFRIGERATION:SYSTEM:SUCTIONPIPE",
+        "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT",
+        "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT",
+        "REFRIGERATION:SECONDARYSYSTEM:RECEIVER",
+        "REFRIGERATION:SECONDARYSYSTEM:PIPE",
+        "REFRIGERATION:WALKIN",
+        "PUMP:VARIABLESPEED",
+        "PUMP:CONSTANTSPEED",
+        "PUMP:VARIABLESPEED:CONDENSATE",
+        "HEADEREDPUMPS:VARIABLESPEED",
+        "HEADEREDPUMPS:CONSTANTSPEED",
+        "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT",
+        "PLANTCOMPONENT:USERDEFINED",
+        "COIL:USERDEFINED",
+        "ZONEHVAC:FORCEDAIR:USERDEFINED",
+        "AIRTERMINAL:SINGLEDUCT:USERDEFINED",
+        "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
+        "ELECTRICEQUIPMENT:ITE:AIRCOOLED",
+        "COIL:COOLING:DX:SINGLESPEED",
+        "COIL:HEATING:DX:SINGLESPEED",
+        "COIL:COOLING:DX:TWOSPEED",
+        "COIL:COOLING:DX:MULTISPEED",
+        "COIL:HEATING:DX:MULTISPEED",
+        "ELECTRICLOADCENTER:STORAGE:CONVERTER",
+        "FAN:SYSTEMMODEL"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesCC = {
+        "People",
+        "Lights",
+        "ElectricEquipment",
+        "GasEquipment",
+        "HotWaterEquipment",
+        "SteamEquipment",
+        "OtherEquipment",
+        "ZoneBaseboard:OutdoorTemperatureControlled",
+        "ZoneContaminantSourceAndSink:CarbonDioxide",
+        "WaterUse:Equipment",
+        "DaylightingDevice:Tubular",
+        "WaterHeater:Mixed",
+        "WaterHeater:Stratified",
+        "ThermalStorage:ChilledWater:Mixed",
+        "ThermalStorage:ChilledWater:Stratified",
+        "Generator:FuelCell",
+        "Generator:MicroCHP",
+        "ElectricLoadCenter:Transformer",
+        "ElectricLoadCenter:Inverter:Simple",
+        "ElectricLoadCenter:Inverter:FunctionOfPower",
+        "ElectricLoadCenter:Inverter:LookUpTable",
+        "ElectricLoadCenter:Storage:LiIonNMCBattery",
+        "ElectricLoadCenter:Storage:Battery",
+        "ElectricLoadCenter:Storage:Simple",
+        "Pipe:Indoor",
+        "Refrigeration:Case",
+        "Refrigeration:CompressorRack",
+        "Refrigeration:System:Condenser:AirCooled",
+        "Refrigeration:TranscriticalSystem:GasCooler:AirCooled",
+        "Refrigeration:System:SuctionPipe",
+        "Refrigeration:TranscriticalSystem:SuctionPipeMT",
+        "Refrigeration:TranscriticalSystem:SuctionPipeLT",
+        "Refrigeration:SecondarySystem:Receiver",
+        "Refrigeration:SecondarySystem:Pipe",
+        "Refrigeration:WalkIn",
+        "Pump:VariableSpeed",
+        "Pump:ConstantSpeed",
+        "Pump:VariableSpeed:Condensate",
+        "HeaderedPumps:VariableSpeed",
+        "HeaderedPumps:ConstantSpeed",
+        "ZoneContaminantSourceAndSink:GenericContaminant",
+        "PlantComponent:UserDefined",
+        "Coil:UserDefined",
+        "ZoneHVAC:ForcedAir:UserDefined",
+        "AirTerminal:SingleDuct:UserDefined",
+        "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+        "ElectricEquipment:ITE:AirCooled",
+        "Coil:Cooling:DX:SingleSpeed",
+        "Coil:Heating:DX:SingleSpeed",
+        "Coil:Cooling:DX:TwoSpeed",
+        "Coil:Cooling:DX:MultiSpeed",
+        "Coil:Heating:DX:MultiSpeed",
+        "ElectricLoadCenter:Storage:Converter",
+        "Fan:SystemModel"};
 
     // Parameters for checking surface heat transfer models
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
@@ -937,9 +1105,9 @@ namespace DataHeatBalance {
     {
         // Members
         std::string Name;
-        int ZonePtr;   // Which zone infiltration is in
-        int SchedPtr;  // Schedule for infiltration
-        int ModelType; // which model is used for infiltration
+        int ZonePtr;                     // Which zone infiltration is in
+        int SchedPtr;                    // Schedule for infiltration
+        InfiltrationModelType ModelType; // which model is used for infiltration
         // Design Flow Rate model terms
         Real64 DesignLevel;
         Real64 ConstantTermCoef;
@@ -979,13 +1147,13 @@ namespace DataHeatBalance {
 
         // Default Constructor
         InfiltrationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
-              VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0), FlowCoefficient(0.0),
-              AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0), EMSOverrideOn(false),
-              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0), MCpI_temp(0.0),
-              InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0), InfilTotalLoss(0.0),
-              InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0), InfilMdot(0.0),
-              InfilMass(0.0), InfilAirChangeRate(0.0)
+            : ZonePtr(0), SchedPtr(0), ModelType(InfiltrationModelType::Unassigned), DesignLevel(0.0), ConstantTermCoef(0.0),
+              TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0),
+              BasicWindCoefficient(0.0), FlowCoefficient(0.0), AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0),
+              ShelterFactor(0.0), EMSOverrideOn(false), EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0),
+              MassFlowRate(0.0), MCpI_temp(0.0), InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0),
+              InfilTotalGain(0.0), InfilTotalLoss(0.0), InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0),
+              InfilVdotStdDensity(0.0), InfilMdot(0.0), InfilMass(0.0), InfilAirChangeRate(0.0)
         {
         }
     };
@@ -996,7 +1164,7 @@ namespace DataHeatBalance {
         std::string Name;
         int ZonePtr;
         int SchedPtr;
-        int ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
+        VentilationModelType ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
         Real64 DesignLevel;
         bool EMSSimpleVentOn;        // EMS actuating ventilation flow rate if .TRUE.
         Real64 EMSimpleVentFlowRate; // Value EMS is directing to use for override
@@ -1039,12 +1207,12 @@ namespace DataHeatBalance {
 
         // Default Constructor
         VentilationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
-              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0), FanEfficiency(0.0),
-              FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0),
-              MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0),
-              MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0),
-              OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
+            : ZonePtr(0), SchedPtr(0), ModelType(VentilationModelType::Unassigned), DesignLevel(0.0), EMSSimpleVentOn(false),
+              EMSimpleVentFlowRate(0.0), MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0),
+              FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
+              VelocitySQTermCoef(0.0), MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0),
+              MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0),
+              IndoorTempErrCount(0), OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
               HybridControlMasterNum(0), HybridControlMasterStatus(false), QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0),
               OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
         {
@@ -1057,7 +1225,7 @@ namespace DataHeatBalance {
         std::string Name;           // Object name
         std::string ZoneName;       // Zone name
         int ZonePtr;                // Zone number
-        int BalanceMethod;          // Air Balance Method: None=0, Quadrature = 1
+        AirBalance BalanceMethod;   // Air Balance Method
         Real64 InducedAirRate;      // Induced Outdoor Air Due to Duct Leakage Unbalance [m3/s]
         int InducedAirSchedPtr;     // Induced Outdoor Air Fraction Schedule
         Real64 BalMassFlowRate;     // balanced mass flow rate
@@ -1073,7 +1241,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZoneAirBalanceData()
-            : ZonePtr(0), BalanceMethod(0), InducedAirRate(0.0), InducedAirSchedPtr(0), BalMassFlowRate(0.0), InfMassFlowRate(0.0),
+            : ZonePtr(0), BalanceMethod(AirBalance::None), InducedAirRate(0.0), InducedAirSchedPtr(0), BalMassFlowRate(0.0), InfMassFlowRate(0.0),
               NatMassFlowRate(0.0), ExhMassFlowRate(0.0), IntMassFlowRate(0.0), ERVMassFlowRate(0.0), OneTimeFlag(false), NumOfERVs(0)
         {
         }
@@ -1141,16 +1309,16 @@ namespace DataHeatBalance {
         AdjustmentType ZoneFlowAdjustment; // determines how zone air flow is adjusted (AdjustMixingOnly, AdjustReturnOnly, AdjustMixingThenReturn,
                                            // AdjustReturnThenMixing, None)        int InfiltrationTreatment;   // determines how infiltration is
                                            // treated for zone mass balance
-        int InfiltrationTreatment;         // determines how infiltration is treated for zone mass balance
-        int InfiltrationZoneType;          // specifies which types of zones allow infiltration to be changed
-        bool AdjustZoneMixingFlow;         // used to adjust zone mixing air flows to enforce air flow balance
-        bool AdjustZoneInfiltrationFlow;   // used to adjust zone infiltration air flows to enforce air flow balance
-                                           // Note, unique global object
+        InfiltrationFlow InfiltrationTreatment;    // determines how infiltration is treated for zone mass balance
+        InfiltrationZoneType InfiltrationForZones; // specifies which types of zones allow infiltration to be changed
+        bool AdjustZoneMixingFlow;                 // used to adjust zone mixing air flows to enforce air flow balance
+        bool AdjustZoneInfiltrationFlow;           // used to adjust zone infiltration air flows to enforce air flow balance
+                                                   // Note, unique global object
 
         // Default Constructor
         ZoneAirMassFlowConservation()
-            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(0),
-              InfiltrationZoneType(0), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
+            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(InfiltrationFlow::No),
+              InfiltrationForZones(InfiltrationZoneType::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };
@@ -1191,7 +1359,7 @@ namespace DataHeatBalance {
         // Members
         std::string CompObjectType;         // device object class name
         std::string CompObjectName;         // device user unique name
-        int CompTypeOfNum;                  // type of internal gain device identifier
+        IntGainType CompType;               // type of internal gain device identifier
         Real64 spaceGainFrac;               // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
         Real64 *PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;             // current timestep value of convection heat gain rate for device, watts
@@ -1211,10 +1379,11 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
-              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0),
-              PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0),
-              PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0), ReturnAirNodeNum(0)
+            : CompType(IntGainType::Unassigned), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0),
+              PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0),
+              PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0),
+              PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0),
+              ReturnAirNodeNum(0)
         {
         }
     };

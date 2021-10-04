@@ -7,6 +7,6 @@ regression_baseline_default : develop # this is the branch to use as the baselin
 regression_baseline_develop : ""
 regression_baseline_master : ""
 notification_recipients:
-  - lgentile
+  - myoldmopar
 aging_pull_requests_notification: true
 aging_pull_requests_numdays: 28
