@@ -992,8 +992,6 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingAirflowSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using PlantUtilities::MyPlantSizingIndex;
         using Psychrometrics::CPHW;
         using SteamCoils::GetCoilSteamInletNode;
@@ -1072,7 +1070,7 @@ namespace UnitHeater {
         if (CurZoneEqNum > 0) {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex;
-                SizingMethod = HeatingAirflowSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                 FieldNum = 1; //  N1 , \field Maximum Supply Air Flow Rate
                 PrintFlag = true;
                 SizingString = state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames(FieldNum) + " [m3/s]";
@@ -1107,7 +1105,7 @@ namespace UnitHeater {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
-                    SizingMethod = HeatingCapacitySizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                     TempSize = AutoSize;
                     PrintFlag = false;
                     state.dataSize->DataScalableSizingON = true;
@@ -1122,7 +1120,7 @@ namespace UnitHeater {
                     }
                     state.dataSize->DataAutosizedHeatingCapacity = TempSize;
                     state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                    SizingMethod = HeatingAirflowSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                     PrintFlag = true;
                     TempSize = AutoSize;
                     errorsFound = false;
@@ -1136,7 +1134,7 @@ namespace UnitHeater {
             } else {
                 // no scalble sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
-                SizingMethod = HeatingAirflowSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                 FieldNum = 1; // N1 , \field Maximum Supply Air Flow Rate
                 PrintFlag = true;
                 SizingString = state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames(FieldNum) + " [m3/s]";
@@ -1199,7 +1197,7 @@ namespace UnitHeater {
                         }
 
                         if (DoWaterCoilSizing) {
-                            SizingMethod = HeatingCapacitySizing;
+                            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
                                 zoneHVACIndex = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex;
                                 CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
@@ -1338,7 +1336,7 @@ namespace UnitHeater {
                         if (PltSizHeatNum > 0) {
                             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
                                 zoneHVACIndex = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex;
-                                SizingMethod = HeatingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                                 CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
                                 ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                                 if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -1365,7 +1363,7 @@ namespace UnitHeater {
                                         state.dataSize->DataScalableCapSizingON = true;
                                     }
                                 }
-                                SizingMethod = HeatingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                                 PrintFlag = false;
                                 bool errorsFound = false;
                                 HeatingCapacitySizer sizerHeatingCapacity;

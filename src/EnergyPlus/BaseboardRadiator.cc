@@ -694,7 +694,6 @@ namespace BaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
 
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -762,7 +761,7 @@ namespace BaseboardRadiator {
                     CompName = baseboard->Baseboard(BaseboardNum).EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
-                    SizingMethod = HeatingCapacitySizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                     FieldNum = 1;
                     PrintFlag = false;
                     SizingString = baseboard->BaseboardParamsNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
@@ -889,7 +888,7 @@ namespace BaseboardRadiator {
                     CompName = baseboard->Baseboard(BaseboardNum).EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
-                    SizingMethod = HeatingCapacitySizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                     FieldNum = 1;
                     PrintFlag = false;
                     SizingString = baseboard->BaseboardParamsNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";

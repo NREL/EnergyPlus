@@ -98,7 +98,8 @@ enum class AutoSizingType
     WaterHeatingCoilUASizing = 20,
     ZoneCoolingLoadSizing = 26,
     ZoneHeatingLoadSizing = 27,
-    Unknown = 0
+    Unknown = 0,
+    Num = 35
 };
 
 enum class AutoSizingResultType

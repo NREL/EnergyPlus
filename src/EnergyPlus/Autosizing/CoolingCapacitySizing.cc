@@ -537,7 +537,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         if (this->isEpJSON) this->sizingString = "cooling_design_capacity [W]";
     }
     if (this->dataScalableCapSizingON) {
-        auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing));
+        auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingCapacitySizing)));
         if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
             this->sizingStringScalable = "(scaled by capacity / area) ";
         } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||

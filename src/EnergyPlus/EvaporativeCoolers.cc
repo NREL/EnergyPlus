@@ -4297,7 +4297,6 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
     using DataSizing::AutoSize;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4335,7 +4334,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
         if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
             state.dataSize->ZoneCoolingOnlyFan = true;
             zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
-            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::CoolingAirFlowSizing);
             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
             ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
             if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
@@ -4371,7 +4370,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                 ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
             } else if (SAFMethod == FlowPerCoolingCapacity) {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 TempSize = AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;

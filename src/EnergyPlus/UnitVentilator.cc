@@ -1802,10 +1802,6 @@ namespace UnitVentilator {
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         using namespace DataSizing;
-        using DataHVACGlobals::CoolingAirflowSizing;
-        using DataHVACGlobals::CoolingCapacitySizing;
-        using DataHVACGlobals::HeatingAirflowSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
@@ -1939,7 +1935,7 @@ namespace UnitVentilator {
                     !state.dataSize->ZoneHeatingOnlyFan) {
 
                     SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-                    SizingMethod = CoolingAirflowSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::CoolingAirFlowSizing);
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                     if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                         SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -1973,7 +1969,7 @@ namespace UnitVentilator {
                         CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                     } else if (SAFMethod == FlowPerCoolingCapacity) {
-                        SizingMethod = CoolingCapacitySizing;
+                        SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                         TempSize = AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
@@ -1998,7 +1994,7 @@ namespace UnitVentilator {
 
                 } else if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0 && state.dataSize->ZoneHeatingOnlyFan &&
                            !state.dataSize->ZoneCoolingOnlyFan) {
-                    SizingMethod = HeatingAirflowSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                     SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                     if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
@@ -2031,7 +2027,7 @@ namespace UnitVentilator {
                         HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                     } else if (SAFMethod == FlowPerHeatingCapacity) {
-                        SizingMethod = HeatingCapacitySizing;
+                        SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                         TempSize = AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
@@ -2042,7 +2038,7 @@ namespace UnitVentilator {
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                        SizingMethod = HeatingAirflowSizing;
+                        SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                         PrintFlag = true;
                         TempSize = AutoSize;
                         errorsFound = false;
@@ -2058,7 +2054,7 @@ namespace UnitVentilator {
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption != state.dataUnitVentilators->NoneOption) {
                         if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
                             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-                            SizingMethod = CoolingAirflowSizing;
+                            SizingMethod = static_cast<int>(AutoSizingType::CoolingAirFlowSizing);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                             if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                                 SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -2094,7 +2090,7 @@ namespace UnitVentilator {
                                 CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                             } else if (SAFMethod == FlowPerCoolingCapacity) {
-                                SizingMethod = CoolingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                                 TempSize = AutoSize;
                                 PrintFlag = false;
                                 state.dataSize->DataScalableSizingON = true;
@@ -2116,7 +2112,7 @@ namespace UnitVentilator {
                                 CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                             }
                         } else if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
-                            SizingMethod = HeatingAirflowSizing;
+                            SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                             if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
@@ -2151,7 +2147,7 @@ namespace UnitVentilator {
                                 HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                             } else if (SAFMethod == FlowPerHeatingCapacity) {
-                                SizingMethod = HeatingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                                 TempSize = AutoSize;
                                 PrintFlag = false;
                                 state.dataSize->DataScalableSizingON = true;
@@ -2162,7 +2158,7 @@ namespace UnitVentilator {
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                 state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                                SizingMethod = HeatingAirflowSizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                                 PrintFlag = true;
                                 TempSize = AutoSize;
                                 errorsFound = false;
@@ -2388,7 +2384,7 @@ namespace UnitVentilator {
 
                         if (DoWaterCoilSizing) {
                             if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                SizingMethod = HeatingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                                     zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
                                     CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
@@ -2529,7 +2525,7 @@ namespace UnitVentilator {
                                                            ErrorsFound);
                         if (PltSizHeatNum > 0) {
                             if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                SizingMethod = HeatingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                                     zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
                                     CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
@@ -2704,7 +2700,7 @@ namespace UnitVentilator {
                         }
                         if (DoWaterCoilSizing) {
                             if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow >= SmallAirVolFlow) {
-                                SizingMethod = CoolingCapacitySizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                                     zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
                                     CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;

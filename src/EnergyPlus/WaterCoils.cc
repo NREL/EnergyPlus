@@ -2804,7 +2804,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 TempSize = AutoSize;
             }
             if (state.dataSize->CurSysNum > 0) {
-                SizingType = HeatingCapacitySizing;
+                SizingType = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 FieldNum = 3; //  N3 , \field Rated Capacity
                 SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
                 bool errorsFound = false;

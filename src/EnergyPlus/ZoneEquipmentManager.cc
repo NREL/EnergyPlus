@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
@@ -228,7 +229,6 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
 
     // Using/Aliasing
     using DataHVACGlobals::NoAction;
-    using DataHVACGlobals::NumOfSizingTypes;
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -264,7 +264,7 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
-            ZoneEqSizing(ControlledZoneNum).SizingMethod.allocate(NumOfSizingTypes);
+            ZoneEqSizing(ControlledZoneNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
             ZoneEqSizing(ControlledZoneNum).SizingMethod = 0;
         }
     }

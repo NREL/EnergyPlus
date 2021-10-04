@@ -693,7 +693,6 @@ namespace ElectricBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("SizeElectricBaseboard");
@@ -722,7 +721,7 @@ namespace ElectricBaseboardRadiator {
             CompName = ElecBaseboard(BaseboardNum).EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = ElecBaseboard(BaseboardNum).ZonePtr;
-            SizingMethod = HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
             FieldNum = 1;
             PrintFlag = true;
             SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";

@@ -2714,9 +2714,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::AutoCalculateSizing;
-        using DataHVACGlobals::CoolingCapacitySizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2782,7 +2779,7 @@ namespace LowTempRadiantSystem {
 
                 CompType = "ZoneHVAC:LowTemperatureRadiant:Electric";
                 CompName = state.dataLowTempRadSys->ElecRadSys(RadSysNum).Name;
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 FieldNum = 1;
                 PrintFlag = true;
                 SizingString = state.dataLowTempRadSys->ElecRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
@@ -2825,7 +2822,7 @@ namespace LowTempRadiantSystem {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                SizingMethod = AutoCalculateSizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                                 state.dataSize->DataConstantUsedForSizing =
                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                                 state.dataSize->DataFractionUsedForSizing = 1.0;
@@ -2881,7 +2878,7 @@ namespace LowTempRadiantSystem {
 
             if (state.dataSize->CurZoneEqNum > 0) {
 
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 FieldNum = 2;
                 PrintFlag = true;
                 SizingString = state.dataLowTempRadSys->HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
@@ -2924,7 +2921,7 @@ namespace LowTempRadiantSystem {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                SizingMethod = AutoCalculateSizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                                 state.dataSize->DataConstantUsedForSizing =
                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                                 state.dataSize->DataFractionUsedForSizing = 1.0;
@@ -3063,7 +3060,7 @@ namespace LowTempRadiantSystem {
 
             if (state.dataSize->CurZoneEqNum > 0) {
 
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 FieldNum = 4;
                 PrintFlag = true;
                 SizingString = state.dataLowTempRadSys->HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
@@ -3105,7 +3102,7 @@ namespace LowTempRadiantSystem {
                         if (CapSizingMethod == CoolingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                SizingMethod = AutoCalculateSizing;
+                                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                                 state.dataSize->DataConstantUsedForSizing =
                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                                 state.dataSize->DataFractionUsedForSizing = 1.0;

@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -608,8 +609,8 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     CntrlZoneNum = 1;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingCapacitySizing)) =
         state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     // do electric baseboard sizing
@@ -626,8 +627,8 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     CntrlZoneNum = 2;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingCapacitySizing)) =
         state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
@@ -646,8 +647,8 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     CntrlZoneNum = 3;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingCapacitySizing)) =
         state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;

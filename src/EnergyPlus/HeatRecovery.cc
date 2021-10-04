@@ -1862,7 +1862,7 @@ namespace HeatRecovery {
         }
         if (state.dataSize->CurZoneEqNum > 0) {
             if (state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow == AutoSize) {
-                SizingMethod = AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
                     // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
                     state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
@@ -1874,7 +1874,7 @@ namespace HeatRecovery {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
             } else {
                 if (state.dataSize->ZoneSizingRunDone) {
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
                         // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
                         state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;

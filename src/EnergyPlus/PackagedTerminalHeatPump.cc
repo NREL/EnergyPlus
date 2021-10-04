@@ -5141,9 +5141,6 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
-    using DataHVACGlobals::HeatingAirflowSizing;
-    using DataHVACGlobals::HeatingCapacitySizing;
     using DataZoneEquipment::PkgTermACAirToAir_Num;
     using DataZoneEquipment::PkgTermHPAirToAir_Num;
     using DataZoneEquipment::PkgTermHPWaterToAir_Num;
@@ -5253,7 +5250,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             }
 
             zoneHVACIndex = state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex;
-            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::CoolingAirFlowSizing);
             PrintFlag = true;
             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
@@ -5287,7 +5284,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             } else if (SAFMethod == FlowPerCoolingCapacity) {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 TempSize = AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;
@@ -5312,7 +5309,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             }
 
-            SizingMethod = HeatingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
             FieldNum = 2; // N2, \field Supply Air Flow Rate During Heating Operation
             PrintFlag = true;
             SizingString = state.dataPTHP->PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
@@ -5346,7 +5343,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             } else if (SAFMethod == FlowPerHeatingCapacity) {
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 TempSize = AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;
@@ -5361,7 +5358,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 }
                 state.dataSize->DataAutosizedHeatingCapacity = TempSize;
                 state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                SizingMethod = HeatingAirflowSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                 PrintFlag = true;
                 TempSize = AutoSize;
                 errorsFound = false;
@@ -5411,7 +5408,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             }
 
             // initialize capacity sizing variables: cooling
-            SizingMethod = CoolingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
             CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -5434,7 +5431,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             }
 
             // initialize capacity sizing variables: heating
-            SizingMethod = HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
             CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -5506,7 +5503,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirFlow = false;
 
             PrintFlag = false;
-            SizingMethod = HeatingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
             FieldNum = 2; // N2, \field Supply Air Flow Rate During Heating Operation
             SizingString = state.dataPTHP->PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow;
@@ -5546,7 +5543,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize &&
                     state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     state.dataSize->DataConstantUsedForSizing =
                         max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
                     minNoLoadFlow = 0.6667;

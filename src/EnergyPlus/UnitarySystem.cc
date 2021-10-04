@@ -1744,7 +1744,7 @@ namespace UnitarySystems {
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     state.dataSize->DataFlowUsedForSizing = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-                    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                     TempSize = DataSizing::AutoSize;
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         state.dataSize->DataTotCapCurveIndex =
@@ -1783,7 +1783,7 @@ namespace UnitarySystems {
 
             // Cooling airflow should be known at this point. Now find DataSizing::AutoSized design cooling capacity.
             if (CoolingSAFlowMethod != state.dataUnitarySystems->FlowPerCoolingCapacity && this->m_DesignCoolingCapacity < 0.0) {
-                SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
@@ -1827,7 +1827,7 @@ namespace UnitarySystems {
                             VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                         state.dataSize->DataIsDXCoil = true;
                     }
-                    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                     state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                     TempSize = DataSizing::AutoSize;
                     CoolingCapacitySizer sizerCoolingCapacity;
@@ -1850,7 +1850,7 @@ namespace UnitarySystems {
         if (this->m_HeatCoilExists) {
             if (!this->m_CoolCoilExists) state.dataSize->ZoneHeatingOnlyFan = true;
             FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
-            SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxHeatAirVolFlow;
             SaveCurDuctType = state.dataSize->CurDuctType;
@@ -1888,7 +1888,7 @@ namespace UnitarySystems {
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataSize->DataFlowUsedForSizing = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
-                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 TempSize = DataSizing::AutoSize;
                 state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
                 state.dataSize->DataHeatSizeRatio = this->m_HeatingSizingRatio;
@@ -1921,7 +1921,7 @@ namespace UnitarySystems {
 
             // Heating airflow should be known at this point. Now find DataSizing::AutoSized design heating capacity.
             if (HeatingSAFlowMethod != state.dataUnitarySystems->FlowPerHeatingCapacity && this->m_DesignHeatingCapacity == DataSizing::AutoSize) {
-                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 state.dataSize->DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
                 state.dataSize->DataHeatSizeRatio = this->m_HeatingSizingRatio;
@@ -1945,7 +1945,7 @@ namespace UnitarySystems {
                 if (!HardSizeNoDesRun && (HeatingSAFlowMethod != state.dataUnitarySystems->FlowPerHeatingCapacity &&
                                           this->m_DesignHeatingCapacity != DataSizing::AutoSize)) {
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                        SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                        SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                         state.dataSize->DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
                         TempSize = DataSizing::AutoSize;
                         state.dataSize->DataHeatSizeRatio = this->m_HeatingSizingRatio;
@@ -2028,7 +2028,7 @@ namespace UnitarySystems {
 
         if (this->m_HeatCoilExists) {
 
-            SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
             if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
             }
@@ -2688,7 +2688,7 @@ namespace UnitarySystems {
 
         if (this->m_CoolCoilExists) {
 
-            SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
             // water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
@@ -2701,7 +2701,7 @@ namespace UnitarySystems {
                                                      ErrFound);
                 EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
                 HXCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(
@@ -2714,7 +2714,7 @@ namespace UnitarySystems {
                     state, UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType)), HXCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
@@ -2734,7 +2734,7 @@ namespace UnitarySystems {
                     state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP)
@@ -2759,7 +2759,7 @@ namespace UnitarySystems {
                     state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple)
                     EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
@@ -2770,7 +2770,7 @@ namespace UnitarySystems {
                     state, this->m_CoolingCoilName, state.dataSize->DataConstantUsedForSizing, ErrFound, CompType);
                 EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
             }
 
             TempSize = this->m_DesignCoolingCapacity;
@@ -2788,7 +2788,7 @@ namespace UnitarySystems {
 
         if (this->m_HeatCoilExists) {
 
-            SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
 
             // water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
             if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -2801,7 +2801,7 @@ namespace UnitarySystems {
                                                      ErrFound);
                 EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 this->m_DesignHeatingCapacity = DataSizing::AutoSize;
             }
 
@@ -2842,7 +2842,7 @@ namespace UnitarySystems {
 
         if (this->m_SuppCoilExists) {
 
-            SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
 
             PrintFlag = false;
             TempSize = this->m_DesignSuppHeatingCapacity;
@@ -2861,7 +2861,7 @@ namespace UnitarySystems {
             if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat && IsAutoSize) {
                 state.dataSize->DataConstantUsedForSizing = max(this->m_DesignSuppHeatingCapacity, this->m_DesignCoolingCapacity);
                 state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 TempSize = DataSizing::AutoSize;
             }
 

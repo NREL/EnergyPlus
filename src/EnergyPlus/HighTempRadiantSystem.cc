@@ -791,7 +791,6 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr const char *RoutineName("SizeHighTempRadiantSystem");
@@ -827,7 +826,7 @@ namespace HighTempRadiantSystem {
             CompName = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).Name;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-            SizingMethod = HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
             FieldNum = 1;
             PrintFlag = true;
             SizingString = state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";

@@ -954,8 +954,6 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     // was derived from the low temperature radiant system model and adapted for
     // cooling only.
 
-    using DataHVACGlobals::AutoCalculateSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
     using DataHVACGlobals::SmallLoad;
     using DataSizing::AutoSize;
     using DataSizing::CapacityPerFloorArea;
@@ -1004,7 +1002,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
     if (state.dataSize->CurZoneEqNum > 0) {
 
-        SizingMethod = CoolingCapacitySizing;
+        SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
         FieldNum = 4;
         PrintFlag = true;
         bool errorsFound = false;
@@ -1041,7 +1039,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 if (CapSizingMethod == CoolingDesignCapacity) {
                     if (state.dataSize->ZoneSizingRunDone) {
                         CheckZoneSizing(state, CompType, CompName);
-                        SizingMethod = AutoCalculateSizing;
+                        SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                         state.dataSize->DataConstantUsedForSizing =
                             state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                         state.dataSize->DataFractionUsedForSizing = 1.0;

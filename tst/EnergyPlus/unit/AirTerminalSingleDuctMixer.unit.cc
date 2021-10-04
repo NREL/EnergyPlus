@@ -53,6 +53,7 @@
 // ObjexxFCL Headers
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -7693,7 +7694,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     auto &zoneEqSizing(state->dataSize->ZoneEqSizing(1));
-    zoneEqSizing.SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    zoneEqSizing.SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -8126,7 +8127,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     auto &zoneEqSizing(state->dataSize->ZoneEqSizing(1));
-    zoneEqSizing.SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    zoneEqSizing.SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);

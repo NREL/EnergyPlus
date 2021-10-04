@@ -7916,10 +7916,6 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     using namespace DataSizing;
     using CurveManager::CurveValue;
     auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
-    using DataHVACGlobals::CoolingAirflowSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
-    using DataHVACGlobals::HeatingAirflowSizing;
-    using DataHVACGlobals::HeatingCapacitySizing;
 
     using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -8121,7 +8117,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
         zoneHVACIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HVACSizingIndex;
 
-        SizingMethod = CoolingAirflowSizing;
+        SizingMethod = static_cast<int>(AutoSizingType::CoolingAirFlowSizing);
         PrintFlag = true;
         bool errorsFound = false;
         SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
@@ -8156,7 +8152,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
         } else if (SAFMethod == FlowPerCoolingCapacity) {
-            SizingMethod = CoolingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
             TempSize = AutoSize;
             PrintFlag = false;
             state.dataSize->DataScalableSizingON = true;
@@ -8180,7 +8176,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
         }
 
-        SizingMethod = HeatingAirflowSizing;
+        SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
         FieldNum = 3; // N3, \field Supply Air Flow Rate During Heating Operation
         PrintFlag = true;
         SizingString = state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
@@ -8213,7 +8209,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
         } else if (SAFMethod == FlowPerHeatingCapacity) {
-            SizingMethod = HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
             TempSize = AutoSize;
             PrintFlag = false;
             state.dataSize->DataScalableSizingON = true;
@@ -8227,7 +8223,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-            SizingMethod = HeatingAirflowSizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
             PrintFlag = true;
             TempSize = AutoSize;
             errorsFound = false;
@@ -8277,7 +8273,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
         }
 
-        SizingMethod = HeatingAirflowSizing;
+        SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
         FieldNum = 4; // N4, \field Supply Air Flow Rate When No Heating is Needed
         PrintFlag = true;
         SizingString = state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
@@ -8319,7 +8315,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         }
 
         // initialize capacity sizing variables: cooling
-        SizingMethod = CoolingCapacitySizing;
+        SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
         CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
         EqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
         if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -8341,7 +8337,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         }
 
         // initialize capacity sizing variables: heating
-        SizingMethod = HeatingCapacitySizing;
+        SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
         CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
         EqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
         if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -8379,7 +8375,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
         FieldNum = 3; // N3, \field Supply Air Flow Rate During Heating Operation
         SizingString = state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-        SizingMethod = HeatingAirflowSizing;
+        SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
         TempSize = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow;
         errorsFound = false;
         HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -8683,7 +8679,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerWaterHeatingCapacity.size(state, TempSize, ErrorsFound);
             }
         } else {
-            SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
             SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
             if (TempSize == DataSizing::AutoSize) {
                 IsAutoSize = true;

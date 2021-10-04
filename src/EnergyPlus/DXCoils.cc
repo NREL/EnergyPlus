@@ -7978,7 +7978,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             PrintFlag = true;
             state.dataSize->DataTotCapCurveIndex = state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode);
             if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name + ":" + state.dataDXCoils->DXCoil(DXCoilNum).CoilPerformanceName(Mode);
                 FieldNum = 1;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -7986,7 +7986,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical ||
                        state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating ||
                        state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 1;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -7994,7 +7994,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 state.dataSize->DataCoolCoilCap = state.dataSize->DXCoolCap;
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
                        state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 1;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -8003,7 +8003,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).WaterInNode).Temp =
                     state.dataDXCoils->DXCoil(DXCoilNum).RatedInletWaterTemp; // set the rated water inlet node for HPWHs for use in CalcHPWHDXCoil
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling) {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 1;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -8022,7 +8022,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 }
                 CalcVRFCoilCapModFac(state, 0, _, CompName, CoilInTemp, _, _, _, state.dataSize->DataTotCapCurveValue);
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 7 + (state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds - 1) * 13;
                 state.dataSize->DataTotCapCurveIndex =
@@ -8031,7 +8031,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 PrintFlag = false;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
             } else if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 10 + (state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds - 1) * 5;
                 state.dataSize->DataTotCapCurveIndex =
@@ -8040,7 +8040,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 PrintFlag = false;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
             } else {
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 1;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -8194,7 +8194,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 15; // Low Speed Evaporative Condenser Air Flow Rate
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [m3/s]";
-                SizingMethod = AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
                 // Auto size low speed condenser air flow to 1/3 Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -8230,7 +8230,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                         if (state.dataGlobal->isEpJSON) stringOverride = "evaporative_condenser_pump_rated_power_consumption [W]";
                     }
                 }
-                SizingMethod = AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
                 // Auto size high speed evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
@@ -8347,7 +8347,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 FieldNum = 7;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum);
-                SizingMethod = AutoCalculateSizing;
+                SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
                 // Auto size low speed SHR to be the same as high speed SHR
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(Mode);
@@ -8430,7 +8430,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 FieldNum = 10 + (Mode - 1) * 13;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     // Auto size low speed flow to fraction of the highest speed flow
                     state.dataSize->DataConstantUsedForSizing =
                         state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
@@ -8485,7 +8485,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             if (Mode == state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds) {
                 PrintFlag = true;
                 state.dataSize->DataFlowUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 FieldNum = 7 + (Mode - 1) * 13;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 state.dataSize->DataEMSOverrideON = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
@@ -8499,7 +8499,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     TempSize = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     state.dataSize->DataConstantUsedForSizing = TempSize;
                     state.dataSize->DataFractionUsedForSizing = 1.0;
                     MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -8519,11 +8519,11 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             } else {
                 // cooling capacity at lower speeds
                 PrintFlag = true;
-                SizingMethod = CoolingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 FieldNum = 7 + (Mode - 1) * 13;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     // auto size low speed capacity to fraction of the highest speed capacity
                     if (!HardSizeNoDesRun) {
                         state.dataSize->DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
@@ -8791,7 +8791,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 FieldNum = 12 + (Mode - 1) * 5;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     // Auto size low speed flow to fraction of the highest speed capacity
                     state.dataSize->DataConstantUsedForSizing =
                         state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
@@ -8885,7 +8885,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
             CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
             if (Mode == state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds) {
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 state.dataSize->DataFlowUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                 FieldNum = 10 + (Mode - 1) * 5;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
@@ -8893,7 +8893,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     // Heating capacity is assumed to be equal to the cooling capacity
                     PrintFlag = false;
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     state.dataSize->DataFractionUsedForSizing = 1.0;
                     if (state.dataDXCoils->DXCoil(DXCoilNum).CompanionUpstreamDXCoil > 0) {
                         NumOfSpeedCompanion = state.dataDXCoils->DXCoil(state.dataDXCoils->DXCoil(DXCoilNum).CompanionUpstreamDXCoil).NumOfSpeeds;
@@ -8910,7 +8910,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     MSRatedTotCapDesAtMaxSpeed = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     state.dataSize->DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
@@ -8928,11 +8928,11 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 }
             } else {
                 PrintFlag = true;
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 FieldNum = 10 + (Mode - 1) * 5;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
-                    SizingMethod = AutoCalculateSizing;
+                    SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
                     // auto size low speed capacity to fraction of the highest speed capacity
                     if (!HardSizeNoDesRun) {
                         state.dataSize->DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
