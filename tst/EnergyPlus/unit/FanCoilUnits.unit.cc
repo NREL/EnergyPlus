@@ -2865,7 +2865,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;  // TODO: This should not be a magic number
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a magic number
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);

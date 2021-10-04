@@ -74,7 +74,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
-                switch(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing))) {
+                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing))) {
                 case DataSizing::SupplyAirFlowRate:
                 case DataSizing::None:
                 case DataSizing::FlowPerFloorArea:
