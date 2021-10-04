@@ -214,7 +214,7 @@ namespace PlantChillers {
 
             auto &thisChiller = state.dataPlantChillers->ElectricChiller(ChillerNum);
             thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisChiller.plantTypeOfNum = DataPlant::PlantEquipmentType::Chiller_Electric;
+            thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_Electric;
 
             thisChiller.CondenserType = static_cast<DataPlant::CondenserType>(
                 getEnumerationValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
@@ -816,7 +816,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                this->plantTypeOfNum,
+                                                                this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
                                                                 this->QCondenser,
@@ -828,7 +828,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->HRLoopNum,
                                                             this->HRLoopSideNum,
-                                                            this->plantTypeOfNum,
+                                                            this->ChillerType,
                                                             this->HeatRecInletNodeNum,
                                                             this->HeatRecOutletNodeNum,
                                                             this->QHeatRecovery,
@@ -2104,7 +2104,7 @@ namespace PlantChillers {
             this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    this->plantTypeOfNum,
+                                                    this->ChillerType,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,
@@ -2118,7 +2118,7 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
                                                         this->CDBranchNum,
@@ -2130,12 +2130,12 @@ namespace PlantChillers {
                                                         this->CondInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         this->HRBranchNum,
@@ -2147,13 +2147,13 @@ namespace PlantChillers {
                                                         this->HeatRecInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->ChillerType, true);
             }
 
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
                 this->HeatRecActive) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
+                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->ChillerType, false);
             }
 
             if (errFlag) {
@@ -2252,7 +2252,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                this->plantTypeOfNum,
+                                                                this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
                                                                 this->QCondenser,
@@ -2264,7 +2264,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->HRLoopNum,
                                                             this->HRLoopSideNum,
-                                                            this->plantTypeOfNum,
+                                                            this->ChillerType,
                                                             this->HeatRecInletNodeNum,
                                                             this->HeatRecOutletNodeNum,
                                                             this->QTotalHeatRecovered,
@@ -2332,7 +2332,7 @@ namespace PlantChillers {
 
             auto &thisChiller = state.dataPlantChillers->EngineDrivenChiller(ChillerNum);
             thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisChiller.plantTypeOfNum = DataPlant::PlantEquipmentType::Chiller_EngineDriven;
+            thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_EngineDriven;
 
             thisChiller.NomCap = state.dataIPShortCut->rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
@@ -4273,7 +4273,7 @@ namespace PlantChillers {
             this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    this->plantTypeOfNum,
+                                                    this->ChillerType,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,
@@ -4287,7 +4287,7 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
                                                         this->CDBranchNum,
@@ -4299,12 +4299,12 @@ namespace PlantChillers {
                                                         this->CondInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         this->HRBranchNum,
@@ -4316,13 +4316,13 @@ namespace PlantChillers {
                                                         this->HeatRecInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->ChillerType, true);
             }
 
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
                 this->HeatRecActive) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
+                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->ChillerType, false);
             }
             if (errFlag) {
                 ShowFatalError(state, "InitEngineDrivenChiller: Program terminated due to previous condition(s).");
@@ -4414,7 +4414,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                this->plantTypeOfNum,
+                                                                this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
                                                                 this->QCondenser,
@@ -4426,7 +4426,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->HRLoopNum,
                                                             this->HRLoopSideNum,
-                                                            this->plantTypeOfNum,
+                                                            this->ChillerType,
                                                             this->HeatRecInletNodeNum,
                                                             this->HeatRecOutletNodeNum,
                                                             this->HeatRecLubeRate,
@@ -4495,7 +4495,7 @@ namespace PlantChillers {
 
             auto &thisChiller = state.dataPlantChillers->GTChiller(ChillerNum);
             thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisChiller.plantTypeOfNum = DataPlant::PlantEquipmentType::Chiller_CombTurbine;
+            thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_CombTurbine;
 
             thisChiller.NomCap = state.dataIPShortCut->rNumericArgs(1);
 
@@ -6348,7 +6348,7 @@ namespace PlantChillers {
             this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    this->plantTypeOfNum,
+                                                    this->ChillerType,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,
@@ -6362,7 +6362,7 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
                                                         this->CDBranchNum,
@@ -6374,12 +6374,12 @@ namespace PlantChillers {
                                                         this->CondInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         this->HRBranchNum,
@@ -6391,13 +6391,13 @@ namespace PlantChillers {
                                                         this->HeatRecInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->ChillerType, true);
             }
 
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
                 this->HeatRecActive) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
+                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->ChillerType, false);
             }
             if (errFlag) {
                 ShowFatalError(state, "InitGTChiller: Program terminated due to previous condition(s).");
@@ -6490,7 +6490,7 @@ namespace PlantChillers {
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                this->plantTypeOfNum,
+                                                                this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
                                                                 this->QCondenser,
@@ -6563,7 +6563,7 @@ namespace PlantChillers {
 
             auto &thisChiller = state.dataPlantChillers->ConstCOPChiller(ChillerNum);
             thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisChiller.plantTypeOfNum = DataPlant::PlantEquipmentType::Chiller_ConstCOP;
+            thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_ConstCOP;
             thisChiller.NomCap = state.dataIPShortCut->rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
                 thisChiller.NomCapWasAutoSized = true;
@@ -7887,7 +7887,7 @@ namespace PlantChillers {
             this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    this->plantTypeOfNum,
+                                                    this->ChillerType,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,
@@ -7901,7 +7901,7 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->plantTypeOfNum,
+                                                        this->ChillerType,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
                                                         this->CDBranchNum,
@@ -7913,7 +7913,7 @@ namespace PlantChillers {
                                                         this->CondInletNodeNum,
                                                         _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->ChillerType, true);
             }
 
             if (errFlag) {
