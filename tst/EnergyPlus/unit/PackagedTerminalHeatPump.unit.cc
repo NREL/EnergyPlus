@@ -519,6 +519,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(16);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = ZoneHVACSizingType::None;
     SizePTUnit(*state, 1);
 
     // This VS coil is rather quirky. It sizes the capacity based on zone sizing air flow rate.
