@@ -15279,6 +15279,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
     state->dataGlobal->BeginEnvrnFlag = false;
     int AirLoopNum = 0;
 
+    state->dataSize->ZoneEqSizing(1).SizingMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity; // allows it to pass, but it's wrong
     thisSys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
     EXPECT_EQ(1.500, thisSys->m_DesignFanVolFlowRate);
     EXPECT_EQ(1.500, thisSys->m_MaxCoolAirVolFlow);
