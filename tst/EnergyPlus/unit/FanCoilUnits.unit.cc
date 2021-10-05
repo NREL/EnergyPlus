@@ -2131,7 +2131,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a numeric literal
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -2865,7 +2865,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a magic number
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -3296,7 +3296,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a magic number
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -3660,7 +3660,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     UpdateScheduleValues(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a magic number
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -4029,7 +4029,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     UpdateScheduleValues(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a magic number
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
@@ -4398,7 +4398,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     UpdateScheduleValues(*state);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0; // TODO: This should not be a magic number
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);

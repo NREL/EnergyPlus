@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -81,7 +82,7 @@ namespace BaseboardElectric {
         Real64 ElecUseLoad;
         Real64 ElecUseRate;
         int ZonePtr;                  // point to the zone where the basebaord is located
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         bool MySizeFlag;
@@ -90,7 +91,7 @@ namespace BaseboardElectric {
         // Default Constructor
         BaseboardParams()
             : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
+              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
               CheckEquipName(true)
         {
         }

@@ -93,7 +93,7 @@ namespace ElectricBaseboardRadiator {
         Real64 ConvEnergy;
         Real64 RadEnergy;
         Array1D<Real64> FracDistribToSurf;
-        int HeatingCapMethod;         // - Method for electric baseboard heating capacity scalable sizing calculation
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for electric baseboard heating capacity scalable sizing calculation
         Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
         // Default Constructor
@@ -101,7 +101,7 @@ namespace ElectricBaseboardRadiator {
             : EquipType(0), ZonePtr(0), SchedPtr(0), TotSurfToDistrib(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0),
               AirInletHumRat(0.0), AirOutletTemp(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0),
               TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0),
-              HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+              ScaledHeatingCapacity(0.0)
         {
         }
     };

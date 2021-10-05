@@ -265,7 +265,7 @@ namespace LowTempRadiantSystem {
         // Members
         std::string designObjectName; // Design Object
         int DesignObjectPtr = 0;
-        int HeatingCapMethod = 0; // - Method for Low Temp Radiant system heating capacity scaled sizing calculation (HeatingDesignCapacity,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for Low Temp Radiant system heating capacity scaled sizing calculation (HeatingDesignCapacity,
         // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity =
             0.0; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment,
@@ -274,7 +274,7 @@ namespace LowTempRadiantSystem {
         Real64 WaterVolFlowMaxCool = 0.0; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool = 0.0;    // maximum water flow rate for cooling, kg/s
         Real64 WaterMassFlowRate = 0.0;   // water mass flow rate
-        int CoolingCapMethod = 0;         // - Method for Low Temp Radiant system cooling capacity scaled sizing calculation (CoolingDesignCapacity,
+        DataSizing::ZoneHVACSizingType CoolingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for Low Temp Radiant system cooling capacity scaled sizing calculation (CoolingDesignCapacity,
         // CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
         Real64 ScaledCoolingCapacity =
             0.0; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment,
@@ -312,7 +312,7 @@ namespace LowTempRadiantSystem {
         LowTempRadiantSetpointTypes VarFlowSetpointType =
             LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         std::string DesignHeatingCapMethodInput;
-        int DesignHeatingCapMethod = 0; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
+        DataSizing::ZoneHVACSizingType DesignHeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
         // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 DesignScaledHeatingCapacity =
             0.0; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment,
@@ -327,7 +327,7 @@ namespace LowTempRadiantSystem {
         std::string ColdSetptSched;                                      // Schedule name for the zone setpoint temperature
         int ColdSetptSchedPtr = 0;                                       // Schedule index for the zone setpoint temperature
         std::string DesignCoolingCapMethodInput;
-        int DesignCoolingCapMethod = 0; // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity,
+        DataSizing::ZoneHVACSizingType DesignCoolingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity,
                                         // CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
         Real64 DesignScaledCoolingCapacity =
             0.0; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment,
@@ -450,7 +450,7 @@ namespace LowTempRadiantSystem {
         // Report data
         Real64 ElecPower = 0.0;   // heating sent to panel in Watts
         Real64 ElecEnergy;        // heating sent to panel in Joules
-        int HeatingCapMethod = 0; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation
         //- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity =
             0.0; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment,

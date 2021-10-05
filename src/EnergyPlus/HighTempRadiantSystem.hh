@@ -63,11 +63,6 @@ struct EnergyPlusData;
 
 namespace HighTempRadiantSystem {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
     enum class RadHeaterType
     {
         Unassigned,
@@ -85,14 +80,6 @@ namespace HighTempRadiantSystem {
         MRTSPControl = 1005,
         OperativeSPControl = 1006
     };
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
-
-    // Types
 
     struct HighTempRadiantSystemData
     {
@@ -128,7 +115,7 @@ namespace HighTempRadiantSystem {
         Real64 GasEnergy;     // system gas consumption in Joules
         Real64 HeatPower;     // actual heating sent to zone (convective and radiative) in Watts
         Real64 HeatEnergy;    // actual heating sent to zone (convective and radiative) in Joules
-        int HeatingCapMethod; // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity,
                               // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64
             ScaledHeatingCapacity; // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
@@ -138,7 +125,7 @@ namespace HighTempRadiantSystem {
             : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Unassigned), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
               FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Unassigned), ThrottlRange(0.0), SetptSchedPtr(0),
               FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
-              HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+              HeatEnergy(0.0), ScaledHeatingCapacity(0.0)
         {
         }
     };

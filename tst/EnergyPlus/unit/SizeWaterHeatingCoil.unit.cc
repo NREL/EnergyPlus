@@ -1232,7 +1232,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurDuctType = 1;
     state->dataHeatBal->Zone(1).FloorArea = 99.16;
-    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingCapMethod = 9;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingTotalCapacity = 12000.;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).SysAirMinFlowRat = 0.3;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 3.4;

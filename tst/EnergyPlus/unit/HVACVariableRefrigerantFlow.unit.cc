@@ -227,7 +227,7 @@ protected:
 
         state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
         state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
-        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) = DataSizing::SupplyAirFlowRate;
+        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
         auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
         thisZoneEqConfig.IsControlled = true;
@@ -3806,7 +3806,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
@@ -4905,7 +4905,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
@@ -5756,7 +5756,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
@@ -11426,7 +11426,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
@@ -13162,7 +13162,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
@@ -15846,7 +15846,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;

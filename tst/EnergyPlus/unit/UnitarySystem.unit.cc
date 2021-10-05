@@ -485,8 +485,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     mySys->m_HeatCoilExists = true;
     mySys->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
     mySys->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
-    mySys->m_CoolingSAFMethod = DataSizing::SupplyAirFlowRate;
-    mySys->m_HeatingSAFMethod = DataSizing::SupplyAirFlowRate;
+    mySys->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
+    mySys->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     mySys->m_DesignCoolingCapacity = DataSizing::AutoSize;
     mySys->m_DesignHeatingCapacity = DataSizing::AutoSize;
     mySys->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
@@ -534,8 +534,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // reset sizing information
     mySys->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
     mySys->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
-    mySys->m_CoolingSAFMethod = DataSizing::SupplyAirFlowRate;
-    mySys->m_HeatingSAFMethod = DataSizing::SupplyAirFlowRate;
+    mySys->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
+    mySys->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     mySys->m_DesignCoolingCapacity = DataSizing::AutoSize;
     mySys->m_DesignHeatingCapacity = DataSizing::AutoSize;
     // pretend this is first call and UnitarySystem doesn't know the coil index
@@ -4030,16 +4030,16 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 {
     int AirLoopNum(1);
-    int iCoolingSizingType(1);
-    int iHeatingSizingType(1);
+    DataSizing::ZoneHVACSizingType iCoolingSizingType = DataSizing::ZoneHVACSizingType::None;
+    DataSizing::ZoneHVACSizingType iHeatingSizingType = DataSizing::ZoneHVACSizingType::None;
     bool FirstHVACIteration(true);
-    Array1D_int SizingTypes({DataSizing::None,
-                             DataSizing::SupplyAirFlowRate,
-                             DataSizing::FlowPerFloorArea,
-                             DataSizing::FractionOfAutosizedCoolingAirflow,
-                             DataSizing::FractionOfAutosizedHeatingAirflow,
-                             DataSizing::FlowPerCoolingCapacity,
-                             DataSizing::FlowPerHeatingCapacity});
+    Array1D<DataSizing::ZoneHVACSizingType> SizingTypes({DataSizing::ZoneHVACSizingType::None,
+                             DataSizing::ZoneHVACSizingType::SupplyAirFlowRate,
+                                                         DataSizing::ZoneHVACSizingType::FlowPerFloorArea,
+                             DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow,
+                             DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow,
+                             DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity,
+                             DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity});
 
     //	int const None( 1 );
     //	int const SupplyAirFlowRate( 2 );
@@ -4077,7 +4077,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     // test cooling only sizing
     thisSys.m_FanExists = true;
@@ -4090,12 +4090,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 15.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0006;
 
-    for (int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerCoolingCapacity; ++iSizingType) {
+    for (auto iSizingType : SizingTypes) {
 
-        if (iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) continue; // not allowed for cooling air flow
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) continue; // not allowed for cooling air flow
 
         thisSys.Name = format("UnitarySystem:CoolingOnly #{}", iSizingType);
-        thisSys.m_CoolingSAFMethod = SizingTypes(iSizingType);
+        thisSys.m_CoolingSAFMethod = iSizingType;
         thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize;
         thisSys.m_MaxCoolAirVolFlow = DataSizing::AutoSize;
         thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -4104,11 +4104,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
         // for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and
         // yield 1.005
-        if (iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow)
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow)
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.005;
-        if (iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow) thisSys.m_MaxCoolAirVolFlow = 1.0;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) thisSys.m_MaxCoolAirVolFlow = 1.0;
         // for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
-        if (iSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
 
         mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
@@ -4122,7 +4122,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     // #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not
     // exist.
     thisSys.Name = "UnitarySystem:CoolingOnly No Heating Coil";
-    thisSys.m_CoolingSAFMethod = SizingTypes(DataSizing::SupplyAirFlowRate);
+    thisSys.m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize;
     thisSys.m_MaxCoolAirVolFlow = DataSizing::AutoSize;
     thisSys.m_MaxHeatAirVolFlow = 0.0; // no heating coil
@@ -4149,13 +4149,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.001;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 30.0;
 
-    for (int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType) {
+    for (auto iSizingType : SizingTypes) {
 
-        if (iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow) continue; // not allowed for heating air flow
-        if (iSizingType == DataSizing::FlowPerCoolingCapacity) continue;            // not allowed for heating air flow
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) continue; // not allowed for heating air flow
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) continue;            // not allowed for heating air flow
 
         thisSys.Name = format("UnitarySystem:HeatingOnly #{}", iSizingType);
-        thisSys.m_HeatingSAFMethod = SizingTypes(iSizingType);
+        thisSys.m_HeatingSAFMethod = iSizingType;
         thisSys.m_DesignHeatingCapacity = DataSizing::AutoSize;
         thisSys.m_MaxCoolAirVolFlow = DataSizing::AutoSize;
         thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -4164,11 +4164,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
         // for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and
         // yield 1.005
-        if (iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow)
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow)
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.005;
-        if (iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) thisSys.m_MaxHeatAirVolFlow = 1.0;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) thisSys.m_MaxHeatAirVolFlow = 1.0;
         // for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
-        if (iSizingType == DataSizing::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
 
         mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
@@ -4182,7 +4182,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     // #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not
     // exist.
     thisSys.Name = "UnitarySystem:HeatingOnly No Cooling Coil";
-    thisSys.m_HeatingSAFMethod = SizingTypes(DataSizing::SupplyAirFlowRate);
+    thisSys.m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     thisSys.m_DesignHeatingCapacity = DataSizing::AutoSize;
     thisSys.m_MaxCoolAirVolFlow = 0.0; // nocooling coil
     thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -4212,17 +4212,17 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.001;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 30.0;
 
-    for (int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType) {
+    for (auto iSizingType : SizingTypes) {
 
         iCoolingSizingType = iSizingType;
         iHeatingSizingType = iSizingType;
-        if (iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow) iHeatingSizingType = DataSizing::FractionOfAutosizedHeatingAirflow;
-        if (iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) iCoolingSizingType = DataSizing::FractionOfAutosizedCoolingAirflow;
-        if (iSizingType == DataSizing::FlowPerCoolingCapacity) iHeatingSizingType = DataSizing::FlowPerHeatingCapacity;
-        if (iSizingType == DataSizing::FlowPerHeatingCapacity) iCoolingSizingType = DataSizing::FlowPerCoolingCapacity;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) iHeatingSizingType = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) iCoolingSizingType = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) iHeatingSizingType = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) iCoolingSizingType = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
         thisSys.Name = format("UnitarySystem:CoolingAndHeating #{}", iSizingType);
-        thisSys.m_CoolingSAFMethod = SizingTypes(iCoolingSizingType);
-        thisSys.m_HeatingSAFMethod = SizingTypes(iHeatingSizingType);
+        thisSys.m_CoolingSAFMethod = iCoolingSizingType;
+        thisSys.m_HeatingSAFMethod = iHeatingSizingType;
         thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize;
         thisSys.m_DesignHeatingCapacity = DataSizing::AutoSize;
         thisSys.m_MaxCoolAirVolFlow = DataSizing::AutoSize;
@@ -4235,19 +4235,19 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad = 0.0;
         // for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and
         // yield 1.005
-        if (iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow)
+        if (iCoolingSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow)
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.005;
-        if (iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow) thisSys.m_MaxCoolAirVolFlow = 1.0;
+        if (iCoolingSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) thisSys.m_MaxCoolAirVolFlow = 1.0;
         // for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
-        if (iCoolingSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+        if (iCoolingSizingType == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
         // for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and
         // yield 1.005
-        if (iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) {
+        if (iHeatingSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.005;
             thisSys.m_MaxHeatAirVolFlow = 1.0;
         }
         // for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
-        if (iHeatingSizingType == DataSizing::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
+        if (iHeatingSizingType == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
 
         mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
@@ -7848,7 +7848,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     bool FirstHVACIteration = true;
     int AirLoopNum = 0;
@@ -9633,7 +9633,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     bool FirstHVACIteration = true;
     int AirLoopNum = 0;
@@ -11768,7 +11768,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_HeatCoilExists = false;
 
     thisSys.Name = "UnitarySystem:CoolingOnly";
-    thisSys.m_CoolingSAFMethod = DataSizing::FractionOfAutosizedCoolingAirflow;
+    thisSys.m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
     thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize;
     thisSys.m_MaxCoolAirVolFlow = 1.0;
     thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -12484,7 +12484,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFractionOfAutoSizedCoolingFlowRateValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
-    EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, state->dataUnitarySystems->FractionOfAutoSizedCoolingValue);
+    //EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow);
     EXPECT_EQ(userspecifiedFractionOfAutoSizedCoolingFlowRateValue, 0.9);
 
     bool FirstHVACIteration = true;
@@ -12625,7 +12625,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFlowPerCoolingCapacityValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
-    EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, state->dataUnitarySystems->FlowPerCoolingCapacity);
+    //EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity);
     EXPECT_EQ(userspecifiedFlowPerCoolingCapacityValue, 0.0000462180155978106);
 
     bool FirstHVACIteration = true;
@@ -12802,11 +12802,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_TRUE(thisSys->m_RunOnSensibleLoad);                                     // checks for "SENSIBLEONLYLOADCONTROL"
     EXPECT_EQ("COIL:HEATING:FUEL", thisSys->m_SuppHeatCoilTypeName);               // checks supplemental heating coil object type
     EXPECT_EQ("SUPPLEMENTAL HEATING COIL", thisSys->m_SuppHeatCoilName);           // checks supplemental heating coil name
-    EXPECT_EQ(4, thisSys->m_CoolingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedCoolingAirflow
+    //EXPECT_EQ(DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow, thisSys->m_CoolingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedCoolingAirflow
     EXPECT_EQ(0.5, thisSys->m_MaxCoolAirVolFlow); // checks Cooling Fraction of Autosized Cooling Supply Air Flow Rate value
-    EXPECT_EQ(5, thisSys->m_HeatingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedHeatingAirflow
+    //EXPECT_EQ(DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow, thisSys->m_HeatingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedHeatingAirflow
     EXPECT_EQ(0.8, thisSys->m_MaxHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
-    EXPECT_EQ(6, thisSys->m_NoCoolHeatSAFMethod); // checks cooling supply air flow rate sizing method, FlowPerCoolingCapacity
+    //EXPECT_EQ(DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity, thisSys->m_NoCoolHeatSAFMethod); // checks cooling supply air flow rate sizing method, FlowPerCoolingCapacity
     EXPECT_EQ(0.0000462180155978106, thisSys->m_MaxNoCoolHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
     EXPECT_EQ(30.0, thisSys->DesignMaxOutletTemp);                        // checks Maximum Supply Air Temperature value
     EXPECT_EQ(20.0, thisSys->m_MaxOATSuppHeat); // checks Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation value
@@ -13299,9 +13299,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     EXPECT_EQ(thisClgCoil.RatedTotCap(1), DataSizing::AutoSize);
     EXPECT_EQ(thisHtgCoil.NominalCapacity, DataSizing::AutoSize);
 
-    ASSERT_EQ(thisSys->m_CoolingSAFMethod, state->dataUnitarySystems->None);
-    ASSERT_EQ(thisSys->m_HeatingSAFMethod, state->dataUnitarySystems->None);
-    ASSERT_EQ(thisSys->m_NoCoolHeatSAFMethod, state->dataUnitarySystems->None);
+//    ASSERT_EQ(thisSys->m_CoolingSAFMethod, DataSizing::ZoneHVACSizingType::None);
+//    ASSERT_EQ(thisSys->m_HeatingSAFMethod, DataSizing::ZoneHVACSizingType::None);
+//    ASSERT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::None);
 
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
@@ -13313,7 +13313,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.005;

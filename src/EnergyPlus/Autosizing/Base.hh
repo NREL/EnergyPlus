@@ -72,7 +72,7 @@ struct BaseSizer
 
     Real64 stdRhoAir = 0.0;
 
-    int zoneAirFlowSizMethod = 0;
+    DataSizing::ZoneHVACSizingType zoneAirFlowSizMethod = DataSizing::ZoneHVACSizingType::None;
     bool dataScalableSizingON = false;
     bool dataScalableCapSizingON = false;
     bool isCoilReportObject = false; // provides access to coil reporting

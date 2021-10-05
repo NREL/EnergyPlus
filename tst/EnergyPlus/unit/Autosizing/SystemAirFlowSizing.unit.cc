@@ -189,7 +189,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     // Test 6 - Zone Equipment, set ZoneEqSizing data
     state->dataSize->ZoneEqSizing(1).SystemAirFlow = true;
     state->dataSize->ZoneEqSizing(1).AirVolFlow = 1.8;
-    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -268,7 +268,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     state->dataSize->ZoneEqSizing(1).CoolingAirFlow = false;
     state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
 
-    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FractionOfAutosizedCoolingAirflow;
+    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
 
     // Test 12 - Zone Equipment, set fraction of autosized cooling flow for cooling only fan
     state->dataSize->DataFracOfAutosizedCoolingAirflow = 0.4;
@@ -346,7 +346,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(1.28, sizedValue, 0.0001); // max of FinalZoneSizing cooling/heating flow * fraction
     sizer.autoSizedValue = 0.0;            // reset for next test
 
-    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FractionOfAutosizedHeatingAirflow;
+    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
 
     // Test 18 - Zone Equipment, set fraction of autosized cooling flow for cooling only fan
     state->dataSize->DataFracOfAutosizedCoolingAirflow = 0.4;
@@ -425,7 +425,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(0.64, sizedValue, 0.0001); // max of FinalZoneSizing cooling/heating flow * fraction
     sizer.autoSizedValue = 0.0;            // reset for next test
 
-    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FlowPerCoolingCapacity;
+    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
 
     // Test 24 - Zone Equipment, set fraction of autosized cooling capacity for cooling only fan
     state->dataSize->DataFlowPerCoolingCapacity = 0.00005;
@@ -507,7 +507,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(1.2, sizedValue, 0.0001); // max of autosized cooling/heating capacity * fraction
     sizer.autoSizedValue = 0.0;           // reset for next test
 
-    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::FlowPerHeatingCapacity;
+    state->dataSize->ZoneEqSizing(1).SizingMethod(int(sizer.sizingType)) = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
 
     // Test 30 - Zone Equipment, set fraction of autosized cooling capacity for cooling only fan
     state->dataSize->ZoneCoolingOnlyFan = true;

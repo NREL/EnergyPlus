@@ -271,9 +271,6 @@ namespace HWBaseboardRadiator {
         using BranchNodeConnections::TestCompSet;
         using DataLoopNode::ObjectIsNotParent;
         using DataSizing::AutoSize;
-        using DataSizing::CapacityPerFloorArea;
-        using DataSizing::FractionOfAutosizedHeatingCapacity;
-        using DataSizing::HeatingDesignCapacity;
         using GlobalNames::VerifyUniqueBaseboardName;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -360,9 +357,9 @@ namespace HWBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = HeatingDesignCapacity;
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = CapacityPerFloorArea;
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -398,7 +395,7 @@ namespace HWBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -569,7 +566,7 @@ namespace HWBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             HWBaseboard(BaseboardNum).HeatingCapMethod = HWBaseboardDesignDataObject.HeatingCapMethod;
-            if (HWBaseboard(BaseboardNum).HeatingCapMethod == HeatingDesignCapacity) {
+            if (HWBaseboard(BaseboardNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     HWBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && HWBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
@@ -589,10 +586,10 @@ namespace HWBaseboardRadiator {
                                       "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
-            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == CapacityPerFloorArea) {
+            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                 HWBaseboard(BaseboardNum).ScaledHeatingCapacity = HWBaseboardDesignDataObject.ScaledHeatingCapacity;
 
-            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                 HWBaseboard(BaseboardNum).ScaledHeatingCapacity = HWBaseboardDesignDataObject.ScaledHeatingCapacity;
 
             } else {
@@ -1106,7 +1103,7 @@ namespace HWBaseboardRadiator {
         int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
                           // HeatingCapacitySizing, etc.)
         bool PrintFlag;   // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
         PltSizHeatNum = 0;
@@ -1137,9 +1134,9 @@ namespace HWBaseboardRadiator {
             SizingString = HWBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = HWBaseboard(BaseboardNum).HeatingCapMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-            if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                if (CapSizingMethod == HeatingDesignCapacity) {
+            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                     if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
@@ -1148,13 +1145,13 @@ namespace HWBaseboardRadiator {
                     }
                     TempSize = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
 
-                } else if (CapSizingMethod == CapacityPerFloorArea) {
+                } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
                         HWBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad;
                     state.dataSize->DataScalableCapSizingON = true;
-                } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -1851,119 +1848,6 @@ namespace HWBaseboardRadiator {
 
         return SumHATsurf;
     }
-
-    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,               // type index
-                                          std::string const &BaseboardName,         // component name
-                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
-                                          [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
-                                          [[maybe_unused]] int const LoopSide,      // Plant loop side index for where called from
-                                          int &CompIndex,                           // Chiller number pointer
-                                          [[maybe_unused]] bool const FirstHVACIteration,
-                                          bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   Sept. 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // update sim routine called from plant
-
-        // METHODOLOGY EMPLOYED:
-        // check input, provide comp index, call utility routines
-
-        // Using/Aliasing
-        using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
-
-        using PlantUtilities::PullCompInterconnectTrigger;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
-        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
-
-        int BaseboardNum;
-
-        // Find the correct baseboard
-        if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(BaseboardName, HWBaseboard, &HWBaseboardParams::EquipID);
-            if (BaseboardNum == 0) {
-                ShowFatalError(state, "UpdateHWBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName);
-            }
-            CompIndex = BaseboardNum;
-        } else {
-            BaseboardNum = CompIndex;
-            if (BaseboardNum > NumHWBaseboards || BaseboardNum < 1) {
-                ShowFatalError(
-                    state,
-                    format("UpdateHWBaseboardPlantConnection:  Invalid CompIndex passed={}, Number of baseboards={}, Entered baseboard name={}",
-                           BaseboardNum,
-                           NumHWBaseboards,
-                           BaseboardName));
-            }
-            if (state.dataGlobal->KickOffSimulation) {
-                if (BaseboardName != HWBaseboard(BaseboardNum).EquipID) {
-                    ShowFatalError(state,
-                                   format("UpdateHWBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name "
-                                          "for that index={}",
-                                          BaseboardNum,
-                                          BaseboardName,
-                                          HWBaseboard(BaseboardNum).EquipID));
-                }
-                if (BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Water) {
-                    ShowFatalError(state,
-                                   format("UpdateHWBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name "
-                                          "for that index={}",
-                                          BaseboardNum,
-                                          BaseboardName,
-                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
-                }
-            }
-        }
-
-        if (InitLoopEquip) {
-            return;
-        }
-
-        PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum,
-                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::HeatTransferRate,
-                                    HWBaseboard(BaseboardNum).Power);
-
-        PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum,
-                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::MassFlowRate,
-                                    HWBaseboard(BaseboardNum).WaterMassFlowRate);
-
-        PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum,
-                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::Temperature,
-                                    HWBaseboard(BaseboardNum).WaterOutletTemp);
-    }
-
-    //*****************************************************************************************
 
 } // namespace HWBaseboardRadiator
 

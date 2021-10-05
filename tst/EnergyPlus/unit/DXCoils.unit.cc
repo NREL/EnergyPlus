@@ -1470,7 +1470,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
-        DataSizing::SupplyAirFlowRate;
+        DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     state->dataSize->NumZoneSizingInput = 1;

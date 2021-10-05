@@ -81,7 +81,7 @@ void createCoilSelectionReportObj(EnergyPlusData &state)
 CoilSelectionData::CoilSelectionData( // constructor
     std::string const &coilName)
     : isCooling(false), isHeating(false), coilNum(-999), airloopNum(-999), oaControllerNum(-999), zoneEqNum(-999), oASysNum(-999), zoneHVACTypeNum(0),
-      zoneHVACIndex(0), typeof_Coil(-999), coilSizingMethodConcurrence(-999), coilSizingMethodCapacity(-999), coilSizingMethodAirFlow(-999),
+      zoneHVACIndex(0), typeof_Coil(-999), coilSizingMethodConcurrence(-999),
       isCoilSizingForTotalLoad(false), capIsAutosized(false), volFlowIsAutosized(false), coilWaterFlowUser(-999.0), oaPretreated(false),
       isSupplementalHeater(false), coilTotCapFinal(-999.0), coilSensCapFinal(-999.0), coilRefAirVolFlowFinal(-999.0),
       coilRefWaterVolFlowFinal(-999.0), coilTotCapAtPeak(-999.0), coilSensCapAtPeak(-999.0), coilDesMassFlow(-999.0), coilDesVolFlow(-999.0),
@@ -723,25 +723,25 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->coilSizingMethodConcurrenceName = "Coincident";
         }
 
-        if (c->coilSizingMethodCapacity == DataSizing::CoolingDesignCapacity) {
+        if (c->coilSizingMethodCapacity == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity) {
             c->coilSizingMethodCapacityName = "CoolingDesignCapacity";
-        } else if (c->coilSizingMethodCapacity == DataSizing::HeatingDesignCapacity) {
+        } else if (c->coilSizingMethodCapacity == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
             c->coilSizingMethodCapacityName = "HeatingDesignCapacity";
-        } else if (c->coilSizingMethodCapacity == DataSizing::CapacityPerFloorArea) {
+        } else if (c->coilSizingMethodCapacity == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
             c->coilSizingMethodCapacityName = "CapacityPerFloorArea";
-        } else if (c->coilSizingMethodCapacity == DataSizing::FractionOfAutosizedCoolingCapacity) {
+        } else if (c->coilSizingMethodCapacity == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
             c->coilSizingMethodCapacityName = "FractionOfAutosizedCoolingCapacity";
-        } else if (c->coilSizingMethodCapacity == DataSizing::FractionOfAutosizedHeatingCapacity) {
+        } else if (c->coilSizingMethodCapacity == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
             c->coilSizingMethodCapacityName = "FractionOfAutosizedHeatingCapacity";
         }
 
-        if (c->coilSizingMethodAirFlow == DataSizing::SupplyAirFlowRate) {
+        if (c->coilSizingMethodAirFlow == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) {
             c->coilSizingMethodAirFlowName = "SupplyAirFlowRate";
-        } else if (c->coilSizingMethodAirFlow == DataSizing::FlowPerFloorArea) {
+        } else if (c->coilSizingMethodAirFlow == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
             c->coilSizingMethodAirFlowName = "FlowPerFloorArea";
-        } else if (c->coilSizingMethodAirFlow == DataSizing::FractionOfAutosizedCoolingAirflow) {
+        } else if (c->coilSizingMethodAirFlow == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
             c->coilSizingMethodAirFlowName = "FractionOfAutosizedCoolingAirflow";
-        } else if (c->coilSizingMethodAirFlow == DataSizing::FractionOfAutosizedHeatingAirflow) {
+        } else if (c->coilSizingMethodAirFlow == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
             c->coilSizingMethodAirFlowName = "FractionOfAutosizedHeatingAirflow";
         }
 

@@ -184,7 +184,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
 
     // Electric - HeatingDesignCapacity method
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower = AutoSize;
-    state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = HeatingDesignCapacity;
+    state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity = AutoSize;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 1200.0;
     SizeLowTempRadiantSystem(*state, RadSysNum, SystemType);
@@ -192,7 +192,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
 
     // Electric - CapacityPerFloorArea method - hold until scalable sizing issue is resolved
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower = AutoSize;
-    state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
+    state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity = 1.5;
     state->dataHeatBal->Zone(1).FloorArea = 500.0;
     SizeLowTempRadiantSystem(*state, RadSysNum, SystemType);
@@ -200,7 +200,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
 
     // Electric - FractionOfAutosizedHeatingCapacity method - hold until scalable sizing issue is resolved
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower = AutoSize;
-    state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+    state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity = 10.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 880.0;
     SizeLowTempRadiantSystem(*state, RadSysNum, SystemType);
@@ -227,14 +227,14 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
 
     // Hydronic - HeatingDesignCapacity/CoolingDesignCapacity method
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat = AutoSize;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = HeatingDesignCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = AutoSize;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 1200.0;
     ExpectedResult1 = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
     ExpectedResult1 = ExpectedResult1 / (state->dataSize->PlantSizData(1).DeltaT * RhoWater * CpWater);
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool = AutoSize;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = CoolingDesignCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = AutoSize;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad = 2200.0;
     ExpectedResult2 = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
@@ -260,14 +260,14 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
 
     // Hydronic - CapacityPerFloorArea method
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat = AutoSize;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = 10.0;
     state->dataHeatBal->Zone(1).FloorArea = 500.0;
     ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity * state->dataHeatBal->Zone(1).FloorArea;
     ExpectedResult1 = ExpectedResult1 / (state->dataSize->PlantSizData(1).DeltaT * RhoWater * CpWater);
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool = AutoSize;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = CapacityPerFloorArea;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = 20.0;
     ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity * state->dataHeatBal->Zone(1).FloorArea;
     ExpectedResult2 = ExpectedResult2 / (state->dataSize->PlantSizData(2).DeltaT * RhoWater * CpWater);
@@ -278,7 +278,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
 
     // Hydronic - FractionOfAutosizedHeating/CoolingCapacity method
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat = AutoSize;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = 1.2;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 880.0;
     ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity *
@@ -286,7 +286,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     ExpectedResult1 = ExpectedResult1 / (state->dataSize->PlantSizData(1).DeltaT * RhoWater * CpWater);
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool = AutoSize;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = 1.5;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad = 1200.0;
     ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity *
@@ -317,13 +317,13 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode;
 
     // Hydronic - HeatingDesignCapacity/CoolingDesignCapacity Autosize Method
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = HeatingDesignCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = AutoSize;
     state->dataSize->FinalZoneSizing.allocate(state->dataSize->CurZoneEqNum);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 1200.0;
     ExpectedResult1 = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
 
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = CoolingDesignCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = AutoSize;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad = 2200.0;
     ExpectedResult2 = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
@@ -342,11 +342,11 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
 
     // Hydronic - CapacityPerFloorArea Capacity Sizing Method
     state->dataHeatBal->Zone(1).FloorArea = 50.0;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = 200.0;
     ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity * state->dataHeatBal->Zone(1).FloorArea;
 
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = CapacityPerFloorArea;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = 250.0;
     ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity * state->dataHeatBal->Zone(1).FloorArea;
 
@@ -355,13 +355,13 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     EXPECT_NEAR(ExpectedResult2, state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity, 0.1);
 
     // Hydronic - FractionOfAutosizedHeating/CoolingCapacity Sizing Method
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = 1.2;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 880.0;
     ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity *
                       state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
 
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = 1.5;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad = 1200.0;
     ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity *
@@ -1193,9 +1193,9 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingCapacitySizing)) =
-        DataSizing::FractionOfAutosizedHeatingCapacity;
+        DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingCapacitySizing)) =
-        DataSizing::FractionOfAutosizedCoolingCapacity;
+        DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
     // heating capacity sizing calculation
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 10000.0;
     HeatingCapacity = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad *

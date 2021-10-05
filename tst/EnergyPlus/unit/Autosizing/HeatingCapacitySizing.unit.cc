@@ -444,7 +444,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     Real64 unAdjustedSize = sizedValue;
 
     // Test 18 - Airloop Equipment, no OA, fraction of autosized heating capacity
-    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedHeatingCapacity = 0.5;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -456,7 +456,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(unAdjustedSize * 0.5, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::None;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedHeatingCapacity = 0.0;
 
     // Test 19 - Airloop Equipment, with min OA
@@ -692,7 +692,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = false;
 
     // Test 35 - Airloop Equipment, CurDuctType = Main, air loop uses scaled sizing
-    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataSize->FinalSysSizing(1).HeatingTotalCapacity = 3325.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -706,7 +706,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 36 - Airloop Equipment, CurDuctType = Main, air loop uses scaled sizing
-    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataSize->FinalSysSizing(1).HeatingTotalCapacity = 2325.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -718,7 +718,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(2325.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::None;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;
     state->dataSize->FinalSysSizing(1).HeatingTotalCapacity = 0.0;
 
     // Test 37 - OA Equipment, OA Sys capacity sizing

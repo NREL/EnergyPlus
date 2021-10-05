@@ -2749,9 +2749,9 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                 NomCapUserInp = true;
             } else if (state.dataSize->CurSysNum > 0 && state.dataSize->CurSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
-                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                     NomCapUserInp = true;
-                } else if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
+                } else if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity &&
                            state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingTotalCapacity > 0.0) {
                     NomCapUserInp = true;
                 }

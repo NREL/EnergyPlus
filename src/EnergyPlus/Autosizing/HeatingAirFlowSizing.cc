@@ -75,9 +75,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
                 switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing))) {
-                case DataSizing::SupplyAirFlowRate:
-                case DataSizing::None:
-                case DataSizing::FlowPerFloorArea:
+                case DataSizing::ZoneHVACSizingType::SupplyAirFlowRate:
+                case DataSizing::ZoneHVACSizingType::None:
+                case DataSizing::ZoneHVACSizingType::FlowPerFloorArea:
                     if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
                         this->autoSizedValue = max(this->zoneEqSizing(this->curZoneEqNum).AirVolFlow,
                                                    this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
@@ -100,7 +100,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         }
                     }
                     break;
-                case DataSizing::FractionOfAutosizedCoolingAirflow:
+                case DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow:
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
@@ -119,7 +119,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                     }
                     break;
-                case DataSizing::FractionOfAutosizedHeatingAirflow:
+                case DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow:
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
@@ -138,7 +138,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                     }
                     break;
-                case DataSizing::FlowPerCoolingCapacity:
+                case DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity:
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
@@ -155,7 +155,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                     }
                     break;
-                case DataSizing::FlowPerHeatingCapacity:
+                case DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity:
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
@@ -262,15 +262,15 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             if (this->isEpJSON) this->sizingString = "heating_supply_air_flow_rate [m3/s]";
         }
         if (this->dataScalableSizingON) {
-            if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
+            if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
                 this->sizingStringScalable = "(scaled by flow / zone) ";
-            } else if (this->zoneAirFlowSizMethod == DataSizing::FlowPerFloorArea) {
+            } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                 this->sizingStringScalable = "(scaled by flow / area) ";
-            } else if (this->zoneAirFlowSizMethod == DataSizing::FractionOfAutosizedCoolingAirflow ||
-                       this->zoneAirFlowSizMethod == DataSizing::FractionOfAutosizedHeatingAirflow) {
+            } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow ||
+                       this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
                 this->sizingStringScalable = "(scaled by fractional multiplier) ";
-            } else if (this->zoneAirFlowSizMethod == DataSizing::FlowPerCoolingCapacity ||
-                       this->zoneAirFlowSizMethod == DataSizing::FlowPerHeatingCapacity) {
+            } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity ||
+                       this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) {
                 this->sizingStringScalable = "(scaled by flow / capacity) ";
             }
         }

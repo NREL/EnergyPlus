@@ -265,7 +265,7 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
             ZoneEqSizing(ControlledZoneNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-            ZoneEqSizing(ControlledZoneNum).SizingMethod = 0;
+            ZoneEqSizing(ControlledZoneNum).SizingMethod = DataSizing::ZoneHVACSizingType::None;
         }
     }
 

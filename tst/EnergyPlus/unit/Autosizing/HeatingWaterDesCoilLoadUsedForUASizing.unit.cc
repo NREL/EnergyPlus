@@ -339,7 +339,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 14 - Airloop Equipment, heating sizing ratio = 1.25
-    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).FractionOfAutosizedHeatingCapacity = 1.25;
 
     // start with an auto-sized value as the user input

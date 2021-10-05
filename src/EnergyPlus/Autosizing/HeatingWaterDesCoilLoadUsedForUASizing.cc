@@ -170,7 +170,7 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                                            (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
                 }
             } else {
-                if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                     this->dataFracOfAutosizedHeatingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedHeatingCapacity;
                 }
                 if (this->dataDesicRegCoil) {

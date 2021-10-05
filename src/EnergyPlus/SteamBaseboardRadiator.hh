@@ -130,41 +130,23 @@ namespace SteamBaseboardRadiator {
 
     struct SteamBaseboardDesignData : SteamBaseboardParams
     {
-        // Members
         std::string designName;
-        int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
         // FracOfAutosizedHeatingCapacity)
-        Real64 DesignScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        Real64 Offset;
-        Real64 FracRadiant;
-        Real64 FracDistribPerson;
-
-        // Default Constructor
-        SteamBaseboardDesignData() : HeatingCapMethod(0), DesignScaledHeatingCapacity(0.0), Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
-        {
-        }
+        Real64 DesignScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 Offset = 0.0;
+        Real64 FracRadiant = 0.0;
+        Real64 FracDistribPerson = 0.0;
     };
 
     struct SteamBaseboardNumericFieldData
     {
-        // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        SteamBaseboardNumericFieldData()
-        {
-        }
     };
 
     struct SteamBaseboardDesignNumericFieldData
     {
-        // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        SteamBaseboardDesignNumericFieldData()
-        {
-        }
     };
 
     void SimSteamBaseboard(EnergyPlusData &state,

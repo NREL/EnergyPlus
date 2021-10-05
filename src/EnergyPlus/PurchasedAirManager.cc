@@ -1482,9 +1482,9 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                             // HeatingCapacitySizing, etc.)
     bool PrintFlag;         // TRUE when sizing information is reported in the eio file
     int zoneHVACIndex;      // index of zoneHVAC equipment sizing specification
-    int SAFMethod(0);       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+    DataSizing::ZoneHVACSizingType SAFMethod = DataSizing::ZoneHVACSizingType::None;       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
                             // FractionOfAutosizedHeatingAirflow ...)
-    int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+    DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                             // FractionOfAutosizedHeatingCapacity )
     Real64 CoolingAirVolFlowDes(0.0); // cooling supply air flow rate
     Real64 HeatingAirVolFlowDes(0.0); // heating supply air flow rate
@@ -1516,13 +1516,13 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
             FieldNum = 5; // N5 , \field Maximum Heating Air Flow Rate
             PrintFlag = true;
             SizingString = state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(FieldNum) + " [m3/s]";
-            if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
+            if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod != DataSizing::ZoneHVACSizingType::None) {
                 SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                 state.dataSize->ZoneHeatingOnlyFan = true;
                 SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-                if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow) {
-                    if (SAFMethod == SupplyAirFlowRate) {
+                if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea || SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
+                    if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) {
                         if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow == AutoSize) &&
                             ((PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitFlowRate) ||
                              (PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitFlowRateAndCapacity))) {
@@ -1542,7 +1542,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                     sizingHeatingAirFlow.size(state, state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow, ErrorsFound);
                             }
                         }
-                    } else if (SAFMethod == FlowPerFloorArea) {
+                    } else if (SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow *
                                                                                 state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
@@ -1553,7 +1553,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
-                    } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
+                    } else if (SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
                         state.dataSize->DataFracOfAutosizedHeatingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow == AutoSize) &&
                             ((PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitFlowRate) ||
@@ -1570,7 +1570,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                     } else {
                         // Invalid sizing method
                     }
-                } else if (SAFMethod == FlowPerHeatingCapacity) {
+                } else if (SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) {
                     SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                     TempSize = AutoSize;
                     PrintFlag = false;
@@ -1600,22 +1600,22 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
                 CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).CapSizingMethod = CapSizingMethod;
-                if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                    CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    if (CapSizingMethod == HeatingDesignCapacity) {
+                if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                    CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                         if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity > 0.0) {
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
                                 state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                         }
                         TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-                    } else if (CapSizingMethod == CapacityPerFloorArea) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
                             state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity *
                             state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                         state.dataSize->DataScalableSizingON = true;
-                    } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                         state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                         TempSize = AutoSize;
                     }
@@ -1676,12 +1676,12 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
             }
 
             PrintFlag = true;
-            if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
+            if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod != DataSizing::ZoneHVACSizingType::None) {
                 state.dataSize->ZoneCoolingOnlyFan = true;
                 SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-                if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                    if (SAFMethod == SupplyAirFlowRate) {
+                if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea || SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
+                    if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) {
                         if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                             ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                              (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
@@ -1700,7 +1700,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                 CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, CoolingAirVolFlowDes, ErrorsFound);
                             }
                         }
-                    } else if (SAFMethod == FlowPerFloorArea) {
+                    } else if (SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
                                                                                 state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
@@ -1713,7 +1713,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
-                    } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
+                    } else if (SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
                         if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                             ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                              (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
@@ -1732,7 +1732,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                     } else {
                         // Invalid scalable sizing method
                     }
-                } else if (SAFMethod == FlowPerCoolingCapacity) {
+                } else if (SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) {
                     if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                         ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                          (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
@@ -1764,9 +1764,9 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
                 CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).CapSizingMethod = CapSizingMethod;
-                if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                    CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                    if (CapSizingMethod == CoolingDesignCapacity) {
+                if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                    CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity) {
                         if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =
@@ -1775,13 +1775,13 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                             state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow;
                         }
                         TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                    } else if (CapSizingMethod == CapacityPerFloorArea) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =
                             state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity *
                             state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                         state.dataSize->DataScalableSizingON = true;
-                    } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                         state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                         state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow;
                         TempSize = AutoSize;

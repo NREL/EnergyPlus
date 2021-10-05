@@ -3944,15 +3944,15 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 SysSizInput(SysSizIndex).CoolAirDesMethod = InpDesAirFlow;
             } else if (coolAirDesMethod == "FLOWPERFLOORAREA") {
                 SysSizInput(SysSizIndex).CoolAirDesMethod = InpDesAirFlow;
-                SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FlowPerFloorArea;
+                SysSizInput(SysSizIndex).ScaleCoolSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
                 SysSizInput(SysSizIndex).FlowPerFloorAreaCooled = state.dataIPShortCut->rNumericArgs(iCoolFlowPerFloorAreaNumericNum);
             } else if (coolAirDesMethod == "FRACTIONOFAUTOSIZEDCOOLINGAIRFLOW") {
                 SysSizInput(SysSizIndex).CoolAirDesMethod = FromDDCalc;
-                SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FractionOfAutosizedCoolingAirflow;
+                SysSizInput(SysSizIndex).ScaleCoolSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
                 SysSizInput(SysSizIndex).FractionOfAutosizedCoolingAirflow = state.dataIPShortCut->rNumericArgs(iCoolFlowPerFracCoolNumericNum);
             } else if (coolAirDesMethod == "FLOWPERCOOLINGCAPACITY") {
                 SysSizInput(SysSizIndex).CoolAirDesMethod = FromDDCalc;
-                SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+                SysSizInput(SysSizIndex).ScaleCoolSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
                 SysSizInput(SysSizIndex).FlowPerCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolFlowPerCoolCapNumericNum);
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
@@ -3973,19 +3973,19 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 SysSizInput(SysSizIndex).HeatAirDesMethod = InpDesAirFlow;
             } else if (heatAirDesMethod == "FLOWPERFLOORAREA") {
                 SysSizInput(SysSizIndex).HeatAirDesMethod = InpDesAirFlow;
-                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FlowPerFloorArea;
+                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
                 SysSizInput(SysSizIndex).FlowPerFloorAreaHeated = state.dataIPShortCut->rNumericArgs(iHeatFlowPerFloorAreaNumericNum);
             } else if (heatAirDesMethod == "FRACTIONOFAUTOSIZEDHEATINGAIRFLOW") {
                 SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
-                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FractionOfAutosizedHeatingAirflow;
+                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
                 SysSizInput(SysSizIndex).FractionOfAutosizedHeatingAirflow = state.dataIPShortCut->rNumericArgs(iHeatFlowPerFracHeatNumericNum);
             } else if (heatAirDesMethod == "FRACTIONOFAUTOSIZEDCOOLINGAIRFLOW") {
                 SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
-                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FractionOfAutosizedCoolingAirflow;
+                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
                 SysSizInput(SysSizIndex).FractionOfAutosizedCoolingAirflow = state.dataIPShortCut->rNumericArgs(iHeatFlowPerFracCoolNumericNum);
             } else if (heatAirDesMethod == "FLOWPERHEATINGCAPACITY") {
                 SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
-                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+                SysSizInput(SysSizIndex).ScaleHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
                 SysSizInput(SysSizIndex).FlowPerHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFlowPerHeatCapNumericNum);
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
@@ -4036,7 +4036,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
 
         // Determine SysSizInput electric Cooling design capacity sizing method
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum), "COOLINGDESIGNCAPACITY")) {
-            SysSizInput(SysSizIndex).CoolingCapMethod = CoolingDesignCapacity;
+            SysSizInput(SysSizIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
             // SysSizInput( SysSizIndex ).ScaledCoolingCapacity = AutoSize can be set to autosize cooling capacity
             SysSizInput(SysSizIndex).ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolDesignCapacityNumericNum);
             if (SysSizInput(SysSizIndex).ScaledCoolingCapacity < 0.0 && SysSizInput(SysSizIndex).ScaledCoolingCapacity != AutoSize) {
@@ -4048,7 +4048,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum), "CAPACITYPERFLOORAREA")) {
-            SysSizInput(SysSizIndex).CoolingCapMethod = CapacityPerFloorArea;
+            SysSizInput(SysSizIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
             if (!state.dataIPShortCut->lNumericFieldBlanks(iCoolCapacityPerFloorAreaNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolCapacityPerFloorAreaNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledCoolingCapacity <= 0.0) {
@@ -4080,7 +4080,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum), "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY")) {
-            SysSizInput(SysSizIndex).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+            SysSizInput(SysSizIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
             if (!state.dataIPShortCut->lNumericFieldBlanks(iCoolFracOfAutosizedCapacityNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolFracOfAutosizedCapacityNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledCoolingCapacity < 0.0) {
@@ -4101,7 +4101,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum), "NONE")) {
-            SysSizInput(SysSizIndex).CoolingCapMethod = None;
+            SysSizInput(SysSizIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::None;
             SysSizInput(SysSizIndex).ScaledCoolingCapacity = 0.0;
         } else {
             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
@@ -4115,7 +4115,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
 
         // Determine SysSizInput electric heating design capacity sizing method
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HEATINGDESIGNCAPACITY")) {
-            SysSizInput(SysSizIndex).HeatingCapMethod = HeatingDesignCapacity;
+            SysSizInput(SysSizIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
             // SysSizInput( SysSizIndex ).ScaledHeatingCapacity = AutoSize can be set to autosize heating capacity
             SysSizInput(SysSizIndex).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
             if (SysSizInput(SysSizIndex).ScaledHeatingCapacity < 0.0 && SysSizInput(SysSizIndex).ScaledHeatingCapacity != AutoSize) {
@@ -4127,7 +4127,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CAPACITYPERFLOORAREA")) {
-            SysSizInput(SysSizIndex).HeatingCapMethod = CapacityPerFloorArea;
+            SysSizInput(SysSizIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
             if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledHeatingCapacity <= 0.0) {
@@ -4159,7 +4159,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FRACTIONOFAUTOSIZEDHEATINGCAPACITY")) {
-            SysSizInput(SysSizIndex).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+            SysSizInput(SysSizIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
             if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledHeatingCapacity < 0.0) {
@@ -4180,7 +4180,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "NONE")) {
-            SysSizInput(SysSizIndex).HeatingCapMethod = None;
+            SysSizInput(SysSizIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;
             SysSizInput(SysSizIndex).ScaledHeatingCapacity = 0.0;
         } else {
             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
@@ -4703,7 +4703,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
 
             // Determine supply air flow rate sizing method for cooling mode
             if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "SupplyAirFlowRate")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = SupplyAirFlowRate;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
                 if (!lNumericBlanks(iMaxCoolAirVolFlowNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iMaxCoolAirVolFlowNumericNum);
@@ -4724,7 +4724,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "FlowPerFloorArea")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = FlowPerFloorArea;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
                 if (!lNumericBlanks(iCoolFlowPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iCoolFlowPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
@@ -4752,7 +4752,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "FractionOfAutosizedCoolingAirflow")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = FractionOfAutosizedCoolingAirflow;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
                 if (!lNumericBlanks(iCoolFlowPerFracCoolNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iCoolFlowPerFracCoolNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
@@ -4781,7 +4781,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "FlowPerCoolingCapacity")) {
 
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = FlowPerCoolingCapacity;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
                 if (!lNumericBlanks(iCoolFlowPerCoolCapNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iCoolFlowPerCoolCapNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
@@ -4809,7 +4809,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "None") || lAlphaBlanks(iCoolSAFMAlphaNum)) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = None;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingSAFMethod = DataSizing::ZoneHVACSizingType::None;
                 state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = 0.0;
                 // cooling supply air flow rate will not be sized, may be cooling coil does not exist
             } else {
@@ -4819,7 +4819,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
             }
             // Determine supply air flow rate sizing method for heating mode
             if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "SupplyAirFlowRate")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = SupplyAirFlowRate;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
                 if (!lNumericBlanks(iMaxHeatAirVolFlowNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iMaxHeatAirVolFlowNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow == AutoSize)
@@ -4840,7 +4840,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "FlowPerFloorArea")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = FlowPerFloorArea;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
                 if (!lNumericBlanks(iHeatFlowPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iHeatFlowPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
@@ -4868,7 +4868,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "FractionOfAutosizedHeatingAirflow")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = FractionOfAutosizedHeatingAirflow;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
                 if (!lNumericBlanks(iHeatFlowPerFracCoolNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iHeatFlowPerFracCoolNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
@@ -4896,7 +4896,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "FlowPerHeatingCapacity")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = FlowPerHeatingCapacity;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
                 if (!lNumericBlanks(iHeatFlowPerHeatCapNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iHeatFlowPerHeatCapNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
@@ -4924,7 +4924,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "None") || lAlphaBlanks(iHeatSAFMAlphaNum)) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = None;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = DataSizing::ZoneHVACSizingType::None;
                 state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = 0.0;
             } else {
                 ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
@@ -4934,7 +4934,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
 
             // Determine supply air flow rate sizing method when cooling or heating is not needed
             if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "SupplyAirFlowRate")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = SupplyAirFlowRate;
+                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
                 if (!lNumericBlanks(iMaxNoCoolHeatAirVolFlowNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iMaxNoCoolHeatAirVolFlowNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow == AutoSize)
@@ -4955,7 +4955,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "FlowPerFloorArea")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = FlowPerFloorArea;
+                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
                 if (!lNumericBlanks(iNoCoolHeatFlowPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iNoCoolHeatFlowPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
@@ -4985,7 +4985,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "FractionOfAutosizedCoolingAirflow")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = FractionOfAutosizedCoolingAirflow;
+                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
                 if (!lNumericBlanks(iNoCoolHeatFlowPerFracCoolNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iNoCoolHeatFlowPerFracCoolNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
@@ -5015,7 +5015,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "FractionOfAutosizedHeatingAirflow")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = FractionOfAutosizedHeatingAirflow;
+                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
                 if (!lNumericBlanks(iNoCoolHeatFlowPerFracHeatNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iNoCoolHeatFlowPerFracHeatNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
@@ -5045,7 +5045,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "None") || lAlphaBlanks(iNoCoolHeatSAFMAlphaNum)) {
-                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = None;
+                state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::None;
                 state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = 0.0;
             } else {
                 ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
@@ -5055,7 +5055,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
 
             // Determine cooling design capacity of zoneHVAC equipment
             if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "CoolingDesignCapacity")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = CoolingDesignCapacity;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
                 if (!lNumericBlanks(iCoolDesignCapacityNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity = Numbers(iCoolDesignCapacityNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity == AutoSize)
@@ -5075,7 +5075,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "CapacityPerFloorArea")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = CapacityPerFloorArea;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!lNumericBlanks(iCoolCapacityPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity = Numbers(iCoolCapacityPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity <= 0.0) {
@@ -5100,7 +5100,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "FractionOfAutosizedCoolingCapacity")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
                 if (!lNumericBlanks(iCoolFracOfAutosizedCapacityNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity = Numbers(iCoolFracOfAutosizedCapacityNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity == AutoSize)
@@ -5121,7 +5121,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "None") || lAlphaBlanks(iCoolCAPMAlphaNum)) {
-                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = None;
+                state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = DataSizing::ZoneHVACSizingType::None;
             } else {
                 ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
                 ShowContinueError(state, "Illegal " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
@@ -5130,7 +5130,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
 
             // Determine heating design capacity of zone HVAC equipment
             if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = HeatingDesignCapacity;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
                 if (!lNumericBlanks(iHeatDesignCapacityNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity = Numbers(iHeatDesignCapacityNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity == AutoSize)
@@ -5150,7 +5150,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = CapacityPerFloorArea;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!lNumericBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity = Numbers(iHeatCapacityPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity <= 0.0) {
@@ -5175,7 +5175,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 if (!lNumericBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity = Numbers(iHeatFracOfAutosizedCapacityNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity == AutoSize)
@@ -5196,7 +5196,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "None") || lAlphaBlanks(iHeatCAPMAlphaNum)) {
-                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = None;
+                state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;
             } else {
                 ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
                 ShowContinueError(state, "Illegal " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));

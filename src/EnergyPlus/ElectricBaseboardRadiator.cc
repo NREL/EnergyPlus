@@ -181,9 +181,6 @@ namespace ElectricBaseboardRadiator {
 
         // Using/Aliasing
         using DataSizing::AutoSize;
-        using DataSizing::CapacityPerFloorArea;
-        using DataSizing::FractionOfAutosizedHeatingCapacity;
-        using DataSizing::HeatingDesignCapacity;
         using GlobalNames::VerifyUniqueBaseboardName;
         using ScheduleManager::GetScheduleIndex;
 
@@ -266,7 +263,7 @@ namespace ElectricBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                ElecBaseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
+                ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
 
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -288,7 +285,7 @@ namespace ElectricBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                ElecBaseboard(BaseboardNum).HeatingCapMethod = CapacityPerFloorArea;
+                ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
@@ -320,7 +317,7 @@ namespace ElectricBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                ElecBaseboard(BaseboardNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
@@ -707,7 +704,7 @@ namespace ElectricBaseboardRadiator {
         int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
                           // HeatingCapacitySizing, etc.)
         bool PrintFlag;   // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
@@ -727,9 +724,9 @@ namespace ElectricBaseboardRadiator {
             SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = ElecBaseboard(BaseboardNum).HeatingCapMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-            if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                if (CapSizingMethod == HeatingDesignCapacity) {
+            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
@@ -739,7 +736,7 @@ namespace ElectricBaseboardRadiator {
                     }
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
-                } else if (CapSizingMethod == CapacityPerFloorArea) {
+                } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                     if (state.dataSize->ZoneSizingRunDone) {
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
@@ -747,7 +744,7 @@ namespace ElectricBaseboardRadiator {
                     }
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     state.dataSize->DataScalableCapSizingON = true;
-                } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;

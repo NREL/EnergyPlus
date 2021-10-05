@@ -299,13 +299,13 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     CheckSysSizing(state, this->compType, this->compName);
                     DesVolFlow = this->dataFlowUsedForSizing;
                     Real64 NominalCapacityDes = 0.0;
-                    if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::FractionOfAutosizedCoolingCapacity) {
+                    if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                         this->dataFracOfAutosizedCoolingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedCoolingCapacity;
                     }
-                    if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::CapacityPerFloorArea) {
+                    if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                         NominalCapacityDes = this->finalSysSizing(this->curSysNum).CoolingTotalCapacity;
                         this->autoSizedValue = NominalCapacityDes;
-                    } else if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::CoolingDesignCapacity &&
+                    } else if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity &&
                                this->finalSysSizing(this->curSysNum).CoolingTotalCapacity > 0.0) {
                         NominalCapacityDes = this->finalSysSizing(this->curSysNum).CoolingTotalCapacity;
                         this->autoSizedValue = NominalCapacityDes;
@@ -446,8 +446,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                        this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, format("...Rated Total Cooling Capacity = {:.2T} [W]", this->autoSizedValue));
                     if (this->oaSysFlag || this->airLoopSysFlag ||
-                        this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::CapacityPerFloorArea ||
-                        (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::CoolingDesignCapacity &&
+                        this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                        (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity &&
                          this->finalSysSizing(this->curSysNum).CoolingTotalCapacity)) {
                         ShowContinueError(state,
                                           format("...Capacity passed by parent object to size child component = {:.2T} [W]", this->autoSizedValue));
@@ -538,10 +538,10 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
     }
     if (this->dataScalableCapSizingON) {
         auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingCapacitySizing)));
-        if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
+        if (SELECT_CASE_var == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
             this->sizingStringScalable = "(scaled by capacity / area) ";
-        } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||
-                   SELECT_CASE_var == DataSizing::FractionOfAutosizedCoolingCapacity) {
+        } else if (SELECT_CASE_var == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity ||
+                   SELECT_CASE_var == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
             this->sizingStringScalable = "(scaled by fractional multiplier) ";
         }
     }

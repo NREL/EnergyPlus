@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA = DataSizing::AutoSize; // reset to autosize to test new calculation
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).WaterVolFlowRateMax = DataSizing::AutoSize;
     // check UA value with autosized UA
-    state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
     EXPECT_EQ(state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA, 2000.0);
@@ -474,7 +474,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA = DataSizing::AutoSize; // reset to autosize to test new calculation
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).WaterVolFlowRateMax = DataSizing::AutoSize;
     // check UA value with autosized scaled capacity
-    state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
     EXPECT_EQ(state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA, 3000.0);

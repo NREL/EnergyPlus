@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 namespace EnergyPlus {
 
@@ -275,9 +276,9 @@ namespace UnitarySystems {
         int m_SuppHeatCoilIndex;
         int m_SuppHeatControlNodeNum;
         Real64 m_SupHeaterLoad;
-        int m_CoolingSAFMethod;
-        int m_HeatingSAFMethod;
-        int m_NoCoolHeatSAFMethod;
+        DataSizing::ZoneHVACSizingType m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::None;
+        DataSizing::ZoneHVACSizingType m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::None;
+        DataSizing::ZoneHVACSizingType m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::None;
         Real64 m_MaxNoCoolHeatAirVolFlow;
         UseCompFlow m_AirFlowControl;
         bool m_CoolingCoilUpstream;
@@ -935,15 +936,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     int numUnitarySystems = 0;
     bool economizerFlag = false;      // holds air loop economizer status
     bool SuppHeatingCoilFlag = false; // set to TRUE when simulating supplemental heating coil
-
-    // Supply Air Sizing Option
-    int const None = 1;
-    int const SupplyAirFlowRate = 2;
-    int const FlowPerFloorArea = 3;
-    int const FractionOfAutoSizedCoolingValue = 4;
-    int const FractionOfAutoSizedHeatingValue = 5;
-    int const FlowPerCoolingCapacity = 6;
-    int const FlowPerHeatingCapacity = 7;
 
     // Coil type for SimWater and SimSteamCoil
     int const CoolingCoil = 0;

@@ -355,7 +355,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneSizingInput(1).ZoneNum = state->dataSize->CurZoneEqNum;
     state->dataSize->ZoneEqSizing(1).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(1).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(1).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
     state->dataSize->FinalZoneSizing(1).OutTempAtHeatPeak = -20.0;
     state->dataSize->FinalZoneSizing(1).DesHeatCoilInTemp = -20.0; // simulates zone heating air flow rate <= zone OA flow rate
@@ -535,8 +535,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(20);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
-        static_cast<int>(AutoSizingType::HeatingAirFlowSizing); // TODO: This can't be right
+//    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
+//        static_cast<int>(AutoSizingType::HeatingAirFlowSizing); // TODO: This was being assigned a value of 14 which does not have meaning...
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 0.0;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
     state->dataSize->FinalZoneSizing.allocate(1);
@@ -691,8 +691,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(20);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
-        static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
+//    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
+//        static_cast<int>(AutoSizingType::HeatingAirFlowSizing);  // This made no sense...
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 0.0;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
     state->dataSize->FinalZoneSizing.allocate(1);
@@ -1758,7 +1758,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(25) = 0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(25) = DataSizing::ZoneHVACSizingType::None;
     state->dataSize->ZoneEqFanCoil = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
 

@@ -402,7 +402,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     Real64 unScaledCapacity = sizedValue;
 
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
-    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
+    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
     // start with an autosized value
@@ -422,7 +422,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;                                          // reset for next test
 
     // Test 16 - Airloop Equipment, with OA and precooling of OA stream, add scalable capacity per floor area sizing
-    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataSize->FinalSysSizing(1).CoolingTotalCapacity = 4500.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -437,7 +437,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 17 - Airloop Equipment, with OA and precooling of OA stream, add scalable capacity sizing
-    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
+    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
     state->dataSize->FinalSysSizing(1).CoolingTotalCapacity = 3500.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;

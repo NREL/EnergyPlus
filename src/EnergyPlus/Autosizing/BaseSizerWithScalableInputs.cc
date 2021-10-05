@@ -130,15 +130,15 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
 
     if (this->curZoneEqNum) {
         if (this->zoneHVACSizingIndex > 0) {
-            int coolingSAFMethod = this->zoneHVACSizing(this->zoneHVACSizingIndex).CoolingSAFMethod;
+            DataSizing::ZoneHVACSizingType coolingSAFMethod = this->zoneHVACSizing(this->zoneHVACSizingIndex).CoolingSAFMethod;
             this->zoneAirFlowSizMethod = coolingSAFMethod;
             this->dataFractionUsedForSizing = 1.0;
             this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
-            if (coolingSAFMethod == DataSizing::FlowPerFloorArea) {
+            if (coolingSAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                 state.dataSize->DataScalableSizingON = true;
                 this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow *
                                                   state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-            } else if (coolingSAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
+            } else if (coolingSAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
                 state.dataSize->DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
                 state.dataSize->DataScalableSizingON = true;
             }
@@ -146,11 +146,11 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             if (int(this->zoneEqSizing.size()) > 0 && int(this->zoneEqSizing(this->curZoneEqNum).SizingMethod.size()) > 0) {
                 this->zoneAirFlowSizMethod = this->zoneEqSizing(this->curZoneEqNum).SizingMethod(int(this->sizingType));
             } else {
-                this->zoneAirFlowSizMethod = 0;
+                this->zoneAirFlowSizMethod = DataSizing::ZoneHVACSizingType::None;
             }
-            if (this->zoneAirFlowSizMethod == 0) {
+            if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
                 // do nothing, sizing method not set
-            } else if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
+            } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
             }
         }
     }

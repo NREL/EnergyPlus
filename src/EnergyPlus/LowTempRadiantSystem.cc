@@ -268,11 +268,6 @@ namespace LowTempRadiantSystem {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using DataSizing::AutoSize;
-        using DataSizing::CapacityPerFloorArea;
-        using DataSizing::CoolingDesignCapacity;
-        using DataSizing::FractionOfAutosizedCoolingCapacity;
-        using DataSizing::FractionOfAutosizedHeatingCapacity;
-        using DataSizing::HeatingDesignCapacity;
         using FluidProperties::FindGlycol;
 
         using NodeInputManager::GetOnlySingleNode;
@@ -463,9 +458,9 @@ namespace LowTempRadiantSystem {
             // Determine Low Temp Radiant heating design capacity sizing method
             thisRadSysDesign.DesignHeatingCapMethodInput = Alphas(5);
             if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "HeatingDesignCapacity")) {
-                thisRadSysDesign.DesignHeatingCapMethod = HeatingDesignCapacity;
+                thisRadSysDesign.DesignHeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
             } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "CapacityPerFloorArea")) {
-                thisRadSysDesign.DesignHeatingCapMethod = CapacityPerFloorArea;
+                thisRadSysDesign.DesignHeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!lNumericBlanks(4)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(4);
                     if (thisRadSysDesign.DesignScaledHeatingCapacity <= 0.0) {
@@ -486,7 +481,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "FractionOfAutosizedHeatingCapacity")) {
-                thisRadSysDesign.DesignHeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                thisRadSysDesign.DesignHeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 if (!lNumericBlanks(5)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(5);
                     if (thisRadSysDesign.DesignScaledHeatingCapacity < 0.0) {
@@ -519,9 +514,9 @@ namespace LowTempRadiantSystem {
             // Determine Low Temp Radiant cooling design capacity sizing method
             thisRadSysDesign.DesignCoolingCapMethodInput = Alphas(7);
             if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "CoolingDesignCapacity")) {
-                thisRadSysDesign.DesignCoolingCapMethod = CoolingDesignCapacity;
+                thisRadSysDesign.DesignCoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
             } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "CapacityPerFloorArea")) {
-                thisRadSysDesign.DesignCoolingCapMethod = CapacityPerFloorArea;
+                thisRadSysDesign.DesignCoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!lNumericBlanks(7)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(7);
                     std::string a = cNumericFields(4);
@@ -543,7 +538,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "FractionOfAutosizedCoolingCapacity")) {
-                thisRadSysDesign.DesignCoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+                thisRadSysDesign.DesignCoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
                 if (!lNumericBlanks(8)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(8);
                     if (thisRadSysDesign.DesignScaledCoolingCapacity < 0.0) {
@@ -706,8 +701,8 @@ namespace LowTempRadiantSystem {
             thisRadSys.TubeLength = Numbers(1);
 
             // Determine Low Temp Radiant heating design capacity sizing method
-            if (variableFlowDesignDataObject.DesignHeatingCapMethod == HeatingDesignCapacity) {
-                thisRadSys.HeatingCapMethod = HeatingDesignCapacity;
+            if (variableFlowDesignDataObject.DesignHeatingCapMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
+                thisRadSys.HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
                 if (!lNumericBlanks(2)) {
                     thisRadSys.ScaledHeatingCapacity = Numbers(2);
                     if (thisRadSys.ScaledHeatingCapacity < 0.0 && thisRadSys.ScaledHeatingCapacity != AutoSize) {
@@ -723,11 +718,11 @@ namespace LowTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 }
-            } else if (variableFlowDesignDataObject.DesignHeatingCapMethod == CapacityPerFloorArea) {
-                thisRadSys.HeatingCapMethod = CapacityPerFloorArea;
+            } else if (variableFlowDesignDataObject.DesignHeatingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
+                thisRadSys.HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 thisRadSys.ScaledHeatingCapacity = variableFlowDesignDataObject.DesignScaledHeatingCapacity;
-            } else if (variableFlowDesignDataObject.DesignHeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
-                thisRadSys.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+            } else if (variableFlowDesignDataObject.DesignHeatingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                thisRadSys.HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 thisRadSys.ScaledHeatingCapacity = variableFlowDesignDataObject.DesignScaledHeatingCapacity;
             }
 
@@ -766,8 +761,8 @@ namespace LowTempRadiantSystem {
             }
 
             // Determine Low Temp Radiant cooling design capacity sizing method
-            if (variableFlowDesignDataObject.DesignCoolingCapMethod == CoolingDesignCapacity) {
-                thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
+            if (variableFlowDesignDataObject.DesignCoolingCapMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity) {
+                thisRadSys.CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
                 if (!lNumericBlanks(4)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(4);
                     if (thisRadSys.ScaledCoolingCapacity < 0.0 && thisRadSys.ScaledCoolingCapacity != AutoSize) {
@@ -783,11 +778,11 @@ namespace LowTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 }
-            } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == CapacityPerFloorArea) {
-                thisRadSys.CoolingCapMethod = CapacityPerFloorArea;
+            } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
+                thisRadSys.CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 thisRadSys.ScaledCoolingCapacity = variableFlowDesignDataObject.DesignScaledCoolingCapacity;
-            } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                thisRadSys.CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+            } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
+                thisRadSys.CoolingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity;
                 thisRadSys.ScaledCoolingCapacity = variableFlowDesignDataObject.DesignScaledCoolingCapacity;
             }
 
@@ -831,7 +826,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.CircLength = Numbers(6);
 
             if ((thisRadSys.WaterVolFlowMaxCool == AutoSize) &&
-                (variableFlowDesignDataObject.DesignCoolingCapMethod == 0 || lAlphaBlanks(8) || lAlphaBlanks(9) ||
+                (variableFlowDesignDataObject.DesignCoolingCapMethod == DataSizing::ZoneHVACSizingType::None || lAlphaBlanks(8) || lAlphaBlanks(9) ||
                  (thisRadSys.ColdWaterInNode <= 0) || (thisRadSys.ColdWaterOutNode <= 0) || (variableFlowDesignDataObject.ColdSetptSchedPtr == 0))) {
                 ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules");
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (cooling input) =" + Alphas(1));
@@ -1241,7 +1236,7 @@ namespace LowTempRadiantSystem {
             // Heating user input data
             // Determine Low Temp Radiant heating design capacity sizing method
             if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                thisElecSys.HeatingCapMethod = HeatingDesignCapacity;
+                thisElecSys.HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
                 if (!lNumericBlanks(iHeatDesignCapacityNumericNum)) {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatDesignCapacityNumericNum);
                     thisElecSys.MaxElecPower = thisElecSys.ScaledHeatingCapacity;
@@ -1259,7 +1254,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                thisElecSys.HeatingCapMethod = CapacityPerFloorArea;
+                thisElecSys.HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!lNumericBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatCapacityPerFloorAreaNumericNum);
                     thisElecSys.MaxElecPower = thisElecSys.ScaledHeatingCapacity;
@@ -1284,7 +1279,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                thisElecSys.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                thisElecSys.HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 if (!lNumericBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatFracOfAutosizedCapacityNumericNum);
                     thisElecSys.MaxElecPower = thisElecSys.ScaledHeatingCapacity;
@@ -2752,7 +2747,7 @@ namespace LowTempRadiantSystem {
         int FieldNum = 1;                    // IDD numeric field number where input field description is found
         int SizingMethod;                    // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
         bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
         Real64 DesCoilLoad;     // design autosized or user specified capacity
         OperatingMode OpMode(OperatingMode::ClgHtg); // System operating mode
@@ -2787,14 +2782,14 @@ namespace LowTempRadiantSystem {
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
-                    if (CapSizingMethod == HeatingDesignCapacity && state.dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity && state.dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
                         TempSize = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity;
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                    } else if (CapSizingMethod == CapacityPerFloorArea) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                         state.dataSize->DataScalableCapSizingON = true;
                         TempSize = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity *
                                    Zone(state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZonePtr).FloorArea;
@@ -2805,7 +2800,7 @@ namespace LowTempRadiantSystem {
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         state.dataSize->DataScalableCapSizingON = false;
                         state.dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower = TempSize;
-                    } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                         ShowSevereError(state,
                                         format("{}: auto-sizing cannot be done for {} = {}\".",
                                                RoutineName,
@@ -2817,9 +2812,9 @@ namespace LowTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                        CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                        if (CapSizingMethod == HeatingDesignCapacity) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                        CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                        if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
@@ -2832,7 +2827,7 @@ namespace LowTempRadiantSystem {
                             } else {
                                 TempSize = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity;
                             }
-                        } else if (CapSizingMethod == CapacityPerFloorArea) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
@@ -2843,7 +2838,7 @@ namespace LowTempRadiantSystem {
                                        Zone(state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZonePtr).FloorArea;
                             state.dataSize->DataScalableCapSizingON = true;
 
-                        } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
@@ -2886,14 +2881,14 @@ namespace LowTempRadiantSystem {
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
-                    if (CapSizingMethod == HeatingDesignCapacity && state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity && state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
                         TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity;
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                    } else if (CapSizingMethod == CapacityPerFloorArea) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                         state.dataSize->DataScalableCapSizingON = true;
                         TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity *
                                    Zone(state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr).FloorArea;
@@ -2902,7 +2897,7 @@ namespace LowTempRadiantSystem {
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                         state.dataSize->DataScalableCapSizingON = false;
-                    } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat == AutoSize) {
                             ShowSevereError(state,
                                             format("{}: auto-sizing cannot be done for {} = {}\".",
@@ -2916,9 +2911,9 @@ namespace LowTempRadiantSystem {
                         }
                     }
                 } else { // Autosize or hard-size with sizing run
-                    if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                        CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                        if (CapSizingMethod == HeatingDesignCapacity) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                        CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                        if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
@@ -2931,7 +2926,7 @@ namespace LowTempRadiantSystem {
                             } else {
                                 TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity;
                             }
-                        } else if (CapSizingMethod == CapacityPerFloorArea) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
@@ -2941,7 +2936,7 @@ namespace LowTempRadiantSystem {
                             TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity *
                                        Zone(state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr).FloorArea;
                             state.dataSize->DataScalableCapSizingON = true;
-                        } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
@@ -3068,13 +3063,13 @@ namespace LowTempRadiantSystem {
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
-                    if (CapSizingMethod == CoolingDesignCapacity && state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity > 0.0) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity && state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity > 0.0) {
                         TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity;
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
-                    } else if (CapSizingMethod == CapacityPerFloorArea) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                         state.dataSize->DataScalableCapSizingON = true;
                         TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity *
                                    Zone(state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr).FloorArea;
@@ -3083,7 +3078,7 @@ namespace LowTempRadiantSystem {
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                         state.dataSize->DataScalableCapSizingON = false;
-                    } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
+                    } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool == AutoSize) {
                             ShowSevereError(state,
                                             format("{}: auto-sizing cannot be done for {} = {}\".",
@@ -3097,9 +3092,9 @@ namespace LowTempRadiantSystem {
                         }
                     }
                 } else { // Autosize or hard-size with sizing run
-                    if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                        CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                        if (CapSizingMethod == CoolingDesignCapacity) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                        CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
+                        if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 SizingMethod = static_cast<int>(AutoSizingType::AutoCalculateSizing);
@@ -3112,7 +3107,7 @@ namespace LowTempRadiantSystem {
                             } else {
                                 TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity;
                             }
-                        } else if (CapSizingMethod == CapacityPerFloorArea) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                             if (state.dataSize->ZoneSizingRunDone) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
@@ -3122,7 +3117,7 @@ namespace LowTempRadiantSystem {
                             TempSize = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity *
                                        Zone(state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr).FloorArea;
                             state.dataSize->DataScalableCapSizingON = true;
-                        } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =

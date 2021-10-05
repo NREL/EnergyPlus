@@ -709,7 +709,7 @@ void BaseSizer::clearState()
 {
     stdRhoAir = 0.0;
 
-    zoneAirFlowSizMethod = 0;
+    zoneAirFlowSizMethod = DataSizing::ZoneHVACSizingType::None;
     dataScalableSizingON = false;
     dataScalableCapSizingON = false;
     isCoilReportObject = false; // provides access to coil reporting

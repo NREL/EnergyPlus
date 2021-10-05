@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -119,7 +120,7 @@ namespace HWBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
@@ -132,88 +133,57 @@ namespace HWBaseboardRadiator {
               AirInletTempStd(0.0), AirInletTemp(0.0), AirOutletTemp(0.0), AirInletHumRat(0.0), AirOutletTempStd(0.0), FracConvect(0.0),
               TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0),
               LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
-              HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+              ScaledHeatingCapacity(0.0)
         {
         }
     };
 
     struct HWBaseboardDesignData : HWBaseboardParams
     {
-        // Members
         std::string designName;
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        Real64 Offset;
-        Real64 FracRadiant;
-        Real64 FracDistribPerson;
-
-        // Default Constructor
-        HWBaseboardDesignData() : HeatingCapMethod(0), ScaledHeatingCapacity(0.0), Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
-        {
-        }
+        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 Offset = 0.0;
+        Real64 FracRadiant = 0.0;
+        Real64 FracDistribPerson = 0.0;
     };
 
     struct HWBaseboardNumericFieldData
     {
-        // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        HWBaseboardNumericFieldData()
-        {
-        }
     };
 
     struct HWBaseboardDesignNumericFieldData
     {
-        // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        HWBaseboardDesignNumericFieldData()
-        {
-        }
     };
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
-                        int const ActualZoneNum,
-                        int const ControlledZoneNum,
-                        bool const FirstHVACIteration,
+                        int ActualZoneNum,
+                        int ControlledZoneNum,
+                        bool FirstHVACIteration,
                         Real64 &PowerMet,
                         int &CompIndex);
 
     void GetHWBaseboardInput(EnergyPlusData &state);
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitHWBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub, bool FirstHVACIteration);
 
-    void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void SizeHWBaseboard(EnergyPlusData &state, int BaseboardNum);
 
     void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void UpdateHWBaseboard(EnergyPlusData &state, int BaseboardNum);
 
     void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
     void DistributeBBRadGains(EnergyPlusData &state);
 
-    void ReportHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void ReportHWBaseboard(EnergyPlusData &state, int BaseboardNum);
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
-    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,       // type index
-                                          std::string const &BaseboardName, // component name
-                                          int const EquipFlowCtrl,          // Flow control mode for the equipment
-                                          int const LoopNum,                // Plant loop index for where called from
-                                          int const LoopSide,               // Plant loop side index for where called from
-                                          int &CompIndex,                   // Chiller number pointer
-                                          bool const FirstHVACIteration,
-                                          bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
-    );
-
-    //*****************************************************************************************
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
 } // namespace HWBaseboardRadiator
 

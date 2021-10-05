@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -107,7 +108,7 @@ namespace CoolingPanelSimple {
         int CondErrIndex;
         Real64 ColdThrottlRange;
         Real64 RatedWaterTemp;
-        int CoolingCapMethod;
+        DataSizing::ZoneHVACSizingType CoolingCapMethod = DataSizing::ZoneHVACSizingType::None;
         Real64 ScaledCoolingCapacity;
         Real64 UA;
         Real64 Offset;
@@ -146,7 +147,7 @@ namespace CoolingPanelSimple {
         CoolingPanelParams()
             : EquipType(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
               CompErrIndex(0), ControlType(Control::Unassigned), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE), CondDewPtDeltaT(0.0),
-              CondErrIndex(0), ColdThrottlRange(0.0), RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0), UA(0.0), Offset(0.0),
+              CondErrIndex(0), ColdThrottlRange(0.0), RatedWaterTemp(0.0), ScaledCoolingCapacity(0.0), UA(0.0), Offset(0.0),
               WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0),
               WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0),
               RatedZoneAirTemp(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0),

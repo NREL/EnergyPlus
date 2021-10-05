@@ -364,9 +364,9 @@ namespace SteamBaseboardRadiator {
 
             // Determine steam baseboard radiator system heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = HeatingDesignCapacity;
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = CapacityPerFloorArea;
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -405,7 +405,7 @@ namespace SteamBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -577,7 +577,7 @@ namespace SteamBaseboardRadiator {
                         "Hot Steam Nodes");
 
             // Determine steam baseboard radiator system heating design capacity sizing method
-            if (SteamBaseboardDesignDataObject.HeatingCapMethod == HeatingDesignCapacity) {
+            if (SteamBaseboardDesignDataObject.HeatingCapMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -603,10 +603,10 @@ namespace SteamBaseboardRadiator {
                                       "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
-            } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == CapacityPerFloorArea) {
+            } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity =
                     SteamBaseboardDesignDataObject.DesignScaledHeatingCapacity;
-            } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+            } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity =
                     SteamBaseboardDesignDataObject.DesignScaledHeatingCapacity;
             }
@@ -1095,7 +1095,7 @@ namespace SteamBaseboardRadiator {
         int FieldNum = 1;                    // IDD numeric field number where input field description is found
         int SizingMethod;                    // Integer representation of sizing method name (HeatingCapacitySizing)
         bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
+        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
         auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
@@ -1141,24 +1141,24 @@ namespace SteamBaseboardRadiator {
                     SizingString = state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
                     CapSizingMethod = SteamBaseboardDesignDataObject.HeatingCapMethod;
                     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                    if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                        CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                        CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
 
-                        if (CapSizingMethod == HeatingDesignCapacity) {
+                        if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                             if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                                 CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             }
                             TempSize = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
-                        } else if (CapSizingMethod == CapacityPerFloorArea) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity *
                                 state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             state.dataSize->DataScalableCapSizingON = true;
-                        } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                        } else if (CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity =

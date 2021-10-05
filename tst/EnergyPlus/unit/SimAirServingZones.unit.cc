@@ -233,8 +233,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     state->dataSize->FinalSysSizing.allocate(AirLoopNum);
 
     // set system flow sizing method for cooling
-    state->dataSize->FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
-    state->dataSize->FinalSysSizing(AirLoopNum).CoolingCapMethod = CoolingDesignCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;
     state->dataSize->FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = 12500.0;
     state->dataSize->FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
     // scale cooling flow rate using user input capacity
@@ -246,8 +246,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     EXPECT_DOUBLE_EQ(0.755125, state->dataSize->FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
     // set system flow sizing method for heating
-    state->dataSize->FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
-    state->dataSize->FinalSysSizing(AirLoopNum).HeatingCapMethod = HeatingDesignCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::HeatingDesignCapacity;
     state->dataSize->FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = 14400.0;
     state->dataSize->FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
     // scale heating flow rate using user input capacity
@@ -274,8 +274,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     state->dataSize->FinalSysSizing.allocate(AirLoopNum);
 
     // set system flow sizing method for cooling
-    state->dataSize->FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
-    state->dataSize->FinalSysSizing(AirLoopNum).CoolingCapMethod = CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).CoolingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataSize->FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = 10.4732; // Watts per m2 floor area
     state->dataSize->FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
     state->dataSize->FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 61.450534421531373;
@@ -289,8 +289,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     EXPECT_DOUBLE_EQ(0.038878893558427413, state->dataSize->FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
     // set system flow sizing method for heating
-    state->dataSize->FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
-    state->dataSize->FinalSysSizing(AirLoopNum).HeatingCapMethod = CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).HeatingCapMethod = DataSizing::ZoneHVACSizingType::CapacityPerFloorArea;
     state->dataSize->FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = 32.0050; // Watts per m2 floor area
     state->dataSize->FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
     state->dataSize->FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 61.450534421531373;

@@ -928,7 +928,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     state->dataSize->NumZoneSizingInput = 1;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(static_cast<int>(AutoSizingType::Num));
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(SizingType) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(SizingType) = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
     // Now, we're ready to call the function
     bool errorsFound = false;

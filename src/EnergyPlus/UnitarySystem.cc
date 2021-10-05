@@ -146,7 +146,7 @@ namespace UnitarySystems {
           m_DesignSuppHeatingCapacity(0.0), m_SuppCoilAirInletNode(0), m_SuppCoilAirOutletNode(0),
 
           m_SuppCoilFluidInletNode(0), m_MaxSuppCoilFluidFlow(0.0), m_SuppHeatCoilIndex(0), m_SuppHeatControlNodeNum(0), m_SupHeaterLoad(0.0),
-          m_CoolingSAFMethod(0), m_HeatingSAFMethod(0), m_NoCoolHeatSAFMethod(0), m_MaxNoCoolHeatAirVolFlow(0.0),
+          m_MaxNoCoolHeatAirVolFlow(0.0),
           m_AirFlowControl(UseCompFlow::FlowNotYetSet), m_CoolingCoilUpstream(true), m_MaxOATSuppHeat(0.0), m_MinOATCompressorCooling(0.0),
           m_MinOATCompressorHeating(0.0), m_MaxONOFFCyclesperHour(0.0), m_HPTimeConstant(0.0), m_OnCyclePowerFraction(0.0), m_FanDelayTime(0.0),
           m_AncillaryOnPower(0.0), m_AncillaryOffPower(0.0), m_DesignHRWaterVolumeFlow(0.0), m_MaxHROutletWaterTemp(0.0), m_HeatRecActive(false),
@@ -1652,8 +1652,8 @@ namespace UnitarySystems {
         std::string SizingString;
         std::string CompName = this->Name;
         std::string CompType = this->UnitType;
-        int CoolingSAFlowMethod = this->m_CoolingSAFMethod;
-        int HeatingSAFlowMethod = this->m_HeatingSAFMethod;
+        DataSizing::ZoneHVACSizingType CoolingSAFlowMethod = this->m_CoolingSAFMethod;
+        DataSizing::ZoneHVACSizingType HeatingSAFlowMethod = this->m_HeatingSAFMethod;
         // can't reset this to 0 for systems where DX heating coil is in downstream unit and DX cooling coil is in upstream unit
         //        DXCoolCap = 0.0;
         state.dataSize->UnitaryHeatCap = 0.0;
@@ -1718,18 +1718,18 @@ namespace UnitarySystems {
             // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
             if (this->UnitType == "AirLoopHVAC:UnitarySystem") state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
             bool errorsFound = false;
-            if ((CoolingSAFlowMethod == state.dataUnitarySystems->SupplyAirFlowRate) || (CoolingSAFlowMethod == state.dataUnitarySystems->None)) {
+            if ((CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) || (CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysCoolingFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-            } else if (CoolingSAFlowMethod == state.dataUnitarySystems->FlowPerFloorArea) {
+            } else if (CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysCoolingFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
-            } else if (CoolingSAFlowMethod == state.dataUnitarySystems->FractionOfAutoSizedCoolingValue) {
+            } else if (CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
                 TempSize = DataSizing::AutoSize;
                 CoolingAirFlowSizer sizingCoolingAirFlow;
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
@@ -1737,7 +1737,7 @@ namespace UnitarySystems {
                 SysCoolingFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 SysCoolingFlow *= this->m_MaxCoolAirVolFlow;
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
-            } else if (CoolingSAFlowMethod == state.dataUnitarySystems->FlowPerCoolingCapacity) {
+            } else if (CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) {
                 if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) {
                     TempSize = DataSizing::AutoSize;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1782,7 +1782,7 @@ namespace UnitarySystems {
             EqSizing.CoolingAirVolFlow = SysCoolingFlow;
 
             // Cooling airflow should be known at this point. Now find DataSizing::AutoSized design cooling capacity.
-            if (CoolingSAFlowMethod != state.dataUnitarySystems->FlowPerCoolingCapacity && this->m_DesignCoolingCapacity < 0.0) {
+            if (CoolingSAFlowMethod != DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity && this->m_DesignCoolingCapacity < 0.0) {
                 SizingMethod = static_cast<int>(AutoSizingType::CoolingCapacitySizing);
                 state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
@@ -1813,7 +1813,7 @@ namespace UnitarySystems {
                 }
             } else {
                 if (!HardSizeNoDesRun &&
-                    (CoolingSAFlowMethod != state.dataUnitarySystems->FlowPerCoolingCapacity && this->m_DesignCoolingCapacity > 0.0)) {
+                    (CoolingSAFlowMethod != DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity && this->m_DesignCoolingCapacity > 0.0)) {
                     // corrected code for #8756
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
@@ -1855,14 +1855,14 @@ namespace UnitarySystems {
             TempSize = this->m_MaxHeatAirVolFlow;
             SaveCurDuctType = state.dataSize->CurDuctType;
             state.dataSize->CurDuctType = DataHVACGlobals::Heating;
-            if ((HeatingSAFlowMethod == state.dataUnitarySystems->SupplyAirFlowRate) || (HeatingSAFlowMethod == state.dataUnitarySystems->None)) {
+            if ((HeatingSAFlowMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) || (HeatingSAFlowMethod == DataSizing::ZoneHVACSizingType::None)) {
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysHeatingFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
-            } else if (HeatingSAFlowMethod == state.dataUnitarySystems->FlowPerFloorArea) {
+            } else if (HeatingSAFlowMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
@@ -1870,7 +1870,7 @@ namespace UnitarySystems {
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysHeatingFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
-            } else if (HeatingSAFlowMethod == state.dataUnitarySystems->FractionOfAutoSizedHeatingValue) {
+            } else if (HeatingSAFlowMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
                 TempSize = DataSizing::AutoSize;
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -1880,7 +1880,7 @@ namespace UnitarySystems {
                 SysHeatingFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 SysHeatingFlow *= this->m_MaxHeatAirVolFlow;
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
-            } else if (HeatingSAFlowMethod == state.dataUnitarySystems->FlowPerHeatingCapacity) {
+            } else if (HeatingSAFlowMethod == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) {
                 TempSize = DataSizing::AutoSize;
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -1920,7 +1920,7 @@ namespace UnitarySystems {
             EqSizing.HeatingAirVolFlow = SysHeatingFlow;
 
             // Heating airflow should be known at this point. Now find DataSizing::AutoSized design heating capacity.
-            if (HeatingSAFlowMethod != state.dataUnitarySystems->FlowPerHeatingCapacity && this->m_DesignHeatingCapacity == DataSizing::AutoSize) {
+            if (HeatingSAFlowMethod != DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity && this->m_DesignHeatingCapacity == DataSizing::AutoSize) {
                 SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
                 state.dataSize->DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
@@ -1942,7 +1942,7 @@ namespace UnitarySystems {
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
-                if (!HardSizeNoDesRun && (HeatingSAFlowMethod != state.dataUnitarySystems->FlowPerHeatingCapacity &&
+                if (!HardSizeNoDesRun && (HeatingSAFlowMethod != DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity &&
                                           this->m_DesignHeatingCapacity != DataSizing::AutoSize)) {
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         SizingMethod = static_cast<int>(AutoSizingType::HeatingCapacitySizing);
@@ -2126,7 +2126,7 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
                 }
             }
-            if (this->m_NoCoolHeatSAFMethod <= state.dataUnitarySystems->SupplyAirFlowRate && this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_NoCoolHeatSAFMethod <= DataSizing::ZoneHVACSizingType::SupplyAirFlowRate && this->m_ControlType == ControlType::CCMASHRAE) {
                 if (this->m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
                     state.dataSize->DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
@@ -2150,17 +2150,17 @@ namespace UnitarySystems {
                     state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
                     state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
-            } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FractionOfAutoSizedCoolingValue) {
+            } else if (this->m_NoCoolHeatSAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.CoolingAirVolFlow;
                 state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
-            } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FractionOfAutoSizedHeatingValue) {
+            } else if (this->m_NoCoolHeatSAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.HeatingAirVolFlow;
                 state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
-            } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FlowPerCoolingCapacity) {
+            } else if (this->m_NoCoolHeatSAFMethod == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) {
                 if (EqSizing.DesCoolingLoad <= 0.0) {
                     // water coils not sizing yet
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
@@ -2178,7 +2178,7 @@ namespace UnitarySystems {
                 state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
-            } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FlowPerHeatingCapacity) {
+            } else if (this->m_NoCoolHeatSAFMethod == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) {
                 if (EqSizing.DesHeatingLoad <= 0.0) {
                     // water coil not sizing yet
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -5824,7 +5824,7 @@ namespace UnitarySystems {
 
         // Determine supply air flow rate sizing method for cooling mode
         if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "SupplyAirFlowRate")) {
-            this->m_CoolingSAFMethod = state.dataUnitarySystems->SupplyAirFlowRate;
+            this->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
             if (loc_m_CoolingSAFMethod_SAFlow != -999.0) {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_SAFlow;
@@ -5849,7 +5849,7 @@ namespace UnitarySystems {
             }
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "FlowPerFloorArea")) {
 
-            this->m_CoolingSAFMethod = state.dataUnitarySystems->FlowPerFloorArea;
+            this->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
             if (loc_m_CoolingSAFMethod_SAFlowPerFloorArea != -999.0) {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_SAFlowPerFloorArea;
                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
@@ -5879,7 +5879,7 @@ namespace UnitarySystems {
             }
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "FractionOfAutosizedCoolingValue")) {
 
-            this->m_CoolingSAFMethod = state.dataUnitarySystems->FractionOfAutoSizedCoolingValue;
+            this->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
             if (loc_m_CoolingSAFMethod_FracOfAutosizedCoolingSAFlow != -999.0) {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_FracOfAutosizedCoolingSAFlow;
                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
@@ -5908,7 +5908,7 @@ namespace UnitarySystems {
             }
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "FlowPerCoolingCapacity")) {
 
-            this->m_CoolingSAFMethod = state.dataUnitarySystems->FlowPerCoolingCapacity;
+            this->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
             if (loc_m_CoolingSAFMethod_FlowPerCoolingCapacity != -999.0) {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_FlowPerCoolingCapacity;
                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
@@ -5937,7 +5937,7 @@ namespace UnitarySystems {
             }
 
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "None") || loc_m_CoolingSAFMethod == "") {
-            this->m_CoolingSAFMethod = state.dataUnitarySystems->None;
+            this->m_CoolingSAFMethod = DataSizing::ZoneHVACSizingType::None;
             if (this->m_CoolCoilExists && this->m_MaxCoolAirVolFlow == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 if (this->m_HeatCoilExists) {
@@ -5958,7 +5958,7 @@ namespace UnitarySystems {
 
         // Determine supply air flow rate sizing method for heating mode
         if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "SupplyAirFlowRate")) {
-            this->m_HeatingSAFMethod = state.dataUnitarySystems->SupplyAirFlowRate;
+            this->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
             if (loc_m_HeatingSAFMethod_SAFlow != -999.0) {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_SAFlow;
                 if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
@@ -5980,7 +5980,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "FlowPerFloorArea")) {
-            this->m_HeatingSAFMethod = state.dataUnitarySystems->FlowPerFloorArea;
+            this->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
             if (loc_m_HeatingSAFMethod_SAFlowPerFloorArea != -999.0) {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_SAFlowPerFloorArea;
                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6009,7 +6009,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "FractionOfAutosizedHeatingValue")) {
-            this->m_HeatingSAFMethod = state.dataUnitarySystems->FractionOfAutoSizedHeatingValue;
+            this->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
             if (loc_m_HeatingSAFMethod_FracOfAutosizedHeatingSAFlow != -999.0) {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_FracOfAutosizedHeatingSAFlow;
                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6037,7 +6037,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "FlowPerHeatingCapacity")) {
-            this->m_HeatingSAFMethod = state.dataUnitarySystems->FlowPerHeatingCapacity;
+            this->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
             if (loc_m_HeatingSAFMethod_FlowPerHeatingCapacity != -999.0) {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_FlowPerHeatingCapacity;
                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6065,7 +6065,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "None") || loc_m_HeatingSAFMethod == "") {
-            this->m_HeatingSAFMethod = state.dataUnitarySystems->None;
+            this->m_HeatingSAFMethod = DataSizing::ZoneHVACSizingType::None;
             if (this->m_HeatCoilExists && this->m_MaxHeatAirVolFlow == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 if (loc_m_HeatingSAFMethod == "") {
@@ -6091,7 +6091,7 @@ namespace UnitarySystems {
 
         // Determine supply air flow rate sizing method when cooling or heating is not needed
         if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "SupplyAirFlowRate")) {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->SupplyAirFlowRate;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
             if (loc_m_NoCoolHeatSAFMethod_SAFlow != -999.0) {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_SAFlow;
                 if (this->m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
@@ -6112,7 +6112,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FlowPerFloorArea")) {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->FlowPerFloorArea;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerFloorArea;
             if (loc_m_NoCoolHeatSAFMethod_SAFlowPerFloorArea != -999.0) {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_SAFlowPerFloorArea;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6140,7 +6140,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FractionOfAutosizedCoolingValue")) {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->FractionOfAutoSizedCoolingValue;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
             if (loc_m_NoCoolHeatSAFMethod_FracOfAutosizedCoolingSAFlow != -999.0) {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_FracOfAutosizedCoolingSAFlow;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6169,7 +6169,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FractionOfAutosizedHeatingValue")) {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->FractionOfAutoSizedHeatingValue;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
             if (loc_m_NoCoolHeatSAFMethod_FracOfAutosizedHeatingSAFlow != -999.0) {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_FracOfAutosizedHeatingSAFlow;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6198,7 +6198,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FlowPerCoolingCapacity")) {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->FlowPerCoolingCapacity;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
             if (loc_m_NoCoolHeatSAFMethod_FlowPerCoolingCapacity != -999.0) {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_FlowPerCoolingCapacity;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6226,7 +6226,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FlowPerHeatingCapacity")) {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->FlowPerHeatingCapacity;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
             if (loc_m_NoCoolHeatSAFMethod_FlowPerHeatingCapacity != -999.0) {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_FlowPerHeatingCapacity;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
@@ -6254,7 +6254,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
-            this->m_NoCoolHeatSAFMethod = state.dataUnitarySystems->None;
+            this->m_NoCoolHeatSAFMethod = DataSizing::ZoneHVACSizingType::None;
             if (this->m_ControlType == ControlType::CCMASHRAE) {
                 if (loc_m_NoCoolHeatSAFMethod_SAFlow == -99999.0) { // no load air flow is autosized
                     this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
