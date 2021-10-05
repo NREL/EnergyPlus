@@ -175,13 +175,7 @@ namespace WaterToAirHeatPumpSimple {
                                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
     void GetSimpleWatertoAirHPInput(EnergyPlusData &state);
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
                                 int const HPNum,                    // Current HPNum under simulation

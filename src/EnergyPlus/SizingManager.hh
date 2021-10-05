@@ -105,12 +105,6 @@ namespace SizingManager {
 
     void GetZoneAirDistribution(EnergyPlusData &state);
 
-    void GetZoneHVACSizing(EnergyPlusData &state);
-
-    void GetAirTerminalSizing(EnergyPlusData &state);
-
-    void GetSizingParams(EnergyPlusData &state);
-
     void GetZoneSizingInput(EnergyPlusData &state);
 
     void ReportTemperatureInputError(EnergyPlusData &state,
@@ -120,14 +114,7 @@ namespace SizingManager {
                                      bool const shouldFlagSevere,
                                      bool &ErrorsFound);
 
-    void GetZoneAndZoneListNames(
-        EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
-
-    void GetSystemSizingInput(EnergyPlusData &state);
-
     void GetPlantSizingInput(EnergyPlusData &state);
-
-    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
     void ReportZoneSizing(EnergyPlusData &state,
                           std::string const &ZoneName,   // the name of the zone
@@ -144,18 +131,6 @@ namespace SizingManager {
                           Real64 TotOccs,                // design number of occupants for the zone
                           Real64 MinOAVolFlow,           // zone design minimum outside air flow rate [m3/s]
                           Real64 DOASHeatAddRate         // zone design heat addition rate from the DOAS [W]
-    );
-
-    void ReportSysSizing(EnergyPlusData &state,
-                         std::string const &SysName,      // the name of the zone
-                         std::string const &LoadType,     // either "Cooling" or "Heating"
-                         std::string const &PeakLoadType, // either "Sensible" or "Total"
-                         Real64 const &UserDesCap,        // User  Design Capacity
-                         Real64 const &CalcDesVolFlow,    // Calculated  Design Air Flow Rate
-                         Real64 const &UserDesVolFlow,    // User Design Air Flow Rate
-                         std::string const &DesDayName,   // the name of the design day that produced the peak
-                         std::string const &DesDayDate,   // the date that produced the peak
-                         int const &TimeStepIndex         // time step of the peak
     );
 
     std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);

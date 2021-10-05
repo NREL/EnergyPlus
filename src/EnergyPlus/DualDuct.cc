@@ -192,9 +192,6 @@ namespace DualDuct {
         }
     }
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetDualDuctInput(EnergyPlusData &state)
     {
 
@@ -859,12 +856,6 @@ namespace DualDuct {
         }
     }
 
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void DualDuctAirTerminal::InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
@@ -1230,12 +1221,6 @@ namespace DualDuct {
             }
         }
     }
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
 
     void DualDuctAirTerminal::SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum)
     {

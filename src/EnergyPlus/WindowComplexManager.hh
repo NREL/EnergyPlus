@@ -239,8 +239,6 @@ namespace WindowComplexManager {
                        Array1S<Real64> const ytab // Table of values, monotonic, ascending order
     );
 
-    //=================================================================================================
-
 } // namespace WindowComplexManager
 
 struct WindowComplexManagerData : BaseGlobalStruct

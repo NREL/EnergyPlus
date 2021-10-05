@@ -82,8 +82,6 @@ namespace WindowManager {
 
     void InitGlassOpticalCalculations(EnergyPlusData &state);
 
-    //*****************************************************************************************
-
     void W5InitGlassParameters(EnergyPlusData &state);
 
     //****************************************************************************
@@ -96,8 +94,6 @@ namespace WindowManager {
                                        Real64 const wlbot, // Lowest and highest wavelength considered
                                        Real64 const wltop);
 
-    //************************************************************************
-
     void SystemPropertiesAtLambdaAndPhi(EnergyPlusData &state,
                                         int const n, // Number of glass layers
                                         Real64 &tt,  // System transmittance
@@ -106,21 +102,15 @@ namespace WindowManager {
                                         Array1A<Real64> aft // System absorptance of each glass layer
     );
 
-    //*************************************************************************
-
     void SolarSprectrumAverage(EnergyPlusData &state,
                                Array1A<Real64> p, // Quantity to be weighted by solar spectrum
                                Real64 &psol       // Quantity p weighted by solar spectrum
     );
 
-    //********************************************************************
-
     void VisibleSprectrumAverage(EnergyPlusData &state,
                                  Array1A<Real64> p, // Quantity to be weighted by solar spectrum
                                  Real64 &pvis       // Quantity p weighted by solar spectrum and photopic
     );
-
-    //**********************************************************************
 
     void Interpolate(Array1A<Real64> x, // Array of data points for independent variable
                      Array1A<Real64> y, // Array of data points for dependent variable
@@ -158,11 +148,7 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    //****************************************************************************
-
     void WindowHeatBalanceEquations(EnergyPlusData &state, int const SurfNum); // Surface number
-
-    //****************************************************************************
 
     void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
                                           int const nglasslayer,     // Number of glass layers
@@ -171,8 +157,6 @@ namespace WindowManager {
                                           Array2D<Real64> &Aface,    // Coefficient in equation Aface*thetas = Bface
                                           Array1D<Real64> &Bface     // Coefficient in equation Aface*thetas = Bface
     );
-
-    //****************************************************************************
 
     void GetHeatBalanceEqCoefMatrix(EnergyPlusData &state,
                                     int const SurfNum,
@@ -198,11 +182,7 @@ namespace WindowManager {
                                     Array2D<Real64> &Aface,
                                     Array1D<Real64> &Bface);
 
-    //****************************************************************************
-
     void SolveForWindowTemperatures(EnergyPlusData &state, int const SurfNum); // Surface number
-
-    //****************************************************************************
 
     void ExtOrIntShadeNaturalFlow(EnergyPlusData &state,
                                   int const SurfNum,  // Surface number
@@ -214,8 +194,6 @@ namespace WindowManager {
                                   Real64 &QConvGap    // Convective heat gain from glass-shade/blind gap for interior shade (W)
     );
 
-    //****************************************************************************
-
     void BetweenGlassShadeNaturalFlow(EnergyPlusData &state,
                                       int const SurfNum,       // Surface number
                                       int const iter,          // Iteration number for glass heat balance calculation
@@ -223,8 +201,6 @@ namespace WindowManager {
                                       Array1A<Real64> TGapNew, // Current-iteration average gas temp in gaps (K)
                                       Array1A<Real64> hcv      // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
     );
-
-    //****************************************************************************
 
     void BetweenGlassForcedFlow(EnergyPlusData &state,
                                 int const SurfNum,  // Surface number
@@ -236,8 +212,6 @@ namespace WindowManager {
                                 Real64 &QConvGap    // Convective heat gain from air flow gap (W)
     );
 
-    //****************************************************************************
-
     void BetweenGlassShadeForcedFlow(EnergyPlusData &state,
                                      int const SurfNum,       // Surface number
                                      int const iter,          // Iteration number for glass heat balance calculation
@@ -248,8 +222,6 @@ namespace WindowManager {
                                      Real64 &QConvTot         // Sum of convective heat flow from gaps (W)
     );
 
-    //****************************************************************************
-
     void LUdecomposition(EnergyPlusData &state,
                          Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
@@ -257,15 +229,11 @@ namespace WindowManager {
                          Real64 &d             // +1 if even number of row interchange is even, -1
     );
 
-    //**************************************************************************
-
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
                     Array1D_int const &indx, // Vector of row permutations
                     Array1D<Real64> &b       // Matrix and vector in a.x = b;
     );
-
-    //******************************************************************************
 
     void WindowGasConductance(EnergyPlusData &state,
                               Real64 const tleft,  // Temperature of gap surface closest to outside (K)
@@ -276,8 +244,6 @@ namespace WindowManager {
                               Real64 &gr           // Gap gas Grashof number
     );
 
-    //******************************************************************************
-
     void WindowGasPropertiesAtTemp(EnergyPlusData &state,
                                    Real64 const tmean, // Temperature of gas in gap (K)
                                    int const IGap,     // Gap number
@@ -285,14 +251,10 @@ namespace WindowManager {
                                    Real64 &visc        // Gap gas dynamic viscosity at tmean (g/m-s)
     );
 
-    //********************************************************************************
-
     void StartingWindowTemps(EnergyPlusData &state,
                              int const SurfNum,          // Surface number
                              Array1A<Real64> AbsRadShade // Short-wave radiation absorbed by shade/blind faces
     );
-
-    //****************************************************************************
 
     void NusseltNumber(EnergyPlusData &state,
                        int const SurfNum, // Surface number
@@ -303,8 +265,6 @@ namespace WindowManager {
                        Real64 const pr,   // Gap gas Prandtl number
                        Real64 &gnu        // Gap gas Nusselt number
     );
-
-    //*******************************************************************************************************
 
     void TransAndReflAtPhi(Real64 const cs,                // Cosine of incidence angle
                            Real64 const tf0,               // Transmittance at zero incidence angle
@@ -331,8 +291,6 @@ namespace WindowManager {
                                         Real64 const Fx2y1,
                                         Real64 const Fx2y2);
 
-    //**************************************************************************
-
     void W5LsqFit(Array1S<Real64> const IndepVar, // Independent variables
                   Array1S<Real64> const DepVar,   // Dependent variables
                   int const N,                    // Order of polynomial
@@ -340,8 +298,6 @@ namespace WindowManager {
                   int const N2,
                   Array1S<Real64> CoeffsCurve // Polynomial coeffients from fit
     );
-
-    //********************************************************************************
 
     void W5LsqFit2(Array1A<Real64> const IndepVar, // Independent variables
                    Array1A<Real64> const DepVar,   // Dependent variables
@@ -351,19 +307,11 @@ namespace WindowManager {
                    Array1A<Real64> CoeffsCurve // Polynomial coeffients from fit
     );
 
-    //***********************************************************************
-
     Real64 DiffuseAverage(Array1S<Real64> const PropertyValue); // Property value at angles of incidence
-
-    //*************************************************************************************
 
     Real64 DiffuseAverageProfAngGnd(Array1S<Real64> const Property); // Property value vs. profile angle
 
-    //*************************************************************************************
-
     Real64 DiffuseAverageProfAngSky(Array1S<Real64> const Property); // Property value vs. profile angle
-
-    //*************************************************************************************
 
     void CalcWinFrameAndDividerTemps(EnergyPlusData &state,
                                      int const SurfNum,     // Surface number
@@ -374,8 +322,6 @@ namespace WindowManager {
                                      Real64 const Outir,    // Exterior IR irradiance from sky and ground
                                      int const ConstrNum    // Construction number of window
     );
-
-    //************************************************************************************
 
     void CalcNominalWindowCond(EnergyPlusData &state,
                                int const ConstrNum,        // Construction number
@@ -396,27 +342,17 @@ namespace WindowManager {
                                Real64 &TSolNorm                   // Overall beam solar transmittance at normal incidence
     );
 
-    //****************************************************************************
-
     void WindowTempsForNominalCond(EnergyPlusData &state,
                                    int const ConstrNum,  // Construction number
                                    Array1A<Real64> hgap, // Gap gas conductive conductance (W/m2-K)
                                    Real64 const adjRatio // adjusment Ratio to hcin
     );
 
-    //****************************************************************************
-
     void StartingWinTempsForNominalCond(EnergyPlusData &state);
-
-    //****************************************************************************
 
     void ReportGlass(EnergyPlusData &state);
 
-    //*************************************************************************************
-
     void CalcWindowBlindProperties(EnergyPlusData &state);
-
-    //*************************************************************************************
 
     void CalcWindowScreenProperties(EnergyPlusData &state);
 
@@ -428,8 +364,6 @@ namespace WindowManager {
                             Array1A<Real64> p        // Blind properties
     );
 
-    //**********************************************************************************************
-
     void BlindOpticsBeam(EnergyPlusData &state,
                          int const BlindNum,      // Blind number
                          Array1A<Real64> const c, // Slat properties (equivalent to BLD_PR)
@@ -438,16 +372,12 @@ namespace WindowManager {
                          Array1A<Real64> p        // Blind properties (equivalent to ST_LAY)
     );
 
-    //********************************************************************************************
-
     void ViewFac(Real64 const s,    // Slat width (m)
                  Real64 const h,    // Distance between faces of adjacent slats (m)
                  Real64 const phib, // Elevation angle of normal to slat (radians)
                  Real64 const phis, // Profile angle of radiation source (radians)
                  Array2A<Real64> F  // View factor array
     );
-
-    //*****************************************************************************************
 
     void InvertMatrix(EnergyPlusData &state,
                       Array2A<Real64> a, // Matrix to be inverted
@@ -456,8 +386,6 @@ namespace WindowManager {
                       int const np,      // Dimension of matrix
                       int const n);
 
-    //*****************************************************************************************
-
     void LUDCMP(EnergyPlusData &state,
                 Array2A<Real64> A, // matrix
                 int const N,
@@ -465,19 +393,13 @@ namespace WindowManager {
                 Array1A_int INDX,
                 int &D);
 
-    //*****************************************************************************************
-
     void LUBKSB(Array2A<Real64> A, int const N, int const NP, Array1A_int INDX, Array1A<Real64> B);
 
     // added for custom solar or visible spectrum
 
     void CheckAndReadCustomSprectrumData(EnergyPlusData &state);
 
-    //*****************************************************************************************
-
     void initWindowModel(EnergyPlusData &state);
-
-    //*****************************************************************************************
 
 } // namespace WindowManager
 

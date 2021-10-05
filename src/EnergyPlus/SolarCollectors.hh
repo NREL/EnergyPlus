@@ -293,8 +293,6 @@ namespace SolarCollectors {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    void GetSolarCollectorInput(EnergyPlusData &state);
-
 } // namespace SolarCollectors
 
 struct SolarCollectorsData : BaseGlobalStruct

@@ -486,14 +486,6 @@ namespace OutputReportTabular {
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    //======================================================================================================================
-    //======================================================================================================================
-
-    //    GET INPUT ROUTINES
-
-    //======================================================================================================================
-    //======================================================================================================================
-
     void GetInputTabularMonthly(EnergyPlusData &state);
 
     void InitializeTabularMonthly(EnergyPlusData &state);

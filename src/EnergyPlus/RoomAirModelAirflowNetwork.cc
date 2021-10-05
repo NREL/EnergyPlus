@@ -163,8 +163,6 @@ namespace RoomAirModelAirflowNetwork {
 
     } // SimRoomAirModelAirflowNetwork
 
-    //****************************************************
-
     void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state,
                                                   int const ZoneNum,
                                                   int const RoomAirNode) // index number for the specified zone and node
@@ -213,8 +211,6 @@ namespace RoomAirModelAirflowNetwork {
         thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     } // LoadPredictionRoomAirModelAirflowNetwork
-
-    //****************************************************
 
     void RAFNData::InitRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode) // index number for the specified zone
     {
@@ -614,8 +610,6 @@ namespace RoomAirModelAirflowNetwork {
         ThisRAFNNode.CpAir = PsyCpAirFnW(ThisRAFNNode.HumRat);
 
     } // InitRoomAirModelAirflowNetwork
-
-    //*****************************************************************************************
 
     void RAFNData::CalcRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode) // index number for the specified zone and node
     {
@@ -1360,8 +1354,6 @@ namespace RoomAirModelAirflowNetwork {
 
     } // SumNonAirSystemResponseForNode
 
-    //*****************************************************************************************
-
     void RAFNData::SumSystemDepResponseForNode(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
@@ -1427,8 +1419,6 @@ namespace RoomAirModelAirflowNetwork {
         }
 
     } // SumSystemDepResponseForNode
-
-    //*****************************************************************************************
 
 } // namespace RoomAirModelAirflowNetwork
 

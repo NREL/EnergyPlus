@@ -111,6 +111,1825 @@ namespace SystemAvailabilityManager {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
+    void InitSysAvailManagers(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   August 2001
+        //       MODIFIED       Brent Griffith, CR8376 initialize to NoAction every timestep
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for initializations of the System Availability Manager objects.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the status flags to trigger initializations.
+
+        using DataZoneEquipment::NumValidSysAvailZoneComponents;
+
+        int SysAvailNum; // DO loop indes for Sys Avail Manager objects
+        int ZoneEquipType;
+        int ZoneListNum;
+        int ScanZoneListNum;
+        int ZoneNum;
+        // One time initializations
+
+        if (state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag) {
+
+            for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs; ++SysAvailNum) {
+                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType ==
+                    state.dataSystemAvailabilityManager->CycleOnControlZone) {
+                    // set the controlled zone numbers
+                    for (int index = 1; index <= state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones; ++index) {
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+                            if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
+                                    state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(index)) {
+                                    state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(index) = ControlledZoneNum;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
+                {
+                    auto const SELECT_CASE_var(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType);
+                    if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ControlZone) {
+                        // set the controlled zone numbers
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+                            if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
+                                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneNum) {
+                                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
+                        // a zone list
+                        ZoneListNum = UtilityRoutines::FindItemInList(
+                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName, state.dataHeatBal->ZoneList);
+                        if (ZoneListNum > 0) {
+                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumOfZones =
+                                state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
+                            if (!allocated(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs)) {
+                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum)
+                                    .ZonePtrs.allocate({1, state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones});
+                            }
+                            for (ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
+                                ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
+                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs(ScanZoneListNum) = ZoneNum;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs; ++SysAvailNum) {
+                // set the controlled zone numbers
+                for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+                    if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
+                            state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).ZoneNum) {
+                            state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag = false;
+
+        } // end 1 time initializations
+
+        // initialize individual availability managers to no action (CR 8376 reporting issue)
+        if (allocated(state.dataSystemAvailabilityManager->SchedSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->SchedSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->NCycSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->NCycSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->NVentSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->NVentSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->DiffTSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData))
+            for (auto &e : state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData)
+                e.AvailStatus = NoAction;
+        if (allocated(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData)) {
+            for (auto &e : state.dataSystemAvailabilityManager->OptStartSysAvailMgrData) {
+                e.AvailStatus = NoAction;
+                e.isSimulated = false;
+            }
+        }
+        //  HybridVentSysAvailMgrData%AvailStatus= NoAction
+        for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
+            if (allocated(state.dataHVACGlobal->ZoneComp)) {
+                if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp > 0)
+                    for (auto &e : state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
+                        e.AvailStatus = NoAction;
+            }
+        }
+    }
+
+    void CalcSchedSysAvailMgr(EnergyPlusData &state,
+                              int const SysAvailNum, // number of the current scheduled system availability manager
+                              int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   August 2001
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component.
+
+        // METHODOLOGY EMPLOYED:
+        // Looks at the System Availability Manager schedule and sets the
+        // AvailStatus indicator accordingly. Mostly a useless algorithm
+        // since the fan schedules can do the same thing.
+
+        if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).SchedPtr) > 0.0) {
+            AvailStatus = CycleOn;
+        } else {
+            AvailStatus = ForceOff;
+        }
+
+        state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcSchedOnSysAvailMgr(EnergyPlusData &state,
+                                int const SysAvailNum, // number of the current scheduled on system availability manager
+                                int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         R. Raustad - FSEC
+        //       DATE WRITTEN   August 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component.
+
+        // METHODOLOGY EMPLOYED:
+        // Looks at the System Availability Manager schedule and sets the
+        // AvailStatus indicator accordingly. If the schedule value is > 0
+        // the availability status is CycleOn, ELSE the status is NoAction.
+
+        if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).SchedPtr) > 0.0) {
+            AvailStatus = CycleOn;
+        } else {
+            AvailStatus = NoAction;
+        }
+
+        state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcSchedOffSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum, // number of the current scheduled off system availability manager
+                                 int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         R. Raustad - FSEC
+        //       DATE WRITTEN   August 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component.
+
+        // METHODOLOGY EMPLOYED:
+        // Looks at the System Availability Manager schedule and sets the
+        // AvailStatus indicator accordingly.  If the schedule value is = 0
+        // the availability status is ForceOff, ELSE the status is NoAction.
+
+        if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).SchedPtr) == 0.0) {
+            AvailStatus = ForceOff;
+        } else {
+            AvailStatus = NoAction;
+        }
+
+        state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcOptStartSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum,  // number of the current scheduled system availability manager
+                                 int const PriAirSysNum, // number of the primary air system affected by this Avail. Manager
+                                 int &AvailStatus,       // System status indicator
+                                 [[maybe_unused]] Optional_int_const ZoneEquipType, // Type of ZoneHVAC equipment component
+                                 [[maybe_unused]] Optional_int_const CompNum        // Index of ZoneHVAC equipment component
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR            Xiufeng Pang (XP)
+        //       DATE WRITTEN      August 2013
+        //       MODIFIED
+        //       RE-ENGINEERED
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component
+
+        // METHODOLOGY EMPLOYED:
+        // Sets the AvailStatus indicator according to the
+        // optimum start algorithm
+
+        // Using/Aliasing
+        using namespace DataAirLoop;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        int ScheduleIndex;
+        Array2D<Real64> DayValues;
+        Array2D<Real64> DayValuesTmr;
+        int JDay;
+        int TmrJDay;
+        int TmrDayOfWeek;
+        int ZoneNum;
+        Real64 FanStartTime;
+        Real64 FanStartTimeTmr;
+        Real64 PreStartTime;
+        Real64 PreStartTimeTmr;
+        Real64 DeltaTime;
+        Real64 TempDiff;
+        Real64 TempDiffHi;
+        Real64 TempDiffLo;
+        bool FirstTimeATGFlag(true);
+        bool OverNightStartFlag(false); // Flag to indicate the optimum start starts before mid night.
+        bool CycleOnFlag(false);
+        bool OSReportVarFlag(true);
+        int NumPreDays;
+        int NumOfZonesInList;
+        Real64 AdaTempGradHeat;
+        Real64 AdaTempGradCool;
+        Real64 ATGUpdateTime1(0.0);
+        Real64 ATGUpdateTime2(0.0);
+        Real64 ATGUpdateTemp1(0.0);
+        Real64 ATGUpdateTemp2(0.0);
+        bool ATGUpdateFlag1(false);
+        bool ATGUpdateFlag2(false);
+        int ATGCounter;
+        int ATGWCZoneNumHi;
+        int ATGWCZoneNumLo;
+        Real64 NumHoursBeforeOccupancy; // Variable to store the number of hours before occupancy in optimum start period
+        bool exitLoop;                  // exit loop on found data
+
+        auto &OptStartMgr(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum));
+
+        // some avail managers may be used in air loop and plant availability manager lists, if so they only need be simulated once
+        if (OptStartMgr.isSimulated) {
+            AvailStatus = OptStartMgr.AvailStatus;
+            return;
+        }
+        OptStartMgr.isSimulated = true;
+
+        // update air loop specific data
+        TempDiffLo = OptStartMgr.TempDiffLo;
+        TempDiffHi = OptStartMgr.TempDiffHi;
+        ATGWCZoneNumLo = OptStartMgr.ATGWCZoneNumLo;
+        ATGWCZoneNumHi = OptStartMgr.ATGWCZoneNumHi;
+        CycleOnFlag = OptStartMgr.CycleOnFlag;
+        ATGUpdateFlag1 = OptStartMgr.ATGUpdateFlag1;
+        ATGUpdateFlag2 = OptStartMgr.ATGUpdateFlag2;
+        NumHoursBeforeOccupancy = OptStartMgr.NumHoursBeforeOccupancy;
+        FirstTimeATGFlag = OptStartMgr.FirstTimeATGFlag;
+        OverNightStartFlag = OptStartMgr.OverNightStartFlag;
+        OSReportVarFlag = OptStartMgr.OSReportVarFlag;
+
+        if (OptStartMgr.CtrlAlgType == state.dataSystemAvailabilityManager->AdaptiveTemperatureGradient) {
+            NumPreDays = OptStartMgr.NumPreDays;
+            if (!allocated(state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat)) {
+                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat.allocate(NumPreDays);
+                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool.allocate(NumPreDays);
+            }
+            if (!allocated(OptStartMgr.AdaTempGradTrdHeat)) {
+                OptStartMgr.AdaTempGradTrdHeat.allocate(NumPreDays);
+                OptStartMgr.AdaTempGradTrdHeat = 0.0;
+                OptStartMgr.AdaTempGradTrdCool.allocate(NumPreDays);
+                OptStartMgr.AdaTempGradTrdCool = 0.0;
+            }
+            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.AdaTempGradTrdHeat;
+            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.AdaTempGradTrdCool;
+            AdaTempGradHeat = OptStartMgr.AdaTempGradHeat;
+            AdaTempGradCool = OptStartMgr.AdaTempGradCool;
+            ATGUpdateTime1 = OptStartMgr.ATGUpdateTime1;
+            ATGUpdateTime2 = OptStartMgr.ATGUpdateTime2;
+            ATGUpdateTemp1 = OptStartMgr.ATGUpdateTemp1;
+            ATGUpdateTemp2 = OptStartMgr.ATGUpdateTemp2;
+        }
+
+        auto &OptStartData = state.dataHVACGlobal->OptStartData;
+
+        // add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
+        if (state.dataGlobal->KickOffSimulation) {
+            AvailStatus = NoAction;
+        } else {
+            ScheduleIndex = GetScheduleIndex(state, OptStartMgr.FanSched);
+            JDay = state.dataEnvrn->DayOfYear;
+            TmrJDay = JDay + 1;
+            TmrDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
+
+            DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+            DayValuesTmr.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+            if (!allocated(OptStartData.OptStartFlag)) {
+                OptStartData.OptStartFlag.allocate(state.dataGlobal->NumOfZones);
+                OptStartData.OccStartTime.allocate(state.dataGlobal->NumOfZones);
+            }
+            if (!allocated(OptStartData.ActualZoneNum)) OptStartData.ActualZoneNum.allocate(state.dataGlobal->NumOfZones);
+
+            // OptStartFlag needs to be reset each timestep to not stay set to true post-occupancy
+            OptStartData.OptStartFlag = false;
+
+            // reset OptStartData once per beginning of day
+            if (state.dataGlobal->BeginDayFlag) {
+                NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
+                if (state.dataSystemAvailabilityManager->BeginOfDayResetFlag) {
+                    OptStartData.OccStartTime = 22.99; // initialize the zone occupancy start time
+                    state.dataSystemAvailabilityManager->BeginOfDayResetFlag = false;
+                }
+            }
+            if (!state.dataGlobal->BeginDayFlag) state.dataSystemAvailabilityManager->BeginOfDayResetFlag = true;
+
+            GetScheduleValuesForDay(state, ScheduleIndex, DayValues);
+            GetScheduleValuesForDay(state, ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek);
+
+            FanStartTime = 0.0;
+            FanStartTimeTmr = 0.0;
+            exitLoop = false;
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= state.dataGlobal->NumOfTimeStepInHour; ++J) {
+                    if (DayValues(J, I) <= 0.0) continue;
+                    FanStartTime = I - 1 + 1.0 / state.dataGlobal->NumOfTimeStepInHour * J - 0.01;
+                    exitLoop = true;
+                    break;
+                }
+                if (exitLoop) break;
+            }
+
+            exitLoop = false;
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= state.dataGlobal->NumOfTimeStepInHour; ++J) {
+                    if (DayValuesTmr(J, I) <= 0.0) continue;
+                    FanStartTimeTmr = I - 1 + 1.0 / state.dataGlobal->NumOfTimeStepInHour * J - 0.01;
+                    exitLoop = true;
+                    break;
+                }
+                if (exitLoop) break;
+            }
+
+            if (FanStartTimeTmr == 0.0) FanStartTimeTmr = 24.0;
+
+            // Pass the start time to ZoneTempPredictorCorrector
+            for (int counter = 1; counter <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++counter) {
+                int actZoneNum =
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(counter)).ActualZoneNum;
+                OptStartData.OccStartTime(actZoneNum) = FanStartTime;
+                OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
+            }
+            for (int counter = 1; counter <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesHeated; ++counter) {
+                int actZoneNum =
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).HeatCtrlZoneNums(counter)).ActualZoneNum;
+                OptStartData.OccStartTime(actZoneNum) = FanStartTime;
+                OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
+            }
+
+            if (state.dataEnvrn->DSTIndicator > 0) {
+                --FanStartTime;
+                --FanStartTimeTmr;
+            }
+
+            {
+                auto const SELECT_CASE_var(OptStartMgr.CtrlAlgType);
+                if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ConstantStartTime) {
+                    if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->StayOff) {
+                        AvailStatus = NoAction;
+                    } else {
+                        DeltaTime = OptStartMgr.ConstStartTime;
+                        if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                            DeltaTime = OptStartMgr.MaxOptStartTime;
+                        }
+                        PreStartTime = FanStartTime - DeltaTime;
+                        if (PreStartTime < 0.0) PreStartTime = -0.1;
+                        PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                        if (PreStartTimeTmr < 0.0) {
+                            PreStartTimeTmr += 24.0;
+                            OverNightStartFlag = true;
+                        } else {
+                            OverNightStartFlag = false;
+                        }
+                        if (!OverNightStartFlag) {
+                            if (FanStartTime == 0.0 || state.dataGlobal->PreviousHour > FanStartTime) {
+                                AvailStatus = NoAction;
+                                OSReportVarFlag = true;
+                            } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                if (OSReportVarFlag) {
+                                    NumHoursBeforeOccupancy = DeltaTime;
+                                    OSReportVarFlag = false;
+                                }
+                                AvailStatus = CycleOn;
+                                OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                            } else {
+                                AvailStatus = NoAction;
+                                OSReportVarFlag = true;
+                            }
+                        } else {
+                            if (FanStartTime == 0.0 ||
+                                (state.dataGlobal->HourOfDay > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                AvailStatus = NoAction;
+                                OSReportVarFlag = true;
+                            } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                if (OSReportVarFlag) {
+                                    NumHoursBeforeOccupancy = DeltaTime;
+                                    OSReportVarFlag = false;
+                                }
+                                AvailStatus = CycleOn;
+                                OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                            } else {
+                                AvailStatus = NoAction;
+                                OSReportVarFlag = true;
+                            }
+                        }
+                    }
+
+                } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ConstantTemperatureGradient) {
+                    if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->ControlZone) {
+                        ZoneNum = OptStartMgr.ZoneNum;
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
+                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
+                            TempDiff = 0.0;
+                        } else {
+                            if (!CycleOnFlag) {
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+                                    TempDiffHi = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
+                                    TempDiffLo = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
+                                } else {
+                                    TempDiffHi = 0.0;
+                                    TempDiffLo = 0.0;
+                                }
+                            }
+                        }
+
+                        if (TempDiffHi < 0.0) {
+                            TempDiff = TempDiffLo;
+                            if (TempDiff < 0.0) { // Heating Mode
+                                TempDiff = std::abs(TempDiff);
+                                DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
+                                if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                    DeltaTime = OptStartMgr.MaxOptStartTime;
+                                }
+                                PreStartTime = FanStartTime - DeltaTime;
+                                if (PreStartTime < 0) PreStartTime = -0.1;
+                                PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                                if (PreStartTimeTmr < 0) {
+                                    PreStartTimeTmr += 24.0;
+                                    OverNightStartFlag = true;
+                                } else {
+                                    OverNightStartFlag = false;
+                                }
+                                if (!OverNightStartFlag) {
+                                    if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    } else if (CycleOnFlag) {
+                                        AvailStatus = CycleOn;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                        if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
+                                    } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                        AvailStatus = CycleOn;
+                                        CycleOnFlag = true;
+                                        if (OSReportVarFlag) {
+                                            NumHoursBeforeOccupancy = DeltaTime;
+                                            OSReportVarFlag = false;
+                                        }
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    } else {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    }
+                                } else {
+                                    if (FanStartTime == 0.0 ||
+                                        (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    } else if (CycleOnFlag) {
+                                        AvailStatus = CycleOn;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                        if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
+                                            CycleOnFlag = false;
+                                    } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                        if (OSReportVarFlag) {
+                                            NumHoursBeforeOccupancy = DeltaTime;
+                                            OSReportVarFlag = false;
+                                        }
+                                        AvailStatus = CycleOn;
+                                        CycleOnFlag = true;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    } else {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    }
+                                }
+                            } else {
+                                AvailStatus = NoAction;
+                                CycleOnFlag = false;
+                            }
+                        } else if (state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
+                            TempDiff = TempDiffHi;
+                            DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
+                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                DeltaTime = OptStartMgr.MaxOptStartTime;
+                            }
+                            PreStartTime = FanStartTime - DeltaTime;
+                            if (PreStartTime < 0) PreStartTime = -0.1;
+                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                            if (PreStartTimeTmr < 0) {
+                                PreStartTimeTmr += 24.0;
+                                OverNightStartFlag = true;
+                            } else {
+                                OverNightStartFlag = false;
+                            }
+                            if (!OverNightStartFlag) {
+                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            } else {
+                                if (FanStartTime == 0.0 ||
+                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            }
+                        } else {
+                            AvailStatus = NoAction;
+                            CycleOnFlag = false;
+                        }
+                    } else if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
+
+                        NumOfZonesInList = OptStartMgr.NumOfZones;
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
+                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
+                            TempDiff = 0.0;
+                        } else {
+                            if (!CycleOnFlag) {
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+                                    TempDiffHi = 0.0;
+                                    TempDiffLo = 0.0;
+                                    for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
+                                                   state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiffHi = max(TempDiffHi, TempDiff);
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
+                                                   state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiffLo = min(TempDiffLo, TempDiff);
+                                    }
+                                } else {
+                                    TempDiffHi = 0.0;
+                                    TempDiffLo = 0.0;
+                                }
+                            }
+                        }
+                        if ((TempDiffHi < 0.0 && TempDiffLo < 0.0) ||
+                            (std::abs(TempDiffLo) > std::abs(TempDiffHi) && TempDiffLo < 0)) { // Heating Mode
+                            TempDiff = TempDiffLo;
+                            TempDiff = std::abs(TempDiff);
+                            DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
+                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                DeltaTime = OptStartMgr.MaxOptStartTime;
+                            }
+                            PreStartTime = FanStartTime - DeltaTime;
+                            if (PreStartTime < 0) PreStartTime = -0.1;
+                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                            if (PreStartTimeTmr < 0) {
+                                PreStartTimeTmr += 24.0;
+                                OverNightStartFlag = true;
+                            } else {
+                                OverNightStartFlag = false;
+                            }
+                            if (!OverNightStartFlag) {
+                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            } else {
+                                if (FanStartTime == 0.0 ||
+                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
+                                        CycleOnFlag = false;
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            }
+                        } else if (TempDiffHi <= 0.0 && TempDiffLo >= 0.0) { // not heating and not cooling
+                            AvailStatus = NoAction;
+                            CycleOnFlag = false;
+                            TempDiffHi = 0.0;
+                            TempDiffLo = 0.0;
+                        } else if (TempDiffHi < 30.0) { // Cooling Mode
+                            TempDiff = TempDiffHi;
+                            DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
+                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                DeltaTime = OptStartMgr.MaxOptStartTime;
+                            }
+                            PreStartTime = FanStartTime - DeltaTime;
+                            if (PreStartTime < 0) PreStartTime = -0.1;
+                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                            if (PreStartTimeTmr < 0) {
+                                PreStartTimeTmr += 24.0;
+                                OverNightStartFlag = true;
+                            } else {
+                                OverNightStartFlag = false;
+                            }
+                            if (!OverNightStartFlag) {
+                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            } else {
+                                if (FanStartTime == 0.0 ||
+                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            }
+                        } else {
+                            AvailStatus = NoAction;
+                            CycleOnFlag = false;
+                        }
+                    } else {
+                        AvailStatus = NoAction;
+                    }
+
+                } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->AdaptiveTemperatureGradient) {
+
+                    if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->ControlZone) {
+                        ZoneNum = OptStartMgr.ZoneNum;
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
+                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
+                            TempDiff = 0.0;
+                        } else {
+                            if (!CycleOnFlag) {
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+                                    TempDiffHi = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
+                                    TempDiffLo = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
+                                } else {
+                                    TempDiffHi = 0.0;
+                                    TempDiffLo = 0.0;
+                                }
+                            }
+                        }
+                        // Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
+                        //-----------------------------------------------------------------------------
+                        if (state.dataGlobal->WarmupFlag) {
+                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+                            AdaTempGradCool = OptStartMgr.InitTGradCool;
+                        } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
+                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+                            AdaTempGradCool = OptStartMgr.InitTGradCool;
+                        } else {
+                            if (state.dataGlobal->BeginDayFlag && FirstTimeATGFlag) {
+                                FirstTimeATGFlag = false;
+                                AdaTempGradHeat += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) / NumPreDays -
+                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(1) / NumPreDays;
+                                AdaTempGradCool += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) / NumPreDays -
+                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(1) / NumPreDays;
+                                if (FanStartTime > 0) {
+                                    for (ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter) {
+                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter) =
+                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter + 1);
+                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter) =
+                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter + 1);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (state.dataGlobal->CurrentTime >= 1.0) FirstTimeATGFlag = true;
+                        //------------------------------------------------------------------------------
+
+                        if (TempDiffHi < 0.0) {
+                            TempDiff = TempDiffLo;
+                            if (TempDiff < 0.0) { // Heating Mode
+                                TempDiff = std::abs(TempDiff);
+                                DeltaTime = TempDiff / AdaTempGradHeat;
+                                if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                    DeltaTime = OptStartMgr.MaxOptStartTime;
+                                }
+                                PreStartTime = FanStartTime - DeltaTime;
+                                if (PreStartTime < 0.0) PreStartTime = -0.1;
+                                PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                                if (PreStartTimeTmr < 0.0) {
+                                    PreStartTimeTmr += 24.0;
+                                    OverNightStartFlag = true;
+                                } else {
+                                    OverNightStartFlag = false;
+                                }
+                                if (!OverNightStartFlag) {
+                                    if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    } else if (CycleOnFlag) {
+                                        AvailStatus = CycleOn;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                        if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
+                                        // Calculate the current day actual temperature gradient --------------------------
+                                        if (!state.dataGlobal->WarmupFlag) {
+                                            if (ATGUpdateFlag1) {
+                                                ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                                ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                                ATGUpdateFlag1 = false;
+                                            }
+                                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >=
+                                                    state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) &&
+                                                ATGUpdateFlag2) {
+                                                ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                                ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                                ATGUpdateFlag2 = false;
+                                                if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
+                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1);
+                                                } else {
+                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
+                                                }
+                                            }
+                                        }
+                                        //---------------------------------------------------------------------------------
+                                    } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                        if (OSReportVarFlag) {
+                                            NumHoursBeforeOccupancy = DeltaTime;
+                                            OSReportVarFlag = false;
+                                        }
+                                        AvailStatus = CycleOn;
+                                        CycleOnFlag = true;
+                                        ATGUpdateFlag1 = true;
+                                        ATGUpdateFlag2 = true;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    } else {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    }
+                                } else {
+                                    if (FanStartTime == 0.0 ||
+                                        (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    } else if (CycleOnFlag) {
+                                        AvailStatus = CycleOn;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                        if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
+                                            CycleOnFlag = false;
+                                        // Calculate the current day actual temperature gradient --------------------------
+                                        if (!state.dataGlobal->WarmupFlag) {
+                                            if (ATGUpdateFlag1) {
+                                                ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                                ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                                ATGUpdateFlag1 = false;
+                                            }
+                                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >=
+                                                    state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) &&
+                                                ATGUpdateFlag2) {
+                                                ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                                ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                                ATGUpdateFlag2 = false;
+                                                if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
+                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
+                                                } else {
+                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
+                                                }
+                                            }
+                                        }
+                                        //---------------------------------------------------------------------------------
+                                    } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                        if (OSReportVarFlag) {
+                                            NumHoursBeforeOccupancy = DeltaTime;
+                                            OSReportVarFlag = false;
+                                        }
+                                        AvailStatus = CycleOn;
+                                        CycleOnFlag = true;
+                                        ATGUpdateFlag1 = true;
+                                        ATGUpdateFlag2 = true;
+                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    } else {
+                                        AvailStatus = NoAction;
+                                        CycleOnFlag = false;
+                                        OSReportVarFlag = true;
+                                    }
+                                }
+                            } else {
+                                AvailStatus = NoAction;
+                                CycleOnFlag = false;
+                            }
+                        } else if (state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
+                            TempDiff = TempDiffHi;
+                            DeltaTime = TempDiff / AdaTempGradCool;
+                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                DeltaTime = OptStartMgr.MaxOptStartTime;
+                            }
+                            PreStartTime = FanStartTime - DeltaTime;
+                            if (PreStartTime < 0.0) PreStartTime = -0.1;
+                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                            if (PreStartTimeTmr < 0.0) {
+                                PreStartTimeTmr += 24.0;
+                                OverNightStartFlag = true;
+                            } else {
+                                OverNightStartFlag = false;
+                            }
+                            if (!OverNightStartFlag) {
+                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (ATGUpdateFlag1) {
+                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                            ATGUpdateFlag1 = false;
+                                        }
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) &&
+                                            ATGUpdateFlag2) {
+                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                            ATGUpdateFlag2 = false;
+                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1);
+                                            } else {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
+                                            }
+                                        }
+                                    }
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    ATGUpdateFlag1 = true;
+                                    ATGUpdateFlag2 = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            } else {
+                                if (FanStartTime == 0.0 ||
+                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (ATGUpdateFlag1) {
+                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                            ATGUpdateFlag1 = false;
+                                        }
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) &&
+                                            ATGUpdateFlag2) {
+                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
+                                            ATGUpdateFlag2 = false;
+                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
+                                            } else {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
+                                            }
+                                        }
+                                    }
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    ATGUpdateFlag1 = true;
+                                    ATGUpdateFlag2 = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            }
+                        } else { // Not heating nor cooling mode
+                            AvailStatus = NoAction;
+                            CycleOnFlag = false;
+                        }
+                    } else if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
+
+                        NumOfZonesInList = OptStartMgr.NumOfZones;
+                        ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
+                        ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
+                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
+                            TempDiff = 0.0;
+                        } else {
+                            if (!CycleOnFlag) {
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+                                    TempDiffHi = 0.0;
+                                    TempDiffLo = 0.0;
+                                    ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
+                                    ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
+                                    for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
+                                                   state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiffHi = max(TempDiffHi, TempDiff);
+                                        // Store the worse case zone number for actual temperature gradient calculation
+                                        if (TempDiff == TempDiffHi) {
+                                            ATGWCZoneNumHi = OptStartMgr.ZonePtrs(ZoneNum);
+                                        }
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
+                                                   state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiffLo = min(TempDiffLo, TempDiff);
+                                        if (TempDiff == TempDiffLo) {
+                                            ATGWCZoneNumLo = OptStartMgr.ZonePtrs(ZoneNum);
+                                        }
+                                    }
+                                } else {
+                                    TempDiffHi = 0.0;
+                                    TempDiffLo = 0.0;
+                                }
+                            }
+                        }
+                        // Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
+                        //-----------------------------------------------------------------------------
+                        if (state.dataGlobal->WarmupFlag) {
+                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+                            AdaTempGradCool = OptStartMgr.InitTGradCool;
+                        } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
+                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+                            AdaTempGradCool = OptStartMgr.InitTGradCool;
+                        } else {
+                            if (state.dataGlobal->BeginDayFlag && FirstTimeATGFlag) {
+                                FirstTimeATGFlag = false;
+                                AdaTempGradHeat += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) / NumPreDays -
+                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(1) / NumPreDays;
+                                AdaTempGradCool += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) / NumPreDays -
+                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(1) / NumPreDays;
+                                if (FanStartTime > 0) {
+                                    for (ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter) {
+                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter) =
+                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter + 1);
+                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter) =
+                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter + 1);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (state.dataGlobal->CurrentTime >= 1.0) FirstTimeATGFlag = true;
+                        //------------------------------------------------------------------------------
+
+                        if ((TempDiffHi < 0.0 && TempDiffLo < 0.0) ||
+                            (std::abs(TempDiffLo) > std::abs(TempDiffHi) && TempDiffLo < 0.0)) { // Heating Mode
+                            TempDiff = TempDiffLo;
+                            TempDiff = std::abs(TempDiff);
+                            DeltaTime = TempDiff / AdaTempGradHeat;
+                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                DeltaTime = OptStartMgr.MaxOptStartTime;
+                            }
+                            PreStartTime = FanStartTime - DeltaTime;
+                            if (PreStartTime < 0.0) PreStartTime = -0.1;
+                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                            if (PreStartTimeTmr < 0.0) {
+                                PreStartTimeTmr += 24.0;
+                                OverNightStartFlag = true;
+                            } else {
+                                OverNightStartFlag = false;
+                            }
+                            if (!OverNightStartFlag) {
+                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                    OSReportVarFlag = true;
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
+                                    // Calculate the current day actual temperature gradient --------------------------
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (ATGUpdateFlag1) {
+                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateFlag1 = false;
+                                        }
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo) >=
+                                                state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) &&
+                                            ATGUpdateFlag2) {
+                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateFlag2 = false;
+                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1);
+                                            } else {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
+                                            }
+                                        }
+                                    }
+                                    //---------------------------------------------------------------------------------
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    ATGUpdateFlag1 = true;
+                                    ATGUpdateFlag2 = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            } else {
+                                if (FanStartTime == 0.0 ||
+                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    // Calculate the current day actual temperature gradient --------------------------
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (ATGUpdateFlag1) {
+                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateFlag1 = false;
+                                        }
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo) >=
+                                                state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) &&
+                                            ATGUpdateFlag2) {
+                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateFlag2 = false;
+                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
+                                            } else {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
+                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
+                                            }
+                                        }
+                                    }
+                                    //---------------------------------------------------------------------------------
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                    if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
+                                        CycleOnFlag = false;
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    ATGUpdateFlag1 = true;
+                                    ATGUpdateFlag2 = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            }
+                        } else if (TempDiffHi <= 0.0 && TempDiffLo >= 0.0) { // not heating and not cooling
+                            AvailStatus = NoAction;
+                            CycleOnFlag = false;
+                            TempDiffHi = 0.0;
+                            TempDiffLo = 0.0;
+                        } else if (TempDiffHi < 30.0) { // Cooling Mode
+                            TempDiff = TempDiffHi;
+                            DeltaTime = TempDiff / AdaTempGradCool;
+                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
+                                DeltaTime = OptStartMgr.MaxOptStartTime;
+                            }
+                            PreStartTime = FanStartTime - DeltaTime;
+                            if (PreStartTime < 0) PreStartTime = -0.1;
+                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
+                            if (PreStartTimeTmr < 0) {
+                                PreStartTimeTmr += 24.0;
+                                OverNightStartFlag = true;
+                            } else {
+                                OverNightStartFlag = false;
+                            }
+                            if (!OverNightStartFlag) {
+                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    // Calculate the current day actual temperature gradient --------------------------
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (ATGUpdateFlag1) {
+                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateFlag1 = false;
+                                        }
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi) <=
+                                                state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) &&
+                                            ATGUpdateFlag2) {
+                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateFlag2 = false;
+                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1);
+                                            } else {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
+                                            }
+                                        }
+                                    }
+                                    //---------------------------------------------------------------------------------
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    ATGUpdateFlag1 = true;
+                                    ATGUpdateFlag2 = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            } else {
+                                if (FanStartTime == 0.0 ||
+                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                } else if (CycleOnFlag) {
+                                    AvailStatus = CycleOn;
+                                    // Calculate the current day actual temperature gradient --------------------------
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (ATGUpdateFlag1) {
+                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateFlag1 = false;
+                                        }
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi) <=
+                                                state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) &&
+                                            ATGUpdateFlag2) {
+                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateFlag2 = false;
+                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
+                                            } else {
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
+                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
+                                            }
+                                        }
+                                    }
+                                    //---------------------------------------------------------------------------------
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
+                                    if (OSReportVarFlag) {
+                                        NumHoursBeforeOccupancy = DeltaTime;
+                                        OSReportVarFlag = false;
+                                    }
+                                    AvailStatus = CycleOn;
+                                    CycleOnFlag = true;
+                                    ATGUpdateFlag2 = true;
+                                    ATGUpdateFlag1 = true;
+                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
+                                } else {
+                                    AvailStatus = NoAction;
+                                    CycleOnFlag = false;
+                                    OSReportVarFlag = true;
+                                }
+                            }
+                        } else {
+                            AvailStatus = NoAction;
+                            CycleOnFlag = false;
+                        }
+                    } else {
+                        AvailStatus = NoAction;
+                    }
+
+                } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->AdaptiveASHRAE) {
+                    AvailStatus = NoAction;
+                }
+            }
+        }
+
+        OptStartMgr.AvailStatus = AvailStatus;
+        OptStartMgr.NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
+        OptStartMgr.TempDiffLo = TempDiffLo;
+        OptStartMgr.TempDiffHi = TempDiffHi;
+        OptStartMgr.ATGWCZoneNumLo = ATGWCZoneNumLo;
+        OptStartMgr.ATGWCZoneNumHi = ATGWCZoneNumHi;
+        OptStartMgr.CycleOnFlag = CycleOnFlag;
+        OptStartMgr.ATGUpdateFlag1 = ATGUpdateFlag1;
+        OptStartMgr.ATGUpdateFlag2 = ATGUpdateFlag2;
+        OptStartMgr.FirstTimeATGFlag = FirstTimeATGFlag;
+        OptStartMgr.OverNightStartFlag = OverNightStartFlag;
+        OptStartMgr.OSReportVarFlag = OSReportVarFlag;
+        if (OptStartMgr.CtrlAlgType == state.dataSystemAvailabilityManager->AdaptiveTemperatureGradient) {
+            OptStartMgr.AdaTempGradTrdHeat = state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat;
+            OptStartMgr.AdaTempGradTrdCool = state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool;
+            OptStartMgr.AdaTempGradHeat = AdaTempGradHeat;
+            OptStartMgr.AdaTempGradCool = AdaTempGradCool;
+            OptStartMgr.ATGUpdateTime1 = ATGUpdateTime1;
+            OptStartMgr.ATGUpdateTime2 = ATGUpdateTime2;
+            OptStartMgr.ATGUpdateTemp1 = ATGUpdateTemp1;
+            OptStartMgr.ATGUpdateTemp2 = ATGUpdateTemp2;
+        }
+    }
+
+    void CalcNVentSysAvailMgr(EnergyPlusData &state,
+                              int const SysAvailNum,           // number of the current scheduled system availability manager
+                              int const PriAirSysNum,          // number of the primary air system affected by this Avail. Manager
+                              int &AvailStatus,                // System status indicator
+                              Optional_int_const ZoneEquipType // Type of zone equipment component
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   December 2004
+        //       MODIFIED       March 2011, Chandan Sharma - FSEC: Allowed night ventilation
+        //                             availability manager to work for zone component
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a primary air loop and ZoneHVAC component and sets a specified flow
+        // rate fraction for the air loop for use during night ventilation.
+
+        // METHODOLOGY EMPLOYED:
+        // Looks at outside and indoor conditions to determine if night ventilation
+        // is beneficial. If it is and it is scheduled on the AvailStatus is set to cycle
+        // on and the loop flow rate fractionis set to the specified night ventilation
+        // value.
+
+        using namespace DataAirLoop;
+
+        int ZoneInSysNum;
+        int CtrldZoneNum;
+        int ZoneNum;
+        bool TempCheck;     // TRUE if one zone's temperature is above the value of the vent temp sched
+        bool DelTCheck;     // TRUE if the control zone temperature - outside temperature > VentDelT
+        bool LowLimCheck;   // TRUE if one zones's air temperature is below this value
+        Real64 VentTemp;    // value of the ventilation temperature schedule
+        int ControlZoneNum; // actual zone number of the control zone
+
+        TempCheck = false;
+        DelTCheck = false;
+        LowLimCheck = false;
+        // check if night venting allowed: not allowed if avail sched is off or fan sched is on
+        // CR 7913 changed to allow during warmup
+        if ((GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).SchedPtr) <= 0.0) ||
+            (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).FanSchedPtr) > 0.0)) {
+            AvailStatus = NoAction;
+        } else {
+
+            VentTemp = GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempSchedPtr);
+            ControlZoneNum = state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).ZoneNum;
+
+            if (present(ZoneEquipType)) {
+                // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
+                if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) > VentTemp) {
+                    TempCheck = true;
+                }
+                // if the room temperature is less than the low limit set the low limit check to TRUE
+                if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) <
+                    state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
+                    LowLimCheck = true;
+                }
+            } else {
+                for (ZoneInSysNum = 1; ZoneInSysNum <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled;
+                     ++ZoneInSysNum) { // loop over zones in system
+
+                    CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
+                    ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
+                    // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > VentTemp) {
+                        TempCheck = true;
+                    }
+                    // if the room temperature is less than the low limit set the low limit check to TRUE
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                        state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
+                        LowLimCheck = true;
+                    }
+                }
+            }
+            // If the difference between the control zone temperature and the outside temperature is greater than
+            // the specified night venting delta T then set the delta T check to TRUE
+            if ((state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) - state.dataEnvrn->OutDryBulbTemp) >
+                state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
+                DelTCheck = true;
+            }
+            // If the limit requirements are met turn on night ventilation
+            if (TempCheck && DelTCheck && !LowLimCheck) {
+                AvailStatus = CycleOn;
+            } else {
+                AvailStatus = NoAction;
+            }
+        }
+
+        if (!present(ZoneEquipType)) {
+            if (AvailStatus == CycleOn) {
+                state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).LoopFlowRateSet = true;
+                state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).NightVent = true;
+                state.dataAirLoop->AirLoopFlow(PriAirSysNum).ReqSupplyFrac =
+                    state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentFlowFrac;
+            }
+        }
+
+        state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcDiffTSysAvailMgr(EnergyPlusData &state,
+                              int const SysAvailNum,    // Number of the current scheduled system availability manager
+                              int const PreviousStatus, // System status for the previous timestep
+                              int &AvailStatus          // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
+
+        // METHODOLOGY EMPLOYED:
+
+        Real64 DeltaTemp;
+
+        DeltaTemp = state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode).Temp -
+                    state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode).Temp;
+
+        if (DeltaTemp >= state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOn) {
+            AvailStatus = CycleOn;
+        } else if (DeltaTemp <= state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOff) {
+            AvailStatus = ForceOff;
+        } else {
+
+            if (PreviousStatus == NoAction) {
+                AvailStatus = ForceOff;
+            } else {
+                AvailStatus = PreviousStatus; // No change, but not "NoAction"; it should always be on or off.
+            }
+        }
+
+        state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcHiTurnOffSysAvailMgr(EnergyPlusData &state,
+                                  int const SysAvailNum, // Number of the current scheduled system availability manager
+                                  int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
+
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node).Temp >=
+            state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Temp) {
+            AvailStatus = ForceOff;
+        } else {
+            AvailStatus = NoAction;
+        }
+
+        state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcHiTurnOnSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum, // Number of the current scheduled system availability manager
+                                 int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
+
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node).Temp >=
+            state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Temp) {
+            AvailStatus = CycleOn;
+        } else {
+            AvailStatus = NoAction;
+        }
+
+        state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcLoTurnOffSysAvailMgr(EnergyPlusData &state,
+                                  int const SysAvailNum, // Number of the current scheduled system availability manager
+                                  int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
+
+        // If applicability schedule is off, then availability manager is inactive, return no action
+        if (state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr > 0) {
+            if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr) <= 0.0) {
+                AvailStatus = NoAction;
+                state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+                return;
+            }
+        }
+
+        // Availability manager is active, check temperature limit
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node).Temp <=
+            state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Temp) {
+            AvailStatus = ForceOff;
+        } else {
+            AvailStatus = NoAction;
+        }
+
+        state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    void CalcLoTurnOnSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum, // Number of the current scheduled system availability manager
+                                 int &AvailStatus       // System status indicator
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
+
+        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node).Temp <=
+            state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Temp) {
+            AvailStatus = CycleOn;
+        } else {
+            AvailStatus = NoAction;
+        }
+
+        state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
+    }
+
+    int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName) // name to validate
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   April 2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function returns true for a valid System Availability Manager Type
+        // and false if not.
+
+        // Return value
+        int ValidType; // result of validation
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int Found;
+
+        Found = UtilityRoutines::FindItem(AvailMgrName,
+                                          state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes,
+                                          state.dataSystemAvailabilityManager->NumValidSysAvailManagerTypes);
+        if (Found > 0) {
+            //   Hybrid ventilation must not be specified in a list
+            if (state.dataSystemAvailabilityManager->ValidSysAvailManagerTypes(Found) !=
+                state.dataSystemAvailabilityManager->SysAvailMgr_HybridVent) {
+                ValidType = state.dataSystemAvailabilityManager->ValidSysAvailManagerTypes(Found);
+            } else {
+                ValidType = 0;
+            }
+        } else {
+            ValidType = 0;
+        }
+
+        return ValidType;
+    }
+
+    void SimSysAvailManager(EnergyPlusData &state,
+                            int const SysAvailType,
+                            std::string const &SysAvailName,
+                            int &SysAvailNum,
+                            int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
+                            int const PreviousStatus,
+                            int &AvailStatus,
+                            Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC:* equipment component
+                            Optional_int_const CompNum = _        // Index of ZoneHVAC:* equipment component
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   August 2001
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE
+        // Loop over all the System Availability Managers and invoke the correct
+        // System Availability Manager algorithm.
+
+        // Using/Aliasing
+
+        {
+            auto const SELECT_CASE_var(SysAvailType);
+            if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_Scheduled) { // 'AvailabilityManager:Scheduled'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcSchedSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:Scheduled not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_ScheduledOn) { // 'AvailabilityManager:ScheduledOn'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcSchedOnSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOn not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_ScheduledOff) { // 'AvailabilityManager:ScheduledOff'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcSchedOffSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOff not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_NightCycle) { // 'AvailabilityManager:NightCycle'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NCycSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightCycle not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_OptimumStart) { // 'AvailabilityManager:OptimumStart'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptStartSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:OptimumStart not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_NightVent) { // 'AvailabilityManager:NightVentilation'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NVentSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightVentilation not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var ==
+                       state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo) { // 'AvailabilityManager:DifferentialThermostat'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcDiffTSysAvailMgr(state, SysAvailNum, PreviousStatus, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var ==
+                       state.dataSystemAvailabilityManager->SysAvailMgr_HiTempTOff) { // 'AvailabilityManager:HighTemperatureTurnOff'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcHiTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_HiTempTOn) { // 'AvailabilityManager:HighTemperatureTurnOn'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcHiTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var ==
+                       state.dataSystemAvailabilityManager->SysAvailMgr_LoTempTOff) { // 'AvailabilityManager:LowTemperatureTurnOff'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcLoTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: " + SysAvailName);
+                }
+
+            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_LoTempTOn) { // 'AvailabilityManager:LowTemperatureTurnOn'
+                if (SysAvailNum == 0) {
+                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData);
+                }
+                if (SysAvailNum > 0) {
+                    CalcLoTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
+                } else {
+                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: " + SysAvailName);
+                }
+
+            } else {
+                ShowSevereError(state, format("AvailabilityManager Type not found: {}", SysAvailType));
+                ShowContinueError(state, "Occurs in Manager=" + SysAvailName);
+                ShowFatalError(state, "Preceding condition causes termination.");
+            }
+        }
+    }
+
     void ManageSystemAvailability(EnergyPlusData &state)
     {
 
@@ -1679,382 +3498,6 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    void InitSysAvailManagers(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   August 2001
-        //       MODIFIED       Brent Griffith, CR8376 initialize to NoAction every timestep
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the System Availability Manager objects.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger initializations.
-
-        using DataZoneEquipment::NumValidSysAvailZoneComponents;
-
-        int SysAvailNum; // DO loop indes for Sys Avail Manager objects
-        int ZoneEquipType;
-        int ZoneListNum;
-        int ScanZoneListNum;
-        int ZoneNum;
-        // One time initializations
-
-        if (state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag) {
-
-            for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs; ++SysAvailNum) {
-                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType ==
-                    state.dataSystemAvailabilityManager->CycleOnControlZone) {
-                    // set the controlled zone numbers
-                    for (int index = 1; index <= state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones; ++index) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-                                    state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(index)) {
-                                    state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(index) = ControlledZoneNum;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
-                {
-                    auto const SELECT_CASE_var(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType);
-                    if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ControlZone) {
-                        // set the controlled zone numbers
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-                                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneNum) {
-                                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
-                                    break;
-                                }
-                            }
-                        }
-                    } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
-                        // a zone list
-                        ZoneListNum = UtilityRoutines::FindItemInList(
-                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName, state.dataHeatBal->ZoneList);
-                        if (ZoneListNum > 0) {
-                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumOfZones =
-                                state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
-                            if (!allocated(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs)) {
-                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum)
-                                    .ZonePtrs.allocate({1, state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones});
-                            }
-                            for (ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
-                                ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
-                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs(ScanZoneListNum) = ZoneNum;
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs; ++SysAvailNum) {
-                // set the controlled zone numbers
-                for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-                            state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).ZoneNum) {
-                            state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag = false;
-
-        } // end 1 time initializations
-
-        // initialize individual availability managers to no action (CR 8376 reporting issue)
-        if (allocated(state.dataSystemAvailabilityManager->SchedSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->SchedSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->NCycSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->NCycSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->NVentSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->NVentSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->DiffTSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData))
-            for (auto &e : state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData)
-                e.AvailStatus = NoAction;
-        if (allocated(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData)) {
-            for (auto &e : state.dataSystemAvailabilityManager->OptStartSysAvailMgrData) {
-                e.AvailStatus = NoAction;
-                e.isSimulated = false;
-            }
-        }
-        //  HybridVentSysAvailMgrData%AvailStatus= NoAction
-        for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
-            if (allocated(state.dataHVACGlobal->ZoneComp)) {
-                if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp > 0)
-                    for (auto &e : state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
-                        e.AvailStatus = NoAction;
-            }
-        }
-    }
-
-    void SimSysAvailManager(EnergyPlusData &state,
-                            int const SysAvailType,
-                            std::string const &SysAvailName,
-                            int &SysAvailNum,
-                            int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
-                            int const PreviousStatus,
-                            int &AvailStatus,
-                            Optional_int_const ZoneEquipType, // Type of ZoneHVAC:* equipment component
-                            Optional_int_const CompNum        // Index of ZoneHVAC:* equipment component
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   August 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE
-        // Loop over all the System Availability Managers and invoke the correct
-        // System Availability Manager algorithm.
-
-        // Using/Aliasing
-
-        {
-            auto const SELECT_CASE_var(SysAvailType);
-            if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_Scheduled) { // 'AvailabilityManager:Scheduled'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcSchedSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:Scheduled not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_ScheduledOn) { // 'AvailabilityManager:ScheduledOn'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcSchedOnSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOn not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_ScheduledOff) { // 'AvailabilityManager:ScheduledOff'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcSchedOffSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOff not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_NightCycle) { // 'AvailabilityManager:NightCycle'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NCycSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightCycle not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_OptimumStart) { // 'AvailabilityManager:OptimumStart'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptStartSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:OptimumStart not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_NightVent) { // 'AvailabilityManager:NightVentilation'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NVentSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightVentilation not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var ==
-                       state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo) { // 'AvailabilityManager:DifferentialThermostat'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcDiffTSysAvailMgr(state, SysAvailNum, PreviousStatus, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var ==
-                       state.dataSystemAvailabilityManager->SysAvailMgr_HiTempTOff) { // 'AvailabilityManager:HighTemperatureTurnOff'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcHiTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_HiTempTOn) { // 'AvailabilityManager:HighTemperatureTurnOn'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcHiTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var ==
-                       state.dataSystemAvailabilityManager->SysAvailMgr_LoTempTOff) { // 'AvailabilityManager:LowTemperatureTurnOff'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcLoTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_LoTempTOn) { // 'AvailabilityManager:LowTemperatureTurnOn'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcLoTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: " + SysAvailName);
-                }
-
-            } else {
-                ShowSevereError(state, format("AvailabilityManager Type not found: {}", SysAvailType));
-                ShowContinueError(state, "Occurs in Manager=" + SysAvailName);
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
-        }
-    }
-
-    void CalcSchedSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum, // number of the current scheduled system availability manager
-                              int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   August 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component.
-
-        // METHODOLOGY EMPLOYED:
-        // Looks at the System Availability Manager schedule and sets the
-        // AvailStatus indicator accordingly. Mostly a useless algorithm
-        // since the fan schedules can do the same thing.
-
-        if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).SchedPtr) > 0.0) {
-            AvailStatus = CycleOn;
-        } else {
-            AvailStatus = ForceOff;
-        }
-
-        state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcSchedOnSysAvailMgr(EnergyPlusData &state,
-                                int const SysAvailNum, // number of the current scheduled on system availability manager
-                                int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         R. Raustad - FSEC
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component.
-
-        // METHODOLOGY EMPLOYED:
-        // Looks at the System Availability Manager schedule and sets the
-        // AvailStatus indicator accordingly. If the schedule value is > 0
-        // the availability status is CycleOn, ELSE the status is NoAction.
-
-        if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).SchedPtr) > 0.0) {
-            AvailStatus = CycleOn;
-        } else {
-            AvailStatus = NoAction;
-        }
-
-        state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcSchedOffSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum, // number of the current scheduled off system availability manager
-                                 int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         R. Raustad - FSEC
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component.
-
-        // METHODOLOGY EMPLOYED:
-        // Looks at the System Availability Manager schedule and sets the
-        // AvailStatus indicator accordingly.  If the schedule value is = 0
-        // the availability status is ForceOff, ELSE the status is NoAction.
-
-        if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).SchedPtr) == 0.0) {
-            AvailStatus = ForceOff;
-        } else {
-            AvailStatus = NoAction;
-        }
-
-        state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
     void CalcNCycSysAvailMgr(EnergyPlusData &state,
                              int const SysAvailNum,            // number of the current scheduled system availability manager
                              int const PriAirSysNum,           // number of the primary air system affected by this Avail. Manager
@@ -2456,1161 +3899,6 @@ namespace SystemAvailabilityManager {
         return false;
     }
 
-    void CalcOptStartSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum,  // number of the current scheduled system availability manager
-                                 int const PriAirSysNum, // number of the primary air system affected by this Avail. Manager
-                                 int &AvailStatus,       // System status indicator
-                                 [[maybe_unused]] Optional_int_const ZoneEquipType, // Type of ZoneHVAC equipment component
-                                 [[maybe_unused]] Optional_int_const CompNum        // Index of ZoneHVAC equipment component
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR            Xiufeng Pang (XP)
-        //       DATE WRITTEN      August 2013
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a primary air loop, plant loop or ZoneHVAC component
-
-        // METHODOLOGY EMPLOYED:
-        // Sets the AvailStatus indicator according to the
-        // optimum start algorithm
-
-        // Using/Aliasing
-        using namespace DataAirLoop;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        int ScheduleIndex;
-        Array2D<Real64> DayValues;
-        Array2D<Real64> DayValuesTmr;
-        int JDay;
-        int TmrJDay;
-        int TmrDayOfWeek;
-        int ZoneNum;
-        Real64 FanStartTime;
-        Real64 FanStartTimeTmr;
-        Real64 PreStartTime;
-        Real64 PreStartTimeTmr;
-        Real64 DeltaTime;
-        Real64 TempDiff;
-        Real64 TempDiffHi;
-        Real64 TempDiffLo;
-        bool FirstTimeATGFlag(true);
-        bool OverNightStartFlag(false); // Flag to indicate the optimum start starts before mid night.
-        bool CycleOnFlag(false);
-        bool OSReportVarFlag(true);
-        int NumPreDays;
-        int NumOfZonesInList;
-        Real64 AdaTempGradHeat;
-        Real64 AdaTempGradCool;
-        Real64 ATGUpdateTime1(0.0);
-        Real64 ATGUpdateTime2(0.0);
-        Real64 ATGUpdateTemp1(0.0);
-        Real64 ATGUpdateTemp2(0.0);
-        bool ATGUpdateFlag1(false);
-        bool ATGUpdateFlag2(false);
-        int ATGCounter;
-        int ATGWCZoneNumHi;
-        int ATGWCZoneNumLo;
-        Real64 NumHoursBeforeOccupancy; // Variable to store the number of hours before occupancy in optimum start period
-        bool exitLoop;                  // exit loop on found data
-
-        auto &OptStartMgr(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum));
-
-        // some avail managers may be used in air loop and plant availability manager lists, if so they only need be simulated once
-        if (OptStartMgr.isSimulated) {
-            AvailStatus = OptStartMgr.AvailStatus;
-            return;
-        }
-        OptStartMgr.isSimulated = true;
-
-        // update air loop specific data
-        TempDiffLo = OptStartMgr.TempDiffLo;
-        TempDiffHi = OptStartMgr.TempDiffHi;
-        ATGWCZoneNumLo = OptStartMgr.ATGWCZoneNumLo;
-        ATGWCZoneNumHi = OptStartMgr.ATGWCZoneNumHi;
-        CycleOnFlag = OptStartMgr.CycleOnFlag;
-        ATGUpdateFlag1 = OptStartMgr.ATGUpdateFlag1;
-        ATGUpdateFlag2 = OptStartMgr.ATGUpdateFlag2;
-        NumHoursBeforeOccupancy = OptStartMgr.NumHoursBeforeOccupancy;
-        FirstTimeATGFlag = OptStartMgr.FirstTimeATGFlag;
-        OverNightStartFlag = OptStartMgr.OverNightStartFlag;
-        OSReportVarFlag = OptStartMgr.OSReportVarFlag;
-
-        if (OptStartMgr.CtrlAlgType == state.dataSystemAvailabilityManager->AdaptiveTemperatureGradient) {
-            NumPreDays = OptStartMgr.NumPreDays;
-            if (!allocated(state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat)) {
-                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat.allocate(NumPreDays);
-                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool.allocate(NumPreDays);
-            }
-            if (!allocated(OptStartMgr.AdaTempGradTrdHeat)) {
-                OptStartMgr.AdaTempGradTrdHeat.allocate(NumPreDays);
-                OptStartMgr.AdaTempGradTrdHeat = 0.0;
-                OptStartMgr.AdaTempGradTrdCool.allocate(NumPreDays);
-                OptStartMgr.AdaTempGradTrdCool = 0.0;
-            }
-            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.AdaTempGradTrdHeat;
-            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.AdaTempGradTrdCool;
-            AdaTempGradHeat = OptStartMgr.AdaTempGradHeat;
-            AdaTempGradCool = OptStartMgr.AdaTempGradCool;
-            ATGUpdateTime1 = OptStartMgr.ATGUpdateTime1;
-            ATGUpdateTime2 = OptStartMgr.ATGUpdateTime2;
-            ATGUpdateTemp1 = OptStartMgr.ATGUpdateTemp1;
-            ATGUpdateTemp2 = OptStartMgr.ATGUpdateTemp2;
-        }
-
-        auto &OptStartData = state.dataHVACGlobal->OptStartData;
-
-        // add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
-        if (state.dataGlobal->KickOffSimulation) {
-            AvailStatus = NoAction;
-        } else {
-            ScheduleIndex = GetScheduleIndex(state, OptStartMgr.FanSched);
-            JDay = state.dataEnvrn->DayOfYear;
-            TmrJDay = JDay + 1;
-            TmrDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
-
-            DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
-            DayValuesTmr.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
-            if (!allocated(OptStartData.OptStartFlag)) {
-                OptStartData.OptStartFlag.allocate(state.dataGlobal->NumOfZones);
-                OptStartData.OccStartTime.allocate(state.dataGlobal->NumOfZones);
-            }
-            if (!allocated(OptStartData.ActualZoneNum)) OptStartData.ActualZoneNum.allocate(state.dataGlobal->NumOfZones);
-
-            // OptStartFlag needs to be reset each timestep to not stay set to true post-occupancy
-            OptStartData.OptStartFlag = false;
-
-            // reset OptStartData once per beginning of day
-            if (state.dataGlobal->BeginDayFlag) {
-                NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
-                if (state.dataSystemAvailabilityManager->BeginOfDayResetFlag) {
-                    OptStartData.OccStartTime = 22.99; // initialize the zone occupancy start time
-                    state.dataSystemAvailabilityManager->BeginOfDayResetFlag = false;
-                }
-            }
-            if (!state.dataGlobal->BeginDayFlag) state.dataSystemAvailabilityManager->BeginOfDayResetFlag = true;
-
-            GetScheduleValuesForDay(state, ScheduleIndex, DayValues);
-            GetScheduleValuesForDay(state, ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek);
-
-            FanStartTime = 0.0;
-            FanStartTimeTmr = 0.0;
-            exitLoop = false;
-            for (int I = 1; I <= 24; ++I) {
-                for (int J = 1; J <= state.dataGlobal->NumOfTimeStepInHour; ++J) {
-                    if (DayValues(J, I) <= 0.0) continue;
-                    FanStartTime = I - 1 + 1.0 / state.dataGlobal->NumOfTimeStepInHour * J - 0.01;
-                    exitLoop = true;
-                    break;
-                }
-                if (exitLoop) break;
-            }
-
-            exitLoop = false;
-            for (int I = 1; I <= 24; ++I) {
-                for (int J = 1; J <= state.dataGlobal->NumOfTimeStepInHour; ++J) {
-                    if (DayValuesTmr(J, I) <= 0.0) continue;
-                    FanStartTimeTmr = I - 1 + 1.0 / state.dataGlobal->NumOfTimeStepInHour * J - 0.01;
-                    exitLoop = true;
-                    break;
-                }
-                if (exitLoop) break;
-            }
-
-            if (FanStartTimeTmr == 0.0) FanStartTimeTmr = 24.0;
-
-            // Pass the start time to ZoneTempPredictorCorrector
-            for (int counter = 1; counter <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++counter) {
-                int actZoneNum =
-                    state.dataZoneEquip->ZoneEquipConfig(state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(counter)).ActualZoneNum;
-                OptStartData.OccStartTime(actZoneNum) = FanStartTime;
-                OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
-            }
-            for (int counter = 1; counter <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesHeated; ++counter) {
-                int actZoneNum =
-                    state.dataZoneEquip->ZoneEquipConfig(state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).HeatCtrlZoneNums(counter)).ActualZoneNum;
-                OptStartData.OccStartTime(actZoneNum) = FanStartTime;
-                OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
-            }
-
-            if (state.dataEnvrn->DSTIndicator > 0) {
-                --FanStartTime;
-                --FanStartTimeTmr;
-            }
-
-            {
-                auto const SELECT_CASE_var(OptStartMgr.CtrlAlgType);
-                if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ConstantStartTime) {
-                    if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->StayOff) {
-                        AvailStatus = NoAction;
-                    } else {
-                        DeltaTime = OptStartMgr.ConstStartTime;
-                        if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                            DeltaTime = OptStartMgr.MaxOptStartTime;
-                        }
-                        PreStartTime = FanStartTime - DeltaTime;
-                        if (PreStartTime < 0.0) PreStartTime = -0.1;
-                        PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                        if (PreStartTimeTmr < 0.0) {
-                            PreStartTimeTmr += 24.0;
-                            OverNightStartFlag = true;
-                        } else {
-                            OverNightStartFlag = false;
-                        }
-                        if (!OverNightStartFlag) {
-                            if (FanStartTime == 0.0 || state.dataGlobal->PreviousHour > FanStartTime) {
-                                AvailStatus = NoAction;
-                                OSReportVarFlag = true;
-                            } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                if (OSReportVarFlag) {
-                                    NumHoursBeforeOccupancy = DeltaTime;
-                                    OSReportVarFlag = false;
-                                }
-                                AvailStatus = CycleOn;
-                                OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                            } else {
-                                AvailStatus = NoAction;
-                                OSReportVarFlag = true;
-                            }
-                        } else {
-                            if (FanStartTime == 0.0 ||
-                                (state.dataGlobal->HourOfDay > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                AvailStatus = NoAction;
-                                OSReportVarFlag = true;
-                            } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                if (OSReportVarFlag) {
-                                    NumHoursBeforeOccupancy = DeltaTime;
-                                    OSReportVarFlag = false;
-                                }
-                                AvailStatus = CycleOn;
-                                OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                            } else {
-                                AvailStatus = NoAction;
-                                OSReportVarFlag = true;
-                            }
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ConstantTemperatureGradient) {
-                    if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->ControlZone) {
-                        ZoneNum = OptStartMgr.ZoneNum;
-                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
-                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
-                            TempDiff = 0.0;
-                        } else {
-                            if (!CycleOnFlag) {
-                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
-                                    TempDiffHi = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
-                                    TempDiffLo = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
-                                } else {
-                                    TempDiffHi = 0.0;
-                                    TempDiffLo = 0.0;
-                                }
-                            }
-                        }
-
-                        if (TempDiffHi < 0.0) {
-                            TempDiff = TempDiffLo;
-                            if (TempDiff < 0.0) { // Heating Mode
-                                TempDiff = std::abs(TempDiff);
-                                DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
-                                if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                    DeltaTime = OptStartMgr.MaxOptStartTime;
-                                }
-                                PreStartTime = FanStartTime - DeltaTime;
-                                if (PreStartTime < 0) PreStartTime = -0.1;
-                                PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                                if (PreStartTimeTmr < 0) {
-                                    PreStartTimeTmr += 24.0;
-                                    OverNightStartFlag = true;
-                                } else {
-                                    OverNightStartFlag = false;
-                                }
-                                if (!OverNightStartFlag) {
-                                    if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    } else if (CycleOnFlag) {
-                                        AvailStatus = CycleOn;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                        if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
-                                    } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                        AvailStatus = CycleOn;
-                                        CycleOnFlag = true;
-                                        if (OSReportVarFlag) {
-                                            NumHoursBeforeOccupancy = DeltaTime;
-                                            OSReportVarFlag = false;
-                                        }
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    } else {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    }
-                                } else {
-                                    if (FanStartTime == 0.0 ||
-                                        (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    } else if (CycleOnFlag) {
-                                        AvailStatus = CycleOn;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                        if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
-                                            CycleOnFlag = false;
-                                    } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                        if (OSReportVarFlag) {
-                                            NumHoursBeforeOccupancy = DeltaTime;
-                                            OSReportVarFlag = false;
-                                        }
-                                        AvailStatus = CycleOn;
-                                        CycleOnFlag = true;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    } else {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    }
-                                }
-                            } else {
-                                AvailStatus = NoAction;
-                                CycleOnFlag = false;
-                            }
-                        } else if (state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
-                            TempDiff = TempDiffHi;
-                            DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
-                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                DeltaTime = OptStartMgr.MaxOptStartTime;
-                            }
-                            PreStartTime = FanStartTime - DeltaTime;
-                            if (PreStartTime < 0) PreStartTime = -0.1;
-                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                            if (PreStartTimeTmr < 0) {
-                                PreStartTimeTmr += 24.0;
-                                OverNightStartFlag = true;
-                            } else {
-                                OverNightStartFlag = false;
-                            }
-                            if (!OverNightStartFlag) {
-                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            } else {
-                                if (FanStartTime == 0.0 ||
-                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            }
-                        } else {
-                            AvailStatus = NoAction;
-                            CycleOnFlag = false;
-                        }
-                    } else if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
-
-                        NumOfZonesInList = OptStartMgr.NumOfZones;
-                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
-                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
-                            TempDiff = 0.0;
-                        } else {
-                            if (!CycleOnFlag) {
-                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
-                                    TempDiffHi = 0.0;
-                                    TempDiffLo = 0.0;
-                                    for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
-                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
-                                                   state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
-                                        TempDiffHi = max(TempDiffHi, TempDiff);
-                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
-                                                   state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
-                                        TempDiffLo = min(TempDiffLo, TempDiff);
-                                    }
-                                } else {
-                                    TempDiffHi = 0.0;
-                                    TempDiffLo = 0.0;
-                                }
-                            }
-                        }
-                        if ((TempDiffHi < 0.0 && TempDiffLo < 0.0) ||
-                            (std::abs(TempDiffLo) > std::abs(TempDiffHi) && TempDiffLo < 0)) { // Heating Mode
-                            TempDiff = TempDiffLo;
-                            TempDiff = std::abs(TempDiff);
-                            DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
-                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                DeltaTime = OptStartMgr.MaxOptStartTime;
-                            }
-                            PreStartTime = FanStartTime - DeltaTime;
-                            if (PreStartTime < 0) PreStartTime = -0.1;
-                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                            if (PreStartTimeTmr < 0) {
-                                PreStartTimeTmr += 24.0;
-                                OverNightStartFlag = true;
-                            } else {
-                                OverNightStartFlag = false;
-                            }
-                            if (!OverNightStartFlag) {
-                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            } else {
-                                if (FanStartTime == 0.0 ||
-                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
-                                        CycleOnFlag = false;
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            }
-                        } else if (TempDiffHi <= 0.0 && TempDiffLo >= 0.0) { // not heating and not cooling
-                            AvailStatus = NoAction;
-                            CycleOnFlag = false;
-                            TempDiffHi = 0.0;
-                            TempDiffLo = 0.0;
-                        } else if (TempDiffHi < 30.0) { // Cooling Mode
-                            TempDiff = TempDiffHi;
-                            DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
-                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                DeltaTime = OptStartMgr.MaxOptStartTime;
-                            }
-                            PreStartTime = FanStartTime - DeltaTime;
-                            if (PreStartTime < 0) PreStartTime = -0.1;
-                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                            if (PreStartTimeTmr < 0) {
-                                PreStartTimeTmr += 24.0;
-                                OverNightStartFlag = true;
-                            } else {
-                                OverNightStartFlag = false;
-                            }
-                            if (!OverNightStartFlag) {
-                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            } else {
-                                if (FanStartTime == 0.0 ||
-                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            }
-                        } else {
-                            AvailStatus = NoAction;
-                            CycleOnFlag = false;
-                        }
-                    } else {
-                        AvailStatus = NoAction;
-                    }
-
-                } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->AdaptiveTemperatureGradient) {
-
-                    if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->ControlZone) {
-                        ZoneNum = OptStartMgr.ZoneNum;
-                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
-                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
-                            TempDiff = 0.0;
-                        } else {
-                            if (!CycleOnFlag) {
-                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
-                                    TempDiffHi = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
-                                    TempDiffLo = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
-                                } else {
-                                    TempDiffHi = 0.0;
-                                    TempDiffLo = 0.0;
-                                }
-                            }
-                        }
-                        // Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
-                        //-----------------------------------------------------------------------------
-                        if (state.dataGlobal->WarmupFlag) {
-                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
-                            AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
-                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
-                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
-                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
-                            AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else {
-                            if (state.dataGlobal->BeginDayFlag && FirstTimeATGFlag) {
-                                FirstTimeATGFlag = false;
-                                AdaTempGradHeat += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) / NumPreDays -
-                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(1) / NumPreDays;
-                                AdaTempGradCool += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) / NumPreDays -
-                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(1) / NumPreDays;
-                                if (FanStartTime > 0) {
-                                    for (ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter) {
-                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter) =
-                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter + 1);
-                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter) =
-                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter + 1);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (state.dataGlobal->CurrentTime >= 1.0) FirstTimeATGFlag = true;
-                        //------------------------------------------------------------------------------
-
-                        if (TempDiffHi < 0.0) {
-                            TempDiff = TempDiffLo;
-                            if (TempDiff < 0.0) { // Heating Mode
-                                TempDiff = std::abs(TempDiff);
-                                DeltaTime = TempDiff / AdaTempGradHeat;
-                                if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                    DeltaTime = OptStartMgr.MaxOptStartTime;
-                                }
-                                PreStartTime = FanStartTime - DeltaTime;
-                                if (PreStartTime < 0.0) PreStartTime = -0.1;
-                                PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                                if (PreStartTimeTmr < 0.0) {
-                                    PreStartTimeTmr += 24.0;
-                                    OverNightStartFlag = true;
-                                } else {
-                                    OverNightStartFlag = false;
-                                }
-                                if (!OverNightStartFlag) {
-                                    if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    } else if (CycleOnFlag) {
-                                        AvailStatus = CycleOn;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                        if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
-                                        // Calculate the current day actual temperature gradient --------------------------
-                                        if (!state.dataGlobal->WarmupFlag) {
-                                            if (ATGUpdateFlag1) {
-                                                ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                                ATGUpdateFlag1 = false;
-                                            }
-                                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >=
-                                                    state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) &&
-                                                ATGUpdateFlag2) {
-                                                ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                                ATGUpdateFlag2 = false;
-                                                if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
-                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1);
-                                                } else {
-                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
-                                                }
-                                            }
-                                        }
-                                        //---------------------------------------------------------------------------------
-                                    } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                        if (OSReportVarFlag) {
-                                            NumHoursBeforeOccupancy = DeltaTime;
-                                            OSReportVarFlag = false;
-                                        }
-                                        AvailStatus = CycleOn;
-                                        CycleOnFlag = true;
-                                        ATGUpdateFlag1 = true;
-                                        ATGUpdateFlag2 = true;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    } else {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    }
-                                } else {
-                                    if (FanStartTime == 0.0 ||
-                                        (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    } else if (CycleOnFlag) {
-                                        AvailStatus = CycleOn;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                        if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
-                                            CycleOnFlag = false;
-                                        // Calculate the current day actual temperature gradient --------------------------
-                                        if (!state.dataGlobal->WarmupFlag) {
-                                            if (ATGUpdateFlag1) {
-                                                ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                                ATGUpdateFlag1 = false;
-                                            }
-                                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >=
-                                                    state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) &&
-                                                ATGUpdateFlag2) {
-                                                ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                                ATGUpdateFlag2 = false;
-                                                if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
-                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
-                                                } else {
-                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                        (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
-                                                }
-                                            }
-                                        }
-                                        //---------------------------------------------------------------------------------
-                                    } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                        if (OSReportVarFlag) {
-                                            NumHoursBeforeOccupancy = DeltaTime;
-                                            OSReportVarFlag = false;
-                                        }
-                                        AvailStatus = CycleOn;
-                                        CycleOnFlag = true;
-                                        ATGUpdateFlag1 = true;
-                                        ATGUpdateFlag2 = true;
-                                        OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    } else {
-                                        AvailStatus = NoAction;
-                                        CycleOnFlag = false;
-                                        OSReportVarFlag = true;
-                                    }
-                                }
-                            } else {
-                                AvailStatus = NoAction;
-                                CycleOnFlag = false;
-                            }
-                        } else if (state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
-                            TempDiff = TempDiffHi;
-                            DeltaTime = TempDiff / AdaTempGradCool;
-                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                DeltaTime = OptStartMgr.MaxOptStartTime;
-                            }
-                            PreStartTime = FanStartTime - DeltaTime;
-                            if (PreStartTime < 0.0) PreStartTime = -0.1;
-                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                            if (PreStartTimeTmr < 0.0) {
-                                PreStartTimeTmr += 24.0;
-                                OverNightStartFlag = true;
-                            } else {
-                                OverNightStartFlag = false;
-                            }
-                            if (!OverNightStartFlag) {
-                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        if (ATGUpdateFlag1) {
-                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                            ATGUpdateFlag1 = false;
-                                        }
-                                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) &&
-                                            ATGUpdateFlag2) {
-                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                            ATGUpdateFlag2 = false;
-                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1);
-                                            } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
-                                            }
-                                        }
-                                    }
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    ATGUpdateFlag1 = true;
-                                    ATGUpdateFlag2 = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            } else {
-                                if (FanStartTime == 0.0 ||
-                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        if (ATGUpdateFlag1) {
-                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                            ATGUpdateFlag1 = false;
-                                        }
-                                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) &&
-                                            ATGUpdateFlag2) {
-                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
-                                            ATGUpdateFlag2 = false;
-                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
-                                            } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
-                                            }
-                                        }
-                                    }
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    ATGUpdateFlag1 = true;
-                                    ATGUpdateFlag2 = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            }
-                        } else { // Not heating nor cooling mode
-                            AvailStatus = NoAction;
-                            CycleOnFlag = false;
-                        }
-                    } else if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
-
-                        NumOfZonesInList = OptStartMgr.NumOfZones;
-                        ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
-                        ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
-                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
-                            (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
-                            TempDiff = 0.0;
-                        } else {
-                            if (!CycleOnFlag) {
-                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
-                                    TempDiffHi = 0.0;
-                                    TempDiffLo = 0.0;
-                                    ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
-                                    ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
-                                    for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
-                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
-                                                   state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
-                                        TempDiffHi = max(TempDiffHi, TempDiff);
-                                        // Store the worse case zone number for actual temperature gradient calculation
-                                        if (TempDiff == TempDiffHi) {
-                                            ATGWCZoneNumHi = OptStartMgr.ZonePtrs(ZoneNum);
-                                        }
-                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) -
-                                                   state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
-                                        TempDiffLo = min(TempDiffLo, TempDiff);
-                                        if (TempDiff == TempDiffLo) {
-                                            ATGWCZoneNumLo = OptStartMgr.ZonePtrs(ZoneNum);
-                                        }
-                                    }
-                                } else {
-                                    TempDiffHi = 0.0;
-                                    TempDiffLo = 0.0;
-                                }
-                            }
-                        }
-                        // Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
-                        //-----------------------------------------------------------------------------
-                        if (state.dataGlobal->WarmupFlag) {
-                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
-                            AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
-                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
-                            AdaTempGradHeat = OptStartMgr.InitTGradHeat;
-                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
-                            AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else {
-                            if (state.dataGlobal->BeginDayFlag && FirstTimeATGFlag) {
-                                FirstTimeATGFlag = false;
-                                AdaTempGradHeat += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) / NumPreDays -
-                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(1) / NumPreDays;
-                                AdaTempGradCool += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) / NumPreDays -
-                                                   state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(1) / NumPreDays;
-                                if (FanStartTime > 0) {
-                                    for (ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter) {
-                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter) =
-                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(ATGCounter + 1);
-                                        state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter) =
-                                            state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(ATGCounter + 1);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (state.dataGlobal->CurrentTime >= 1.0) FirstTimeATGFlag = true;
-                        //------------------------------------------------------------------------------
-
-                        if ((TempDiffHi < 0.0 && TempDiffLo < 0.0) ||
-                            (std::abs(TempDiffLo) > std::abs(TempDiffHi) && TempDiffLo < 0.0)) { // Heating Mode
-                            TempDiff = TempDiffLo;
-                            TempDiff = std::abs(TempDiff);
-                            DeltaTime = TempDiff / AdaTempGradHeat;
-                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                DeltaTime = OptStartMgr.MaxOptStartTime;
-                            }
-                            PreStartTime = FanStartTime - DeltaTime;
-                            if (PreStartTime < 0.0) PreStartTime = -0.1;
-                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                            if (PreStartTimeTmr < 0.0) {
-                                PreStartTimeTmr += 24.0;
-                                OverNightStartFlag = true;
-                            } else {
-                                OverNightStartFlag = false;
-                            }
-                            if (!OverNightStartFlag) {
-                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                    OSReportVarFlag = true;
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    if (state.dataGlobal->CurrentTime > FanStartTime) CycleOnFlag = false;
-                                    // Calculate the current day actual temperature gradient --------------------------
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        if (ATGUpdateFlag1) {
-                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
-                                            ATGUpdateFlag1 = false;
-                                        }
-                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo) >=
-                                                state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) &&
-                                            ATGUpdateFlag2) {
-                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
-                                            ATGUpdateFlag2 = false;
-                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1);
-                                            } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
-                                            }
-                                        }
-                                    }
-                                    //---------------------------------------------------------------------------------
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    ATGUpdateFlag1 = true;
-                                    ATGUpdateFlag2 = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            } else {
-                                if (FanStartTime == 0.0 ||
-                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    // Calculate the current day actual temperature gradient --------------------------
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        if (ATGUpdateFlag1) {
-                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
-                                            ATGUpdateFlag1 = false;
-                                        }
-                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo) >=
-                                                state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) &&
-                                            ATGUpdateFlag2) {
-                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
-                                            ATGUpdateFlag2 = false;
-                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
-                                            } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
-                                                    (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
-                                            }
-                                        }
-                                    }
-                                    //---------------------------------------------------------------------------------
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    if (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime < PreStartTimeTmr)
-                                        CycleOnFlag = false;
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    ATGUpdateFlag1 = true;
-                                    ATGUpdateFlag2 = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            }
-                        } else if (TempDiffHi <= 0.0 && TempDiffLo >= 0.0) { // not heating and not cooling
-                            AvailStatus = NoAction;
-                            CycleOnFlag = false;
-                            TempDiffHi = 0.0;
-                            TempDiffLo = 0.0;
-                        } else if (TempDiffHi < 30.0) { // Cooling Mode
-                            TempDiff = TempDiffHi;
-                            DeltaTime = TempDiff / AdaTempGradCool;
-                            if (DeltaTime > OptStartMgr.MaxOptStartTime) {
-                                DeltaTime = OptStartMgr.MaxOptStartTime;
-                            }
-                            PreStartTime = FanStartTime - DeltaTime;
-                            if (PreStartTime < 0) PreStartTime = -0.1;
-                            PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
-                            if (PreStartTimeTmr < 0) {
-                                PreStartTimeTmr += 24.0;
-                                OverNightStartFlag = true;
-                            } else {
-                                OverNightStartFlag = false;
-                            }
-                            if (!OverNightStartFlag) {
-                                if (FanStartTime == 0.0 || state.dataGlobal->CurrentTime > FanStartTime) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    // Calculate the current day actual temperature gradient --------------------------
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        if (ATGUpdateFlag1) {
-                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
-                                            ATGUpdateFlag1 = false;
-                                        }
-                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi) <=
-                                                state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) &&
-                                            ATGUpdateFlag2) {
-                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
-                                            ATGUpdateFlag2 = false;
-                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1);
-                                            } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
-                                            }
-                                        }
-                                    }
-                                    //---------------------------------------------------------------------------------
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    ATGUpdateFlag1 = true;
-                                    ATGUpdateFlag2 = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            } else {
-                                if (FanStartTime == 0.0 ||
-                                    (state.dataGlobal->CurrentTime > FanStartTime && state.dataGlobal->CurrentTime <= PreStartTimeTmr)) {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                } else if (CycleOnFlag) {
-                                    AvailStatus = CycleOn;
-                                    // Calculate the current day actual temperature gradient --------------------------
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        if (ATGUpdateFlag1) {
-                                            ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
-                                            ATGUpdateFlag1 = false;
-                                        }
-                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi) <=
-                                                state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) &&
-                                            ATGUpdateFlag2) {
-                                            ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
-                                            ATGUpdateFlag2 = false;
-                                            if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
-                                            } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
-                                                    (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
-                                            }
-                                        }
-                                    }
-                                    //---------------------------------------------------------------------------------
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else if (PreStartTime < state.dataGlobal->CurrentTime || PreStartTimeTmr < state.dataGlobal->CurrentTime) {
-                                    if (OSReportVarFlag) {
-                                        NumHoursBeforeOccupancy = DeltaTime;
-                                        OSReportVarFlag = false;
-                                    }
-                                    AvailStatus = CycleOn;
-                                    CycleOnFlag = true;
-                                    ATGUpdateFlag2 = true;
-                                    ATGUpdateFlag1 = true;
-                                    OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                } else {
-                                    AvailStatus = NoAction;
-                                    CycleOnFlag = false;
-                                    OSReportVarFlag = true;
-                                }
-                            }
-                        } else {
-                            AvailStatus = NoAction;
-                            CycleOnFlag = false;
-                        }
-                    } else {
-                        AvailStatus = NoAction;
-                    }
-
-                } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->AdaptiveASHRAE) {
-                    AvailStatus = NoAction;
-                }
-            }
-        }
-
-        OptStartMgr.AvailStatus = AvailStatus;
-        OptStartMgr.NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
-        OptStartMgr.TempDiffLo = TempDiffLo;
-        OptStartMgr.TempDiffHi = TempDiffHi;
-        OptStartMgr.ATGWCZoneNumLo = ATGWCZoneNumLo;
-        OptStartMgr.ATGWCZoneNumHi = ATGWCZoneNumHi;
-        OptStartMgr.CycleOnFlag = CycleOnFlag;
-        OptStartMgr.ATGUpdateFlag1 = ATGUpdateFlag1;
-        OptStartMgr.ATGUpdateFlag2 = ATGUpdateFlag2;
-        OptStartMgr.FirstTimeATGFlag = FirstTimeATGFlag;
-        OptStartMgr.OverNightStartFlag = OverNightStartFlag;
-        OptStartMgr.OSReportVarFlag = OSReportVarFlag;
-        if (OptStartMgr.CtrlAlgType == state.dataSystemAvailabilityManager->AdaptiveTemperatureGradient) {
-            OptStartMgr.AdaTempGradTrdHeat = state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat;
-            OptStartMgr.AdaTempGradTrdCool = state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool;
-            OptStartMgr.AdaTempGradHeat = AdaTempGradHeat;
-            OptStartMgr.AdaTempGradCool = AdaTempGradCool;
-            OptStartMgr.ATGUpdateTime1 = ATGUpdateTime1;
-            OptStartMgr.ATGUpdateTime2 = ATGUpdateTime2;
-            OptStartMgr.ATGUpdateTemp1 = ATGUpdateTemp1;
-            OptStartMgr.ATGUpdateTemp2 = ATGUpdateTemp2;
-        }
-    }
-
     void DefineOptStartSysAvailManager::SetOptStartFlag(EnergyPlusData &state, int const AirLoopNum)
     {
         // Set the OptStartFlag true for all zones on the air loop
@@ -3622,334 +3910,6 @@ namespace SystemAvailabilityManager {
         for (int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesHeated; ++counter) {
             int actZoneNum = state.dataZoneEquip->ZoneEquipConfig(thisAirToZoneNodeInfo.HeatCtrlZoneNums(counter)).ActualZoneNum;
             state.dataHVACGlobal->OptStartData.OptStartFlag(actZoneNum) = true;
-        }
-    }
-    void CalcNVentSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,           // number of the current scheduled system availability manager
-                              int const PriAirSysNum,          // number of the primary air system affected by this Avail. Manager
-                              int &AvailStatus,                // System status indicator
-                              Optional_int_const ZoneEquipType // Type of zone equipment component
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   December 2004
-        //       MODIFIED       March 2011, Chandan Sharma - FSEC: Allowed night ventilation
-        //                             availability manager to work for zone component
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a primary air loop and ZoneHVAC component and sets a specified flow
-        // rate fraction for the air loop for use during night ventilation.
-
-        // METHODOLOGY EMPLOYED:
-        // Looks at outside and indoor conditions to determine if night ventilation
-        // is beneficial. If it is and it is scheduled on the AvailStatus is set to cycle
-        // on and the loop flow rate fractionis set to the specified night ventilation
-        // value.
-
-        using namespace DataAirLoop;
-
-        int ZoneInSysNum;
-        int CtrldZoneNum;
-        int ZoneNum;
-        bool TempCheck;     // TRUE if one zone's temperature is above the value of the vent temp sched
-        bool DelTCheck;     // TRUE if the control zone temperature - outside temperature > VentDelT
-        bool LowLimCheck;   // TRUE if one zones's air temperature is below this value
-        Real64 VentTemp;    // value of the ventilation temperature schedule
-        int ControlZoneNum; // actual zone number of the control zone
-
-        TempCheck = false;
-        DelTCheck = false;
-        LowLimCheck = false;
-        // check if night venting allowed: not allowed if avail sched is off or fan sched is on
-        // CR 7913 changed to allow during warmup
-        if ((GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).SchedPtr) <= 0.0) ||
-            (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).FanSchedPtr) > 0.0)) {
-            AvailStatus = NoAction;
-        } else {
-
-            VentTemp = GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempSchedPtr);
-            ControlZoneNum = state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).ZoneNum;
-
-            if (present(ZoneEquipType)) {
-                // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
-                if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) > VentTemp) {
-                    TempCheck = true;
-                }
-                // if the room temperature is less than the low limit set the low limit check to TRUE
-                if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) <
-                    state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
-                    LowLimCheck = true;
-                }
-            } else {
-                for (ZoneInSysNum = 1; ZoneInSysNum <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled;
-                     ++ZoneInSysNum) { // loop over zones in system
-
-                    CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
-                    ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
-                    // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
-                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > VentTemp) {
-                        TempCheck = true;
-                    }
-                    // if the room temperature is less than the low limit set the low limit check to TRUE
-                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                        state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
-                        LowLimCheck = true;
-                    }
-                }
-            }
-            // If the difference between the control zone temperature and the outside temperature is greater than
-            // the specified night venting delta T then set the delta T check to TRUE
-            if ((state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) - state.dataEnvrn->OutDryBulbTemp) >
-                state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
-                DelTCheck = true;
-            }
-            // If the limit requirements are met turn on night ventilation
-            if (TempCheck && DelTCheck && !LowLimCheck) {
-                AvailStatus = CycleOn;
-            } else {
-                AvailStatus = NoAction;
-            }
-        }
-
-        if (!present(ZoneEquipType)) {
-            if (AvailStatus == CycleOn) {
-                state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).LoopFlowRateSet = true;
-                state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).NightVent = true;
-                state.dataAirLoop->AirLoopFlow(PriAirSysNum).ReqSupplyFrac =
-                    state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentFlowFrac;
-            }
-        }
-
-        state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcDiffTSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,    // Number of the current scheduled system availability manager
-                              int const PreviousStatus, // System status for the previous timestep
-                              int &AvailStatus          // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
-
-        // METHODOLOGY EMPLOYED:
-
-        Real64 DeltaTemp;
-
-        DeltaTemp = state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode).Temp -
-                    state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode).Temp;
-
-        if (DeltaTemp >= state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOn) {
-            AvailStatus = CycleOn;
-        } else if (DeltaTemp <= state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOff) {
-            AvailStatus = ForceOff;
-        } else {
-
-            if (PreviousStatus == NoAction) {
-                AvailStatus = ForceOff;
-            } else {
-                AvailStatus = PreviousStatus; // No change, but not "NoAction"; it should always be on or off.
-            }
-        }
-
-        state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcHiTurnOffSysAvailMgr(EnergyPlusData &state,
-                                  int const SysAvailNum, // Number of the current scheduled system availability manager
-                                  int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
-
-        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node).Temp >=
-            state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Temp) {
-            AvailStatus = ForceOff;
-        } else {
-            AvailStatus = NoAction;
-        }
-
-        state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcHiTurnOnSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum, // Number of the current scheduled system availability manager
-                                 int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
-
-        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node).Temp >=
-            state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Temp) {
-            AvailStatus = CycleOn;
-        } else {
-            AvailStatus = NoAction;
-        }
-
-        state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcLoTurnOffSysAvailMgr(EnergyPlusData &state,
-                                  int const SysAvailNum, // Number of the current scheduled system availability manager
-                                  int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
-
-        // If applicability schedule is off, then availability manager is inactive, return no action
-        if (state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr > 0) {
-            if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr) <= 0.0) {
-                AvailStatus = NoAction;
-                state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-                return;
-            }
-        }
-
-        // Availability manager is active, check temperature limit
-        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node).Temp <=
-            state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Temp) {
-            AvailStatus = ForceOff;
-        } else {
-            AvailStatus = NoAction;
-        }
-
-        state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    void CalcLoTurnOnSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum, // Number of the current scheduled system availability manager
-                                 int &AvailStatus       // System status indicator
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
-
-        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node).Temp <=
-            state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Temp) {
-            AvailStatus = CycleOn;
-        } else {
-            AvailStatus = NoAction;
-        }
-
-        state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
-    }
-
-    int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName) // name to validate
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   April 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function returns true for a valid System Availability Manager Type
-        // and false if not.
-
-        // Return value
-        int ValidType; // result of validation
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Found;
-
-        Found = UtilityRoutines::FindItem(AvailMgrName,
-                                          state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes,
-                                          state.dataSystemAvailabilityManager->NumValidSysAvailManagerTypes);
-        if (Found > 0) {
-            //   Hybrid ventilation must not be specified in a list
-            if (state.dataSystemAvailabilityManager->ValidSysAvailManagerTypes(Found) !=
-                state.dataSystemAvailabilityManager->SysAvailMgr_HybridVent) {
-                ValidType = state.dataSystemAvailabilityManager->ValidSysAvailManagerTypes(Found);
-            } else {
-                ValidType = 0;
-            }
-        } else {
-            ValidType = 0;
-        }
-
-        return ValidType;
-    }
-
-    void ManageHybridVentilation(EnergyPlusData &state)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   March 2007
-        //       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Manage the simulation of the Hybrid Ventilation Control System Availability Managers
-
-        using namespace DataLoopNode;
-        using namespace DataAirLoop;
-
-        int PriAirSysNum; // Primary Air System index
-        int SysAvailNum;
-
-        if (state.dataSystemAvailabilityManager->GetHybridInputFlag) {
-            GetHybridVentilationInputs(state);
-            state.dataSystemAvailabilityManager->GetHybridInputFlag = false;
-        }
-
-        if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs == 0) return;
-
-        InitHybridVentSysAvailMgr(state);
-
-        for (SysAvailNum = 1; SysAvailNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
-            if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) {
-                    if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum)
-                        CalcHybridVentSysAvailMgr(state, SysAvailNum, PriAirSysNum);
-                }
-            } else {
-                // Hybrid ventilation manager is applied to zone component
-                if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimHybridVentSysAvailMgr) {
-                    CalcHybridVentSysAvailMgr(state, SysAvailNum);
-                }
-            }
         }
     }
 
@@ -4861,6 +4821,47 @@ namespace SystemAvailabilityManager {
         }
         state.dataSystemAvailabilityManager->TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
         state.dataSystemAvailabilityManager->CurrentEndTimeLast = state.dataSystemAvailabilityManager->CurrentEndTime;
+    }
+
+    void ManageHybridVentilation(EnergyPlusData &state)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   March 2007
+        //       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manage the simulation of the Hybrid Ventilation Control System Availability Managers
+
+        using namespace DataLoopNode;
+        using namespace DataAirLoop;
+
+        int PriAirSysNum; // Primary Air System index
+        int SysAvailNum;
+
+        if (state.dataSystemAvailabilityManager->GetHybridInputFlag) {
+            GetHybridVentilationInputs(state);
+            state.dataSystemAvailabilityManager->GetHybridInputFlag = false;
+        }
+
+        if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs == 0) return;
+
+        InitHybridVentSysAvailMgr(state);
+
+        for (SysAvailNum = 1; SysAvailNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
+            if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
+                for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) {
+                    if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum)
+                        CalcHybridVentSysAvailMgr(state, SysAvailNum, PriAirSysNum);
+                }
+            } else {
+                // Hybrid ventilation manager is applied to zone component
+                if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimHybridVentSysAvailMgr) {
+                    CalcHybridVentSysAvailMgr(state, SysAvailNum);
+                }
+            }
+        }
     }
 
     void CalcHybridVentSysAvailMgr(EnergyPlusData &state,

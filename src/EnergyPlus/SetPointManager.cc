@@ -123,7 +123,6 @@ namespace EnergyPlus::SetPointManager {
 // To encapsulate the data and algorithms required to
 // determine all the controller setpoints in the problem.
 
-// METHODOLOGY EMPLOYED:
 // Previous time step node data will be used, in a set of fixed, precoded algorithms,
 // to determine the current time step's controller setpoints.
 
@@ -134,6 +133,53 @@ using namespace CurveManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
 
+void UpdateOAPretreatSetPoints(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         M. J. Witte based on UpdateMixedAirSetPoints by Fred Buhl,
+    //                        Work supported by ASHRAE research project 1254-RP
+    //       DATE WRITTEN   January 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Loop over all the Outside Air Pretreat Managers and use their output arrays
+    // to set the node setpoints.
+
+    int SetPtMgrNum;
+    int CtrlNodeIndex;
+    int NodeNum;
+
+    // Loop over all the Mixed Air Setpoint Managers
+
+    for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumOAPretreatSetPtMgrs; ++SetPtMgrNum) {
+
+        for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes;
+             ++CtrlNodeIndex) { // Loop over the list of nodes wanting
+            // setpoints from this setpoint manager
+            NodeNum = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
+
+            {
+                auto const SELECT_CASE_var(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode);
+                if (SELECT_CASE_var == iCtrlVarType::Temp) { // 'Temperature'
+                    state.dataLoopNodes->Node(NodeNum).TempSetPoint =
+                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+                } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) {                  // 'MaximumHumidityRatio'
+                    state.dataLoopNodes->Node(NodeNum).HumRatMax =
+                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+                } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) {                  // 'MinimumHumidityRatio'
+                    state.dataLoopNodes->Node(NodeNum).HumRatMin =
+                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+                } else if (SELECT_CASE_var == iCtrlVarType::HumRat) {                     // 'HumidityRatio'
+                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
+                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+                }
+            }
+        }
+    }
+}
+
 void ManageSetPoints(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -142,27 +188,9 @@ void ManageSetPoints(EnergyPlusData &state)
     //       MODIFIED       Fred Buhl May 2000
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-
     // METHODOLOGY EMPLOYED:
     // Each flag is checked and the appropriate manager is then called.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum; // loop index
 
     // First time ManageSetPoints is called, get the input for all the setpoint managers
@@ -240,7 +268,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // METHODOLOGY EMPLOYED:
     // Use the Get routines from the InputProcessor module.
 
-    // Using/Aliasing
     using DataZoneEquipment::GetSystemNodeNumberForZone;
     using General::FindNumberInList;
 
@@ -249,11 +276,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     using ScheduleManager::CheckScheduleValueMinMax;
     using ScheduleManager::GetScheduleIndex;
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
     const char *RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_string cAlphaFieldNames;
     Array1D_string cNumericFieldNames;
     Array1D_bool lNumericFieldBlanks;
@@ -3801,8 +3825,6 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
     // 3) For SET POINT MANAGER:RETURN AIR BYPASS FLOW
     //    check for duplicate air loop names.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
     int SetPtMgrNum;      // Setpoint Manager index
     int TempSetPtMgrNum;  // Setpoint Manager index for warning messages
     int CtrldNodeNum;     // index of the items in the controlled node node list
@@ -3996,11 +4018,8 @@ void InitSetPointManagers(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger initializations.
 
-    // Using/Aliasing
     using namespace DataPlant;
     using OutAirNodeManager::CheckOutAirNodeNumber;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     int SetZoneNum;
     int ControlledZoneNum;
@@ -5496,7 +5515,6 @@ void SimSetPointManagers(EnergyPlusData &state)
     // Loop over all the Setpoint Managers and invoke the correct
     // Setpoint Manager algorithm.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum;
 
     // Execute all the Setpoint Managers
@@ -5675,14 +5693,6 @@ void DefineScheduledSetPointManager::calculate(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Set the setpoint using a simple schedule.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
     // SUBROUTINE ARGUMENTS:
 
     this->SetPt = GetCurrentScheduleValue(state, this->SchedPtr);
@@ -5703,7 +5713,6 @@ void DefineScheduledTESSetPointManager::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Modified schedule setpoint manager logic
 
-    // Locals
     Real64 CurSchValOnPeak;
     Real64 CurSchValCharge;
     Real64 const OnVal(0.5);
@@ -5740,14 +5749,6 @@ void DefineSchedDualSetPointManager::calculate(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Set the both setpoint using a simple schedule.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
     // SUBROUTINE ARGUMENTS:
 
     this->SetPtHi = GetCurrentScheduleValue(state, this->SchedPtrHi);
@@ -5759,17 +5760,6 @@ void DefineOutsideAirSetPointManager::calculate(EnergyPlusData &state)
 
     // SUBROUTINE ARGUMENTS:
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 SchedVal;
     Real64 OutLowTemp;
     Real64 OutHighTemp;
@@ -5829,29 +5819,11 @@ void DefineSZReheatSetPointManager::calculate(EnergyPlusData &state)
     // From the heating or cooling load of the control zone, calculate the supply air setpoint
     // needed to meet that zone load
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using namespace DataZoneEnergyDemands;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
     using Psychrometrics::PsyTdbFnHW;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;     // required zone load [W]
     Real64 ZoneMassFlow; // zone inlet mass flow rate [kg/s]
     Real64 CpAir;        // inlet air specific heat [J/kg-C]
@@ -6110,7 +6082,6 @@ void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     // is used to calculate the minimum supply air humidity ratio
     // needed to meet minimum zone relative humidity requirement
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallMassFlow;
     using Psychrometrics::PsyWFnTdbRhPb;
 
@@ -6157,7 +6128,6 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // is used to calculate the maximum supply air humidity ratio
     // needed to meet maximum zone relative humidity requirement
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallMassFlow;
     using Psychrometrics::PsyWFnTdbRhPb;
 
@@ -6201,26 +6171,8 @@ void DefineMixedAirSetPointManager::calculate(EnergyPlusData &state)
     // Starting with the setpoint at the reference node, subtract the supply fan
     // temperature rise and set the resulting temperature at the mixed air node.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FanInNode;       // supply fan inlet node number
     int FanOutNode;      // supply fan outlet node number
     int RefNode;         // setpoint reference node number
@@ -6303,26 +6255,8 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
     // the reference setpoint at the mixed air node.
     // (based on CalcMixedAirSetPoint)
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RefNode;            // setpoint reference node number
     int MixedOutNode;       // mixed air outlet node number
     int OAInNode;           // outside air inlet node number
@@ -6434,11 +6368,9 @@ void DefineWarmestSetPointManager::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Zone sensible heat balance
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;         // required zone load [W]
     Real64 ZoneMassFlowMax;  // zone inlet maximum mass flow rate [kg/s]
     Real64 CpAir;            // inlet air specific heat [J/kg-C]
@@ -6497,14 +6429,11 @@ void DefineColdestSetPointManager::calculate(EnergyPlusData &state)
     // Calculate the "coldest" supply air setpoint temperature that will satisfy the heating
     // requirements of all the zones served by a central air system.
 
-    // METHODOLOGY EMPLOYED:
     // Zone sensible heat balance
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;         // required zone load [W]
     Real64 ZoneMassFlowMax;  // zone inlet maximum mass flow rate [kg/s]
     Real64 CpAir;            // inlet air specific heat [J/kg-C]
@@ -6589,11 +6518,9 @@ void DefWarmestSetPtManagerTempFlow::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Zone sensible heat balance
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;         // required zone load [W]
     Real64 ZoneMassFlowMax;  // zone inlet maximum mass flow rate [kg/s]
     Real64 CpAir;            // inlet air specific heat [J/kg-C]
@@ -6711,25 +6638,6 @@ void DefRABFlowSetPointManager::calculate(EnergyPlusData &state)
     // return asir branch that will deliver the desired temperature at the loop outlet
     // node.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int MixerRABInNode;  // Mixer RAB inlet node number
     int MixerSupInNode;  // Mixer supply inlet node number
     int MixerOutNode;    // Mixer outlet node number
@@ -6774,11 +6682,9 @@ void DefMultiZoneAverageHeatingSetPointManager::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Zone sensible (heating load) heat balance around the zones served by a central air system
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
     Real64 ZoneMassFlowRate;         // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
     Real64 CpAir;                    // inlet air specific heat [J/kg-C]
@@ -6858,11 +6764,9 @@ void DefMultiZoneAverageCoolingSetPointManager::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Zone sensible (cooling load) heat balance around the zones served by a central air system
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
     Real64 ZoneMassFlowRate;         // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
     Real64 CpAir;                    // inlet air specific heat [J/kg-C]
@@ -6935,11 +6839,9 @@ void DefMultiZoneAverageMinHumSetPointManager::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Zone latent load balance around the zones served by a central air system
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
     Real64 ZoneMassFlowRate;     // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
     int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -7003,11 +6905,9 @@ void DefMultiZoneAverageMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Zone latent load balance around the zones served by a central air system
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
     Real64 ZoneMassFlowRate;     // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
     int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -7073,14 +6973,11 @@ void DefMultiZoneMinHumSetPointManager::calculate(EnergyPlusData &state)
     // over all the zones that a central air system can humidify and calculates the setpoint based
     // on a zone with the highest humidity ratio setpoint requirement:
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
+    Real64 constexpr SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int AirLoopNum;              // the index of the air loop served by this setpoint manager
     int ZonesCooledIndex;        // DO loop index for zones cooled by the air loop
     int CtrlZoneNum;             // the controlled zone index
@@ -7139,14 +7036,11 @@ void DefMultiZoneMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // over all the zones that a central air system can dehumidify and calculates the setpoint
     // based on a zone with the lowest humidity ratio setpoint requirement:
 
-    // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
+    Real64 constexpr SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int AirLoopNum;              // the index of the air loop served by this setpoint manager
     int ZonesCooledIndex;        // DO loop index for zones cooled by the air loop
     int CtrlZoneNum;             // the controlled zone index
@@ -7207,23 +7101,6 @@ void DefineFollowOATempSetPointManager::calculate(EnergyPlusData &state)
     // The sign convention is that a positive Offset will increase the resulting setpoint.
     // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //  INTEGER      :: CtrldNodeNum    ! index of the items in the controlled node list
     Real64 MinSetPoint; // minimum allowed setpoint
     Real64 MaxSetPoint; // maximum allowed setpoint
 
@@ -7268,23 +7145,6 @@ void DefineFollowSysNodeTempSetPointManager::calculate(EnergyPlusData &state)
     // as the reference system node temperature.  The sign convention is that a positive offset will increase
     // the resulting setpoint.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RefNode;        // setpoint reference node number
     Real64 RefNodeTemp; // setpoint at reference node
     Real64 MinSetPoint; // minimum allowed setpoint
@@ -7333,7 +7193,6 @@ void DefineGroundTempSetPointManager::calculate(EnergyPlusData &state)
     // The sign convention is that a positive Offset will increase the resulting setpoint.
     // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MinSetPoint; // minimum allowed setpoint
     Real64 MaxSetPoint; // maximum allowed setpoint
 
@@ -7376,41 +7235,11 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     // using one curve to determine the optimum condenser entering water temperature for a given timestep
     // and two other curves to place boundary conditions on the optimal setpoint value.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using CurveManager::CurveValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataPlant;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //////////// hoisted into namespace ////////////////////////////////////////////////
-    // static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F} // DCESPMDsn_EntCondTemp
-    // static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F} // DCESPMDsn_MinCondSetpt
-    // static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep // DCESPMCur_MinLiftTD
-    // static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W // DCESPMDesign_Load_Sum
-    // static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W // DCESPMActual_Load_Sum
-    // static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W // DCESPMWeighted_Actual_Load_Sum
-    // static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W // DCESPMWeighted_Design_Load_Sum
-    // static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers // DCESPMWeighted_Ratio
-    // static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C // DCESPMMin_DesignWB
-    // static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C // DCESPMMin_ActualWb
-    // static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C // DCESPMOpt_CondEntTemp
-    // static Real64 DesignClgCapacity_Watts( 0.0 ); // DCESPMDesignClgCapacity_Watts
-    // static Real64 CurrentLoad_Watts( 0.0 ); // DCESPMCurrentLoad_Watts
-    // static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C) // DCESPMCondInletTemp
-    // static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C) // DCESPMEvapOutletTemp
-    ////////////////////////////////////////////////////////////////////////////////////
     Real64 NormDsnCondFlow(0.0);        // Normalized design condenser flow for cooling towers, m3/s per watt
     Real64 Twr_DesignWB(0.0);           // The cooling tower design inlet air wet bulb temperature, C
     Real64 Dsn_CondMinThisChiller(0.0); // Design Minimum Condenser Entering for current chillers this timestep
@@ -7620,10 +7449,8 @@ void DefineIdealCondEntSetPointManager::calculate(EnergyPlusData &state)
     // and evaporator leaving water temperature. The maximum boundary is specified by the user.
     // It is assumed that a single minimum point exists between these boundaries.
 
-    // Using/Aliasing
     using namespace DataPlant;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &CondWaterSetPoint = state.dataSetPointManager->CondWaterSetPoint;
     auto &EvapOutletTemp = state.dataSetPointManager->EvapOutletTemp;
     auto &CondTempLimit = state.dataSetPointManager->CondTempLimit;
@@ -7800,7 +7627,6 @@ void DefineReturnWaterChWSetPointManager::calculate(EnergyPlusData &state, DataL
     // The assumptions related to lagging of setpoint are most suited for smaller timesteps and/or plants that don't vary wildly from one time
     // step to another The assumptions also become affected by variable flow plants more-so than constant-flow plants
 
-    // Using/Aliasing
     using namespace DataPlant;
 
     // we need to know the plant to get the fluid ID in case it is glycol
@@ -7906,7 +7732,6 @@ void DefineReturnWaterHWSetPointManager::calculate(EnergyPlusData &state, DataLo
     // The assumptions related to lagging of setpoint are most suited for smaller timesteps and/or plants that don't vary wildly from one time
     // step to another The assumptions also become affected by variable flow plants more-so than constant-flow plants
 
-    // Using/Aliasing
     using namespace DataPlant;
 
     // we need to know the plant to get the fluid ID in case it is glycol
@@ -7991,10 +7816,8 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     // For the Ideal Cond reset setpoint manager, this sets up the
     // report variables used during the calculation.
 
-    // Using/Aliasing
     using namespace DataPlant;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string TypeOfComp;
     std::string NameOfComp;
 
@@ -8152,25 +7975,8 @@ void UpdateSetPointManagers(EnergyPlusData &state)
     // Loop over all the Setpoint Managers and use their output arrays
     // to set the node setpoints.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum;
     int CtrlNodeIndex;
     int NodeNum;
@@ -8620,24 +8426,6 @@ void UpdateMixedAirSetPoints(EnergyPlusData &state)
     // Loop over all the Mixed Air Managers and use their output arrays
     // to set the node setpoints.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum;
     int CtrlNodeIndex;
     int NodeNum;
@@ -8653,71 +8441,6 @@ void UpdateMixedAirSetPoints(EnergyPlusData &state)
 
             if (state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                 state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-            }
-        }
-    }
-}
-
-void UpdateOAPretreatSetPoints(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         M. J. Witte based on UpdateMixedAirSetPoints by Fred Buhl,
-    //                        Work supported by ASHRAE research project 1254-RP
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Loop over all the Outside Air Pretreat Managers and use their output arrays
-    // to set the node setpoints.
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SetPtMgrNum;
-    int CtrlNodeIndex;
-    int NodeNum;
-
-    // Loop over all the Mixed Air Setpoint Managers
-
-    for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumOAPretreatSetPtMgrs; ++SetPtMgrNum) {
-
-        for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes;
-             ++CtrlNodeIndex) { // Loop over the list of nodes wanting
-            // setpoints from this setpoint manager
-            NodeNum = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-
-            {
-                auto const SELECT_CASE_var(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                if (SELECT_CASE_var == iCtrlVarType::Temp) { // 'Temperature'
-                    state.dataLoopNodes->Node(NodeNum).TempSetPoint =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) {                  // 'MaximumHumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatMax =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) {                  // 'MinimumHumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatMin =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == iCtrlVarType::HumRat) {                     // 'HumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                }
             }
         }
     }
@@ -8781,15 +8504,9 @@ bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, iCtrlVarType
     // Cycle through all setpoint managers and find if the node passed in has a setpoint manager of passed
     // in type associated to it.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
     // Return value
     bool IsNodeOnSetPtManager;
 
-    // Locals
     int SetPtMgrNum;
     int NumNode;
 
@@ -8830,28 +8547,9 @@ bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, iCtrlVarTyp
     // METHODOLOGY EMPLOYED:
     // Cycle through all setpoint managers and find if the node has a specific control type
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // Return value
     bool NodeHasSPMCtrlVarType;
 
-    // Locals
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum; // loop counter for each set point manager
     int NumNode;     // loop counter for each node and specific control type
 
@@ -8898,26 +8596,8 @@ void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
     // variable type. This routine is called from "GetControllerInput" routine.  This reset is
     // just to stop false warning message due to control variable type mismatch.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     const char *RoutineName("ResetHumidityRatioCtrlVarType: ");
 
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // Locals
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum;        // loop counter for each set point manager
     int NumNode;            // loop counter for each node and specific control type
     int SetPtMgrNumPtr;     // setpoint manager
@@ -8997,26 +8677,9 @@ iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int const Cntrl
     // Loop over all the humidity setpoint Managers to determine the
     // humidity ratio setpoint type
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
     // Return value
     iCtrlVarType HumRatCntrlType;
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum;
     int CtrlNodeIndex;
     int NodeNum;
@@ -9126,21 +8789,6 @@ void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
     // of various ice storage equipment with the user having to do this manually.  The
     // point is to provide a simpler input description and take care of logic internally.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFoundinTESSchSetup(false);
     int NodeNum;
 
@@ -9205,26 +8853,9 @@ bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum)
     // PURPOSE OF THIS SUBROUTINE
     // Get freezing check status
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
     // Return value
     bool FeezigCheckFlag;
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CtrldNodeNum;
 
     if (state.dataSetPointManager->GetInputFlag) {
@@ -9256,26 +8887,9 @@ int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAi
     // PURPOSE OF THIS SUBROUTINE
     // Loop over all the MixedAir setpoint Managers to find coil freezing check flag
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
     // Return value
     int MixedAirSPMNum;
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SetPtMgrNum;
     int CtrldNodeNum;
 

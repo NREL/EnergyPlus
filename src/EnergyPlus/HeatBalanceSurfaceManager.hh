@@ -77,16 +77,7 @@ namespace HeatBalanceSurfaceManager {
     // CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
     //  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
 
-    // Record Keeping/Utility Routines for Module
-
-    // Reporting routines for module
-
-    // Functions
-
     void ManageSurfaceHeatBalance(EnergyPlusData &state);
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 

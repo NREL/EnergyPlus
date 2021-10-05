@@ -234,8 +234,6 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    //******************************************************************************
-
     void GetHXAssistedCoolingCoilInput(EnergyPlusData &state)
     {
 
@@ -909,7 +907,6 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     // End Initialization Section of the Module
-    //******************************************************************************
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                                    int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil

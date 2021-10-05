@@ -4555,8 +4555,6 @@ namespace FluidProperties {
              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.542e-05, 270.9, 177.8},
         }};
 
-    //*****************************************************************************
-
     template <size_t NumOfTemps, size_t NumOfConcs>
     void InterpDefValuesForGlycolConc(
         EnergyPlusData &state,
@@ -4655,8 +4653,6 @@ namespace FluidProperties {
             }
         }
     }
-
-    //*****************************************************************************
 
     void InterpValuesForGlycolConc(EnergyPlusData &state,
                                    int const NumOfConcs,               // number of concentrations (dimension of raw data)
@@ -4759,8 +4755,6 @@ namespace FluidProperties {
             }
         }
     }
-
-    //*****************************************************************************
 
     void InitializeGlycolTempLimits(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found here
     {
@@ -4893,8 +4887,6 @@ namespace FluidProperties {
             }
         }
     }
-
-    //*****************************************************************************
 
     void InitializeRefrigerantLimits(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found here
     {
@@ -5060,8 +5052,6 @@ namespace FluidProperties {
             }
         }
     }
-
-    //*****************************************************************************
 
     void ReportAndTestGlycols(EnergyPlusData &state)
     {
@@ -5386,8 +5376,6 @@ namespace FluidProperties {
             }
         }
     }
-
-    //*****************************************************************************
 
     void ReportAndTestRefrigerants(EnergyPlusData &state)
     {
@@ -5843,8 +5831,6 @@ namespace FluidProperties {
         }
     }
 
-    //*****************************************************************************
-
     Real64 GetSatPressureRefrig(EnergyPlusData &state,
                                 std::string_view const Refrigerant, // carries in substance name
                                 Real64 const Temperature,           // actual temperature given as input
@@ -5969,8 +5955,6 @@ namespace FluidProperties {
 
         return ReturnValue;
     }
-
-    //*****************************************************************************
 
     Real64 GetSatTemperatureRefrig(EnergyPlusData &state,
                                    std::string_view const Refrigerant, // carries in substance name
@@ -6102,8 +6086,6 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
-
     Real64 GetSatEnthalpyRefrig(EnergyPlusData &state,
                                 std::string_view const Refrigerant, // carries in substance name
                                 Real64 const Temperature,           // actual temperature given as input
@@ -6185,8 +6167,6 @@ namespace FluidProperties {
         return GetInterpolatedSatProp(
             state, Temperature, refrig.HTemps, refrig.HfValues, refrig.HfgValues, Quality, CalledFrom, refrig.HfLowTempIndex, refrig.HfHighTempIndex);
     }
-
-    //*****************************************************************************
 
     Real64 GetSatDensityRefrig(EnergyPlusData &state,
                                std::string_view const Refrigerant, // carries in substance name
@@ -6347,8 +6327,6 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
-
     Real64 GetSatSpecificHeatRefrig(EnergyPlusData &state,
                                     std::string_view const Refrigerant, // carries in substance name
                                     Real64 const Temperature,           // actual temperature given as input
@@ -6448,8 +6426,6 @@ namespace FluidProperties {
 
         return ReturnValue;
     }
-
-    //*****************************************************************************
 
     Real64 GetSupHeatEnthalpyRefrig(EnergyPlusData &state,
                                     std::string_view const Refrigerant, // carries in substance name
@@ -6716,8 +6692,6 @@ namespace FluidProperties {
 
         return ReturnValue;
     }
-
-    //*****************************************************************************
 
     Real64 GetSupHeatPressureRefrig(EnergyPlusData &state,
                                     std::string const &Refrigerant,   // carries in substance name
@@ -7039,8 +7013,6 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
-
     Real64 GetSupHeatTempRefrig(EnergyPlusData &state,
                                 std::string_view const Refrigerant, // carries in substance name
                                 Real64 const Pressure,              // actual pressure given as input
@@ -7235,8 +7207,6 @@ namespace FluidProperties {
 
         return TempResidual;
     }
-
-    //*****************************************************************************
 
     Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
                                    std::string_view const Refrigerant, // carries in substance name
@@ -7505,7 +7475,6 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
                                      std::string_view const Glycol,    // carries in substance name
@@ -7667,8 +7636,6 @@ namespace FluidProperties {
             return GetInterpValue_fast(Temperature, glycol_CpTemps(beg), glycol_CpTemps(end), glycol_CpValues(beg), glycol_CpValues(end));
         }
     }
-
-    //*****************************************************************************
 
     Real64 GetDensityGlycol(EnergyPlusData &state,
                             std::string_view const Glycol,    // carries in substance name
@@ -7847,8 +7814,6 @@ namespace FluidProperties {
 
         return ReturnValue;
     }
-
-    //*****************************************************************************
 
     Real64 GetConductivityGlycol(EnergyPlusData &state,
                                  std::string_view const Glycol,    // carries in substance name
@@ -8031,8 +7996,6 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
-
     Real64 GetViscosityGlycol(EnergyPlusData &state,
                               std::string_view const Glycol,    // carries in substance name
                               Real64 const Temperature,         // actual temperature given as input
@@ -8213,14 +8176,10 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
-
     void GetInterpValue_error(EnergyPlusData &state)
     {
         ShowFatalError(state, "GetInterpValue: Temperatures for fluid property data too close together, division by zero");
     }
-
-    //*****************************************************************************
 
     Real64 GetQualityRefrig(EnergyPlusData &state,
                             std::string const &Refrigerant,   // carries in substance name
@@ -8353,8 +8312,6 @@ namespace FluidProperties {
         return ReturnValue;
     }
 
-    //*****************************************************************************
-
     int FindRefrigerant(EnergyPlusData &state, std::string_view const Refrigerant) // carries in substance name
     {
 
@@ -8398,8 +8355,6 @@ namespace FluidProperties {
 
         return FindRefrigerant;
     }
-
-    //*****************************************************************************
 
     int FindGlycol(EnergyPlusData &state, std::string_view const Glycol) // carries in substance name
     {
@@ -8446,8 +8401,6 @@ namespace FluidProperties {
 
         return FindGlycol;
     }
-
-    //*****************************************************************************
 
     std::string GetGlycolNameByIndex(EnergyPlusData &state, int const Idx) // carries in substance index
     {
@@ -8502,8 +8455,6 @@ namespace FluidProperties {
             return "";
         }
     }
-
-    //*****************************************************************************
 
     int FindArrayIndex(Real64 const Value,           // Value to be placed/found within the array of values
                        Array1D<Real64> const &Array, // Array of values in ascending order
@@ -8605,8 +8556,6 @@ namespace FluidProperties {
             }
         }
     }
-
-    //*****************************************************************************
 
     Real64 GetInterpolatedSatProp(EnergyPlusData &state,
                                   Real64 const Temperature,          // Saturation Temp.
@@ -8714,8 +8663,6 @@ namespace FluidProperties {
 
         return ReturnValue;
     }
-
-    //*****************************************************************************
 
     int CheckFluidPropertyName(EnergyPlusData &state,
                                std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames

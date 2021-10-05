@@ -800,8 +800,6 @@ void SimPressureDropSystem(EnergyPlusData &state,
     }
 }
 
-//=================================================================================================!
-
 Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
                                  int const LoopNum,            // - Index of which plant/condenser loop is being simulated
                                  Real64 const SystemMassFlow,  // - Initial "guess" at system mass flow rate [kg/s]
@@ -961,7 +959,5 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
 
     return ResolvedLoopMassFlowRate;
 }
-
-//=================================================================================================!
 
 } // namespace EnergyPlus::PlantPressureSystem

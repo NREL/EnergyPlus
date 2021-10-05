@@ -170,8 +170,6 @@ namespace WindTurbine {
 
     void ReportWindTurbine(EnergyPlusData &state, int WindTurbineNum);
 
-    //*****************************************************************************************
-
 } // namespace WindTurbine
 
 struct WindTurbineData : BaseGlobalStruct

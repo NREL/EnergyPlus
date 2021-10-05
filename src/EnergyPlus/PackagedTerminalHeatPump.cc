@@ -2892,8 +2892,6 @@ void GetPTUnit(EnergyPlusData &state)
         }
     }
 
-    //***********************************************************************************
-
     for (PTUnitIndex = 1; PTUnitIndex <= state.dataPTHP->NumPTWSHP; ++PTUnitIndex) {
 
         FanInletNodeNum = 0;
@@ -3924,8 +3922,6 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
 
     } // End of the WaterToAirHeatPump Loop
-
-    //***********************************************************************************
 
     Alphas.deallocate();
     Numbers.deallocate();
@@ -7611,8 +7607,6 @@ int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int 
     return GetPTUnitMixedAirNode;
 }
 
-//******************************************************************************
-
 void SimVariableSpeedHP(EnergyPlusData &state,
                         int const PTUnitNum,           // number of the current engine driven Heat Pump being simulated
                         int const ZoneNum,             // Controlled zone number
@@ -7783,9 +7777,6 @@ void SimVariableSpeedHP(EnergyPlusData &state,
         }
     }
 }
-
-//******************************************************************************
-//******************************************************************************
 
 void ControlVSHPOutput(EnergyPlusData &state,
                        int const PTUnitNum,           // Unit index in fan coil array
@@ -8234,10 +8225,6 @@ void ControlVSHPOutput(EnergyPlusData &state,
     state.dataPTHP->PTUnit(PTUnitNum).CompSpeedNum = SpeedNum;
 }
 
-//******************************************************************************
-
-//******************************************************************************
-
 Real64 VSHPCyclingResidual(EnergyPlusData &state,
                            Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                            Array1D<Real64> const &Par // par(1) = FurnaceNum
@@ -8357,8 +8344,6 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
 
     return VSHPCyclingResidual;
 }
-
-//******************************************************************************
 
 Real64 VSHPSpeedResidual(EnergyPlusData &state,
                          Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
@@ -8481,8 +8466,6 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
 
     return VSHPSpeedResidual;
 }
-
-//******************************************************************************
 
 void CalcVarSpeedHeatPump(EnergyPlusData &state,
                           int const PTUnitNum,                 // Unit index in fan coil array

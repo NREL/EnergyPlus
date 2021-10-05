@@ -820,7 +820,6 @@ namespace OutputProcessor {
 
 } // namespace OutputProcessor
 
-//==============================================================================================
 // *****************************************************************************
 // These routines are available outside the OutputProcessor Module (i.e. calling
 // routines do not have to "USE OutputProcessor".  But each of these routines

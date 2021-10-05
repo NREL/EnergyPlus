@@ -349,10 +349,6 @@ namespace SingleDuct {
 
     void GetATMixers(EnergyPlusData &state);
 
-    void CalcATMixer(EnergyPlusData &state, int SysNum);
-
-    void UpdateATMixer(EnergyPlusData &state, int SysNum);
-
     void GetATMixer(EnergyPlusData &state,
                     std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
@@ -362,11 +358,6 @@ namespace SingleDuct {
                     int &ATMixerSecNode,              // air terminal mixer secondary air node number
                     int &ATMixerOutNode,              // air terminal mixer outlet air node number
                     int const &ZoneEquipOutletNode    // zone equipment outlet node (used with inlet side mixers)
-    );
-
-    void SetATMixerPriFlow(EnergyPlusData &state,
-                           int ATMixerNum,                               // Air terminal mixer index
-                           Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
     void setATMixerSizingProperties(EnergyPlusData &state,

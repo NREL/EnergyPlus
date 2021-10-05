@@ -16830,8 +16830,6 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     }
 }
 
-// ======================  Utility routines ======================================
-
 void GetDXCoilIndex(EnergyPlusData &state,
                     std::string const &DXCoilName,
                     int &DXCoilIndex,

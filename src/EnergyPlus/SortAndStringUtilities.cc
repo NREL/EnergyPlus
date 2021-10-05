@@ -51,209 +51,101 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::SortAndStringUtilities {
 
-namespace SortAndStringUtilities {
+// Module containing the routines dealing with Sorting
 
-    // Module containing the routines dealing with Sorting
+// MODULE INFORMATION:
+//       AUTHOR         Linda Lawrie
+//       DATE WRITTEN   March 2009
+//       MODIFIED       na
+//       RE-ENGINEERED  na
 
-    // MODULE INFORMATION:
+void QsortPartition(Array1S_string Alphas, // Alphas to be sorted
+                    Array1S_int iAlphas,   // Indexes of sorted array
+                    int &marker)
+{
+
+    // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2009
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // <description>
+    std::string const &cpivot(Alphas(1));
+    int i = 0;
+    int j = Alphas.isize() + 1;
+
+    while (true) {
+        --j;
+        while (true) {
+            if (lessthani(Alphas(j), cpivot) || equali(Alphas(j), cpivot)) break;
+            --j;
+        }
+        ++i;
+        while (true) {
+            if (lessthani(cpivot, Alphas(i)) || equali(cpivot, Alphas(i))) break;
+            ++i;
+        }
+        if (i < j) { // Swap the strings at index i and j
+            Alphas(i).swap(Alphas(j));
+            std::swap(iAlphas(i), iAlphas(j));
+        } else if (i == j) {
+            marker = i + 1;
+            return;
+        } else {
+            marker = i;
+            return;
+        }
+    }
+}
+
+void QsortC(Array1S_string Alphas, // Alphas to be sorted
+            Array1S_int iAlphas    // Indexes of sorted array
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   March 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Make sort order for an Alpha Array but store the pointers in an
+    // accompanying integer array which must be filled prior to the first call
+    // as this routine is recursive and called from within.
 
     // METHODOLOGY EMPLOYED:
-    // <description>
+    // recursion and quick-sort methodology
 
-    // REFERENCES:
-    // na
+    if (Alphas.size() > 1) {
+        int iq;
+        QsortPartition(Alphas, iAlphas, iq);
+        QsortC(Alphas({_, iq - 1}), iAlphas({_, iq - 1}));
+        QsortC(Alphas({iq, _}), iAlphas({iq, _}));
+    }
+}
 
-    // OTHER NOTES:
-    // na
+void SetupAndSort(Array1D_string &Alphas, // Alphas to be sorted
+                  Array1D_int &iAlphas    // Indexes of sorted array
+)
+{
 
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // <use statements for access to subroutines in other modules>
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   March 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    // PURPOSE OF THIS SUBROUTINE:
+    // Set up and call sort routine for Alphas
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SortUtilities
-
-    // Functions
-
-    void SetupAndSort(Array1D_string &Alphas, // Alphas to be sorted
-                      Array1D_int &iAlphas    // Indexes of sorted array
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   March 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set up and call sort routine for Alphas
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        for (int Loop = 1, Loop_end = Alphas.u(); Loop <= Loop_end; ++Loop) {
-            iAlphas(Loop) = Loop;
-        }
-
-        QsortC(Alphas, iAlphas);
+    for (int Loop = 1, Loop_end = Alphas.u(); Loop <= Loop_end; ++Loop) {
+        iAlphas(Loop) = Loop;
     }
 
-    void QsortC(Array1S_string Alphas, // Alphas to be sorted
-                Array1S_int iAlphas    // Indexes of sorted array
-    )
-    {
+    QsortC(Alphas, iAlphas);
+}
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   March 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Make sort order for an Alpha Array but store the pointers in an
-        // accompanying integer array which must be filled prior to the first call
-        // as this routine is recursive and called from within.
-
-        // METHODOLOGY EMPLOYED:
-        // recursion and quick-sort methodology
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        if (Alphas.size() > 1) {
-            int iq;
-            QsortPartition(Alphas, iAlphas, iq);
-            QsortC(Alphas({_, iq - 1}), iAlphas({_, iq - 1}));
-            QsortC(Alphas({iq, _}), iAlphas({iq, _}));
-        }
-    }
-
-    void QsortPartition(Array1S_string Alphas, // Alphas to be sorted
-                        Array1S_int iAlphas,   // Indexes of sorted array
-                        int &marker)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   March 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        std::string const &cpivot(Alphas(1));
-        int i = 0;
-        int j = Alphas.isize() + 1;
-
-        while (true) {
-            --j;
-            while (true) {
-                if (lessthani(Alphas(j), cpivot) || equali(Alphas(j), cpivot)) break;
-                --j;
-            }
-            ++i;
-            while (true) {
-                if (lessthani(cpivot, Alphas(i)) || equali(cpivot, Alphas(i))) break;
-                ++i;
-            }
-            if (i < j) { // Swap the strings at index i and j
-                Alphas(i).swap(Alphas(j));
-                std::swap(iAlphas(i), iAlphas(j));
-            } else if (i == j) {
-                marker = i + 1;
-                return;
-            } else {
-                marker = i;
-                return;
-            }
-        }
-    }
-
-} // namespace SortAndStringUtilities
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::SortAndStringUtilities

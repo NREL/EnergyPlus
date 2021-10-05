@@ -111,8 +111,7 @@ namespace EcoRoofManager {
                          [[maybe_unused]] int const unit,
                          [[maybe_unused]] Real64 const Tg,
                          [[maybe_unused]] Real64 const Tf,
-                         [[maybe_unused]] Real64 const Qsoil
-    )
+                         [[maybe_unused]] Real64 const Qsoil)
     {
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor

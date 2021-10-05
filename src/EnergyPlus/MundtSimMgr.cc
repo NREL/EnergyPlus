@@ -815,8 +815,6 @@ namespace MundtSimMgr {
         SetSurfHBDataForMundtModel(state, ZoneNum);
     }
 
-    //*****************************************************************************************
-
 } // namespace MundtSimMgr
 
 } // namespace EnergyPlus

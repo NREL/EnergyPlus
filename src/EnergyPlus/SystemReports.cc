@@ -66,8 +66,6 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -109,6 +107,611 @@ using namespace DataZoneEquipment;
 using namespace DataAirSystems;
 
 // Functions
+
+void UpdateZoneSubCompPtrArray(EnergyPlusData &state,
+                               int &Idx,
+                               int const ListNum,
+                               int const AirDistUnitNum,
+                               int const SubCompNum,
+                               int const PlantLoopType,
+                               int const PlantLoop,
+                               int const PlantBranch,
+                               int const PlantComp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update Zone Sub Component Pointer Array
+
+    if (state.dataSysRpts->OneTimeFlag_UpdateZoneSubCompPtrArray) {
+        state.dataAirSystemsData->ZoneSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray);
+        for (auto &e : state.dataAirSystemsData->ZoneSubCompToPlant) {
+            e.ZoneEqListNum = 0;
+            e.ZoneEqCompNum = 0;
+            e.ZoneEqSubCompNum = 0;
+            e.PlantLoopType = 0;
+            e.PlantLoopNum = 0;
+            e.PlantLoopBranch = 0;
+            e.PlantLoopComp = 0;
+            e.FirstDemandSidePtr = 0;
+            e.LastDemandSidePtr = 0;
+        }
+
+        state.dataSysRpts->OneTimeFlag_UpdateZoneSubCompPtrArray = false;
+    }
+
+    if (state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray) { // Redimension larger
+        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray);
+        state.dataAirSystemsData->ZoneSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray *= 2);
+        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray; ++i) {
+            auto &zctp(state.dataAirSystemsData->ZoneSubCompToPlant(i));
+            zctp.ZoneEqListNum = 0;
+            zctp.ZoneEqCompNum = 0;
+            zctp.ZoneEqSubCompNum = 0;
+            zctp.PlantLoopType = 0;
+            zctp.PlantLoopNum = 0;
+            zctp.PlantLoopBranch = 0;
+            zctp.PlantLoopComp = 0;
+            zctp.FirstDemandSidePtr = 0;
+            zctp.LastDemandSidePtr = 0;
+        }
+    }
+
+    Idx = state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray;
+    auto &zctp(state.dataAirSystemsData->ZoneSubCompToPlant(Idx));
+    zctp.ZoneEqListNum = ListNum;
+    zctp.ZoneEqCompNum = AirDistUnitNum;
+    zctp.ZoneEqSubCompNum = SubCompNum;
+    zctp.PlantLoopType = PlantLoopType;
+    zctp.PlantLoopNum = PlantLoop;
+    zctp.PlantLoopBranch = PlantBranch;
+    zctp.PlantLoopComp = PlantComp;
+    ++state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray;
+}
+
+void UpdateZoneCompPtrArray(EnergyPlusData &state,
+                            int &Idx,
+                            int const ListNum,
+                            int const AirDistUnitNum,
+                            int const PlantLoopType,
+                            int const PlantLoop,
+                            int const PlantBranch,
+                            int const PlantComp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update Zone Component pointers
+
+    if (state.dataSysRpts->OneTimeFlag_UpdateZoneCompPtrArray) {
+        state.dataAirSystemsData->ZoneCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray);
+        for (auto &e : state.dataAirSystemsData->ZoneCompToPlant) {
+            e.ZoneEqListNum = 0;
+            e.ZoneEqCompNum = 0;
+            e.PlantLoopType = 0;
+            e.PlantLoopNum = 0;
+            e.PlantLoopBranch = 0;
+            e.PlantLoopComp = 0;
+            e.FirstDemandSidePtr = 0;
+            e.LastDemandSidePtr = 0;
+        }
+
+        state.dataSysRpts->OneTimeFlag_UpdateZoneCompPtrArray = false;
+    }
+
+    if (state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray) { // Redimension larger
+        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray);
+        state.dataAirSystemsData->ZoneCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray *= 2);
+        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray; ++i) {
+            auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(i));
+            zctp.ZoneEqListNum = 0;
+            zctp.ZoneEqCompNum = 0;
+            zctp.PlantLoopType = 0;
+            zctp.PlantLoopNum = 0;
+            zctp.PlantLoopBranch = 0;
+            zctp.PlantLoopComp = 0;
+            zctp.FirstDemandSidePtr = 0;
+            zctp.LastDemandSidePtr = 0;
+        }
+    }
+
+    Idx = state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray;
+    auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(Idx));
+    zctp.ZoneEqListNum = ListNum;
+    zctp.ZoneEqCompNum = AirDistUnitNum;
+    zctp.PlantLoopType = PlantLoopType;
+    zctp.PlantLoopNum = PlantLoop;
+    zctp.PlantLoopBranch = PlantBranch;
+    zctp.PlantLoopComp = PlantComp;
+    ++state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray;
+}
+
+void UpdateZoneSubSubCompPtrArray(EnergyPlusData &state,
+                                  int &Idx,
+                                  int const ListNum,
+                                  int const AirDistUnitNum,
+                                  int const SubCompNum,
+                                  int const SubSubCompNum,
+                                  int const PlantLoopType,
+                                  int const PlantLoop,
+                                  int const PlantBranch,
+                                  int const PlantComp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update Zone Sub Component Pointer Array
+
+    if (state.dataSysRpts->OneTimeFlag_UpdateZoneSubSubCompPtrArray) {
+        state.dataAirSystemsData->ZoneSubSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray);
+        for (auto &e : state.dataAirSystemsData->ZoneSubSubCompToPlant) {
+            e.ZoneEqListNum = 0;
+            e.ZoneEqCompNum = 0;
+            e.ZoneEqSubCompNum = 0;
+            e.ZoneEqSubSubCompNum = 0;
+            e.PlantLoopType = 0;
+            e.PlantLoopNum = 0;
+            e.PlantLoopBranch = 0;
+            e.PlantLoopComp = 0;
+            e.FirstDemandSidePtr = 0;
+            e.LastDemandSidePtr = 0;
+        }
+
+        state.dataSysRpts->OneTimeFlag_UpdateZoneSubSubCompPtrArray = false;
+    }
+
+    if (state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray >=
+        state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray) { // Redimension larger
+        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray);
+        state.dataAirSystemsData->ZoneSubSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray *= 2);
+        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray; ++i) {
+            auto &zctp(state.dataAirSystemsData->ZoneSubSubCompToPlant(i));
+            zctp.ZoneEqListNum = 0;
+            zctp.ZoneEqCompNum = 0;
+            zctp.ZoneEqSubCompNum = 0;
+            zctp.ZoneEqSubSubCompNum = 0;
+            zctp.PlantLoopType = 0;
+            zctp.PlantLoopNum = 0;
+            zctp.PlantLoopBranch = 0;
+            zctp.PlantLoopComp = 0;
+            zctp.FirstDemandSidePtr = 0;
+            zctp.LastDemandSidePtr = 0;
+        }
+    }
+
+    Idx = state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray;
+    auto &zctp(state.dataAirSystemsData->ZoneSubSubCompToPlant(Idx));
+    zctp.ZoneEqListNum = ListNum;
+    zctp.ZoneEqCompNum = AirDistUnitNum;
+    zctp.ZoneEqSubCompNum = SubCompNum;
+    zctp.ZoneEqSubSubCompNum = SubSubCompNum;
+    zctp.PlantLoopType = PlantLoopType;
+    zctp.PlantLoopNum = PlantLoop;
+    zctp.PlantLoopBranch = PlantBranch;
+    zctp.PlantLoopComp = PlantComp;
+    ++state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray;
+}
+
+void FindDemandSideMatch(EnergyPlusData &state,
+                         std::string const &CompType, // Inlet node of the component to find the match of
+                         std::string_view CompName,   // Outlet node of the component to find the match of
+                         bool &MatchFound,            // Set to .TRUE. when a match is found
+                         int &MatchLoopType,          // Loop number of the match
+                         int &MatchLoop,              // Loop number of the match
+                         int &MatchBranch,            // Branch number of the match
+                         int &MatchComp               // Component number of the match
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   September 2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine intializes the connections between various loops.
+    // Due to the fact that this requires numerous string compares, it
+    // is much more efficient to find this information once and then
+    // store it in module level variables (LoopConnect derived type).
+
+    // METHODOLOGY EMPLOYED:
+    // Simply cycles through the plant and condenser demand sides until
+    // a component is found that matches the component type and name
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int PassBranchNum; // DO loop counter for branches
+    int PassCompNum;   // DO loop counter for components
+    int PassLoopNum;   // DO loop counter for loops or the top level of the hierarchy
+
+    // Initialize all of the output variables
+
+    MatchFound = false;
+    MatchLoopType = 0;
+    MatchLoop = 0;
+    MatchLoop = 0;
+    MatchBranch = 0;
+    MatchComp = 0;
+
+    // Now cycle through all of the demand side loops to see if we can find
+    // a match for the component type and name.  Once a match is found,
+    // record the type of loop and the loop, branch, and component numbers.
+    if (!MatchFound) { // Go through the plant demand side loops
+        for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PassLoopNum) {
+            for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
+                for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents;
+                     ++PassCompNum) {
+                    if (UtilityRoutines::SameString(
+                            CompType, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
+                        UtilityRoutines::SameString(
+                            CompName, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
+                        // Found a match on the plant demand side--increment the counter
+                        MatchFound = true;
+                        MatchLoopType = 1;
+                        MatchLoop = PassLoopNum;
+                        MatchBranch = PassBranchNum;
+                        MatchComp = PassCompNum;
+                        break; // PassCompNum DO loop
+                    }
+                }
+                if (MatchFound) break; // PassBranchNum DO loop
+            }
+            if (MatchFound) break; // PassLoopNum DO loop
+        }
+    }
+
+    if (!MatchFound) { // Go through the condenser demand side loops
+        for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PassLoopNum) {
+            for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
+                for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents;
+                     ++PassCompNum) {
+                    if (UtilityRoutines::SameString(
+                            CompType, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
+                        UtilityRoutines::SameString(
+                            CompName, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
+                        // Found a match on the plant demand side--increment the counter
+                        MatchFound = true;
+                        MatchLoopType = 2;
+                        MatchLoop = PassLoopNum;
+                        MatchBranch = PassBranchNum;
+                        MatchComp = PassCompNum;
+                        break; // PassCompNum DO loop
+                    }
+                }
+                if (MatchFound) break; // PassBranchNum DO loop
+            }
+            if (MatchFound) break; // PassLoopNum DO loop
+        }
+    }
+}
+
+void UpdateAirSysCompPtrArray(EnergyPlusData &state,
+                              int &Idx,
+                              int const AirLoopNum,
+                              int const BranchNum,
+                              int const CompNum,
+                              int const PlantLoopType,
+                              int const PlantLoop,
+                              int const PlantBranch,
+                              int const PlantComp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update Air System Component Pointer Array
+
+    if (state.dataSysRpts->OneTimeFlag_UpdateAirSysCompPtrArray) {
+        state.dataAirSystemsData->AirSysCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray);
+        for (auto &e : state.dataAirSystemsData->AirSysCompToPlant) {
+            e.AirLoopNum = 0;
+            e.AirLoopBranch = 0;
+            e.AirLoopComp = 0;
+            e.PlantLoopType = 0;
+            e.PlantLoopNum = 0;
+            e.PlantLoopBranch = 0;
+            e.PlantLoopComp = 0;
+            e.FirstDemandSidePtr = 0;
+            e.LastDemandSidePtr = 0;
+        }
+
+        state.dataSysRpts->OneTimeFlag_UpdateAirSysCompPtrArray = false;
+    }
+
+    if (state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray) { // Redimension larger
+        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray);
+        state.dataAirSystemsData->AirSysCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray *= 2);
+        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray; ++i) {
+            auto &actp(state.dataAirSystemsData->AirSysCompToPlant(i));
+            actp.AirLoopNum = 0;
+            actp.AirLoopBranch = 0;
+            actp.AirLoopComp = 0;
+            actp.PlantLoopType = 0;
+            actp.PlantLoopNum = 0;
+            actp.PlantLoopBranch = 0;
+            actp.PlantLoopComp = 0;
+            actp.FirstDemandSidePtr = 0;
+            actp.LastDemandSidePtr = 0;
+        }
+    }
+
+    Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray;
+    auto &actp(state.dataAirSystemsData->AirSysCompToPlant(Idx));
+    actp.AirLoopNum = AirLoopNum;
+    actp.AirLoopBranch = BranchNum;
+    actp.AirLoopComp = CompNum;
+    actp.PlantLoopType = PlantLoopType;
+    actp.PlantLoopNum = PlantLoop;
+    actp.PlantLoopBranch = PlantBranch;
+    actp.PlantLoopComp = PlantComp;
+    ++state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray;
+}
+
+void UpdateAirSysSubCompPtrArray(EnergyPlusData &state,
+                                 int &Idx,
+                                 int const AirLoopNum,
+                                 int const BranchNum,
+                                 int const CompNum,
+                                 int const SubCompNum,
+                                 int const PlantLoopType,
+                                 int const PlantLoop,
+                                 int const PlantBranch,
+                                 int const PlantComp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update Air System Sub Component Pointer Array
+
+    if (state.dataSysRpts->OneTimeFlag_UpdateAirSysSubCompPtrArray) {
+        state.dataAirSystemsData->AirSysSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray);
+        for (auto &e : state.dataAirSystemsData->AirSysSubCompToPlant) {
+            e.AirLoopNum = 0;
+            e.AirLoopBranch = 0;
+            e.AirLoopComp = 0;
+            e.AirLoopSubComp = 0;
+            e.PlantLoopType = 0;
+            e.PlantLoopNum = 0;
+            e.PlantLoopBranch = 0;
+            e.PlantLoopComp = 0;
+            e.FirstDemandSidePtr = 0;
+            e.LastDemandSidePtr = 0;
+        }
+
+        state.dataSysRpts->OneTimeFlag_UpdateAirSysSubCompPtrArray = false;
+    }
+
+    if (state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray >=
+        state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray) { // Redimension larger
+        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray);
+        state.dataAirSystemsData->AirSysSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray *= 2);
+        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray; ++i) {
+            auto &actp(state.dataAirSystemsData->AirSysSubCompToPlant(i));
+            actp.AirLoopNum = 0;
+            actp.AirLoopBranch = 0;
+            actp.AirLoopComp = 0;
+            actp.AirLoopSubComp = 0;
+            actp.PlantLoopType = 0;
+            actp.PlantLoopNum = 0;
+            actp.PlantLoopBranch = 0;
+            actp.PlantLoopComp = 0;
+            actp.FirstDemandSidePtr = 0;
+            actp.LastDemandSidePtr = 0;
+        }
+    }
+
+    Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray;
+    auto &actp(state.dataAirSystemsData->AirSysSubCompToPlant(Idx));
+    actp.AirLoopNum = AirLoopNum;
+    actp.AirLoopBranch = BranchNum;
+    actp.AirLoopComp = CompNum;
+    actp.AirLoopSubComp = SubCompNum;
+    actp.PlantLoopType = PlantLoopType;
+    actp.PlantLoopNum = PlantLoop;
+    actp.PlantLoopBranch = PlantBranch;
+    actp.PlantLoopComp = PlantComp;
+    ++state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray;
+}
+
+void UpdateAirSysSubSubCompPtrArray(EnergyPlusData &state,
+                                    int &Idx,
+                                    int const AirLoopNum,
+                                    int const BranchNum,
+                                    int const CompNum,
+                                    int const SubCompNum,
+                                    int const SubSubCompNum,
+                                    int const PlantLoopType,
+                                    int const PlantLoop,
+                                    int const PlantBranch,
+                                    int const PlantComp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Update Air System Sub Sub Component Pointer Array
+
+    if (state.dataSysRpts->OneTimeFlag_UpdateAirSysSubSubCompPtrArray) {
+        state.dataAirSystemsData->AirSysSubSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray);
+        for (auto &e : state.dataAirSystemsData->AirSysSubSubCompToPlant) {
+            e.AirLoopNum = 0;
+            e.AirLoopBranch = 0;
+            e.AirLoopComp = 0;
+            e.AirLoopSubComp = 0;
+            e.AirLoopSubSubComp = 0;
+            e.PlantLoopType = 0;
+            e.PlantLoopNum = 0;
+            e.PlantLoopBranch = 0;
+            e.PlantLoopComp = 0;
+            e.FirstDemandSidePtr = 0;
+            e.LastDemandSidePtr = 0;
+        }
+
+        state.dataSysRpts->OneTimeFlag_UpdateAirSysSubSubCompPtrArray = false;
+    }
+
+    if (state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray >=
+        state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray) { // Redimension larger
+        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray);
+        state.dataAirSystemsData->AirSysSubSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray *= 2);
+        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray; ++i) {
+            auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(i));
+            actp.AirLoopNum = 0;
+            actp.AirLoopBranch = 0;
+            actp.AirLoopComp = 0;
+            actp.AirLoopSubComp = 0;
+            actp.AirLoopSubSubComp = 0;
+            actp.PlantLoopType = 0;
+            actp.PlantLoopNum = 0;
+            actp.PlantLoopBranch = 0;
+            actp.PlantLoopComp = 0;
+            actp.FirstDemandSidePtr = 0;
+            actp.LastDemandSidePtr = 0;
+        }
+    }
+
+    Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray;
+    auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(Idx));
+    actp.AirLoopNum = AirLoopNum;
+    actp.AirLoopBranch = BranchNum;
+    actp.AirLoopComp = CompNum;
+    actp.AirLoopSubComp = SubCompNum;
+    actp.AirLoopSubSubComp = SubSubCompNum;
+    actp.PlantLoopType = PlantLoopType;
+    actp.PlantLoopNum = PlantLoop;
+    actp.PlantLoopBranch = PlantBranch;
+    actp.PlantLoopComp = PlantComp;
+    ++state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray;
+}
+
+void MatchPlantSys(EnergyPlusData &state,
+                   int const AirLoopNum, // counter for zone air distribution inlets
+                   int const BranchNum   // counter for zone air distribution inlets
+)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   May 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // calculate and report zone ventilation loads
+
+    // METHODOLOGY EMPLOYED:
+    // calculate energy contribution of outside air through mixing box and pro-rate to
+    // zones according to zone mass flow rates.
+
+    // Using/Aliasing
+    using namespace DataGlobalConstants;
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    int constexpr EnergyTrans(1);
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    std::string CompType;
+    std::string CompName;
+    int CompNum; // counter for components on air loop branch connected to air distribution unit
+    int VarNum;
+    int SubCompNum;    // counter for components on air loop branch connected to air distribution unit
+    int SubSubCompNum; // counter for components on air loop branch connected to air distribution unit
+    bool MatchFound;   // Set to .TRUE. when a match is found
+    int MatchLoop;     // Loop number of the match
+    int MatchBranch;   // Branch number of the match
+    int MatchComp;     // Component number of the match
+    int MatchLoopType;
+    int Idx;
+
+    for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+        {
+            auto &thisComp(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum));
+            for (VarNum = 1; VarNum <= thisComp.NumMeteredVars; ++VarNum) {
+                if (thisComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
+                    thisComp.EnergyTransComp = EnergyTrans;
+                    CompType = thisComp.TypeOf;
+                    CompName = thisComp.Name;
+                    Idx = 0;
+                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                    if (MatchFound)
+                        UpdateAirSysCompPtrArray(state, Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                    thisComp.AirSysToPlantPtr = Idx;
+                    break;
+                }
+            }
+            for (SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum) {
+                //!!!!          IF(SysVentLoad == 0.0d0)EXIT
+                {
+                    auto &thisSubComp(thisComp.SubComp(SubCompNum));
+                    for (VarNum = 1; VarNum <= thisSubComp.NumMeteredVars; ++VarNum) {
+                        if (thisSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
+                            thisSubComp.EnergyTransComp = EnergyTrans;
+                            CompType = thisSubComp.TypeOf;
+                            CompName = thisSubComp.Name;
+                            Idx = 0;
+                            FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                            if (MatchFound)
+                                UpdateAirSysSubCompPtrArray(
+                                    state, Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                            thisSubComp.AirSysToPlantPtr = Idx;
+                            break;
+                        }
+                    }
+                    for (SubSubCompNum = 1; SubSubCompNum <= thisSubComp.NumSubSubComps; ++SubSubCompNum) {
+                        //!!!!            IF(SysVentLoad == 0.0d0)EXIT
+                        {
+                            auto &thisSubSubComp(thisSubComp.SubSubComp(SubSubCompNum));
+                            for (VarNum = 1; VarNum <= thisSubSubComp.NumMeteredVars; ++VarNum) {
+                                if (thisSubSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
+                                    thisSubSubComp.EnergyTransComp = EnergyTrans;
+                                    CompType = thisSubSubComp.TypeOf;
+                                    CompName = thisSubSubComp.Name;
+                                    Idx = 0;
+                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    if (MatchFound)
+                                        UpdateAirSysSubSubCompPtrArray(state,
+                                                                       Idx,
+                                                                       AirLoopNum,
+                                                                       BranchNum,
+                                                                       CompNum,
+                                                                       SubCompNum,
+                                                                       SubSubCompNum,
+                                                                       MatchLoopType,
+                                                                       MatchLoop,
+                                                                       MatchBranch,
+                                                                       MatchComp);
+                                    thisSubSubComp.AirSysToPlantPtr = Idx;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 void InitEnergyReports(EnergyPlusData &state)
 {
@@ -1265,411 +1868,6 @@ void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &A
         }
 
     } // While loop
-}
-
-void UpdateZoneCompPtrArray(EnergyPlusData &state,
-                            int &Idx,
-                            int const ListNum,
-                            int const AirDistUnitNum,
-                            int const PlantLoopType,
-                            int const PlantLoop,
-                            int const PlantBranch,
-                            int const PlantComp)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update Zone Component pointers
-
-    if (state.dataSysRpts->OneTimeFlag_UpdateZoneCompPtrArray) {
-        state.dataAirSystemsData->ZoneCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray);
-        for (auto &e : state.dataAirSystemsData->ZoneCompToPlant) {
-            e.ZoneEqListNum = 0;
-            e.ZoneEqCompNum = 0;
-            e.PlantLoopType = 0;
-            e.PlantLoopNum = 0;
-            e.PlantLoopBranch = 0;
-            e.PlantLoopComp = 0;
-            e.FirstDemandSidePtr = 0;
-            e.LastDemandSidePtr = 0;
-        }
-
-        state.dataSysRpts->OneTimeFlag_UpdateZoneCompPtrArray = false;
-    }
-
-    if (state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray) { // Redimension larger
-        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray);
-        state.dataAirSystemsData->ZoneCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray *= 2);
-        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray; ++i) {
-            auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(i));
-            zctp.ZoneEqListNum = 0;
-            zctp.ZoneEqCompNum = 0;
-            zctp.PlantLoopType = 0;
-            zctp.PlantLoopNum = 0;
-            zctp.PlantLoopBranch = 0;
-            zctp.PlantLoopComp = 0;
-            zctp.FirstDemandSidePtr = 0;
-            zctp.LastDemandSidePtr = 0;
-        }
-    }
-
-    Idx = state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray;
-    auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(Idx));
-    zctp.ZoneEqListNum = ListNum;
-    zctp.ZoneEqCompNum = AirDistUnitNum;
-    zctp.PlantLoopType = PlantLoopType;
-    zctp.PlantLoopNum = PlantLoop;
-    zctp.PlantLoopBranch = PlantBranch;
-    zctp.PlantLoopComp = PlantComp;
-    ++state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray;
-}
-
-void UpdateZoneSubCompPtrArray(EnergyPlusData &state,
-                               int &Idx,
-                               int const ListNum,
-                               int const AirDistUnitNum,
-                               int const SubCompNum,
-                               int const PlantLoopType,
-                               int const PlantLoop,
-                               int const PlantBranch,
-                               int const PlantComp)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update Zone Sub Component Pointer Array
-
-    if (state.dataSysRpts->OneTimeFlag_UpdateZoneSubCompPtrArray) {
-        state.dataAirSystemsData->ZoneSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray);
-        for (auto &e : state.dataAirSystemsData->ZoneSubCompToPlant) {
-            e.ZoneEqListNum = 0;
-            e.ZoneEqCompNum = 0;
-            e.ZoneEqSubCompNum = 0;
-            e.PlantLoopType = 0;
-            e.PlantLoopNum = 0;
-            e.PlantLoopBranch = 0;
-            e.PlantLoopComp = 0;
-            e.FirstDemandSidePtr = 0;
-            e.LastDemandSidePtr = 0;
-        }
-
-        state.dataSysRpts->OneTimeFlag_UpdateZoneSubCompPtrArray = false;
-    }
-
-    if (state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray) { // Redimension larger
-        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray);
-        state.dataAirSystemsData->ZoneSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray *= 2);
-        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray; ++i) {
-            auto &zctp(state.dataAirSystemsData->ZoneSubCompToPlant(i));
-            zctp.ZoneEqListNum = 0;
-            zctp.ZoneEqCompNum = 0;
-            zctp.ZoneEqSubCompNum = 0;
-            zctp.PlantLoopType = 0;
-            zctp.PlantLoopNum = 0;
-            zctp.PlantLoopBranch = 0;
-            zctp.PlantLoopComp = 0;
-            zctp.FirstDemandSidePtr = 0;
-            zctp.LastDemandSidePtr = 0;
-        }
-    }
-
-    Idx = state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray;
-    auto &zctp(state.dataAirSystemsData->ZoneSubCompToPlant(Idx));
-    zctp.ZoneEqListNum = ListNum;
-    zctp.ZoneEqCompNum = AirDistUnitNum;
-    zctp.ZoneEqSubCompNum = SubCompNum;
-    zctp.PlantLoopType = PlantLoopType;
-    zctp.PlantLoopNum = PlantLoop;
-    zctp.PlantLoopBranch = PlantBranch;
-    zctp.PlantLoopComp = PlantComp;
-    ++state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray;
-}
-
-void UpdateZoneSubSubCompPtrArray(EnergyPlusData &state,
-                                  int &Idx,
-                                  int const ListNum,
-                                  int const AirDistUnitNum,
-                                  int const SubCompNum,
-                                  int const SubSubCompNum,
-                                  int const PlantLoopType,
-                                  int const PlantLoop,
-                                  int const PlantBranch,
-                                  int const PlantComp)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update Zone Sub Component Pointer Array
-
-    if (state.dataSysRpts->OneTimeFlag_UpdateZoneSubSubCompPtrArray) {
-        state.dataAirSystemsData->ZoneSubSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray);
-        for (auto &e : state.dataAirSystemsData->ZoneSubSubCompToPlant) {
-            e.ZoneEqListNum = 0;
-            e.ZoneEqCompNum = 0;
-            e.ZoneEqSubCompNum = 0;
-            e.ZoneEqSubSubCompNum = 0;
-            e.PlantLoopType = 0;
-            e.PlantLoopNum = 0;
-            e.PlantLoopBranch = 0;
-            e.PlantLoopComp = 0;
-            e.FirstDemandSidePtr = 0;
-            e.LastDemandSidePtr = 0;
-        }
-
-        state.dataSysRpts->OneTimeFlag_UpdateZoneSubSubCompPtrArray = false;
-    }
-
-    if (state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray >=
-        state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray) { // Redimension larger
-        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray);
-        state.dataAirSystemsData->ZoneSubSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray *= 2);
-        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray; ++i) {
-            auto &zctp(state.dataAirSystemsData->ZoneSubSubCompToPlant(i));
-            zctp.ZoneEqListNum = 0;
-            zctp.ZoneEqCompNum = 0;
-            zctp.ZoneEqSubCompNum = 0;
-            zctp.ZoneEqSubSubCompNum = 0;
-            zctp.PlantLoopType = 0;
-            zctp.PlantLoopNum = 0;
-            zctp.PlantLoopBranch = 0;
-            zctp.PlantLoopComp = 0;
-            zctp.FirstDemandSidePtr = 0;
-            zctp.LastDemandSidePtr = 0;
-        }
-    }
-
-    Idx = state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray;
-    auto &zctp(state.dataAirSystemsData->ZoneSubSubCompToPlant(Idx));
-    zctp.ZoneEqListNum = ListNum;
-    zctp.ZoneEqCompNum = AirDistUnitNum;
-    zctp.ZoneEqSubCompNum = SubCompNum;
-    zctp.ZoneEqSubSubCompNum = SubSubCompNum;
-    zctp.PlantLoopType = PlantLoopType;
-    zctp.PlantLoopNum = PlantLoop;
-    zctp.PlantLoopBranch = PlantBranch;
-    zctp.PlantLoopComp = PlantComp;
-    ++state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray;
-}
-
-void UpdateAirSysCompPtrArray(EnergyPlusData &state,
-                              int &Idx,
-                              int const AirLoopNum,
-                              int const BranchNum,
-                              int const CompNum,
-                              int const PlantLoopType,
-                              int const PlantLoop,
-                              int const PlantBranch,
-                              int const PlantComp)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update Air System Component Pointer Array
-
-    if (state.dataSysRpts->OneTimeFlag_UpdateAirSysCompPtrArray) {
-        state.dataAirSystemsData->AirSysCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray);
-        for (auto &e : state.dataAirSystemsData->AirSysCompToPlant) {
-            e.AirLoopNum = 0;
-            e.AirLoopBranch = 0;
-            e.AirLoopComp = 0;
-            e.PlantLoopType = 0;
-            e.PlantLoopNum = 0;
-            e.PlantLoopBranch = 0;
-            e.PlantLoopComp = 0;
-            e.FirstDemandSidePtr = 0;
-            e.LastDemandSidePtr = 0;
-        }
-
-        state.dataSysRpts->OneTimeFlag_UpdateAirSysCompPtrArray = false;
-    }
-
-    if (state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray) { // Redimension larger
-        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray);
-        state.dataAirSystemsData->AirSysCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray *= 2);
-        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray; ++i) {
-            auto &actp(state.dataAirSystemsData->AirSysCompToPlant(i));
-            actp.AirLoopNum = 0;
-            actp.AirLoopBranch = 0;
-            actp.AirLoopComp = 0;
-            actp.PlantLoopType = 0;
-            actp.PlantLoopNum = 0;
-            actp.PlantLoopBranch = 0;
-            actp.PlantLoopComp = 0;
-            actp.FirstDemandSidePtr = 0;
-            actp.LastDemandSidePtr = 0;
-        }
-    }
-
-    Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray;
-    auto &actp(state.dataAirSystemsData->AirSysCompToPlant(Idx));
-    actp.AirLoopNum = AirLoopNum;
-    actp.AirLoopBranch = BranchNum;
-    actp.AirLoopComp = CompNum;
-    actp.PlantLoopType = PlantLoopType;
-    actp.PlantLoopNum = PlantLoop;
-    actp.PlantLoopBranch = PlantBranch;
-    actp.PlantLoopComp = PlantComp;
-    ++state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray;
-}
-
-void UpdateAirSysSubCompPtrArray(EnergyPlusData &state,
-                                 int &Idx,
-                                 int const AirLoopNum,
-                                 int const BranchNum,
-                                 int const CompNum,
-                                 int const SubCompNum,
-                                 int const PlantLoopType,
-                                 int const PlantLoop,
-                                 int const PlantBranch,
-                                 int const PlantComp)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update Air System Sub Component Pointer Array
-
-    if (state.dataSysRpts->OneTimeFlag_UpdateAirSysSubCompPtrArray) {
-        state.dataAirSystemsData->AirSysSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray);
-        for (auto &e : state.dataAirSystemsData->AirSysSubCompToPlant) {
-            e.AirLoopNum = 0;
-            e.AirLoopBranch = 0;
-            e.AirLoopComp = 0;
-            e.AirLoopSubComp = 0;
-            e.PlantLoopType = 0;
-            e.PlantLoopNum = 0;
-            e.PlantLoopBranch = 0;
-            e.PlantLoopComp = 0;
-            e.FirstDemandSidePtr = 0;
-            e.LastDemandSidePtr = 0;
-        }
-
-        state.dataSysRpts->OneTimeFlag_UpdateAirSysSubCompPtrArray = false;
-    }
-
-    if (state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray >=
-        state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray) { // Redimension larger
-        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray);
-        state.dataAirSystemsData->AirSysSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray *= 2);
-        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray; ++i) {
-            auto &actp(state.dataAirSystemsData->AirSysSubCompToPlant(i));
-            actp.AirLoopNum = 0;
-            actp.AirLoopBranch = 0;
-            actp.AirLoopComp = 0;
-            actp.AirLoopSubComp = 0;
-            actp.PlantLoopType = 0;
-            actp.PlantLoopNum = 0;
-            actp.PlantLoopBranch = 0;
-            actp.PlantLoopComp = 0;
-            actp.FirstDemandSidePtr = 0;
-            actp.LastDemandSidePtr = 0;
-        }
-    }
-
-    Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray;
-    auto &actp(state.dataAirSystemsData->AirSysSubCompToPlant(Idx));
-    actp.AirLoopNum = AirLoopNum;
-    actp.AirLoopBranch = BranchNum;
-    actp.AirLoopComp = CompNum;
-    actp.AirLoopSubComp = SubCompNum;
-    actp.PlantLoopType = PlantLoopType;
-    actp.PlantLoopNum = PlantLoop;
-    actp.PlantLoopBranch = PlantBranch;
-    actp.PlantLoopComp = PlantComp;
-    ++state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray;
-}
-
-void UpdateAirSysSubSubCompPtrArray(EnergyPlusData &state,
-                                    int &Idx,
-                                    int const AirLoopNum,
-                                    int const BranchNum,
-                                    int const CompNum,
-                                    int const SubCompNum,
-                                    int const SubSubCompNum,
-                                    int const PlantLoopType,
-                                    int const PlantLoop,
-                                    int const PlantBranch,
-                                    int const PlantComp)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Update Air System Sub Sub Component Pointer Array
-
-    if (state.dataSysRpts->OneTimeFlag_UpdateAirSysSubSubCompPtrArray) {
-        state.dataAirSystemsData->AirSysSubSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray);
-        for (auto &e : state.dataAirSystemsData->AirSysSubSubCompToPlant) {
-            e.AirLoopNum = 0;
-            e.AirLoopBranch = 0;
-            e.AirLoopComp = 0;
-            e.AirLoopSubComp = 0;
-            e.AirLoopSubSubComp = 0;
-            e.PlantLoopType = 0;
-            e.PlantLoopNum = 0;
-            e.PlantLoopBranch = 0;
-            e.PlantLoopComp = 0;
-            e.FirstDemandSidePtr = 0;
-            e.LastDemandSidePtr = 0;
-        }
-
-        state.dataSysRpts->OneTimeFlag_UpdateAirSysSubSubCompPtrArray = false;
-    }
-
-    if (state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray >=
-        state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray) { // Redimension larger
-        int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray);
-        state.dataAirSystemsData->AirSysSubSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray *= 2);
-        for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray; ++i) {
-            auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(i));
-            actp.AirLoopNum = 0;
-            actp.AirLoopBranch = 0;
-            actp.AirLoopComp = 0;
-            actp.AirLoopSubComp = 0;
-            actp.AirLoopSubSubComp = 0;
-            actp.PlantLoopType = 0;
-            actp.PlantLoopNum = 0;
-            actp.PlantLoopBranch = 0;
-            actp.PlantLoopComp = 0;
-            actp.FirstDemandSidePtr = 0;
-            actp.LastDemandSidePtr = 0;
-        }
-    }
-
-    Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray;
-    auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(Idx));
-    actp.AirLoopNum = AirLoopNum;
-    actp.AirLoopBranch = BranchNum;
-    actp.AirLoopComp = CompNum;
-    actp.AirLoopSubComp = SubCompNum;
-    actp.AirLoopSubSubComp = SubSubCompNum;
-    actp.PlantLoopType = PlantLoopType;
-    actp.PlantLoopNum = PlantLoop;
-    actp.PlantLoopBranch = PlantBranch;
-    actp.PlantLoopComp = PlantComp;
-    ++state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray;
 }
 
 void AllocateAndSetUpVentReports(EnergyPlusData &state)
@@ -3504,12 +3702,6 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     }
 }
 
-// End Initialization Section of the Module
-//******************************************************************************
-
-// Beginning of Reporting subroutines for the SimAir Module
-// *****************************************************************************
-
 void ReportSystemEnergyUse(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -5124,218 +5316,6 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
     state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA += state.dataSysRpts->AnyZoneTimeBelowVozDynOcc;
     state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA += state.dataSysRpts->AllZonesTimeAtVozDynOcc;
     state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA += state.dataSysRpts->AnyZoneTimeAboveVozDynOcc;
-}
-
-void MatchPlantSys(EnergyPlusData &state,
-                   int const AirLoopNum, // counter for zone air distribution inlets
-                   int const BranchNum   // counter for zone air distribution inlets
-)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   May 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // calculate and report zone ventilation loads
-
-    // METHODOLOGY EMPLOYED:
-    // calculate energy contribution of outside air through mixing box and pro-rate to
-    // zones according to zone mass flow rates.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataGlobalConstants;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const EnergyTrans(1);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CompType;
-    std::string CompName;
-    int CompNum; // counter for components on air loop branch connected to air distribution unit
-    int VarNum;
-    int SubCompNum;    // counter for components on air loop branch connected to air distribution unit
-    int SubSubCompNum; // counter for components on air loop branch connected to air distribution unit
-    bool MatchFound;   // Set to .TRUE. when a match is found
-    int MatchLoop;     // Loop number of the match
-    int MatchBranch;   // Branch number of the match
-    int MatchComp;     // Component number of the match
-    int MatchLoopType;
-    int Idx;
-
-    for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-        {
-            auto &thisComp(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum));
-            for (VarNum = 1; VarNum <= thisComp.NumMeteredVars; ++VarNum) {
-                if (thisComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
-                    thisComp.EnergyTransComp = EnergyTrans;
-                    CompType = thisComp.TypeOf;
-                    CompName = thisComp.Name;
-                    Idx = 0;
-                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
-                    if (MatchFound)
-                        UpdateAirSysCompPtrArray(state, Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
-                    thisComp.AirSysToPlantPtr = Idx;
-                    break;
-                }
-            }
-            for (SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum) {
-                //!!!!          IF(SysVentLoad == 0.0d0)EXIT
-                {
-                    auto &thisSubComp(thisComp.SubComp(SubCompNum));
-                    for (VarNum = 1; VarNum <= thisSubComp.NumMeteredVars; ++VarNum) {
-                        if (thisSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
-                            thisSubComp.EnergyTransComp = EnergyTrans;
-                            CompType = thisSubComp.TypeOf;
-                            CompName = thisSubComp.Name;
-                            Idx = 0;
-                            FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
-                            if (MatchFound)
-                                UpdateAirSysSubCompPtrArray(
-                                    state, Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
-                            thisSubComp.AirSysToPlantPtr = Idx;
-                            break;
-                        }
-                    }
-                    for (SubSubCompNum = 1; SubSubCompNum <= thisSubComp.NumSubSubComps; ++SubSubCompNum) {
-                        //!!!!            IF(SysVentLoad == 0.0d0)EXIT
-                        {
-                            auto &thisSubSubComp(thisSubComp.SubSubComp(SubSubCompNum));
-                            for (VarNum = 1; VarNum <= thisSubSubComp.NumMeteredVars; ++VarNum) {
-                                if (thisSubSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
-                                    thisSubSubComp.EnergyTransComp = EnergyTrans;
-                                    CompType = thisSubSubComp.TypeOf;
-                                    CompName = thisSubSubComp.Name;
-                                    Idx = 0;
-                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
-                                    if (MatchFound)
-                                        UpdateAirSysSubSubCompPtrArray(state,
-                                                                       Idx,
-                                                                       AirLoopNum,
-                                                                       BranchNum,
-                                                                       CompNum,
-                                                                       SubCompNum,
-                                                                       SubSubCompNum,
-                                                                       MatchLoopType,
-                                                                       MatchLoop,
-                                                                       MatchBranch,
-                                                                       MatchComp);
-                                    thisSubSubComp.AirSysToPlantPtr = Idx;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void FindDemandSideMatch(EnergyPlusData &state,
-                         std::string const &CompType, // Inlet node of the component to find the match of
-                         std::string_view CompName,   // Outlet node of the component to find the match of
-                         bool &MatchFound,            // Set to .TRUE. when a match is found
-                         int &MatchLoopType,          // Loop number of the match
-                         int &MatchLoop,              // Loop number of the match
-                         int &MatchBranch,            // Branch number of the match
-                         int &MatchComp               // Component number of the match
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Rick Strand
-    //       DATE WRITTEN   September 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine intializes the connections between various loops.
-    // Due to the fact that this requires numerous string compares, it
-    // is much more efficient to find this information once and then
-    // store it in module level variables (LoopConnect derived type).
-
-    // METHODOLOGY EMPLOYED:
-    // Simply cycles through the plant and condenser demand sides until
-    // a component is found that matches the component type and name
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PassBranchNum; // DO loop counter for branches
-    int PassCompNum;   // DO loop counter for components
-    int PassLoopNum;   // DO loop counter for loops or the top level of the hierarchy
-
-    // Initialize all of the output variables
-
-    MatchFound = false;
-    MatchLoopType = 0;
-    MatchLoop = 0;
-    MatchLoop = 0;
-    MatchBranch = 0;
-    MatchComp = 0;
-
-    // Now cycle through all of the demand side loops to see if we can find
-    // a match for the component type and name.  Once a match is found,
-    // record the type of loop and the loop, branch, and component numbers.
-    if (!MatchFound) { // Go through the plant demand side loops
-        for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PassLoopNum) {
-            for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
-                for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents;
-                     ++PassCompNum) {
-                    if (UtilityRoutines::SameString(
-                            CompType, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
-                        UtilityRoutines::SameString(
-                            CompName, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
-                        // Found a match on the plant demand side--increment the counter
-                        MatchFound = true;
-                        MatchLoopType = 1;
-                        MatchLoop = PassLoopNum;
-                        MatchBranch = PassBranchNum;
-                        MatchComp = PassCompNum;
-                        break; // PassCompNum DO loop
-                    }
-                }
-                if (MatchFound) break; // PassBranchNum DO loop
-            }
-            if (MatchFound) break; // PassLoopNum DO loop
-        }
-    }
-
-    if (!MatchFound) { // Go through the condenser demand side loops
-        for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PassLoopNum) {
-            for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
-                for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents;
-                     ++PassCompNum) {
-                    if (UtilityRoutines::SameString(
-                            CompType, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
-                        UtilityRoutines::SameString(
-                            CompName, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
-                        // Found a match on the plant demand side--increment the counter
-                        MatchFound = true;
-                        MatchLoopType = 2;
-                        MatchLoop = PassLoopNum;
-                        MatchBranch = PassBranchNum;
-                        MatchComp = PassCompNum;
-                        break; // PassCompNum DO loop
-                    }
-                }
-                if (MatchFound) break; // PassBranchNum DO loop
-            }
-            if (MatchFound) break; // PassLoopNum DO loop
-        }
-    }
 }
 
 void ReportAirLoopConnections(EnergyPlusData &state)

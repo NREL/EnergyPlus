@@ -413,9 +413,6 @@ namespace HVACVariableRefrigerantFlow {
         {
         }
 
-        // Begin of Methods for New VRF Model: Fluid Temperature Control
-        //******************************************************************************
-
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(
@@ -780,11 +777,6 @@ namespace HVACVariableRefrigerantFlow {
         {
         }
 
-        // Methods for New VRF Model: Fluid Temperature Control
-        //******************************************************************************
-        // Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are
-        // not member functions of this class.
-
         void CalcVRFIUVariableTeTc(EnergyPlusData &state,
                                    Real64 &EvapTemp, // evaporating temperature
                                    Real64 &CondTemp  // condensing temperature
@@ -845,8 +837,6 @@ namespace HVACVariableRefrigerantFlow {
                      Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
-        // Methods for curve based and refrigerant flow control based models
-        //******************************************************************************
         void CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                                     int VRFTUNum,            // index of vrf terminal unit
                                     bool FirstHVACIteration, // True when first HVAC iteration

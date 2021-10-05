@@ -1094,8 +1094,6 @@ void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     }
 }
 
-//**************************************************************************************************
-
 Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
                                            Real64 HAT_floor,
                                            Real64 HA_floor,

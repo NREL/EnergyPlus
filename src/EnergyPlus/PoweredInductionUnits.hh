@@ -193,8 +193,6 @@ namespace PoweredInductionUnits {
 
     void ReportPIU(EnergyPlusData &state, int PIUNum); // number of the current fan coil unit being simulated
 
-    // ===================== Utilities =====================================
-
     bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 
     void PIUInducesPlenumAir(EnergyPlusData &state, int NodeNum); // induced air node number

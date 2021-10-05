@@ -2415,10 +2415,6 @@ void FindCompSPInput(EnergyPlusData &state,
     }
 }
 
-//******************************************************************************
-
-//******************************************************************************
-
 void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
 {
     // SUBROUTINE INFORMATION:
@@ -2782,10 +2778,6 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         ShowFatalError(state, "InitLoadDistribution: Fatal error caused by previous severe error(s).");
     }
 }
-
-//******************************************************************************
-
-//******************************************************************************
 
 void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
                                                    int const LoopNum,         // component topology
@@ -3531,10 +3523,6 @@ void DistributePlantLoad(EnergyPlusData &state,
     }
 }
 
-//******************************************************************************
-
-//******************************************************************************
-
 void SetupPlantEMSActuators(EnergyPlusData &state)
 {
 
@@ -3638,8 +3626,5 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
         }
     }
 }
-
-//*END PLANT EMS CONTROL ROUTINES!
-//******************************************************************************
 
 } // namespace EnergyPlus::PlantCondLoopOperation

@@ -192,9 +192,6 @@ namespace WaterToAirHeatPump {
         }
     }
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetWatertoAirHPInput(EnergyPlusData &state)
     {
 

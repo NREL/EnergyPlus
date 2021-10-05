@@ -106,19 +106,6 @@ namespace SolarShading {
                 int const NRS  // Surface Number of the potential shadow receiving surface
     );
 
-    void CHKGSS(EnergyPlusData &state,
-                int const NRS,     // Surface number of the potential shadow receiving surface
-                int const NSS,     // Surface number of the potential shadow casting surface
-                Real64 const ZMIN, // Lowest point of the receiving surface
-                bool &CannotShade  // TRUE if shadow casting surface cannot shade receiving surface.
-    );
-
-    void CHKSBS(EnergyPlusData &state,
-                int const HTS,   // Heat transfer surface number of the general receiving surf
-                int const GRSNR, // Surface number of general receiving surface
-                int const SBSNR  // Surface number of subsurface
-    );
-
     bool polygon_contains_point(int const nsides,            // number of sides (vertices)
                                 Array1D<Vector> &polygon_3d, // points of polygon
                                 Vector const &point_3d,      // point to be tested
@@ -126,88 +113,15 @@ namespace SolarShading {
                                 bool const ignorey,
                                 bool const ignorez);
 
-    void ComputeIntSolarAbsorpFactors(EnergyPlusData &state);
-
-    void CLIP(EnergyPlusData &state, int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
-
-    void CTRANS(EnergyPlusData &state,
-                int const NS,         // Surface number whose vertex coordinates are being transformed
-                int const NGRS,       // Base surface number for surface NS
-                int &NVT,             // Number of vertices for surface NS
-                Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-                Array1D<Real64> &YVT,
-                Array1D<Real64> &ZVT);
-
-    void HTRANS(EnergyPlusData &state,
-                int const I,          // Mode selector: 0 - Compute H.C. of sides
-                int const NS,         // Figure Number
-                int const NumVertices // Number of vertices
-    );
-
-    void HTRANS0(EnergyPlusData &state,
-                 int const NS,         // Figure Number
-                 int const NumVertices // Number of vertices
-    );
-
-    void HTRANS1(EnergyPlusData &state,
-                 int const NS,         // Figure Number
-                 int const NumVertices // Number of vertices
-    );
-
-    void INCLOS(EnergyPlusData &state,
-                int const N1,            // Figure number of figure 1
-                int const N1NumVert,     // Number of vertices of figure 1
-                int const N2,            // Figure number of figure 2
-                int const N2NumVert,     // Number of vertices of figure 2
-                int &NumVerticesOverlap, // Number of vertices which overlap
-                int &NIN                 // Number of vertices of figure 1 within figure 2
-    );
-
-    void INTCPT(EnergyPlusData &state,
-                int const NV1, // Number of vertices of figure NS1
-                int const NV2, // Number of vertices of figure NS2
-                int &NV3,      // Number of vertices of figure NS3
-                int const NS1, // Number of the figure being overlapped
-                int const NS2  // Number of the figure doing overlapping
-    );
-
-    void CLIPPOLY(EnergyPlusData &state,
-                  int const NS1, // Figure number of figure 1 (The subject polygon)
-                  int const NS2, // Figure number of figure 2 (The clipping polygon)
-                  int const NV1, // Number of vertices of figure 1
-                  int const NV2, // Number of vertices of figure 2
-                  int &NV3       // Number of vertices of figure 3
-    );
-
-    void MULTOL(EnergyPlusData &state,
-                int const NNN,   // argument
-                int const LOC0,  // Location in the homogeneous coordinate array
-                int const NRFIGS // Number of figures overlapped
-    );
-
     void ORDER(EnergyPlusData &state,
                int const NV3, // Number of vertices of figure NS3
                int const NS3  // Location to place results of overlap
-    );
-
-    void DeterminePolygonOverlap(EnergyPlusData &state,
-                                 int const NS1, // Number of the figure being overlapped
-                                 int const NS2, // Number of the figure doing overlapping
-                                 int const NS3  // Location to place results of overlap
     );
 
     void CalcPerSolarBeam(EnergyPlusData &state,
                           Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
-    );
-
-    void FigureSunCosines(EnergyPlusData &state,
-                          int const iHour,
-                          int const iTimeStep,
-                          Real64 const EqOfTime,       // value of Equation of Time for period
-                          Real64 const SinSolarDeclin, // value of Sine of Solar Declination for period
-                          Real64 const CosSolarDeclin  // value of Cosine of Solar Declination for period
     );
 
     void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep);
@@ -217,30 +131,6 @@ namespace SolarShading {
     void SHADOW(EnergyPlusData &state,
                 int const iHour, // Hour index
                 int const TS     // Time Step
-    );
-
-    void SHDBKS(EnergyPlusData &state,
-                int const NGRS, // Number of the general receiving surface
-                int const CurSurf,
-                int const NBKS, // Number of back surfaces
-                int const HTS   // Heat transfer surface number of the general receiving surf
-    );
-
-    void SHDGSS(EnergyPlusData &state,
-                int const NGRS,
-                int const iHour,   // Hour Counter
-                int const TS,      // TimeStep
-                int const CurSurf, // Current Surface
-                int const NGSS,    // Number of general shadowing surfaces
-                int const HTS      // Heat transfer surface number of the general receiving surf
-    );
-
-    void CalcInteriorSolarOverlaps(EnergyPlusData &state,
-                                   int const iHour, // Hour Index
-                                   int const NBKS,  // Number of back surfaces associated with this GRSNR (in general, only
-                                   int const HTSS,  // Surface number of the subsurface (exterior window)
-                                   int const GRSNR, // General receiving surface number (base surface of the exterior window)
-                                   int const TS     // Time step Index
     );
 
     void CalcInteriorSolarDistribution(EnergyPlusData &state);
@@ -267,25 +157,9 @@ namespace SolarShading {
                 int const Hour,
                 int const TS);
 
-    void SHDSBS(EnergyPlusData &state,
-                int const iHour, // Hour Index
-                int const CurSurf,
-                int const NBKS, // Number of back surfaces
-                int const NSBS, // Number of subsurfaces
-                int const HTS,  // Heat transfer surface number of the general receiving surf
-                int const TS    // Time step Index
-    );
-
     void SUN3(int const JulianDayOfYear,      // Julian Day Of Year
               Real64 &SineOfSolarDeclination, // Sine of Solar Declination
               Real64 &EquationOfTime          // Equation of Time (Degrees)
-    );
-
-    void SUN4(EnergyPlusData &state,
-              Real64 const CurrentTime,    // Time to use in shadowing calculations
-              Real64 const EqOfTime,       // Equation of time for current day
-              Real64 const SinSolarDeclin, // Sine of the Solar declination (current day)
-              Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
     );
 
     void WindowShadingManager(EnergyPlusData &state);
@@ -302,34 +176,13 @@ namespace SolarShading {
 
     void CalcWindowProfileAngles(EnergyPlusData &state);
 
-    void CalcFrameDividerShadow(EnergyPlusData &state,
-                                int const SurfNum,  // Surface number
-                                int const FrDivNum, // Frame/divider number
-                                int const HourNum   // Hour number
-    );
-
     void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state);
 
     void ReportSurfaceShading(EnergyPlusData &state);
 
     void ReportSurfaceErrors(EnergyPlusData &state);
 
-    void ComputeWinShadeAbsorpFactors(EnergyPlusData &state);
-
     void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state);
-
-    void CalcInteriorWinTransDifSolInitialDistribution(
-        EnergyPlusData &state,
-        int const IntWinEnclosureNum,     // Interior Window Enclosure index number
-        int const IntWinSurfNum,          // Interior Window Surface number
-        Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent enclosure [W]
-    );
-
-    void CalcComplexWindowOverlap(EnergyPlusData &state,
-                                  BSDFGeomDescr &Geom,               // State Geometry
-                                  BSDFWindowGeomDescr const &Window, // Window Geometry
-                                  int const ISurf                    // Surface number of the complex fenestration
-    );
 
     void TimestepInitComplexFenestration(EnergyPlusData &state);
 

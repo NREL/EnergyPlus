@@ -58,7 +58,6 @@
 
 namespace EnergyPlus::RootFinder {
 
-// Using/Aliasing
 using DataRootFinder::PointType;
 using DataRootFinder::RootFinderDataType;
 

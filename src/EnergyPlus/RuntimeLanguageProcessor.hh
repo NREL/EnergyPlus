@@ -65,7 +65,6 @@ struct EnergyPlusData;
 
 namespace RuntimeLanguageProcessor {
 
-    // Using/Aliasing
     using DataRuntimeLanguage::ErlFunc;
     using DataRuntimeLanguage::ErlValueType;
 

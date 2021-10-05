@@ -1364,6 +1364,4 @@ int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
     return GetHybridUnitaryACReturnAirNode;
 }
 
-//*****************************************************************************************
-
 } // namespace EnergyPlus::HybridUnitaryAirConditioners

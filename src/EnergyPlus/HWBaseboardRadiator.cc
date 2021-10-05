@@ -1970,8 +1970,6 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
 
-    //*****************************************************************************************
-
 } // namespace HWBaseboardRadiator
 
 } // namespace EnergyPlus

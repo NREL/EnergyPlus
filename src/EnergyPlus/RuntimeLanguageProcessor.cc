@@ -85,7 +85,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 //       MODIFIED       Brent Griffith, May - August 2009
 //       RE-ENGINEERED  na
 
-// Using/Aliasing
 using namespace DataRuntimeLanguage;
 
 void InitializeRuntimeLanguage(EnergyPlusData &state)
@@ -100,7 +99,6 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // One time run.  Must be run BEFORE anything gets parsed.
 
-    // Using/Aliasing
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
@@ -240,29 +238,8 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // re initialize Erl for new simulation environment period
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using OutputProcessor::SetInternalVariableValue;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ActuatorUsedLoop;
     int EMSActuatorVariableNum;
     int ErlVariableNum;
@@ -351,15 +328,8 @@ int AddInstruction(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Adds an instruction to a stack.
 
-    // METHODOLOGY EMPLOYED:
-
     // Return value
     int InstructionNum;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Object Data
     ErlStackType TempStack;
@@ -402,12 +372,6 @@ void AddError(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Adds an error message to a stack.
 
-    // METHODOLOGY EMPLOYED:
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ErrorNum; // local count of errors for this ErlStack
 
     // Object Data
@@ -446,30 +410,8 @@ void SetupPossibleOperators(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     //  setup hard coded list of possible operands
 
-    // METHODOLOGY EMPLOYED:
     // Allocate structure and fill basic info on opertors and operands
     //  operators include built-in functions where operands are function arguments
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     if (state.dataRuntimeLangProcessor->AlreadyDidOnce) return;
 
@@ -877,12 +819,7 @@ int NewExpression(EnergyPlusData &state)
     // PURPOSE OF THIS FUNCTION:
     // Creates a new expression.
 
-    // METHODOLOGY EMPLOYED:
-
     // Return value
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -911,13 +848,11 @@ int ProcessTokens(
     // PURPOSE OF THIS SUBROUTINE:
     // Processes tokens into expressions.
 
-    // METHODOLOGY EMPLOYED:
     // Uses recursion to handle tokens with compound expressions
 
     // Return value
     int ExpressionNum;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Pos;
     int LastPos;
     int TokenNum;
@@ -1177,17 +1112,8 @@ void ParseExpression(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Parsing string into a series of tokens
 
-    // METHODOLOGY EMPLOYED:
+    int constexpr MaxDoLoopCounts(500);
 
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxDoLoopCounts(500);
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //  CHARACTER(len=120), DIMENSION(MaxErrors) :: Error  ! Errors should be stored with the stack
     int NumErrors;
     std::string::size_type Pos;
@@ -1569,20 +1495,12 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
     // Parsing a block of text creates a program stack in DataRuntimeLanguage.
     // This routine only executes once for each Erl program.
 
-    // METHODOLOGY EMPLOYED:
     // Loop over each line of Erl code and parse based on statement keyword
 
-    // Using/Aliasing
+    int constexpr IfDepthAllowed(5);        // depth of IF block nesting
+    int constexpr ELSEIFLengthAllowed(200); // number of ELSEIFs allowed
+    int constexpr WhileDepthAllowed(1);     // depth of While block nesting
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const IfDepthAllowed(5);        // depth of IF block nesting
-    int const ELSEIFLengthAllowed(200); // number of ELSEIFs allowed
-    int const WhileDepthAllowed(1);     // depth of While block nesting
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LineNum;
     int StackNum2;
     std::string::size_type Pos;
@@ -1877,7 +1795,6 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
     } else if (NestedIfDepth > 1) {
         AddError(state, StackNum, 0, format("Missing {} ENDIF instructions needed to terminate earlier IF instructions.", NestedIfDepth));
     }
-
 }
 
 ErlValueType StringValue(std::string const &String)
@@ -1891,33 +1808,10 @@ ErlValueType StringValue(std::string const &String)
     // PURPOSE OF THIS FUNCTION:
     // convert string to Erl Value structure
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
     // Return value
     ErlValueType Value;
 
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-    // na
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    // na
 
     Value.Type = Value::String;
     Value.String = String;
@@ -1933,22 +1827,8 @@ std::string ValueToString(ErlValueType const &Value)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
     // Return value
     std::string String;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
 
     String = "";
 
@@ -1985,17 +1865,8 @@ void WriteTrace(EnergyPlusData &state, int const StackNum, int const Instruction
     //                      Brent Griffith, May 2016, added bool and fatal error messages for runtime problems with math and unitialized vars
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-
-    // METHODOLOGY EMPLOYED:
-
-    // Using/Aliasing
     using General::CreateSysTimeIntervalString;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LineNum;
     std::string NameString;
     std::string LineNumString;
@@ -2071,10 +1942,6 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     // Return value
     ErlValueType ReturnValue;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InstructionNum;
     int InstructionNum2;
     int ExpressionNum;
@@ -2215,18 +2082,11 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
     // PURPOSE OF THIS FUNCTION:
     // Evaluates an expression.
 
-    // METHODOLOGY EMPLOYED:
-
-    // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
-    // Using/Aliasing
     using namespace Psychrometrics;
     using CurveManager::CurveValue;
 
     // Return value
     ErlValueType ReturnValue;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int thisTrend;      // local temporary
@@ -3123,14 +2983,10 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     // The runtime language objects are all loaded in one step, names registered, etc.  They are parsed in a second step
     // once all the object names are known.
 
-    // Using/Aliasing
     using CurveManager::GetCurveIndex;
 
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
     auto constexpr RoutineName("GetRuntimeLanguageUserInput: ");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int GlobalNum;
     int StackNum;
     int ErrorNum;
@@ -4181,12 +4037,6 @@ void ReportRuntimeLanguage(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
 
-    // METHODOLOGY EMPLOYED:
-
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RuntimeReportVarNum;
     int VariableNum;
 
@@ -4211,36 +4061,9 @@ ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const>
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
     // Return value
     ErlValueType newValue;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-    // na
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    // na
 
     if (present(OrigValue)) { // preserve other parts of structure and only updated Value%Number
         newValue = OrigValue;
@@ -4354,14 +4177,6 @@ void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This is the ExternalInterface runtime write ErlVariable function
 
-    // METHODOLOGY EMPLOYED:
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
     state.dataRuntimeLang->ErlVariable(varNum).Value = SetErlValueNumber(value);
 }
 
@@ -4381,13 +4196,6 @@ void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets flags for ExternalInterface variables
 
-    // METHODOLOGY EMPLOYED:
-    // USE STATEMENTS:
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // Set initial value
     if (setToNull) {
         state.dataRuntimeLang->ErlVariable(varNum).Value.Type = Value::Null;
@@ -4415,14 +4223,8 @@ bool isExternalInterfaceErlVariable(EnergyPlusData &state, int const varNum) // 
     // This function checks if an Erl name obtained from the xml file
     // is indeed specified as a ExternalInterface variable in the idf file
 
-    // METHODOLOGY EMPLOYED:
-    // USE STATEMENTS:
-
     // Return value
     bool isExternalInterfaceVar; // Set to true if the variable is a ExternalInterface variable
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     isExternalInterfaceVar = state.dataRuntimeLang->ErlVariable(varNum).SetByExternalInterface;
 

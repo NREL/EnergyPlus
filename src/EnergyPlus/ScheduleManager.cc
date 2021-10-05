@@ -91,9 +91,6 @@ namespace ScheduleManager {
     // validating it, and storing it in such a manner that the schedule manager
     // can provide the scheduling value needs for the simulation.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
 
@@ -113,7 +110,7 @@ namespace ScheduleManager {
                                   "CustomDay1",
                                   "CustomDay2"});
 
-    int const NumScheduleTypeLimitUnitTypes(14);
+    int constexpr NumScheduleTypeLimitUnitTypes(14);
     Array1D_string ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
                                               {"Dimensionless",
                                                "Temperature",
@@ -130,16 +127,832 @@ namespace ScheduleManager {
                                                "Control",
                                                "Mode"});
 
-    // DERIVED TYPE DEFINITIONS
+    void DecodeHHMMField(EnergyPlusData &state,
+                         std::string const &FieldValue,          // Input field value
+                         int &RetHH,                             // Returned "hour"
+                         int &RetMM,                             // Returned "minute"
+                         bool &ErrorsFound,                      // True if errors found in this field
+                         std::string const &DayScheduleName,     // originating day schedule name
+                         std::string const &FullFieldValue,      // Full Input field value
+                         ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
+    )
+    {
 
-    // INTERFACE BLOCK SPECIFICATIONS
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K Lawrie
+        //       DATE WRITTEN   January 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // MODULE VARIABLE DECLARATIONS:
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine decodes a hhmm date field input as part of the "until" time in a schedule
+        // representation.
 
-    // MODULE SUBROUTINES:
-    //*************************************************************************
+        Real64 rRetHH; // real Returned "hour"
+        Real64 rRetMM; // real Returned "minute"
+        bool nonIntegral;
+        std::string hHour;
+        std::string mMinute;
 
-    // Functions
+        std::string String = stripped(FieldValue);
+        std::string::size_type const Pos = index(String, ':');
+        nonIntegral = false;
+        if (Pos == std::string::npos) {
+            ShowSevereError(state,
+                            "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)=" +
+                                stripped(FullFieldValue));
+            ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+            ErrorsFound = true;
+            return;
+        } else if (Pos == 0) {
+            RetHH = 0;
+        } else {
+            bool error = false;
+            rRetHH = UtilityRoutines::ProcessNumber(String.substr(0, Pos), error);
+            RetHH = int(rRetHH);
+            if (double(RetHH) != rRetHH || error || rRetHH < 0.0) {
+                if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
+                    ShowWarningError(state,
+                                     "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in HH)=" +
+                                         stripped(FullFieldValue));
+                    ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
+                    nonIntegral = true;
+                } else {
+                    ShowSevereError(state,
+                                    "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in HH)=" +
+                                        stripped(FullFieldValue));
+                    ShowContinueError(state, "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
+                    ErrorsFound = true;
+                    return;
+                }
+            }
+        }
+
+        String.erase(0, Pos + 1);
+        bool error = false;
+        rRetMM = UtilityRoutines::ProcessNumber(String, error);
+        RetMM = int(rRetMM);
+        if (double(RetMM) != rRetMM || error || rRetMM < 0.0) {
+            if (double(RetMM) != rRetMM && rRetMM >= 0.0) {
+                ShowWarningError(state,
+                                 "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in MM)=" +
+                                     stripped(FullFieldValue));
+                ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
+                nonIntegral = true;
+            } else {
+                ShowSevereError(state,
+                                "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in MM)=" +
+                                    stripped(FullFieldValue));
+                ShowContinueError(state, "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
+                ErrorsFound = true;
+                return;
+            }
+        }
+
+        if (nonIntegral) {
+            ShowContinueError(state, format("Until value to be used will be: {:2.2F}:{:2.2F}", hHour, mMinute));
+        }
+        if (interpolationKind == ScheduleInterpolation::No) {
+            if (!isMinuteMultipleOfTimestep(RetMM, state.dataGlobal->MinutesPerTimeStep)) {
+                ShowWarningError(
+                    state,
+                    "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " +
+                        stripped(FullFieldValue));
+                ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
+            }
+        }
+    }
+
+    void ProcessIntervalFields(EnergyPlusData &state,
+                               Array1S_string const Untils,
+                               Array1S<Real64> const Numbers,
+                               int const NumUntils,
+                               int const NumNumbers,
+                               Array2A<Real64> MinuteValue,
+                               Array2A_bool SetMinuteValue,
+                               bool &ErrorsFound,
+                               std::string const &DayScheduleName,     // Name (used for errors)
+                               std::string const &ErrContext,          // Context (used for errors)
+                               ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         <author>
+        //       DATE WRITTEN   <date_written>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine processes the "interval" fields with/without optional "until" in front of
+        // time (hh:mm).
+
+        // na.
+
+        // Argument array dimensioning
+        MinuteValue.dim(60, 24);
+        SetMinuteValue.dim(60, 24);
+
+        int Count;
+        std::string::size_type Pos;
+        int HHField;
+        int MMField;
+        int Hr;
+        int Min;
+        int SHr;  // starting hour
+        int SMin; // starting minute
+        int EHr;  // ending hour
+        int EMin; // ending minute
+        std::string::size_type sFld;
+        int totalMinutes;
+        Real64 incrementPerMinute;
+        Real64 curValue;
+
+        MinuteValue = 0.0;
+        SetMinuteValue = false;
+        SHr = 1;
+        SMin = 1;
+        EHr = 0;
+        EMin = 0;
+        sFld = 0;
+
+        Real64 StartValue = 0;
+        Real64 EndValue = 0;
+
+        if (NumUntils != NumNumbers) {
+            ShowSevereError(state,
+                            "ProcessScheduleInput: ProcessIntervalFields, number of Time fields does not match number of value fields, " +
+                                ErrContext + '=' + DayScheduleName);
+            ErrorsFound = true;
+            return;
+        }
+
+        for (Count = 1; Count <= NumUntils; ++Count) {
+            Pos = index(Untils(Count), "UNTIL");
+            if (Pos == 0) {
+                if (Untils(Count)[5] == ':') {
+                    sFld = 6;
+                } else {
+                    sFld = 5;
+                }
+                DecodeHHMMField(state, Untils(Count).substr(sFld), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
+            } else if (Pos == std::string::npos) {
+                DecodeHHMMField(state, Untils(Count), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
+            } else { // Until found but wasn't first field
+                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
+                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+                ErrorsFound = true;
+                continue;
+            }
+            // Field decoded
+            if (HHField < 0 || HHField > 24 || MMField < 0 || MMField > 60) {
+                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
+                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+                ErrorsFound = true;
+                continue;
+            }
+            if (HHField == 24 && MMField > 0 && MMField < 60) {
+                ShowWarningError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
+                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+                ShowContinueError(state, "Terminating the field at 24:00");
+                MMField = 0;
+            }
+
+            // Fill in values
+            if (MMField == 0) {
+                EHr = HHField + 1;
+                EMin = 60;
+            }
+            if (MMField < 60) {
+                EHr = HHField + 1;
+                EMin = MMField;
+            }
+
+            if (interpolationKind == ScheduleInterpolation::Linear) {
+                totalMinutes = (EHr - SHr) * 60 + (EMin - SMin) + 1;
+                if (totalMinutes == 0) totalMinutes = 1; // protect future division
+                if (Count == 1) {
+                    StartValue = Numbers(Count); // assume first period is flat
+                    EndValue = Numbers(Count);
+                } else {
+                    StartValue = EndValue;
+                    EndValue = Numbers(Count);
+                }
+                incrementPerMinute = (EndValue - StartValue) / totalMinutes;
+                curValue = StartValue + incrementPerMinute;
+            }
+
+            if (SHr == EHr) {
+                for (Min = SMin; Min <= EMin; ++Min) {
+                    if (SetMinuteValue(Min, SHr)) {
+                        ShowSevereError(state,
+                                        "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " +
+                                            ErrContext + '=' + DayScheduleName);
+                        ErrorsFound = true;
+                        goto UntilLoop_exit;
+                    }
+                    if (interpolationKind == ScheduleInterpolation::Linear) {
+                        MinuteValue(Min, EHr) = curValue;
+                        curValue += incrementPerMinute;
+                        SetMinuteValue(Min, SHr) = true;
+                    } else {
+                        MinuteValue(Min, SHr) = Numbers(Count);
+                        SetMinuteValue(Min, SHr) = true;
+                    }
+                }
+                SMin = EMin + 1;
+                if (SMin > 60) {
+                    ++SHr;
+                    SMin = 1;
+                }
+            } else if (EHr < SHr) {
+                ShowSevereError(state,
+                                "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext +
+                                    '=' + DayScheduleName);
+                ErrorsFound = true;
+            } else {
+                if (interpolationKind == ScheduleInterpolation::Linear) {
+                    for (Min = SMin; Min <= 60; ++Min) { // for portion of starting hour
+                        MinuteValue(Min, SHr) = curValue;
+                        curValue += incrementPerMinute;
+                        SetMinuteValue(Min, SHr) = true;
+                    }
+                    for (Hr = SHr + 1; Hr <= EHr - 1; ++Hr) { // for intermediate hours
+                        for (Min = 1; Min <= 60; ++Min) {
+                            MinuteValue(Min, Hr) = curValue;
+                            curValue += incrementPerMinute;
+                            SetMinuteValue(Min, Hr) = true;
+                        }
+                    }
+                    for (Min = 1; Min <= EMin; ++Min) { // for ending hour
+                        MinuteValue(Min, EHr) = curValue;
+                        curValue += incrementPerMinute;
+                        SetMinuteValue(Min, EHr) = true;
+                    }
+                } else { // either no interpolation or "average" interpolation (average just is when the interval does not match the timestep)
+                    for (Min = SMin; Min <= 60; ++Min) { // for portion of starting hour
+                        MinuteValue(Min, SHr) = Numbers(Count);
+                        SetMinuteValue(Min, SHr) = true;
+                    }
+                    for (Hr = SHr + 1; Hr <= EHr - 1; ++Hr) { // for intermediate hours
+                        MinuteValue(_, Hr) = Numbers(Count);
+                        SetMinuteValue(_, Hr) = true;
+                    }
+                    for (Min = 1; Min <= EMin; ++Min) { // for ending hour
+                        MinuteValue(Min, EHr) = Numbers(Count);
+                        SetMinuteValue(Min, EHr) = true;
+                    }
+                }
+                SHr = EHr;
+                SMin = EMin + 1;
+                if (SMin > 60) {
+                    ++SHr;
+                    SMin = 1;
+                }
+            }
+        }
+    UntilLoop_exit:;
+
+        if (!all(SetMinuteValue)) {
+            ShowSevereError(state,
+                            "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, incomplete day detected, " + ErrContext + '=' +
+                                DayScheduleName);
+            ErrorsFound = true;
+        }
+    }
+
+    void ProcessForDayTypes(EnergyPlusData &state,
+                            std::string const &ForDayField, // Field containing the "FOR:..."
+                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
+                            Array1D_bool &AlReady,          // Array of days already done
+                            bool &ErrorsFound               // Will be true if error found.
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   February 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine processes a field "For: day types" and returns
+        // those day types (can be multiple) from field.
+
+        // Argument array dimensioning
+        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
+        EP_SIZE_CHECK(AlReady, MaxDayTypes);
+
+        int DayT;
+        bool OneValid;
+        bool DupAssignment;
+
+        OneValid = false;
+        DupAssignment = false;
+        // Just test for specific days
+        if (has(ForDayField, "WEEKDAY")) {
+            TheseDays({2, 6}) = true;
+            if (any(AlReady({2, 6}))) {
+                DupAssignment = true;
+            } else {
+                AlReady({2, 6}) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "MONDAY")) {
+            TheseDays(2) = true;
+            if (AlReady(2)) {
+                DupAssignment = true;
+            } else {
+                AlReady(2) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "TUESDAY")) {
+            TheseDays(3) = true;
+            if (AlReady(3)) {
+                DupAssignment = true;
+            } else {
+                AlReady(3) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "WEDNESDAY")) {
+            TheseDays(4) = true;
+            if (AlReady(4)) {
+                DupAssignment = true;
+            } else {
+                AlReady(4) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "THURSDAY")) {
+            TheseDays(5) = true;
+            if (AlReady(5)) {
+                DupAssignment = true;
+            } else {
+                AlReady(5) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "FRIDAY")) {
+            TheseDays(6) = true;
+            if (AlReady(6)) {
+                DupAssignment = true;
+            } else {
+                AlReady(6) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "WEEKEND")) {
+            TheseDays(1) = true;
+            TheseDays(7) = true;
+            if (AlReady(1)) {
+                DupAssignment = true;
+            } else {
+                AlReady(1) = true;
+            }
+            if (AlReady(7)) {
+                DupAssignment = true;
+            } else {
+                AlReady(7) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "SATURDAY")) {
+            TheseDays(7) = true;
+            if (AlReady(7)) {
+                DupAssignment = true;
+            } else {
+                AlReady(7) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "SUNDAY")) {
+            TheseDays(1) = true;
+            if (AlReady(1)) {
+                DupAssignment = true;
+            } else {
+                AlReady(1) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "CUSTOMDAY1")) {
+            TheseDays(11) = true;
+            if (AlReady(11)) {
+                DupAssignment = true;
+            } else {
+                AlReady(11) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "CUSTOMDAY2")) {
+            TheseDays(12) = true;
+            if (AlReady(12)) {
+                DupAssignment = true;
+            } else {
+                AlReady(12) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "ALLDAY")) {
+            TheseDays({1, MaxDayTypes}) = true;
+            if (any(AlReady)) {
+                DupAssignment = true;
+            } else {
+                AlReady = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "HOLIDAY")) {
+            TheseDays(8) = true;
+            if (AlReady(8)) {
+                DupAssignment = true;
+            } else {
+                AlReady(8) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "SUMMER")) {
+            TheseDays(9) = true;
+            if (AlReady(9)) {
+                DupAssignment = true;
+            } else {
+                AlReady(9) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "WINTER")) {
+            TheseDays(10) = true;
+            if (AlReady(10)) {
+                DupAssignment = true;
+            } else {
+                AlReady(10) = true;
+            }
+            OneValid = true;
+        }
+        if (has(ForDayField, "ALLOTHERDAY")) {
+            for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                if (AlReady(DayT)) continue;
+                TheseDays(DayT) = true;
+                AlReady(DayT) = true;
+            }
+            OneValid = true;
+        }
+
+        if (DupAssignment) {
+            ShowSevereError(state, "ProcessScheduleInput: ProcessForDayTypes, Duplicate assignment attempted in \"for\" days field=" + ForDayField);
+            ErrorsFound = true;
+        }
+        if (!OneValid) {
+            ShowSevereError(state, "ProcessScheduleInput: ProcessForDayTypes, No valid day assignments found in \"for\" days field=" + ForDayField);
+            ErrorsFound = true;
+        }
+    }
+
+    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   January 2003
+        //       MODIFIED       February 2008 - add IDF outputs (compact schedules)
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine puts the details of the Schedules on the .eio file (Inits file).
+
+        Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
+        Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+                                               "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
+
+        int Count;
+        int Hr;
+        int TS;
+        int NumF;
+        int PMon;
+        int PDay;
+        int iWeek;
+        int iDay;
+        int DT;
+        int iDayP;
+        Array1D_string ShowMinute;
+        int CurMinute;
+        Array1D_string TimeHHMM;
+        std::string NoAverageLinear;
+        std::string YesNo2;
+        std::string Num1;
+        std::string Num2;
+        Array2D_string RoundTSValue;
+
+        ShowMinute.allocate(state.dataGlobal->NumOfTimeStepInHour);
+        TimeHHMM.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        RoundTSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+        ShowMinute = std::string{};
+        TimeHHMM = std::string{};
+        RoundTSValue = std::string{};
+
+        CurMinute = state.dataGlobal->MinutesPerTimeStep;
+        for (Count = 1; Count <= state.dataGlobal->NumOfTimeStepInHour - 1; ++Count) {
+            ShowMinute(Count) = format("{:02}", CurMinute);
+            CurMinute += state.dataGlobal->MinutesPerTimeStep;
+        }
+        ShowMinute(state.dataGlobal->NumOfTimeStepInHour) = "00";
+
+        {
+            auto const SELECT_CASE_var(LevelOfDetail);
+
+            if ((SELECT_CASE_var >= 1) && (SELECT_CASE_var <= 2)) {
+                NumF = 1;
+                for (Hr = 1; Hr <= 24; ++Hr) {
+                    if (LevelOfDetail == 2) {
+                        for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour - 1; ++TS) {
+                            TimeHHMM(NumF) = HrField(Hr - 1) + ':' + ShowMinute(TS);
+                            ++NumF;
+                        }
+                    }
+                    TimeHHMM(NumF) = HrField(Hr) + ':' + ShowMinute(state.dataGlobal->NumOfTimeStepInHour);
+                    ++NumF;
+                }
+                --NumF;
+
+                // SchTFmt Schedule Types Header
+                auto constexpr SchTFmt0("! Schedule Details Report={} =====================\n");
+                auto constexpr SchDFmt{",{}"};
+                auto constexpr SchDFmtdata{",{}"};
+                if (LevelOfDetail == 1) {
+                    print(state.files.eio, SchTFmt0, "Hourly");
+                } else {
+                    print(state.files.eio, SchTFmt0, "Timestep");
+                }
+
+                auto constexpr SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
+                print(state.files.eio, "{}\n", SchTFmt);
+                // SchDFmt Header (DaySchedule) builds the appropriate set of commas/times based on detail level
+                //      DO Count=1,NumF
+                //        SchDFmt=TRIM(SchDFmt)//'A'
+                //        IF (Count /= NumF) SchDFmt=TRIM(SchDFmt)//",',',"
+                //      ENDDO
+                //      SchDFmt=TRIM(SchDFmt)//')'
+                auto constexpr SchDFmt0("! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
+                print(state.files.eio, "{}", SchDFmt0);
+                for (Count = 1; Count <= NumF; ++Count) {
+                    print(state.files.eio, SchDFmt, TimeHHMM(Count));
+                }
+                print(state.files.eio, "\n");
+                // SchWFmt Header (WeekSchedule)
+                std::string SchWFmt("! <WeekSchedule>,Name");
+                for (Count = 1; Count <= MaxDayTypes; ++Count) {
+                    SchWFmt += "," + ValidDayTypes(Count);
+                }
+                print(state.files.eio, "{}\n", SchWFmt);
+                auto constexpr SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
+                print(state.files.eio, "{}\n", SchSFmt);
+
+                for (Count = 1; Count <= state.dataScheduleMgr->NumScheduleTypes; ++Count) {
+                    if (state.dataScheduleMgr->ScheduleType(Count).Limited) {
+                        NoAverageLinear = "Average";
+                        Num1 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Minimum);
+                        strip(Num1);
+                        Num2 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Maximum);
+                        strip(Num2);
+                        if (state.dataScheduleMgr->ScheduleType(Count).IsReal) {
+                            YesNo2 = "Yes";
+                        } else {
+                            YesNo2 = "No";
+                            Num1 = fmt::to_string(static_cast<int>(state.dataScheduleMgr->ScheduleType(Count).Minimum));
+                            Num2 = fmt::to_string(static_cast<int>(state.dataScheduleMgr->ScheduleType(Count).Maximum));
+                        }
+                    } else {
+                        NoAverageLinear = "No";
+                        Num1 = "N/A";
+                        Num2 = "N/A";
+                        YesNo2 = "N/A";
+                    }
+                    auto constexpr SchTFmtdata("ScheduleTypeLimits,{},{},{},{},{}\n");
+                    print(state.files.eio, SchTFmtdata, state.dataScheduleMgr->ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
+                }
+
+                //      WRITE(Num1,*) NumOfTimeStepInHour*24
+                //      Num1=ADJUSTL(Num1)
+                //      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
+                for (Count = 1; Count <= state.dataScheduleMgr->NumDaySchedules; ++Count) {
+                    switch (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated) {
+                    case ScheduleInterpolation::Average:
+                        NoAverageLinear = "Average";
+                        break;
+                    case ScheduleInterpolation::Linear:
+                        NoAverageLinear = "Linear";
+                        break;
+                    case ScheduleInterpolation::No:
+                        NoAverageLinear = "No";
+                        break;
+                    }
+                    for (Hr = 1; Hr <= 24; ++Hr) {
+                        for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                            RoundTSValue(TS, Hr) = format("{:.2R}", state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr));
+                        }
+                    }
+                    auto constexpr SchDFmtdata0("DaySchedule,{},{},{},{}");
+                    if (LevelOfDetail == 1) {
+                        print(state.files.eio,
+                              SchDFmtdata0,
+                              state.dataScheduleMgr->DaySchedule(Count).Name,
+                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr).Name,
+                              NoAverageLinear,
+                              "Values:");
+                        for (Hr = 1; Hr <= 24; ++Hr) {
+                            print(state.files.eio, SchDFmtdata, RoundTSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                        }
+                        print(state.files.eio, "\n");
+                    } else if (LevelOfDetail == 2) {
+                        print(state.files.eio,
+                              SchDFmtdata0,
+                              state.dataScheduleMgr->DaySchedule(Count).Name,
+                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr).Name,
+                              NoAverageLinear,
+                              "Values:");
+                        for (Hr = 1; Hr <= 24; ++Hr) {
+                            for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                                print(state.files.eio, SchDFmtdata, RoundTSValue(TS, Hr));
+                            }
+                        }
+                        print(state.files.eio, "\n");
+                    }
+                }
+
+                for (Count = 1; Count <= state.dataScheduleMgr->NumWeekSchedules; ++Count) {
+                    auto constexpr SchWFmtdata("Schedule:Week:Daily,{}");
+                    print(state.files.eio, SchWFmtdata, state.dataScheduleMgr->WeekSchedule(Count).Name);
+                    for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
+                        print(state.files.eio,
+                              ",{}",
+                              state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
+                    }
+                    print(state.files.eio, "\n");
+                }
+
+                for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
+                    NumF = 1;
+                    print(state.files.eio,
+                          "Schedule,{},{}",
+                          state.dataScheduleMgr->Schedule(Count).Name,
+                          state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
+                    while (NumF <= 366) {
+                        TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
+                        auto constexpr ThruFmt(",Through {} {:02},{}");
+                        while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
+                            if (NumF == 366) {
+                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
+                                print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
+                            }
+                            ++NumF;
+                            if (NumF > 366) break; // compound If might have a problem unless this included.
+                        }
+                        if (NumF <= 366) {
+                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
+                            print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
+                        }
+                    }
+                    print(state.files.eio, "\n");
+                }
+
+            } else if (SELECT_CASE_var == 3) {
+                for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
+                    print(state.files.debug, "\n");
+                    print(state.files.debug, "  Schedule:Compact,\n");
+                    print(state.files.debug, "    {},           !- Name\n", state.dataScheduleMgr->Schedule(Count).Name);
+                    print(state.files.debug,
+                          "    {},          !- ScheduleTypeLimits\n",
+                          state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
+                    NumF = 1;
+                    while (NumF <= 366) {
+                        TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
+                        while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
+                            if (NumF == 366) {
+                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
+                                print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
+                                iDayP = 0;
+                                for (DT = 2; DT <= 6; ++DT) {
+                                    print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                    if (iDay != iDayP) {
+                                        for (Hr = 1; Hr <= 24; ++Hr) {
+                                            print(state.files.debug,
+                                                  "    Until: {}:{},{:.2R},\n",
+                                                  Hr,
+                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                        }
+                                    } else {
+                                        print(state.files.debug, "    Same as previous\n");
+                                    }
+                                    iDayP = iDay;
+                                }
+                                DT = 1;
+                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                if (iDay != iDayP) {
+                                    for (Hr = 1; Hr <= 24; ++Hr) {
+                                        print(state.files.debug,
+                                              "    Until: {}:{},{:.2R},\n",
+                                              Hr,
+                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                    }
+                                } else {
+                                    print(state.files.debug, "    Same as previous\n");
+                                }
+                                iDayP = iDay;
+                                for (DT = 7; DT <= MaxDayTypes; ++DT) {
+                                    print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                    if (iDay != iDayP) {
+                                        for (Hr = 1; Hr <= 24; ++Hr) {
+                                            print(state.files.debug,
+                                                  "    Until: {}:{},{:.2R},\n",
+                                                  Hr,
+                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                        }
+                                    } else {
+                                        print(state.files.debug, "    Same as previous\n");
+                                    }
+                                    iDayP = iDay;
+                                }
+                            }
+                            ++NumF;
+                            if (NumF > 366) break; // compound If might have a problem unless this included.
+                        }
+                        if (NumF <= 366) {
+                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
+                            print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
+                            iDayP = 0;
+                            for (DT = 2; DT <= 6; ++DT) {
+                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                if (iDay != iDayP) {
+                                    for (Hr = 1; Hr <= 24; ++Hr) {
+                                        print(state.files.debug,
+                                              "    Until: {}:{},{:.2R},\n",
+                                              Hr,
+                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                    }
+                                } else {
+                                    print(state.files.debug, "    Same as previous\n");
+                                }
+                                iDayP = iDay;
+                            }
+                            DT = 1;
+                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+                            if (iDay != iDayP) {
+                                for (Hr = 1; Hr <= 24; ++Hr) {
+                                    print(state.files.debug,
+                                          "    Until: {}:{},{:.2R},\n",
+                                          Hr,
+                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                }
+                            } else {
+                                print(state.files.debug, "    Same as previous\n");
+                            }
+                            iDayP = iDay;
+                            for (DT = 7; DT <= MaxDayTypes; ++DT) {
+                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                if (iDay != iDayP) {
+                                    for (Hr = 1; Hr <= 24; ++Hr) {
+                                        print(state.files.debug,
+                                              "    Until: {}:{},{:.2R},\n",
+                                              Hr,
+                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                    }
+                                } else {
+                                    print(state.files.debug, "    Same as previous\n");
+                                }
+                                iDayP = iDay;
+                            }
+                        }
+                    }
+                }
+
+            } else {
+            }
+        }
+
+        ShowMinute.deallocate();
+        TimeHHMM.deallocate();
+        RoundTSValue.deallocate();
+    }
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
@@ -156,7 +969,6 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Uses the standard get routines in the InputProcessor.
 
-        // Using/Aliasing
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSemicolon;
         using DataStringGlobals::CharSpace;
@@ -164,11 +976,7 @@ namespace ScheduleManager {
         using DataSystemVariables::CheckForActualFilePath;
         using General::ProcessDateString;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
         auto constexpr RoutineName("ProcessScheduleInput: ");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array1D_int DaysInYear(366);
         int LoopIndex;
@@ -221,7 +1029,6 @@ namespace ScheduleManager {
         Array2D_bool SetMinuteValue;       // Temporary for processing interval schedules
         int NumFields;
         int SCount;
-        //  LOGICAL RptSchedule
         int RptLevel;
         int CurMinute;
         int MinutesPerItem;
@@ -2228,369 +3035,6 @@ namespace ScheduleManager {
         print(state.files.audit, "{}\n", "  Processing Schedule Input -- Complete");
     }
 
-    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   January 2003
-        //       MODIFIED       February 2008 - add IDF outputs (compact schedules)
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine puts the details of the Schedules on the .eio file (Inits file).
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
-        Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
-                                               "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;
-        int Hr;
-        int TS;
-        int NumF;
-        int PMon;
-        int PDay;
-        int iWeek;
-        int iDay;
-        int DT;
-        int iDayP;
-        Array1D_string ShowMinute;
-        int CurMinute;
-        Array1D_string TimeHHMM;
-        std::string NoAverageLinear;
-        std::string YesNo2;
-        std::string Num1;
-        std::string Num2;
-        Array2D_string RoundTSValue;
-
-        ShowMinute.allocate(state.dataGlobal->NumOfTimeStepInHour);
-        TimeHHMM.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        RoundTSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
-        ShowMinute = std::string{};
-        TimeHHMM = std::string{};
-        RoundTSValue = std::string{};
-
-        CurMinute = state.dataGlobal->MinutesPerTimeStep;
-        for (Count = 1; Count <= state.dataGlobal->NumOfTimeStepInHour - 1; ++Count) {
-            ShowMinute(Count) = format("{:02}", CurMinute);
-            CurMinute += state.dataGlobal->MinutesPerTimeStep;
-        }
-        ShowMinute(state.dataGlobal->NumOfTimeStepInHour) = "00";
-
-        {
-            auto const SELECT_CASE_var(LevelOfDetail);
-
-            if ((SELECT_CASE_var >= 1) && (SELECT_CASE_var <= 2)) {
-                NumF = 1;
-                for (Hr = 1; Hr <= 24; ++Hr) {
-                    if (LevelOfDetail == 2) {
-                        for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour - 1; ++TS) {
-                            TimeHHMM(NumF) = HrField(Hr - 1) + ':' + ShowMinute(TS);
-                            ++NumF;
-                        }
-                    }
-                    TimeHHMM(NumF) = HrField(Hr) + ':' + ShowMinute(state.dataGlobal->NumOfTimeStepInHour);
-                    ++NumF;
-                }
-                --NumF;
-
-                // SchTFmt Schedule Types Header
-                auto constexpr SchTFmt0("! Schedule Details Report={} =====================\n");
-                auto constexpr SchDFmt{",{}"};
-                auto constexpr SchDFmtdata{",{}"};
-                if (LevelOfDetail == 1) {
-                    print(state.files.eio, SchTFmt0, "Hourly");
-                } else {
-                    print(state.files.eio, SchTFmt0, "Timestep");
-                }
-
-                auto constexpr SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
-                print(state.files.eio, "{}\n", SchTFmt);
-                // SchDFmt Header (DaySchedule) builds the appropriate set of commas/times based on detail level
-                //      DO Count=1,NumF
-                //        SchDFmt=TRIM(SchDFmt)//'A'
-                //        IF (Count /= NumF) SchDFmt=TRIM(SchDFmt)//",',',"
-                //      ENDDO
-                //      SchDFmt=TRIM(SchDFmt)//')'
-                auto constexpr SchDFmt0("! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
-                print(state.files.eio, "{}", SchDFmt0);
-                for (Count = 1; Count <= NumF; ++Count) {
-                    print(state.files.eio, SchDFmt, TimeHHMM(Count));
-                }
-                print(state.files.eio, "\n");
-                // SchWFmt Header (WeekSchedule)
-                std::string SchWFmt("! <WeekSchedule>,Name");
-                for (Count = 1; Count <= MaxDayTypes; ++Count) {
-                    SchWFmt += "," + ValidDayTypes(Count);
-                }
-                print(state.files.eio, "{}\n", SchWFmt);
-                auto constexpr SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
-                print(state.files.eio, "{}\n", SchSFmt);
-
-                for (Count = 1; Count <= state.dataScheduleMgr->NumScheduleTypes; ++Count) {
-                    if (state.dataScheduleMgr->ScheduleType(Count).Limited) {
-                        NoAverageLinear = "Average";
-                        Num1 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Minimum);
-                        strip(Num1);
-                        Num2 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Maximum);
-                        strip(Num2);
-                        if (state.dataScheduleMgr->ScheduleType(Count).IsReal) {
-                            YesNo2 = "Yes";
-                        } else {
-                            YesNo2 = "No";
-                            Num1 = fmt::to_string(static_cast<int>(state.dataScheduleMgr->ScheduleType(Count).Minimum));
-                            Num2 = fmt::to_string(static_cast<int>(state.dataScheduleMgr->ScheduleType(Count).Maximum));
-                        }
-                    } else {
-                        NoAverageLinear = "No";
-                        Num1 = "N/A";
-                        Num2 = "N/A";
-                        YesNo2 = "N/A";
-                    }
-                    auto constexpr SchTFmtdata("ScheduleTypeLimits,{},{},{},{},{}\n");
-                    print(state.files.eio, SchTFmtdata, state.dataScheduleMgr->ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
-                }
-
-                //      WRITE(Num1,*) NumOfTimeStepInHour*24
-                //      Num1=ADJUSTL(Num1)
-                //      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
-                for (Count = 1; Count <= state.dataScheduleMgr->NumDaySchedules; ++Count) {
-                    switch (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated) {
-                    case ScheduleInterpolation::Average:
-                        NoAverageLinear = "Average";
-                        break;
-                    case ScheduleInterpolation::Linear:
-                        NoAverageLinear = "Linear";
-                        break;
-                    case ScheduleInterpolation::No:
-                        NoAverageLinear = "No";
-                        break;
-                    }
-                    for (Hr = 1; Hr <= 24; ++Hr) {
-                        for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                            RoundTSValue(TS, Hr) = format("{:.2R}", state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr));
-                        }
-                    }
-                    auto constexpr SchDFmtdata0("DaySchedule,{},{},{},{}");
-                    if (LevelOfDetail == 1) {
-                        print(state.files.eio,
-                              SchDFmtdata0,
-                              state.dataScheduleMgr->DaySchedule(Count).Name,
-                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr).Name,
-                              NoAverageLinear,
-                              "Values:");
-                        for (Hr = 1; Hr <= 24; ++Hr) {
-                            print(state.files.eio, SchDFmtdata, RoundTSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                        }
-                        print(state.files.eio, "\n");
-                    } else if (LevelOfDetail == 2) {
-                        print(state.files.eio,
-                              SchDFmtdata0,
-                              state.dataScheduleMgr->DaySchedule(Count).Name,
-                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr).Name,
-                              NoAverageLinear,
-                              "Values:");
-                        for (Hr = 1; Hr <= 24; ++Hr) {
-                            for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                print(state.files.eio, SchDFmtdata, RoundTSValue(TS, Hr));
-                            }
-                        }
-                        print(state.files.eio, "\n");
-                    }
-                }
-
-                for (Count = 1; Count <= state.dataScheduleMgr->NumWeekSchedules; ++Count) {
-                    auto constexpr SchWFmtdata("Schedule:Week:Daily,{}");
-                    print(state.files.eio, SchWFmtdata, state.dataScheduleMgr->WeekSchedule(Count).Name);
-                    for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
-                        print(state.files.eio,
-                              ",{}",
-                              state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
-                    }
-                    print(state.files.eio, "\n");
-                }
-
-                for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
-                    NumF = 1;
-                    print(state.files.eio,
-                          "Schedule,{},{}",
-                          state.dataScheduleMgr->Schedule(Count).Name,
-                          state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
-                    while (NumF <= 366) {
-                        TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
-                        auto constexpr ThruFmt(",Through {} {:02},{}");
-                        while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
-                            if (NumF == 366) {
-                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
-                            }
-                            ++NumF;
-                            if (NumF > 366) break; // compound If might have a problem unless this included.
-                        }
-                        if (NumF <= 366) {
-                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
-                        }
-                    }
-                    print(state.files.eio, "\n");
-                }
-
-            } else if (SELECT_CASE_var == 3) {
-                for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
-                    print(state.files.debug, "\n");
-                    print(state.files.debug, "  Schedule:Compact,\n");
-                    print(state.files.debug, "    {},           !- Name\n", state.dataScheduleMgr->Schedule(Count).Name);
-                    print(state.files.debug,
-                          "    {},          !- ScheduleTypeLimits\n",
-                          state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
-                    NumF = 1;
-                    while (NumF <= 366) {
-                        TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
-                        while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
-                            if (NumF == 366) {
-                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
-                                iDayP = 0;
-                                for (DT = 2; DT <= 6; ++DT) {
-                                    print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                    if (iDay != iDayP) {
-                                        for (Hr = 1; Hr <= 24; ++Hr) {
-                                            print(state.files.debug,
-                                                  "    Until: {}:{},{:.2R},\n",
-                                                  Hr,
-                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                        }
-                                    } else {
-                                        print(state.files.debug, "    Same as previous\n");
-                                    }
-                                    iDayP = iDay;
-                                }
-                                DT = 1;
-                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                if (iDay != iDayP) {
-                                    for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(state.files.debug,
-                                              "    Until: {}:{},{:.2R},\n",
-                                              Hr,
-                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                    }
-                                } else {
-                                    print(state.files.debug, "    Same as previous\n");
-                                }
-                                iDayP = iDay;
-                                for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                    print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                    if (iDay != iDayP) {
-                                        for (Hr = 1; Hr <= 24; ++Hr) {
-                                            print(state.files.debug,
-                                                  "    Until: {}:{},{:.2R},\n",
-                                                  Hr,
-                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                        }
-                                    } else {
-                                        print(state.files.debug, "    Same as previous\n");
-                                    }
-                                    iDayP = iDay;
-                                }
-                            }
-                            ++NumF;
-                            if (NumF > 366) break; // compound If might have a problem unless this included.
-                        }
-                        if (NumF <= 366) {
-                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
-                            iDayP = 0;
-                            for (DT = 2; DT <= 6; ++DT) {
-                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                if (iDay != iDayP) {
-                                    for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(state.files.debug,
-                                              "    Until: {}:{},{:.2R},\n",
-                                              Hr,
-                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                    }
-                                } else {
-                                    print(state.files.debug, "    Same as previous\n");
-                                }
-                                iDayP = iDay;
-                            }
-                            DT = 1;
-                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-                            if (iDay != iDayP) {
-                                for (Hr = 1; Hr <= 24; ++Hr) {
-                                    print(state.files.debug,
-                                          "    Until: {}:{},{:.2R},\n",
-                                          Hr,
-                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                }
-                            } else {
-                                print(state.files.debug, "    Same as previous\n");
-                            }
-                            iDayP = iDay;
-                            for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                if (iDay != iDayP) {
-                                    for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(state.files.debug,
-                                              "    Until: {}:{},{:.2R},\n",
-                                              Hr,
-                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                    }
-                                } else {
-                                    print(state.files.debug, "    Same as previous\n");
-                                }
-                                iDayP = iDay;
-                            }
-                        }
-                    }
-                }
-
-            } else {
-            }
-        }
-
-        ShowMinute.deallocate();
-        TimeHHMM.deallocate();
-        RoundTSValue.deallocate();
-    }
-
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex)
     {
 
@@ -2608,28 +3052,9 @@ namespace ScheduleManager {
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (!state.dataScheduleMgr->ScheduleDSTSFileWarningIssued) {
             if (state.dataEnvrn->DSTIndicator == 1) {
@@ -2680,26 +3105,6 @@ namespace ScheduleManager {
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
             state.dataScheduleMgr->ScheduleInputProcessed = true;
@@ -2731,28 +3136,8 @@ namespace ScheduleManager {
         // This function provides a method to look up schedule values for any hour, timestep, day
         // of the year (rather than just the "current time").
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
         // Return value
         Real64 scheduleValue(0.0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -2873,28 +3258,8 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the internal pointer to Schedule "ScheduleName".
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Return value
         std::string TypeOfSchedule;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int curSchType;
@@ -2966,7 +3331,6 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WeekSchedulePointer;
         int DaySchedulePointer;
 
@@ -3025,28 +3389,7 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -3076,25 +3419,6 @@ namespace ScheduleManager {
         // for supervisory controls or internal gains obtained from real-time occupancy
         // measurements.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int TS; // Counter for Num Of Time Steps in Hour
         int Hr; // Hour Counter
@@ -3107,558 +3431,12 @@ namespace ScheduleManager {
         }
     }
 
-    void ProcessIntervalFields(EnergyPlusData &state,
-                               Array1S_string const Untils,
-                               Array1S<Real64> const Numbers,
-                               int const NumUntils,
-                               int const NumNumbers,
-                               Array2A<Real64> MinuteValue,
-                               Array2A_bool SetMinuteValue,
-                               bool &ErrorsFound,
-                               std::string const &DayScheduleName,     // Name (used for errors)
-                               std::string const &ErrContext,          // Context (used for errors)
-                               ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine processes the "interval" fields with/without optional "until" in front of
-        // time (hh:mm).
-
-        // METHODOLOGY EMPLOYED:
-        // na.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-        MinuteValue.dim(60, 24);
-        SetMinuteValue.dim(60, 24);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;
-        std::string::size_type Pos;
-        int HHField;
-        int MMField;
-        int Hr;
-        int Min;
-        int SHr;  // starting hour
-        int SMin; // starting minute
-        int EHr;  // ending hour
-        int EMin; // ending minute
-        std::string::size_type sFld;
-        int totalMinutes;
-        Real64 incrementPerMinute;
-        Real64 curValue;
-
-        MinuteValue = 0.0;
-        SetMinuteValue = false;
-        SHr = 1;
-        SMin = 1;
-        EHr = 0;
-        EMin = 0;
-        sFld = 0;
-
-        Real64 StartValue = 0;
-        Real64 EndValue = 0;
-
-        if (NumUntils != NumNumbers) {
-            ShowSevereError(state,
-                            "ProcessScheduleInput: ProcessIntervalFields, number of Time fields does not match number of value fields, " +
-                                ErrContext + '=' + DayScheduleName);
-            ErrorsFound = true;
-            return;
-        }
-
-        for (Count = 1; Count <= NumUntils; ++Count) {
-            Pos = index(Untils(Count), "UNTIL");
-            if (Pos == 0) {
-                if (Untils(Count)[5] == ':') {
-                    sFld = 6;
-                } else {
-                    sFld = 5;
-                }
-                DecodeHHMMField(state, Untils(Count).substr(sFld), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
-            } else if (Pos == std::string::npos) {
-                DecodeHHMMField(state, Untils(Count), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
-            } else { // Until found but wasn't first field
-                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
-                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
-                ErrorsFound = true;
-                continue;
-            }
-            // Field decoded
-            if (HHField < 0 || HHField > 24 || MMField < 0 || MMField > 60) {
-                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
-                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
-                ErrorsFound = true;
-                continue;
-            }
-            if (HHField == 24 && MMField > 0 && MMField < 60) {
-                ShowWarningError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
-                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
-                ShowContinueError(state, "Terminating the field at 24:00");
-                MMField = 0;
-            }
-
-            // Fill in values
-            if (MMField == 0) {
-                EHr = HHField + 1;
-                EMin = 60;
-            }
-            if (MMField < 60) {
-                EHr = HHField + 1;
-                EMin = MMField;
-            }
-
-            if (interpolationKind == ScheduleInterpolation::Linear) {
-                totalMinutes = (EHr - SHr) * 60 + (EMin - SMin) + 1;
-                if (totalMinutes == 0) totalMinutes = 1; // protect future division
-                if (Count == 1) {
-                    StartValue = Numbers(Count); // assume first period is flat
-                    EndValue = Numbers(Count);
-                } else {
-                    StartValue = EndValue;
-                    EndValue = Numbers(Count);
-                }
-                incrementPerMinute = (EndValue - StartValue) / totalMinutes;
-                curValue = StartValue + incrementPerMinute;
-            }
-
-            if (SHr == EHr) {
-                for (Min = SMin; Min <= EMin; ++Min) {
-                    if (SetMinuteValue(Min, SHr)) {
-                        ShowSevereError(state,
-                                        "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " +
-                                            ErrContext + '=' + DayScheduleName);
-                        ErrorsFound = true;
-                        goto UntilLoop_exit;
-                    }
-                    if (interpolationKind == ScheduleInterpolation::Linear) {
-                        MinuteValue(Min, EHr) = curValue;
-                        curValue += incrementPerMinute;
-                        SetMinuteValue(Min, SHr) = true;
-                    } else {
-                        MinuteValue(Min, SHr) = Numbers(Count);
-                        SetMinuteValue(Min, SHr) = true;
-                    }
-                }
-                SMin = EMin + 1;
-                if (SMin > 60) {
-                    ++SHr;
-                    SMin = 1;
-                }
-            } else if (EHr < SHr) {
-                ShowSevereError(state,
-                                "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext +
-                                    '=' + DayScheduleName);
-                ErrorsFound = true;
-            } else {
-                if (interpolationKind == ScheduleInterpolation::Linear) {
-                    for (Min = SMin; Min <= 60; ++Min) { // for portion of starting hour
-                        MinuteValue(Min, SHr) = curValue;
-                        curValue += incrementPerMinute;
-                        SetMinuteValue(Min, SHr) = true;
-                    }
-                    for (Hr = SHr + 1; Hr <= EHr - 1; ++Hr) { // for intermediate hours
-                        for (Min = 1; Min <= 60; ++Min) {
-                            MinuteValue(Min, Hr) = curValue;
-                            curValue += incrementPerMinute;
-                            SetMinuteValue(Min, Hr) = true;
-                        }
-                    }
-                    for (Min = 1; Min <= EMin; ++Min) { // for ending hour
-                        MinuteValue(Min, EHr) = curValue;
-                        curValue += incrementPerMinute;
-                        SetMinuteValue(Min, EHr) = true;
-                    }
-                } else { // either no interpolation or "average" interpolation (average just is when the interval does not match the timestep)
-                    for (Min = SMin; Min <= 60; ++Min) { // for portion of starting hour
-                        MinuteValue(Min, SHr) = Numbers(Count);
-                        SetMinuteValue(Min, SHr) = true;
-                    }
-                    for (Hr = SHr + 1; Hr <= EHr - 1; ++Hr) { // for intermediate hours
-                        MinuteValue(_, Hr) = Numbers(Count);
-                        SetMinuteValue(_, Hr) = true;
-                    }
-                    for (Min = 1; Min <= EMin; ++Min) { // for ending hour
-                        MinuteValue(Min, EHr) = Numbers(Count);
-                        SetMinuteValue(Min, EHr) = true;
-                    }
-                }
-                SHr = EHr;
-                SMin = EMin + 1;
-                if (SMin > 60) {
-                    ++SHr;
-                    SMin = 1;
-                }
-            }
-        }
-    UntilLoop_exit:;
-
-        if (!all(SetMinuteValue)) {
-            ShowSevereError(state,
-                            "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, incomplete day detected, " + ErrContext + '=' +
-                                DayScheduleName);
-            ErrorsFound = true;
-        }
-    }
-
-    void DecodeHHMMField(EnergyPlusData &state,
-                         std::string const &FieldValue,          // Input field value
-                         int &RetHH,                             // Returned "hour"
-                         int &RetMM,                             // Returned "minute"
-                         bool &ErrorsFound,                      // True if errors found in this field
-                         std::string const &DayScheduleName,     // originating day schedule name
-                         std::string const &FullFieldValue,      // Full Input field value
-                         ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K Lawrie
-        //       DATE WRITTEN   January 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine decodes a hhmm date field input as part of the "until" time in a schedule
-        // representation.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 rRetHH; // real Returned "hour"
-        Real64 rRetMM; // real Returned "minute"
-        bool nonIntegral;
-        std::string hHour;
-        std::string mMinute;
-
-        std::string String = stripped(FieldValue);
-        std::string::size_type const Pos = index(String, ':');
-        nonIntegral = false;
-        if (Pos == std::string::npos) {
-            ShowSevereError(state,
-                            "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)=" +
-                                stripped(FullFieldValue));
-            ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
-            ErrorsFound = true;
-            return;
-        } else if (Pos == 0) {
-            RetHH = 0;
-        } else {
-            bool error = false;
-            rRetHH = UtilityRoutines::ProcessNumber(String.substr(0, Pos), error);
-            RetHH = int(rRetHH);
-            if (double(RetHH) != rRetHH || error || rRetHH < 0.0) {
-                if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
-                    ShowWarningError(state,
-                                     "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in HH)=" +
-                                         stripped(FullFieldValue));
-                    ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
-                    nonIntegral = true;
-                } else {
-                    ShowSevereError(state,
-                                    "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in HH)=" +
-                                        stripped(FullFieldValue));
-                    ShowContinueError(state, "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
-                    ErrorsFound = true;
-                    return;
-                }
-            }
-        }
-
-        String.erase(0, Pos + 1);
-        bool error = false;
-        rRetMM = UtilityRoutines::ProcessNumber(String, error);
-        RetMM = int(rRetMM);
-        if (double(RetMM) != rRetMM || error || rRetMM < 0.0) {
-            if (double(RetMM) != rRetMM && rRetMM >= 0.0) {
-                ShowWarningError(state,
-                                 "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in MM)=" +
-                                     stripped(FullFieldValue));
-                ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
-                nonIntegral = true;
-            } else {
-                ShowSevereError(state,
-                                "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in MM)=" +
-                                    stripped(FullFieldValue));
-                ShowContinueError(state, "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
-                ErrorsFound = true;
-                return;
-            }
-        }
-
-        if (nonIntegral) {
-            ShowContinueError(state, format("Until value to be used will be: {:2.2F}:{:2.2F}", hHour, mMinute));
-        }
-        if (interpolationKind == ScheduleInterpolation::No) {
-            if (!isMinuteMultipleOfTimestep(RetMM, state.dataGlobal->MinutesPerTimeStep)) {
-                ShowWarningError(
-                    state,
-                    "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " +
-                        stripped(FullFieldValue));
-                ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
-            }
-        }
-    }
-
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep)
     {
         if (minute != 0) {
             return (minute % numMinutesPerTimestep == 0);
         } else {
             return true;
-        }
-    }
-
-    void ProcessForDayTypes(EnergyPlusData &state,
-                            std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
-                            Array1D_bool &AlReady,          // Array of days already done
-                            bool &ErrorsFound               // Will be true if error found.
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   February 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine processes a field "For: day types" and returns
-        // those day types (can be multiple) from field.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
-        EP_SIZE_CHECK(AlReady, MaxDayTypes);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DayT;
-        bool OneValid;
-        bool DupAssignment;
-
-        OneValid = false;
-        DupAssignment = false;
-        // Just test for specific days
-        if (has(ForDayField, "WEEKDAY")) {
-            TheseDays({2, 6}) = true;
-            if (any(AlReady({2, 6}))) {
-                DupAssignment = true;
-            } else {
-                AlReady({2, 6}) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "MONDAY")) {
-            TheseDays(2) = true;
-            if (AlReady(2)) {
-                DupAssignment = true;
-            } else {
-                AlReady(2) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "TUESDAY")) {
-            TheseDays(3) = true;
-            if (AlReady(3)) {
-                DupAssignment = true;
-            } else {
-                AlReady(3) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "WEDNESDAY")) {
-            TheseDays(4) = true;
-            if (AlReady(4)) {
-                DupAssignment = true;
-            } else {
-                AlReady(4) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "THURSDAY")) {
-            TheseDays(5) = true;
-            if (AlReady(5)) {
-                DupAssignment = true;
-            } else {
-                AlReady(5) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "FRIDAY")) {
-            TheseDays(6) = true;
-            if (AlReady(6)) {
-                DupAssignment = true;
-            } else {
-                AlReady(6) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "WEEKEND")) {
-            TheseDays(1) = true;
-            TheseDays(7) = true;
-            if (AlReady(1)) {
-                DupAssignment = true;
-            } else {
-                AlReady(1) = true;
-            }
-            if (AlReady(7)) {
-                DupAssignment = true;
-            } else {
-                AlReady(7) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "SATURDAY")) {
-            TheseDays(7) = true;
-            if (AlReady(7)) {
-                DupAssignment = true;
-            } else {
-                AlReady(7) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "SUNDAY")) {
-            TheseDays(1) = true;
-            if (AlReady(1)) {
-                DupAssignment = true;
-            } else {
-                AlReady(1) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "CUSTOMDAY1")) {
-            TheseDays(11) = true;
-            if (AlReady(11)) {
-                DupAssignment = true;
-            } else {
-                AlReady(11) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "CUSTOMDAY2")) {
-            TheseDays(12) = true;
-            if (AlReady(12)) {
-                DupAssignment = true;
-            } else {
-                AlReady(12) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "ALLDAY")) {
-            TheseDays({1, MaxDayTypes}) = true;
-            if (any(AlReady)) {
-                DupAssignment = true;
-            } else {
-                AlReady = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "HOLIDAY")) {
-            TheseDays(8) = true;
-            if (AlReady(8)) {
-                DupAssignment = true;
-            } else {
-                AlReady(8) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "SUMMER")) {
-            TheseDays(9) = true;
-            if (AlReady(9)) {
-                DupAssignment = true;
-            } else {
-                AlReady(9) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "WINTER")) {
-            TheseDays(10) = true;
-            if (AlReady(10)) {
-                DupAssignment = true;
-            } else {
-                AlReady(10) = true;
-            }
-            OneValid = true;
-        }
-        if (has(ForDayField, "ALLOTHERDAY")) {
-            for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                if (AlReady(DayT)) continue;
-                TheseDays(DayT) = true;
-                AlReady(DayT) = true;
-            }
-            OneValid = true;
-        }
-
-        if (DupAssignment) {
-            ShowSevereError(state, "ProcessScheduleInput: ProcessForDayTypes, Duplicate assignment attempted in \"for\" days field=" + ForDayField);
-            ErrorsFound = true;
-        }
-        if (!OneValid) {
-            ShowSevereError(state, "ProcessScheduleInput: ProcessForDayTypes, No valid day assignments found in \"for\" days field=" + ForDayField);
-            ErrorsFound = true;
         }
     }
 
@@ -3684,26 +3462,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
@@ -3791,26 +3551,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
@@ -3911,26 +3653,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
@@ -4018,26 +3742,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
@@ -4129,26 +3835,8 @@ namespace ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;  // Loop Control variable
@@ -4203,26 +3891,8 @@ namespace ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;  // Loop Control variable
@@ -4279,26 +3949,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
@@ -4372,26 +4024,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
@@ -4453,29 +4087,8 @@ namespace ScheduleManager {
         // This function returns true if the schedule contains fractional
         // values [>0, <1].
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool HasFractions; // True if the schedule has fractional values
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WkSch;
@@ -4545,29 +4158,8 @@ namespace ScheduleManager {
         // This function returns the minimum value used by a schedule over
         // the entire year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 MinimumValue; // Minimum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
@@ -4637,29 +4229,8 @@ namespace ScheduleManager {
         // This function returns the maximum value used by a schedule over
         // the entire year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 MaximumValue; // Maximum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
@@ -4729,32 +4300,8 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the schedule name from the Schedule Index.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string ScheduleName;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -4823,7 +4370,6 @@ namespace ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // In response to CR7498, report orphan (unused) schedule items.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NeedOrphanMessage;
         bool NeedUseMessage;
         int Item;
@@ -5035,32 +4581,8 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the number of schedules.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NumberOfSchedules;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         NumberOfSchedules = state.dataScheduleMgr->NumSchedules;
 

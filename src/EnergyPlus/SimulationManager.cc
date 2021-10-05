@@ -70,19 +70,12 @@ extern "C" {
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -149,7 +142,6 @@ namespace SimulationManager {
     // responsible for setting the global environment flags for these
     // loops.
 
-    // METHODOLOGY EMPLOYED:
     // This module was constructed from the remnants of (I)BLAST routines
     // SIMBLD (Simulate Building), SIMZG (Simulate Zone Group), and SIMZGD
     // (Simulate Zone Group for a Day).
@@ -158,14 +150,304 @@ namespace SimulationManager {
     // (I)BLAST legacy code, internal Reverse Engineering documentation,
     // and internal Evolutionary Engineering documentation.
 
-    // Using/Aliasing
     using namespace DataSizing;
     using namespace DataSystemVariables;
     using namespace HeatBalanceManager;
     using namespace WeatherManager;
     using namespace ExternalInterface;
 
-    // MODULE PARAMETER DEFINITIONS:
+    void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   August 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // In response to CR 7518, this routine will check to see if a proper combination of SimulationControl, RunPeriod,
+        // SizingPeriod:*, etc are entered to proceed with a simulation.
+
+        // For now (8/2008), the routine will query several objects in the input.  And try to produce warnings or
+        // fatals as a result.
+
+        int NumZoneSizing;
+        int NumSystemSizing;
+        int NumPlantSizing;
+        int NumDesignDays;
+        int NumRunPeriodDesign;
+        int NumSizingDays;
+        bool WeatherFileAttached;
+        bool ErrorsFound;
+
+        ErrorsFound = false;
+        NumZoneSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Zone");
+        NumSystemSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:System");
+        NumPlantSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Plant");
+        NumDesignDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        NumRunPeriodDesign = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        NumSizingDays = NumDesignDays + NumRunPeriodDesign;
+
+        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
+
+        if (state.dataSimulationManager->RunControlInInput) {
+            if (state.dataGlobal->DoZoneSizing) {
+                if (NumZoneSizing > 0 && NumSizingDays == 0) {
+                    ErrorsFound = true;
+                    ShowSevereError(
+                        state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
+                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
+                }
+                if (NumZoneSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file "
+                                    "requested; but no weather file specified.");
+                }
+            }
+            if (state.dataGlobal->DoSystemSizing) {
+                if (NumSystemSizing > 0 && NumSizingDays == 0) {
+                    ErrorsFound = true;
+                    ShowSevereError(
+                        state,
+                        "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.");
+                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
+                }
+                if (NumSystemSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file "
+                                    "requested; but no weather file specified.");
+                }
+            }
+            if (state.dataGlobal->DoPlantSizing) {
+                if (NumPlantSizing > 0 && NumSizingDays == 0) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
+                                    "environments specified.");
+                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
+                }
+                if (NumPlantSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather "
+                                    "file requested; but no weather file specified.");
+                }
+            }
+            if (state.dataGlobal->DoDesDaySim && NumSizingDays == 0) {
+                ShowWarningError(state,
+                                 "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
+                                 "environments specified.");
+                ShowContinueError(
+                    state,
+                    "...No design environment results produced. For these results, add appropriate SizingPeriod:* objects for your simulation.");
+            }
+            if (state.dataGlobal->DoDesDaySim && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
+                ErrorsFound = true;
+                ShowSevereError(state,
+                                "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
+                                "environments specified; but no weather file specified.");
+            }
+            if (state.dataGlobal->DoWeathSim && !state.dataSimulationManager->RunPeriodsInInput) {
+                ShowWarningError(state,
+                                 "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
+                                 "weather file specified.  No annual results produced.");
+            }
+            if (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput && !WeatherFileAttached) {
+                ShowWarningError(state,
+                                 "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
+                                 "file specified; but no weather file specified.");
+            }
+        }
+        if (!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
+            ShowWarningError(state,
+                             "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
+                             "be performed, and most input will not be read.");
+        }
+        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing &&
+            !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
+            ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
+            ErrorsFound = true;
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Program terminates due to preceding conditions.");
+        }
+    }
+
+    void CheckForRequestedReporting(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // EnergyPlus does not automatically produce any results files.  Because of this, users may not request
+        // reports and may get confused when nothing is produced.  This routine will provide a warning when
+        // results should be produced (either sizing periods or weather files are run) but no reports are
+        // requested.
+
+        bool SimPeriods;
+        bool ReportingRequested;
+
+        ReportingRequested = false;
+        SimPeriods = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
+                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
+                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
+                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
+
+        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
+            ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
+            // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
+            if (!ReportingRequested) {
+                ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");
+                ShowContinueError(state,
+                                  "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", "
+                                  "\"Output:Meter\" and others.");
+            }
+        }
+    }
+
+    void ReportNodeConnections(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine 'reports' the NodeConnection data structure.  It groups the
+        // report/dump by parent, non-parent objects.
+
+        using namespace DataBranchNodeConnections;
+
+        // Formats
+        static constexpr std::string_view Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
+        static constexpr std::string_view Format_703(
+            "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
+
+        state.dataBranchNodeConnections->NonConnectedNodes.dimension(state.dataLoopNodes->NumOfNodes, true);
+
+        int NumNonParents = 0;
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
+            if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
+            ++NumNonParents;
+        }
+        const auto NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
+        state.dataBranchNodeConnections->ParentNodeList.allocate(NumParents);
+
+        //  Do Parent Objects
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, Format_702, "Parent");
+        print(state.files.bnd, " #Parent Node Connections,{}\n", NumParents);
+        print(state.files.bnd, Format_703, "Parent");
+
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
+            if (!state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
+            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
+            print(state.files.bnd,
+                  " Parent Node Connection,{},{},{},{},{}\n",
+                  state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
+            // Build ParentNodeLists
+            if (UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Inlet") ||
+                UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Outlet")) {
+                bool ParentComponentFound = false;
+                for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
+                    if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType !=
+                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType ||
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).CName !=
+                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
+                        continue;
+                    ParentComponentFound = true;
+                    {
+                        auto const SELECT_CASE_var(
+                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
+                        if (SELECT_CASE_var == "INLET") {
+                            state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        } else if (SELECT_CASE_var == "OUTLET") {
+                            state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        }
+                    }
+                }
+                if (!ParentComponentFound) {
+                    ++state.dataBranchNodeConnections->NumOfActualParents;
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CType =
+                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName =
+                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
+                    {
+                        auto const SELECT_CASE_var(
+                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
+                        if (SELECT_CASE_var == "INLET") {
+                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        } else if (SELECT_CASE_var == "OUTLET") {
+                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
+                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        }
+                    }
+                }
+            }
+        }
+
+        //  Do non-Parent Objects
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, Format_702, "Non-Parent");
+        print(state.files.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
+        print(state.files.bnd, Format_703, "Non-Parent");
+
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
+            if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
+            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
+            print(state.files.bnd,
+                  " Non-Parent Node Connection,{},{},{},{},{}\n",
+                  state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType,
+                  state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
+        }
+
+        int NumNonConnected = 0;
+        for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
+            if (state.dataBranchNodeConnections->NonConnectedNodes(Loop)) ++NumNonConnected;
+        }
+
+        if (NumNonConnected > 0) {
+            print(state.files.bnd, "{}\n", "! ===============================================================");
+            static constexpr std::string_view Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
+            print(state.files.bnd, Format_705, NumNonConnected);
+            static constexpr std::string_view Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
+            print(state.files.bnd, "{}\n", Format_706);
+            for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
+                if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
+                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, state.dataLoopNodes->NodeID(Loop));
+            }
+        }
+
+        state.dataBranchNodeConnections->NonConnectedNodes.deallocate();
+    }
 
     void ManageSimulation(EnergyPlusData &state)
     {
@@ -182,7 +464,6 @@ namespace SimulationManager {
         // simulation.  This includes the environment loop, a day loop, an
         // hour loop, and a time step loop.
 
-        // Using/Aliasing
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using BranchInputManager::ManageBranchInput;
         using BranchInputManager::TestBranchIntegrity;
@@ -224,7 +505,6 @@ namespace SimulationManager {
         using SystemReports::CreateEnergyReportStructure;
         using SystemReports::ReportAirLoopConnections;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool Available; // an environment is available to process
         bool ErrorsFound(false);
         bool TerminalError(false);
@@ -365,9 +645,6 @@ namespace SimulationManager {
                 ReportLoopConnections(state);
                 ReportAirLoopConnections(state);
                 ReportNodeConnections(state);
-                // Debug reports
-                //      CALL ReportCompSetMeterVariables
-                //      CALL ReportParentChildren
             }
             CreateEnergyReportStructure(state);
             bool anyEMSRan;
@@ -661,19 +938,15 @@ namespace SimulationManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets global project data from the input file.
 
-        // METHODOLOGY EMPLOYED:
         // Use GetObjectItem from the Input Processor
 
-        // Using/Aliasing
         using DataStringGlobals::MatchVersion;
         using namespace DataSystemVariables;
         auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas(10);
         Array1D<Real64> Number(4);
         int NumAlpha;
@@ -1500,174 +1773,6 @@ namespace SimulationManager {
         }
     }
 
-    void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // In response to CR 7518, this routine will check to see if a proper combination of SimulationControl, RunPeriod,
-        // SizingPeriod:*, etc are entered to proceed with a simulation.
-
-        // METHODOLOGY EMPLOYED:
-        // For now (8/2008), the routine will query several objects in the input.  And try to produce warnings or
-        // fatals as a result.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumZoneSizing;
-        int NumSystemSizing;
-        int NumPlantSizing;
-        int NumDesignDays;
-        int NumRunPeriodDesign;
-        int NumSizingDays;
-        bool WeatherFileAttached;
-        bool ErrorsFound;
-
-        ErrorsFound = false;
-        NumZoneSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Zone");
-        NumSystemSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:System");
-        NumPlantSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Plant");
-        NumDesignDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
-        NumRunPeriodDesign = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
-        NumSizingDays = NumDesignDays + NumRunPeriodDesign;
-
-        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
-
-        if (state.dataSimulationManager->RunControlInInput) {
-            if (state.dataGlobal->DoZoneSizing) {
-                if (NumZoneSizing > 0 && NumSizingDays == 0) {
-                    ErrorsFound = true;
-                    ShowSevereError(
-                        state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
-                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
-                }
-                if (NumZoneSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file "
-                                    "requested; but no weather file specified.");
-                }
-            }
-            if (state.dataGlobal->DoSystemSizing) {
-                if (NumSystemSizing > 0 && NumSizingDays == 0) {
-                    ErrorsFound = true;
-                    ShowSevereError(
-                        state,
-                        "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.");
-                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
-                }
-                if (NumSystemSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file "
-                                    "requested; but no weather file specified.");
-                }
-            }
-            if (state.dataGlobal->DoPlantSizing) {
-                if (NumPlantSizing > 0 && NumSizingDays == 0) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
-                                    "environments specified.");
-                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
-                }
-                if (NumPlantSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather "
-                                    "file requested; but no weather file specified.");
-                }
-            }
-            if (state.dataGlobal->DoDesDaySim && NumSizingDays == 0) {
-                ShowWarningError(state,
-                                 "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
-                                 "environments specified.");
-                ShowContinueError(
-                    state,
-                    "...No design environment results produced. For these results, add appropriate SizingPeriod:* objects for your simulation.");
-            }
-            if (state.dataGlobal->DoDesDaySim && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
-                ErrorsFound = true;
-                ShowSevereError(state,
-                                "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
-                                "environments specified; but no weather file specified.");
-            }
-            if (state.dataGlobal->DoWeathSim && !state.dataSimulationManager->RunPeriodsInInput) {
-                ShowWarningError(state,
-                                 "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
-                                 "weather file specified.  No annual results produced.");
-            }
-            if (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput && !WeatherFileAttached) {
-                ShowWarningError(state,
-                                 "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
-                                 "file specified; but no weather file specified.");
-            }
-        }
-        if (!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowWarningError(state,
-                             "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
-                             "be performed, and most input will not be read.");
-        }
-        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing &&
-            !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
-            ErrorsFound = true;
-        }
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "Program terminates due to preceding conditions.");
-        }
-    }
-
-    void CheckForRequestedReporting(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // EnergyPlus does not automatically produce any results files.  Because of this, users may not request
-        // reports and may get confused when nothing is produced.  This routine will provide a warning when
-        // results should be produced (either sizing periods or weather files are run) but no reports are
-        // requested.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool SimPeriods;
-        bool ReportingRequested;
-
-        ReportingRequested = false;
-        SimPeriods = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
-
-        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
-            ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
-            // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
-            if (!ReportingRequested) {
-                ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");
-                ShowContinueError(state,
-                                  "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", "
-                                  "\"Output:Meter\" and others.");
-            }
-        }
-    }
-
     std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)
     {
         auto result = std::make_unique<std::ofstream>(filePath, mode);
@@ -1740,21 +1845,12 @@ namespace SimulationManager {
         // an EnergyPlus run.  It also prints the end of data marker for each
         // output file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataOutputs;
         using namespace DataRuntimeLanguage;
         using namespace DataSystemVariables;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cEnvSetThreads;
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
@@ -1933,11 +2029,9 @@ namespace SimulationManager {
         //  developed to resolve reverse DD problems caused be the differences
         //  that stem from setup and information gathering that occurs during the first pass.
 
-        // METHODOLOGY EMPLOYED:
         // Using global flag (kickoff simulation), only a few time steps are executed.
         // global flag is used in other parts of simulation to terminate quickly.
 
-        // Using/Aliasing
         using CostEstimateManager::SimCostEstimate;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
 
@@ -2021,135 +2115,6 @@ namespace SimulationManager {
         if (ErrorsFound) ShowFatalError(state, "Previous conditions cause program termination.");
     }
 
-    void ReportNodeConnections(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine 'reports' the NodeConnection data structure.  It groups the
-        // report/dump by parent, non-parent objects.
-
-        // Using/Aliasing
-        using namespace DataBranchNodeConnections;
-
-        // Formats
-        static constexpr std::string_view Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
-        static constexpr std::string_view Format_703(
-            "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
-
-        state.dataBranchNodeConnections->NonConnectedNodes.dimension(state.dataLoopNodes->NumOfNodes, true);
-
-        int NumNonParents = 0;
-        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            ++NumNonParents;
-        }
-        const auto NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
-        state.dataBranchNodeConnections->ParentNodeList.allocate(NumParents);
-
-        //  Do Parent Objects
-        print(state.files.bnd, "{}\n", "! ===============================================================");
-        print(state.files.bnd, Format_702, "Parent");
-        print(state.files.bnd, " #Parent Node Connections,{}\n", NumParents);
-        print(state.files.bnd, Format_703, "Parent");
-
-        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
-            if (!state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
-            print(state.files.bnd,
-                  " Parent Node Connection,{},{},{},{},{}\n",
-                  state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
-            // Build ParentNodeLists
-            if (UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Inlet") ||
-                UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Outlet")) {
-                bool ParentComponentFound = false;
-                for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
-                    if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType !=
-                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType ||
-                        state.dataBranchNodeConnections->ParentNodeList(Loop1).CName !=
-                            state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
-                        continue;
-                    ParentComponentFound = true;
-                    {
-                        auto const SELECT_CASE_var(
-                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
-                        if (SELECT_CASE_var == "INLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        } else if (SELECT_CASE_var == "OUTLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        }
-                    }
-                }
-                if (!ParentComponentFound) {
-                    ++state.dataBranchNodeConnections->NumOfActualParents;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CType =
-                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName =
-                        state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
-                    {
-                        auto const SELECT_CASE_var(
-                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
-                        if (SELECT_CASE_var == "INLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        } else if (SELECT_CASE_var == "OUTLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        }
-                    }
-                }
-            }
-        }
-
-        //  Do non-Parent Objects
-        print(state.files.bnd, "{}\n", "! ===============================================================");
-        print(state.files.bnd, Format_702, "Non-Parent");
-        print(state.files.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
-        print(state.files.bnd, Format_703, "Non-Parent");
-
-        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
-            print(state.files.bnd,
-                  " Non-Parent Node Connection,{},{},{},{},{}\n",
-                  state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
-        }
-
-        int NumNonConnected = 0;
-        for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
-            if (state.dataBranchNodeConnections->NonConnectedNodes(Loop)) ++NumNonConnected;
-        }
-
-        if (NumNonConnected > 0) {
-            print(state.files.bnd, "{}\n", "! ===============================================================");
-            static constexpr std::string_view Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
-            print(state.files.bnd, Format_705, NumNonConnected);
-            static constexpr std::string_view Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
-            print(state.files.bnd, "{}\n", Format_706);
-            for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
-                if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
-                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, state.dataLoopNodes->NodeID(Loop));
-            }
-        }
-
-        state.dataBranchNodeConnections->NonConnectedNodes.deallocate();
-    }
-
     void ReportLoopConnections(EnergyPlusData &state)
     {
 
@@ -2165,7 +2130,6 @@ namespace SimulationManager {
         // return air paths, controlled zones.
         // This information should be useful in diagnosing node connection input errors.
 
-        // Using/Aliasing
         using namespace DataAirLoop;
         using namespace DataBranchNodeConnections;
         using namespace DataHVACGlobals;
@@ -2173,7 +2137,6 @@ namespace SimulationManager {
         using namespace DataZoneEquipment;
         using DualDuct::ReportDualDuctConnections;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
 
         // Formats
@@ -2716,33 +2679,11 @@ namespace SimulationManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reports parent compsets with ensuing children data.
 
-        // METHODOLOGY EMPLOYED:
         // Uses IsParentObject,GetNumChildren,GetChildrenData
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
 
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int Loop1;
         Array1D_string ChildCType;
@@ -2829,30 +2770,10 @@ namespace SimulationManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reports comp set meter variables.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
         using namespace DataGlobalConstants;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int Loop1;
         int NumVariables;
@@ -2938,7 +2859,6 @@ namespace SimulationManager {
         // This provides post processing (for errors, etc) directly after the InputProcessor
         // finishes.  Code originally in the Input Processor.
 
-        // Using/Aliasing
         // using SQLiteProcedures::CreateSQLiteDatabase;
         using FluidProperties::FindGlycol;
 
@@ -2977,7 +2897,6 @@ void Resimulate(EnergyPlusData &state,
     // power is reduced which also impacts the zone internal heat gains and therefore requires that the entire
     // zone heat balance must be resimulated.
 
-    // METHODOLOGY EMPLOYED:
     // If the zone heat balance must be resimulated, all the major subroutines are called sequentially in order
     // to recalculate the impacts of demand limiting.  This routine is called from ManageHVAC _before_ any variables
     // are reported or histories are updated.  This routine can be called multiple times without the overall
@@ -3017,7 +2936,6 @@ void Resimulate(EnergyPlusData &state,
     //         RecKeepHeatBalance
     //         ReportHeatBalance
 
-    // Using/Aliasing
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3027,7 +2945,6 @@ void Resimulate(EnergyPlusData &state,
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
     using namespace ZoneEquipmentManager;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
 
     if (ResimExt) {

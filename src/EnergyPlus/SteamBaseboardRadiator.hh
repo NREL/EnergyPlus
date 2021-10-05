@@ -175,34 +175,11 @@ namespace SteamBaseboardRadiator {
                            Real64 &PowerMet,
                            int &CompIndex);
 
-    void GetSteamBaseboardInput(EnergyPlusData &state);
-
-    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
-
-    void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
-
     void CalcSteamBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
-
-    void UpdateSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void UpdateBBSteamRadSourceValAvg(EnergyPlusData &state, bool &SteamBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBSteamRadGains(EnergyPlusData &state);
-
-    void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
-
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
-    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             int const BaseboardTypeNum,       // type index
-                                             std::string const &BaseboardName, // component name
-                                             int const EquipFlowCtrl,          // Flow control mode for the equipment
-                                             int const LoopNum,                // Plant loop index for where called from
-                                             int const LoopSide,               // Plant loop side index for where called from
-                                             int &CompIndex,                   // Chiller number pointer
-                                             bool const FirstHVACIteration,
-                                             bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
-    );
 
 } // namespace SteamBaseboardRadiator
 

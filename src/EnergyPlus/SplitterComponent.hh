@@ -102,13 +102,7 @@ namespace SplitterComponent {
 
     void GetSplitterInput(EnergyPlusData &state);
 
-    void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
-
     void CalcAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstCall);
-
-    void UpdateSplitter(EnergyPlusData &state, int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall);
-
-    void ReportSplitter(int const SplitterNum);
 
     int GetSplitterOutletNumber(EnergyPlusData &state,
                                 std::string const &SplitterName, // must match Splitter names for the Splitter type

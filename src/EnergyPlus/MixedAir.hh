@@ -491,9 +491,6 @@ namespace MixedAir {
 
     int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName); // must match OA mixer names for the OA mixer type
 
-    // End of Utility Section of the Module
-    //******************************************************************************
-
 } // namespace MixedAir
 
 struct MixedAirData : BaseGlobalStruct

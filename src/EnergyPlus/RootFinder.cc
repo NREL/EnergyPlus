@@ -166,7 +166,6 @@ namespace EnergyPlus::RootFinder {
 // "Numerical Recipes in FORTRAN", Chapter 9 "Root Finding and Nonlinear Sets of Equations", pp.340-352
 // Used for formulas, but not for code.
 
-// Using/Aliasing
 using namespace DataRootFinder;
 
 void ResetRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
@@ -308,7 +307,6 @@ void InitializeRootFinder(EnergyPlusData &state,
     // This subroutine initializes the min and max for the root finder before
     // finding a new root.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 SavedXCandidate;
     Real64 XMinReset;
 
@@ -387,7 +385,6 @@ void UpdateMinMax(RootFinderDataType &RootFinderData, // Data used by root findi
 
     // METHODOLOGY EMPLOYED:
     // PRECONDITION:
-    // na
     // POSTCONDITION:
     // - RootFinderData%MinPoint possibly updated
     // - RootFinderData%MaxPoint possibly updated
@@ -764,11 +761,10 @@ bool CheckNonSingularity(RootFinderDataType const &RootFinderData) // Data used 
     // Return value
     bool CheckNonSingularity;
 
-    // FUNCTION PARAMETER DEFINITIONS:
     // Safety factor used to detect a singular residual function between the min and max
     // points.
     // NOTE: Requesting exactly the same value is obtained by setting SafetyFactor = 0.0
-    Real64 const SafetyFactor(0.1);
+    Real64 constexpr SafetyFactor(0.1);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaY; // Difference between min and max Y-values
@@ -1021,7 +1017,6 @@ void SortHistory(int const N,                // Number of points to sort in hist
     // This subroutine orders the N points in the history array in increasing
     // order of ABS(Y) values.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int I;
     int J;
     Real64 XTemp;
@@ -1070,7 +1065,6 @@ void UpdateHistory(RootFinderDataType &RootFinderData, // Data used by root find
     // POSTCONDITION:
     // - RootFinderData%History(:) updated with last 3 best iterates
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumHistory;
 
     // Update history with best iterates so that:
@@ -1351,7 +1345,6 @@ bool BracketRoot(RootFinderDataType const &RootFinderData, // Data used by root 
     // When the lower and upper brackets are detected then the FUNCTION SecantMethod
     // should be used instead.
     // PRECONDITION:
-    // na
     // POSTCONDITION:
     // - MinPoint%X <= XNext <= MaxPoint%X
     // - LowerPoint%X < XNext < UpperPoint%X
@@ -1500,7 +1493,6 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
     // This subroutine computes the next candidate value based on the information available so far.
     // Stores new value into RootFinderData%XCandidate
     // PRECONDITION:
-    // na
     // POSTCONDITION:
     // - LowerPoint%X < XCandidate < UpperPoint%X
     // - RootFinderData%CurrentMethodType update with current solution method.
@@ -1510,7 +1502,6 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
     // Once it is bracketed, then we use the specified solution methods (Bisection,
     // False position, Secant and Brent) to compute the next candidate.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &XNext = state.dataGeneral->XNext;
 
     //----------------------------------------------------------------------------

@@ -94,25 +94,6 @@ namespace SolarCollectors {
 
     static constexpr std::string_view fluidNameWater("WATER");
 
-    PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
-    {
-        // Process the input data
-        if (state.dataSolarCollectors->GetInputFlag) {
-            GetSolarCollectorInput(state);
-            state.dataSolarCollectors->GetInputFlag = false;
-        }
-        // Now look for this particular object
-        for (auto &thisSC : state.dataSolarCollectors->Collector) {
-            if (thisSC.Name == objectName) {
-                return &thisSC;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state, "LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
     void GetSolarCollectorInput(EnergyPlusData &state)
     {
 
@@ -713,6 +694,25 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->CheckEquipName.dimension(state.dataSolarCollectors->NumOfCollectors, true);
             }
         }
+    }
+
+    PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
+    {
+        // Process the input data
+        if (state.dataSolarCollectors->GetInputFlag) {
+            GetSolarCollectorInput(state);
+            state.dataSolarCollectors->GetInputFlag = false;
+        }
+        // Now look for this particular object
+        for (auto &thisSC : state.dataSolarCollectors->Collector) {
+            if (thisSC.Name == objectName) {
+                return &thisSC;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(state, "LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void CollectorData::setupOutputVars(EnergyPlusData &state)

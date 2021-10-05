@@ -1674,8 +1674,6 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    // ========================= Utilities =======================
-
     bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
     {
 

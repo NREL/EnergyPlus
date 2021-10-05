@@ -68,10 +68,6 @@ namespace SimulationManager {
 
     std::string bool_to_string(bool logical);
 
-    void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state);
-
-    void CheckForRequestedReporting(EnergyPlusData &state);
-
     std::unique_ptr<std::ostream>
     OpenStreamFile(EnergyPlusData &state, const fs::path &fileName, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc));
 
@@ -83,13 +79,7 @@ namespace SimulationManager {
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportNodeConnections(EnergyPlusData &state);
-
     void ReportLoopConnections(EnergyPlusData &state);
-
-    void ReportParentChildren(EnergyPlusData &state);
-
-    void ReportCompSetMeterVariables(EnergyPlusData &state);
 
     void PostIPProcessing(EnergyPlusData &state);
 

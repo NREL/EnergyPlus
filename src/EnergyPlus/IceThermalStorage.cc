@@ -1513,8 +1513,6 @@ namespace IceThermalStorage {
         if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
     }
 
-    //******************************************************************************
-
     void SimpleIceStorageData::CalcIceStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap)
     {
         //------------------------------------------------------------------------
@@ -1561,8 +1559,6 @@ namespace IceThermalStorage {
         MinCap = ITSCoolingRateMin;
     }
 
-    //******************************************************************************
-
     void SimpleIceStorageData::CalcIceStorageDormant(EnergyPlusData &state)
     {
         // Provide output results for ITS.
@@ -1592,8 +1588,6 @@ namespace IceThermalStorage {
 
         this->Urate = 0.0; //[n/a]
     }
-
-    //******************************************************************************
 
     void SimpleIceStorageData::CalcIceStorageCharge(EnergyPlusData &state)
     {
@@ -1699,8 +1693,6 @@ namespace IceThermalStorage {
         this->ITSCoolingRate = -Qice;
         this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
-
-    //******************************************************************************
 
     void SimpleIceStorageData::CalcQiceChargeMaxByChiller(EnergyPlusData &state, Real64 &QiceMaxByChiller)
     {

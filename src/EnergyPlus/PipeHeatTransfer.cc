@@ -1141,8 +1141,6 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     }
 }
 
-//==============================================================================
-
 void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex)
 {
 
@@ -1313,8 +1311,6 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const
 
     state.dataPipeHT->nsvOutletTemp = this->TentativeFluidTemp(this->NumSections);
 }
-
-//==============================================================================
 
 void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation Pipe Number
 {
@@ -1521,8 +1517,6 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
 IterationLoop_exit:;
 }
 
-//==============================================================================
-
 void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
 {
 
@@ -1584,8 +1578,6 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).HumRat = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).HumRat;
 }
 
-//==============================================================================
-
 void PipeHTData::ReportPipesHeatTransfer(EnergyPlusData &state)
 {
 
@@ -1642,8 +1634,6 @@ void PipeHTData::ReportPipesHeatTransfer(EnergyPlusData &state)
     }
 }
 
-//==============================================================================
-
 void PipeHTData::CalcZonePipesHeatGain(EnergyPlusData &state)
 {
 
@@ -1670,8 +1660,6 @@ void PipeHTData::CalcZonePipesHeatGain(EnergyPlusData &state)
 
     if (!state.dataGlobal->BeginEnvrnFlag) state.dataPipeHT->MyEnvrnFlag = true;
 }
-
-//==============================================================================
 
 Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
                                          Real64 const Temperature,  // Temperature of water entering the surface, in C
@@ -1805,8 +1793,6 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
 
     return CalcPipeHeatTransCoef;
 }
-
-//==============================================================================
 
 Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
 {
@@ -1962,8 +1948,6 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     return OutsidePipeHeatTransCoef;
 }
 
-//==============================================================================
-
 Real64 PipeHTData::TBND(EnergyPlusData &state,
                         Real64 const z // Current Depth
 )
@@ -1993,9 +1977,5 @@ Real64 PipeHTData::TBND(EnergyPlusData &state,
 void PipeHTData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
-
-//===============================================================================
-
-//===============================================================================
 
 } // namespace EnergyPlus::PipeHeatTransfer

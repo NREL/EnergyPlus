@@ -60,7 +60,7 @@
 
 namespace EnergyPlus {
 
-//******************************************************************************
+
 
 // Xing model factory
 std::shared_ptr<XingGroundTempsModel>
@@ -124,7 +124,7 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType ob
     }
 }
 
-//******************************************************************************
+
 
 Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 {
@@ -177,7 +177,7 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     return retVal;
 }
 
-//******************************************************************************
+
 
 Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 _depth, int _month)
 {
@@ -209,7 +209,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, 
     return getGroundTemp(state);
 }
 
-//******************************************************************************
+
 
 Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 _depth, Real64 seconds)
 {
@@ -236,6 +236,6 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
     return getGroundTemp(state);
 }
 
-//******************************************************************************
+
 
 } // namespace EnergyPlus

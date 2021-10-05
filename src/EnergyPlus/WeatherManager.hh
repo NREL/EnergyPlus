@@ -237,9 +237,8 @@ namespace WeatherManager {
             : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(DDHumIndType::WetBulb), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0),
               SkyClear(0.0), RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0),
               SolarModel(DesignDaySolarModel::ASHRAE_ClearSky), DBTempRangeType(DDDBRangeType::Default), TempRangeSchPtr(0), HumIndSchPtr(0),
-              BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
-              DewPointNeedsSet(false),                      //**Trane:BEG: Sizing Speed Up
-              maxWarmupDays(-1), suppressBegEnvReset(false) //**Trane:END: Sizing Speed Up
+              BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false), DewPointNeedsSet(false),
+              maxWarmupDays(-1), suppressBegEnvReset(false)
         {
         }
     };

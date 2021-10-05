@@ -2409,8 +2409,6 @@ void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current
     state.dataPowerInductionUnits->PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);
 }
 
-// ===================== Utilities =====================================
-
 bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
 {
 

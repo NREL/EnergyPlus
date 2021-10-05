@@ -10520,10 +10520,6 @@ namespace Furnaces {
         return Residuum;
     }
 
-    //        End of Reporting subroutines for the Furnace Module
-
-    //******************************************************************************
-
     void SimVariableSpeedHP(EnergyPlusData &state,
                             int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -10860,8 +10856,6 @@ namespace Furnaces {
             }
         }
     }
-
-    //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
                            int const FurnaceNum,          // Unit index of engine driven heat pump
@@ -11293,8 +11287,6 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FanPartLoadRatio = PartLoadFrac;
         }
     }
-
-    //******************************************************************************
 
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               int const FurnaceNum,          // Variable speed heat pump number
@@ -11963,8 +11955,6 @@ namespace Furnaces {
         state.dataFurnaces->Furnace(FurnaceNum).LatentLoadMet = LatentLoadMet;
     }
 
-    //******************************************************************************
-
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
                                Real64 const PartLoadFrac,        // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                std::array<Real64, 10> const &Par // par(1) = FurnaceNum
@@ -12080,8 +12070,6 @@ namespace Furnaces {
 
         return VSHPCyclingResidual;
     }
-
-    //******************************************************************************
 
     Real64 VSHPSpeedResidual(EnergyPlusData &state,
                              Real64 const SpeedRatio,          // compressor cycling ratio (1.0 is continuous, 0.0 is off)

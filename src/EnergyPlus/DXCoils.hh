@@ -678,8 +678,6 @@ namespace DXCoils {
 
     void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    // ======================  Utility routines ======================================
-
     void GetDXCoilIndex(EnergyPlusData &state,
                         std::string const &DXCoilName,
                         int &DXCoilIndex,
@@ -822,8 +820,6 @@ namespace DXCoils {
                                    int const SecCoilSHRFT,
                                    int const SecCoilSHRFF);
 
-    // Begin of Methods for New VRF Model: Fluid Temperature Control
-    //******************************************************************************
     void ControlVRFIUCoil(EnergyPlusData &state,
                           int const CoilIndex,     // index to VRFTU coil
                           Real64 const QCoil,      // coil load

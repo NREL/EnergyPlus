@@ -3713,9 +3713,6 @@ namespace VariableSpeedCoils {
         }
     }
 
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void InitVarSpeedCoil(EnergyPlusData &state,
                           int const DXCoilNum,                             // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]

@@ -357,8 +357,6 @@ namespace Furnaces {
 
     //        End of Reporting subroutines for the Furnace Module
 
-    //******************************************************************************
-
     void SimVariableSpeedHP(EnergyPlusData &state,
                             int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -367,8 +365,6 @@ namespace Furnaces {
                             Real64 const QLatReq,          // required latent load
                             Real64 &OnOffAirFlowRatio      // ratio of compressor ON airflow to AVERAGE airflow over timestep
     );
-
-    //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
                            int const FurnaceNum,          // Unit index of engine driven heat pump
@@ -385,8 +381,6 @@ namespace Furnaces {
                            Real64 &SupHeaterLoad          // Supplemental heater load [W]
     );
 
-    //******************************************************************************
-
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               int const FurnaceNum,          // Variable speed heat pump number
                               bool const FirstHVACIteration, // Flag for 1st HVAC iteration
@@ -402,14 +396,10 @@ namespace Furnaces {
                               Real64 &SupHeaterLoad          // supplemental heater load (W)
     );
 
-    //******************************************************************************
-
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
                                Real64 const PartLoadFrac,        // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                std::array<Real64, 10> const &Par // par(1) = FurnaceNum
     );
-
-    //******************************************************************************
 
     Real64 VSHPSpeedResidual(EnergyPlusData &state,
                              Real64 const SpeedRatio,          // compressor cycling ratio (1.0 is continuous, 0.0 is off)

@@ -1689,8 +1689,6 @@ namespace WindowManager {
         ReportGlass(state);
     }
 
-    //*****************************************************************************************
-
     void W5InitGlassParameters(EnergyPlusData &state)
     {
         // Initializes variables used in the window optical and thermal calculation.
@@ -1956,8 +1954,6 @@ namespace WindowManager {
         } // End of wavelength loop
     }
 
-    //************************************************************************
-
     void SystemPropertiesAtLambdaAndPhi(EnergyPlusData &state,
                                         int const n, // Number of glass layers
                                         Real64 &tt,  // System transmittance
@@ -2044,8 +2040,6 @@ namespace WindowManager {
         }
     }
 
-    //*************************************************************************
-
     void SolarSprectrumAverage(EnergyPlusData &state,
                                Array1A<Real64> p, // Quantity to be weighted by solar spectrum
                                Real64 &psol       // Quantity p weighted by solar spectrum
@@ -2084,8 +2078,6 @@ namespace WindowManager {
 
         psol = up / down;
     }
-
-    //********************************************************************
 
     void VisibleSprectrumAverage(EnergyPlusData &state,
                                  Array1A<Real64> p, // Quantity to be weighted by solar spectrum
@@ -2143,8 +2135,6 @@ namespace WindowManager {
 
         pvis = up / down;
     }
-
-    //**********************************************************************
 
     void Interpolate(Array1A<Real64> x, // Array of data points for independent variable
                      Array1A<Real64> y, // Array of data points for dependent variable
@@ -4727,8 +4717,6 @@ namespace WindowManager {
         TGapOutletAve = 0.5 * (TGapOutlet(1) + TGapOutlet(2));
     }
 
-    //****************************************************************************
-
     void LUdecomposition(EnergyPlusData &state,
                          Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
@@ -4812,8 +4800,6 @@ namespace WindowManager {
         }
     }
 
-    //**************************************************************************
-
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
                     Array1D_int const &indx, // Vector of row permutations
@@ -4863,8 +4849,6 @@ namespace WindowManager {
             b(i) = sum / a(i, i);
         }
     }
-
-    //******************************************************************************
 
     void WindowGasConductance(EnergyPlusData &state,
                               Real64 const tleft,  // Temperature of gap surface closest to outside (K)
@@ -5032,8 +5016,6 @@ namespace WindowManager {
         gr = 9.807 * pow_3(state.dataWindowManager->gap(IGap)) * std::abs(tleft - tright) * pow_2(dens) / (tmean * pow_2(visc));
     }
 
-    //******************************************************************************
-
     void WindowGasPropertiesAtTemp(EnergyPlusData &state,
                                    Real64 const tmean, // Temperature of gas in gap (K)
                                    int const IGap,     // Gap number
@@ -5129,8 +5111,6 @@ namespace WindowManager {
 
         } // End of check if single or multiple gases in gap
     }
-
-    //********************************************************************************
 
     void StartingWindowTemps(EnergyPlusData &state,
                              int const SurfNum,          // Surface number
@@ -5269,8 +5249,6 @@ namespace WindowManager {
         }
     }
 
-    //****************************************************************************
-
     void NusseltNumber(EnergyPlusData &state,
                        int const SurfNum, // Surface number
                        Real64 const tso,  // Temperature of gap surface closest to outside (K)
@@ -5366,8 +5344,6 @@ namespace WindowManager {
             }
         }
     }
-
-    //*******************************************************************************************************
 
     void TransAndReflAtPhi(Real64 const cs,                // Cosine of incidence angle
                            Real64 const tf0,               // Transmittance at zero incidence angle
@@ -5920,8 +5896,6 @@ namespace WindowManager {
         return InterpResult;
     }
 
-    //**************************************************************************
-
     void W5LsqFit(Array1S<Real64> const IndepVar, // Independent variables
                   Array1S<Real64> const DepVar,   // Dependent variables
                   int const N,                    // Order of polynomial
@@ -6013,8 +5987,6 @@ namespace WindowManager {
             --L;
         }
     }
-
-    //********************************************************************************
 
     void W5LsqFit2(Array1A<Real64> const IndepVar, // Independent variables
                    Array1A<Real64> const DepVar,   // Dependent variables
@@ -6114,8 +6086,6 @@ namespace WindowManager {
         }
     }
 
-    //***********************************************************************
-
     Real64 DiffuseAverage(Array1S<Real64> const PropertyValue) // Property value at angles of incidence
     {
 
@@ -6154,8 +6124,6 @@ namespace WindowManager {
 
         return DiffuseAverage;
     }
-
-    //*************************************************************************************
 
     Real64 DiffuseAverageProfAngGnd(Array1S<Real64> const Property) // Property value vs. profile angle
     {
@@ -6202,8 +6170,6 @@ namespace WindowManager {
         return DiffuseAverageProfAngGnd;
     }
 
-    //*************************************************************************************
-
     Real64 DiffuseAverageProfAngSky(Array1S<Real64> const Property) // Property value vs. profile angle
     {
 
@@ -6248,8 +6214,6 @@ namespace WindowManager {
 
         return DiffuseAverageProfAngSky;
     }
-
-    //*************************************************************************************
 
     void CalcWinFrameAndDividerTemps(EnergyPlusData &state,
                                      int const SurfNum,     // Surface number
@@ -6474,8 +6438,6 @@ namespace WindowManager {
             // DivTempOut = state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin;
         } // End of check if window has dividers
     }
-
-    //************************************************************************************
 
     void CalcNominalWindowCond(EnergyPlusData &state,
                                int const ConstrNum,        // Construction number
@@ -7078,7 +7040,6 @@ namespace WindowManager {
         }
         NominalConductance = 1.0 / (rOut + Rbare + rIn);
     }
-    //****************************************************************************
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
                                    int const ConstrNum,  // Construction number
@@ -7237,8 +7198,6 @@ namespace WindowManager {
         }
     }
 
-    //****************************************************************************
-
     void StartingWinTempsForNominalCond(EnergyPlusData &state)
     {
 
@@ -7290,8 +7249,6 @@ namespace WindowManager {
             state.dataWindowManager->thetas(i) = (ressum / restot) * temdiff + state.dataWindowManager->tout;
         }
     }
-
-    //****************************************************************************
 
     void ReportGlass(EnergyPlusData &state)
     {
@@ -7800,8 +7757,6 @@ namespace WindowManager {
         }
     }
 
-    //*************************************************************************************
-
     void CalcWindowBlindProperties(EnergyPlusData &state)
     {
 
@@ -7988,8 +7943,6 @@ namespace WindowManager {
 
         } // End of loop over blinds
     }
-
-    //*************************************************************************************
 
     void CalcWindowScreenProperties(EnergyPlusData &state)
     {
@@ -8567,8 +8520,6 @@ namespace WindowManager {
         } // End of IR properties calculation
     }
 
-    //**********************************************************************************************
-
     void BlindOpticsBeam(EnergyPlusData &state,
                          int const BlindNum,      // Blind number
                          Array1A<Real64> const c, // Slat properties (equivalent to BLD_PR)
@@ -8775,8 +8726,6 @@ namespace WindowManager {
         } // End of loop over front and back side properties of blind
     }
 
-    //********************************************************************************************
-
     void ViewFac(Real64 const s,    // Slat width (m)
                  Real64 const h,    // Distance between faces of adjacent slats (m)
                  Real64 const phib, // Elevation angle of normal to slat (radians)
@@ -8880,8 +8829,6 @@ namespace WindowManager {
         }
     }
 
-    //*****************************************************************************************
-
     void InvertMatrix(EnergyPlusData &state,
                       Array2A<Real64> a, // Matrix to be inverted
                       Array2A<Real64> y, // Inverse of matrix a
@@ -8923,8 +8870,6 @@ namespace WindowManager {
             LUBKSB(a, n, np, indx, y(j, 1));
         }
     }
-
-    //*****************************************************************************************
 
     void LUDCMP(EnergyPlusData &state,
                 Array2A<Real64> A, // matrix
@@ -9024,8 +8969,6 @@ namespace WindowManager {
 
         if (A(N, N) == 0.0) A(N, N) = DataGlobalConstants::rTinyValue;
     }
-
-    //*****************************************************************************************
 
     void LUBKSB(Array2A<Real64> A, int const N, int const NP, Array1A_int INDX, Array1A<Real64> B)
     {
@@ -9243,16 +9186,12 @@ namespace WindowManager {
         state.dataWindowManager->RunMeOnceFlag = true;
     }
 
-    //*****************************************************************************************
-
     void initWindowModel(EnergyPlusData &state)
     {
         const std::string objectName = "WindowsCalculationEngine";
         state.dataWindowManager->inExtWindowModel = CWindowModel::WindowModelFactory(state, objectName);
         state.dataWindowManager->winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory(state);
     }
-
-    //*****************************************************************************************
 
 } // namespace WindowManager
 

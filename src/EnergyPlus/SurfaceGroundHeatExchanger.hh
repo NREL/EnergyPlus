@@ -185,34 +185,22 @@ namespace SurfaceGroundHeatExchanger {
 
         void InitSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
-        //==============================================================================
-
         void CalcSurfaceGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
         );
-
-        //==============================================================================
 
         void CalcBottomFluxCoefficents(Real64 Tbottom, // current bottom (lower) surface temperature
                                        Real64 Ttop     // current top (upper) surface temperature
         );
 
-        //==============================================================================
-
         void CalcTopFluxCoefficents(Real64 Tbottom, // current bottom (lower) surface temperature
                                     Real64 Ttop     // current top (upper) surface temperature
         );
-
-        //==============================================================================
 
         void CalcSourceTempCoefficents(Real64 Tbottom, // current bottom (lower) surface temperature
                                        Real64 Ttop     // current top (upper) surface temperature
         );
 
-        //==============================================================================
-
         Real64 CalcSourceFlux(EnergyPlusData &state); // component number
-
-        //==============================================================================
 
         void UpdateHistories(Real64 TopFlux,    // current top (top) surface flux
                              Real64 BottomFlux, // current bottom (bottom) surface flux
@@ -220,14 +208,10 @@ namespace SurfaceGroundHeatExchanger {
                              Real64 SourceTemp  // current source temperature
         );
 
-        //==============================================================================
-
         Real64 CalcHXEffectTerm(EnergyPlusData &state,
                                 Real64 Temperature,  // Temperature of water entering the surface, in C
                                 Real64 WaterMassFlow // Mass flow rate, in kg/s
         );
-
-        //==============================================================================
 
         void CalcTopSurfTemp(Real64 FluxTop,             // top surface flux
                              Real64 &TempTop,            // top surface temperature
@@ -242,8 +226,6 @@ namespace SurfaceGroundHeatExchanger {
                              bool ThisIsSnow             // snow flag
         );
 
-        //==============================================================================
-
         void CalcBottomSurfTemp(Real64 FluxBtm,       // bottom surface flux
                                 Real64 &TempBtm,      // bottom surface temperature
                                 Real64 ThisDryBulb,   // dry bulb temperature
@@ -251,24 +233,14 @@ namespace SurfaceGroundHeatExchanger {
                                 Real64 ThisGroundTemp // ground temperature
         );
 
-        //==============================================================================
-
         void UpdateSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface
 
-        //==============================================================================
-
         void ReportSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface under consideration
-
-        //==============================================================================
 
         void oneTimeInit(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
 
         void oneTimeInit_new(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
     };
-
-    void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
-
-    //==============================================================================
 
 } // namespace SurfaceGroundHeatExchanger
 

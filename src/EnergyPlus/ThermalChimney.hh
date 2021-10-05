@@ -132,10 +132,6 @@ namespace ThermalChimney {
 
     void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
 
-    //        End of Module Subroutines for ThermalChimney
-
-    //*****************************************************************************************
-
 } // namespace ThermalChimney
 struct ThermalChimneysData : BaseGlobalStruct
 {

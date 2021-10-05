@@ -1112,8 +1112,6 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
     state.dataMixedAir->OAController(OAControllerNum).UpdateOAController(state);
 }
 
-//******************************************************************************
-
 void GetOutsideAirSysInputs(EnergyPlusData &state)
 {
 
@@ -3364,7 +3362,6 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
         MechVentCheckFlag(OAControllerNum) = false;
     }
-    //****
 
     // Perform a one time initialization of AirloopHVAC OA System report variables
     // If AirloopHVAC objects are used, NumPrimaryAirSys > 0 and the initialization proceeds and then sets
@@ -3759,9 +3756,6 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 } // namespace MixedAir
 
-//******************************************************************************
-
-//******************************************************************************
 void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration)
 {
 
@@ -5263,10 +5257,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     }
 }
 
-//******************************************************************************
-
-//******************************************************************************
-
 void OAControllerProps::SizeOAController(EnergyPlusData &state)
 {
 
@@ -5414,10 +5404,6 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
         ShowFatalError(state, "Preceding sizing errors cause program termination");
     }
 }
-
-//******************************************************************************
-
-//******************************************************************************
 
 void OAControllerProps::UpdateOAController(EnergyPlusData &state)
 {
@@ -6718,7 +6704,5 @@ int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName // mu
 
     return WhichOAMixer;
 }
-// End of Utility Section of the Module
-//******************************************************************************
 
 } // namespace EnergyPlus::MixedAir

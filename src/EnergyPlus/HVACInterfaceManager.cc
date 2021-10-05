@@ -380,8 +380,6 @@ void UpdateHVACInterface(EnergyPlusData &state,
     }
 }
 
-//***************
-
 // In-Place Right Shift by 1 of Array Elements
 void rshift1(Array1D<Real64> &a)
 {
@@ -553,8 +551,6 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
         }
     }
 }
-
-//***************
 
 void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp)
 {

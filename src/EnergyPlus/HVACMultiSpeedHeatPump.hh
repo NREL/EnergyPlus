@@ -287,8 +287,6 @@ namespace HVACMultiSpeedHeatPump {
                        int &CompIndex                 // Index to changeover-bypass VAV system
     );
 
-    //******************************************************************************
-
     void SimMSHP(EnergyPlusData &state,
                  int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -298,11 +296,7 @@ namespace HVACMultiSpeedHeatPump {
                  Real64 &OnOffAirFlowRatio      // ratio of compressor ON airflow to AVERAGE airflow over timestep
     );
 
-    //******************************************************************************
-
     void GetMSHeatPumpInput(EnergyPlusData &state);
-
-    //******************************************************************************
 
     void InitMSHeatPump(EnergyPlusData &state,
                         int const MSHeatPumpNum,       // Engine driven heat pump number

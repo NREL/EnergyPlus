@@ -1115,8 +1115,6 @@ namespace WindTurbine {
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    //*****************************************************************************************
-
 } // namespace WindTurbine
 
 } // namespace EnergyPlus

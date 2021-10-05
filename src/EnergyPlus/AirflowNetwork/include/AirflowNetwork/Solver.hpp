@@ -274,8 +274,6 @@ namespace AirflowNetwork {
                 Real64 &RhoDr     // Air density of dry air on the link level used
     );
 
-    //*****************************************************************************************
-
 } // namespace AirflowNetwork
 
 struct AirflowNetworkSolverData : BaseGlobalStruct

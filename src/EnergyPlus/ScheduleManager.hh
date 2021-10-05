@@ -68,12 +68,7 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    int const MaxDayTypes(12);
+    int constexpr MaxDayTypes(12);
 
     enum class SchedType : int
     {
@@ -84,10 +79,6 @@ namespace ScheduleManager {
         ScheduleInput_constant = 4,
         ScheduleInput_external = 5
     };
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
 
     // MODULE VARIABLE DECLARATIONS:
 
@@ -175,8 +166,6 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
-
     // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex);
 
@@ -210,37 +199,7 @@ namespace ScheduleManager {
                                       Real64 &Value // The new value for the schedule
     );
 
-    void ProcessIntervalFields(EnergyPlusData &state,
-                               Array1S_string const Untils,
-                               Array1S<Real64> const Numbers,
-                               int const NumUntils,
-                               int const NumNumbers,
-                               Array2A<Real64> MinuteValue,
-                               Array2A_bool SetMinuteValue,
-                               bool &ErrorsFound,
-                               std::string const &DayScheduleName,     // Name (used for errors)
-                               std::string const &ErrContext,          // Context (used for errors)
-                               ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
-    );
-
-    void DecodeHHMMField(EnergyPlusData &state,
-                         std::string const &FieldValue,          // Input field value
-                         int &RetHH,                             // Returned "hour"
-                         int &RetMM,                             // Returned "minute"
-                         bool &ErrorsFound,                      // True if errors found in this field
-                         std::string const &DayScheduleName,     // originating day schedule name
-                         std::string const &FullFieldValue,      // Full Input field value
-                         ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
-    );
-
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
-
-    void ProcessForDayTypes(EnergyPlusData &state,
-                            std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
-                            Array1D_bool &AlReady,          // Array of days already done
-                            bool &ErrorsFound               // Will be true if error found.
-    );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex,      // Which Schedule being tested

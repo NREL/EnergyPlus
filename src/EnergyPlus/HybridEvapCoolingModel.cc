@@ -64,7 +64,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus { //***************
+namespace EnergyPlus {
 
 namespace HybridEvapCoolingModel {
     // Module containing the EvaporativeCoolers simulation routines

@@ -181,12 +181,6 @@ namespace DualDuct {
 
         void SizeDualDuct(EnergyPlusData &state);
 
-        // End Initialization Section of the Module
-        //******************************************************************************
-
-        // Begin Algorithm Section of the Module
-        //******************************************************************************
-
         void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
@@ -203,21 +197,9 @@ namespace DualDuct {
                                 Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
-        // End Algorithm Section of the Module
-        // *****************************************************************************
-
-        // Beginning of Update subroutines for the Damper Module
-        // *****************************************************************************
-
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
         void UpdateDualDuct(EnergyPlusData &state);
-
-        //        End of Update subroutines for the Damper Module
-        // *****************************************************************************
-
-        // Beginning of Reporting subroutines for the Damper Module
-        // *****************************************************************************
 
         void ReportDualDuct();
     };
@@ -227,23 +209,11 @@ namespace DualDuct {
     void SimulateDualDuct(
         EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetDualDuctInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
 
     void ReportDualDuctConnections(EnergyPlusData &state);
 
     void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string_view CompName, bool &RecircIsUsed);
-
-    //        End of Reporting subroutines for the Damper Module
-    // *****************************************************************************
-
-    // Clears the global data in DualDuct.
-    // Needed for unit tests, should not be normally called.
 
 } // namespace DualDuct
 

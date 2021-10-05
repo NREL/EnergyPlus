@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -82,17 +81,10 @@ namespace SolarReflectionManager {
     // PURPOSE OF THIS MODULE:
     // Manages the calculation of factors for solar reflected from obstructions and ground.
 
-    // METHODOLOGY EMPLOYED:
-    // REFERENCES: na
-
-    // OTHER NOTES: na
-
-    // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace ScheduleManager;
     using namespace DataEnvironment;
-
     using namespace DataVectorTypes;
 
     void InitSolReflRecSurf(EnergyPlusData &state)
@@ -109,39 +101,35 @@ namespace SolarReflectionManager {
         // needed to calculate factors for solar reflection from obstructions and ground.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;            // Surface number
-        int RecSurfNum;         // Receiving surface number
-        int loop;               // DO loop indices
-        int loop1;              // DO loop indices
-        int loopA;              // DO loop indices
-        int loopB;              // DO loop indices
-        int ObsSurfNum;         // Surface number of an obstruction
-        bool ObsBehindRec;      // True if an obstruction is entirely behind a receiving surface
-        bool ObsHasView;        // True if view between receiving surface and heat trans surf obstruction
-        Vector3<Real64> RecVec; // First vertex of a receiving surface (m)
-        Vector3<Real64> ObsVec; // A vertex of a candidate obstructing surface (m)
-        Vector3<Real64> VecAB;  // Vector from receiving surface vertex to obstruction surface vertex (m)
-        Vector3<Real64> HitPt;  // Hit point (m)
-        Real64 DotProd;         // Dot product of vectors (m2)
-        int RecPtNum;           // Receiving point number
-        // unused  REAL(r64)         :: SumX                 ! Sum of X (or Y or Z) coordinate values of a surface
-        // unused  REAL(r64)         :: SumY                 ! Sum of X (or Y or Z) coordinate values of a surface
-        // unused  REAL(r64)         :: SumZ                 ! Sum of X (or Y or Z) coordinate values of a surface
-        Real64 PhiSurf;   // Altitude of normal to receiving surface (radians)
-        Real64 ThetaSurf; // Azimuth of normal to receiving surface (radians)
-        Real64 PhiMin;    // Minimum and maximum values of ray altitude angle (radians)
-        Real64 PhiMax;    // Minimum and maximum values of ray altitude angle (radians)
-        Real64 ThetaMin;  // Minimum and maximum values of ray azimuth angle (radians)
-        Real64 ThetaMax;  // Minimum and maximum values of ray azimuth angle (radians)
-        Real64 Phi;       // Ray altitude angle, increment, sine, and cosine
-        Real64 DPhi;      // Ray altitude angle, increment, sine, and cosine
-        Real64 SPhi;      // Ray altitude angle, increment, sine, and cosine
-        Real64 CPhi;      // Ray altitude angle, increment, sine, and cosine
-        Real64 Theta;     // Ray azimuth angle and increment
-        Real64 DTheta;    // Ray azimuth angle and increment
-        int IPhi;         // Ray altitude angle and azimuth angle indices
-        int ITheta;       // Ray altitude angle and azimuth angle indices
-        // unused  REAL(r64)         :: APhi                 ! Intermediate variable
+        int SurfNum;                  // Surface number
+        int RecSurfNum;               // Receiving surface number
+        int loop;                     // DO loop indices
+        int loop1;                    // DO loop indices
+        int loopA;                    // DO loop indices
+        int loopB;                    // DO loop indices
+        int ObsSurfNum;               // Surface number of an obstruction
+        bool ObsBehindRec;            // True if an obstruction is entirely behind a receiving surface
+        bool ObsHasView;              // True if view between receiving surface and heat trans surf obstruction
+        Vector3<Real64> RecVec;       // First vertex of a receiving surface (m)
+        Vector3<Real64> ObsVec;       // A vertex of a candidate obstructing surface (m)
+        Vector3<Real64> VecAB;        // Vector from receiving surface vertex to obstruction surface vertex (m)
+        Vector3<Real64> HitPt;        // Hit point (m)
+        Real64 DotProd;               // Dot product of vectors (m2)
+        int RecPtNum;                 // Receiving point number
+        Real64 PhiSurf;               // Altitude of normal to receiving surface (radians)
+        Real64 ThetaSurf;             // Azimuth of normal to receiving surface (radians)
+        Real64 PhiMin;                // Minimum and maximum values of ray altitude angle (radians)
+        Real64 PhiMax;                // Minimum and maximum values of ray altitude angle (radians)
+        Real64 ThetaMin;              // Minimum and maximum values of ray azimuth angle (radians)
+        Real64 ThetaMax;              // Minimum and maximum values of ray azimuth angle (radians)
+        Real64 Phi;                   // Ray altitude angle, increment, sine, and cosine
+        Real64 DPhi;                  // Ray altitude angle, increment, sine, and cosine
+        Real64 SPhi;                  // Ray altitude angle, increment, sine, and cosine
+        Real64 CPhi;                  // Ray altitude angle, increment, sine, and cosine
+        Real64 Theta;                 // Ray azimuth angle and increment
+        Real64 DTheta;                // Ray azimuth angle and increment
+        int IPhi;                     // Ray altitude angle and azimuth angle indices
+        int ITheta;                   // Ray altitude angle and azimuth angle indices
         int RayNum;                   // Ray number
         Vector3<Real64> URay;         // Unit vector along ray pointing away from receiving surface
         Real64 CosIncAngRay;          // Cosine of angle of incidence of ray on receiving surface
@@ -164,7 +152,6 @@ namespace SolarReflectionManager {
         Real64 Beta;
         Real64 HorDis;               // Distance between ground hit point and proj'n of receiving pt onto ground (m)
         Vector3<Real64> GroundHitPt; // Coordinates of ground hit point
-        // unused  REAL(r64)         :: ArgASin
         Real64 ACosTanTan;
         int J;           // DO loop indices
         int K;           // DO loop indices
@@ -174,11 +161,6 @@ namespace SolarReflectionManager {
         static Vector3<Real64> const unit_z(0.0, 0.0, 1.0);
         static Vector3<Real64> const zero3(0.0);
 
-        // Find number of surfaces that are sun-exposed exterior building heat transfer surfaces.
-        // These are candidates for receiving solar reflected from obstructions and ground.
-        // CR 7640.  12/3/2008 BG simplified logic to allow for Other Side Conditions Modeled boundary condition.
-        //           and solar collectors on shading surfaces that need this.
-
         // shading surfaces have ExtSolar = False, so they are not included in TotSolReflRecSurf
         state.dataSolarReflectionManager->TotSolReflRecSurf = 0;
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -186,29 +168,6 @@ namespace SolarReflectionManager {
                 ++state.dataSolarReflectionManager->TotSolReflRecSurf;
             }
         }
-
-        // TH 3/29/2010. ShadowSurfPossibleReflector is not used!
-        // Set flag that determines whether a surface can be an exterior reflector
-        // DO SurfNum = 1,TotSurfaces
-        //  Surface(SurfNum)%ShadowSurfPossibleReflector = .FALSE.
-        // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
-        //  IF(Surface(SurfNum)%HeatTransSurf .AND. Surface(SurfNum)%ExtBoundCond > 0 ) CYCLE
-        //  IF(Surface(SurfNum)%HeatTransSurf .AND. Surface(SurfNum)%ExtBoundCond == Ground) CYCLE
-        //  IF(Surface(SurfNum)%HeatTransSurf .AND. Surface(SurfNum)%ExtBoundCond == OtherSideCoefNoCalcExt) CYCLE
-        //  IF(Surface(SurfNum)%HeatTransSurf .AND. Surface(SurfNum)%ExtBoundCond == OtherSideCoefCalcExt) CYCLE
-
-        // Exclude daylighting shelves. A separate solar reflection calculation is done for these.
-        //  IF(Surface(SurfNum)%Shelf > 0) CYCLE
-
-        // Exclude duplicate shading surfaces
-        // TH 3/24/2010. Why? a mirror shading surface can reflect solar (either beam or diffuse)
-        //  can use a flag like Surface(SurfNum)%Mirrored (True or False) to avoid string comparison
-        //   and to allow surface names starting with 'Mir'
-        // IF(Surface(SurfNum)%Name(1:3) == 'Mir') CYCLE
-        //  IF(Surface(SurfNum)%MirroredSurf) CYCLE
-
-        //  Surface(SurfNum)%ShadowSurfPossibleReflector = .TRUE.
-        // END DO
 
         if (state.dataSolarReflectionManager->TotSolReflRecSurf == 0) {
             ShowWarningError(state, "Calculation of solar reflected from obstructions has been requested but there");
@@ -559,41 +518,6 @@ namespace SolarReflectionManager {
         }                 // End of receiving surface loop
     }
 
-    //=====================================================================================================
-
-    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   September 2003
-        //       MODIFIED       TH 4/6/2010, fixed CR 7872
-        //       RE-ENGINEERED  B. Griffith, October 2012, for timestep integrated solar.
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // manage calculations for factors for irradiance on exterior heat transfer surfaces due to
-        // beam-to-diffuse solar reflection from obstructions and ground.
-
-        // METHODOLOGY EMPLOYED: call worker routine depending on solar calculation method
-
-        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-            if (state.dataGlobal->BeginSimFlag) {
-                DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
-            } else {
-                DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
-            }
-            state.dataSurface->SurfReflFacBmToDiffSolObs = 0.0;
-            state.dataSurface->SurfReflFacBmToDiffSolGnd = 0.0;
-            for (state.dataSolarReflectionManager->IHr = 1; state.dataSolarReflectionManager->IHr <= 24; ++state.dataSolarReflectionManager->IHr) {
-                FigureBeamSolDiffuseReflFactors(state, state.dataSolarReflectionManager->IHr);
-            }    // End of IHr loop
-        } else { // timestep integrated solar, use current hour of day
-            state.dataSurface->SurfReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
-            state.dataSurface->SurfReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
-            FigureBeamSolDiffuseReflFactors(state, state.dataGlobal->HourOfDay);
-        }
-    }
-
     void FigureBeamSolDiffuseReflFactors(EnergyPlusData &state, int const iHour)
     {
 
@@ -829,43 +753,40 @@ namespace SolarReflectionManager {
         } // End of loop over receiving surfaces
     }
 
-    //=================================================================================================
-
-    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state)
+    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith, October 2012, for timestep integrated solar
+        //       MODIFIED       TH 4/6/2010, fixed CR 7872
+        //       RE-ENGINEERED  B. Griffith, October 2012, for timestep integrated solar.
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Manage calculation of factors for beam solar irradiance on exterior heat transfer surfaces due to
-        // specular (beam-to-beam) reflection from obstructions such as a highly-glazed neighboring
-        // building.
+        // manage calculations for factors for irradiance on exterior heat transfer surfaces due to
+        // beam-to-diffuse solar reflection from obstructions and ground.
 
-        // METHODOLOGY EMPLOYED:
-        // call worker routine as appropriate
+        // METHODOLOGY EMPLOYED: call worker routine depending on solar calculation method
 
         if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
-                DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
             }
-            state.dataSurface->SurfReflFacBmToBmSolObs = 0.0;
-            state.dataSurface->SurfCosIncAveBmToBmSolObs = 0.0;
-            for (state.dataSolarReflectionManager->NumHr = 1; state.dataSolarReflectionManager->NumHr <= 24;
-                 ++state.dataSolarReflectionManager->NumHr) {
-                FigureBeamSolSpecularReflFactors(state, state.dataSolarReflectionManager->NumHr);
-            }    // End of NumHr loop
+            state.dataSurface->SurfReflFacBmToDiffSolObs = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolGnd = 0.0;
+            for (state.dataSolarReflectionManager->IHr = 1; state.dataSolarReflectionManager->IHr <= 24; ++state.dataSolarReflectionManager->IHr) {
+                FigureBeamSolDiffuseReflFactors(state, state.dataSolarReflectionManager->IHr);
+            }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
-            state.dataSurface->SurfReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
-            state.dataSurface->SurfCosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
-            FigureBeamSolSpecularReflFactors(state, state.dataGlobal->HourOfDay);
+            state.dataSurface->SurfReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSurface->SurfReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            FigureBeamSolDiffuseReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
+
+    //=================================================================================================
 
     void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour)
     {
@@ -1081,6 +1002,42 @@ namespace SolarReflectionManager {
                 state.dataSurface->SurfCosIncAveBmToBmSolObs(iHour, SurfNum) /= double(NumRecPts);
             } // End of check if number of possible obstructions > 0
         }     // End of loop over receiving surfaces
+    }
+
+    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Winkelmann
+        //       DATE WRITTEN   September 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  B. Griffith, October 2012, for timestep integrated solar
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manage calculation of factors for beam solar irradiance on exterior heat transfer surfaces due to
+        // specular (beam-to-beam) reflection from obstructions such as a highly-glazed neighboring
+        // building.
+
+        // METHODOLOGY EMPLOYED:
+        // call worker routine as appropriate
+
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
+            if (state.dataGlobal->BeginSimFlag) {
+                DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
+            } else {
+                DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
+            }
+            state.dataSurface->SurfReflFacBmToBmSolObs = 0.0;
+            state.dataSurface->SurfCosIncAveBmToBmSolObs = 0.0;
+            for (state.dataSolarReflectionManager->NumHr = 1; state.dataSolarReflectionManager->NumHr <= 24;
+                 ++state.dataSolarReflectionManager->NumHr) {
+                FigureBeamSolSpecularReflFactors(state, state.dataSolarReflectionManager->NumHr);
+            }    // End of NumHr loop
+        } else { // timestep integrated solar, use current hour of day
+            state.dataSurface->SurfReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSurface->SurfCosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            FigureBeamSolSpecularReflFactors(state, state.dataGlobal->HourOfDay);
+        }
     }
 
     //=================================================================================================

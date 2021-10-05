@@ -132,37 +132,6 @@ namespace SurfaceGroundHeatExchanger {
     int const SurfCond_Ground(1);
     int const SurfCond_Exposed(2);
 
-    PlantComponent *
-    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
-    {
-        if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
-            GetSurfaceGroundHeatExchanger(state);
-            state.dataSurfaceGroundHeatExchangers->GetInputFlag = false;
-        }
-        // Now look for this particular pipe in the list
-        for (auto &ghx : state.dataSurfaceGroundHeatExchangers->SurfaceGHE) {
-            if (ghx.Name == objectName) {
-                return &ghx;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state, "Surface Ground Heat Exchanger: Error getting inputs for pipe named: " + objectName);
-        // Shut up the compiler
-        return nullptr;
-    }
-
-    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state,
-                                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                                  bool const FirstHVACIteration,
-                                                  [[maybe_unused]] Real64 &CurLoad,
-                                                  [[maybe_unused]] bool const RunFlag)
-    {
-        this->InitSurfaceGroundHeatExchanger(state);
-        this->CalcSurfaceGroundHeatExchanger(state, FirstHVACIteration);
-        this->UpdateSurfaceGroundHeatExchngr(state);
-        this->ReportSurfaceGroundHeatExchngr(state);
-    }
-
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state)
     {
 
@@ -440,6 +409,37 @@ namespace SurfaceGroundHeatExchanger {
             }
             state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning = false;
         }
+    }
+
+    PlantComponent *
+    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
+    {
+        if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
+            GetSurfaceGroundHeatExchanger(state);
+            state.dataSurfaceGroundHeatExchangers->GetInputFlag = false;
+        }
+        // Now look for this particular pipe in the list
+        for (auto &ghx : state.dataSurfaceGroundHeatExchangers->SurfaceGHE) {
+            if (ghx.Name == objectName) {
+                return &ghx;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(state, "Surface Ground Heat Exchanger: Error getting inputs for pipe named: " + objectName);
+        // Shut up the compiler
+        return nullptr;
+    }
+
+    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state,
+                                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                                  bool const FirstHVACIteration,
+                                                  [[maybe_unused]] Real64 &CurLoad,
+                                                  [[maybe_unused]] bool const RunFlag)
+    {
+        this->InitSurfaceGroundHeatExchanger(state);
+        this->CalcSurfaceGroundHeatExchanger(state, FirstHVACIteration);
+        this->UpdateSurfaceGroundHeatExchngr(state);
+        this->ReportSurfaceGroundHeatExchngr(state);
     }
 
     void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger(EnergyPlusData &state)

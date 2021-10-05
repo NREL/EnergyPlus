@@ -333,8 +333,6 @@ namespace VentilatedSlab {
 
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
-    //*****************************************************************************************
-
 } // namespace VentilatedSlab
 
 struct VentilatedSlabData : BaseGlobalStruct

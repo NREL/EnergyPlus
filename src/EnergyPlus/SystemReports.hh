@@ -155,78 +155,9 @@ namespace SystemReports {
 
     void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
-    void UpdateZoneCompPtrArray(EnergyPlusData &state,
-                                int &Idx,
-                                int const ListNum,
-                                int const AirDistUnitNum,
-                                int const PlantLoopType,
-                                int const PlantLoop,
-                                int const PlantBranch,
-                                int const PlantComp);
-
-    void UpdateZoneSubCompPtrArray(EnergyPlusData &state,
-                                   int &Idx,
-                                   int const ListNum,
-                                   int const AirDistUnitNum,
-                                   int const SubCompNum,
-                                   int const PlantLoopType,
-                                   int const PlantLoop,
-                                   int const PlantBranch,
-                                   int const PlantComp);
-
-    void UpdateZoneSubSubCompPtrArray(EnergyPlusData &state,
-                                      int &Idx,
-                                      int const ListNum,
-                                      int const AirDistUnitNum,
-                                      int const SubCompNum,
-                                      int const SubSubCompNum,
-                                      int const PlantLoopType,
-                                      int const PlantLoop,
-                                      int const PlantBranch,
-                                      int const PlantComp);
-
-    void UpdateAirSysCompPtrArray(EnergyPlusData &state,
-                                  int &Idx,
-                                  int const AirLoopNum,
-                                  int const BranchNum,
-                                  int const CompNum,
-                                  int const PlantLoopType,
-                                  int const PlantLoop,
-                                  int const PlantBranch,
-                                  int const PlantComp);
-
-    void UpdateAirSysSubCompPtrArray(EnergyPlusData &state,
-                                     int &Idx,
-                                     int const AirLoopNum,
-                                     int const BranchNum,
-                                     int const CompNum,
-                                     int const SubCompNum,
-                                     int const PlantLoopType,
-                                     int const PlantLoop,
-                                     int const PlantBranch,
-                                     int const PlantComp);
-
-    void UpdateAirSysSubSubCompPtrArray(EnergyPlusData &state,
-                                        int &Idx,
-                                        int const AirLoopNum,
-                                        int const BranchNum,
-                                        int const CompNum,
-                                        int const SubCompNum,
-                                        int const SubSubCompNum,
-                                        int const PlantLoopType,
-                                        int const PlantLoop,
-                                        int const PlantBranch,
-                                        int const PlantComp);
-
     void AllocateAndSetUpVentReports(EnergyPlusData &state);
 
     void CreateEnergyReportStructure(EnergyPlusData &state);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Beginning of Reporting subroutines for the SimAir Module
-    // *****************************************************************************
 
     void ReportSystemEnergyUse(EnergyPlusData &state);
 
@@ -240,25 +171,7 @@ namespace SystemReports {
 
     void ReportMaxVentilationLoads(EnergyPlusData &state);
 
-    void MatchPlantSys(EnergyPlusData &state,
-                       int const AirLoopNum, // counter for zone air distribution inlets
-                       int const BranchNum   // counter for zone air distribution inlets
-    );
-
-    void FindDemandSideMatch(EnergyPlusData &state,
-                             std::string const &CompType, // Inlet node of the component to find the match of
-                             std::string_view CompName,   // Outlet node of the component to find the match of
-                             bool &MatchFound,            // Set to .TRUE. when a match is found
-                             int &MatchLoopType,          // Loop number of the match
-                             int &MatchLoop,              // Loop number of the match
-                             int &MatchBranch,            // Branch number of the match
-                             int &MatchComp               // Component number of the match
-    );
-
     void ReportAirLoopConnections(EnergyPlusData &state);
-
-    //        End of Reporting subroutines for the SimAir Module
-    // *****************************************************************************
 
     struct IdentifyLoop
     {

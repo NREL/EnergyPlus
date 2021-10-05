@@ -874,9 +874,6 @@ namespace WaterToAirHeatPumpSimple {
         }
     }
 
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
                                 int const HPNum,                                 // Current HPNum under simulation
                                 Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]

@@ -83,7 +83,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
@@ -105,7 +104,6 @@ namespace EnergyPlus::SingleDuct {
 // To encapsulate the data and algorithms required to
 // simulate single duct systems as a single driver or inter-connecting controllers.
 
-// Using/Aliasing
 using namespace DataLoopNode;
 using BranchNodeConnections::SetUpCompSets;
 using BranchNodeConnections::TestCompSet;
@@ -143,9 +141,6 @@ void SimulateSingleDuct(
     // It is called from the ManageZoneEquip
     // at the system time step.
 
-    // Using/Aliasing
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SysNum; // The Sys that you are currently loading input into
 
     // Obtains and Allocates Sys related parameters from input file
@@ -220,9 +215,6 @@ void SimulateSingleDuct(
     state.dataSize->TermUnitSingDuct = false;
 }
 
-// Get Input Section of the Module
-//******************************************************************************
-
 void GetSysInput(EnergyPlusData &state)
 {
 
@@ -235,10 +227,8 @@ void GetSysInput(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is the main routine to call other input routines and Get routines
 
-    // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    // Using/Aliasing
     using NodeInputManager::GetOnlySingleNode;
     using SteamCoils::GetCoilAirOutletNode;
     using SteamCoils::GetCoilSteamInletNode;
@@ -252,10 +242,8 @@ void GetSysInput(EnergyPlusData &state)
     using namespace DataHeatBalance;
     using DataPlant::TypeOf_CoilSteamAirHeating;
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
 
     int NumZoneSiz;
     int ZoneSizIndex;
@@ -2461,12 +2449,6 @@ void GetSysInput(EnergyPlusData &state)
     }
 }
 
-// End of Get Input subroutines for the Module
-//******************************************************************************
-
-// Beginning Initialization Section of the Module
-//******************************************************************************
-
 void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACIteration)
 {
 
@@ -2479,10 +2461,8 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for  initializations of the Sys Components.
 
-    // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    // Using/Aliasing
     using DataPlant::TypeOf_CoilSteamAirHeating;
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
     using DataZoneEquipment::CheckZoneEquipmentList;
@@ -2490,11 +2470,9 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     using PlantUtilities::ScanPlantLoopsForObject;
     auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitSys");
     static constexpr std::string_view RoutineNameFull("InitHVACSingleDuct");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
     int OutletNode;
     int SysIndex;
@@ -2853,10 +2831,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     // This subroutine is for sizing Sys Components for which flow rates have not been
     // specified in the input.
 
-    // METHODOLOGY EMPLOYED:
     // Obtains flow rates from the zone or system sizing arrays.
 
-    // Using/Aliasing
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
     using General::SafeDivide;
@@ -2867,11 +2843,9 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     using WaterCoils::GetCoilWaterOutletNode;
     using WaterCoils::SetCoilDesFlow;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeSys");
     static constexpr std::string_view RoutineNameFull("SizeHVACSingleDuct");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PltSizHeatNum; // index of plant sizing object for 1st heating loop
     Real64 DesMassFlow;
     Real64 TempSteamIn;
@@ -3807,12 +3781,6 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     }
 }
 
-// End Initialization Section of the Module
-//******************************************************************************
-
-// Begin Algorithm Section of the Module
-//******************************************************************************
-
 void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
 {
 
@@ -3830,33 +3798,15 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct volume VAV.
 
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using namespace DataZoneEnergyDemands;
-    // unused   USE DataHeatBalFanSys, ONLY: Mat
+
     using DataHVACGlobals::SmallLoad;
     using HeatingCoils::SimulateHeatingCoilComponents;
     using PlantUtilities::SetActuatedBranchFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow;     // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
     Real64 QTotLoad;     // [Watts] Remaining load required for this zone
     Real64 QZnReq;       // [Watts] Load calculated for heating coil
@@ -4325,25 +4275,9 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // User input defines method used to calculate OA.
 
-    // REFERENCES:
-
-    // Using/Aliasing
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
     bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
@@ -4387,13 +4321,6 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     // This subroutine simulates the VAV box with varying airflow in heating and cooling.
     // Modified version of SimVAV.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using namespace DataZoneEnergyDemands;
     using DataHVACGlobals::SmallLoad;
     // unused   USE DataHeatBalFanSys,    ONLY: Mat
@@ -4403,18 +4330,6 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     // unused   USE DataHeatBalFanSys,    ONLY: ZoneThermostatSetPointHi, ZoneThermostatSetPointLo
     using PlantUtilities::SetActuatedBranchFlowRate;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow;      // Total Mass Flow Rate from Hot & Cold Inlets [kg/sec]
     Real64 QTotLoad;      // Total load based on thermostat setpoint temperature [Watts]
     Real64 QZnReq;        // Total load to be met by terminal heater [Watts]
@@ -4760,15 +4675,12 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // on equip on/off combinations. Assign the heating load to the appropriate region and iteratively
     // solve for the appropriate control variable value using Regula-Falsi solver.
 
-    // Using/Aliasing
     using namespace DataZoneEnergyDemands;
     using General::SolveRoot;
     using SteamCoils::GetCoilCapacity;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const BigLoad(1.0e+20);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow = 0; // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
     Real64 QTotLoad;     // [Watts]
     // unused  REAL(r64) :: QZnReq      ! [Watts]
@@ -4887,8 +4799,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
     }
 
-    // Active cooling with fix for issue #5592
-    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
+    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad<QCoolFanOnMin - SmallLoad &&this->sd_airterminalInlet.AirMassFlowRateMaxAvail> 0.0 &&
         !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         // check that it can meet the load
         FanOp = 1;
@@ -5220,32 +5131,14 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct constant volume systems.
 
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
 
-    // REFERENCES:
-    // na
 
-    // Using/Aliasing
     using namespace DataZoneEnergyDemands;
-    // unused   USE DataHeatBalFanSys, ONLY: Mat
     using HeatingCoils::SimulateHeatingCoilComponents;
     using PlantUtilities::SetActuatedBranchFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow;     // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
     Real64 QZnReq;       // [Watts]
     Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
@@ -5432,28 +5325,11 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Simulates the unit components sequentially in the air flow direction.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using HeatingCoils::SimulateHeatingCoilComponents;
     using PlantUtilities::SetComponentFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FanInNode;       // unit air inlet node (fan inlet)
     int FanOutNode;      // fan outlet node (heating coil inlet node)
     int HCOutNode;       // unit air outlet node (heating coil air outlet node)
@@ -5549,18 +5425,11 @@ Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(EnergyPlusData &state,
     // Calls CalcVAVVS, and calculates
     // the residual as defined above.
 
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
     // Return value
     Real64 Residuum; // residual to be minimized to zero
 
     // Argument array dimensioning
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
     // Par(2) = FirstHVACIteration (1. or 0.)
     // Par(3) = REAL(ZoneNodeNum)
     // Par(4) = REAL(HCType)
@@ -5568,15 +5437,6 @@ Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(EnergyPlusData &state,
     // Par(6) = REAL(FanType)
     // Par(7) = REAL(FanOp)
     // Par(8) = cooling demand [W] (negative)
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int UnitIndex;
@@ -5621,18 +5481,11 @@ Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(EnergyPlusData &state,
     // Calls CalcVAVVS, and calculates
     // the residual as defined above.
 
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
     // Return value
     Real64 Residuum; // residual to be minimized to zero
 
     // Argument array dimensioning
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
     // Par(2) = FirstHVACIteration (1. or 0.)
     // Par(3) = REAL(ZoneNodeNum)
     // Par(4) = REAL(HCType)
@@ -5642,15 +5495,6 @@ Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(EnergyPlusData &state,
     // Par(8) = heating demand [W]
     // Par(9) = min steam flow rate [m3/s] - steam only
     // Par(10 = max steam flow rate [m3/s] - steam only
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int UnitIndex;
@@ -5714,18 +5558,11 @@ Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(EnergyPlusData &state,
     // Calls CalcVAVVS, and calculates
     // the residual as defined above.
 
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
     // Return value
     Real64 Residuum; // residual to be minimized to zero
 
     // Argument array dimensioning
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
     // Par(2) = FirstHVACIteration (1. or 0.)
     // Par(3) = REAL(ZoneNodeNum)
     // Par(4) = REAL(HCType)
@@ -5733,15 +5570,6 @@ Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(EnergyPlusData &state,
     // Par(6) = REAL(FanType)
     // Par(7) = REAL(FanOp)
     // Par(8) = heating demand [W]
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int UnitIndex;
@@ -5788,18 +5616,11 @@ Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(EnergyPlusData &state,
     // Calls CalcVAVVS, and calculates
     // the residual as defined above.
 
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
     // Return value
     Real64 Residuum; // residual to be minimized to zero
 
     // Argument array dimensioning
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
     // Par(2) = FirstHVACIteration (1. or 0.)
     // Par(3) = REAL(ZoneNodeNum)
     // Par(4) = REAL(HCType)
@@ -5807,15 +5628,6 @@ Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(EnergyPlusData &state,
     // Par(6) = REAL(FanType)
     // Par(7) = REAL(FanOp)
     // Par(8) = heating demand [W]
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int UnitIndex;
@@ -5867,7 +5679,6 @@ void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the Syss.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;
     int InletNode;
 
@@ -5921,28 +5732,7 @@ void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the Sys report variables.
 
-    // METHODOLOGY EMPLOYED:
-    // There is method to this madness.
 
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Still needs to report the Sys power from this component
 
@@ -5997,6 +5787,125 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
     }
 }
 
+void UpdateATMixer(EnergyPlusData &state, int const SysNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR
+    //       DATE WRITTEN   March 2012
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Move the results of CalcATMixer to the affected nodes
+
+    using namespace DataLoopNode;
+
+    int PriInNode = state.dataSingleDuct->SysATMixer(SysNum).PriInNode;
+    int SecInNode = state.dataSingleDuct->SysATMixer(SysNum).SecInNode;
+    int MixedAirOutNode = state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNode;
+
+    // mixed air data
+    state.dataLoopNodes->Node(MixedAirOutNode).Temp = state.dataSingleDuct->SysATMixer(SysNum).MixedAirTemp;
+    state.dataLoopNodes->Node(MixedAirOutNode).HumRat = state.dataSingleDuct->SysATMixer(SysNum).MixedAirHumRat;
+    state.dataLoopNodes->Node(MixedAirOutNode).Enthalpy = state.dataSingleDuct->SysATMixer(SysNum).MixedAirEnthalpy;
+    state.dataLoopNodes->Node(MixedAirOutNode).Press = state.dataSingleDuct->SysATMixer(SysNum).MixedAirPressure;
+    state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate = state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate;
+
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
+            state.dataLoopNodes->Node(MixedAirOutNode).CO2 = state.dataLoopNodes->Node(PriInNode).CO2;
+        } else {
+            state.dataLoopNodes->Node(MixedAirOutNode).CO2 =
+                (state.dataLoopNodes->Node(SecInNode).MassFlowRate * state.dataLoopNodes->Node(SecInNode).CO2 +
+                 state.dataLoopNodes->Node(PriInNode).MassFlowRate * state.dataLoopNodes->Node(PriInNode).CO2) /
+                state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate;
+        }
+    }
+
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
+            state.dataLoopNodes->Node(MixedAirOutNode).GenContam = state.dataLoopNodes->Node(PriInNode).GenContam;
+        } else {
+            state.dataLoopNodes->Node(MixedAirOutNode).GenContam =
+                (state.dataLoopNodes->Node(SecInNode).MassFlowRate * state.dataLoopNodes->Node(SecInNode).GenContam +
+                 state.dataLoopNodes->Node(PriInNode).MassFlowRate * state.dataLoopNodes->Node(PriInNode).GenContam) /
+                state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate;
+        }
+    }
+
+    // update ADU flow data - because SimATMixer is called from the various zone equipment so the updates in SimZoneAirLoopEquipment won't work
+    int aduNum = state.dataSingleDuct->SysATMixer(SysNum).ADUNum;
+    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateTU = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
+    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateZSup = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
+    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateSup = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
+}
+
+void CalcATMixer(EnergyPlusData &state, int const SysNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR
+    //       DATE WRITTEN   March 2012
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE
+    // Calculate the mixed air flow and conditions in the air terminal mixer
+
+    using Psychrometrics::PsyTdbFnHW;
+
+    // SUBROUTINE ARGUMENT DEFINITIONS
+
+    state.dataSingleDuct->PriEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Enthalpy;
+    state.dataSingleDuct->PriHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).HumRat;
+    state.dataSingleDuct->PriTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Temp;
+    state.dataSingleDuct->PriMassFlowRateCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).MassFlowRate;
+
+    state.dataSingleDuct->SecAirMassFlowRateCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).MassFlowRate;
+    state.dataSingleDuct->SecAirEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Enthalpy;
+    state.dataSingleDuct->SecAirHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).HumRat;
+    state.dataSingleDuct->SecAirTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Temp;
+
+    if (state.dataSingleDuct->SysATMixer(SysNum).MixerType == ATMixer_SupplySide) {
+        state.dataSingleDuct->MixedAirMassFlowRateCATM = state.dataSingleDuct->SecAirMassFlowRateCATM + state.dataSingleDuct->PriMassFlowRateCATM;
+    } else {
+        // for inlet side mixer, the mixed air flow has been set, but we don't know the secondary flow
+        state.dataSingleDuct->MixedAirMassFlowRateCATM =
+            state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNode).MassFlowRate;
+        state.dataSingleDuct->SecAirMassFlowRateCATM =
+            max(state.dataSingleDuct->MixedAirMassFlowRateCATM - state.dataSingleDuct->PriMassFlowRateCATM, 0.0);
+        state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).MassFlowRate = state.dataSingleDuct->SecAirMassFlowRateCATM;
+        if (std::abs(state.dataSingleDuct->PriMassFlowRateCATM + state.dataSingleDuct->SecAirMassFlowRateCATM -
+                     state.dataSingleDuct->MixedAirMassFlowRateCATM) > SmallMassFlow) {
+            ShowSevereError(state,
+                            "CalcATMixer: Invalid mass flow rates in AirTerminal:SingleDuct:Mixer=" + state.dataSingleDuct->SysATMixer(SysNum).Name);
+            ShowContinueErrorTimeStamp(state,
+                                       format("Primary mass flow rate={:.6R}Secondary mass flow rate={:.6R}Mixed mass flow rate={:.6R}",
+                                              state.dataSingleDuct->PriMassFlowRateCATM,
+                                              state.dataSingleDuct->SecAirMassFlowRateCATM,
+                                              state.dataSingleDuct->MixedAirMassFlowRateCATM));
+            ShowFatalError(state, "Simulation terminates.");
+        }
+    }
+    // now calculate the mixed (outlet) conditions
+    if (state.dataSingleDuct->MixedAirMassFlowRateCATM > 0.0) {
+        state.dataSingleDuct->MixedAirEnthalpyCATM = (state.dataSingleDuct->SecAirMassFlowRateCATM * state.dataSingleDuct->SecAirEnthalpyCATM +
+                                                      state.dataSingleDuct->PriMassFlowRateCATM * state.dataSingleDuct->PriEnthalpyCATM) /
+                                                     state.dataSingleDuct->MixedAirMassFlowRateCATM;
+        state.dataSingleDuct->MixedAirHumRatCATM = (state.dataSingleDuct->SecAirMassFlowRateCATM * state.dataSingleDuct->SecAirHumRatCATM +
+                                                    state.dataSingleDuct->PriMassFlowRateCATM * state.dataSingleDuct->PriHumRatCATM) /
+                                                   state.dataSingleDuct->MixedAirMassFlowRateCATM;
+        // Mixed air temperature is calculated from the mixed air enthalpy and humidity ratio.
+        state.dataSingleDuct->MixedAirTempCATM = PsyTdbFnHW(state.dataSingleDuct->MixedAirEnthalpyCATM, state.dataSingleDuct->MixedAirHumRatCATM);
+    }
+
+    state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate = state.dataSingleDuct->MixedAirMassFlowRateCATM;
+    state.dataSingleDuct->SysATMixer(SysNum).MixedAirEnthalpy = state.dataSingleDuct->MixedAirEnthalpyCATM;
+    state.dataSingleDuct->SysATMixer(SysNum).MixedAirHumRat = state.dataSingleDuct->MixedAirHumRatCATM;
+    state.dataSingleDuct->SysATMixer(SysNum).MixedAirTemp = state.dataSingleDuct->MixedAirTempCATM;
+}
+
 void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const FirstHVACIteration, int &SysIndex)
 {
 
@@ -6008,8 +5917,6 @@ void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const Fi
 
     // PURPOSE OF THIS SUBROUTINE
     // Simulate an Air Terminal Mixer component
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     if (state.dataSingleDuct->GetATMixerFlag) {
         state.dataSingleDuct->GetATMixerFlag = false;
@@ -6047,7 +5954,6 @@ void GetATMixers(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Use the Get routines from the InputProcessor module.
 
-    // Using/Aliasing
     using DataZoneEquipment::EquipmentData;
     using DataZoneEquipment::SubEquipmentData;
     using NodeInputManager::GetOnlySingleNode;
@@ -6057,7 +5963,6 @@ void GetATMixers(EnergyPlusData &state)
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumNums;    // Number of REAL(r64) numbers returned by GetObjectItem
     int NumAlphas;  // Number of alphanumerics returned by GetObjectItem
     int ATMixerNum; // Index of inlet side mixer air terminal unit
@@ -6483,147 +6388,6 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
     }
 }
 
-void CalcATMixer(EnergyPlusData &state, int const SysNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR
-    //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Calculate the mixed air flow and conditions in the air terminal mixer
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyTdbFnHW;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    state.dataSingleDuct->PriEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Enthalpy;
-    state.dataSingleDuct->PriHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).HumRat;
-    state.dataSingleDuct->PriTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).Temp;
-    state.dataSingleDuct->PriMassFlowRateCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).PriInNode).MassFlowRate;
-
-    state.dataSingleDuct->SecAirMassFlowRateCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).MassFlowRate;
-    state.dataSingleDuct->SecAirEnthalpyCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Enthalpy;
-    state.dataSingleDuct->SecAirHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).HumRat;
-    state.dataSingleDuct->SecAirTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Temp;
-
-    if (state.dataSingleDuct->SysATMixer(SysNum).MixerType == ATMixer_SupplySide) {
-        state.dataSingleDuct->MixedAirMassFlowRateCATM = state.dataSingleDuct->SecAirMassFlowRateCATM + state.dataSingleDuct->PriMassFlowRateCATM;
-    } else {
-        // for inlet side mixer, the mixed air flow has been set, but we don't know the secondary flow
-        state.dataSingleDuct->MixedAirMassFlowRateCATM =
-            state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNode).MassFlowRate;
-        state.dataSingleDuct->SecAirMassFlowRateCATM =
-            max(state.dataSingleDuct->MixedAirMassFlowRateCATM - state.dataSingleDuct->PriMassFlowRateCATM, 0.0);
-        state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).MassFlowRate = state.dataSingleDuct->SecAirMassFlowRateCATM;
-        if (std::abs(state.dataSingleDuct->PriMassFlowRateCATM + state.dataSingleDuct->SecAirMassFlowRateCATM -
-                     state.dataSingleDuct->MixedAirMassFlowRateCATM) > SmallMassFlow) {
-            ShowSevereError(state,
-                            "CalcATMixer: Invalid mass flow rates in AirTerminal:SingleDuct:Mixer=" + state.dataSingleDuct->SysATMixer(SysNum).Name);
-            ShowContinueErrorTimeStamp(state,
-                                       format("Primary mass flow rate={:.6R}Secondary mass flow rate={:.6R}Mixed mass flow rate={:.6R}",
-                                              state.dataSingleDuct->PriMassFlowRateCATM,
-                                              state.dataSingleDuct->SecAirMassFlowRateCATM,
-                                              state.dataSingleDuct->MixedAirMassFlowRateCATM));
-            ShowFatalError(state, "Simulation terminates.");
-        }
-    }
-    // now calculate the mixed (outlet) conditions
-    if (state.dataSingleDuct->MixedAirMassFlowRateCATM > 0.0) {
-        state.dataSingleDuct->MixedAirEnthalpyCATM = (state.dataSingleDuct->SecAirMassFlowRateCATM * state.dataSingleDuct->SecAirEnthalpyCATM +
-                                                      state.dataSingleDuct->PriMassFlowRateCATM * state.dataSingleDuct->PriEnthalpyCATM) /
-                                                     state.dataSingleDuct->MixedAirMassFlowRateCATM;
-        state.dataSingleDuct->MixedAirHumRatCATM = (state.dataSingleDuct->SecAirMassFlowRateCATM * state.dataSingleDuct->SecAirHumRatCATM +
-                                                    state.dataSingleDuct->PriMassFlowRateCATM * state.dataSingleDuct->PriHumRatCATM) /
-                                                   state.dataSingleDuct->MixedAirMassFlowRateCATM;
-        // Mixed air temperature is calculated from the mixed air enthalpy and humidity ratio.
-        state.dataSingleDuct->MixedAirTempCATM = PsyTdbFnHW(state.dataSingleDuct->MixedAirEnthalpyCATM, state.dataSingleDuct->MixedAirHumRatCATM);
-    }
-
-    state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate = state.dataSingleDuct->MixedAirMassFlowRateCATM;
-    state.dataSingleDuct->SysATMixer(SysNum).MixedAirEnthalpy = state.dataSingleDuct->MixedAirEnthalpyCATM;
-    state.dataSingleDuct->SysATMixer(SysNum).MixedAirHumRat = state.dataSingleDuct->MixedAirHumRatCATM;
-    state.dataSingleDuct->SysATMixer(SysNum).MixedAirTemp = state.dataSingleDuct->MixedAirTempCATM;
-}
-
-void UpdateATMixer(EnergyPlusData &state, int const SysNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR
-    //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE
-    // Move the results of CalcATMixer to the affected nodes
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int PriInNode = state.dataSingleDuct->SysATMixer(SysNum).PriInNode;
-    int SecInNode = state.dataSingleDuct->SysATMixer(SysNum).SecInNode;
-    int MixedAirOutNode = state.dataSingleDuct->SysATMixer(SysNum).MixedAirOutNode;
-
-    // mixed air data
-    state.dataLoopNodes->Node(MixedAirOutNode).Temp = state.dataSingleDuct->SysATMixer(SysNum).MixedAirTemp;
-    state.dataLoopNodes->Node(MixedAirOutNode).HumRat = state.dataSingleDuct->SysATMixer(SysNum).MixedAirHumRat;
-    state.dataLoopNodes->Node(MixedAirOutNode).Enthalpy = state.dataSingleDuct->SysATMixer(SysNum).MixedAirEnthalpy;
-    state.dataLoopNodes->Node(MixedAirOutNode).Press = state.dataSingleDuct->SysATMixer(SysNum).MixedAirPressure;
-    state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate = state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate;
-
-    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
-            state.dataLoopNodes->Node(MixedAirOutNode).CO2 = state.dataLoopNodes->Node(PriInNode).CO2;
-        } else {
-            state.dataLoopNodes->Node(MixedAirOutNode).CO2 =
-                (state.dataLoopNodes->Node(SecInNode).MassFlowRate * state.dataLoopNodes->Node(SecInNode).CO2 +
-                 state.dataLoopNodes->Node(PriInNode).MassFlowRate * state.dataLoopNodes->Node(PriInNode).CO2) /
-                state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate;
-        }
-    }
-
-    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
-            state.dataLoopNodes->Node(MixedAirOutNode).GenContam = state.dataLoopNodes->Node(PriInNode).GenContam;
-        } else {
-            state.dataLoopNodes->Node(MixedAirOutNode).GenContam =
-                (state.dataLoopNodes->Node(SecInNode).MassFlowRate * state.dataLoopNodes->Node(SecInNode).GenContam +
-                 state.dataLoopNodes->Node(PriInNode).MassFlowRate * state.dataLoopNodes->Node(PriInNode).GenContam) /
-                state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate;
-        }
-    }
-
-    // update ADU flow data - because SimATMixer is called from the various zone equipment so the updates in SimZoneAirLoopEquipment won't work
-    int aduNum = state.dataSingleDuct->SysATMixer(SysNum).ADUNum;
-    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateTU = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
-    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateZSup = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
-    state.dataDefineEquipment->AirDistUnit(aduNum).MassFlowRateSup = state.dataLoopNodes->Node(PriInNode).MassFlowRate;
-}
-
 void GetATMixer(EnergyPlusData &state,
                 std::string const &ZoneEquipName, // zone unit name name
                 std::string &ATMixerName,         // air terminal mixer name
@@ -6709,7 +6473,6 @@ void SetATMixerPriFlow(EnergyPlusData &state,
     // parameter is present, or to the maximum available mass flow rate of the primary
     // air inlet node.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PriAirNode; // air terminal mixer primary air inlet node number
 
     if (ATMixerNum <= 0) return;

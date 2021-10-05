@@ -99,19 +99,9 @@ namespace SolarReflectionManager {
 
     void InitSolReflRecSurf(EnergyPlusData &state);
 
-    //=====================================================================================================
-
     void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state);
 
-    void FigureBeamSolDiffuseReflFactors(EnergyPlusData &state, int const iHour);
-
-    //=================================================================================================
-
     void CalcBeamSolSpecularReflFactors(EnergyPlusData &state);
-
-    void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour);
-
-    //=================================================================================================
 
     void CalcSkySolDiffuseReflFactors(EnergyPlusData &state);
 

@@ -233,9 +233,6 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
     ReportWaterCoil(state, CoilNum);
 }
 
-// Get Input Section of the Module
-//******************************************************************************
-
 void GetWaterCoilInput(EnergyPlusData &state)
 {
 
@@ -3035,12 +3032,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
         ShowFatalError(state, "Preceding water coil sizing errors cause program termination");
     }
 }
-
-// End Initialization Section of the Module
-//******************************************************************************
-
-// Begin Algorithm Section of the Module
-//******************************************************************************
 
 void CalcSimpleHeatingCoil(EnergyPlusData &state,
                            int const CoilNum,          // index to heating coil
@@ -5974,11 +5965,8 @@ Label10:;
     }
 }
 
-void CheckWaterCoilSchedule(EnergyPlusData &state,
-                            [[maybe_unused]] std::string const &CompType,
-                            std::string_view CompName,
-                            Real64 &Value,
-                            int &CompIndex)
+void CheckWaterCoilSchedule(
+    EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:

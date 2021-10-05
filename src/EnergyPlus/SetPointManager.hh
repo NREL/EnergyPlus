@@ -175,7 +175,7 @@ namespace SetPointManager {
         TESScheduled,
         Unknown
     };
-    int constexpr NumValidSPMTypes = 30;
+
     inline const char *managerTypeName(SetPointManagerType t)
     {
         switch (t) {
@@ -999,8 +999,6 @@ namespace SetPointManager {
 
     void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void VerifySetPointManagers(EnergyPlusData &state, bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
-
     void InitSetPointManagers(EnergyPlusData &state);
 
     void SimSetPointManagers(EnergyPlusData &state);
@@ -1008,8 +1006,6 @@ namespace SetPointManager {
     void UpdateSetPointManagers(EnergyPlusData &state);
 
     void UpdateMixedAirSetPoints(EnergyPlusData &state);
-
-    void UpdateOAPretreatSetPoints(EnergyPlusData &state);
 
     int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 

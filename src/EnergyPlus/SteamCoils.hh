@@ -159,20 +159,6 @@ namespace SteamCoils {
 
     void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
-    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum);
-
-    void CalcSteamAirCoil(EnergyPlusData &state,
-                          int const CoilNum,
-                          Real64 const QCoilRequested, // requested coil load
-                          Real64 &QCoilActual,         // coil load actually delivered
-                          int const FanOpMode,         // fan operating mode
-                          Real64 const PartLoadRatio   // part-load ratio of heating coil
-    );
-
-    void UpdateSteamCoil(EnergyPlusData &state, int const CoilNum);
-
-    void ReportSteamCoil(EnergyPlusData &state, int const CoilNum);
-
     int GetSteamCoilIndex(EnergyPlusData &state,
                           std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type

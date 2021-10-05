@@ -693,9 +693,9 @@ namespace ThermalChimney {
         Array1D<Real64> TempTCMassAirFlowRate(10);   // Temporary Value of Thermal Chimney Mass Flow Rate ()
         Array1D<Real64> TempTCVolumeAirFlowRate(10); // Temporary Value of Thermal Chimney Volume Flow Rate ()
         int IterationLoop;
-        Real64 Process1; // Temporary Variable Used in the Middle of the Calculation
-        Real64 Process2; // Temporary Variable Used in the Middle of the Calculation
-        Real64 Process3; // Temporary Variable Used in the Middle of the Calculation
+        Real64 Process1;              // Temporary Variable Used in the Middle of the Calculation
+        Real64 Process2;              // Temporary Variable Used in the Middle of the Calculation
+        Real64 Process3;              // Temporary Variable Used in the Middle of the Calculation
         Real64 AirDensityThermalChim; // (kg/m^3)
         Real64 AirDensity;            // (kg/m^3)
         Real64 CpAir;

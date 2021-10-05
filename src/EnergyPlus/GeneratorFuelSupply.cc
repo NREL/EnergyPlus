@@ -251,8 +251,6 @@ namespace GeneratorFuelSupply {
         } // MyOneTimeFlag
     }
 
-    //******************************************************************************
-
     void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound)
     {
 
