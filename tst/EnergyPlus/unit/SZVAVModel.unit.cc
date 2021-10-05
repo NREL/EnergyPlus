@@ -641,7 +641,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.Type);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     AirMassFlow = 0.60;

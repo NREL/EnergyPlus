@@ -3161,7 +3161,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.Type);
+    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
     EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
     state->dataPlnt->TotNumLoops = 2;
@@ -3562,7 +3562,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.Type);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
     EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
     state->dataPlnt->TotNumLoops = 1;
@@ -3931,7 +3931,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.Type);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
     EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
     state->dataPlnt->TotNumLoops = 1;
@@ -4300,7 +4300,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.Type);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
     EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
     state->dataPlnt->TotNumLoops = 1;
@@ -4624,7 +4624,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.Type);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);

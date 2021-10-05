@@ -1192,13 +1192,13 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
         // check if setpoint on outlet node
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {

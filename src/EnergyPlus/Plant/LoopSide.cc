@@ -932,21 +932,21 @@ namespace DataPlant {
                     auto &component(branch.Comp(CompCounter));
 
                     int NodeToCheckRequest = component.NodeNumIn;
-                    int FlowPriorityStatus = component.FlowPriority;
+                    LoopFlowStatus FlowPriorityStatus = component.FlowPriority;
 
                     // reference
                     auto &node_with_request(state.dataLoopNodes->Node(NodeToCheckRequest));
 
                     if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(component.Type)]) {
 
-                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus_Unknown) {
+                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus::Unknown) {
                             // do nothing
-                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn) {
+                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn) {
                             ThisBranchFlowRequestNeedAndTurnOn = max(ThisBranchFlowRequestNeedAndTurnOn, node_with_request.MassFlowRateRequest);
                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
-                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus_NeedyIfLoopOn) {
+                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::NeedyIfLoopOn) {
                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
-                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus_TakesWhatGets) {
+                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::TakesWhatGets) {
                             // do nothing
                         }
                     } else { // handle pumps differently

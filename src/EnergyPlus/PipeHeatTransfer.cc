@@ -193,7 +193,6 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using DataHeatBalance::IntGainTypeOf_PipeIndoor;
 
     using NodeInputManager::GetOnlySingleNode;
     using namespace DataLoopNode;
@@ -777,7 +776,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                   state.dataPipeHT->PipeHT(Item).EnvrZonePtr,
                                   "Pipe:Indoor",
                                   state.dataPipeHT->PipeHT(Item).Name,
-                                  IntGainTypeOf_PipeIndoor,
+                                  DataHeatBalance::IntGainType::PipeIndoor,
                                   &state.dataPipeHT->PipeHT(Item).ZoneHeatGainRate);
         }
 

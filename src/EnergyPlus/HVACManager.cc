@@ -2435,7 +2435,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     // Using/Aliasing
     using AirflowNetworkBalanceManager::ReportAirflowNetwork;
-    using DataHeatBalance::AirBalanceQuadrature;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
     using DataHVACGlobals::FanType_ZoneExhaust;
@@ -2896,7 +2895,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         // Reporting combined outdoor air flows
         for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
-            if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature &&
+            if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == DataHeatBalance::AirBalance::Quadrature &&
                 ZoneLoop == state.dataHeatBal->ZoneAirBalance(j).ZonePtr) {
                 if (state.dataHeatBalFanSys->MAT(ZoneLoop) > Zone(ZoneLoop).OutDryBulbTemp) {
                     ZnAirRpt(ZoneLoop).OABalanceHeatLoss = state.dataHeatBalFanSys->MDotCPOA(ZoneLoop) *

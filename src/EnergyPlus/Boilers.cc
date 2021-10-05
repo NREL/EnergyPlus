@@ -492,7 +492,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 }
 

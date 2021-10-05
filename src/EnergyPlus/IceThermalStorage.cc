@@ -1382,7 +1382,7 @@ namespace IceThermalStorage {
                         .LoopSide(DataPlant::SupplySide)
                         .Branch(this->PlantBranchNum)
                         .Comp(CompNum)
-                        .FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                        .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                 }
             }
 
@@ -1453,7 +1453,7 @@ namespace IceThermalStorage {
                      compNum <= state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).TotalComponents;
                      ++compNum) {
                     state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).Comp(compNum).FlowPriority =
-                        DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                        DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                 }
             }
             this->MyLoad = 0.0;
