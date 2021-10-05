@@ -57,8 +57,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -103,13 +103,15 @@ public:                                  // data
     int coilSizingMethodConcurrence;             // 1 = noncoincident, 2 = coincident
     std::string coilSizingMethodConcurrenceName; // string name of sizing method for concurrence
 
-    DataSizing::ZoneHVACSizingType coilSizingMethodCapacity = DataSizing::ZoneHVACSizingType::None; // 8=CoolingDesignCapacity, 9=HeatingDesignCapacity, 10=CapacityPerFloorArea, 11=FractionOfAutosizedCoolingCapacity,
-                                  // 12=FractionOfAutosizedHeatingCapacity
+    DataSizing::ZoneHVACSizingType coilSizingMethodCapacity =
+        DataSizing::ZoneHVACSizingType::None; // 8=CoolingDesignCapacity, 9=HeatingDesignCapacity, 10=CapacityPerFloorArea,
+                                              // 11=FractionOfAutosizedCoolingCapacity, 12=FractionOfAutosizedHeatingCapacity
     std::string coilSizingMethodCapacityName;
 
-    DataSizing::ZoneHVACSizingType coilSizingMethodAirFlow = DataSizing::ZoneHVACSizingType::None; // choice of how to get system design air flow rates;
-                                 //  2=SupplyAirFlowRate, 3=FlowPerFloorArea, 4=FractionOfAutosizedCoolingAirflow,
-                                 //  5=FractionOfAutosizedHeatingAirflow, 6=FlowPerCoolingCapacity, 7=FlowPerHeatingCapacity
+    DataSizing::ZoneHVACSizingType coilSizingMethodAirFlow =
+        DataSizing::ZoneHVACSizingType::None; // choice of how to get system design air flow rates;
+                                              //  2=SupplyAirFlowRate, 3=FlowPerFloorArea, 4=FractionOfAutosizedCoolingAirflow,
+                                              //  5=FractionOfAutosizedHeatingAirflow, 6=FlowPerCoolingCapacity, 7=FlowPerHeatingCapacity
     std::string coilSizingMethodAirFlowName;
 
     bool isCoilSizingForTotalLoad; // Type of peak to size (cooling) coils on: True is TotalCoolingLoad, False is sensible

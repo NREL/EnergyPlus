@@ -975,9 +975,10 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     bool PrintFlag;           // TRUE when sizing information is reported in the eio file
     std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
     Real64 TempSize;          // autosized value of coil input field
-    DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None;   // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                              // FractionOfAutosizedHeatingCapacity )
-    int PltSizCoolNum(0);     // index of plant sizing object for 1st cooling loop
+    DataSizing::ZoneHVACSizingType CapSizingMethod =
+        DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
+                                              // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+    int PltSizCoolNum(0); // index of plant sizing object for 1st cooling loop
     Real64 rho;
     Real64 Cp;
     Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reporting
@@ -1031,7 +1032,8 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 }
             }
         } else { // Autosize or hard-size with sizing run
-            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity ||
+                CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                 if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity) {
                     if (state.dataSize->ZoneSizingRunDone) {

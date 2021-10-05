@@ -299,7 +299,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     CheckSysSizing(state, this->compType, this->compName);
                     DesVolFlow = this->dataFlowUsedForSizing;
                     Real64 NominalCapacityDes = 0.0;
-                    if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
+                    if (this->finalSysSizing(this->curSysNum).CoolingCapMethod ==
+                        DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                         this->dataFracOfAutosizedCoolingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedCoolingCapacity;
                     }
                     if (this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea) {

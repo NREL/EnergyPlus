@@ -262,7 +262,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             if (this->isEpJSON) this->sizingString = "heating_supply_air_flow_rate [m3/s]";
         }
         if (this->dataScalableSizingON) {
-            if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
+            if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate ||
+                this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
                 this->sizingStringScalable = "(scaled by flow / zone) ";
             } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                 this->sizingStringScalable = "(scaled by flow / area) ";

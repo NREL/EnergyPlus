@@ -727,7 +727,9 @@ namespace BaseboardRadiator {
         int FieldNum = 1;                    // IDD numeric field number where input field description is found
         int SizingMethod;                    // Integer representation of sizing method name (HeatingCapacitySizing)
         bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
-        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
+        DataSizing::ZoneHVACSizingType CapSizingMethod =
+            DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and
+                                                  // FractionOfAutosizedHeatingCapacity )
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
         auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
@@ -767,7 +769,8 @@ namespace BaseboardRadiator {
                     SizingString = baseboard->BaseboardParamsNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
                     CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
                     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity ||
+                        CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
                         CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
 
                         if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
@@ -894,7 +897,8 @@ namespace BaseboardRadiator {
                     SizingString = baseboard->BaseboardParamsNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
                     CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
                     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                    if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity ||
+                        CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
                         CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                         if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {

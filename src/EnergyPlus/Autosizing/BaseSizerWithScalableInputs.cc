@@ -150,7 +150,8 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             }
             if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
                 // do nothing, sizing method not set
-            } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
+            } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate ||
+                       this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
             }
         }
     }

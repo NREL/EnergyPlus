@@ -99,8 +99,9 @@ namespace BaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for water baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+        DataSizing::ZoneHVACSizingType HeatingCapMethod =
+            DataSizing::ZoneHVACSizingType::None; // - Method for water baseboard Radiator system heating capacity scaledsizing calculation
+                                                  // (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
                                       // equipment, {-}, or {W/m2}
 
@@ -115,8 +116,8 @@ namespace BaseboardRadiator {
               WaterMassFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterMassFlowRateMax(0.0), Offset(0.0), AirMassFlowRate(0.0), DesAirMassFlowRate(0.0),
               WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0),
               AirOutletTemp(0.0), Power(0.0), Energy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0),
-              BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true), SetLoopIndexFlag(true), MyEnvrnFlag(true)
+              BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), ScaledHeatingCapacity(0.0), MySizeFlag(true), CheckEquipName(true),
+              SetLoopIndexFlag(true), MyEnvrnFlag(true)
         {
         }
     };

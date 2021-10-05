@@ -48,9 +48,9 @@
 #ifndef BaseSizerWithFanHeatInputs_hh_INCLUDED
 #define BaseSizerWithFanHeatInputs_hh_INCLUDED
 
-#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 #include <string>

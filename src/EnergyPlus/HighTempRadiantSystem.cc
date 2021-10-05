@@ -805,8 +805,9 @@ namespace HighTempRadiantSystem {
         int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
                           // HeatingCapacitySizing, etc.)
         bool PrintFlag;   // TRUE when sizing information is reported in the eio file
-        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                                // FractionOfAutosizedHeatingCapacity )
+        DataSizing::ZoneHVACSizingType CapSizingMethod =
+            DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
+                                                  // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
         IsAutoSize = false;
         MaxPowerCapacDes = 0.0;
@@ -829,7 +830,8 @@ namespace HighTempRadiantSystem {
             SizingString = state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod;
             ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity ||
+                CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
 
                 if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {

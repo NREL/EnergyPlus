@@ -79,7 +79,8 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
-                if ((this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) || (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None)) {
+                if ((this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) ||
+                    (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None)) {
 
                     if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
                         this->autoSizedValue = max(this->zoneEqSizing(this->curZoneEqNum).AirVolFlow,
@@ -914,7 +915,8 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
         }
 
         if (this->dataScalableSizingON) {
-            if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
+            if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate ||
+                this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::None) {
                 this->sizingStringScalable = "(scaled by flow / zone) ";
             } else if (this->zoneAirFlowSizMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea) {
                 this->sizingStringScalable = "(scaled by flow / area) ";

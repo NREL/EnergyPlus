@@ -1443,11 +1443,13 @@ namespace FanCoilUnits {
         int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
                           // HeatingCapacitySizing, etc.)
         bool PrintFlag;   // TRUE when sizing information is reported in the eio file
-        DataSizing::ZoneHVACSizingType SAFMethod = DataSizing::ZoneHVACSizingType::None; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                          // FractionOfAutosizedHeatingAirflow ...)
-        DataSizing::ZoneHVACSizingType CapSizingMethod = DataSizing::ZoneHVACSizingType::None;    // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                                   // FractionOfAutosizedHeatingCapacity )
-        bool SizingDesRunThisZone; // test for zone sizing
+        DataSizing::ZoneHVACSizingType SAFMethod =
+            DataSizing::ZoneHVACSizingType::None; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea,
+                                                  // FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+        DataSizing::ZoneHVACSizingType CapSizingMethod =
+            DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
+                                                  // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+        bool SizingDesRunThisZone;      // test for zone sizing
         bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
         Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
         int CoilNum;                    // index of water coil object
@@ -1517,7 +1519,9 @@ namespace FanCoilUnits {
                     SizingMethod = static_cast<int>(AutoSizingType::CoolingAirFlowSizing);
                     SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-                    if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea || SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
+                    if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate ||
+                        SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea ||
+                        SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) {
                         if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) {
                             if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow =
@@ -1552,7 +1556,8 @@ namespace FanCoilUnits {
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         state.dataSize->DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
-                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod ==
+                            DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                             state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                         }
                         state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
@@ -1570,7 +1575,9 @@ namespace FanCoilUnits {
                     SizingMethod = static_cast<int>(AutoSizingType::HeatingAirFlowSizing);
                     SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-                    if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate || SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea || SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
+                    if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate ||
+                        SAFMethod == DataSizing::ZoneHVACSizingType::FlowPerFloorArea ||
+                        SAFMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) {
                         if (SAFMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) {
                             if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow > 0.0) {
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow =
@@ -1614,7 +1621,8 @@ namespace FanCoilUnits {
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod ==
+                            DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                         }
                         state.dataSize->DataAutosizedHeatingCapacity = TempSize;
@@ -1845,7 +1853,8 @@ namespace FanCoilUnits {
                                 zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
                                 CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                                if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                                if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity ||
+                                    CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
                                     CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                                     if (CapSizingMethod == DataSizing::ZoneHVACSizingType::HeatingDesignCapacity) {
                                         if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity > 0.0) {
@@ -2041,7 +2050,8 @@ namespace FanCoilUnits {
                             zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
                             CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity || CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
+                            if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity ||
+                                CapSizingMethod == DataSizing::ZoneHVACSizingType::CapacityPerFloorArea ||
                                 CapSizingMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingCapacity) {
                                 if (CapSizingMethod == DataSizing::ZoneHVACSizingType::CoolingDesignCapacity) {
                                     if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {

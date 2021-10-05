@@ -131,7 +131,9 @@ namespace SteamBaseboardRadiator {
     struct SteamBaseboardDesignData : SteamBaseboardParams
     {
         std::string designName;
-        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        DataSizing::ZoneHVACSizingType HeatingCapMethod =
+            DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity,
+                                                  // CapacityPerFloorArea,
         // FracOfAutosizedHeatingCapacity)
         Real64 DesignScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         Real64 Offset = 0.0;

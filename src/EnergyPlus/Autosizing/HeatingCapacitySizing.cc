@@ -226,7 +226,8 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         DesVolFlow = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                     }
                 } else {
-                    if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
+                    if (this->finalSysSizing(this->curSysNum).HeatingCapMethod ==
+                        DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingCapacity) {
                         this->dataFracOfAutosizedHeatingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedHeatingCapacity;
                     }
                     if (this->dataFlowUsedForSizing > 0.0) {

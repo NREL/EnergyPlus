@@ -109,14 +109,15 @@ namespace HighTempRadiantSystem {
         Array1D<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
         // Other parameters
         // Report data
-        Real64 ElecPower;     // system electric consumption in Watts
-        Real64 ElecEnergy;    // system electric consumption in Joules
-        Real64 GasPower;      // system gas consumption in Watts
-        Real64 GasEnergy;     // system gas consumption in Joules
-        Real64 HeatPower;     // actual heating sent to zone (convective and radiative) in Watts
-        Real64 HeatEnergy;    // actual heating sent to zone (convective and radiative) in Joules
-        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None; // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+        Real64 ElecPower;  // system electric consumption in Watts
+        Real64 ElecEnergy; // system electric consumption in Joules
+        Real64 GasPower;   // system gas consumption in Watts
+        Real64 GasEnergy;  // system gas consumption in Joules
+        Real64 HeatPower;  // actual heating sent to zone (convective and radiative) in Watts
+        Real64 HeatEnergy; // actual heating sent to zone (convective and radiative) in Joules
+        DataSizing::ZoneHVACSizingType HeatingCapMethod =
+            DataSizing::ZoneHVACSizingType::None; // - Method for High Temperature Radiant heating capacity scalable sizing calculation
+                                                  // (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64
             ScaledHeatingCapacity; // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 

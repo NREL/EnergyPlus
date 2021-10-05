@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -120,8 +120,9 @@ namespace HWBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
+        DataSizing::ZoneHVACSizingType HeatingCapMethod =
+            DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity,
+                                                  // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
         // Default Constructor
@@ -141,8 +142,9 @@ namespace HWBaseboardRadiator {
     struct HWBaseboardDesignData : HWBaseboardParams
     {
         std::string designName;
-        DataSizing::ZoneHVACSizingType HeatingCapMethod = DataSizing::ZoneHVACSizingType::None;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
+        DataSizing::ZoneHVACSizingType HeatingCapMethod =
+            DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity,
+                                                  // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         Real64 Offset = 0.0;
         Real64 FracRadiant = 0.0;

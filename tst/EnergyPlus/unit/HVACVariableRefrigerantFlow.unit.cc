@@ -227,7 +227,8 @@ protected:
 
         state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
         state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
-        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) = DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
+        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) =
+            DataSizing::ZoneHVACSizingType::SupplyAirFlowRate;
 
         auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
         thisZoneEqConfig.IsControlled = true;

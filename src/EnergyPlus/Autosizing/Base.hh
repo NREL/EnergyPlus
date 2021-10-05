@@ -49,8 +49,8 @@
 #define Base_hh_INCLUDED
 
 // EnergyPlus headers
-#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/Autosizing/Types.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>

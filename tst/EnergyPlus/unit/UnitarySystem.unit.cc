@@ -4034,12 +4034,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     DataSizing::ZoneHVACSizingType iHeatingSizingType = DataSizing::ZoneHVACSizingType::None;
     bool FirstHVACIteration(true);
     Array1D<DataSizing::ZoneHVACSizingType> SizingTypes({DataSizing::ZoneHVACSizingType::None,
-                             DataSizing::ZoneHVACSizingType::SupplyAirFlowRate,
+                                                         DataSizing::ZoneHVACSizingType::SupplyAirFlowRate,
                                                          DataSizing::ZoneHVACSizingType::FlowPerFloorArea,
-                             DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow,
-                             DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow,
-                             DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity,
-                             DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity});
+                                                         DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow,
+                                                         DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow,
+                                                         DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity,
+                                                         DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity});
 
     //	int const None( 1 );
     //	int const SupplyAirFlowRate( 2 );
@@ -4216,10 +4216,14 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
         iCoolingSizingType = iSizingType;
         iHeatingSizingType = iSizingType;
-        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow) iHeatingSizingType = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
-        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow) iCoolingSizingType = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
-        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity) iHeatingSizingType = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
-        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity) iCoolingSizingType = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow)
+            iHeatingSizingType = DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow)
+            iCoolingSizingType = DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity)
+            iHeatingSizingType = DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity;
+        if (iSizingType == DataSizing::ZoneHVACSizingType::FlowPerHeatingCapacity)
+            iCoolingSizingType = DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity;
         thisSys.Name = format("UnitarySystem:CoolingAndHeating #{}", iSizingType);
         thisSys.m_CoolingSAFMethod = iCoolingSizingType;
         thisSys.m_HeatingSAFMethod = iHeatingSizingType;
@@ -12484,7 +12488,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFractionOfAutoSizedCoolingFlowRateValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
-    //EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow);
+    // EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow);
     EXPECT_EQ(userspecifiedFractionOfAutoSizedCoolingFlowRateValue, 0.9);
 
     bool FirstHVACIteration = true;
@@ -12625,7 +12629,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFlowPerCoolingCapacityValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
-    //EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity);
+    // EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity);
     EXPECT_EQ(userspecifiedFlowPerCoolingCapacityValue, 0.0000462180155978106);
 
     bool FirstHVACIteration = true;
@@ -12802,11 +12806,14 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_TRUE(thisSys->m_RunOnSensibleLoad);                                     // checks for "SENSIBLEONLYLOADCONTROL"
     EXPECT_EQ("COIL:HEATING:FUEL", thisSys->m_SuppHeatCoilTypeName);               // checks supplemental heating coil object type
     EXPECT_EQ("SUPPLEMENTAL HEATING COIL", thisSys->m_SuppHeatCoilName);           // checks supplemental heating coil name
-    //EXPECT_EQ(DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow, thisSys->m_CoolingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedCoolingAirflow
+    // EXPECT_EQ(DataSizing::ZoneHVACSizingType::FractionOfAutosizedCoolingAirflow, thisSys->m_CoolingSAFMethod);    // checks cooling supply air flow
+    // rate sizing method, FractionOfAutosizedCoolingAirflow
     EXPECT_EQ(0.5, thisSys->m_MaxCoolAirVolFlow); // checks Cooling Fraction of Autosized Cooling Supply Air Flow Rate value
-    //EXPECT_EQ(DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow, thisSys->m_HeatingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedHeatingAirflow
+    // EXPECT_EQ(DataSizing::ZoneHVACSizingType::FractionOfAutosizedHeatingAirflow, thisSys->m_HeatingSAFMethod);    // checks cooling supply air flow
+    // rate sizing method, FractionOfAutosizedHeatingAirflow
     EXPECT_EQ(0.8, thisSys->m_MaxHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
-    //EXPECT_EQ(DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity, thisSys->m_NoCoolHeatSAFMethod); // checks cooling supply air flow rate sizing method, FlowPerCoolingCapacity
+    // EXPECT_EQ(DataSizing::ZoneHVACSizingType::FlowPerCoolingCapacity, thisSys->m_NoCoolHeatSAFMethod); // checks cooling supply air flow rate
+    // sizing method, FlowPerCoolingCapacity
     EXPECT_EQ(0.0000462180155978106, thisSys->m_MaxNoCoolHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
     EXPECT_EQ(30.0, thisSys->DesignMaxOutletTemp);                        // checks Maximum Supply Air Temperature value
     EXPECT_EQ(20.0, thisSys->m_MaxOATSuppHeat); // checks Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation value
@@ -13299,9 +13306,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     EXPECT_EQ(thisClgCoil.RatedTotCap(1), DataSizing::AutoSize);
     EXPECT_EQ(thisHtgCoil.NominalCapacity, DataSizing::AutoSize);
 
-//    ASSERT_EQ(thisSys->m_CoolingSAFMethod, DataSizing::ZoneHVACSizingType::None);
-//    ASSERT_EQ(thisSys->m_HeatingSAFMethod, DataSizing::ZoneHVACSizingType::None);
-//    ASSERT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::None);
+    //    ASSERT_EQ(thisSys->m_CoolingSAFMethod, DataSizing::ZoneHVACSizingType::None);
+    //    ASSERT_EQ(thisSys->m_HeatingSAFMethod, DataSizing::ZoneHVACSizingType::None);
+    //    ASSERT_EQ(thisSys->m_NoCoolHeatSAFMethod, DataSizing::ZoneHVACSizingType::None);
 
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
