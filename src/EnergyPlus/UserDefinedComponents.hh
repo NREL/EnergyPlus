@@ -319,10 +319,6 @@ namespace UserDefinedComponents {
     void SimAirTerminalUserDefined(
         EnergyPlusData &state, std::string_view CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetUserDefinedPlantComponents(EnergyPlusData &state);
-
-    void GetUserDefinedComponents(EnergyPlusData &state);
-
     void GetUserDefinedCoilIndex(
         EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 

@@ -73,8 +73,6 @@ struct EnergyPlusData;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles(EnergyPlusData &state);
-
 void CloseOutOpenFiles();
 
 int EndEnergyPlus(EnergyPlusData &state);
@@ -189,22 +187,7 @@ void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
                                      std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void StoreRecurringErrorMessage(EnergyPlusData &state,
-                                std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
-                                int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
-                                Optional<Real64 const> ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
-                                std::string const &ErrorReportMaxUnits = "", // Units for "max" reporting
-                                std::string const &ErrorReportMinUnits = "", // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
-);
-
 void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
-
-void SummarizeErrors(EnergyPlusData &state);
-
-void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
 

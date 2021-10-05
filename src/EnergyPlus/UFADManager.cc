@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -96,9 +95,6 @@ namespace EnergyPlus::UFADManager {
 // REFERENCES:
 // See the EnergyPlus Engineering Reference and the PhD thesis of Anna Liu, UC San Diego
 
-// OTHER NOTES:
-// na
-
 // Using/Aliasing
 using namespace DataLoopNode;
 using namespace DataEnvironment;
@@ -107,120 +103,6 @@ using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
 using namespace DataRoomAirModel;
 using ConvectionCoefficients::CalcDetailedHcInForDVModel;
-
-void ManageUCSDUFModels(EnergyPlusData &state,
-                        int const ZoneNum,                                 // index number for the specified zone
-                        DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   August, 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Manages the simulation of the 2-node nonuniform zone models for underfloor air
-    // distribution systems (UFAD). Called from RoomAirManager, ManageAirModel
-
-    // METHODOLOGY EMPLOYED:
-    // uses Init and Calc routines in the standard EPlus manner to manage the calculation
-    // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-    using namespace DataEnvironment;
-    using namespace DataHeatBalance;
-    using namespace DataHeatBalSurface;
-    using namespace DataSurfaces;
-    using namespace DataRoomAirModel;
-    using ConvectionCoefficients::CalcDetailedHcInForDVModel;
-
-    // input was obtained in RoomAirManager, GetUFADIntZoneData
-
-    InitUCSDUF(state, ZoneNum, ZoneModelType); // initialize some module variables
-
-    {
-        auto const SELECT_CASE_var(ZoneModelType);
-
-        if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
-            // simulate room airflow using the UCSDUFI model
-            CalcUCSDUI(state, ZoneNum);
-
-        } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD interior zone model
-            // simulate room airflow using the UCSDUFI model
-            CalcUCSDUE(state, ZoneNum);
-        }
-    }
-}
-
-void InitUCSDUF(EnergyPlusData &state,
-                int const ZoneNum,
-                DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // initialize arrays & variables used by the UCSD UFAD zone models
-
-    // METHODOLOGY EMPLOYED:
-    // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
-
-    Real64 NumShadesDown(0.0);
-    int UINum; // index to underfloor interior zone model data
-
-    // Do the one time initializations
-    if (state.dataUFADManager->MyOneTimeFlag) {
-        state.dataUFADManager->HeightFloorSubzoneTop = 0.2;
-        state.dataUFADManager->ThickOccupiedSubzoneMin = 0.2;
-        state.dataUFADManager->HeightIntMassDefault = 2.0;
-        state.dataUFADManager->MyOneTimeFlag = false;
-        state.dataUFADManager->MySizeFlag.dimension(state.dataGlobal->NumOfZones, true);
-    }
-
-    if (state.dataUFADManager->MySizeFlag(ZoneNum)) {
-        SizeUCSDUF(state, ZoneNum, ZoneModelType);
-        state.dataUFADManager->MySizeFlag(ZoneNum) = false;
-    }
-
-    // initialize these variables every timestep
-
-    state.dataUFADManager->HeightIntMass = state.dataUFADManager->HeightIntMassDefault;
-    state.dataRoomAirMod->ZoneUFGamma(ZoneNum) = 0.0;
-    state.dataRoomAirMod->ZoneUFPowInPlumes(ZoneNum) = 0.0;
-    NumShadesDown = 0.0;
-    for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
-        int SurfNum = state.dataUCSDShared->APos_Window(Ctd);
-        if (SurfNum == 0) continue;
-        if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment ||
-            state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
-            state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt ||
-            state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-            if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                ++NumShadesDown;
-            }
-        }
-    }
-    if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
-        UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
-        if (state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin > 1.0) {
-            if (NumShadesDown / state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin >= 0.5) {
-                state.dataRoomAirMod->ZoneUCSDUE(UINum).ShadeDown = true;
-            } else {
-                state.dataRoomAirMod->ZoneUCSDUE(UINum).ShadeDown = false;
-            }
-        } else {
-            state.dataRoomAirMod->ZoneUCSDUE(UINum).ShadeDown = false;
-        }
-    }
-}
 
 void SizeUCSDUF(EnergyPlusData &state,
                 int const ZoneNum,
@@ -648,6 +530,73 @@ void SizeUCSDUF(EnergyPlusData &state,
     }
 }
 
+void InitUCSDUF(EnergyPlusData &state,
+                int const ZoneNum,
+                DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   August 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // initialize arrays & variables used by the UCSD UFAD zone models
+
+    // METHODOLOGY EMPLOYED:
+    // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
+
+    Real64 NumShadesDown(0.0);
+    int UINum; // index to underfloor interior zone model data
+
+    // Do the one time initializations
+    if (state.dataUFADManager->MyOneTimeFlag) {
+        state.dataUFADManager->HeightFloorSubzoneTop = 0.2;
+        state.dataUFADManager->ThickOccupiedSubzoneMin = 0.2;
+        state.dataUFADManager->HeightIntMassDefault = 2.0;
+        state.dataUFADManager->MyOneTimeFlag = false;
+        state.dataUFADManager->MySizeFlag.dimension(state.dataGlobal->NumOfZones, true);
+    }
+
+    if (state.dataUFADManager->MySizeFlag(ZoneNum)) {
+        SizeUCSDUF(state, ZoneNum, ZoneModelType);
+        state.dataUFADManager->MySizeFlag(ZoneNum) = false;
+    }
+
+    // initialize these variables every timestep
+
+    state.dataUFADManager->HeightIntMass = state.dataUFADManager->HeightIntMassDefault;
+    state.dataRoomAirMod->ZoneUFGamma(ZoneNum) = 0.0;
+    state.dataRoomAirMod->ZoneUFPowInPlumes(ZoneNum) = 0.0;
+    NumShadesDown = 0.0;
+    for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
+        int SurfNum = state.dataUCSDShared->APos_Window(Ctd);
+        if (SurfNum == 0) continue;
+        if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment ||
+            state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
+            state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt ||
+            state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
+            if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
+                ++NumShadesDown;
+            }
+        }
+    }
+    if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+        UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
+        if (state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin > 1.0) {
+            if (NumShadesDown / state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin >= 0.5) {
+                state.dataRoomAirMod->ZoneUCSDUE(UINum).ShadeDown = true;
+            } else {
+                state.dataRoomAirMod->ZoneUCSDUE(UINum).ShadeDown = false;
+            }
+        } else {
+            state.dataRoomAirMod->ZoneUCSDUE(UINum).ShadeDown = false;
+        }
+    }
+}
+
 void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight)
 {
 
@@ -678,7 +627,6 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     Real64 ZInfSurf; // lowest height for this surface
     Real64 HLU;      // Convection coefficient for the upper area of surface
     Real64 LayH;     // Height of the Occupied/Mixed subzone interface
-    Real64 LayFrac;  // Fraction height of the Occupied/Mixed subzone interface
     int SurfNum;     // Surface number
     // Initialize HAT and HA
 
@@ -695,7 +643,6 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
 
     // Is the air flow model for this zone set to UCSDDV Displacement Ventilation?
     if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
-        LayFrac = FractionHeight;
         LayH = FractionHeight *
                (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1));
         // WALL Hc, HA and HAT calculation
@@ -2026,6 +1973,53 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
     } else {
         state.dataRoomAirMod->ZoneUFMixedFlagRep(ZoneNum) = 0.0;
+    }
+}
+
+void ManageUCSDUFModels(EnergyPlusData &state,
+                        int const ZoneNum,                                 // index number for the specified zone
+                        DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   August, 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Manages the simulation of the 2-node nonuniform zone models for underfloor air
+    // distribution systems (UFAD). Called from RoomAirManager, ManageAirModel
+
+    // METHODOLOGY EMPLOYED:
+    // uses Init and Calc routines in the standard EPlus manner to manage the calculation
+    // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
+
+    // Using/Aliasing
+    using namespace DataLoopNode;
+    using namespace DataEnvironment;
+    using namespace DataHeatBalance;
+    using namespace DataHeatBalSurface;
+    using namespace DataSurfaces;
+    using namespace DataRoomAirModel;
+    using ConvectionCoefficients::CalcDetailedHcInForDVModel;
+
+    // input was obtained in RoomAirManager, GetUFADIntZoneData
+
+    InitUCSDUF(state, ZoneNum, ZoneModelType); // initialize some module variables
+
+    {
+        auto const SELECT_CASE_var(ZoneModelType);
+
+        if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
+            // simulate room airflow using the UCSDUFI model
+            CalcUCSDUI(state, ZoneNum);
+
+        } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD interior zone model
+            // simulate room airflow using the UCSDUFI model
+            CalcUCSDUE(state, ZoneNum);
+        }
     }
 }
 

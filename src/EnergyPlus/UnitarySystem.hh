@@ -915,16 +915,8 @@ namespace UnitarySystems {
         int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
     };
 
-    int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
     int getUnitarySystemIndex(EnergyPlusData &state, std::string_view objectName);
 
-    bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
-    bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
-    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
-    bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
-    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
-    void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
 
 } // namespace UnitarySystems

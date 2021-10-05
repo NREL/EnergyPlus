@@ -60,13 +60,13 @@ struct EnergyPlusData;
 
 namespace SimulationManager {
 
+    constexpr std::array<std::string_view, 2> boolNames = {"False", "True"};
+
     void ManageSimulation(EnergyPlusData &state);
 
     void GetProjectData(EnergyPlusData &state);
 
     void writeIntialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue);
-
-    std::string bool_to_string(bool logical);
 
     std::unique_ptr<std::ostream>
     OpenStreamFile(EnergyPlusData &state, const fs::path &fileName, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc));

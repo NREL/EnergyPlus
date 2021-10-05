@@ -80,11 +80,7 @@ namespace Vectors {
 
     Real64 AreaPolygon(int const n, Array1D<Vector> &p);
 
-    Real64 VecSquaredLength(Vector const &vec);
-
     Real64 VecLength(Vector const &vec);
-
-    Vector VecNegate(Vector const &vec);
 
     Vector VecNormalize(Vector const &vec);
 

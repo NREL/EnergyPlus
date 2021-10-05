@@ -1749,7 +1749,8 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog(state,
                                        "Program, Version, TimeStamp",
                                        state.dataStrGlobals->VerStringVar); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
+        UtilityRoutines::appendPerfLog(
+            state, "Use Coil Direct Solution", fmt::to_string(SimulationManager::boolNames[state.dataGlobal->DoCoilDirectSolutions]));
         if (state.dataHeatBalIntRadExchg->CarrollMethod) {
             UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
@@ -1758,19 +1759,11 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
         UtilityRoutines::appendPerfLog(state, "Number of Timesteps per Hour", fmt::to_string(state.dataGlobal->NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog(
+            state, "SuppressAllBeginEnvironmentResets", fmt::to_string(SimulationManager::boolNames[state.dataEnvrn->forceBeginEnvResetSuppress]));
         UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
         UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
         UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp));
-    }
-
-    std::string bool_to_string(bool logical)
-    {
-        if (logical) {
-            return ("True");
-        } else {
-            return ("False");
-        }
     }
 
     std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)

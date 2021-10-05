@@ -64,22 +64,6 @@ namespace UFADManager {
                             DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void InitUCSDUF(EnergyPlusData &state,
-                    int const ZoneNum,
-                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
-    );
-
-    void SizeUCSDUF(EnergyPlusData &state,
-                    int const ZoneNum,
-                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
-    );
-
-    void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
-
-    void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
 } // namespace UFADManager
 
 struct UFADManagerData : BaseGlobalStruct

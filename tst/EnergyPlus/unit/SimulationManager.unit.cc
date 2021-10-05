@@ -119,10 +119,10 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
+TEST_F(EnergyPlusFixture, Simulationmanager_boolNames)
 {
-    EXPECT_EQ(SimulationManager::bool_to_string(true), "True");
-    EXPECT_EQ(SimulationManager::bool_to_string(false), "False");
+    EXPECT_EQ(SimulationManager::boolNames[true], "True");
+    EXPECT_EQ(SimulationManager::boolNames[false], "False");
 }
 
 TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)

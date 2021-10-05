@@ -162,8 +162,6 @@ namespace UnitHeater {
                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeUnitHeater(EnergyPlusData &state, int const UnitHeatNum);
-
     void CalcUnitHeater(EnergyPlusData &state,
                         int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
@@ -178,20 +176,6 @@ namespace UnitHeater {
                                   Real64 &LoadMet,                         // load met by unit (watts)
                                   Optional_int_const OpMode = _,           // fan operating mode
                                   Optional<Real64 const> PartLoadRatio = _ // part-load ratio
-    );
-
-    // SUBROUTINE UpdateUnitHeater
-
-    // No update routine needed in this module since all of the updates happen on
-    // the Node derived type directly and these updates are done by other routines.
-
-    // END SUBROUTINE UpdateUnitHeater
-
-    void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
-
-    Real64 CalcUnitHeaterResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1D<Real64> const &Par  // Function parameters
     );
 
 } // namespace UnitHeater

@@ -617,165 +617,6 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-int AbortEnergyPlus(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine causes the program to halt due to a fatal error.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts a message on output files.
-    // Closes files.
-    // Stops the program.
-
-    // Using/Aliasing
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using namespace DataErrorTracking;
-    using BranchInputManager::TestBranchIntegrity;
-    using BranchNodeConnections::CheckNodeConnections;
-    using BranchNodeConnections::TestCompSetInletOutletNodes;
-    using ExternalInterface::CloseSocket;
-
-    using NodeInputManager::CheckMarkedNodes;
-    using NodeInputManager::SetupNodeVarsForReporting;
-    using PlantManager::CheckPlantOnAbort;
-    using SimulationManager::ReportLoopConnections;
-    using SolarShading::ReportSurfaceErrors;
-    using SystemReports::ReportAirLoopConnections;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    std::string NumWarnings;
-    std::string NumSevere;
-    std::string NumWarningsDuringWarmup;
-    std::string NumSevereDuringWarmup;
-    std::string NumWarningsDuringSizing;
-    std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
-    bool ErrFound;
-    bool TerminalError;
-
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, false);
-    }
-
-    state.dataErrTracking->AbortProcessing = true;
-    if (state.dataErrTracking->AskForConnectionsReport) {
-        state.dataErrTracking->AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
-
-        ShowMessage(state, "Fatal error -- final processing.  More error messages may appear.");
-        SetupNodeVarsForReporting(state);
-
-        ErrFound = false;
-        TerminalError = false;
-        TestBranchIntegrity(state, ErrFound);
-        if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(state, ErrFound);
-        if (ErrFound) TerminalError = true;
-        CheckMarkedNodes(state, ErrFound);
-        if (ErrFound) TerminalError = true;
-        CheckNodeConnections(state, ErrFound);
-        if (ErrFound) TerminalError = true;
-        TestCompSetInletOutletNodes(state, ErrFound);
-        if (ErrFound) TerminalError = true;
-
-        if (!TerminalError) {
-            ReportAirLoopConnections(state);
-            ReportLoopConnections(state);
-        }
-
-    } else if (!state.dataErrTracking->ExitDuringSimulations) {
-        ShowMessage(state, "Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
-        ShowMessage(state, "Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
-    }
-
-    if (state.dataErrTracking->AskForSurfacesReport) {
-        ReportSurfaces(state);
-    }
-
-    ReportSurfaceErrors(state);
-    CheckPlantOnAbort(state);
-    ShowRecurringErrors(state);
-    SummarizeErrors(state);
-    CloseMiscOpenFiles(state);
-    NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
-    NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
-    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
-    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
-    NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
-    NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
-
-    // catch up with timings if in middle
-    state.dataSysVars->Time_Finish = epElapsedTime();
-    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
-    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
-    if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
-    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
-    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
-    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
-    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
-    Seconds = state.dataSysVars->Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
-
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
-
-    ShowMessage(state,
-                "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                    " Severe Errors.");
-    ShowMessage(state,
-                "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                    " Severe Errors.");
-    ShowMessage(state,
-                "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-    DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
-
-    {
-        auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
-
-        if (!tempfl.good()) {
-            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
-        }
-        print(
-            tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
-    }
-
-    state.dataResultsFramework->resultsFramework->writeOutputs(state);
-
-#ifdef EP_Detailed_Timings
-    epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
-#endif
-    std::cerr << "Program terminated: "
-              << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-    // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
-    // indicating that E+ terminated with an error.
-    if (state.dataExternalInterface->NumExternalInterfaces > 0) CloseSocket(state, -1);
-
-    if (state.dataGlobal->eplusRunningViaAPI) {
-        state.files.flushAll();
-    }
-
-    return EXIT_FAILURE;
-}
-
 void CloseMiscOpenFiles(EnergyPlusData &state)
 {
 
@@ -804,122 +645,6 @@ void CloseMiscOpenFiles(EnergyPlusData &state)
     } else {
         state.files.debug.del();
     }
-}
-
-int EndEnergyPlus(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine causes the program to terminate when complete (no errors).
-
-    // METHODOLOGY EMPLOYED:
-    // Puts a message on output files.
-    // Closes files.
-    // Stops the program.
-
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using namespace DataErrorTracking;
-    using ExternalInterface::CloseSocket;
-
-    using SolarShading::ReportSurfaceErrors;
-
-    std::string NumWarnings;
-    std::string NumSevere;
-    std::string NumWarningsDuringWarmup;
-    std::string NumSevereDuringWarmup;
-    std::string NumWarningsDuringSizing;
-    std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
-
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, true);
-    }
-
-    ReportSurfaceErrors(state);
-    ShowRecurringErrors(state);
-    SummarizeErrors(state);
-    CloseMiscOpenFiles(state);
-    NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
-    strip(NumWarnings);
-    NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
-    strip(NumSevere);
-    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
-    strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
-    strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
-    strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
-    strip(NumSevereDuringSizing);
-
-    state.dataSysVars->Time_Finish = epElapsedTime();
-    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
-    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
-    if (state.dataGlobal->createPerfLog) {
-        UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
-    }
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
-    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
-    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
-    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
-    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
-    Seconds = state.dataSysVars->Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
-
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
-
-    if (state.dataGlobal->createPerfLog) {
-        UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
-        UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
-        UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
-    }
-    ShowMessage(state,
-                "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                    " Severe Errors.");
-    ShowMessage(state,
-                "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                    " Severe Errors.");
-    ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-    DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
-
-    {
-        auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
-        if (!tempfl.good()) {
-            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
-        }
-        print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
-    }
-
-    state.dataResultsFramework->resultsFramework->writeOutputs(state);
-
-#ifdef EP_Detailed_Timings
-    epSummaryTimes(Time_Finish - Time_Start);
-#endif
-    if (state.dataGlobal->printConsoleOutput) std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-    // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
-    // indicating that E+ finished its simulation
-    if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
-
-    if (state.dataGlobal->eplusRunningViaAPI) {
-        state.files.flushAll();
-    }
-
-    return EXIT_SUCCESS;
 }
 
 void ConvertCaseToUpper(std::string_view InputString, // Input string
@@ -1349,6 +1074,89 @@ void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, 
     }
 }
 
+void StoreRecurringErrorMessage(EnergyPlusData &state,
+                                std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
+                                int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
+                                Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
+                                Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
+                                Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
+                                std::string const &ErrorReportMaxUnits,  // Units for "max" reporting
+                                std::string const &ErrorReportMinUnits,  // Units for "min" reporting
+                                std::string const &ErrorReportSumUnits   // Units for "sum" reporting
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael J. Witte
+    //       DATE WRITTEN   August 2004
+    //       MODIFIED       September 2005;LKL;Added Units
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine stores a recurring ErrorMessage with
+    // for output at the end of the simulation with automatic tracking of number
+    // of occurrences and optional tracking of associated min, max, and sum values
+
+    // Using/Aliasing
+    using namespace DataStringGlobals;
+    using namespace DataErrorTracking;
+    // If Index is zero, then assign next available index and reallocate array
+    if (ErrorMsgIndex == 0) {
+        state.dataErrTracking->RecurringErrors.redimension(++state.dataErrTracking->NumRecurringErrors);
+        ErrorMsgIndex = state.dataErrTracking->NumRecurringErrors;
+        // The message string only needs to be stored once when a new recurring message is created
+        state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
+        state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Count = 1;
+        if (state.dataGlobal->WarmupFlag) state.dataErrTracking->RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
+        if (state.dataGlobal->DoingSizing) state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SizingCount = 1;
+
+        // For max, min, and sum values, store the current value when a new recurring message is created
+        if (present(ErrorReportMaxOf)) {
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue = ErrorReportMaxOf;
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMax = true;
+            if (!ErrorReportMaxUnits.empty()) {
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxUnits = ErrorReportMaxUnits;
+            }
+        }
+        if (present(ErrorReportMinOf)) {
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue = ErrorReportMinOf;
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMin = true;
+            if (!ErrorReportMinUnits.empty()) {
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinUnits = ErrorReportMinUnits;
+            }
+        }
+        if (present(ErrorReportSumOf)) {
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumValue = ErrorReportSumOf;
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportSum = true;
+            if (!ErrorReportSumUnits.empty()) {
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumUnits = ErrorReportSumUnits;
+            }
+        }
+
+    } else if (ErrorMsgIndex > 0) {
+        // Do stats and store
+        ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Count;
+        if (state.dataGlobal->WarmupFlag) ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).WarmupCount;
+        if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SizingCount;
+
+        if (present(ErrorReportMaxOf)) {
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue =
+                max(ErrorReportMaxOf, state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue);
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMax = true;
+        }
+        if (present(ErrorReportMinOf)) {
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue =
+                min(ErrorReportMinOf, state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue);
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMin = true;
+        }
+        if (present(ErrorReportSumOf)) {
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumValue += ErrorReportSumOf;
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportSum = true;
+        }
+    } else {
+        // If ErrorMsgIndex < 0, then do nothing
+    }
+}
+
 void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
                                    std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
@@ -1511,89 +1319,6 @@ void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
 
     StoreRecurringErrorMessage(
         state, " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
-}
-
-void StoreRecurringErrorMessage(EnergyPlusData &state,
-                                std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
-                                int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
-                                Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
-                                Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
-                                std::string const &ErrorReportMaxUnits,  // Units for "max" reporting
-                                std::string const &ErrorReportMinUnits,  // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits   // Units for "sum" reporting
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael J. Witte
-    //       DATE WRITTEN   August 2004
-    //       MODIFIED       September 2005;LKL;Added Units
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine stores a recurring ErrorMessage with
-    // for output at the end of the simulation with automatic tracking of number
-    // of occurrences and optional tracking of associated min, max, and sum values
-
-    // Using/Aliasing
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-    // If Index is zero, then assign next available index and reallocate array
-    if (ErrorMsgIndex == 0) {
-        state.dataErrTracking->RecurringErrors.redimension(++state.dataErrTracking->NumRecurringErrors);
-        ErrorMsgIndex = state.dataErrTracking->NumRecurringErrors;
-        // The message string only needs to be stored once when a new recurring message is created
-        state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
-        state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Count = 1;
-        if (state.dataGlobal->WarmupFlag) state.dataErrTracking->RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
-        if (state.dataGlobal->DoingSizing) state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SizingCount = 1;
-
-        // For max, min, and sum values, store the current value when a new recurring message is created
-        if (present(ErrorReportMaxOf)) {
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue = ErrorReportMaxOf;
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMax = true;
-            if (!ErrorReportMaxUnits.empty()) {
-                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxUnits = ErrorReportMaxUnits;
-            }
-        }
-        if (present(ErrorReportMinOf)) {
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue = ErrorReportMinOf;
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMin = true;
-            if (!ErrorReportMinUnits.empty()) {
-                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinUnits = ErrorReportMinUnits;
-            }
-        }
-        if (present(ErrorReportSumOf)) {
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumValue = ErrorReportSumOf;
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportSum = true;
-            if (!ErrorReportSumUnits.empty()) {
-                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumUnits = ErrorReportSumUnits;
-            }
-        }
-
-    } else if (ErrorMsgIndex > 0) {
-        // Do stats and store
-        ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Count;
-        if (state.dataGlobal->WarmupFlag) ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).WarmupCount;
-        if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SizingCount;
-
-        if (present(ErrorReportMaxOf)) {
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue =
-                max(ErrorReportMaxOf, state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue);
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMax = true;
-        }
-        if (present(ErrorReportMinOf)) {
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue =
-                min(ErrorReportMinOf, state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue);
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMin = true;
-        }
-        if (present(ErrorReportSumOf)) {
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumValue += ErrorReportSumOf;
-            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportSum = true;
-        }
-    } else {
-        // If ErrorMsgIndex < 0, then do nothing
-    }
 }
 
 void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1773,6 +1498,281 @@ void ShowRecurringErrors(EnergyPlusData &state)
         }
         ShowMessage(state, "");
     }
+}
+
+int EndEnergyPlus(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   December 1997
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine causes the program to terminate when complete (no errors).
+
+    // METHODOLOGY EMPLOYED:
+    // Puts a message on output files.
+    // Closes files.
+    // Stops the program.
+
+    using namespace DataSystemVariables;
+    using namespace DataTimings;
+    using namespace DataErrorTracking;
+    using ExternalInterface::CloseSocket;
+
+    using SolarShading::ReportSurfaceErrors;
+
+    std::string NumWarnings;
+    std::string NumSevere;
+    std::string NumWarningsDuringWarmup;
+    std::string NumSevereDuringWarmup;
+    std::string NumWarningsDuringSizing;
+    std::string NumSevereDuringSizing;
+    int Hours;      // Elapsed Time Hour Reporting
+    int Minutes;    // Elapsed Time Minute Reporting
+    Real64 Seconds; // Elapsed Time Second Reporting
+
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, true);
+    }
+
+    ReportSurfaceErrors(state);
+    ShowRecurringErrors(state);
+    SummarizeErrors(state);
+    CloseMiscOpenFiles(state);
+    NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
+    strip(NumWarnings);
+    NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
+    strip(NumSevere);
+    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
+    strip(NumWarningsDuringWarmup);
+    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+    strip(NumSevereDuringWarmup);
+    NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
+    strip(NumWarningsDuringSizing);
+    NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
+    strip(NumSevereDuringSizing);
+
+    state.dataSysVars->Time_Finish = epElapsedTime();
+    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
+    if (state.dataGlobal->createPerfLog) {
+        UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
+    }
+#ifdef EP_Detailed_Timings
+    epStopTime("EntireRun=");
+#endif
+    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+    Seconds = state.dataSysVars->Elapsed_Time;
+    if (Seconds < 0.0) Seconds = 0.0;
+    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+
+    if (state.dataGlobal->createPerfLog) {
+        UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
+        UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
+        UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
+    }
+    ShowMessage(state,
+                "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+                    " Severe Errors.");
+    ShowMessage(state,
+                "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+                    " Severe Errors.");
+    ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+    DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
+
+    {
+        auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
+        if (!tempfl.good()) {
+            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
+        }
+        print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
+    }
+
+    state.dataResultsFramework->resultsFramework->writeOutputs(state);
+
+#ifdef EP_Detailed_Timings
+    epSummaryTimes(Time_Finish - Time_Start);
+#endif
+    if (state.dataGlobal->printConsoleOutput) std::cerr << "EnergyPlus Completed Successfully." << std::endl;
+    // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
+    // indicating that E+ finished its simulation
+    if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
+
+    if (state.dataGlobal->eplusRunningViaAPI) {
+        state.files.flushAll();
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int AbortEnergyPlus(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   December 1997
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine causes the program to halt due to a fatal error.
+
+    // METHODOLOGY EMPLOYED:
+    // Puts a message on output files.
+    // Closes files.
+    // Stops the program.
+
+    // Using/Aliasing
+    using namespace DataSystemVariables;
+    using namespace DataTimings;
+    using namespace DataErrorTracking;
+    using BranchInputManager::TestBranchIntegrity;
+    using BranchNodeConnections::CheckNodeConnections;
+    using BranchNodeConnections::TestCompSetInletOutletNodes;
+    using ExternalInterface::CloseSocket;
+
+    using NodeInputManager::CheckMarkedNodes;
+    using NodeInputManager::SetupNodeVarsForReporting;
+    using PlantManager::CheckPlantOnAbort;
+    using SimulationManager::ReportLoopConnections;
+    using SolarShading::ReportSurfaceErrors;
+    using SystemReports::ReportAirLoopConnections;
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+
+    std::string NumWarnings;
+    std::string NumSevere;
+    std::string NumWarningsDuringWarmup;
+    std::string NumSevereDuringWarmup;
+    std::string NumWarningsDuringSizing;
+    std::string NumSevereDuringSizing;
+    int Hours;      // Elapsed Time Hour Reporting
+    int Minutes;    // Elapsed Time Minute Reporting
+    Real64 Seconds; // Elapsed Time Second Reporting
+    bool ErrFound;
+    bool TerminalError;
+
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->updateSQLiteSimulationRecord(true, false);
+    }
+
+    state.dataErrTracking->AbortProcessing = true;
+    if (state.dataErrTracking->AskForConnectionsReport) {
+        state.dataErrTracking->AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
+
+        ShowMessage(state, "Fatal error -- final processing.  More error messages may appear.");
+        SetupNodeVarsForReporting(state);
+
+        ErrFound = false;
+        TerminalError = false;
+        TestBranchIntegrity(state, ErrFound);
+        if (ErrFound) TerminalError = true;
+        TestAirPathIntegrity(state, ErrFound);
+        if (ErrFound) TerminalError = true;
+        CheckMarkedNodes(state, ErrFound);
+        if (ErrFound) TerminalError = true;
+        CheckNodeConnections(state, ErrFound);
+        if (ErrFound) TerminalError = true;
+        TestCompSetInletOutletNodes(state, ErrFound);
+        if (ErrFound) TerminalError = true;
+
+        if (!TerminalError) {
+            ReportAirLoopConnections(state);
+            ReportLoopConnections(state);
+        }
+
+    } else if (!state.dataErrTracking->ExitDuringSimulations) {
+        ShowMessage(state, "Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
+        ShowMessage(state, "Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
+    }
+
+    if (state.dataErrTracking->AskForSurfacesReport) {
+        ReportSurfaces(state);
+    }
+
+    ReportSurfaceErrors(state);
+    CheckPlantOnAbort(state);
+    ShowRecurringErrors(state);
+    SummarizeErrors(state);
+    CloseMiscOpenFiles(state);
+    NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
+    NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
+    NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
+    NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
+    NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
+
+    // catch up with timings if in middle
+    state.dataSysVars->Time_Finish = epElapsedTime();
+    if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+    state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
+#ifdef EP_Detailed_Timings
+    epStopTime("EntireRun=");
+#endif
+    if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
+    Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+    state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+    Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+    state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+    Seconds = state.dataSysVars->Elapsed_Time;
+    if (Seconds < 0.0) Seconds = 0.0;
+    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+
+    ShowMessage(state,
+                "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+                    " Severe Errors.");
+    ShowMessage(state,
+                "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+                    " Severe Errors.");
+    ShowMessage(state,
+                "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+    DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
+
+    {
+        auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
+
+        if (!tempfl.good()) {
+            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
+        }
+        print(
+            tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
+    }
+
+    state.dataResultsFramework->resultsFramework->writeOutputs(state);
+
+#ifdef EP_Detailed_Timings
+    epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
+#endif
+    std::cerr << "Program terminated: "
+              << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
+    // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
+    // indicating that E+ terminated with an error.
+    if (state.dataExternalInterface->NumExternalInterfaces > 0) CloseSocket(state, -1);
+
+    if (state.dataGlobal->eplusRunningViaAPI) {
+        state.files.flushAll();
+    }
+
+    return EXIT_FAILURE;
 }
 
 } // namespace EnergyPlus

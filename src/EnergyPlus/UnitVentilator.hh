@@ -217,14 +217,6 @@ namespace UnitVentilator {
 
     void GetUnitVentilatorInput(EnergyPlusData &state);
 
-    void InitUnitVentilator(EnergyPlusData &state,
-                            int const UnitVentNum,         // index for the current unit ventilator
-                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                            int const ZoneNum              // number of zone being served
-    );
-
-    void SizeUnitVentilator(EnergyPlusData &state, int const UnitVentNum);
-
     void CalcUnitVentilator(EnergyPlusData &state,
                             int &UnitVentNum,              // number of the current fan coil unit being simulated
                             int const ZoneNum,             // number of zone being served
@@ -241,20 +233,6 @@ namespace UnitVentilator {
                                       Optional<Real64 const> PartLoadFrac = _ // Part Load Ratio of coil and fan
     );
 
-    void SimUnitVentOAMixer(EnergyPlusData &state,
-                            int const UnitVentNum, // Unit index in unit ventilator array
-                            int const FanOpMode    // unit ventilator fan operating mode
-    );
-
-    // SUBROUTINE UpdateUnitVentilator
-
-    // No update routine needed in this module since all of the updates happen on
-    // the Node derived type directly and these updates are done by other routines.
-
-    // END SUBROUTINE UpdateUnitVentilator
-
-    void ReportUnitVentilator(EnergyPlusData &state, int const UnitVentNum); // Unit index in unit ventilator array
-
     int GetUnitVentilatorOutAirNode(EnergyPlusData &state, int const UnitVentNum);
 
     int GetUnitVentilatorZoneInletAirNode(EnergyPlusData &state, int const UnitVentNum);
@@ -262,11 +240,6 @@ namespace UnitVentilator {
     int GetUnitVentilatorMixedAirNode(EnergyPlusData &state, int const UnitVentNum);
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
-
-    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state,
-                                      Real64 const PartLoadRatio, // Coil Part Load Ratio
-                                      Array1D<Real64> const &Par  // Function parameters
-    );
 
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
                                                       int const UnitVentNum,     // Unit Ventilator index number

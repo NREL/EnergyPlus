@@ -286,8 +286,6 @@ namespace VentilatedSlab {
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeVentilatedSlab(EnergyPlusData &state, int const Item);
-
     void CalcVentilatedSlab(EnergyPlusData &state,
                             int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
@@ -308,30 +306,7 @@ namespace VentilatedSlab {
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabRadComps(EnergyPlusData &state,
-                                    int const Item,               // System index in ventilated slab array
-                                    bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
-    );
-
-    void SimVentSlabOAMixer(EnergyPlusData &state, int const Item); // System index in Ventilated Slab array
-
-    void UpdateVentilatedSlab(EnergyPlusData &state,
-                              int const Item,               // Index for the ventilated slab under consideration within the derived types
-                              bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
-    );
-
-    Real64 CalcVentSlabHXEffectTerm(EnergyPlusData &state,
-                                    int const Item,            // Index number of radiant system under consideration
-                                    Real64 const Temperature,  // Temperature of air entering the radiant system, in C
-                                    Real64 const AirMassFlow,  // Mass flow rate of water in the radiant system, in kg/s
-                                    Real64 const FlowFraction, // Mass flow rate fraction for this surface in the radiant system
-                                    Real64 const CoreLength,   // Length of tubing in the radiant system, in m
-                                    Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
-                                    Real64 const CoreNumbers);
-
     Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
-
-    void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
 } // namespace VentilatedSlab
 

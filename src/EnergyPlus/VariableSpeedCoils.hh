@@ -391,18 +391,6 @@ namespace VariableSpeedCoils {
                                  int const SpeedNum              // Speed number, high bound
     );
 
-    void CalcVarSpeedCoilHeating(EnergyPlusData &state,
-                                 int const DXCoilNum,            // Heat Pump Number
-                                 int const CyclingScheme,        // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,            // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
-                                 int const CompOp,               // compressor operation flag
-                                 Real64 const PartLoadRatio,     // compressor part load ratio
-                                 Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
-                                 Real64 const SpeedRatio,        // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-                                 int const SpeedNum              // Speed number, high bound, i.e. SpeedNum - 1 is the other side
-    );
-
     Real64 GetCoilCapacityVariableSpeed(EnergyPlusData &state,
                                         std::string const &CoilType, // must match coil types in this module
                                         std::string const &CoilName, // must match coil names for the coil type
@@ -511,15 +499,6 @@ namespace VariableSpeedCoils {
                               Real64 const SpeedRatio,         // from 0.0 to 1.0
                               int const NumSpeeds,             // number of speeds for input
                               Real64 &TotCapModFac             // capacity modification factor, func of temp and func of flow
-    );
-
-    void CalcVarSpeedHPWH(EnergyPlusData &state,
-                          int const DXCoilNum,        // the number of the DX coil to be simulated
-                          Real64 &RuntimeFrac,        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                          Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
-                          Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-                          int const SpeedNum,         // Speed number, high bound capacity
-                          int const CyclingScheme     // Continuous fan OR cycling compressor
     );
 
     Real64 getVarSpeedPartLoadRatio(EnergyPlusData &state, int const DXCoilNum); // the number of the DX coil to mined for current PLR
