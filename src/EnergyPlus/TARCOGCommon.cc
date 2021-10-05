@@ -267,34 +267,6 @@ namespace TARCOGCommon {
         }
     }
 
-    void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
-    {
-        //***********************************************************************
-        // Purpose: solves the main system of energy balance equations
-        //***********************************************************************
-        // Input:
-        //   a - matrix, radiositied
-        //   b - vector of known quantities
-        //   n - ???
-        // Output:
-        //   b - solutions
-        //   nperr - error code
-
-        // Using/Aliasing
-        using namespace TARCOGParams;
-
-        // Locals
-        Array1D_int indx(n);
-        Real64 d;
-
-        ludcmp(state, a, n, indx, d, nperr, ErrorMessage);
-
-        // Exit on error
-        if ((nperr > 0) && (nperr <= 1000)) return;
-
-        lubksb(a, n, indx, b);
-    }
-
     void ludcmp(EnergyPlusData &state, Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
     {
 
@@ -400,6 +372,34 @@ namespace TARCOGCommon {
             } // j
             b(i) = sum / a(i, i);
         } // i
+    }
+
+    void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
+    {
+        //***********************************************************************
+        // Purpose: solves the main system of energy balance equations
+        //***********************************************************************
+        // Input:
+        //   a - matrix, radiositied
+        //   b - vector of known quantities
+        //   n - ???
+        // Output:
+        //   b - solutions
+        //   nperr - error code
+
+        // Using/Aliasing
+        using namespace TARCOGParams;
+
+        // Locals
+        Array1D_int indx(n);
+        Real64 d;
+
+        ludcmp(state, a, n, indx, d, nperr, ErrorMessage);
+
+        // Exit on error
+        if ((nperr > 0) && (nperr <= 1000)) return;
+
+        lubksb(a, n, indx, b);
     }
 
     Real64 pos(Real64 const x)

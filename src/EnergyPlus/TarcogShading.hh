@@ -101,27 +101,6 @@ namespace TarcogShading {
                  std::string &ErrorMessage,
                  Array1D<Real64> &vfreevent);
 
-    void forcedventilation(EnergyPlusData &state,
-                           const Array1D_int &iprop,
-                           const Array1D<Real64> &frct,
-                           Real64 const press,
-                           int const nmix,
-                           const Array1D<Real64> &xwght,
-                           Array2A<Real64> const xgcon,
-                           Array2A<Real64> const xgvis,
-                           Array2A<Real64> const xgcp,
-                           Real64 const s,
-                           Real64 const H,
-                           Real64 const hc,
-                           Real64 const forcedspeed,
-                           Real64 const Tinlet,
-                           Real64 &Toutlet,
-                           Real64 const Tav,
-                           Real64 &hcv,
-                           Real64 &qv,
-                           int &nperr,
-                           std::string &ErrorMessage);
-
     void shadingin(EnergyPlusData &state,
                    const Array1D_int &iprop1,
                    const Array1D<Real64> &frct1,
@@ -160,52 +139,19 @@ namespace TarcogShading {
                    int &nperr,
                    std::string &ErrorMessage);
 
-    void shadingedge(EnergyPlusData &state,
-                     const Array1D_int &iprop1,
-                     const Array1D<Real64> &frct1,
-                     Real64 const press1,
-                     int const nmix1,
-                     const Array1D_int &iprop2,
-                     const Array1D<Real64> &frct2,
-                     Real64 const press2,
-                     int const nmix2,
-                     const Array1D<Real64> &xwght,
-                     Array2A<Real64> const xgcon,
-                     Array2A<Real64> const xgvis,
-                     Array2A<Real64> const xgcp,
-                     Real64 &Atop,
-                     Real64 &Abot,
-                     Real64 const Al,
-                     Real64 const Ar,
-                     Real64 &Ah,
-                     Real64 const s,
-                     Real64 const H,
-                     Real64 const L,
-                     Real64 const angle,
-                     Real64 const forcedspeed,
-                     Real64 const hc,
-                     Real64 const Tenv,
-                     Real64 const Tav,
-                     Real64 &Tgap,
-                     Real64 &hcv,
-                     Real64 &qv,
-                     int &nperr,
-                     std::string &ErrorMessage,
-                     Real64 &speed);
-
     void updateEffectiveMultipliers(int const nlayer,                          // Number of layers
                                     Real64 const width,                        // IGU width [m]
                                     Real64 const height,                       // IGU height [m]
-                                    const Array1D<Real64> &Atop,               // Top openning area [m2]
-                                    const Array1D<Real64> &Abot,               // Bottom openning area [m2]
-                                    const Array1D<Real64> &Al,                 // Left side openning area [m2]
-                                    const Array1D<Real64> &Ar,                 // Right side openning area [m2]
-                                    const Array1D<Real64> &Ah,                 // Front side openning area [m2]
-                                    Array1D<Real64> &Atop_eff,                 // Output - Effective top openning area [m2]
-                                    Array1D<Real64> &Abot_eff,                 // Output - Effective bottom openning area [m2]
-                                    Array1D<Real64> &Al_eff,                   // Output - Effective left side openning area [m2]
-                                    Array1D<Real64> &Ar_eff,                   // Output - Effective right side openning area [m2]
-                                    Array1D<Real64> &Ah_eff,                   // Output - Effective front side openning area [m2]
+                                    const Array1D<Real64> &Atop,               // Top opening area [m2]
+                                    const Array1D<Real64> &Abot,               // Bottom opening area [m2]
+                                    const Array1D<Real64> &Al,                 // Left side opening area [m2]
+                                    const Array1D<Real64> &Ar,                 // Right side opening area [m2]
+                                    const Array1D<Real64> &Ah,                 // Front side opening area [m2]
+                                    Array1D<Real64> &Atop_eff,                 // Output - Effective top opening area [m2]
+                                    Array1D<Real64> &Abot_eff,                 // Output - Effective bottom opening area [m2]
+                                    Array1D<Real64> &Al_eff,                   // Output - Effective left side opening area [m2]
+                                    Array1D<Real64> &Ar_eff,                   // Output - Effective right side opening area [m2]
+                                    Array1D<Real64> &Ah_eff,                   // Output - Effective front side opening area [m2]
                                     const Array1D<TARCOGLayerType> &LayerType, // Layer type
                                     const Array1D<Real64> &SlatAngle           // Venetian layer slat angle [deg]
     );

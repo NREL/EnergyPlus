@@ -97,52 +97,6 @@ namespace ThermalEN673Calc {
                     Array1D<Real64> &Ra,
                     Array1D<Real64> &Nu);
 
-    void EN673ISO10292(EnergyPlusData &state,
-                       int const nlayer,
-                       Real64 const tout,
-                       Real64 const tind,
-                       const Array1D<Real64> &emis,
-                       const Array1D<Real64> &gap,
-                       const Array1D<Real64> &thick,
-                       const Array1D<Real64> &scon,
-                       Real64 const tilt,
-                       Array2A_int const iprop,
-                       Array2A<Real64> const frct,
-                       Array2A<Real64> const xgcon,
-                       Array2A<Real64> const xgvis,
-                       Array2A<Real64> const xgcp,
-                       const Array1D<Real64> &xwght,
-                       const Array1D<Real64> &presure,
-                       const Array1D_int &nmix,
-                       Array1D<Real64> &theta,
-                       TARCOGGassesParams::Stdrd const standard,
-                       Array1D<Real64> &hg,
-                       Array1D<Real64> &hr,
-                       Array1D<Real64> &hs,
-                       Real64 &hin,
-                       Real64 const hout,
-                       Real64 &hcin,
-                       const Array1D_int &ibc,
-                       Array1D<Real64> &rs,
-                       Real64 &ufactor,
-                       Array1D<Real64> &Ra,
-                       Array1D<Real64> &Nu,
-                       int &nperr,
-                       std::string &ErrorMessage);
-
-    void linint(Real64 const x1, Real64 const x2, Real64 const y1, Real64 const y2, Real64 const x, Real64 &y);
-
-    void solar_EN673(Real64 const dir,
-                     Real64 const totsol,
-                     Real64 const rtot,
-                     const Array1D<Real64> &rs,
-                     int const nlayer,
-                     const Array1D<Real64> &absol,
-                     Real64 &sf,
-                     TARCOGGassesParams::Stdrd const standard,
-                     int &nperr,
-                     std::string &ErrorMessage);
-
 } // namespace ThermalEN673Calc
 
 } // namespace EnergyPlus

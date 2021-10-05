@@ -91,143 +91,10 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(EnergyPlusData &state,
-                    TARCOGOutput::Files &files,
-                    TARCOGGassesParams::Stdrd const standard,
-                    int const nlayer,
-                    Real64 const tout,
-                    Real64 const tind,
-                    Array1D<Real64> &gap,
-                    Array1D<Real64> &thick,
-                    Array1D<Real64> &scon,
-                    const Array1D<Real64> &emis,
-                    Real64 const totsol,
-                    Real64 const tilt,
-                    Real64 const dir,
-                    const Array1D<Real64> &asol,
-                    const Array1D<Real64> &presure,
-                    Array2A_int const iprop,
-                    Array2A<Real64> const frct,
-                    const Array1D_int &nmix,
-                    Array2A<Real64> const xgcon,
-                    Array2A<Real64> const xgvis,
-                    Array2A<Real64> const xgcp,
-                    const Array1D<Real64> &xwght,
-                    Array1D<Real64> &theta,
-                    Real64 &ufactor,
-                    Real64 &hcin,
-                    Real64 &hin,
-                    Real64 &hout,
-                    Real64 &shgc,
-                    int &nperr,
-                    std::string &ErrorMessage,
-                    const Array1D_int &ibc,
-                    Array1D<Real64> &hg,
-                    Array1D<Real64> &hr,
-                    Array1D<Real64> &hs,
-                    Array1D<Real64> &Ra,
-                    Array1D<Real64> &Nu)
+    void linint(Real64 const x1, Real64 const x2, Real64 const y1, Real64 const y2, Real64 const x, Real64 &y)
     {
 
-        // Using/Aliasing
-        using TARCOGArgs::GoAhead;
-        using namespace TARCOGOutput;
-
-        /// function attributes:
-
-        /// INPUTS:
-
-        /// General:
-
-        // Argument array dimensioning
-        EP_SIZE_CHECK(gap, MaxGap);
-        EP_SIZE_CHECK(thick, maxlay);
-        EP_SIZE_CHECK(scon, maxlay);
-        EP_SIZE_CHECK(emis, maxlay2);
-        EP_SIZE_CHECK(asol, maxlay);
-        EP_SIZE_CHECK(presure, maxlay1);
-        iprop.dim(maxgas, maxlay1);
-        frct.dim(maxgas, maxlay1);
-        EP_SIZE_CHECK(nmix, maxlay1);
-        xgcon.dim(3, maxgas);
-        xgvis.dim(3, maxgas);
-        xgcp.dim(3, maxgas);
-        EP_SIZE_CHECK(xwght, maxgas);
-        EP_SIZE_CHECK(theta, maxlay2);
-        EP_SIZE_CHECK(ibc, 2);
-        EP_SIZE_CHECK(hg, maxlay);
-        EP_SIZE_CHECK(hr, maxlay);
-        EP_SIZE_CHECK(hs, maxlay);
-        EP_SIZE_CHECK(Ra, maxlay);
-        EP_SIZE_CHECK(Nu, maxlay);
-
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-
-        /// Gaps:
-
-        //// INPUTS/OUTPUTS:
-
-        /// OUTPUTS:
-        /// Overall:
-
-        /// Layers:
-
-        /// Gaps:
-
-        Array1D<Real64> rs(maxlay3);
-        Real64 rtot;
-        Real64 sft;
-
-        // call  propcon90(standard, mgas, gcon, gvis, gcp, grho, wght, nperr)
-        rtot = 0.0;
-        sft = 0.0;
-        if (GoAhead(nperr)) {
-            EN673ISO10292(state,
-                          nlayer,
-                          tout,
-                          tind,
-                          emis,
-                          gap,
-                          thick,
-                          scon,
-                          tilt,
-                          iprop,
-                          frct,
-                          xgcon,
-                          xgvis,
-                          xgcp,
-                          xwght,
-                          presure,
-                          nmix,
-                          theta,
-                          standard,
-                          hg,
-                          hr,
-                          hs,
-                          hin,
-                          hout,
-                          hcin,
-                          ibc,
-                          rs,
-                          ufactor,
-                          Ra,
-                          Nu,
-                          nperr,
-                          ErrorMessage);
-
-            if (GoAhead(nperr)) {
-                rtot = 1.0 / ufactor;
-                solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
-                if (GoAhead(nperr)) {
-                    shgc = sft;
-                    if (files.WriteDebugOutput)
-                        WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
-                } // GoAhead after solar
-            }     // GoAhead after EN673ISO10292
-        }         // GopAhead after propcon90
+        y = (y2 - y1) / (x2 - x1) * (x - x1) + y1; // Autodesk:DivZero Should protect against divide by zero
     }
 
     void EN673ISO10292(EnergyPlusData &state,
@@ -520,12 +387,6 @@ namespace ThermalEN673Calc {
         // dr...END OF ITERATIONS
     }
 
-    void linint(Real64 const x1, Real64 const x2, Real64 const y1, Real64 const y2, Real64 const x, Real64 &y)
-    {
-
-        y = (y2 - y1) / (x2 - x1) * (x - x1) + y1; // Autodesk:DivZero Should protect against divide by zero
-    }
-
     void solar_EN673(Real64 const dir,
                      Real64 const totsol,
                      Real64 const rtot,
@@ -584,6 +445,145 @@ namespace ThermalEN673Calc {
         }
 
         sf = totsol + fract; // add inward fraction to directly transmitted fraction
+    }
+
+    void Calc_EN673(EnergyPlusData &state,
+                    TARCOGOutput::Files &files,
+                    TARCOGGassesParams::Stdrd const standard,
+                    int const nlayer,
+                    Real64 const tout,
+                    Real64 const tind,
+                    Array1D<Real64> &gap,
+                    Array1D<Real64> &thick,
+                    Array1D<Real64> &scon,
+                    const Array1D<Real64> &emis,
+                    Real64 const totsol,
+                    Real64 const tilt,
+                    Real64 const dir,
+                    const Array1D<Real64> &asol,
+                    const Array1D<Real64> &presure,
+                    Array2A_int const iprop,
+                    Array2A<Real64> const frct,
+                    const Array1D_int &nmix,
+                    Array2A<Real64> const xgcon,
+                    Array2A<Real64> const xgvis,
+                    Array2A<Real64> const xgcp,
+                    const Array1D<Real64> &xwght,
+                    Array1D<Real64> &theta,
+                    Real64 &ufactor,
+                    Real64 &hcin,
+                    Real64 &hin,
+                    Real64 &hout,
+                    Real64 &shgc,
+                    int &nperr,
+                    std::string &ErrorMessage,
+                    const Array1D_int &ibc,
+                    Array1D<Real64> &hg,
+                    Array1D<Real64> &hr,
+                    Array1D<Real64> &hs,
+                    Array1D<Real64> &Ra,
+                    Array1D<Real64> &Nu)
+    {
+
+        // Using/Aliasing
+        using TARCOGArgs::GoAhead;
+        using namespace TARCOGOutput;
+
+        /// function attributes:
+
+        /// INPUTS:
+
+        /// General:
+
+        // Argument array dimensioning
+        EP_SIZE_CHECK(gap, MaxGap);
+        EP_SIZE_CHECK(thick, maxlay);
+        EP_SIZE_CHECK(scon, maxlay);
+        EP_SIZE_CHECK(emis, maxlay2);
+        EP_SIZE_CHECK(asol, maxlay);
+        EP_SIZE_CHECK(presure, maxlay1);
+        iprop.dim(maxgas, maxlay1);
+        frct.dim(maxgas, maxlay1);
+        EP_SIZE_CHECK(nmix, maxlay1);
+        xgcon.dim(3, maxgas);
+        xgvis.dim(3, maxgas);
+        xgcp.dim(3, maxgas);
+        EP_SIZE_CHECK(xwght, maxgas);
+        EP_SIZE_CHECK(theta, maxlay2);
+        EP_SIZE_CHECK(ibc, 2);
+        EP_SIZE_CHECK(hg, maxlay);
+        EP_SIZE_CHECK(hr, maxlay);
+        EP_SIZE_CHECK(hs, maxlay);
+        EP_SIZE_CHECK(Ra, maxlay);
+        EP_SIZE_CHECK(Nu, maxlay);
+
+        // Locals
+        /// Environment related:
+
+        /// Layers:
+
+        /// Gaps:
+
+        //// INPUTS/OUTPUTS:
+
+        /// OUTPUTS:
+        /// Overall:
+
+        /// Layers:
+
+        /// Gaps:
+
+        Array1D<Real64> rs(maxlay3);
+        Real64 rtot;
+        Real64 sft;
+
+        // call  propcon90(standard, mgas, gcon, gvis, gcp, grho, wght, nperr)
+        rtot = 0.0;
+        sft = 0.0;
+        if (GoAhead(nperr)) {
+            EN673ISO10292(state,
+                          nlayer,
+                          tout,
+                          tind,
+                          emis,
+                          gap,
+                          thick,
+                          scon,
+                          tilt,
+                          iprop,
+                          frct,
+                          xgcon,
+                          xgvis,
+                          xgcp,
+                          xwght,
+                          presure,
+                          nmix,
+                          theta,
+                          standard,
+                          hg,
+                          hr,
+                          hs,
+                          hin,
+                          hout,
+                          hcin,
+                          ibc,
+                          rs,
+                          ufactor,
+                          Ra,
+                          Nu,
+                          nperr,
+                          ErrorMessage);
+
+            if (GoAhead(nperr)) {
+                rtot = 1.0 / ufactor;
+                solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
+                if (GoAhead(nperr)) {
+                    shgc = sft;
+                    if (files.WriteDebugOutput)
+                        WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
+                } // GoAhead after solar
+            }     // GoAhead after EN673ISO10292
+        }         // GopAhead after propcon90
     }
 
 } // namespace ThermalEN673Calc

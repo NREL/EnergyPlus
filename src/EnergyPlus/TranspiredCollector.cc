@@ -114,103 +114,6 @@ namespace TranspiredCollector {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string_view CompName, // component name
-                                int &CompIndex             // component index (to reduce string compares during simulation)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B.T. Griffith
-        //       DATE WRITTEN   November 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Manage simulation of Transpired Collectors
-
-        // METHODOLOGY EMPLOYED:
-        // Setup to avoid string comparisons after first call
-
-        // Using/Aliasing
-        using DataHVACGlobals::TempControlTol;
-
-        using ScheduleManager::GetCurrentScheduleValue;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        int UTSCNum(0); // local number index for UTSC
-
-        if (state.dataTranspiredCollector->GetInputFlag) {
-            GetTranspiredCollectorInput(state);
-            state.dataTranspiredCollector->GetInputFlag = false;
-        }
-
-        // Find the correct transpired collector with the Component name and/or index
-        if (CompIndex == 0) {
-            UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
-            if (UTSCNum == 0) {
-                ShowFatalError(state, "Transpired Collector not found=" + std::string{CompName});
-            }
-            CompIndex = UTSCNum;
-        } else {
-            UTSCNum = CompIndex;
-            if (UTSCNum > state.dataTranspiredCollector->NumUTSC || UTSCNum < 1) {
-                ShowFatalError(state,
-                               format("SimTranspiredCollector: Invalid CompIndex passed={}, Number of Transpired Collectors={}, UTSC name={}",
-                                      UTSCNum,
-                                      state.dataTranspiredCollector->NumUTSC,
-                                      CompName));
-            }
-            if (state.dataTranspiredCollector->CheckEquipName(UTSCNum)) {
-                if (CompName != state.dataTranspiredCollector->UTSC(UTSCNum).Name) {
-                    ShowFatalError(state,
-                                   format("SimTranspiredCollector: Invalid CompIndex passed={}, Transpired Collector name={}, stored Transpired "
-                                          "Collector Name for that index={}",
-                                          UTSCNum,
-                                          CompName,
-                                          state.dataTranspiredCollector->UTSC(UTSCNum).Name));
-                }
-                state.dataTranspiredCollector->CheckEquipName(UTSCNum) = false;
-            }
-        }
-
-        InitTranspiredCollector(state, CompIndex);
-
-        // Control point of deciding if transpired collector is active or not.
-        auto &UTSC_CI(state.dataTranspiredCollector->UTSC(CompIndex));
-        auto &InletNode(UTSC_CI.InletNode);
-        auto &ControlNode(UTSC_CI.ControlNode);
-        UTSC_CI.IsOn = false;
-        if ((GetCurrentScheduleValue(state, UTSC_CI.SchedPtr) > 0.0) &&
-            (UTSC_CI.InletMDot > 0.0)) { // availability Schedule | OA system is setting mass flow
-            bool ControlLTSet(false);
-            bool ControlLTSchedule(false);
-            bool ZoneLTSchedule(false);
-            assert(equal_dimensions(InletNode, ControlNode));
-            assert(equal_dimensions(InletNode, UTSC_CI.ZoneNode));
-            for (int i = InletNode.l(), e = InletNode.u(); i <= e; ++i) {
-                if (state.dataLoopNodes->Node(InletNode(i)).Temp + TempControlTol < state.dataLoopNodes->Node(ControlNode(i)).TempSetPoint)
-                    ControlLTSet = true;
-                if (state.dataLoopNodes->Node(InletNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
-                    ControlLTSchedule = true;
-                if (state.dataLoopNodes->Node(UTSC_CI.ZoneNode(i)).Temp + TempControlTol <
-                    GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
-                    ZoneLTSchedule = true;
-            }
-            if (ControlLTSet || (ControlLTSchedule && ZoneLTSchedule))
-                UTSC_CI.IsOn = true; // heating required | free heating helpful | free heating helpful
-        }
-
-        if (state.dataTranspiredCollector->UTSC(UTSCNum).IsOn) {
-            CalcActiveTranspiredCollector(state, UTSCNum);
-        } else {
-            CalcPassiveTranspiredCollector(state, UTSCNum);
-        }
-
-        UpdateTranspiredCollector(state, UTSCNum);
-    }
-
     void GetTranspiredCollectorInput(EnergyPlusData &state)
     {
 
@@ -1403,7 +1306,6 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         int OutletNode;
-        int InletNode;
         int thisOSCM;
         int thisOASys;
 
@@ -1416,7 +1318,6 @@ namespace TranspiredCollector {
         if (state.dataTranspiredCollector->UTSC(UTSCNum).IsOn) { // Active
             if (state.dataTranspiredCollector->UTSC(UTSCNum).NumOASysAttached == 1) {
                 OutletNode = state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode(1);
-                InletNode = state.dataTranspiredCollector->UTSC(UTSCNum).InletNode(1);
                 state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow;
                 state.dataLoopNodes->Node(OutletNode).Temp = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp;
                 state.dataLoopNodes->Node(OutletNode).HumRat = state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat;
@@ -1434,12 +1335,7 @@ namespace TranspiredCollector {
                         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth;
                 }
             }
-        } else { // Passive and/or bypassed           Note Array assignments in following
-                 // Autodesk:F2C++ Array subscript usage: Replaced by below
-            //            Node( UTSC( UTSCNum ).OutletNode ).MassFlowRate = Node( UTSC( UTSCNum ).InletNode ).MassFlowRate;
-            //            Node( UTSC( UTSCNum ).OutletNode ).Temp = Node( UTSC( UTSCNum ).InletNode ).Temp;
-            //            Node( UTSC( UTSCNum ).OutletNode ).HumRat = Node( UTSC( UTSCNum ).InletNode ).HumRat;
-            //            Node( UTSC( UTSCNum ).OutletNode ).Enthalpy = Node( UTSC( UTSCNum ).InletNode ).Enthalpy;
+        } else {
             auto const &OutletNode(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode);
             auto const &InletNode(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode);
             assert(OutletNode.size() == InletNode.size());
@@ -1462,6 +1358,100 @@ namespace TranspiredCollector {
         state.dataSurface->OSCM(thisOSCM).HRad = state.dataTranspiredCollector->UTSC(UTSCNum).HrPlen;
     }
 
+    void SimTranspiredCollector(EnergyPlusData &state,
+                                std::string_view CompName, // component name
+                                int &CompIndex             // component index (to reduce string compares during simulation)
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B.T. Griffith
+        //       DATE WRITTEN   November 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manage simulation of Transpired Collectors
+
+        // METHODOLOGY EMPLOYED:
+        // Setup to avoid string comparisons after first call
+
+        // Using/Aliasing
+        using DataHVACGlobals::TempControlTol;
+        using ScheduleManager::GetCurrentScheduleValue;
+
+        int UTSCNum(0); // local number index for UTSC
+
+        if (state.dataTranspiredCollector->GetInputFlag) {
+            GetTranspiredCollectorInput(state);
+            state.dataTranspiredCollector->GetInputFlag = false;
+        }
+
+        // Find the correct transpired collector with the Component name and/or index
+        if (CompIndex == 0) {
+            UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
+            if (UTSCNum == 0) {
+                ShowFatalError(state, "Transpired Collector not found=" + std::string{CompName});
+            }
+            CompIndex = UTSCNum;
+        } else {
+            UTSCNum = CompIndex;
+            if (UTSCNum > state.dataTranspiredCollector->NumUTSC || UTSCNum < 1) {
+                ShowFatalError(state,
+                               format("SimTranspiredCollector: Invalid CompIndex passed={}, Number of Transpired Collectors={}, UTSC name={}",
+                                      UTSCNum,
+                                      state.dataTranspiredCollector->NumUTSC,
+                                      CompName));
+            }
+            if (state.dataTranspiredCollector->CheckEquipName(UTSCNum)) {
+                if (CompName != state.dataTranspiredCollector->UTSC(UTSCNum).Name) {
+                    ShowFatalError(state,
+                                   format("SimTranspiredCollector: Invalid CompIndex passed={}, Transpired Collector name={}, stored Transpired "
+                                          "Collector Name for that index={}",
+                                          UTSCNum,
+                                          CompName,
+                                          state.dataTranspiredCollector->UTSC(UTSCNum).Name));
+                }
+                state.dataTranspiredCollector->CheckEquipName(UTSCNum) = false;
+            }
+        }
+
+        InitTranspiredCollector(state, CompIndex);
+
+        // Control point of deciding if transpired collector is active or not.
+        auto &UTSC_CI(state.dataTranspiredCollector->UTSC(CompIndex));
+        auto &InletNode(UTSC_CI.InletNode);
+        auto &ControlNode(UTSC_CI.ControlNode);
+        UTSC_CI.IsOn = false;
+        if ((GetCurrentScheduleValue(state, UTSC_CI.SchedPtr) > 0.0) &&
+            (UTSC_CI.InletMDot > 0.0)) { // availability Schedule | OA system is setting mass flow
+            bool ControlLTSet(false);
+            bool ControlLTSchedule(false);
+            bool ZoneLTSchedule(false);
+            assert(equal_dimensions(InletNode, ControlNode));
+            assert(equal_dimensions(InletNode, UTSC_CI.ZoneNode));
+            for (int i = InletNode.l(), e = InletNode.u(); i <= e; ++i) {
+                if (state.dataLoopNodes->Node(InletNode(i)).Temp + TempControlTol < state.dataLoopNodes->Node(ControlNode(i)).TempSetPoint)
+                    ControlLTSet = true;
+                if (state.dataLoopNodes->Node(InletNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
+                    ControlLTSchedule = true;
+                if (state.dataLoopNodes->Node(UTSC_CI.ZoneNode(i)).Temp + TempControlTol <
+                    GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
+                    ZoneLTSchedule = true;
+            }
+            if (ControlLTSet || (ControlLTSchedule && ZoneLTSchedule))
+                UTSC_CI.IsOn = true; // heating required | free heating helpful | free heating helpful
+        }
+
+        if (state.dataTranspiredCollector->UTSC(UTSCNum).IsOn) {
+            CalcActiveTranspiredCollector(state, UTSCNum);
+        } else {
+            CalcPassiveTranspiredCollector(state, UTSCNum);
+        }
+
+        UpdateTranspiredCollector(state, UTSCNum);
+    }
+
     void SetUTSCQdotSource(EnergyPlusData &state,
                            int const UTSCNum,
                            Real64 const QSource // source term in Watts
@@ -1475,7 +1465,7 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Set" routine for updating sink term without exposing variables
+        // object-oriented "Set" routine for updating sink term without exposing variables
 
         // METHODOLOGY EMPLOYED:
         // update derived type with new data , turn power into W/m2
@@ -1493,7 +1483,7 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Get" routine for establishing correct integer index from outside this module
+        // object-oriented "Get" routine for establishing correct integer index from outside this module
 
         // METHODOLOGY EMPLOYED:
         // mine Surface derived type for correct index/number of surface
@@ -1546,7 +1536,7 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Get" routine for collector surface temperature
+        // object-oriented "Get" routine for collector surface temperature
 
         // METHODOLOGY EMPLOYED:
         // access derived type

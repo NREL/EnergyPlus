@@ -156,6 +156,1077 @@ void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Rea
     }
 }
 
+void storeIterationResults(EnergyPlusData &state,
+                           Files &files,
+                           int const nlayer,
+                           int const index,
+                           const Array1D<Real64> &theta,
+                           Real64 const trmout,
+                           Real64 const tamb,
+                           Real64 const trmin,
+                           Real64 const troom,
+                           Real64 const ebsky,
+                           Real64 const ebroom,
+                           Real64 const hcin,
+                           Real64 const hcout,
+                           Real64 const hrin,
+                           Real64 const hrout,
+                           Real64 const hin,
+                           Real64 const hout,
+                           const Array1D<Real64> &Ebb,
+                           const Array1D<Real64> &Ebf,
+                           const Array1D<Real64> &Rb,
+                           const Array1D<Real64> &Rf,
+                           int &)
+{
+    auto &dynFormat = state.dataThermalISO15099Calc->dynFormat;
+    int i;
+
+    // write(a,1000) index
+    print(files.TarcogIterationsFile, "*************************************************************************************************\n");
+    print(files.TarcogIterationsFile, "Iteration number: {:5}\n", index);
+
+    print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n", trmin - DataGlobalConstants::KelvinConv);
+    print(files.TarcogIterationsFile, "Troom = {:12.6F}\n", troom - DataGlobalConstants::KelvinConv);
+    print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n", trmout - DataGlobalConstants::KelvinConv);
+    print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n", tamb - DataGlobalConstants::KelvinConv);
+
+    print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n", ebsky);
+    print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n", ebroom);
+
+    print(files.TarcogIterationsFile, "hcin = {:8.4F}\n", hcin);
+    print(files.TarcogIterationsFile, "hcout = {:8.4F}\n", hcout);
+    print(files.TarcogIterationsFile, "hrin = {:8.4F}\n", hrin);
+    print(files.TarcogIterationsFile, "hrout = {:8.4F}\n", hrout);
+    print(files.TarcogIterationsFile, "hin = {:8.4F}\n", hin);
+    print(files.TarcogIterationsFile, "hout = {:8.4F}\n", hout);
+
+    // Write headers for Ebb and Ebf
+    for (i = 1; i <= 2 * nlayer; ++i) {
+        if (i == 1) {
+            dynFormat = "";
+        }
+        if (mod(i, 2) == 1) {
+            dynFormat += fmt::format("Ebf({:3})", (i + 1) / 2);
+        } else {
+            dynFormat += fmt::format("Ebb({:3})", (i + 1) / 2);
+        }
+        if (i != 2 * nlayer) {
+            dynFormat += "===";
+        }
+    }
+    print(files.TarcogIterationsFile, dynFormat);
+    print(files.TarcogIterationsFile, "\n");
+
+    // write Ebb and Ebf
+    print(files.TarcogIterationsFile, "{:16.8F}   {:16.8F}", Ebf(1), Ebb(1));
+    for (i = 2; i <= nlayer; ++i) {
+        print(files.TarcogIterationsFile, "   {:16.8F}   {:16.8F}", Ebf(i), Ebb(i));
+    }
+    print(files.TarcogIterationsFile, "\n");
+
+    // Write headers for Rb and Rf
+    for (i = 1; i <= 2 * nlayer; ++i) {
+        const auto a = fmt::format("{:3}", (i + 1) / 2); // this is just to simulate correct integer in brackets
+        if (i == 1) {
+            dynFormat = "";
+        }
+        if (mod(i, 2) == 1) {
+            dynFormat += "Rf(" + a + ')';
+        } else {
+            dynFormat += "Rb(" + a + ')';
+        }
+        if (i != 2 * nlayer) {
+            dynFormat += "===";
+        }
+    }
+    print(files.TarcogIterationsFile, dynFormat);
+    print(files.TarcogIterationsFile, "\n");
+    // write Rb and Rf
+    print(files.TarcogIterationsFile, "{:16.8F}   {:16.8F}", Rf(1), Rb(1));
+    for (i = 1; i <= nlayer; ++i) {
+        print(files.TarcogIterationsFile, "   {:16.8F}   {:16.8F}", Rf(i), Rb(i));
+    }
+    print(files.TarcogIterationsFile, "\n");
+
+    // Write header for temperatures
+    for (i = 1; i <= 2 * nlayer; ++i) {
+        const auto a = fmt::format("{:3}", i);
+        if (i == 1) {
+            dynFormat = "";
+        }
+        dynFormat += "theta(" + a + ')';
+        if (i != (2 * nlayer)) {
+            dynFormat += "==";
+        }
+    }
+    print(files.TarcogIterationsFile, dynFormat);
+    print(files.TarcogIterationsFile, "\n");
+
+    // write temperatures
+    print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
+    for (i = 2; i <= 2 * nlayer; ++i) {
+        print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
+    }
+    print(files.TarcogIterationsFile, "\n");
+
+    // close(TarcogIterationsFileNumber)
+
+    // write results in csv file
+    if (index == 0) {
+        dynFormat = "  ";
+        for (i = 1; i <= 2 * nlayer; ++i) {
+            const auto a = fmt::format("{:3}", i);
+            if (i != 2 * nlayer) {
+                dynFormat += "theta(" + a + "),";
+            } else {
+                dynFormat += "theta(" + a + ')';
+            }
+        }
+        print(files.IterationCSVFile, dynFormat);
+        print(files.IterationCSVFile, "\n");
+    }
+    print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
+    for (i = 2; i <= 2 * nlayer; ++i) {
+        print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
+    }
+    print(files.IterationCSVFile, "\n");
+
+    // close(IterationCSVFileNumber)
+}
+
+void effectiveLayerCond(EnergyPlusData &state,
+                        int const nlayer,
+                        const Array1D<TARCOGLayerType> &LayerType, // Layer type
+                        const Array1D<Real64> &scon,               // Layer thermal conductivity
+                        const Array1D<Real64> &thick,              // Layer thickness
+                        Array2A_int const iprop,                   // Gas type in gaps
+                        Array2A<Real64> const frct,                // Fraction of gas
+                        const Array1D_int &nmix,                   // Gas mixture
+                        const Array1D<Real64> &pressure,           // Gas pressure [Pa]
+                        const Array1D<Real64> &wght,               // Molecular weight
+                        Array2A<Real64> const gcon,                // Gas specific conductivity
+                        Array2A<Real64> const gvis,                // Gas specific viscosity
+                        Array2A<Real64> const gcp,                 // Gas specific heat
+                        const Array1D<Real64> &EffectiveOpenness,  // Layer effective openneess [m2]
+                        Array1D<Real64> &theta,                    // Layer surface tempeartures [K]
+                        Array1D<Real64> &sconScaled,               // Layer conductivity divided by thickness
+                        int &nperr,                                // Error message flag
+                        std::string &ErrorMessage                  // Error message
+)
+{
+    for (auto i = 1; i <= nlayer; ++i) {
+        if (LayerType(i) != TARCOGLayerType::SPECULAR) {
+            auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
+            auto nmix1 = nmix(i);
+            auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;
+            for (auto j = 1; j <= maxgas; ++j) {
+                state.dataThermalISO15099Calc->iprop1(j) = iprop(j, i);
+                state.dataThermalISO15099Calc->frct1(j) = frct(j, i);
+            }
+
+            Real64 con;
+            Real64 visc;
+            Real64 dens;
+            Real64 cp;
+            Real64 pr;
+            GASSES90(state,
+                     tLayer,
+                     state.dataThermalISO15099Calc->iprop1,
+                     state.dataThermalISO15099Calc->frct1,
+                     press1,
+                     nmix1,
+                     wght,
+                     gcon,
+                     gvis,
+                     gcp,
+                     con,
+                     visc,
+                     dens,
+                     cp,
+                     pr,
+                     TARCOGGassesParams::Stdrd::ISO15099,
+                     nperr,
+                     ErrorMessage);
+            sconScaled(i) = (EffectiveOpenness(i) * con + (1 - EffectiveOpenness(i)) * scon(i)) / thick(i);
+        } else {
+            sconScaled(i) = scon(i) / thick(i);
+        }
+    }
+}
+
+void CalculateFuncResults(int const nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes)
+{
+    // Tuned Rewritten to traverse a in unit stride order
+    int const nlayer4(4 * nlayer);
+    for (int i = 1; i <= nlayer4; ++i) {
+        FRes(i) = -b(i);
+    }
+    for (int j = 1; j <= nlayer4; ++j) {
+        Real64 const x_j(x(j));
+        for (int i = 1; i <= nlayer4; ++i) {
+            FRes(i) += a(j, i) * x_j;
+        }
+    }
+}
+
+void therm1d(EnergyPlusData &state,
+             Files &files,
+             int const nlayer,
+             int const iwd,
+             Real64 &tout,
+             Real64 &tind,
+             Real64 const wso,
+             Real64 const wsi,
+             Real64 const VacuumPressure,
+             Real64 const VacuumMaxGapThickness,
+             Real64 const dir,
+             Real64 &ebsky,
+             Real64 const Gout,
+             Real64 const trmout,
+             Real64 const trmin,
+             Real64 &ebroom,
+             Real64 const Gin,
+             const Array1D<Real64> &tir,
+             const Array1D<Real64> &rir,
+             const Array1D<Real64> &emis,
+             const Array1D<Real64> &gap,
+             const Array1D<Real64> &thick,
+             const Array1D<Real64> &scon,
+             Real64 const tilt,
+             const Array1D<Real64> &asol,
+             Real64 const height,
+             Real64 const heightt,
+             Real64 const width,
+             Array2_int const &iprop,
+             Array2<Real64> const &frct,
+             const Array1D<Real64> &presure,
+             const Array1D_int &nmix,
+             const Array1D<Real64> &wght,
+             Array2<Real64> const &gcon,
+             Array2<Real64> const &gvis,
+             Array2<Real64> const &gcp,
+             const Array1D<Real64> &gama,
+             const Array1D_int &SupportPillar,
+             const Array1D<Real64> &PillarSpacing,
+             const Array1D<Real64> &PillarRadius,
+             Array1D<Real64> &theta,
+             Array1D<Real64> &q,
+             Array1D<Real64> &qv,
+             Real64 &flux,
+             Real64 &hcin,
+             Real64 &hrin,
+             Real64 &hcout,
+             Real64 &hrout,
+             Real64 &hin,
+             Real64 &hout,
+             Array1D<Real64> &hcgas,
+             Array1D<Real64> &hrgas,
+             Real64 &ufactor,
+             int &nperr,
+             std::string &ErrorMessage,
+             Real64 &tamb,
+             Real64 &troom,
+             const Array1D_int &ibc,
+             const Array1D<Real64> &Atop,
+             const Array1D<Real64> &Abot,
+             const Array1D<Real64> &Al,
+             const Array1D<Real64> &Ar,
+             const Array1D<Real64> &Ah,
+             const Array1D<Real64> &EffectiveOpenness,
+             const Array1D<Real64> &vvent,
+             const Array1D<Real64> &tvent,
+             const Array1D<TARCOGLayerType> &LayerType,
+             Array1D<Real64> &Ra,
+             Array1D<Real64> &Nu,
+             Array1D<Real64> &vfreevent,
+             Array1D<Real64> &qcgas,
+             Array1D<Real64> &qrgas,
+             Array1D<Real64> &Ebf,
+             Array1D<Real64> &Ebb,
+             Array1D<Real64> &Rf,
+             Array1D<Real64> &Rb,
+             Real64 &ShadeEmisRatioOut,
+             Real64 &ShadeEmisRatioIn,
+             Real64 &ShadeHcModifiedOut,
+             Real64 &ShadeHcModifiedIn,
+             TARCOGThermalModel ThermalMod,
+             [[maybe_unused]] int const Debug_mode,
+             Real64 &AchievedErrorTolerance,
+             int &TotalIndex,
+             Real64 const edgeGlCorrFac)
+{
+    //********************************************************************************
+    // Main subroutine for calculation of 1-D heat transfer in the center of glazing.
+    //********************************************************************************
+    // Inputs
+    //   nlayer    number of solid layers
+    //   iwd   wind direction
+    //   tout  outside temp in k
+    //   tind  inside temp in k
+    //   wso   wind speed in m/s
+    //   wsi   inside forced air speed m/s
+    //   Ebsky     ir flux from outside
+    //   Gout  back facing radiosity from outside
+    //   Trmout    Mean outdoor radiant temperature
+    //   Trmin     Mean indoor radiant temperature
+    //   Ebroom    ir flux from room
+    //   Gin   front facing radiosity from room
+    //   tir   ir transmittance of each layer
+    //   rir   ir reflectance of each surface
+    //   emis  ir emittances of each surface
+    //   gap   array of gap widths in meters
+    //   thick     thickness of glazing layers (m)
+    //   scon  Vector of conductivities of 'glazing' layers
+    //   tilt  Window tilt (deg). vert: tilt=90, hor out up: tilt=0, hor out down: tilt=180
+    //   sol   absorbed solar energy for each layer in w/m2
+    //   height    glazing cavity height
+    //   heightt
+    //   iprop
+    //   frct
+    //   presure
+    //   nmix  vector of number of gasses in a mixture for each gap
+    //   hin  convective indoor film coefficient (if non-zero hin input)
+    //   hout     convective outdoor film coeff. (if non-zero hout input)
+    // outputs
+    //   theta     temp distribution in k
+    //   flux  net heat flux between room and window
+    //   rtot  overall thermal resistance
+    //   rs    ?
+    //   hcin  convective indoor film coeff.
+    //   hrin  radiative part of indoor film coeff.
+    //   hcout     convective outdoor film coeff.
+    //   hrout     radiative part of outdoor film coeff.
+    //   hin   convective indoor film coefficient
+    //   hout  convective outdoor film coeff.
+    //   ufactor   overall u-factor
+    //   qcgap     vector of convective/conductive parts of flux in gaps
+    //   qrgap     vector of radiative parts of flux in gaps
+    //   nperr
+    // *Inactives**
+    //   wa - window azimuth (degrees, clockwise from south)
+    //   hgas  matrix of gap film coefficients
+    // Locals
+    //   Ebb   Vector
+    //   Ebf   Vector
+    //   Rb    Vector
+    //   Rf    Vector
+    //   a     Array
+    //   b     Array
+    //   hhat  Vector
+    //   err   iteration tolerance
+    //   dtmax     max temp dfference after iteration
+    //   index     iteration step
+
+    // Using
+    // Locals
+    //    0 - don't create debug output files
+    //    1 - append results to existing debug output file
+    //    2 - store results in new debug output file
+    //   3 - save in-between results (in all iterations) to existing debug file
+
+    Array2D<Real64> a(4 * nlayer, 4 * nlayer);
+    Array1D<Real64> b(4 * nlayer);
+    // REAL(r64) :: hhatv(maxlay3),hcv(maxlay3), Ebgap(maxlay3), Tgap(maxlay1)
+
+    // REAL(r64) ::  alpha
+    int maxiter;
+
+    Real64 qr_gap_out;
+    Real64 qr_gap_in;
+
+    Array1D<Real64> told(2 * nlayer);
+
+    // Simon: parameters used in case of JCFN iteration method
+    Array1D<Real64> FRes({1, 4 * nlayer});      // store function results from current iteration
+    Array1D<Real64> FResOld({1, 4 * nlayer});   // store function results from previous iteration
+    Array1D<Real64> FResDiff({1, 4 * nlayer});  // save difference in results between iterations
+    Array1D<Real64> Radiation({1, 2 * nlayer}); // radiation on layer surfaces.  used as temporary storage during iterations
+
+    Array1D<Real64> x({1, 4 * nlayer});       // temporary vector for storing results (theta and Radiation).  used for easier handling
+    Array1D<Real64> dX({1, 4 * nlayer}, 0.0); // difference in results
+    Array2D<Real64> Jacobian({1, 4 * nlayer}, {1, 4 * nlayer}); // diagonal vector for jacobian comuptation-free newton method
+    Array1D<Real64> DRes({1, 4 * nlayer});                      // used in jacobian forward-difference approximation
+
+    // This is used to store matrix before equation solver.  It is important because solver destroys
+    // content of matrices
+    Array2D<Real64> LeftHandSide({1, 4 * nlayer}, {1, 4 * nlayer});
+    Array1D<Real64> RightHandSide({1, 4 * nlayer});
+
+    // Simon: Keep best achieved convergence
+    Real64 prevDifference;
+    Real64 Relaxation;
+    Array1D<Real64> RadiationSave({1, 2 * nlayer});
+    Array1D<Real64> thetaSave({1, 2 * nlayer});
+    int currentTry;
+
+    int CSMFlag;
+    int i;
+    int j;
+    int k;
+    Real64 curDifference;
+    int index;
+    int curTempCorrection;
+
+    Real64 qc_gap_in;
+    Real64 hc_modified_in;
+
+    CalculationOutcome CalcOutcome;
+
+    bool iterationsFinished; // To mark whether or not iterations are finished
+    bool saveIterationResults;
+    bool updateGapTemperature;
+    // logical :: TurnOnNewton
+
+    int SDLayerIndex = -1;
+
+    Array1D<Real64> sconScaled(maxlay);
+
+    // Simon: This is set to zero until it is resolved what to do with modifier
+    ShadeHcModifiedOut = 0.0;
+    CSMFlag = 0;
+    CalcOutcome = CalculationOutcome::Unknown;
+    curTempCorrection = 0;
+    AchievedErrorTolerance = 0.0;
+    curDifference = 0.0;
+    currentTry = 0;
+    index = 0;
+    TotalIndex = 0;
+    iterationsFinished = false;
+    qv = 0.0;
+    Ebb = 0.0;
+    Ebf = 0.0;
+    Rb = 0.0;
+    Rf = 0.0;
+    a = 0.0;
+    b = 0.0;
+
+    FRes = 0.0;
+    FResOld = 0.0;
+    FResDiff = 0.0;
+    Radiation = 0.0;
+    Relaxation = RelaxationStart;
+
+    maxiter = NumOfIterations;
+
+    saveIterationResults = false;
+
+    for (i = 1; i <= nlayer; ++i) {
+        k = 2 * i;
+        Radiation(k) = Ebb(i);
+        Radiation(k - 1) = Ebf(i);
+        told(k - 1) = 0.0;
+        told(k) = 0.0;
+    }
+
+    // bi...Set LayerTypeSpec array - need to treat venetians AND woven shades as glass:
+    if (ThermalMod == TARCOGThermalModel::CSM) {
+        for (i = 1; i <= nlayer; ++i) {
+            if (IsShadingLayer(LayerType(i))) {
+                //                    LayerTypeSpec( i ) = 0; //Unused
+                SDLayerIndex = i;
+            } else {
+                //                    LayerTypeSpec( i ) = LayerType( i ); //Unused
+            }
+        }
+    }
+
+    // first store results before iterations begin
+    if (saveIterationResults) {
+        storeIterationResults(state,
+                              files,
+                              nlayer,
+                              index,
+                              theta,
+                              trmout,
+                              tamb,
+                              trmin,
+                              troom,
+                              ebsky,
+                              ebroom,
+                              hcin,
+                              hcout,
+                              hrin,
+                              hrout,
+                              hin,
+                              hout,
+                              Ebb,
+                              Ebf,
+                              Rb,
+                              Rf,
+                              nperr);
+    }
+
+    state.dataThermalISO15099Calc->Tgap(1) = tout;
+    state.dataThermalISO15099Calc->Tgap(nlayer + 1) = tind;
+    for (i = 2; i <= nlayer; ++i) {
+        state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
+    }
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!! MAIN ITERATION LOOP
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    while (!(iterationsFinished)) {
+
+        for (i = 1; i <= 2 * nlayer; ++i) {
+            if (theta(i) < 0) {
+                theta(i) = 1.0 * i;
+            }
+        }
+
+        // do i=1,nlayer+1
+        //  if (i == 1) then
+        //    Tgap(i) = tout
+        //  else if (i == nlayer+1) then
+        //    Tgap(i) = tind
+        //  else
+        //    Tgap(i) = (theta(2*i-2) + theta(2*i-1)) / 2.0d0
+        //  end if
+        // end do
+
+        // skip updating gap temperatures for shading devices. Gap temperature in that case is not simply average
+        // between two layer temperatures
+        for (i = 2; i <= nlayer; ++i) {
+            updateGapTemperature = false;
+            if ((!(IsShadingLayer(LayerType(i - 1)))) && (!(IsShadingLayer(LayerType(i))))) {
+                updateGapTemperature = true;
+            }
+            if (updateGapTemperature) {
+                state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
+            }
+        }
+
+        // evaluate convective/conductive components of gap
+        hatter(state,
+               nlayer,
+               iwd,
+               tout,
+               tind,
+               wso,
+               wsi,
+               VacuumPressure,
+               VacuumMaxGapThickness,
+               ebsky,
+               tamb,
+               ebroom,
+               troom,
+               gap,
+               height,
+               heightt,
+               scon,
+               tilt,
+               theta,
+               state.dataThermalISO15099Calc->Tgap,
+               Radiation,
+               trmout,
+               trmin,
+               iprop,
+               frct,
+               presure,
+               nmix,
+               wght,
+               gcon,
+               gvis,
+               gcp,
+               gama,
+               SupportPillar,
+               PillarSpacing,
+               PillarRadius,
+               state.dataThermalISO15099Calc->hgas,
+               hcgas,
+               hrgas,
+               hcin,
+               hcout,
+               hin,
+               hout,
+               index,
+               ibc,
+               nperr,
+               ErrorMessage,
+               hrin,
+               hrout,
+               Ra,
+               Nu);
+
+        effectiveLayerCond(state,
+                           nlayer,
+                           LayerType,
+                           scon,
+                           thick,
+                           iprop,
+                           frct,
+                           nmix,
+                           presure,
+                           wght,
+                           gcon,
+                           gvis,
+                           gcp,
+                           EffectiveOpenness,
+                           theta,
+                           sconScaled,
+                           nperr,
+                           ErrorMessage);
+
+        // exit on error
+        if (!(GoAhead(nperr))) return;
+
+        // bi...Override hhat values near SHADING DEVICE layer(s), but only for CSM thermal model:
+        if ((ThermalMod == TARCOGThermalModel::CSM) && (SDLayerIndex > 0)) {
+            // adjust hhat values
+            // call adjusthhat(SDLayerIndex, ibc, tout, tind, nlayer, theta, wso, wsi, iwd, height, heightt, tilt,  &
+            //               &  thick, gap, hout, hrout, hin, hrin, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, &
+            //               index, SDScalar, Ebf, Ebb, hgas, hhat, nperr, ErrorMessage)
+            // do i = 1, maxlay3
+            // hhatv(i) = 0.0d0
+            // Ebgap(i) = 0.0d0
+            // qv(i)    = 0.0d0
+            // hcv(i)   = 0.0d0
+            // end do
+            matrixQBalance(nlayer,
+                           a,
+                           b,
+                           sconScaled,
+                           hcgas,
+                           state.dataThermalISO15099Calc->hcgapMod,
+                           asol,
+                           qv,
+                           state.dataThermalISO15099Calc->hcv,
+                           tind,
+                           tout,
+                           Gin,
+                           Gout,
+                           theta,
+                           tir,
+                           rir,
+                           emis,
+                           edgeGlCorrFac);
+        } else {
+            // bi...There are no Venetian layers, or ThermalMod is not CSM, so carry on as usual:
+            shading(state,
+                    theta,
+                    gap,
+                    state.dataThermalISO15099Calc->hgas,
+                    hcgas,
+                    hrgas,
+                    frct,
+                    iprop,
+                    presure,
+                    nmix,
+                    wght,
+                    gcon,
+                    gvis,
+                    gcp,
+                    nlayer,
+                    width,
+                    height,
+                    tilt,
+                    tout,
+                    tind,
+                    Atop,
+                    Abot,
+                    Al,
+                    Ar,
+                    Ah,
+                    vvent,
+                    tvent,
+                    LayerType,
+                    state.dataThermalISO15099Calc->Tgap,
+                    qv,
+                    state.dataThermalISO15099Calc->hcv,
+                    nperr,
+                    ErrorMessage,
+                    vfreevent);
+
+            // exit on error
+            if (!(GoAhead(nperr))) return;
+
+            matrixQBalance(nlayer,
+                           a,
+                           b,
+                           sconScaled,
+                           hcgas,
+                           state.dataThermalISO15099Calc->hcgapMod,
+                           asol,
+                           qv,
+                           state.dataThermalISO15099Calc->hcv,
+                           tind,
+                           tout,
+                           Gin,
+                           Gout,
+                           theta,
+                           tir,
+                           rir,
+                           emis,
+                           edgeGlCorrFac);
+
+        } //  end if
+
+        FResOld = FRes;
+
+        // Pack results in one array
+        for (i = 1; i <= nlayer; ++i) {
+            k = 4 * i - 3;
+            j = 2 * i - 1;
+
+            x(k) = theta(j);
+            x(k + 1) = Radiation(j);
+            x(k + 2) = Radiation(j + 1);
+            x(k + 3) = theta(j + 1);
+        }
+
+        CalculateFuncResults(nlayer, a, b, x, FRes);
+
+        FResDiff = FRes - FResOld;
+
+        LeftHandSide = a;
+        RightHandSide = b;
+        EquationsSolver(state, LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
+
+        // Simon: This is much better, but also much slower convergence criteria.  Think of how to make this flexible and allow
+        // user to change this from outside (through argument passing)
+        // curDifference = ABS(FRes(1))
+        // do i = 2, 4*nlayer
+        // curDifference = MAX(curDifference, ABS(FRes(i)))
+        // curDifference = curDifference + ABS(FRes(i))
+        // end do
+
+        curDifference = std::abs(theta(1) - told(1));
+        // curDifference = ABS(FRes(1))
+        for (i = 2; i <= 2 * nlayer; ++i) {
+            // do i = 2, 4*nlayer
+            curDifference = max(curDifference, std::abs(theta(i) - told(i)));
+            // curDifference = MAX(ABS(FRes(i)), curDifference)
+        }
+
+        for (i = 1; i <= nlayer; ++i) {
+            k = 4 * i - 3;
+            j = 2 * i - 1;
+            // if (TurnOnNewton) then
+            //  theta(j) = theta(j) + Relaxation*dx(k)
+            //  theta(j+1) = theta(j+1) + Relaxation*dx(k+1)
+            //  Radiation(j) = Radiation(j) + Relaxation*dx(k+2)
+            //  Radiation(j+1) = Radiation(j+1) + Relaxation*dx(k+3)
+            // else
+            //  dX(k) = RightHandSide(k) - theta(j)
+            //  dX(k+1) = RightHandSide(k + 1) - theta(j+1)
+            //  dX(k+2) = RightHandSide(k + 2) - Radiation(j)
+            //  dX(k+3) = RightHandSide(k + 3) - Radiation(j+1)
+            told(j) = theta(j);
+            told(j + 1) = theta(j + 1);
+            theta(j) = (1 - Relaxation) * theta(j) + Relaxation * RightHandSide(k);
+            Radiation(j) = (1 - Relaxation) * Radiation(j) + Relaxation * RightHandSide(k + 1);
+            Radiation(j + 1) = (1 - Relaxation) * Radiation(j + 1) + Relaxation * RightHandSide(k + 2);
+            theta(j + 1) = (1 - Relaxation) * theta(j + 1) + Relaxation * RightHandSide(k + 3);
+            // end if
+        }
+
+        // it is important not to update gaps around shading layers since that is already calculated by
+        // shading routines
+        for (i = 1; i <= nlayer + 1; ++i) {
+            updateGapTemperature = true;
+            if ((i == 1) || (i == nlayer + 1)) {
+                // update gap array with interior and exterior temperature
+                updateGapTemperature = true;
+            } else {
+                // update gap temperature only if gap on both sides
+                updateGapTemperature = false;
+                if ((!(IsShadingLayer(LayerType(i - 1)))) && (!(IsShadingLayer(LayerType(i))))) {
+                    updateGapTemperature = true;
+                }
+            }
+            j = 2 * (i - 1);
+            if (updateGapTemperature) {
+                if (i == 1) {
+                    state.dataThermalISO15099Calc->Tgap(1) = tout;
+                } else if (i == (nlayer + 1)) {
+                    state.dataThermalISO15099Calc->Tgap(i) = tind;
+                } else {
+                    state.dataThermalISO15099Calc->Tgap(i) = (theta(j) + theta(j + 1)) / 2;
+                }
+            }
+        }
+
+        // and store results during iterations
+        if (saveIterationResults) {
+            storeIterationResults(state,
+                                  files,
+                                  nlayer,
+                                  index + 1,
+                                  theta,
+                                  trmout,
+                                  tamb,
+                                  trmin,
+                                  troom,
+                                  ebsky,
+                                  ebroom,
+                                  hcin,
+                                  hcout,
+                                  hrin,
+                                  hrout,
+                                  hin,
+                                  hout,
+                                  Ebb,
+                                  Ebf,
+                                  Rb,
+                                  Rf,
+                                  nperr);
+        }
+
+        if (!(GoAhead(nperr))) return;
+
+        prevDifference = curDifference;
+
+        if ((index == 0) || (curDifference < AchievedErrorTolerance)) {
+            AchievedErrorTolerance = curDifference;
+            currentTry = 0;
+            for (i = 1; i <= 2 * nlayer; ++i) {
+                RadiationSave(i) = Radiation(i);
+                thetaSave(i) = theta(i);
+            }
+        } else {
+            // This is case when program solution diverged
+            ++currentTry;
+            if (currentTry >= NumOfTries) {
+                currentTry = 0;
+                for (i = 1; i <= 2 * nlayer; ++i) {
+                    Radiation(i) = RadiationSave(i);
+                    theta(i) = thetaSave(i);
+                }
+                // if (.not.TurnOnNewton) then
+                //  TurnOnNewton = .TRUE.
+                // else
+                Relaxation -= RelaxationDecrease;
+                TotalIndex += index;
+                index = 0;
+                // Start from best achieved convergence
+                if (Relaxation <= 0.0) { // cannot continue with relaxation equal to zero
+                    iterationsFinished = true;
+                }
+                // TurnOnNewton = .TRUE.
+                // end if ! if (.not.TurnOnNewton) then
+            } // f (currentTry == NumOfTries) then
+        }
+
+        // Chek if results were found:
+        if (curDifference < ConvergenceTolerance) {
+            CalcOutcome = CalculationOutcome::OK;
+            TotalIndex += index;
+            iterationsFinished = true;
+        }
+
+        if (index >= maxiter) {
+            Relaxation -= RelaxationDecrease;
+            TotalIndex += index;
+            index = 0;
+            // TurnOnNewton = .TRUE.
+
+            // Start from best achieved convergence
+            for (i = 1; i <= 2 * nlayer; ++i) {
+                Radiation(i) = RadiationSave(i);
+                theta(i) = thetaSave(i);
+            }
+            if (Relaxation <= 0.0) { // cannot continue with relaxation equal to zero
+                iterationsFinished = true;
+            }
+        }
+
+        ++index;
+    }
+
+    // Get results from closest iteration and store it
+    if (CalcOutcome == CalculationOutcome::OK) {
+        for (i = 1; i <= 2 * nlayer; ++i) {
+            Radiation(i) = RadiationSave(i);
+            theta(i) = thetaSave(i);
+        }
+
+        for (i = 2; i <= nlayer; ++i) {
+            updateGapTemperature = false;
+            if ((!(IsShadingLayer(LayerType(i - 1)))) && (!(IsShadingLayer(LayerType(i))))) {
+                updateGapTemperature = true;
+            }
+
+            if (updateGapTemperature) {
+                state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
+            }
+        }
+
+        // Simon: It is important to recalculate coefficients from most accurate run
+        hatter(state,
+               nlayer,
+               iwd,
+               tout,
+               tind,
+               wso,
+               wsi,
+               VacuumPressure,
+               VacuumMaxGapThickness,
+               ebsky,
+               tamb,
+               ebroom,
+               troom,
+               gap,
+               height,
+               heightt,
+               scon,
+               tilt,
+               theta,
+               state.dataThermalISO15099Calc->Tgap,
+               Radiation,
+               trmout,
+               trmin,
+               iprop,
+               frct,
+               presure,
+               nmix,
+               wght,
+               gcon,
+               gvis,
+               gcp,
+               gama,
+               SupportPillar,
+               PillarSpacing,
+               PillarRadius,
+               state.dataThermalISO15099Calc->hgas,
+               hcgas,
+               hrgas,
+               hcin,
+               hcout,
+               hin,
+               hout,
+               index,
+               ibc,
+               nperr,
+               ErrorMessage,
+               hrin,
+               hrout,
+               Ra,
+               Nu);
+
+        shading(state,
+                theta,
+                gap,
+                state.dataThermalISO15099Calc->hgas,
+                hcgas,
+                hrgas,
+                frct,
+                iprop,
+                presure,
+                nmix,
+                wght,
+                gcon,
+                gvis,
+                gcp,
+                nlayer,
+                width,
+                height,
+                tilt,
+                tout,
+                tind,
+                Atop,
+                Abot,
+                Al,
+                Ar,
+                Ah,
+                vvent,
+                tvent,
+                LayerType,
+                state.dataThermalISO15099Calc->Tgap,
+                qv,
+                state.dataThermalISO15099Calc->hcv,
+                nperr,
+                ErrorMessage,
+                vfreevent);
+    }
+
+    if (CalcOutcome == CalculationOutcome::Unknown) {
+        ErrorMessage = "Tarcog failed to converge";
+        nperr = 2; // error 2: failed to converge...
+    }
+
+    // Get radiation results first
+    // if (curEquationsApproach.eq.eaQBalance) then
+    for (i = 1; i <= nlayer; ++i) {
+        k = 2 * i - 1;
+        Rf(i) = Radiation(k);
+        Rb(i) = Radiation(k + 1);
+        Ebf(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k));
+        Ebb(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k + 1));
+    }
+    // end if
+
+    // Finishing calcs:
+    resist(nlayer, trmout, tout, trmin, tind, hcgas, hrgas, theta, q, qv, LayerType, thick, scon, ufactor, flux, qcgas, qrgas);
+
+    // bi...  Set T6-related quantities - ratios for modified epsilon, hc for modelling external SDs:
+    //    (using non-solar pass results)
+    if ((dir == 0.0) && (nlayer > 1)) {
+
+        qr_gap_out = Rf(2) - Rb(1);
+        qr_gap_in = Rf(nlayer) - Rb(nlayer - 1);
+
+        if (IsShadingLayer(LayerType(1))) {
+            ShadeEmisRatioOut = qr_gap_out / (emis(3) * DataGlobalConstants::StefanBoltzmann * (pow_4(theta(3)) - pow_4(trmout)));
+            // qc_gap_out = qprim(3) - qr_gap_out
+            // qcgapout2 = qcgas(1)
+            // Hc_modified_out = (qc_gap_out / (theta(3) - tout))
+            // ShadeHcModifiedOut = Hc_modified_out
+        }
+
+        if (IsShadingLayer(LayerType(nlayer))) {
+            ShadeEmisRatioIn =
+                qr_gap_in / (emis(2 * nlayer - 2) * DataGlobalConstants::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
+            qc_gap_in = q(2 * nlayer - 1) - qr_gap_in;
+            hc_modified_in = (qc_gap_in / (tind - theta(2 * nlayer - 2)));
+            ShadeHcModifiedIn = hc_modified_in;
+        }
+    } // IF dir = 0
+}
+
+void solarISO15099(Real64 const totsol, Real64 const rtot, const Array1D<Real64> &rs, int const nlayer, const Array1D<Real64> &absol, Real64 &sf)
+{
+    //***********************************************************************
+    //   This subroutine calculates the shading coefficient for a window.
+    //***********************************************************************
+    //  Inputs:
+    //    absol     array of absorped fraction of solar radiation in lites
+    //    totsol    total solar transmittance
+    //    rtot  total thermal resistance of window
+    //    rs    array of thermal resistances of each gap and layer
+    //    layer     number of layers
+    //     dir  direct solar radiation
+    //  Outputs:
+    //    sf    solar gain of space
+
+    // Argument array dimensioning
+    EP_SIZE_CHECK(rs, maxlay3);
+    EP_SIZE_CHECK(absol, maxlay);
+
+    // Locals
+    Real64 flowin;
+    Real64 fract;
+    int i;
+    int j;
+
+    fract = 0.0;
+    flowin = 0.0;
+    sf = 0.0;
+
+    if (rtot == 0.0) {
+        return;
+    }
+
+    // evaluate inward flowing fraction of absorbed radiation:
+    flowin = (rs(1) + 0.5 * rs(2)) / rtot;
+    fract = absol(1) * flowin;
+
+    for (i = 2; i <= nlayer; ++i) {
+        j = 2 * i;
+        flowin += (0.5 * (rs(j - 2) + rs(j)) + rs(j - 1)) / rtot;
+        fract += absol(i) * flowin;
+    }
+    sf = totsol + fract; // add inward fraction to directly transmitted fraction
+}
+
 void Calc_ISO15099(EnergyPlusData &state,
                    Files &files,
                    int const nlayer,
@@ -1032,10 +2103,10 @@ void Calc_ISO15099(EnergyPlusData &state,
                                      state.dataThermalISO15099Calc->hrgas_NOSD,
                                      AchievedErrorTolerance_NOSD,
                                      NumOfIter_NOSD); // Autodesk:Uninit shgc_NOSD, sc_NOSD, hflux_NOSD,
-                                                      // ShadeHcRatioIn_NOSD, ShadeHcRatioOut_NOSD were
-                                                      // uninitialized
-            }                                         // end if UnshadedDebug = 1
-        }                                             // end if NeedUnshadedRun...
+                // ShadeHcRatioIn_NOSD, ShadeHcRatioOut_NOSD were
+                // uninitialized
+            } // end if UnshadedDebug = 1
+        }     // end if NeedUnshadedRun...
 
         // bi Set T6-related quantities keff, keffc: (using non-solar pass results)
         if (nlayer > 1) {
@@ -1152,818 +2223,6 @@ void Calc_ISO15099(EnergyPlusData &state,
     } // if WriteDebugOutput.eq.true - writing output file
 }
 
-void therm1d(EnergyPlusData &state,
-             Files &files,
-             int const nlayer,
-             int const iwd,
-             Real64 &tout,
-             Real64 &tind,
-             Real64 const wso,
-             Real64 const wsi,
-             Real64 const VacuumPressure,
-             Real64 const VacuumMaxGapThickness,
-             Real64 const dir,
-             Real64 &ebsky,
-             Real64 const Gout,
-             Real64 const trmout,
-             Real64 const trmin,
-             Real64 &ebroom,
-             Real64 const Gin,
-             const Array1D<Real64> &tir,
-             const Array1D<Real64> &rir,
-             const Array1D<Real64> &emis,
-             const Array1D<Real64> &gap,
-             const Array1D<Real64> &thick,
-             const Array1D<Real64> &scon,
-             Real64 const tilt,
-             const Array1D<Real64> &asol,
-             Real64 const height,
-             Real64 const heightt,
-             Real64 const width,
-             Array2_int const &iprop,
-             Array2<Real64> const &frct,
-             const Array1D<Real64> &presure,
-             const Array1D_int &nmix,
-             const Array1D<Real64> &wght,
-             Array2<Real64> const &gcon,
-             Array2<Real64> const &gvis,
-             Array2<Real64> const &gcp,
-             const Array1D<Real64> &gama,
-             const Array1D_int &SupportPillar,
-             const Array1D<Real64> &PillarSpacing,
-             const Array1D<Real64> &PillarRadius,
-             Array1D<Real64> &theta,
-             Array1D<Real64> &q,
-             Array1D<Real64> &qv,
-             Real64 &flux,
-             Real64 &hcin,
-             Real64 &hrin,
-             Real64 &hcout,
-             Real64 &hrout,
-             Real64 &hin,
-             Real64 &hout,
-             Array1D<Real64> &hcgas,
-             Array1D<Real64> &hrgas,
-             Real64 &ufactor,
-             int &nperr,
-             std::string &ErrorMessage,
-             Real64 &tamb,
-             Real64 &troom,
-             const Array1D_int &ibc,
-             const Array1D<Real64> &Atop,
-             const Array1D<Real64> &Abot,
-             const Array1D<Real64> &Al,
-             const Array1D<Real64> &Ar,
-             const Array1D<Real64> &Ah,
-             const Array1D<Real64> &EffectiveOpenness,
-             const Array1D<Real64> &vvent,
-             const Array1D<Real64> &tvent,
-             const Array1D<TARCOGLayerType> &LayerType,
-             Array1D<Real64> &Ra,
-             Array1D<Real64> &Nu,
-             Array1D<Real64> &vfreevent,
-             Array1D<Real64> &qcgas,
-             Array1D<Real64> &qrgas,
-             Array1D<Real64> &Ebf,
-             Array1D<Real64> &Ebb,
-             Array1D<Real64> &Rf,
-             Array1D<Real64> &Rb,
-             Real64 &ShadeEmisRatioOut,
-             Real64 &ShadeEmisRatioIn,
-             Real64 &ShadeHcModifiedOut,
-             Real64 &ShadeHcModifiedIn,
-             TARCOGThermalModel ThermalMod,
-             [[maybe_unused]] int const Debug_mode,
-             Real64 &AchievedErrorTolerance,
-             int &TotalIndex,
-             Real64 const edgeGlCorrFac)
-{
-    //********************************************************************************
-    // Main subroutine for calculation of 1-D heat transfer in the center of glazing.
-    //********************************************************************************
-    // Inputs
-    //   nlayer    number of solid layers
-    //   iwd   wind direction
-    //   tout  outside temp in k
-    //   tind  inside temp in k
-    //   wso   wind speed in m/s
-    //   wsi   inside forced air speed m/s
-    //   Ebsky     ir flux from outside
-    //   Gout  back facing radiosity from outside
-    //   Trmout    Mean outdoor radiant temperature
-    //   Trmin     Mean indoor radiant temperature
-    //   Ebroom    ir flux from room
-    //   Gin   front facing radiosity from room
-    //   tir   ir transmittance of each layer
-    //   rir   ir reflectance of each surface
-    //   emis  ir emittances of each surface
-    //   gap   array of gap widths in meters
-    //   thick     thickness of glazing layers (m)
-    //   scon  Vector of conductivities of 'glazing' layers
-    //   tilt  Window tilt (deg). vert: tilt=90, hor out up: tilt=0, hor out down: tilt=180
-    //   sol   absorbed solar energy for each layer in w/m2
-    //   height    glazing cavity height
-    //   heightt
-    //   iprop
-    //   frct
-    //   presure
-    //   nmix  vector of number of gasses in a mixture for each gap
-    //   hin  convective indoor film coefficient (if non-zero hin input)
-    //   hout     convective outdoor film coeff. (if non-zero hout input)
-    // outputs
-    //   theta     temp distribution in k
-    //   flux  net heat flux between room and window
-    //   rtot  overall thermal resistance
-    //   rs    ?
-    //   hcin  convective indoor film coeff.
-    //   hrin  radiative part of indoor film coeff.
-    //   hcout     convective outdoor film coeff.
-    //   hrout     radiative part of outdoor film coeff.
-    //   hin   convective indoor film coefficient
-    //   hout  convective outdoor film coeff.
-    //   ufactor   overall u-factor
-    //   qcgap     vector of convective/conductive parts of flux in gaps
-    //   qrgap     vector of radiative parts of flux in gaps
-    //   nperr
-    // *Inactives**
-    //   wa - window azimuth (degrees, clockwise from south)
-    //   hgas  matrix of gap film coefficients
-    // Locals
-    //   Ebb   Vector
-    //   Ebf   Vector
-    //   Rb    Vector
-    //   Rf    Vector
-    //   a     Array
-    //   b     Array
-    //   hhat  Vector
-    //   err   iteration tolerance
-    //   dtmax     max temp dfference after iteration
-    //   index     iteration step
-
-    // Using
-    // Locals
-    //    0 - don't create debug output files
-    //    1 - append results to existing debug output file
-    //    2 - store results in new debug output file
-    //   3 - save in-between results (in all iterations) to existing debug file
-
-    Array2D<Real64> a(4 * nlayer, 4 * nlayer);
-    Array1D<Real64> b(4 * nlayer);
-    // REAL(r64) :: hhatv(maxlay3),hcv(maxlay3), Ebgap(maxlay3), Tgap(maxlay1)
-
-    // REAL(r64) ::  alpha
-    int maxiter;
-
-    Real64 qr_gap_out;
-    Real64 qr_gap_in;
-
-    Array1D<Real64> told(2 * nlayer);
-
-    // Simon: parameters used in case of JCFN iteration method
-    Array1D<Real64> FRes({1, 4 * nlayer});      // store function results from current iteration
-    Array1D<Real64> FResOld({1, 4 * nlayer});   // store function results from previous iteration
-    Array1D<Real64> FResDiff({1, 4 * nlayer});  // save difference in results between iterations
-    Array1D<Real64> Radiation({1, 2 * nlayer}); // radiation on layer surfaces.  used as temporary storage during iterations
-
-    Array1D<Real64> x({1, 4 * nlayer});       // temporary vector for storing results (theta and Radiation).  used for easier handling
-    Array1D<Real64> dX({1, 4 * nlayer}, 0.0); // difference in results
-    Array2D<Real64> Jacobian({1, 4 * nlayer}, {1, 4 * nlayer}); // diagonal vector for jacobian comuptation-free newton method
-    Array1D<Real64> DRes({1, 4 * nlayer});                      // used in jacobian forward-difference approximation
-
-    // This is used to store matrix before equation solver.  It is important because solver destroys
-    // content of matrices
-    Array2D<Real64> LeftHandSide({1, 4 * nlayer}, {1, 4 * nlayer});
-    Array1D<Real64> RightHandSide({1, 4 * nlayer});
-
-    // Simon: Keep best achieved convergence
-    Real64 prevDifference;
-    Real64 Relaxation;
-    Array1D<Real64> RadiationSave({1, 2 * nlayer});
-    Array1D<Real64> thetaSave({1, 2 * nlayer});
-    int currentTry;
-
-    int CSMFlag;
-    int i;
-    int j;
-    int k;
-    Real64 curDifference;
-    int index;
-    int curTempCorrection;
-
-    Real64 qc_gap_in;
-    Real64 hc_modified_in;
-
-    CalculationOutcome CalcOutcome;
-
-    bool iterationsFinished; // To mark whether or not iterations are finished
-    bool saveIterationResults;
-    bool updateGapTemperature;
-    // logical :: TurnOnNewton
-
-    int SDLayerIndex = -1;
-
-    Array1D<Real64> sconScaled(maxlay);
-
-    // Simon: This is set to zero until it is resolved what to do with modifier
-    ShadeHcModifiedOut = 0.0;
-    CSMFlag = 0;
-    CalcOutcome = CalculationOutcome::Unknown;
-    curTempCorrection = 0;
-    AchievedErrorTolerance = 0.0;
-    curDifference = 0.0;
-    currentTry = 0;
-    index = 0;
-    TotalIndex = 0;
-    iterationsFinished = false;
-    qv = 0.0;
-    Ebb = 0.0;
-    Ebf = 0.0;
-    Rb = 0.0;
-    Rf = 0.0;
-    a = 0.0;
-    b = 0.0;
-
-    FRes = 0.0;
-    FResOld = 0.0;
-    FResDiff = 0.0;
-    Radiation = 0.0;
-    Relaxation = RelaxationStart;
-
-    maxiter = NumOfIterations;
-
-    saveIterationResults = false;
-
-    for (i = 1; i <= nlayer; ++i) {
-        k = 2 * i;
-        Radiation(k) = Ebb(i);
-        Radiation(k - 1) = Ebf(i);
-        told(k - 1) = 0.0;
-        told(k) = 0.0;
-    }
-
-    // bi...Set LayerTypeSpec array - need to treat venetians AND woven shades as glass:
-    if (ThermalMod == TARCOGThermalModel::CSM) {
-        for (i = 1; i <= nlayer; ++i) {
-            if (IsShadingLayer(LayerType(i))) {
-                //                    LayerTypeSpec( i ) = 0; //Unused
-                SDLayerIndex = i;
-            } else {
-                //                    LayerTypeSpec( i ) = LayerType( i ); //Unused
-            }
-        }
-    }
-
-    // first store results before iterations begin
-    if (saveIterationResults) {
-        storeIterationResults(state,
-                              files,
-                              nlayer,
-                              index,
-                              theta,
-                              trmout,
-                              tamb,
-                              trmin,
-                              troom,
-                              ebsky,
-                              ebroom,
-                              hcin,
-                              hcout,
-                              hrin,
-                              hrout,
-                              hin,
-                              hout,
-                              Ebb,
-                              Ebf,
-                              Rb,
-                              Rf,
-                              nperr);
-    }
-
-    state.dataThermalISO15099Calc->Tgap(1) = tout;
-    state.dataThermalISO15099Calc->Tgap(nlayer + 1) = tind;
-    for (i = 2; i <= nlayer; ++i) {
-        state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
-    }
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //!!! MAIN ITERATION LOOP
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    while (!(iterationsFinished)) {
-
-        for (i = 1; i <= 2 * nlayer; ++i) {
-            if (theta(i) < 0) {
-                theta(i) = 1.0 * i;
-            }
-        }
-
-        // do i=1,nlayer+1
-        //  if (i == 1) then
-        //    Tgap(i) = tout
-        //  else if (i == nlayer+1) then
-        //    Tgap(i) = tind
-        //  else
-        //    Tgap(i) = (theta(2*i-2) + theta(2*i-1)) / 2.0d0
-        //  end if
-        // end do
-
-        // skip updating gap temperatures for shading devices. Gap temperature in that case is not simply average
-        // between two layer temperatures
-        for (i = 2; i <= nlayer; ++i) {
-            updateGapTemperature = false;
-            if ((!(IsShadingLayer(LayerType(i - 1)))) && (!(IsShadingLayer(LayerType(i))))) {
-                updateGapTemperature = true;
-            }
-            if (updateGapTemperature) {
-                state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
-            }
-        }
-
-        // evaluate convective/conductive components of gap
-        hatter(state,
-               nlayer,
-               iwd,
-               tout,
-               tind,
-               wso,
-               wsi,
-               VacuumPressure,
-               VacuumMaxGapThickness,
-               ebsky,
-               tamb,
-               ebroom,
-               troom,
-               gap,
-               height,
-               heightt,
-               scon,
-               tilt,
-               theta,
-               state.dataThermalISO15099Calc->Tgap,
-               Radiation,
-               trmout,
-               trmin,
-               iprop,
-               frct,
-               presure,
-               nmix,
-               wght,
-               gcon,
-               gvis,
-               gcp,
-               gama,
-               SupportPillar,
-               PillarSpacing,
-               PillarRadius,
-               state.dataThermalISO15099Calc->hgas,
-               hcgas,
-               hrgas,
-               hcin,
-               hcout,
-               hin,
-               hout,
-               index,
-               ibc,
-               nperr,
-               ErrorMessage,
-               hrin,
-               hrout,
-               Ra,
-               Nu);
-
-        effectiveLayerCond(state,
-                           nlayer,
-                           LayerType,
-                           scon,
-                           thick,
-                           iprop,
-                           frct,
-                           nmix,
-                           presure,
-                           wght,
-                           gcon,
-                           gvis,
-                           gcp,
-                           EffectiveOpenness,
-                           theta,
-                           sconScaled,
-                           nperr,
-                           ErrorMessage);
-
-        // exit on error
-        if (!(GoAhead(nperr))) return;
-
-        // bi...Override hhat values near SHADING DEVICE layer(s), but only for CSM thermal model:
-        if ((ThermalMod == TARCOGThermalModel::CSM) && (SDLayerIndex > 0)) {
-            // adjust hhat values
-            // call adjusthhat(SDLayerIndex, ibc, tout, tind, nlayer, theta, wso, wsi, iwd, height, heightt, tilt,  &
-            //               &  thick, gap, hout, hrout, hin, hrin, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, &
-            //               index, SDScalar, Ebf, Ebb, hgas, hhat, nperr, ErrorMessage)
-            // do i = 1, maxlay3
-            // hhatv(i) = 0.0d0
-            // Ebgap(i) = 0.0d0
-            // qv(i)    = 0.0d0
-            // hcv(i)   = 0.0d0
-            // end do
-            matrixQBalance(nlayer,
-                           a,
-                           b,
-                           sconScaled,
-                           hcgas,
-                           state.dataThermalISO15099Calc->hcgapMod,
-                           asol,
-                           qv,
-                           state.dataThermalISO15099Calc->hcv,
-                           tind,
-                           tout,
-                           Gin,
-                           Gout,
-                           theta,
-                           tir,
-                           rir,
-                           emis,
-                           edgeGlCorrFac);
-        } else {
-            // bi...There are no Venetian layers, or ThermalMod is not CSM, so carry on as usual:
-            shading(state,
-                    theta,
-                    gap,
-                    state.dataThermalISO15099Calc->hgas,
-                    hcgas,
-                    hrgas,
-                    frct,
-                    iprop,
-                    presure,
-                    nmix,
-                    wght,
-                    gcon,
-                    gvis,
-                    gcp,
-                    nlayer,
-                    width,
-                    height,
-                    tilt,
-                    tout,
-                    tind,
-                    Atop,
-                    Abot,
-                    Al,
-                    Ar,
-                    Ah,
-                    vvent,
-                    tvent,
-                    LayerType,
-                    state.dataThermalISO15099Calc->Tgap,
-                    qv,
-                    state.dataThermalISO15099Calc->hcv,
-                    nperr,
-                    ErrorMessage,
-                    vfreevent);
-
-            // exit on error
-            if (!(GoAhead(nperr))) return;
-
-            matrixQBalance(nlayer,
-                           a,
-                           b,
-                           sconScaled,
-                           hcgas,
-                           state.dataThermalISO15099Calc->hcgapMod,
-                           asol,
-                           qv,
-                           state.dataThermalISO15099Calc->hcv,
-                           tind,
-                           tout,
-                           Gin,
-                           Gout,
-                           theta,
-                           tir,
-                           rir,
-                           emis,
-                           edgeGlCorrFac);
-
-        } //  end if
-
-        FResOld = FRes;
-
-        // Pack results in one array
-        for (i = 1; i <= nlayer; ++i) {
-            k = 4 * i - 3;
-            j = 2 * i - 1;
-
-            x(k) = theta(j);
-            x(k + 1) = Radiation(j);
-            x(k + 2) = Radiation(j + 1);
-            x(k + 3) = theta(j + 1);
-        }
-
-        CalculateFuncResults(nlayer, a, b, x, FRes);
-
-        FResDiff = FRes - FResOld;
-
-        LeftHandSide = a;
-        RightHandSide = b;
-        EquationsSolver(state, LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
-
-        // Simon: This is much better, but also much slower convergence criteria.  Think of how to make this flexible and allow
-        // user to change this from outside (through argument passing)
-        // curDifference = ABS(FRes(1))
-        // do i = 2, 4*nlayer
-        // curDifference = MAX(curDifference, ABS(FRes(i)))
-        // curDifference = curDifference + ABS(FRes(i))
-        // end do
-
-        curDifference = std::abs(theta(1) - told(1));
-        // curDifference = ABS(FRes(1))
-        for (i = 2; i <= 2 * nlayer; ++i) {
-            // do i = 2, 4*nlayer
-            curDifference = max(curDifference, std::abs(theta(i) - told(i)));
-            // curDifference = MAX(ABS(FRes(i)), curDifference)
-        }
-
-        for (i = 1; i <= nlayer; ++i) {
-            k = 4 * i - 3;
-            j = 2 * i - 1;
-            // if (TurnOnNewton) then
-            //  theta(j) = theta(j) + Relaxation*dx(k)
-            //  theta(j+1) = theta(j+1) + Relaxation*dx(k+1)
-            //  Radiation(j) = Radiation(j) + Relaxation*dx(k+2)
-            //  Radiation(j+1) = Radiation(j+1) + Relaxation*dx(k+3)
-            // else
-            //  dX(k) = RightHandSide(k) - theta(j)
-            //  dX(k+1) = RightHandSide(k + 1) - theta(j+1)
-            //  dX(k+2) = RightHandSide(k + 2) - Radiation(j)
-            //  dX(k+3) = RightHandSide(k + 3) - Radiation(j+1)
-            told(j) = theta(j);
-            told(j + 1) = theta(j + 1);
-            theta(j) = (1 - Relaxation) * theta(j) + Relaxation * RightHandSide(k);
-            Radiation(j) = (1 - Relaxation) * Radiation(j) + Relaxation * RightHandSide(k + 1);
-            Radiation(j + 1) = (1 - Relaxation) * Radiation(j + 1) + Relaxation * RightHandSide(k + 2);
-            theta(j + 1) = (1 - Relaxation) * theta(j + 1) + Relaxation * RightHandSide(k + 3);
-            // end if
-        }
-
-        // it is important not to update gaps around shading layers since that is already calculated by
-        // shading routines
-        for (i = 1; i <= nlayer + 1; ++i) {
-            updateGapTemperature = true;
-            if ((i == 1) || (i == nlayer + 1)) {
-                // update gap array with interior and exterior temperature
-                updateGapTemperature = true;
-            } else {
-                // update gap temperature only if gap on both sides
-                updateGapTemperature = false;
-                if ((!(IsShadingLayer(LayerType(i - 1)))) && (!(IsShadingLayer(LayerType(i))))) {
-                    updateGapTemperature = true;
-                }
-            }
-            j = 2 * (i - 1);
-            if (updateGapTemperature) {
-                if (i == 1) {
-                    state.dataThermalISO15099Calc->Tgap(1) = tout;
-                } else if (i == (nlayer + 1)) {
-                    state.dataThermalISO15099Calc->Tgap(i) = tind;
-                } else {
-                    state.dataThermalISO15099Calc->Tgap(i) = (theta(j) + theta(j + 1)) / 2;
-                }
-            }
-        }
-
-        // and store results during iterations
-        if (saveIterationResults) {
-            storeIterationResults(state,
-                                  files,
-                                  nlayer,
-                                  index + 1,
-                                  theta,
-                                  trmout,
-                                  tamb,
-                                  trmin,
-                                  troom,
-                                  ebsky,
-                                  ebroom,
-                                  hcin,
-                                  hcout,
-                                  hrin,
-                                  hrout,
-                                  hin,
-                                  hout,
-                                  Ebb,
-                                  Ebf,
-                                  Rb,
-                                  Rf,
-                                  nperr);
-        }
-
-        if (!(GoAhead(nperr))) return;
-
-        prevDifference = curDifference;
-
-        if ((index == 0) || (curDifference < AchievedErrorTolerance)) {
-            AchievedErrorTolerance = curDifference;
-            currentTry = 0;
-            for (i = 1; i <= 2 * nlayer; ++i) {
-                RadiationSave(i) = Radiation(i);
-                thetaSave(i) = theta(i);
-            }
-        } else {
-            // This is case when program solution diverged
-            ++currentTry;
-            if (currentTry >= NumOfTries) {
-                currentTry = 0;
-                for (i = 1; i <= 2 * nlayer; ++i) {
-                    Radiation(i) = RadiationSave(i);
-                    theta(i) = thetaSave(i);
-                }
-                // if (.not.TurnOnNewton) then
-                //  TurnOnNewton = .TRUE.
-                // else
-                Relaxation -= RelaxationDecrease;
-                TotalIndex += index;
-                index = 0;
-                // Start from best achieved convergence
-                if (Relaxation <= 0.0) { // cannot continue with relaxation equal to zero
-                    iterationsFinished = true;
-                }
-                // TurnOnNewton = .TRUE.
-                // end if ! if (.not.TurnOnNewton) then
-            } // f (currentTry == NumOfTries) then
-        }
-
-        // Chek if results were found:
-        if (curDifference < ConvergenceTolerance) {
-            CalcOutcome = CalculationOutcome::OK;
-            TotalIndex += index;
-            iterationsFinished = true;
-        }
-
-        if (index >= maxiter) {
-            Relaxation -= RelaxationDecrease;
-            TotalIndex += index;
-            index = 0;
-            // TurnOnNewton = .TRUE.
-
-            // Start from best achieved convergence
-            for (i = 1; i <= 2 * nlayer; ++i) {
-                Radiation(i) = RadiationSave(i);
-                theta(i) = thetaSave(i);
-            }
-            if (Relaxation <= 0.0) { // cannot continue with relaxation equal to zero
-                iterationsFinished = true;
-            }
-        }
-
-        ++index;
-    }
-
-    // Get results from closest iteration and store it
-    if (CalcOutcome == CalculationOutcome::OK) {
-        for (i = 1; i <= 2 * nlayer; ++i) {
-            Radiation(i) = RadiationSave(i);
-            theta(i) = thetaSave(i);
-        }
-
-        for (i = 2; i <= nlayer; ++i) {
-            updateGapTemperature = false;
-            if ((!(IsShadingLayer(LayerType(i - 1)))) && (!(IsShadingLayer(LayerType(i))))) {
-                updateGapTemperature = true;
-            }
-
-            if (updateGapTemperature) {
-                state.dataThermalISO15099Calc->Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
-            }
-        }
-
-        // Simon: It is important to recalculate coefficients from most accurate run
-        hatter(state,
-               nlayer,
-               iwd,
-               tout,
-               tind,
-               wso,
-               wsi,
-               VacuumPressure,
-               VacuumMaxGapThickness,
-               ebsky,
-               tamb,
-               ebroom,
-               troom,
-               gap,
-               height,
-               heightt,
-               scon,
-               tilt,
-               theta,
-               state.dataThermalISO15099Calc->Tgap,
-               Radiation,
-               trmout,
-               trmin,
-               iprop,
-               frct,
-               presure,
-               nmix,
-               wght,
-               gcon,
-               gvis,
-               gcp,
-               gama,
-               SupportPillar,
-               PillarSpacing,
-               PillarRadius,
-               state.dataThermalISO15099Calc->hgas,
-               hcgas,
-               hrgas,
-               hcin,
-               hcout,
-               hin,
-               hout,
-               index,
-               ibc,
-               nperr,
-               ErrorMessage,
-               hrin,
-               hrout,
-               Ra,
-               Nu);
-
-        shading(state,
-                theta,
-                gap,
-                state.dataThermalISO15099Calc->hgas,
-                hcgas,
-                hrgas,
-                frct,
-                iprop,
-                presure,
-                nmix,
-                wght,
-                gcon,
-                gvis,
-                gcp,
-                nlayer,
-                width,
-                height,
-                tilt,
-                tout,
-                tind,
-                Atop,
-                Abot,
-                Al,
-                Ar,
-                Ah,
-                vvent,
-                tvent,
-                LayerType,
-                state.dataThermalISO15099Calc->Tgap,
-                qv,
-                state.dataThermalISO15099Calc->hcv,
-                nperr,
-                ErrorMessage,
-                vfreevent);
-    }
-
-    if (CalcOutcome == CalculationOutcome::Unknown) {
-        ErrorMessage = "Tarcog failed to converge";
-        nperr = 2; // error 2: failed to converge...
-    }
-
-    // Get radiation results first
-    // if (curEquationsApproach.eq.eaQBalance) then
-    for (i = 1; i <= nlayer; ++i) {
-        k = 2 * i - 1;
-        Rf(i) = Radiation(k);
-        Rb(i) = Radiation(k + 1);
-        Ebf(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k));
-        Ebb(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k + 1));
-    }
-    // end if
-
-    // Finishing calcs:
-    resist(nlayer, trmout, tout, trmin, tind, hcgas, hrgas, theta, q, qv, LayerType, thick, scon, ufactor, flux, qcgas, qrgas);
-
-    // bi...  Set T6-related quantities - ratios for modified epsilon, hc for modelling external SDs:
-    //    (using non-solar pass results)
-    if ((dir == 0.0) && (nlayer > 1)) {
-
-        qr_gap_out = Rf(2) - Rb(1);
-        qr_gap_in = Rf(nlayer) - Rb(nlayer - 1);
-
-        if (IsShadingLayer(LayerType(1))) {
-            ShadeEmisRatioOut = qr_gap_out / (emis(3) * DataGlobalConstants::StefanBoltzmann * (pow_4(theta(3)) - pow_4(trmout)));
-            // qc_gap_out = qprim(3) - qr_gap_out
-            // qcgapout2 = qcgas(1)
-            // Hc_modified_out = (qc_gap_out / (theta(3) - tout))
-            // ShadeHcModifiedOut = Hc_modified_out
-        }
-
-        if (IsShadingLayer(LayerType(nlayer))) {
-            ShadeEmisRatioIn =
-                qr_gap_in / (emis(2 * nlayer - 2) * DataGlobalConstants::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
-            qc_gap_in = q(2 * nlayer - 1) - qr_gap_in;
-            hc_modified_in = (qc_gap_in / (tind - theta(2 * nlayer - 2)));
-            ShadeHcModifiedIn = hc_modified_in;
-        }
-    } // IF dir = 0
-}
-
 void guess(Real64 const tout,
            Real64 const tind,
            int const nlayer,
@@ -2046,51 +2305,6 @@ void guess(Real64 const tout,
     }
 }
 
-void solarISO15099(Real64 const totsol, Real64 const rtot, const Array1D<Real64> &rs, int const nlayer, const Array1D<Real64> &absol, Real64 &sf)
-{
-    //***********************************************************************
-    //   This subroutine calculates the shading coefficient for a window.
-    //***********************************************************************
-    //  Inputs:
-    //    absol     array of absorped fraction of solar radiation in lites
-    //    totsol    total solar transmittance
-    //    rtot  total thermal resistance of window
-    //    rs    array of thermal resistances of each gap and layer
-    //    layer     number of layers
-    //     dir  direct solar radiation
-    //  Outputs:
-    //    sf    solar gain of space
-
-    // Argument array dimensioning
-    EP_SIZE_CHECK(rs, maxlay3);
-    EP_SIZE_CHECK(absol, maxlay);
-
-    // Locals
-    Real64 flowin;
-    Real64 fract;
-    int i;
-    int j;
-
-    fract = 0.0;
-    flowin = 0.0;
-    sf = 0.0;
-
-    if (rtot == 0.0) {
-        return;
-    }
-
-    // evaluate inward flowing fraction of absorbed radiation:
-    flowin = (rs(1) + 0.5 * rs(2)) / rtot;
-    fract = absol(1) * flowin;
-
-    for (i = 2; i <= nlayer; ++i) {
-        j = 2 * i;
-        flowin += (0.5 * (rs(j - 2) + rs(j)) + rs(j - 1)) / rtot;
-        fract += absol(i) * flowin;
-    }
-    sf = totsol + fract; // add inward fraction to directly transmitted fraction
-}
-
 void resist(int const nlayer,
             Real64 const trmout,
             Real64 const Tout,
@@ -2155,6 +2369,196 @@ void resist(int const nlayer,
     if (tind != Tout) {
         ufactor = flux / (tind - Tout);
     }
+}
+
+void filmPillar(EnergyPlusData &state,
+                const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
+                const Array1D<Real64> &scon,          // Conductivity of glass layers
+                const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+                const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                int const nlayer,
+                const Array1D<Real64> &gap,
+                Array1D<Real64> &hcgas,
+                [[maybe_unused]] Real64 const VacuumMaxGapThickness,
+                [[maybe_unused]] int &nperr,
+                [[maybe_unused]] std::string &ErrorMessage)
+{
+    //***********************************************************************
+    // subroutine to calculate effective conductance of support pillars
+    //***********************************************************************
+
+    // Using
+    // Argument array dimensioning
+    EP_SIZE_CHECK(SupportPillar, maxlay);
+    EP_SIZE_CHECK(scon, maxlay);
+    EP_SIZE_CHECK(PillarSpacing, maxlay);
+    EP_SIZE_CHECK(PillarRadius, maxlay);
+    EP_SIZE_CHECK(gap, MaxGap);
+    EP_SIZE_CHECK(hcgas, maxlay1);
+
+    // Locals
+    //   0 - does not have support pillar
+    //   1 - have support pillar
+
+    for (state.dataThermalISO15099Calc->iFP = 1; state.dataThermalISO15099Calc->iFP <= nlayer - 1; ++state.dataThermalISO15099Calc->iFP) {
+        state.dataThermalISO15099Calc->kFP = 2 * state.dataThermalISO15099Calc->iFP + 1;
+        if (SupportPillar(state.dataThermalISO15099Calc->iFP) == YES_SupportPillar) {
+
+            // Average glass conductivity is taken as average from both glass surrounding gap
+            state.dataThermalISO15099Calc->aveGlassConductivity =
+                (scon(state.dataThermalISO15099Calc->iFP) + scon(state.dataThermalISO15099Calc->iFP + 1)) / 2;
+
+            state.dataThermalISO15099Calc->cpa = 2.0 * state.dataThermalISO15099Calc->aveGlassConductivity *
+                                                 PillarRadius(state.dataThermalISO15099Calc->iFP) /
+                                                 (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) *
+                                                  (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) /
+                                                             (DataGlobalConstants::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
+
+            // It is important to add on prevoius values caluculated for gas
+            hcgas(state.dataThermalISO15099Calc->iFP + 1) += state.dataThermalISO15099Calc->cpa;
+        } // if (SupportPillar(i).eq.YES_SupportPillar) then
+    }
+}
+
+void filmi(EnergyPlusData &state,
+           Real64 const tair,
+           Real64 const t,
+           int const nlayer,
+           Real64 const tilt,
+           Real64 const wsi,
+           Real64 const height,
+           Array2A_int const iprop,
+           Array2A<Real64> const frct,
+           const Array1D<Real64> &presure,
+           const Array1D_int &nmix,
+           const Array1D<Real64> &wght,
+           Array2A<Real64> const gcon,
+           Array2A<Real64> const gvis,
+           Array2A<Real64> const gcp,
+           Real64 &hcin,
+           int const ibc,
+           int &nperr,
+           std::string &ErrorMessage)
+{
+    //***********************************************************************
+    //  purpose to evaluate heat flux at indoor surface of window using still air correlations (Curcija and Goss 1993)
+    //  found in SPC142 equations 5.43 - 5.48.
+    //***********************************************************************
+    // Input
+    //   tair - room air temperature
+    //   t - inside surface temperature
+    //   nlayer  number of glazing layers
+    //   tilt - the tilt of the glazing in degrees
+    //   wsi - room wind speed (m/s)
+    //   height - window height
+    //   iprop
+    //   frct
+    //   presure
+    //   nmix  vector of number of gasses in a mixture for each gap
+    // Output
+    //   hcin - indoor convecive heat transfer coeff
+
+    // If there is forced air in the room than use SPC142 corelation 5.49 to calculate the room side film coefficient.
+
+    // Using
+    // Argument array dimensioning
+    iprop.dim(maxgas, maxlay1);
+    frct.dim(maxgas, maxlay1);
+    EP_SIZE_CHECK(presure, maxlay1);
+    EP_SIZE_CHECK(nmix, maxlay1);
+    EP_SIZE_CHECK(wght, maxgas);
+    gcon.dim(3, maxgas);
+    gvis.dim(3, maxgas);
+    gcp.dim(3, maxgas);
+
+    // Locals
+    int j;
+    Real64 tiltr;
+    Real64 tmean;
+    Real64 delt;
+    Real64 con;
+    Real64 visc;
+    Real64 dens;
+    Real64 cp;
+    Real64 pr;
+    Real64 gr;
+    Real64 RaCrit;
+    Real64 RaL;
+    Real64 Gnui(0.0);
+
+    if (wsi > 0.0) { // main IF
+        {
+            auto const SELECT_CASE_var(ibc);
+            if (SELECT_CASE_var == 0) {
+                hcin = 4.0 + 4.0 * wsi;
+            } else if (SELECT_CASE_var == -1) {
+                hcin = 5.6 + 3.8 * wsi; // SPC142 correlation
+                return;
+            }
+        }
+    } else {                                                  // main IF - else
+        tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
+        tmean = tair + 0.25 * (t - tair);
+        delt = std::abs(tair - t);
+
+        for (j = 1; j <= nmix(nlayer + 1); ++j) {
+            state.dataThermalISO15099Calc->ipropi(j) = iprop(j, nlayer + 1);
+            state.dataThermalISO15099Calc->frcti(j) = frct(j, nlayer + 1);
+        }
+
+        GASSES90(state,
+                 tmean,
+                 state.dataThermalISO15099Calc->ipropi,
+                 state.dataThermalISO15099Calc->frcti,
+                 presure(nlayer + 1),
+                 nmix(nlayer + 1),
+                 wght,
+                 gcon,
+                 gvis,
+                 gcp,
+                 con,
+                 visc,
+                 dens,
+                 cp,
+                 pr,
+                 TARCOGGassesParams::Stdrd::ISO15099,
+                 nperr,
+                 ErrorMessage);
+
+        //   Calculate grashoff number:
+        //   The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
+        gr = DataGlobalConstants::GravityConstant * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
+
+        RaL = gr * pr;
+        //   write(*,*)' RaCrit,RaL,gr,pr '
+        //   write(*,*) RaCrit,RaL,gr,pr
+
+        if ((0.0 <= tilt) && (tilt < 15.0)) { // IF no. 1
+            Gnui = 0.13 * std::pow(RaL, 1.0 / 3.0);
+        } else if ((15.0 <= tilt) && (tilt <= 90.0)) {
+            //   if the room air is still THEN use equations 5.43 - 5.48:
+            RaCrit = 2.5e5 * std::pow(std::exp(0.72 * tilt) / std::sin(tiltr), 0.2);
+            if (RaL <= RaCrit) { // IF no. 2
+                Gnui = 0.56 * root_4(RaL * std::sin(tiltr));
+                // write(*,*) ' Nu ', Gnui
+            } else {
+                // Gnui = 0.13d0*(RaL**0.3333d0 - RaCrit**0.3333d0) + 0.56d0*(RaCrit*sin(tiltr))**0.25d0
+                Gnui = 0.13 * (std::pow(RaL, 1.0 / 3.0) - std::pow(RaCrit, 1.0 / 3.0)) + 0.56 * root_4(RaCrit * std::sin(tiltr));
+            } // end if no. 2
+        } else if ((90.0 < tilt) && (tilt <= 179.0)) {
+            Gnui = 0.56 * root_4(RaL * std::sin(tiltr));
+        } else if ((179.0 < tilt) && (tilt <= 180.0)) {
+            Gnui = 0.58 * std::pow(RaL, 1 / 3.0);
+        } else {
+            assert(false);
+        } // end if no. 1
+        //   write(*,*) ' RaL   ', RaL, '   RaCrit', RaCrit
+        //   write(*,*)'   Nusselt Number   ',Gnui
+
+        hcin = Gnui * (con / height);
+        //   hin = 1.77d0*(ABS(t-tair))**0.25d0
+
+    } // end main IF
 }
 
 void hatter(EnergyPlusData &state,
@@ -2385,207 +2789,6 @@ void hatter(EnergyPlusData &state,
     tamb = (hcout * tout + hrout * trmout) / (hcout + hrout);
 }
 
-void effectiveLayerCond(EnergyPlusData &state,
-                        int const nlayer,
-                        const Array1D<TARCOGLayerType> &LayerType, // Layer type
-                        const Array1D<Real64> &scon,               // Layer thermal conductivity
-                        const Array1D<Real64> &thick,              // Layer thickness
-                        Array2A_int const iprop,                   // Gas type in gaps
-                        Array2A<Real64> const frct,                // Fraction of gas
-                        const Array1D_int &nmix,                   // Gas mixture
-                        const Array1D<Real64> &pressure,           // Gas pressure [Pa]
-                        const Array1D<Real64> &wght,               // Molecular weight
-                        Array2A<Real64> const gcon,                // Gas specific conductivity
-                        Array2A<Real64> const gvis,                // Gas specific viscosity
-                        Array2A<Real64> const gcp,                 // Gas specific heat
-                        const Array1D<Real64> &EffectiveOpenness,  // Layer effective openneess [m2]
-                        Array1D<Real64> &theta,                    // Layer surface tempeartures [K]
-                        Array1D<Real64> &sconScaled,               // Layer conductivity divided by thickness
-                        int &nperr,                                // Error message flag
-                        std::string &ErrorMessage                  // Error message
-)
-{
-    for (auto i = 1; i <= nlayer; ++i) {
-        if (LayerType(i) != TARCOGLayerType::SPECULAR) {
-            auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
-            auto nmix1 = nmix(i);
-            auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;
-            for (auto j = 1; j <= maxgas; ++j) {
-                state.dataThermalISO15099Calc->iprop1(j) = iprop(j, i);
-                state.dataThermalISO15099Calc->frct1(j) = frct(j, i);
-            }
-
-            Real64 con;
-            Real64 visc;
-            Real64 dens;
-            Real64 cp;
-            Real64 pr;
-            GASSES90(state,
-                     tLayer,
-                     state.dataThermalISO15099Calc->iprop1,
-                     state.dataThermalISO15099Calc->frct1,
-                     press1,
-                     nmix1,
-                     wght,
-                     gcon,
-                     gvis,
-                     gcp,
-                     con,
-                     visc,
-                     dens,
-                     cp,
-                     pr,
-                     TARCOGGassesParams::Stdrd::ISO15099,
-                     nperr,
-                     ErrorMessage);
-            sconScaled(i) = (EffectiveOpenness(i) * con + (1 - EffectiveOpenness(i)) * scon(i)) / thick(i);
-        } else {
-            sconScaled(i) = scon(i) / thick(i);
-        }
-    }
-}
-
-void filmi(EnergyPlusData &state,
-           Real64 const tair,
-           Real64 const t,
-           int const nlayer,
-           Real64 const tilt,
-           Real64 const wsi,
-           Real64 const height,
-           Array2A_int const iprop,
-           Array2A<Real64> const frct,
-           const Array1D<Real64> &presure,
-           const Array1D_int &nmix,
-           const Array1D<Real64> &wght,
-           Array2A<Real64> const gcon,
-           Array2A<Real64> const gvis,
-           Array2A<Real64> const gcp,
-           Real64 &hcin,
-           int const ibc,
-           int &nperr,
-           std::string &ErrorMessage)
-{
-    //***********************************************************************
-    //  purpose to evaluate heat flux at indoor surface of window using still air correlations (Curcija and Goss 1993)
-    //  found in SPC142 equations 5.43 - 5.48.
-    //***********************************************************************
-    // Input
-    //   tair - room air temperature
-    //   t - inside surface temperature
-    //   nlayer  number of glazing layers
-    //   tilt - the tilt of the glazing in degrees
-    //   wsi - room wind speed (m/s)
-    //   height - window height
-    //   iprop
-    //   frct
-    //   presure
-    //   nmix  vector of number of gasses in a mixture for each gap
-    // Output
-    //   hcin - indoor convecive heat transfer coeff
-
-    // If there is forced air in the room than use SPC142 corelation 5.49 to calculate the room side film coefficient.
-
-    // Using
-    // Argument array dimensioning
-    iprop.dim(maxgas, maxlay1);
-    frct.dim(maxgas, maxlay1);
-    EP_SIZE_CHECK(presure, maxlay1);
-    EP_SIZE_CHECK(nmix, maxlay1);
-    EP_SIZE_CHECK(wght, maxgas);
-    gcon.dim(3, maxgas);
-    gvis.dim(3, maxgas);
-    gcp.dim(3, maxgas);
-
-    // Locals
-    int j;
-    Real64 tiltr;
-    Real64 tmean;
-    Real64 delt;
-    Real64 con;
-    Real64 visc;
-    Real64 dens;
-    Real64 cp;
-    Real64 pr;
-    Real64 gr;
-    Real64 RaCrit;
-    Real64 RaL;
-    Real64 Gnui(0.0);
-
-    if (wsi > 0.0) { // main IF
-        {
-            auto const SELECT_CASE_var(ibc);
-            if (SELECT_CASE_var == 0) {
-                hcin = 4.0 + 4.0 * wsi;
-            } else if (SELECT_CASE_var == -1) {
-                hcin = 5.6 + 3.8 * wsi; // SPC142 correlation
-                return;
-            }
-        }
-    } else {                                                  // main IF - else
-        tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
-        tmean = tair + 0.25 * (t - tair);
-        delt = std::abs(tair - t);
-
-        for (j = 1; j <= nmix(nlayer + 1); ++j) {
-            state.dataThermalISO15099Calc->ipropi(j) = iprop(j, nlayer + 1);
-            state.dataThermalISO15099Calc->frcti(j) = frct(j, nlayer + 1);
-        }
-
-        GASSES90(state,
-                 tmean,
-                 state.dataThermalISO15099Calc->ipropi,
-                 state.dataThermalISO15099Calc->frcti,
-                 presure(nlayer + 1),
-                 nmix(nlayer + 1),
-                 wght,
-                 gcon,
-                 gvis,
-                 gcp,
-                 con,
-                 visc,
-                 dens,
-                 cp,
-                 pr,
-                 TARCOGGassesParams::Stdrd::ISO15099,
-                 nperr,
-                 ErrorMessage);
-
-        //   Calculate grashoff number:
-        //   The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-        gr = DataGlobalConstants::GravityConstant * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
-
-        RaL = gr * pr;
-        //   write(*,*)' RaCrit,RaL,gr,pr '
-        //   write(*,*) RaCrit,RaL,gr,pr
-
-        if ((0.0 <= tilt) && (tilt < 15.0)) { // IF no. 1
-            Gnui = 0.13 * std::pow(RaL, 1.0 / 3.0);
-        } else if ((15.0 <= tilt) && (tilt <= 90.0)) {
-            //   if the room air is still THEN use equations 5.43 - 5.48:
-            RaCrit = 2.5e5 * std::pow(std::exp(0.72 * tilt) / std::sin(tiltr), 0.2);
-            if (RaL <= RaCrit) { // IF no. 2
-                Gnui = 0.56 * root_4(RaL * std::sin(tiltr));
-                // write(*,*) ' Nu ', Gnui
-            } else {
-                // Gnui = 0.13d0*(RaL**0.3333d0 - RaCrit**0.3333d0) + 0.56d0*(RaCrit*sin(tiltr))**0.25d0
-                Gnui = 0.13 * (std::pow(RaL, 1.0 / 3.0) - std::pow(RaCrit, 1.0 / 3.0)) + 0.56 * root_4(RaCrit * std::sin(tiltr));
-            } // end if no. 2
-        } else if ((90.0 < tilt) && (tilt <= 179.0)) {
-            Gnui = 0.56 * root_4(RaL * std::sin(tiltr));
-        } else if ((179.0 < tilt) && (tilt <= 180.0)) {
-            Gnui = 0.58 * std::pow(RaL, 1 / 3.0);
-        } else {
-            assert(false);
-        } // end if no. 1
-        //   write(*,*) ' RaL   ', RaL, '   RaCrit', RaCrit
-        //   write(*,*)'   Nusselt Number   ',Gnui
-
-        hcin = Gnui * (con / height);
-        //   hin = 1.77d0*(ABS(t-tair))**0.25d0
-
-    } // end main IF
-}
-
 void filmg(EnergyPlusData &state,
            Real64 const tilt,
            const Array1D<Real64> &theta,
@@ -2731,55 +2934,6 @@ void filmg(EnergyPlusData &state,
     }
 }
 
-void filmPillar(EnergyPlusData &state,
-                const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                const Array1D<Real64> &scon,          // Conductivity of glass layers
-                const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
-                int const nlayer,
-                const Array1D<Real64> &gap,
-                Array1D<Real64> &hcgas,
-                [[maybe_unused]] Real64 const VacuumMaxGapThickness,
-                [[maybe_unused]] int &nperr,
-                [[maybe_unused]] std::string &ErrorMessage)
-{
-    //***********************************************************************
-    // subroutine to calculate effective conductance of support pillars
-    //***********************************************************************
-
-    // Using
-    // Argument array dimensioning
-    EP_SIZE_CHECK(SupportPillar, maxlay);
-    EP_SIZE_CHECK(scon, maxlay);
-    EP_SIZE_CHECK(PillarSpacing, maxlay);
-    EP_SIZE_CHECK(PillarRadius, maxlay);
-    EP_SIZE_CHECK(gap, MaxGap);
-    EP_SIZE_CHECK(hcgas, maxlay1);
-
-    // Locals
-    //   0 - does not have support pillar
-    //   1 - have support pillar
-
-    for (state.dataThermalISO15099Calc->iFP = 1; state.dataThermalISO15099Calc->iFP <= nlayer - 1; ++state.dataThermalISO15099Calc->iFP) {
-        state.dataThermalISO15099Calc->kFP = 2 * state.dataThermalISO15099Calc->iFP + 1;
-        if (SupportPillar(state.dataThermalISO15099Calc->iFP) == YES_SupportPillar) {
-
-            // Average glass conductivity is taken as average from both glass surrounding gap
-            state.dataThermalISO15099Calc->aveGlassConductivity =
-                (scon(state.dataThermalISO15099Calc->iFP) + scon(state.dataThermalISO15099Calc->iFP + 1)) / 2;
-
-            state.dataThermalISO15099Calc->cpa = 2.0 * state.dataThermalISO15099Calc->aveGlassConductivity *
-                                                 PillarRadius(state.dataThermalISO15099Calc->iFP) /
-                                                 (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) *
-                                                  (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) /
-                                                             (DataGlobalConstants::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
-
-            // It is important to add on prevoius values caluculated for gas
-            hcgas(state.dataThermalISO15099Calc->iFP + 1) += state.dataThermalISO15099Calc->cpa;
-        } // if (SupportPillar(i).eq.YES_SupportPillar) then
-    }
-}
-
 void nusselt(Real64 const tilt, Real64 const ra, Real64 const asp, Real64 &gnu, int &nperr, std::string &ErrorMessage)
 {
     //***********************************************************************
@@ -2910,160 +3064,6 @@ void nusselt(Real64 const tilt, Real64 const ra, Real64 const asp, Real64 &gnu, 
         nperr = 10; // error flag: angle is out of range
         ErrorMessage = "Window tilt angle is out of range.";
         return;
-    }
-}
-
-void storeIterationResults(EnergyPlusData &state,
-                           Files &files,
-                           int const nlayer,
-                           int const index,
-                           const Array1D<Real64> &theta,
-                           Real64 const trmout,
-                           Real64 const tamb,
-                           Real64 const trmin,
-                           Real64 const troom,
-                           Real64 const ebsky,
-                           Real64 const ebroom,
-                           Real64 const hcin,
-                           Real64 const hcout,
-                           Real64 const hrin,
-                           Real64 const hrout,
-                           Real64 const hin,
-                           Real64 const hout,
-                           const Array1D<Real64> &Ebb,
-                           const Array1D<Real64> &Ebf,
-                           const Array1D<Real64> &Rb,
-                           const Array1D<Real64> &Rf,
-                           int &)
-{
-    auto &dynFormat = state.dataThermalISO15099Calc->dynFormat;
-    int i;
-
-    // write(a,1000) index
-    print(files.TarcogIterationsFile, "*************************************************************************************************\n");
-    print(files.TarcogIterationsFile, "Iteration number: {:5}\n", index);
-
-    print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n", trmin - DataGlobalConstants::KelvinConv);
-    print(files.TarcogIterationsFile, "Troom = {:12.6F}\n", troom - DataGlobalConstants::KelvinConv);
-    print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n", trmout - DataGlobalConstants::KelvinConv);
-    print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n", tamb - DataGlobalConstants::KelvinConv);
-
-    print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n", ebsky);
-    print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n", ebroom);
-
-    print(files.TarcogIterationsFile, "hcin = {:8.4F}\n", hcin);
-    print(files.TarcogIterationsFile, "hcout = {:8.4F}\n", hcout);
-    print(files.TarcogIterationsFile, "hrin = {:8.4F}\n", hrin);
-    print(files.TarcogIterationsFile, "hrout = {:8.4F}\n", hrout);
-    print(files.TarcogIterationsFile, "hin = {:8.4F}\n", hin);
-    print(files.TarcogIterationsFile, "hout = {:8.4F}\n", hout);
-
-    // Write headers for Ebb and Ebf
-    for (i = 1; i <= 2 * nlayer; ++i) {
-        if (i == 1) {
-            dynFormat = "";
-        }
-        if (mod(i, 2) == 1) {
-            dynFormat += fmt::format("Ebf({:3})", (i + 1) / 2);
-        } else {
-            dynFormat += fmt::format("Ebb({:3})", (i + 1) / 2);
-        }
-        if (i != 2 * nlayer) {
-            dynFormat += "===";
-        }
-    }
-    print(files.TarcogIterationsFile, dynFormat);
-    print(files.TarcogIterationsFile, "\n");
-
-    // write Ebb and Ebf
-    print(files.TarcogIterationsFile, "{:16.8F}   {:16.8F}", Ebf(1), Ebb(1));
-    for (i = 2; i <= nlayer; ++i) {
-        print(files.TarcogIterationsFile, "   {:16.8F}   {:16.8F}", Ebf(i), Ebb(i));
-    }
-    print(files.TarcogIterationsFile, "\n");
-
-    // Write headers for Rb and Rf
-    for (i = 1; i <= 2 * nlayer; ++i) {
-        const auto a = fmt::format("{:3}", (i + 1) / 2); // this is just to simulate correct integer in brackets
-        if (i == 1) {
-            dynFormat = "";
-        }
-        if (mod(i, 2) == 1) {
-            dynFormat += "Rf(" + a + ')';
-        } else {
-            dynFormat += "Rb(" + a + ')';
-        }
-        if (i != 2 * nlayer) {
-            dynFormat += "===";
-        }
-    }
-    print(files.TarcogIterationsFile, dynFormat);
-    print(files.TarcogIterationsFile, "\n");
-    // write Rb and Rf
-    print(files.TarcogIterationsFile, "{:16.8F}   {:16.8F}", Rf(1), Rb(1));
-    for (i = 1; i <= nlayer; ++i) {
-        print(files.TarcogIterationsFile, "   {:16.8F}   {:16.8F}", Rf(i), Rb(i));
-    }
-    print(files.TarcogIterationsFile, "\n");
-
-    // Write header for temperatures
-    for (i = 1; i <= 2 * nlayer; ++i) {
-        const auto a = fmt::format("{:3}", i);
-        if (i == 1) {
-            dynFormat = "";
-        }
-        dynFormat += "theta(" + a + ')';
-        if (i != (2 * nlayer)) {
-            dynFormat += "==";
-        }
-    }
-    print(files.TarcogIterationsFile, dynFormat);
-    print(files.TarcogIterationsFile, "\n");
-
-    // write temperatures
-    print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
-    for (i = 2; i <= 2 * nlayer; ++i) {
-        print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
-    }
-    print(files.TarcogIterationsFile, "\n");
-
-    // close(TarcogIterationsFileNumber)
-
-    // write results in csv file
-    if (index == 0) {
-        dynFormat = "  ";
-        for (i = 1; i <= 2 * nlayer; ++i) {
-            const auto a = fmt::format("{:3}", i);
-            if (i != 2 * nlayer) {
-                dynFormat += "theta(" + a + "),";
-            } else {
-                dynFormat += "theta(" + a + ')';
-            }
-        }
-        print(files.IterationCSVFile, dynFormat);
-        print(files.IterationCSVFile, "\n");
-    }
-    print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
-    for (i = 2; i <= 2 * nlayer; ++i) {
-        print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
-    }
-    print(files.IterationCSVFile, "\n");
-
-    // close(IterationCSVFileNumber)
-}
-
-void CalculateFuncResults(int const nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes)
-{
-    // Tuned Rewritten to traverse a in unit stride order
-    int const nlayer4(4 * nlayer);
-    for (int i = 1; i <= nlayer4; ++i) {
-        FRes(i) = -b(i);
-    }
-    for (int j = 1; j <= nlayer4; ++j) {
-        Real64 const x_j(x(j));
-        for (int i = 1; i <= nlayer4; ++i) {
-            FRes(i) += a(j, i) * x_j;
-        }
     }
 }
 

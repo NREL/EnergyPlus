@@ -72,68 +72,6 @@ namespace EnergyPlus::TARCOGDeflection {
 using namespace TARCOGParams;
 using namespace TARCOGCommon;
 
-void PanesDeflection(DeflectionCalculation const DeflectionStandard,
-                     Real64 const W,
-                     Real64 const H,
-                     int const nlayer,
-                     Real64 const Pa,
-                     Real64 const Pini,
-                     Real64 const Tini,
-                     const Array1D<Real64> &PaneThickness,
-                     const Array1D<Real64> &NonDeflectedGapWidth,
-                     Array1D<Real64> &DeflectedGapWidthMax,
-                     Array1D<Real64> &DeflectedGapWidthMean,
-                     const Array1D<Real64> &PanelTemps,
-                     const Array1D<Real64> &YoungsMod,
-                     const Array1D<Real64> &PoissonsRat,
-                     Array1D<Real64> &LayerDeflection,
-                     int &nperr,
-                     std::string &ErrorMessage)
-{
-    //***********************************************************************
-    // PanesDeflection - calculates deflection of panes and recalculate gap
-    //                   widths at maximal point of deflection
-    //***********************************************************************
-
-    // Argument array dimensioning
-    EP_SIZE_CHECK(PaneThickness, maxlay);
-    EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
-    EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
-    EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
-    EP_SIZE_CHECK(PanelTemps, maxlay2);
-    EP_SIZE_CHECK(YoungsMod, maxlay);
-    EP_SIZE_CHECK(PoissonsRat, maxlay);
-    EP_SIZE_CHECK(LayerDeflection, maxlay);
-
-    // Localy used
-    Array1D<Real64> DCoeff(maxlay);
-
-    // first calculate D coefficients since that will be necessary for any of selected standards
-    for (int i = 1; i <= nlayer; ++i) {
-        DCoeff(i) = YoungsMod(i) * pow_3(PaneThickness(i)) / (12 * (1 - pow_2(PoissonsRat(i))));
-    }
-    if (DeflectionStandard == DeflectionCalculation::TEMPERATURE) {
-        DeflectionTemperatures(nlayer,
-                               W,
-                               H,
-                               Pa,
-                               Pini,
-                               Tini,
-                               NonDeflectedGapWidth,
-                               DeflectedGapWidthMax,
-                               DeflectedGapWidthMean,
-                               PanelTemps,
-                               DCoeff,
-                               LayerDeflection,
-                               nperr,
-                               ErrorMessage);
-    } else if (DeflectionStandard == DeflectionCalculation::GAP_WIDTHS) {
-        DeflectionWidths(nlayer, W, H, DCoeff, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, LayerDeflection);
-    } else { // including NO_DEFLECTION_CALCULATION
-        return;
-    }
-}
-
 void DeflectionTemperatures(int const nlayer,
                             Real64 const W,
                             Real64 const H,
@@ -269,6 +207,68 @@ void DeflectionWidths(int const nlayer,
 
     for (int i = 1; i <= nlayer - 1; ++i) {
         DeflectedGapWidthMean(i) = NonDeflectedGapWidth(i) + Ratio * (DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i));
+    }
+}
+
+void PanesDeflection(DeflectionCalculation const DeflectionStandard,
+                     Real64 const W,
+                     Real64 const H,
+                     int const nlayer,
+                     Real64 const Pa,
+                     Real64 const Pini,
+                     Real64 const Tini,
+                     const Array1D<Real64> &PaneThickness,
+                     const Array1D<Real64> &NonDeflectedGapWidth,
+                     Array1D<Real64> &DeflectedGapWidthMax,
+                     Array1D<Real64> &DeflectedGapWidthMean,
+                     const Array1D<Real64> &PanelTemps,
+                     const Array1D<Real64> &YoungsMod,
+                     const Array1D<Real64> &PoissonsRat,
+                     Array1D<Real64> &LayerDeflection,
+                     int &nperr,
+                     std::string &ErrorMessage)
+{
+    //***********************************************************************
+    // PanesDeflection - calculates deflection of panes and recalculate gap
+    //                   widths at maximal point of deflection
+    //***********************************************************************
+
+    // Argument array dimensioning
+    EP_SIZE_CHECK(PaneThickness, maxlay);
+    EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+    EP_SIZE_CHECK(PanelTemps, maxlay2);
+    EP_SIZE_CHECK(YoungsMod, maxlay);
+    EP_SIZE_CHECK(PoissonsRat, maxlay);
+    EP_SIZE_CHECK(LayerDeflection, maxlay);
+
+    // Localy used
+    Array1D<Real64> DCoeff(maxlay);
+
+    // first calculate D coefficients since that will be necessary for any of selected standards
+    for (int i = 1; i <= nlayer; ++i) {
+        DCoeff(i) = YoungsMod(i) * pow_3(PaneThickness(i)) / (12 * (1 - pow_2(PoissonsRat(i))));
+    }
+    if (DeflectionStandard == DeflectionCalculation::TEMPERATURE) {
+        DeflectionTemperatures(nlayer,
+                               W,
+                               H,
+                               Pa,
+                               Pini,
+                               Tini,
+                               NonDeflectedGapWidth,
+                               DeflectedGapWidthMax,
+                               DeflectedGapWidthMean,
+                               PanelTemps,
+                               DCoeff,
+                               LayerDeflection,
+                               nperr,
+                               ErrorMessage);
+    } else if (DeflectionStandard == DeflectionCalculation::GAP_WIDTHS) {
+        DeflectionWidths(nlayer, W, H, DCoeff, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, LayerDeflection);
+    } else { // including NO_DEFLECTION_CALCULATION
+        return;
     }
 }
 

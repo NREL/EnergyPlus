@@ -2155,7 +2155,7 @@ namespace SolarCollectors {
         //       DATE WRITTEN   February 2012
 
         // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Get" routine for establishing correct integer index from outside this module
+        // object-oriented "Get" routine for establishing correct integer index from outside this module
 
         // METHODOLOGY EMPLOYED:
         // mine Surface derived type for correct index/number of surface

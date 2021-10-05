@@ -161,11 +161,7 @@ namespace TranspiredCollector {
 
     void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
-
     void CalcPassiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
-
-    void UpdateTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
     void SetUTSCQdotSource(EnergyPlusData &state,
                            int const UTSCNum,

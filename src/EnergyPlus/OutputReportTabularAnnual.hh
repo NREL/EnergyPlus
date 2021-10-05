@@ -73,7 +73,7 @@ struct EnergyPlusData;
 
 namespace OutputReportTabularAnnual {
 
-    // these functions are not in the class and act as an interface between procedural code and object oriented
+    // these functions are not in the class and act as an interface between procedural code and object-oriented
 
     void GetInputTabularAnnual(EnergyPlusData &state);
 

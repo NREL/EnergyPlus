@@ -243,7 +243,7 @@ namespace Photovoltaics {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Get" routine for collector surface temperature
+        // object-oriented "Get" routine for collector surface temperature
 
         // METHODOLOGY EMPLOYED:
         // access derived type
@@ -1906,7 +1906,7 @@ namespace Photovoltaics {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // object oriented "Set" routine for updating sink term without exposing variables
+        // object-oriented "Set" routine for updating sink term without exposing variables
 
         // METHODOLOGY EMPLOYED:
         // update derived type with new data , turn power into W/m2

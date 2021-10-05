@@ -71,30 +71,6 @@ void PanesDeflection(TARCOGParams::DeflectionCalculation DeflectionStandard,
                      int &nperr,
                      std::string &ErrorMessage);
 
-void DeflectionTemperatures(int nlayer,
-                            Real64 W,
-                            Real64 H,
-                            Real64 Pa,
-                            Real64 Pini,
-                            Real64 Tini,
-                            const Array1D<Real64> &NonDeflectedGapWidth,
-                            Array1D<Real64> &DeflectedGapWidthMax,
-                            Array1D<Real64> &DeflectedGapWidthMean,
-                            const Array1D<Real64> &PanelTemps,
-                            Array1D<Real64> &DCoeff,
-                            Array1D<Real64> &LayerDeflection,
-                            int &nperr,
-                            std::string &ErrorMessage);
-
-void DeflectionWidths(int nlayer,
-                      Real64 W,
-                      Real64 H,
-                      Array1D<Real64> &DCoeff,
-                      const Array1D<Real64> &NonDeflectedGapWidth,
-                      const Array1D<Real64> &DeflectedGapWidthMax,
-                      Array1D<Real64> &DeflectedGapWidthMean,
-                      Array1D<Real64> &LayerDeflection);
-
 } // namespace EnergyPlus::TARCOGDeflection
 
 #endif

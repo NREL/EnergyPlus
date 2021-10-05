@@ -85,7 +85,7 @@ namespace Humidifiers {
     //       DATE WRITTEN   September 2000
     //       MODIFIED       B Griffith, Aug. 2006 added water system interactions
     //                        February 2015, B.Nigusse, FSEC, - transitioned the code
-    //                        to object oriented approach and Added gas fired humidifier
+    //                        to object-oriented approach and Added gas fired humidifier
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:

@@ -83,9 +83,6 @@ namespace ThermalChimney {
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithyms required to manage the ThermalChimney System Component
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // 1. N. K. Bansal, R. Mathur and M. S. Bhandari, "Solar Chimney for Enhanced Stack Ventilation",
     // Building and Environment, 28, pp. 373-377, 1993
@@ -101,9 +98,60 @@ namespace ThermalChimney {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataHeatBalSurface;
-
-    // Use statements for access to subroutines in other modules
     using namespace Psychrometrics;
+
+    void ReportThermalChimney(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Kwang Ho Lee
+        //       DATE WRITTEN   April 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine fills remaining report variables.
+
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
+        int ZoneLoop; // Counter for the # of zones (nz)
+        Real64 AirDensity;
+        Real64 CpAir;
+        Real64 TSMult;
+
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour;
+
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+
+            // Break the infiltration load into heat gain and loss components.
+            AirDensity = PsyRhoAirFnPbTdbW(
+                state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneLoop), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop));
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume =
+                (state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) / CpAir / AirDensity) * TSMult;
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass =
+                (state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) / CpAir) * TSMult;
+
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
+
+            if (state.dataHeatBalFanSys->ZT(ZoneLoop) > state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
+
+                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss =
+                    state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) *
+                    (state.dataHeatBalFanSys->ZT(ZoneLoop) - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) * TSMult;
+                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
+
+            } else if (state.dataHeatBalFanSys->ZT(ZoneLoop) <= state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
+
+                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain =
+                    state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) *
+                    (state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp - state.dataHeatBalFanSys->ZT(ZoneLoop)) * TSMult;
+                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
+            }
+
+        } // ... end of zone loads report variable update loop.
+    }
 
     void ManageThermalChimney(EnergyPlusData &state)
     {
@@ -645,6 +693,65 @@ namespace ThermalChimney {
         }
     }
 
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
+    {
+        // SUBROUTINE INFORMATION:
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine solve linear algebraic equations using Gauss Elimination Method.
+
+        // Argument array dimensioning
+        EquaCoef.dim(NTC, NTC);
+        EP_SIZE_CHECK(EquaConst, NTC);
+        EP_SIZE_CHECK(ThermChimSubTemp, NTC);
+
+        Array1D<Real64> tempor(NTC);
+        Real64 tempb;
+        Real64 TCvalue;
+        Real64 TCcoefficient;
+        int pivot;
+        Real64 ThermalChimSum;
+        int ThermChimLoop1;
+        int ThermChimLoop2;
+        int ThermChimLoop3;
+
+        for (ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1) {
+
+            TCvalue = std::abs(EquaCoef(ThermChimLoop1, ThermChimLoop1));
+            pivot = ThermChimLoop1;
+            for (ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2) {
+                if (std::abs(EquaCoef(ThermChimLoop1, ThermChimLoop2)) > TCvalue) {
+                    TCvalue = std::abs(EquaCoef(ThermChimLoop1, ThermChimLoop2));
+                    pivot = ThermChimLoop2;
+                }
+            }
+
+            if (pivot != ThermChimLoop1) {
+                tempor({ThermChimLoop1, NTC}) = EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop1);
+                tempb = EquaConst(ThermChimLoop1);
+                EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop1) = EquaCoef({ThermChimLoop1, NTC}, pivot);
+                EquaConst(ThermChimLoop1) = EquaConst(pivot);
+                EquaCoef({ThermChimLoop1, NTC}, pivot) = tempor({ThermChimLoop1, NTC});
+                EquaConst(pivot) = tempb;
+            }
+
+            for (ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2) {
+                TCcoefficient = -EquaCoef(ThermChimLoop1, ThermChimLoop2) / EquaCoef(ThermChimLoop1, ThermChimLoop1);
+                EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop2) += TCcoefficient * EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop1);
+                EquaConst(ThermChimLoop2) += TCcoefficient * EquaConst(ThermChimLoop1);
+            }
+        }
+
+        ThermChimSubTemp(NTC) = EquaConst(NTC) / EquaCoef(NTC, NTC);
+        for (ThermChimLoop2 = NTC - 1; ThermChimLoop2 >= 1; --ThermChimLoop2) {
+            ThermalChimSum = 0.0;
+            for (ThermChimLoop3 = ThermChimLoop2 + 1; ThermChimLoop3 <= NTC; ++ThermChimLoop3) {
+                ThermalChimSum += EquaCoef(ThermChimLoop3, ThermChimLoop2) * ThermChimSubTemp(ThermChimLoop3);
+            }
+            ThermChimSubTemp(ThermChimLoop2) = (EquaConst(ThermChimLoop2) - ThermalChimSum) / EquaCoef(ThermChimLoop2, ThermChimLoop2);
+        }
+    }
+
     void CalcThermalChimney(EnergyPlusData &state)
     {
 
@@ -930,141 +1037,6 @@ namespace ThermalChimney {
             }
 
         } // DO Loop=1, TotThermalChimney
-    }
-
-    void ReportThermalChimney(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Kwang Ho Lee
-        //       DATE WRITTEN   April 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine fills remaining report variables.
-
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        int ZoneLoop; // Counter for the # of zones (nz)
-        Real64 AirDensity;
-        Real64 CpAir;
-        Real64 TSMult;
-
-        TSMult = TimeStepSys * DataGlobalConstants::SecInHour;
-
-        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
-
-            // Break the infiltration load into heat gain and loss components.
-            AirDensity = PsyRhoAirFnPbTdbW(
-                state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneLoop), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop));
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop));
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume =
-                (state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) / CpAir / AirDensity) * TSMult;
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass =
-                (state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) / CpAir) * TSMult;
-
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
-
-            if (state.dataHeatBalFanSys->ZT(ZoneLoop) > state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
-
-                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss =
-                    state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) *
-                    (state.dataHeatBalFanSys->ZT(ZoneLoop) - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) * TSMult;
-                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
-
-            } else if (state.dataHeatBalFanSys->ZT(ZoneLoop) <= state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
-
-                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain =
-                    state.dataHeatBalFanSys->MCPThermChim(ZoneLoop) *
-                    (state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp - state.dataHeatBalFanSys->ZT(ZoneLoop)) * TSMult;
-                state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
-            }
-
-        } // ... end of zone loads report variable update loop.
-    }
-
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
-    {
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine sovles linear algebraic equations using Gauss Elimination Method.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Argument array dimensioning
-        EquaCoef.dim(NTC, NTC);
-        EP_SIZE_CHECK(EquaConst, NTC);
-        EP_SIZE_CHECK(ThermChimSubTemp, NTC);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        Array1D<Real64> tempor(NTC);
-        Real64 tempb;
-        Real64 TCvalue;
-        Real64 TCcoefficient;
-        int pivot;
-        Real64 ThermalChimSum;
-        int ThermChimLoop1;
-        int ThermChimLoop2;
-        int ThermChimLoop3;
-
-        for (ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1) {
-
-            TCvalue = std::abs(EquaCoef(ThermChimLoop1, ThermChimLoop1));
-            pivot = ThermChimLoop1;
-            for (ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2) {
-                if (std::abs(EquaCoef(ThermChimLoop1, ThermChimLoop2)) > TCvalue) {
-                    TCvalue = std::abs(EquaCoef(ThermChimLoop1, ThermChimLoop2));
-                    pivot = ThermChimLoop2;
-                }
-            }
-
-            if (pivot != ThermChimLoop1) {
-                tempor({ThermChimLoop1, NTC}) = EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop1);
-                tempb = EquaConst(ThermChimLoop1);
-                EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop1) = EquaCoef({ThermChimLoop1, NTC}, pivot);
-                EquaConst(ThermChimLoop1) = EquaConst(pivot);
-                EquaCoef({ThermChimLoop1, NTC}, pivot) = tempor({ThermChimLoop1, NTC});
-                EquaConst(pivot) = tempb;
-            }
-
-            for (ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2) {
-                TCcoefficient = -EquaCoef(ThermChimLoop1, ThermChimLoop2) / EquaCoef(ThermChimLoop1, ThermChimLoop1);
-                EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop2) += TCcoefficient * EquaCoef({ThermChimLoop1, NTC}, ThermChimLoop1);
-                EquaConst(ThermChimLoop2) += TCcoefficient * EquaConst(ThermChimLoop1);
-            }
-        }
-
-        ThermChimSubTemp(NTC) = EquaConst(NTC) / EquaCoef(NTC, NTC);
-        for (ThermChimLoop2 = NTC - 1; ThermChimLoop2 >= 1; --ThermChimLoop2) {
-            ThermalChimSum = 0.0;
-            for (ThermChimLoop3 = ThermChimLoop2 + 1; ThermChimLoop3 <= NTC; ++ThermChimLoop3) {
-                ThermalChimSum += EquaCoef(ThermChimLoop3, ThermChimLoop2) * ThermChimSubTemp(ThermChimLoop3);
-            }
-            ThermChimSubTemp(ThermChimLoop2) = (EquaConst(ThermChimLoop2) - ThermalChimSum) / EquaCoef(ThermChimLoop2, ThermChimLoop2);
-        }
     }
 
     //        End of Module Subroutines for ThermalChimney

@@ -80,14 +80,6 @@ namespace TARCOGCommon {
 
     Real64 LDSumMean(Real64 Width, Real64 Height);
 
-    void modifyHcGap(Array1D<Real64> const &hcgap, // Convective coefficient for gap
-                     Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
-                     Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
-                     Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
-                     int nlayer,                   // Number of layers
-                     Real64 edgeGlCorrFac          // Edge of glass correction factor
-    );
-
     void matrixQBalance(int nlayer,
                         Array2<Real64> &a,
                         Array1D<Real64> &b,
@@ -108,10 +100,6 @@ namespace TARCOGCommon {
                         Real64 edgeGlCorrFac);
 
     void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int n, int &nperr, std::string &ErrorMessage);
-
-    void ludcmp(EnergyPlusData &state, Array2<Real64> &a, int n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
-
-    void lubksb(Array2A<Real64> a, int n, const Array1D_int &indx, Array1D<Real64> &b);
 
     Real64 pos(Real64 x);
 

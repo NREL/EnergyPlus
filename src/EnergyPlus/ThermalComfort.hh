@@ -178,27 +178,14 @@ namespace ThermalComfort {
                                   Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
-    Real64 CalcFangerPMV(
-        EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActLevel, Real64 CloUnit, Real64 WorkEff);
-
-    Real64 CalcFangerPPD(Real64 PMV);
-
     Real64 CalcRelativeAirVelocity(Real64 AirVel, Real64 ActMet);
-
-    void GetThermalComfortInputsASHRAE(EnergyPlusData &state);
 
     Real64 CalcStandardEffectiveTemp(
         EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActMet, Real64 CloUnit, Real64 WorkEff);
 
-    void CalcCoolingEffectAdjustedPMV(EnergyPlusData &state, Real64 &CoolingEffect, Real64 &CoolingEffectAdjustedPMV);
-
-    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
-
     void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state);
 
     void CalcThermalComfortAnkleDraftASH(EnergyPlusData &state);
-
-    void CalcThermalComfortKSU(EnergyPlusData &state);
 
     void DERIV(EnergyPlusData &state,
                int &TempIndiceNum,         // Number of temperature indices  unused1208
@@ -206,21 +193,11 @@ namespace ThermalComfort {
                Array1D<Real64> &TempChange // Change of temperature
     );
 
-    void RKG(EnergyPlusData &state, int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C);
-
     void GetAngleFactorList(EnergyPlusData &state);
 
     Real64 CalcAngleFactorMRT(EnergyPlusData &state, int const AngleFacNum);
 
     Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum);
-
-    Real64 CalcSatVapPressFromTemp(Real64 const Temp);
-
-    Real64 CalcSatVapPressFromTempTorr(Real64 const Temp);
-
-    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
-
-    void CalcThermalComfortSimpleASH55(EnergyPlusData &state);
 
     void ResetThermalComfortSimpleASH55(EnergyPlusData &state);
 

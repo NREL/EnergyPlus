@@ -167,92 +167,6 @@ namespace ThermalISO15099Calc {
                        int &NumOfIterations,
                        Real64 egdeGlCorrFac);
 
-    void therm1d(EnergyPlusData &state,
-                 TARCOGOutput::Files &files,
-                 int nlayer,
-                 int iwd,
-                 Real64 &tout,
-                 Real64 &tind,
-                 Real64 wso,
-                 Real64 wsi,
-                 Real64 VacuumPressure,
-                 Real64 VacuumMaxGapThickness,
-                 Real64 dir,
-                 Real64 &ebsky,
-                 Real64 Gout,
-                 Real64 trmout,
-                 Real64 trmin,
-                 Real64 &ebroom,
-                 Real64 Gin,
-                 const Array1D<Real64> &tir,
-                 const Array1D<Real64> &rir,
-                 const Array1D<Real64> &emis,
-                 const Array1D<Real64> &gap,
-                 const Array1D<Real64> &thick,
-                 const Array1D<Real64> &scon,
-                 Real64 tilt,
-                 const Array1D<Real64> &asol,
-                 Real64 height,
-                 Real64 heightt,
-                 Real64 width,
-                 Array2_int const &iprop,
-                 Array2<Real64> const &frct,
-                 const Array1D<Real64> &presure,
-                 const Array1D_int &nmix,
-                 const Array1D<Real64> &wght,
-                 Array2<Real64> const &gcon,
-                 Array2<Real64> const &gvis,
-                 Array2<Real64> const &gcp,
-                 const Array1D<Real64> &gama,
-                 const Array1D_int &SupportPillar,
-                 const Array1D<Real64> &PillarSpacing,
-                 const Array1D<Real64> &PillarRadius,
-                 Array1D<Real64> &theta,
-                 Array1D<Real64> &q,
-                 Array1D<Real64> &qv,
-                 Real64 &flux,
-                 Real64 &hcin,
-                 Real64 &hrin,
-                 Real64 &hcout,
-                 Real64 &hrout,
-                 Real64 &hin,
-                 Real64 &hout,
-                 Array1D<Real64> &hcgas,
-                 Array1D<Real64> &hrgas,
-                 Real64 &ufactor,
-                 int &nperr,
-                 std::string &ErrorMessage,
-                 Real64 &tamb,
-                 Real64 &troom,
-                 const Array1D_int &ibc,
-                 const Array1D<Real64> &Atop,
-                 const Array1D<Real64> &Abot,
-                 const Array1D<Real64> &Al,
-                 const Array1D<Real64> &Ar,
-                 const Array1D<Real64> &Ah,
-                 const Array1D<Real64> &EffectiveOpenness,
-                 const Array1D<Real64> &vvent,
-                 const Array1D<Real64> &tvent,
-                 const Array1D<TARCOGLayerType> &LayerType,
-                 Array1D<Real64> &Ra,
-                 Array1D<Real64> &Nu,
-                 Array1D<Real64> &vfreevent,
-                 Array1D<Real64> &qcgas,
-                 Array1D<Real64> &qrgas,
-                 Array1D<Real64> &Ebf,
-                 Array1D<Real64> &Ebb,
-                 Array1D<Real64> &Rf,
-                 Array1D<Real64> &Rb,
-                 Real64 &ShadeEmisRatioOut,
-                 Real64 &ShadeEmisRatioIn,
-                 Real64 &ShadeHcModifiedOut,
-                 Real64 &ShadeHcModifiedIn,
-                 TARCOGThermalModel ThermalMod,
-                 int Debug_mode,
-                 Real64 &AchievedErrorTolerance,
-                 int &TotalIndex,
-                 Real64 edgeGlCorrFac);
-
     void guess(EnergyPlusData &state,
                Real64 tout,
                Real64 tind,
@@ -264,8 +178,6 @@ namespace ThermalISO15099Calc {
                Array1D<Real64> &Ebb,
                Array1D<Real64> &Ebf,
                Array1D<Real64> &Tgap);
-
-    void solarISO15099(Real64 totsol, Real64 rtot, const Array1D<Real64> &rs, int nlayer, const Array1D<Real64> &absol, Real64 &sf);
 
     void resist(int nlayer,
                 Real64 trmout,
@@ -336,46 +248,6 @@ namespace ThermalISO15099Calc {
                 Array1D<Real64> &Ra,
                 Array1D<Real64> &Nu);
 
-    void effectiveLayerCond(EnergyPlusData &state,
-                            int nlayer,
-                            const Array1D<TARCOGLayerType> &LayerType, // Layer type
-                            const Array1D<Real64> &scon,               // Layer thermal conductivity
-                            const Array1D<Real64> &thick,              // Layer thickness
-                            Array2A_int iprop,                         // Gas type in gaps
-                            Array2A<Real64> frct,                      // Fraction of gas
-                            const Array1D_int &nmix,                   // Gas mixture
-                            const Array1D<Real64> &pressure,           // Gas pressure [Pa]
-                            const Array1D<Real64> &wght,               // Molecular weight
-                            Array2A<Real64> gcon,                      // Gas specific conductivity
-                            Array2A<Real64> gvis,                      // Gas specific viscosity
-                            Array2A<Real64> gcp,                       // Gas specific heat
-                            const Array1D<Real64> &EffectiveOpenness,  // Layer effective openneess [m2]
-                            Array1D<Real64> &theta,                    // Layer surface tempeartures [K]
-                            Array1D<Real64> &sconScaled,               // Layer conductivity divided by thickness
-                            int &nperr,                                // Error message flag
-                            std::string &ErrorMessage                  // Error message
-    );
-
-    void filmi(EnergyPlusData &state,
-               Real64 tair,
-               Real64 t,
-               int nlayer,
-               Real64 tilt,
-               Real64 wsi,
-               Real64 height,
-               Array2A_int iprop,
-               Array2A<Real64> frct,
-               const Array1D<Real64> &presure,
-               const Array1D_int &nmix,
-               const Array1D<Real64> &wght,
-               Array2A<Real64> gcon,
-               Array2A<Real64> gvis,
-               Array2A<Real64> gcp,
-               Real64 &hcin,
-               int ibc,
-               int &nperr,
-               std::string &ErrorMessage);
-
     void filmg(EnergyPlusData &state,
                Real64 tilt,
                const Array1D<Real64> &theta,
@@ -399,44 +271,8 @@ namespace ThermalISO15099Calc {
                int &nperr,
                std::string &ErrorMessage);
 
-    void filmPillar(EnergyPlusData &state,
-                    const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                    const Array1D<Real64> &scon,          // Conductivity of glass layers
-                    const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                    const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
-                    int nlayer,
-                    const Array1D<Real64> &gap,
-                    Array1D<Real64> &hcgas,
-                    Real64 VacuumMaxGapThickness,
-                    int &nperr,
-                    std::string &ErrorMessage);
-
     void nusselt(Real64 tilt, Real64 ra, Real64 asp, Real64 &gnu, int &nperr, std::string &ErrorMessage);
 
-    void storeIterationResults(EnergyPlusData &state,
-                               TARCOGOutput::Files &files,
-                               int nlayer,
-                               int index,
-                               const Array1D<Real64> &theta,
-                               Real64 trmout,
-                               Real64 tamb,
-                               Real64 trmin,
-                               Real64 troom,
-                               Real64 ebsky,
-                               Real64 ebroom,
-                               Real64 hcin,
-                               Real64 hcout,
-                               Real64 hrin,
-                               Real64 hrout,
-                               Real64 hin,
-                               Real64 hout,
-                               const Array1D<Real64> &Ebb,
-                               const Array1D<Real64> &Ebf,
-                               const Array1D<Real64> &Rb,
-                               const Array1D<Real64> &Rf,
-                               int &);
-
-    void CalculateFuncResults(int nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes);
 } // namespace ThermalISO15099Calc
 struct ThermalISO15099CalcData : BaseGlobalStruct
 {

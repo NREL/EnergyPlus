@@ -92,390 +92,6 @@ namespace TarcogShading {
 
     // Functions
 
-    void shading(EnergyPlusData &state,
-                 Array1D<Real64> const &theta,
-                 Array1D<Real64> const &gap,
-                 Array1D<Real64> &hgas,
-                 Array1D<Real64> &hcgas,
-                 Array1D<Real64> &hrgas,
-                 Array2<Real64> const &frct,
-                 Array2_int const &iprop,
-                 Array1D<Real64> const &pressure,
-                 Array1D_int const &nmix,
-                 const Array1D<Real64> &xwght,
-                 Array2<Real64> const &xgcon,
-                 Array2<Real64> const &xgvis,
-                 Array2<Real64> const &xgcp,
-                 int const nlayer,
-                 Real64 const width,
-                 Real64 const height,
-                 Real64 const angle,
-                 Real64 const Tout,
-                 Real64 const Tin,
-                 Array1D<Real64> const &Atop,
-                 Array1D<Real64> const &Abot,
-                 Array1D<Real64> const &Al,
-                 Array1D<Real64> const &Ar,
-                 Array1D<Real64> const &Ah,
-                 Array1D<Real64> const &vvent,
-                 Array1D<Real64> const &tvent,
-                 Array1D<TARCOGLayerType> LayerType,
-                 Array1D<Real64> &Tgaps,
-                 Array1D<Real64> &qv,
-                 Array1D<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
-                 int &nperr,
-                 std::string &ErrorMessage,
-                 Array1D<Real64> &vfreevent)
-    {
-        //**************************************************************************************************************
-        //  Input:
-        // theta   Vector of average temperatures
-        //  gap      Vector of gap widths (maxlay) [m]
-        //  hgas    Convective part of gap effective conductivity
-        //  frct    Fraction of gasses in a mixture (maxlay1,maxgas)
-        //  iprop    Vector of gas identifers (maxlay1,maxgas)
-        //  pressure  Vector of gas pressures [N/m^2]
-        //  nmix    Vector of number of gasses for each mixture (maxgas=10)
-        //  nlayer  Number of glazing layers
-        //  width    IGU cavity width [m]
-        //  height  IGU cavity height [m]
-        //  angle    Window angle [degrees]
-        //  Tout    Outdoor temperature [K]
-        //  Tin      Indoor temperature [K]
-        //  Atop    Opening between top of shading device and top of glazing cavity [m^2]
-        //  Abot    Opening between bottom of shading device and bottom of glazing cavity [m^2]
-        //  Al      Opening between left of shading device and left end of glazing cavity [m^2]
-        //  Ar      Opening between right of shading device and right end of glazing cavity [m^2]
-        //  Ah      Total area holes in the shading device [m^2]
-        //  LayerType    Vector of layer types (0 - glazing; 1 - shading)
-        //  Ebf      Vector of emissive power of the front surface (# of layers)
-        //  Input/Output:
-        //  Tgaps    Vector of gap temperatures [K]
-        //  Output:
-        //  qv      Vector of heat transfer to the gap by vetilation [W/m^2]
-        //  hhatv    Vector of all film coefficients for vented cavities (maxlay3)
-        //  hcv      Vector of surface-to-air heat transfer coefficients by condction/convection for vented cavities [W/(m^2*K)]
-        //  Ebgap    Vector of emissive power of the vented cavities (maxlay3)
-        //  nperr    Error flag
-        // vfreevent   Vector of free ventilation velocities in gaps
-        //**************************************************************************************************************
-
-        // Using/Aliasing
-        using namespace TARCOGCommon;
-
-        // Locals
-        // REAL(r64), intent(in) :: Ebf(maxlay)
-
-        Real64 Atops;
-        Real64 Abots;
-        Real64 Als;
-        Real64 Ars;
-        Real64 Ahs;
-        Real64 press1;
-        Real64 press2;
-        Real64 s1;
-        Real64 s2;
-        Real64 s;
-        Real64 hcvs;
-        Real64 qvs;
-        Real64 hc;
-        Real64 hc1;
-        Real64 hc2;
-        Real64 speed;
-        Real64 Tav;
-        Real64 Tgap;
-        Real64 Temp;
-        Real64 speed1;
-        Real64 speed2;
-        Real64 Tav1;
-        Real64 Tav2;
-        Real64 Tgap1;
-        Real64 Tgap2;
-        Real64 hcv1;
-        Real64 hcv2;
-        Real64 qv1;
-        Real64 qv2;
-
-        int i;
-        int j;
-        int k;
-        int nmix1;
-        int nmix2;
-
-        // init vectors:
-        qv = 0.0;
-        hcv = 0.0;
-        // hhatv = 0.0d0
-        // Ebgap = 0.0d0
-        // hcv = 0.0d0
-
-        // main loop:
-        for (i = 1; i <= nlayer; ++i) {
-            k = 2 * i + 1;
-            // if (LayerType(i).eq.VENETBLIND) then
-            if (IsShadingLayer(LayerType(i))) {
-                // dr.........set Shading device geometry
-                Atops = Atop(i);
-                Abots = Abot(i);
-                Als = Al(i);
-                Ars = Ar(i);
-                Ahs = Ah(i);
-
-                // dr.....setting gas properies for two adjacent gaps (or enviroment)
-                nmix1 = nmix(i);
-                nmix2 = nmix(i + 1);
-                press1 = pressure(i);
-                press2 = pressure(i + 1);
-                for (j = 1; j <= maxgas; ++j) {
-                    state.dataTarcogShading->iprop1(j) = iprop(j, i);
-                    state.dataTarcogShading->iprop2(j) = iprop(j, i + 1);
-                    state.dataTarcogShading->frct1(j) = frct(j, i);
-                    state.dataTarcogShading->frct2(j) = frct(j, i + 1);
-                } // j
-
-                // dr.......shading on outdoor side
-                if (i == 1) {
-                    s = gap(1);
-                    hc = hcgas(2);
-                    // Tenv = tvent(1)
-                    Tav = (theta(2) + theta(3)) / 2.0;
-                    Tgap = Tgaps(2);
-
-                    // bi......use Tout as temp of the air at inlet
-                    shadingedge(state,
-                                state.dataTarcogShading->iprop1,
-                                state.dataTarcogShading->frct1,
-                                press1,
-                                nmix1,
-                                state.dataTarcogShading->iprop2,
-                                state.dataTarcogShading->frct2,
-                                press2,
-                                nmix2,
-                                xwght,
-                                xgcon,
-                                xgvis,
-                                xgcp,
-                                Atops,
-                                Abots,
-                                Als,
-                                Ars,
-                                Ahs,
-                                s,
-                                height,
-                                width,
-                                angle,
-                                vvent(2),
-                                hc,
-                                Tout,
-                                Tav,
-                                Tgap,
-                                hcvs,
-                                qvs,
-                                nperr,
-                                ErrorMessage,
-                                speed);
-
-                    // exit on error
-                    if ((nperr > 0) && (nperr < 1000)) return;
-
-                    Tgaps(2) = Tgap;
-                    // Ebgap(3) = sigma * Tgap ** 4
-
-                    hcgas(2) = hcvs / 2.0;
-                    hgas(2) = hcgas(2) + hrgas(2);
-                    hcv(2) = hcvs;
-                    qv(2) = qvs;
-
-                    // bi.........Add free ventilation velocity
-                    vfreevent(2) = speed;
-                } // if (i.eq.1) then
-
-                // dr.......shading on indoor side
-                if (i == nlayer) {
-                    if (nlayer > 1) {
-                        s = gap(nlayer - 1); // Autodesk:BoundsViolation gap(nlayer - 1) @ nlayer=1: Fixed with if block
-                        Tav = (theta(2 * nlayer - 1) + theta(2 * nlayer - 2)) /
-                              2.0; // Autodesk:BoundsViolation theta(2 * nlayer - 2) @ nlayer=1: Fixed with if block in 8.2
-                    } else {
-                        s = 0.0;
-                        Tav = 273.15;
-                    }
-                    hc = hcgas(nlayer);
-                    // Tenv = tvent(nlayer + 1)
-
-                    Tgap = Tgaps(nlayer);
-
-                    // bi.........use Tin as temp of the air at inlet
-                    shadingedge(state,
-                                state.dataTarcogShading->iprop2,
-                                state.dataTarcogShading->frct2,
-                                press2,
-                                nmix2,
-                                state.dataTarcogShading->iprop1,
-                                state.dataTarcogShading->frct1,
-                                press1,
-                                nmix1,
-                                xwght,
-                                xgcon,
-                                xgvis,
-                                xgcp,
-                                Atops,
-                                Abots,
-                                Als,
-                                Ars,
-                                Ahs,
-                                s,
-                                height,
-                                width,
-                                angle,
-                                vvent(nlayer),
-                                hc,
-                                Tin,
-                                Tav,
-                                Tgap,
-                                hcvs,
-                                qvs,
-                                nperr,
-                                ErrorMessage,
-                                speed);
-
-                    // exit on error
-                    if ((nperr > 0) && (nperr < 1000)) return;
-
-                    Tgaps(nlayer) = Tgap;
-                    hcgas(nlayer) = hcvs / 2.0;
-                    hgas(nlayer) = hcgas(nlayer) + hrgas(nlayer);
-                    hcv(nlayer) = hcvs;
-                    qv(nlayer) = qvs;
-
-                    // bi.........Add free ventilation velocity
-                    vfreevent(i) = speed;
-                } // if (i.eq.nlayer) then
-
-                // dr.......shading between glass layers
-                if ((i > 1) && (i < nlayer)) {
-                    // dr.........average temperatures
-                    Tav1 = (theta(2 * i - 2) + theta(2 * i - 1)) / 2.0;
-                    Tav2 = (theta(2 * i) + theta(2 * i + 1)) / 2.0;
-                    Tgap1 = Tgaps(i);
-                    Tgap2 = Tgaps(i + 1);
-
-                    hc1 = hcgas(i);
-                    hc2 = hcgas(i + 1);
-                    if (i > 1) s1 = gap(i - 1);
-                    s2 = gap(i);
-
-                    // speed1 = vvent(i)
-                    // speed2 = vvent(i+1)
-
-                    if ((static_cast<int>(CalcForcedVentilation::allow)) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
-                        forcedventilation(state,
-                                          state.dataTarcogShading->iprop1,
-                                          state.dataTarcogShading->frct1,
-                                          press1,
-                                          nmix1,
-                                          xwght,
-                                          xgcon,
-                                          xgvis,
-                                          xgcp,
-                                          s1,
-                                          height,
-                                          hc1,
-                                          vvent(i),
-                                          tvent(i),
-                                          Temp,
-                                          Tav1,
-                                          hcv1,
-                                          qv1,
-                                          nperr,
-                                          ErrorMessage);
-                        forcedventilation(state,
-                                          state.dataTarcogShading->iprop2,
-                                          state.dataTarcogShading->frct2,
-                                          press2,
-                                          nmix1,
-                                          xwght,
-                                          xgcon,
-                                          xgvis,
-                                          xgcp,
-                                          s2,
-                                          height,
-                                          hc1,
-                                          vvent(i + 1),
-                                          tvent(i + 1),
-                                          Temp,
-                                          Tav2,
-                                          hcv2,
-                                          qv2,
-                                          nperr,
-                                          ErrorMessage);
-                    } else {
-                        shadingin(state,
-                                  state.dataTarcogShading->iprop1,
-                                  state.dataTarcogShading->frct1,
-                                  press1,
-                                  nmix1,
-                                  state.dataTarcogShading->iprop2,
-                                  state.dataTarcogShading->frct2,
-                                  press2,
-                                  nmix2,
-                                  xwght,
-                                  xgcon,
-                                  xgvis,
-                                  xgcp,
-                                  Atops,
-                                  Abots,
-                                  Als,
-                                  Ars,
-                                  Ahs,
-                                  s1,
-                                  s2,
-                                  height,
-                                  width,
-                                  angle,
-                                  hc1,
-                                  hc2,
-                                  speed1,
-                                  speed2,
-                                  Tgap1,
-                                  Tgap2,
-                                  Tav1,
-                                  Tav2,
-                                  hcv1,
-                                  hcv2,
-                                  qv1,
-                                  qv2,
-                                  nperr,
-                                  ErrorMessage);
-                    }
-
-                    // exit on error
-                    if ((nperr > 0) && (nperr < 1000)) return;
-
-                    // if (vvent(i).gt.0) then !not implemented for inside shadin yet
-                    //  nperr = 1006
-                    //  ErrorMessage = 'Forced ventilation not implemented for internal SD layers.'
-                    //  return
-                    // end if
-
-                    hcgas(i) = hcv1 / 2.0;
-                    hcgas(i + 1) = hcv2 / 2.0;
-                    hgas(i) = hcgas(i) + hrgas(i);
-                    hgas(i + 1) = hcgas(i + 1) + hrgas(i + 1);
-                    hcv(i) = hcv1;
-                    hcv(i + 1) = hcv2;
-                    qv(i) = qv1;
-                    qv(i + 1) = qv2;
-                    Tgaps(i) = Tgap1;
-                    Tgaps(i + 1) = Tgap2;
-                    // bi.........Add free ventilation velocity
-                    vfreevent(i) = speed1;
-                    vfreevent(i + 1) = speed2;
-                } // if ((i.gt.1).and.(i.lt.nlayer)) then
-            }     // if (LayerType(i).eq.SHADING) then
-        }
-    }
-
     void forcedventilation(EnergyPlusData &state,
                            const Array1D_int &iprop,
                            const Array1D<Real64> &frct,
@@ -1219,6 +835,390 @@ namespace TarcogShading {
                 Atop_eff(i) = Atop(i);
                 Abot_eff(i) = Abot(i);
             }
+        }
+    }
+
+    void shading(EnergyPlusData &state,
+                 Array1D<Real64> const &theta,
+                 Array1D<Real64> const &gap,
+                 Array1D<Real64> &hgas,
+                 Array1D<Real64> &hcgas,
+                 Array1D<Real64> &hrgas,
+                 Array2<Real64> const &frct,
+                 Array2_int const &iprop,
+                 Array1D<Real64> const &pressure,
+                 Array1D_int const &nmix,
+                 const Array1D<Real64> &xwght,
+                 Array2<Real64> const &xgcon,
+                 Array2<Real64> const &xgvis,
+                 Array2<Real64> const &xgcp,
+                 int const nlayer,
+                 Real64 const width,
+                 Real64 const height,
+                 Real64 const angle,
+                 Real64 const Tout,
+                 Real64 const Tin,
+                 Array1D<Real64> const &Atop,
+                 Array1D<Real64> const &Abot,
+                 Array1D<Real64> const &Al,
+                 Array1D<Real64> const &Ar,
+                 Array1D<Real64> const &Ah,
+                 Array1D<Real64> const &vvent,
+                 Array1D<Real64> const &tvent,
+                 Array1D<TARCOGLayerType> LayerType,
+                 Array1D<Real64> &Tgaps,
+                 Array1D<Real64> &qv,
+                 Array1D<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
+                 int &nperr,
+                 std::string &ErrorMessage,
+                 Array1D<Real64> &vfreevent)
+    {
+        //**************************************************************************************************************
+        //  Input:
+        // theta   Vector of average temperatures
+        //  gap      Vector of gap widths (maxlay) [m]
+        //  hgas    Convective part of gap effective conductivity
+        //  frct    Fraction of gasses in a mixture (maxlay1,maxgas)
+        //  iprop    Vector of gas identifers (maxlay1,maxgas)
+        //  pressure  Vector of gas pressures [N/m^2]
+        //  nmix    Vector of number of gasses for each mixture (maxgas=10)
+        //  nlayer  Number of glazing layers
+        //  width    IGU cavity width [m]
+        //  height  IGU cavity height [m]
+        //  angle    Window angle [degrees]
+        //  Tout    Outdoor temperature [K]
+        //  Tin      Indoor temperature [K]
+        //  Atop    Opening between top of shading device and top of glazing cavity [m^2]
+        //  Abot    Opening between bottom of shading device and bottom of glazing cavity [m^2]
+        //  Al      Opening between left of shading device and left end of glazing cavity [m^2]
+        //  Ar      Opening between right of shading device and right end of glazing cavity [m^2]
+        //  Ah      Total area holes in the shading device [m^2]
+        //  LayerType    Vector of layer types (0 - glazing; 1 - shading)
+        //  Ebf      Vector of emissive power of the front surface (# of layers)
+        //  Input/Output:
+        //  Tgaps    Vector of gap temperatures [K]
+        //  Output:
+        //  qv      Vector of heat transfer to the gap by vetilation [W/m^2]
+        //  hhatv    Vector of all film coefficients for vented cavities (maxlay3)
+        //  hcv      Vector of surface-to-air heat transfer coefficients by condction/convection for vented cavities [W/(m^2*K)]
+        //  Ebgap    Vector of emissive power of the vented cavities (maxlay3)
+        //  nperr    Error flag
+        // vfreevent   Vector of free ventilation velocities in gaps
+        //**************************************************************************************************************
+
+        // Using/Aliasing
+        using namespace TARCOGCommon;
+
+        // Locals
+        // REAL(r64), intent(in) :: Ebf(maxlay)
+
+        Real64 Atops;
+        Real64 Abots;
+        Real64 Als;
+        Real64 Ars;
+        Real64 Ahs;
+        Real64 press1;
+        Real64 press2;
+        Real64 s1;
+        Real64 s2;
+        Real64 s;
+        Real64 hcvs;
+        Real64 qvs;
+        Real64 hc;
+        Real64 hc1;
+        Real64 hc2;
+        Real64 speed;
+        Real64 Tav;
+        Real64 Tgap;
+        Real64 Temp;
+        Real64 speed1;
+        Real64 speed2;
+        Real64 Tav1;
+        Real64 Tav2;
+        Real64 Tgap1;
+        Real64 Tgap2;
+        Real64 hcv1;
+        Real64 hcv2;
+        Real64 qv1;
+        Real64 qv2;
+
+        int i;
+        int j;
+        int k;
+        int nmix1;
+        int nmix2;
+
+        // init vectors:
+        qv = 0.0;
+        hcv = 0.0;
+        // hhatv = 0.0d0
+        // Ebgap = 0.0d0
+        // hcv = 0.0d0
+
+        // main loop:
+        for (i = 1; i <= nlayer; ++i) {
+            k = 2 * i + 1;
+            // if (LayerType(i).eq.VENETBLIND) then
+            if (IsShadingLayer(LayerType(i))) {
+                // dr.........set Shading device geometry
+                Atops = Atop(i);
+                Abots = Abot(i);
+                Als = Al(i);
+                Ars = Ar(i);
+                Ahs = Ah(i);
+
+                // dr.....setting gas properies for two adjacent gaps (or enviroment)
+                nmix1 = nmix(i);
+                nmix2 = nmix(i + 1);
+                press1 = pressure(i);
+                press2 = pressure(i + 1);
+                for (j = 1; j <= maxgas; ++j) {
+                    state.dataTarcogShading->iprop1(j) = iprop(j, i);
+                    state.dataTarcogShading->iprop2(j) = iprop(j, i + 1);
+                    state.dataTarcogShading->frct1(j) = frct(j, i);
+                    state.dataTarcogShading->frct2(j) = frct(j, i + 1);
+                } // j
+
+                // dr.......shading on outdoor side
+                if (i == 1) {
+                    s = gap(1);
+                    hc = hcgas(2);
+                    // Tenv = tvent(1)
+                    Tav = (theta(2) + theta(3)) / 2.0;
+                    Tgap = Tgaps(2);
+
+                    // bi......use Tout as temp of the air at inlet
+                    shadingedge(state,
+                                state.dataTarcogShading->iprop1,
+                                state.dataTarcogShading->frct1,
+                                press1,
+                                nmix1,
+                                state.dataTarcogShading->iprop2,
+                                state.dataTarcogShading->frct2,
+                                press2,
+                                nmix2,
+                                xwght,
+                                xgcon,
+                                xgvis,
+                                xgcp,
+                                Atops,
+                                Abots,
+                                Als,
+                                Ars,
+                                Ahs,
+                                s,
+                                height,
+                                width,
+                                angle,
+                                vvent(2),
+                                hc,
+                                Tout,
+                                Tav,
+                                Tgap,
+                                hcvs,
+                                qvs,
+                                nperr,
+                                ErrorMessage,
+                                speed);
+
+                    // exit on error
+                    if ((nperr > 0) && (nperr < 1000)) return;
+
+                    Tgaps(2) = Tgap;
+                    // Ebgap(3) = sigma * Tgap ** 4
+
+                    hcgas(2) = hcvs / 2.0;
+                    hgas(2) = hcgas(2) + hrgas(2);
+                    hcv(2) = hcvs;
+                    qv(2) = qvs;
+
+                    // bi.........Add free ventilation velocity
+                    vfreevent(2) = speed;
+                } // if (i.eq.1) then
+
+                // dr.......shading on indoor side
+                if (i == nlayer) {
+                    if (nlayer > 1) {
+                        s = gap(nlayer - 1); // Autodesk:BoundsViolation gap(nlayer - 1) @ nlayer=1: Fixed with if block
+                        Tav = (theta(2 * nlayer - 1) + theta(2 * nlayer - 2)) /
+                              2.0; // Autodesk:BoundsViolation theta(2 * nlayer - 2) @ nlayer=1: Fixed with if block in 8.2
+                    } else {
+                        s = 0.0;
+                        Tav = 273.15;
+                    }
+                    hc = hcgas(nlayer);
+                    // Tenv = tvent(nlayer + 1)
+
+                    Tgap = Tgaps(nlayer);
+
+                    // bi.........use Tin as temp of the air at inlet
+                    shadingedge(state,
+                                state.dataTarcogShading->iprop2,
+                                state.dataTarcogShading->frct2,
+                                press2,
+                                nmix2,
+                                state.dataTarcogShading->iprop1,
+                                state.dataTarcogShading->frct1,
+                                press1,
+                                nmix1,
+                                xwght,
+                                xgcon,
+                                xgvis,
+                                xgcp,
+                                Atops,
+                                Abots,
+                                Als,
+                                Ars,
+                                Ahs,
+                                s,
+                                height,
+                                width,
+                                angle,
+                                vvent(nlayer),
+                                hc,
+                                Tin,
+                                Tav,
+                                Tgap,
+                                hcvs,
+                                qvs,
+                                nperr,
+                                ErrorMessage,
+                                speed);
+
+                    // exit on error
+                    if ((nperr > 0) && (nperr < 1000)) return;
+
+                    Tgaps(nlayer) = Tgap;
+                    hcgas(nlayer) = hcvs / 2.0;
+                    hgas(nlayer) = hcgas(nlayer) + hrgas(nlayer);
+                    hcv(nlayer) = hcvs;
+                    qv(nlayer) = qvs;
+
+                    // bi.........Add free ventilation velocity
+                    vfreevent(i) = speed;
+                } // if (i.eq.nlayer) then
+
+                // dr.......shading between glass layers
+                if ((i > 1) && (i < nlayer)) {
+                    // dr.........average temperatures
+                    Tav1 = (theta(2 * i - 2) + theta(2 * i - 1)) / 2.0;
+                    Tav2 = (theta(2 * i) + theta(2 * i + 1)) / 2.0;
+                    Tgap1 = Tgaps(i);
+                    Tgap2 = Tgaps(i + 1);
+
+                    hc1 = hcgas(i);
+                    hc2 = hcgas(i + 1);
+                    if (i > 1) s1 = gap(i - 1);
+                    s2 = gap(i);
+
+                    // speed1 = vvent(i)
+                    // speed2 = vvent(i+1)
+
+                    if ((static_cast<int>(CalcForcedVentilation::allow)) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
+                        forcedventilation(state,
+                                          state.dataTarcogShading->iprop1,
+                                          state.dataTarcogShading->frct1,
+                                          press1,
+                                          nmix1,
+                                          xwght,
+                                          xgcon,
+                                          xgvis,
+                                          xgcp,
+                                          s1,
+                                          height,
+                                          hc1,
+                                          vvent(i),
+                                          tvent(i),
+                                          Temp,
+                                          Tav1,
+                                          hcv1,
+                                          qv1,
+                                          nperr,
+                                          ErrorMessage);
+                        forcedventilation(state,
+                                          state.dataTarcogShading->iprop2,
+                                          state.dataTarcogShading->frct2,
+                                          press2,
+                                          nmix1,
+                                          xwght,
+                                          xgcon,
+                                          xgvis,
+                                          xgcp,
+                                          s2,
+                                          height,
+                                          hc1,
+                                          vvent(i + 1),
+                                          tvent(i + 1),
+                                          Temp,
+                                          Tav2,
+                                          hcv2,
+                                          qv2,
+                                          nperr,
+                                          ErrorMessage);
+                    } else {
+                        shadingin(state,
+                                  state.dataTarcogShading->iprop1,
+                                  state.dataTarcogShading->frct1,
+                                  press1,
+                                  nmix1,
+                                  state.dataTarcogShading->iprop2,
+                                  state.dataTarcogShading->frct2,
+                                  press2,
+                                  nmix2,
+                                  xwght,
+                                  xgcon,
+                                  xgvis,
+                                  xgcp,
+                                  Atops,
+                                  Abots,
+                                  Als,
+                                  Ars,
+                                  Ahs,
+                                  s1,
+                                  s2,
+                                  height,
+                                  width,
+                                  angle,
+                                  hc1,
+                                  hc2,
+                                  speed1,
+                                  speed2,
+                                  Tgap1,
+                                  Tgap2,
+                                  Tav1,
+                                  Tav2,
+                                  hcv1,
+                                  hcv2,
+                                  qv1,
+                                  qv2,
+                                  nperr,
+                                  ErrorMessage);
+                    }
+
+                    // exit on error
+                    if ((nperr > 0) && (nperr < 1000)) return;
+
+                    // if (vvent(i).gt.0) then !not implemented for inside shadin yet
+                    //  nperr = 1006
+                    //  ErrorMessage = 'Forced ventilation not implemented for internal SD layers.'
+                    //  return
+                    // end if
+
+                    hcgas(i) = hcv1 / 2.0;
+                    hcgas(i + 1) = hcv2 / 2.0;
+                    hgas(i) = hcgas(i) + hrgas(i);
+                    hgas(i + 1) = hcgas(i + 1) + hrgas(i + 1);
+                    hcv(i) = hcv1;
+                    hcv(i + 1) = hcv2;
+                    qv(i) = qv1;
+                    qv(i + 1) = qv2;
+                    Tgaps(i) = Tgap1;
+                    Tgaps(i + 1) = Tgap2;
+                    // bi.........Add free ventilation velocity
+                    vfreevent(i) = speed1;
+                    vfreevent(i + 1) = speed2;
+                } // if ((i.gt.1).and.(i.lt.nlayer)) then
+            }     // if (LayerType(i).eq.SHADING) then
         }
     }
 
