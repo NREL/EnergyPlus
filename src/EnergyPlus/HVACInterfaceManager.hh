@@ -132,9 +132,6 @@ namespace HVACInterfaceManager {
 
     void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, Real64 &TankOutletTemp);
 
-    void
-    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, DataPlant::iCommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
-
 } // namespace HVACInterfaceManager
 
 struct HVACInterfaceManagerData : BaseGlobalStruct

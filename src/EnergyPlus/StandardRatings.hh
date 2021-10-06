@@ -170,12 +170,6 @@ namespace StandardRatings {
                          Optional_int_const CondLoopNum,
                          Optional<Real64 const> OpenMotorEff);
 
-    Real64
-    ReformEIRChillerCondInletTempResidual(EnergyPlusData &state,
-                                          Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
-                                          Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
-    );
-
     void CalcDXCoilStandardRating(
         EnergyPlusData &state,
         std::string const &DXCoilName,                             // Name of DX coil for which HSPF is calculated

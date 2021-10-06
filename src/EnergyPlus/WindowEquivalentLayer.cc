@@ -293,6 +293,86 @@ Real64 Specular_F(EnergyPlusData &state,
     return Specular_F;
 }
 
+Real64
+HEMINT(EnergyPlusData &state,
+       std::function<Real64(EnergyPlusData &state, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
+       int const F_Opt,           // options passed to F() (hipRHO, hipTAU)
+       const Array1D<Real64> &F_P // parameters passed to F()
+)
+{
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Romberg Integration of Property function over hemispeherical dome
+    // METHODOLOGY EMPLOYED:
+    //  Romberg Integration.
+
+    // Argument array dimensioning
+    EP_SIZE_CHECK(F_P, state.dataWindowEquivalentLayer->hipDIM);
+
+    constexpr Real64 KMAX(8); // max steps
+    int const NPANMAX(std::pow(2, KMAX));
+    Real64 const TOL(0.0005); // convergence tolerance
+    static constexpr std::string_view RoutineName("HEMINT");
+
+    Array2D<Real64> T(KMAX, KMAX);
+    Real64 FX;
+    Real64 X1;
+    Real64 X2;
+    Real64 X;
+    Real64 DX;
+    Real64 SUM;
+    Real64 DIFF;
+    int nPan;
+    int I;
+    int K;
+    int L;
+    int iPX;
+
+    X1 = 0.0; // integration limits
+    X2 = DataGlobalConstants::PiOvr2;
+    nPan = 1;
+    SUM = 0.0;
+    for (K = 1; K <= KMAX; ++K) {
+        DX = (X2 - X1) / nPan;
+        iPX = NPANMAX / nPan;
+        for (I = 0; I <= nPan; ++I) {
+            if (K == 1 || mod(I * iPX, iPX * 2) != 0) {
+                //   evaluate integrand function for new X values
+                //   2 * sin( x) * cos( x) covers hemisphere with single integral
+                X = X1 + I * DX;
+                FX = 2.0 * std::sin(X) * std::cos(X) * F(state, X, F_Opt, F_P);
+                if (K == 1) FX /= 2.0;
+                SUM += FX;
+            }
+        }
+
+        T(K, 1) = DX * SUM;
+        // trapezoid result - i.e., first column Romberg entry
+        // Now complete the row
+        if (K > 1) {
+            for (L = 2; L <= K; ++L) {
+                Real64 const pow_4_L_1(std::pow(4.0, L - 1));
+                T(K, L) = (pow_4_L_1 * T(K, L - 1) - T(K - 1, L - 1)) / (pow_4_L_1 - 1.0);
+            }
+            //    check for convergence
+            //    do 8 panels minimum, else can miss F() features
+            if (nPan >= 8) {
+                DIFF = std::abs(T(K, K) - T(K - 1, K - 1));
+                if (DIFF < TOL) break;
+            }
+        }
+        nPan *= 2;
+    }
+    if (K > KMAX) {
+        K = KMAX;
+    }
+    return P01(state, T(K, K), RoutineName);
+}
+
 void Specular_RATDiff(EnergyPlusData &state, Real64 &RAT_1MRDiff, Real64 &RAT_TAUDiff)
 {
     // SUBROUTINE INFORMATION:
@@ -7470,86 +7550,6 @@ Real64 P01(EnergyPlusData &state,
     P01 = max(0.0, min(1.0, P));
 
     return P01;
-}
-
-Real64
-HEMINT(EnergyPlusData &state,
-       std::function<Real64(EnergyPlusData &state, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
-       int const F_Opt,           // options passed to F() (hipRHO, hipTAU)
-       const Array1D<Real64> &F_P // parameters passed to F()
-)
-{
-    //       AUTHOR         ASHRAE 1311-RP
-    //       DATE WRITTEN   unknown
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Romberg Integration of Property function over hemispeherical dome
-    // METHODOLOGY EMPLOYED:
-    //  Romberg Integration.
-
-    // Argument array dimensioning
-    EP_SIZE_CHECK(F_P, state.dataWindowEquivalentLayer->hipDIM);
-
-    constexpr Real64 KMAX(8); // max steps
-    int const NPANMAX(std::pow(2, KMAX));
-    Real64 const TOL(0.0005); // convergence tolerance
-    static constexpr std::string_view RoutineName("HEMINT");
-
-    Array2D<Real64> T(KMAX, KMAX);
-    Real64 FX;
-    Real64 X1;
-    Real64 X2;
-    Real64 X;
-    Real64 DX;
-    Real64 SUM;
-    Real64 DIFF;
-    int nPan;
-    int I;
-    int K;
-    int L;
-    int iPX;
-
-    X1 = 0.0; // integration limits
-    X2 = DataGlobalConstants::PiOvr2;
-    nPan = 1;
-    SUM = 0.0;
-    for (K = 1; K <= KMAX; ++K) {
-        DX = (X2 - X1) / nPan;
-        iPX = NPANMAX / nPan;
-        for (I = 0; I <= nPan; ++I) {
-            if (K == 1 || mod(I * iPX, iPX * 2) != 0) {
-                //   evaluate integrand function for new X values
-                //   2 * sin( x) * cos( x) covers hemisphere with single integral
-                X = X1 + I * DX;
-                FX = 2.0 * std::sin(X) * std::cos(X) * F(state, X, F_Opt, F_P);
-                if (K == 1) FX /= 2.0;
-                SUM += FX;
-            }
-        }
-
-        T(K, 1) = DX * SUM;
-        // trapezoid result - i.e., first column Romberg entry
-        // Now complete the row
-        if (K > 1) {
-            for (L = 2; L <= K; ++L) {
-                Real64 const pow_4_L_1(std::pow(4.0, L - 1));
-                T(K, L) = (pow_4_L_1 * T(K, L - 1) - T(K - 1, L - 1)) / (pow_4_L_1 - 1.0);
-            }
-            //    check for convergence
-            //    do 8 panels minimum, else can miss F() features
-            if (nPan >= 8) {
-                DIFF = std::abs(T(K, K) - T(K - 1, K - 1));
-                if (DIFF < TOL) break;
-            }
-        }
-        nPan *= 2;
-    }
-    if (K > KMAX) {
-        K = KMAX;
-    }
-    return P01(state, T(K, K), RoutineName);
 }
 
 void ASHWAT_ThermalCalc(EnergyPlusData &state,

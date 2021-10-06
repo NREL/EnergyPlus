@@ -402,6 +402,52 @@ void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 c
     EvapCond(EvapCoolNum).OutletPressure = EvapCond(EvapCoolNum).InletPressure;
 }
 
+Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
+                                      Real64 const AirMassFlowSec,     // secondary air mass flow rate in kg/s
+                                      std::array<Real64, 6> const &Par // Par(2) is desired outlet temperature of Evap Cooler
+)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         B. Nigusse
+    //       DATE WRITTEN   Sep 2014
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Indirect research special evaporative cooler part load operation:
+    // determines the secondary air flow rate
+
+    // METHODOLOGY EMPLOYED:
+    // Uses regula falsi to minimize setpoint temperature residual to by varying the
+    // secondary air flow rate.
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int EvapCoolIndex;                   // evaporative cooler index
+    OperatingMode DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
+    Real64 EDBTSecAirSide;               // current entering dry bulb temperature of the secondary side
+    Real64 EWBTSecAirSide;               // current entering wet bulb temperature of the secondary side
+    Real64 EHumRatSecAirSide;            // current entering humidity ratio of the secondary side
+    Real64 OutletAirTemp;                // evap Coler outlet air temperature
+    Real64 SysTempSetPoint;              // evaporative cooler outlet setpoint temperature, drybulb
+    Real64 Residuum;                     // Residual to be minimized to zero
+
+    auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
+    EvapCoolIndex = int(Par[0]);
+    DryOrWetOperatingMode = OperatingMode(int(Par[1]));
+    SysTempSetPoint = Par[2];
+    EDBTSecAirSide = Par[3];
+    EWBTSecAirSide = Par[4];
+    EHumRatSecAirSide = Par[5];
+    state.dataEvapCoolers->EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
+    CalcIndirectRDDEvapCoolerOutletTemp(
+        state, EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide);
+    OutletAirTemp = EvapCond(EvapCoolIndex).OutletTemp;
+    Residuum = SysTempSetPoint - OutletAirTemp;
+
+    return Residuum;
+}
+
 void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                                                    int const EvapCoolNum,
                                                    Real64 const InletDryBulbTempSec,
@@ -3079,52 +3125,6 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
         OperatingMode = OperatingMode::None; // this condition should not happen unless the bounds do not cover all combinations possible
     }
     return OperatingMode;
-}
-
-Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                      Real64 const AirMassFlowSec,     // secondary air mass flow rate in kg/s
-                                      std::array<Real64, 6> const &Par // Par(2) is desired outlet temperature of Evap Cooler
-)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Nigusse
-    //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Indirect research special evaporative cooler part load operation:
-    // determines the secondary air flow rate
-
-    // METHODOLOGY EMPLOYED:
-    // Uses regula falsi to minimize setpoint temperature residual to by varying the
-    // secondary air flow rate.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int EvapCoolIndex;                   // evaporative cooler index
-    OperatingMode DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
-    Real64 EDBTSecAirSide;               // current entering dry bulb temperature of the secondary side
-    Real64 EWBTSecAirSide;               // current entering wet bulb temperature of the secondary side
-    Real64 EHumRatSecAirSide;            // current entering humidity ratio of the secondary side
-    Real64 OutletAirTemp;                // evap Coler outlet air temperature
-    Real64 SysTempSetPoint;              // evaporative cooler outlet setpoint temperature, drybulb
-    Real64 Residuum;                     // Residual to be minimized to zero
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-
-    EvapCoolIndex = int(Par[0]);
-    DryOrWetOperatingMode = OperatingMode(int(Par[1]));
-    SysTempSetPoint = Par[2];
-    EDBTSecAirSide = Par[3];
-    EWBTSecAirSide = Par[4];
-    EHumRatSecAirSide = Par[5];
-    state.dataEvapCoolers->EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
-    CalcIndirectRDDEvapCoolerOutletTemp(
-        state, EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide);
-    OutletAirTemp = EvapCond(EvapCoolIndex).OutletTemp;
-    Residuum = SysTempSetPoint - OutletAirTemp;
-
-    return Residuum;
 }
 
 void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,

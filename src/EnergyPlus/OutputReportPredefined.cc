@@ -74,6 +74,63 @@ namespace OutputReportPredefined {
 
     // Internal data structures to store information provided by calls
 
+    int newPreDefReport(EnergyPlusData &state, std::string_view inReportName, std::string_view inReportAbrev, std::string_view inReportNamewithSpaces)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason Glazer
+        //       DATE WRITTEN   August 2006
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   Creates a new index for the next predefined report
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+
+        // Return value
+        int newPreDefReport;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        if (!allocated(state.dataOutRptPredefined->reportName)) {
+            state.dataOutRptPredefined->reportName.allocate(sizeIncrement);
+            state.dataOutRptPredefined->sizeReportName = sizeIncrement;
+            state.dataOutRptPredefined->numReportName = 1;
+        } else {
+            ++state.dataOutRptPredefined->numReportName;
+            // if larger than current size grow the array
+            if (state.dataOutRptPredefined->numReportName > state.dataOutRptPredefined->sizeReportName) {
+                state.dataOutRptPredefined->reportName.redimension(
+                    state.dataOutRptPredefined->sizeReportName *=
+                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+            }
+        }
+        // initialize new record
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).name = inReportName;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).abrev = inReportAbrev;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).namewithspaces = inReportNamewithSpaces;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).show = false;
+        newPreDefReport = state.dataOutRptPredefined->numReportName;
+        return newPreDefReport;
+    }
+
     void SetPredefinedTables(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
@@ -1599,63 +1656,6 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = castingField;
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = receivingField;
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = receivingKind;
-    }
-
-    int newPreDefReport(EnergyPlusData &state, std::string_view inReportName, std::string_view inReportAbrev, std::string_view inReportNamewithSpaces)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   August 2006
-        //       MODIFIED
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   Creates a new index for the next predefined report
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Return value
-        int newPreDefReport;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (!allocated(state.dataOutRptPredefined->reportName)) {
-            state.dataOutRptPredefined->reportName.allocate(sizeIncrement);
-            state.dataOutRptPredefined->sizeReportName = sizeIncrement;
-            state.dataOutRptPredefined->numReportName = 1;
-        } else {
-            ++state.dataOutRptPredefined->numReportName;
-            // if larger than current size grow the array
-            if (state.dataOutRptPredefined->numReportName > state.dataOutRptPredefined->sizeReportName) {
-                state.dataOutRptPredefined->reportName.redimension(
-                    state.dataOutRptPredefined->sizeReportName *=
-                    2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
-            }
-        }
-        // initialize new record
-        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).name = inReportName;
-        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).abrev = inReportAbrev;
-        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).namewithspaces = inReportNamewithSpaces;
-        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).show = false;
-        newPreDefReport = state.dataOutRptPredefined->numReportName;
-        return newPreDefReport;
     }
 
     int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string_view subTableName)

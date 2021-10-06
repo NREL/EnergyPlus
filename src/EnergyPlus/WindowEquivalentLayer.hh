@@ -89,13 +89,6 @@ namespace WindowEquivalentLayer {
                std::string_view const WHAT // identifier for err msg
     );
 
-    Real64
-    HEMINT(EnergyPlusData &state,
-           std::function<Real64(EnergyPlusData &state, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
-           int const F_Opt,           // options passed to F() (hipRHO, hipTAU)
-           const Array1D<Real64> &F_P // parameters passed to F()
-    );
-
     void ASHWAT_ThermalCalc(EnergyPlusData &state,
                             CFSTY &FS,          // fenestration system
                             Real64 const TIN,   // indoor air temperature, K
