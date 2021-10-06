@@ -3798,7 +3798,6 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct volume VAV.
 
-
     using namespace DataZoneEnergyDemands;
 
     using DataHVACGlobals::SmallLoad;
@@ -5131,8 +5130,6 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple single duct constant volume systems.
 
-
-
     using namespace DataZoneEnergyDemands;
     using HeatingCoils::SimulateHeatingCoilComponents;
     using PlantUtilities::SetActuatedBranchFlowRate;
@@ -5731,8 +5728,6 @@ void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the Sys report variables.
-
-
 
     // Still needs to report the Sys power from this component
 

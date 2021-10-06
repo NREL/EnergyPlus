@@ -7239,7 +7239,6 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataPlant;
 
-
     Real64 NormDsnCondFlow(0.0);        // Normalized design condenser flow for cooling towers, m3/s per watt
     Real64 Twr_DesignWB(0.0);           // The cooling tower design inlet air wet bulb temperature, C
     Real64 Dsn_CondMinThisChiller(0.0); // Design Minimum Condenser Entering for current chillers this timestep
