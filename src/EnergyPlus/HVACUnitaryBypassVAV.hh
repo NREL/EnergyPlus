@@ -72,6 +72,7 @@ namespace HVACUnitaryBypassVAV {
     constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Mode of operation
+    // can't change these to enum class since these are used in SetupOutputVariable()
     int constexpr CoolingMode(1); // System operating mode is cooling
     int constexpr HeatingMode(2); // System operating mode is heating
 

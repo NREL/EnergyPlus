@@ -76,15 +76,19 @@ namespace ExternalInterface {
     // MODULE PARAMETER DEFINITIONS:
     int constexpr maxVar(100000);         // Maximum number of variables to be exchanged
     int constexpr maxErrMsgLength(10000); // Maximum error message length from xml schema validation
-    int constexpr indexSchedule(1);       // Index for schedule in inpVarTypes
-    int constexpr indexVariable(2);       // Index for variable in inpVarTypes
-    int constexpr indexActuator(3);       // Index for actuator in inpVarTypes
-    int constexpr fmiOK(0);               // fmiOK
-    int constexpr fmiWarning(1);          // fmiWarning
-    int constexpr fmiDiscard(2);          // fmiDiscard
-    int constexpr fmiError(3);            // fmiError
-    int constexpr fmiFatal(4);            // fmiPending
-    int constexpr fmiPending(5);          // fmiPending
+
+    // can't change these to enum class since these are used in getepvariables() in utilXml.c as arguments
+    int constexpr indexSchedule(1); // Index for schedule in inpVarTypes
+    int constexpr indexVariable(2); // Index for variable in inpVarTypes
+    int constexpr indexActuator(3); // Index for actuator in inpVarTypes
+
+    // used in fmistatus defined in hmiModelFunctions.h
+    int constexpr fmiOK(0);      // fmiOK
+    int constexpr fmiWarning(1); // fmiWarning
+    int constexpr fmiDiscard(2); // fmiDiscard
+    int constexpr fmiError(3);   // fmiError
+    int constexpr fmiFatal(4);   // fmiPending
+    int constexpr fmiPending(5); // fmiPending
 
     struct fmuInputVariableType
     {

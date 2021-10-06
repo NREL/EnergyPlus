@@ -641,7 +641,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
         // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
         // Add sensible heat gain from refrigerated cases with under case returns
-        SumAllReturnAirConvectionGains(state, ZoneNum, QRetAir, ReturnNode);
+        QRetAir = SumAllReturnAirConvectionGains(state, ZoneNum, ReturnNode);
 
         CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
 
@@ -723,7 +723,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         // humidity ratio
         if (!state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
             if (MassFlowRA > 0) {
-                SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                 state.dataLoopNodes->Node(ReturnNode).HumRat =
                     state.dataLoopNodes->Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
             } else {
@@ -731,14 +731,14 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
-                SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, 0);
+                SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, 0);
                 state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
             }
         } else {
             state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
             state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
             // shouldn't the HVAC term be zeroed out then?
-            SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+            SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
             state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
         }
 

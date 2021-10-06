@@ -69,7 +69,7 @@ namespace DataPlant {
         std::string Name;                                 // Component name
         int CompNum;                                      // Component ID number
         DataBranchAirLoopPlant::ControlTypeEnum FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
-        int FlowPriority;                                 // status for overall loop flow determination
+        LoopFlowStatus FlowPriority;                      // status for overall loop flow determination
         bool ON;                                          // TRUE = designated component or operation scheme available
         bool Available;                                   // TRUE = designated component or operation scheme available
         std::string NodeNameIn;                           // Component inlet node name
@@ -90,7 +90,7 @@ namespace DataPlant {
         Real64 EquipDemand;                                // Component load request based on inlet temp and outlet SP
         bool EMSLoadOverrideOn;                            // EMS is calling to override load dispatched to component
         Real64 EMSLoadOverrideValue;                       // EMS value to use for load when overridden [W] always positive.
-        int HowLoadServed;                                 // nature of component in terms of how it can meet load
+        DataPlant::HowMet HowLoadServed;                   // nature of component in terms of how it can meet load
         Real64 MinOutletTemp;                              // Component exit lower limit temperature
         Real64 MaxOutletTemp;                              // Component exit upper limit temperature
         bool FreeCoolCntrlShutDown;                        // true if component was shut down because of free cooling
@@ -105,12 +105,12 @@ namespace DataPlant {
 
         // Default Constructor
         CompData()
-            : TypeOf_Num(0), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus_Unknown), ON(false),
+            : TypeOf_Num(0), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus::Unknown), ON(false),
               Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0), OptLoad(0.0), SizFac(0.0),
               CurOpSchemeType(UnknownStatusOpSchemeType), NumOpSchemes(0), CurCompLevelOpNum(0), EquipDemand(0.0), EMSLoadOverrideOn(false),
-              EMSLoadOverrideValue(0.0), HowLoadServed(HowMet_Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false),
-              FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned), FreeCoolCntrlNodeNum(0),
-              IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
+              EMSLoadOverrideValue(0.0), HowLoadServed(DataPlant::HowMet::Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0),
+              FreeCoolCntrlShutDown(false), FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned),
+              FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }
 

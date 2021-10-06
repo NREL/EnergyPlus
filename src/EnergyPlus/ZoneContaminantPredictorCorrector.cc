@@ -313,7 +313,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                               ZonePtr,
                               "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -460,7 +460,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                   ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                                   nullptr,
                                   nullptr,
                                   nullptr,
@@ -579,7 +579,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                               ZonePtr,
                               "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -705,7 +705,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                               ZonePtr,
                               "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -832,7 +832,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                               ZonePtr,
                               "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -940,7 +940,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                               ZonePtr,
                               "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -1050,7 +1050,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                               ZonePtr,
                               "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -1314,7 +1314,6 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     // Using/Aliasing
     using InternalHeatGains::SumAllInternalCO2Gains;
     using InternalHeatGains::SumAllInternalCO2GainsExceptPeople; // Added for hybrid model
-    using InternalHeatGains::SumAllInternalGenericContamGains;
     using InternalHeatGains::SumInternalCO2GainsByTypes;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1599,11 +1598,12 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     // CO2 gain
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-            SumAllInternalCO2Gains(state, Loop, state.dataContaminantBalance->ZoneCO2Gain(Loop));
+            state.dataContaminantBalance->ZoneCO2Gain(Loop) = SumAllInternalCO2Gains(state, Loop);
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                SumAllInternalCO2GainsExceptPeople(state, Loop, state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop));
+                state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop) = SumAllInternalCO2GainsExceptPeople(state, Loop);
             }
-            SumInternalCO2GainsByTypes(state, Loop, Array1D_int(1, IntGainTypeOf_People), state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop));
+            std::array<DataHeatBalance::IntGainType, 1> IntGainPeopleArray = {DataHeatBalance::IntGainType::People};
+            state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop) = SumInternalCO2GainsByTypes(state, Loop, IntGainPeopleArray);
         }
     }
 

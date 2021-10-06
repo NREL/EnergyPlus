@@ -5039,28 +5039,28 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                       this->AmbientTempZone,
                                       "WaterHeater:Mixed",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_WaterHeaterMixed,
+                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "WaterHeater:Stratified",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_WaterHeaterStratified,
+                                      DataHeatBalance::IntGainType::WaterHeaterStratified,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "ThermalStorage:ChilledWater:Mixed",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "ThermalStorage:ChilledWater:Stratified",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
                                       &this->AmbientZoneGain);
             }
         }

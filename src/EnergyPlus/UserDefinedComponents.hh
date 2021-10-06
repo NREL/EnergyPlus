@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -68,39 +69,39 @@ namespace UserDefinedComponents {
     struct PlantConnectionStruct
     {
         // Members
-        int ErlInitProgramMngr;      // points to an EMS:ProgramManager to run for setup and sizing
-        int ErlSimProgramMngr;       // points to an EMS:ProgramManager to run only when this connection is called
-        int simPluginLocation;       // If Python Plugins are used to simulate this, this defines the location in the plugin structure
-        int initPluginLocation;      // If Python Plugins are used to init this, this defines the location in the plugin structure
-        int LoopNum;                 // plant loop connection index
-        int LoopSideNum;             // plant loop side connection index
-        int BranchNum;               // plant loop branch connection index
-        int CompNum;                 // plant loop component connection index
-        int InletNodeNum;            // plant loop inlet node index
-        int OutletNodeNum;           // plant loop outlet node index
-        int FlowPriority;            // how component affects overall loop flow determination
-        int HowLoadServed;           // nature of component wrt to plant loop's loads
-        Real64 LowOutTempLimit;      // low limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT
-        Real64 HiOutTempLimit;       // hi limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT
-        Real64 MassFlowRateRequest;  // request filled by actuator, might not be satisfied if plant constrained [kg/s]
-        Real64 MassFlowRateMin;      // filled by actuator, reports minimum (hardware) flow rate for component [kg/s]
-        Real64 MassFlowRateMax;      // filled by actuator, reports maximum (hardware) flow rate for component [kg/s]
-        Real64 DesignVolumeFlowRate; // filled by actuator,
-        Real64 MyLoad;               // fills internal variable for user's model to know current load request of supply equip [W]
-        Real64 MinLoad;              // filled by actuator, reports back size for load dispatch routines [W]
-        Real64 MaxLoad;              // filled by actuator, reports back size for load dispatch [W]
-        Real64 OptLoad;              // filled by actuator, reports back size for load dispatch [W]
-        Real64 InletRho;             // fills internal variable, current density for fluid type and inlet temperature [kg/m3]
-        Real64 InletCp;              // fills internal Variable, current specific heat for fluid type and inlet temperature [J/kg-C]
-        Real64 InletTemp;            // fills internal variable, current inlet fluid temperature [C]
-        Real64 InletMassFlowRate;    // fills internal variable, current inlet mass flow rate [kg/s]
-        Real64 OutletTemp;           // filled by actuator, component outlet temperature [C]
+        int ErlInitProgramMngr;                 // points to an EMS:ProgramManager to run for setup and sizing
+        int ErlSimProgramMngr;                  // points to an EMS:ProgramManager to run only when this connection is called
+        int simPluginLocation;                  // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation;                 // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int LoopNum;                            // plant loop connection index
+        int LoopSideNum;                        // plant loop side connection index
+        int BranchNum;                          // plant loop branch connection index
+        int CompNum;                            // plant loop component connection index
+        int InletNodeNum;                       // plant loop inlet node index
+        int OutletNodeNum;                      // plant loop outlet node index
+        DataPlant::LoopFlowStatus FlowPriority; // how component affects overall loop flow determination
+        DataPlant::HowMet HowLoadServed;        // nature of component wrt to plant loop's loads
+        Real64 LowOutTempLimit;                 // low limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT
+        Real64 HiOutTempLimit;                  // hi limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT
+        Real64 MassFlowRateRequest;             // request filled by actuator, might not be satisfied if plant constrained [kg/s]
+        Real64 MassFlowRateMin;                 // filled by actuator, reports minimum (hardware) flow rate for component [kg/s]
+        Real64 MassFlowRateMax;                 // filled by actuator, reports maximum (hardware) flow rate for component [kg/s]
+        Real64 DesignVolumeFlowRate;            // filled by actuator,
+        Real64 MyLoad;                          // fills internal variable for user's model to know current load request of supply equip [W]
+        Real64 MinLoad;                         // filled by actuator, reports back size for load dispatch routines [W]
+        Real64 MaxLoad;                         // filled by actuator, reports back size for load dispatch [W]
+        Real64 OptLoad;                         // filled by actuator, reports back size for load dispatch [W]
+        Real64 InletRho;                        // fills internal variable, current density for fluid type and inlet temperature [kg/m3]
+        Real64 InletCp;                         // fills internal Variable, current specific heat for fluid type and inlet temperature [J/kg-C]
+        Real64 InletTemp;                       // fills internal variable, current inlet fluid temperature [C]
+        Real64 InletMassFlowRate;               // fills internal variable, current inlet mass flow rate [kg/s]
+        Real64 OutletTemp;                      // filled by actuator, component outlet temperature [C]
 
         // Default Constructor
         PlantConnectionStruct()
             : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), LoopNum(0), LoopSideNum(0), BranchNum(0),
-              CompNum(0), InletNodeNum(0), OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus_Unknown),
-              HowLoadServed(DataPlant::HowMet_Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0),
+              CompNum(0), InletNodeNum(0), OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus::Unknown),
+              HowLoadServed(DataPlant::HowMet::Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0),
               MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0),
               InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {

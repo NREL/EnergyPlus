@@ -889,7 +889,7 @@ namespace WaterUse {
                                   this->Zone,
                                   "WaterUse:Equipment",
                                   this->Name,
-                                  DataHeatBalance::IntGainTypeOf_WaterUseEquipment,
+                                  DataHeatBalance::IntGainType::WaterUseEquipment,
                                   &this->SensibleRateNoMultiplier,
                                   nullptr,
                                   nullptr,

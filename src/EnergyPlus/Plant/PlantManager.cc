@@ -3589,174 +3589,174 @@ void SetupBranchControlTypes(EnergyPlusData &state)
 
                         if (SELECT_CASE_var == TypeOf_Other) { //                             = -1
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Unknown;
-                            this_component.FlowPriority = LoopFlowStatus_Unknown;
-                            this_component.HowLoadServed = HowMet_Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
+                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
                         } else if (SELECT_CASE_var == TypeOf_Boiler_Simple) { //         =  1
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCapHiOutLimit;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
                         } else if (SELECT_CASE_var == TypeOf_Boiler_Steam) { //                      =  2
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_Chiller_Absorption) { // = 3 ! older BLAST absorption chiller
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_Indirect_Absorption) { // = 4 ! revised absorption chiller
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_CombTurbine) { //           =  5
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_ConstCOP) { //                 =  6
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
 
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_DFAbsorption) { //             =  7
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_ExhFiredAbsorption) { //             =  76
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_Electric) { //                 =  8
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) { //              =  9
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) { //        = 10
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Chiller_EngineDriven) { //             = 11
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                             }
                         } else if (SELECT_CASE_var == TypeOf_CoolingTower_SingleSpd) { //           = 12
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_CoolingTower_TwoSpd) { //              = 13
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_CoolingTower_VarSpd) { //              = 14
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_CoolingTower_VarSpdMerkel) { //              = 89
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_Generator_FCExhaust) { //              = 15
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
 
                         } else if (SELECT_CASE_var == TypeOf_HeatPumpWtrHeaterPumped ||
                                    SELECT_CASE_var == TypeOf_HeatPumpWtrHeaterWrapped) { //                = 16, 92
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_HPWaterEFCooling) { //                 = 17
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
 
                         } else if (SELECT_CASE_var == TypeOf_HPWaterEFHeating) { //                 = 18
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_HPWaterPECooling) { //                 = 19
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_HPWaterPEHeating) { //                 = 20
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_Pipe) { //                             = 21
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             if (BranchIsInSplitterMixer) {
                                 if (NumComponentsOnBranch == 1) {
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Bypass;
@@ -3769,8 +3769,8 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Passive;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PipeSteam) { //                        = 22
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             if (BranchIsInSplitterMixer) {
                                 if (NumComponentsOnBranch == 1) {
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Bypass;
@@ -3783,8 +3783,8 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Passive;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PipeExterior) { //                     = 23
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             if (BranchIsInSplitterMixer) {
                                 if (NumComponentsOnBranch == 1) {
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Bypass;
@@ -3797,8 +3797,8 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Passive;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PipeInterior) { //                     = 24
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             if (BranchIsInSplitterMixer) {
                                 if (NumComponentsOnBranch == 1) {
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Bypass;
@@ -3811,8 +3811,8 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Passive;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PipeUnderground) { //                  = 25
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             if (BranchIsInSplitterMixer) {
                                 if (NumComponentsOnBranch == 1) {
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Bypass;
@@ -3826,317 +3826,317 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             }
                         } else if (SELECT_CASE_var == TypeOf_PurchChilledWater) { //                = 26
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                         } else if (SELECT_CASE_var == TypeOf_PurchHotWater) { //                    = 27
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCapHiOutLimit;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
                         } else if (SELECT_CASE_var == TypeOf_TS_IceDetailed) { //                   = 28
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_TS_IceSimple) { //                    = 29
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_ValveTempering) { //                  = 30
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_WtrHeaterMixed) { //                   = 31
                             if (LoopSideCtr == DemandSide) {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_PassiveCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_WtrHeaterStratified) { //              = 32
                             if (LoopSideCtr == DemandSide) {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_PassiveCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PumpVariableSpeed) { //                 = 33
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_PumpConstantSpeed) { //                 = 34
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_PumpCondensate) { //                    = 35
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_PumpBankVariableSpeed) { //             = 36
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_PumpBankConstantSpeed) { //             = 37
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_WaterUseConnection) { //              = 38
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWaterCooling) { //               = 39  ! demand side component
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling) { //      = 40  ! demand side component
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating) { //           = 41  ! demand side component
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilSteamAirHeating) { //         = 42  ! demand side component
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_SolarCollectorFlatPlate) { //         = 43  ! demand side component
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_PlantLoadProfile) { //            = 44  ! demand side component
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_GrndHtExchgSystem) { //            = 45
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_GrndHtExchgSurface) { //            = 46
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_GrndHtExchgPond) { //            = 47
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_Generator_MicroTurbine) { //          = 48  !newer FSEC turbine
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_Generator_ICEngine) { //             = 49
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_Generator_CTurbine) { //             = 50  !older BLAST turbine
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_Generator_MicroCHP) { //              = 51
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_Generator_FCStackCooler) { //         = 52
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_ByNominalCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                         } else if (SELECT_CASE_var == TypeOf_FluidCooler_SingleSpd) { //           = 53
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_FluidCooler_TwoSpd) { //            = 54
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_EvapFluidCooler_SingleSpd) { //       = 55
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_EvapFluidCooler_TwoSpd) { //         = 56
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_ChilledWaterTankMixed) { //         = 57
                             if (LoopSideCtr == DemandSide) {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_PassiveCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_ChilledWaterTankStratified) { //      = 58
                             if (LoopSideCtr == DemandSide) {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
                                 this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_PassiveCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PVTSolarCollectorFlatPlate) { //      = 59
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             // next batch for ZoneHVAC
                         } else if (SELECT_CASE_var == TypeOf_Baseboard_Conv_Water) { //        = 60
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { //      = 61
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) { //      = 62
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CooledBeamAirTerminal) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWAHPHeatingEquationFit) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWAHPCoolingEquationFit) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilVSWAHPHeatingEquationFit) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilVSWAHPCoolingEquationFit) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWAHPHeatingParamEst) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_CoilWAHPCoolingParamEst) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_RefrigSystemWaterCondenser) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_RefrigerationWaterCoolRack) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_MultiSpeedHeatPumpRecovery) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_UnitarySysRecovery) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_PipingSystemPipeCircuit) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_SolarCollectorICS) { //         = 75
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_PlantComponentUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_Unknown;
-                            this_component.HowLoadServed = HowMet_Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
+                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
                         } else if (SELECT_CASE_var == TypeOf_CoilUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_Unknown;
-                            this_component.HowLoadServed = HowMet_Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
+                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
                         } else if (SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_Unknown;
-                            this_component.HowLoadServed = HowMet_Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
+                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
                         } else if (SELECT_CASE_var == TypeOf_AirTerminalUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_Unknown;
-                            this_component.HowLoadServed = HowMet_Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
+                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
                         } else if (SELECT_CASE_var == TypeOf_HeatPumpVRF) { //       =  82  ! AirConditioner:VariableRefrigerantFlow
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
 
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else { // should never happen
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_PassiveCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_WaterSource) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                         } else if (SELECT_CASE_var == TypeOf_GrndHtExchgHorizTrench) { // = 83  GroundHeatExchanger:HorizontalTrench
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_FluidToFluidPlantHtExchg) { //          = 84
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                                this_component.HowLoadServed = HowMet_PassiveCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_CentralGroundSourceHeatPump) { // 86
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
                         } else if (SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil) { // 88
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_SwimmingPool_Indoor) { // 90
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = HowMet_NoneDemand;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         } else if (SELECT_CASE_var == TypeOf_GrndHtExchgSlinky) { //            = 91
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
-                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-                            this_component.HowLoadServed = HowMet_PassiveCap;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_HeatPumpEIRCooling || SELECT_CASE_var == TypeOf_HeatPumpEIRHeating) { // 95, 96
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = HowMet_NoneDemand;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
-                                this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
-                                this_component.HowLoadServed = HowMet_ByNominalCap;
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
                             }
                         } else {
                             ShowSevereError(state, "SetBranchControlTypes: Caught unexpected equipment type of number");
