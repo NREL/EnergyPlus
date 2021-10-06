@@ -61,8 +61,6 @@
 
 namespace EnergyPlus {
 
-
-
 // Kusuda model factory
 std::shared_ptr<KusudaGroundTempsModel>
 KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
@@ -172,8 +170,6 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
     }
 }
 
-
-
 Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 {
     // AUTHOR         Matt Mitchell
@@ -205,8 +201,6 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     return retVal;
 }
 
-
-
 Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
@@ -233,8 +227,6 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     // Get and return ground temperature
     return getGroundTemp(state);
 }
-
-
 
 Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const _depth, int const _month)
 {
@@ -263,7 +255,5 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state
     // Get and return ground temperature
     return getGroundTemp(state);
 }
-
-
 
 } // namespace EnergyPlus

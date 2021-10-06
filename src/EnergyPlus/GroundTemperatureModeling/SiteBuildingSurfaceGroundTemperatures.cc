@@ -61,8 +61,6 @@
 
 namespace EnergyPlus {
 
-
-
 // Site:GroundTemperature:BuildingSurface factory
 std::shared_ptr<SiteBuildingSurfaceGroundTemps>
 SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
@@ -139,8 +137,6 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     }
 }
 
-
-
 Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -154,8 +150,6 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlus
 
     return buildingSurfaceGroundTemps(timeOfSimInMonths);
 }
-
-
 
 Real64
 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
@@ -186,8 +180,6 @@ SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &sta
     return getGroundTemp(state);
 }
 
-
-
 Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
@@ -209,7 +201,5 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusDat
     // Get and return ground temp
     return getGroundTemp(state);
 }
-
-
 
 } // namespace EnergyPlus

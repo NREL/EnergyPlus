@@ -69,8 +69,6 @@
 
 namespace EnergyPlus {
 
-
-
 // Finite difference model factory
 std::shared_ptr<FiniteDiffGroundTempsModel>
 FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
@@ -139,8 +137,6 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
     }
 }
 
-
-
 void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -158,8 +154,6 @@ void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
 
     FiniteDiffGroundTempsModel::performSimulation(state);
 }
-
-
 
 void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 {
@@ -362,8 +356,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->EndHourFlag = EndHourFlag_reset;
 }
 
-
-
 void FiniteDiffGroundTempsModel::developMesh()
 {
     // SUBROUTINE INFORMATION:
@@ -448,8 +440,6 @@ void FiniteDiffGroundTempsModel::developMesh()
     }
 }
 
-
-
 void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -512,8 +502,6 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
 
     } while (!convergedFinal);
 }
-
-
 
 void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &state)
 {
@@ -657,8 +645,6 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &st
     cellArray(1).temperature = numerator / denominator;
 }
 
-
-
 void FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(int const cell)
 {
     // SUBROUTINE INFORMATION:
@@ -700,8 +686,6 @@ void FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(int const ce
     //'now that we have passed all directions, update the temperature
     thisCell.temperature = numerator / denominator;
 }
-
-
 
 void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 {
@@ -748,8 +732,6 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
     cellArray(totalNumCells).temperature = numerator / denominator;
 }
 
-
-
 bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -783,8 +765,6 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData
     return converged;
 }
 
-
-
 bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 {
     // SUBROUTINE INFORMATION:
@@ -810,8 +790,6 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
     return converged;
 }
-
-
 
 void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
 {
@@ -868,8 +846,6 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     tempModel.reset();
 }
 
-
-
 void FiniteDiffGroundTempsModel::updateIterationTemperatures()
 {
     // SUBROUTINE INFORMATION:
@@ -885,8 +861,6 @@ void FiniteDiffGroundTempsModel::updateIterationTemperatures()
         cellArray(cell).temperature_prevIteration = cellArray(cell).temperature;
     }
 }
-
-
 
 void FiniteDiffGroundTempsModel::updateTimeStepTemperatures(EnergyPlusData &state)
 {
@@ -910,8 +884,6 @@ void FiniteDiffGroundTempsModel::updateTimeStepTemperatures(EnergyPlusData &stat
     }
 }
 
-
-
 void FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
 {
     // SUBROUTINE INFORMATION:
@@ -933,14 +905,10 @@ void FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
     }
 }
 
-
-
 Real64 FiniteDiffGroundTempsModel::interpolate(Real64 const x, Real64 const x_hi, Real64 const x_low, Real64 const y_hi, Real64 const y_low)
 {
     return (x - x_low) / (x_hi - x_low) * (y_hi - y_low) + y_low;
 }
-
-
 
 Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 {
@@ -1060,8 +1028,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     return T_ix_jy;
 }
 
-
-
 Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const _depth, Real64 const seconds)
 {
     // SUBROUTINE INFORMATION:
@@ -1086,8 +1052,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
 
     return getGroundTemp(state);
 }
-
-
 
 Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const _depth, int const month)
 {
@@ -1115,8 +1079,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
     // Get and return ground temperature
     return getGroundTemp(state);
 }
-
-
 
 void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Optional_bool_const InitOnly)
 {
@@ -1197,7 +1159,5 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Opt
 
     thisCell.props.specificHeat = thisCell.props.rhoCp / thisCell.props.density;
 }
-
-
 
 } // namespace EnergyPlus
