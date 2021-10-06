@@ -170,272 +170,42 @@ namespace DaylightingDevices {
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::SurfaceClass;
 
-    void InitDaylightingDevices(EnergyPlusData &state)
+    int FindTDDPipe(EnergyPlusData &state, int const WinNum)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
-        //       MODIFIED       PGE, Aug 2003:  Added daylighting shelves.
+        //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine initializes all daylighting device:  TDD pipes and daylighting shelves.
-        // This is only called once at the beginning of the simulation under the BeginSimFlag.
+        // Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
 
-        // METHODOLOGY EMPLOYED:
-        // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
+        // Return value
+        int FindTDDPipe;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PipeNum;   // TDD pipe object number
-        int StoredNum; // Stored TDD pipe object number
-        int AngleNum;
-        int TZoneNum;
-        int Loop;
-        Real64 Theta;       // Angle of entry in degrees, 0 is parallel to pipe axis
-        Real64 dTheta;      // Angle increment
-        Real64 Reflectance; // Visible or solar reflectance of surface
-        Real64 SumTZoneLengths;
-        bool Found;
-        int ShelfNum;  // Daylighting shelf object number
-        int ShelfSurf; // Daylighting shelf surface number
-        int WinSurf;   // Window surface number
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int PipeNum; // TDD pipe object number
 
-        int NumStored(0); // Counter for number of pipes stored as they are calculated
+        FindTDDPipe = 0;
 
-        struct TDDPipeStoredData
-        {
-            // Members
-            Real64 AspectRatio;        // Aspect ratio, length / diameter
-            Real64 Reflectance;        // Reflectance of surface
-            Array1D<Real64> TransBeam; // Table of beam transmittance vs. cosine angle
-
-            // Default Constructor
-            TDDPipeStoredData() : AspectRatio(0.0), Reflectance(0.0), TransBeam(DataDaylightingDevices::NumOfAngles, 0.0)
-            {
-            }
-        };
-
-        // Object Data
-        Array1D<TDDPipeStoredData> TDDPipeStored;
-
-        // Initialize tubular daylighting devices (TDDs)
-        GetTDDInput(state);
-
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
-            DisplayString(state, "Initializing Tubular Daylighting Devices");
-            // Setup COSAngle list for all TDDs
-            state.dataDaylightingDevices->COSAngle(1) = 0.0;
-            state.dataDaylightingDevices->COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
-
-            dTheta = 90.0 * DataGlobalConstants::DegToRadians / (DataDaylightingDevices::NumOfAngles - 1.0);
-            Theta = 90.0 * DataGlobalConstants::DegToRadians;
-            for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
-                Theta -= dTheta;
-                state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
-            } // AngleNum
-
-            TDDPipeStored.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes * 2);
-
-            for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
-                // Initialize optical properties
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio =
-                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength / state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter;
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectVis =
-                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction).InsideAbsorpVis;
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectSol =
-                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction).InsideAbsorpSolar;
-
-                // Calculate the beam transmittance table for visible and solar spectrum
-                // First time thru use the visible reflectance
-                Reflectance = state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectVis;
-                for (Loop = 1; Loop <= 2; ++Loop) {
-                    // For computational efficiency, search stored pipes to see if an identical pipe has already been calculated
-                    Found = false;
-                    for (StoredNum = 1; StoredNum <= NumStored; ++StoredNum) {
-                        if (TDDPipeStored(StoredNum).AspectRatio != state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio) continue;
-                        if (TDDPipeStored(StoredNum).Reflectance == Reflectance) {
-                            Found = true; // StoredNum points to the matching TDDPipeStored
-                            break;
-                        }
-                    } // StoredNum
-
-                    if (!Found) { // Not yet calculated
-
-                        // Add a new pipe to TDDPipeStored
-                        ++NumStored;
-                        TDDPipeStored(NumStored).AspectRatio = state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio;
-                        TDDPipeStored(NumStored).Reflectance = Reflectance;
-
-                        // Set beam transmittances for 0 and 90 degrees
-                        TDDPipeStored(NumStored).TransBeam(1) = 0.0;
-                        TDDPipeStored(NumStored).TransBeam(DataDaylightingDevices::NumOfAngles) = 1.0;
-
-                        // Calculate intermediate beam transmittances between 0 and 90 degrees
-                        Theta = 90.0 * DataGlobalConstants::DegToRadians;
-                        for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
-                            Theta -= dTheta;
-                            TDDPipeStored(NumStored).TransBeam(AngleNum) =
-                                CalcPipeTransBeam(Reflectance, state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio, Theta);
-                        } // AngleNum
-
-                        StoredNum = NumStored;
-                    }
-
-                    // Assign stored values to TDDPipe
-                    if (Loop == 1) { // Visible
-                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam = TDDPipeStored(StoredNum).TransBeam;
-                    } else { // Solar
-                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam = TDDPipeStored(StoredNum).TransBeam;
-                    }
-
-                    // Second time thru use the solar reflectance
-                    Reflectance = state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectSol;
-                } // Loop
-
-                // Calculate the solar isotropic diffuse and horizon transmittances.  These values are constant for a given TDD.
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso = CalcTDDTransSolIso(state, PipeNum);
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon = CalcTDDTransSolHorizon(state, PipeNum);
-
-                // Initialize thermal properties
-                SumTZoneLengths = 0.0;
-                for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
-                    SumTZoneLengths += state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum);
-
-                    SetupZoneInternalGain(state,
-                                          state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
-                                          "DaylightingDevice:Tubular",
-                                          state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
-                                          DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-                                          &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
-
-                } // TZoneNum
-
-                state.dataDaylightingDevicesData->TDDPipe(PipeNum).ExtLength =
-                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength - SumTZoneLengths;
-
-                // Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Transmitted Solar Radiation Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Heat Gain Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Heat Loss Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Beam Solar Transmittance",
-                                    OutputProcessor::Unit::None,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Beam Visible Transmittance",
-                                    OutputProcessor::Unit::None,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Diffuse Solar Transmittance",
-                                    OutputProcessor::Unit::None,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-                SetupOutputVariable(state,
-                                    "Tubular Daylighting Device Diffuse Visible Transmittance",
-                                    OutputProcessor::Unit::None,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
-
-            } // PipeNum
-
-            TDDPipeStored.deallocate();
+        if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
+            ShowFatalError(
+                state,
+                "FindTDDPipe: Surface=" + state.dataSurface->Surface(WinNum).Name +
+                    ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface.");
         }
 
-        // Initialize daylighting shelves
-        GetShelfInput(state);
-
-        if (state.dataDaylightingDevicesData->NumOfShelf > 0) DisplayString(state, "Initializing Light Shelf Daylighting Devices");
-
-        for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
-            WinSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
-
-            ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
-            if (ShelfSurf > 0) {
-                // Double surface area so that both sides of the shelf are treated as internal mass
-                state.dataSurface->Surface(ShelfSurf).Area *= 2.0;
+        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+            if ((WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) ||
+                (WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser)) {
+                FindTDDPipe = PipeNum;
+                break;
             }
+        } // PipeNum
 
-            ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
-            if (ShelfSurf > 0) {
-                state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis =
-                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction).OutsideAbsorpVis;
-                state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol =
-                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction).OutsideAbsorpSolar;
-
-                if (state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor < 0) CalcViewFactorToShelf(state, ShelfNum);
-
-                adjustViewFactorsWithShelf(state,
-                                           state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor,
-                                           state.dataSurface->Surface(WinSurf).ViewFactorSky,
-                                           state.dataSurface->Surface(WinSurf).ViewFactorGround,
-                                           WinSurf,
-                                           ShelfNum);
-
-                // Report calculated view factor so that user knows what to make the view factor to ground
-                if (!state.dataDaylightingDevices->ShelfReported) {
-                    print(state.files.eio,
-                          "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
-                    state.dataDaylightingDevices->ShelfReported = true;
-                }
-                print(state.files.eio,
-                      "{},{:.2R},{},{:.2R},{:.2R}\n",
-                      state.dataDaylightingDevicesData->Shelf(ShelfNum).Name,
-                      state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor,
-                      state.dataSurface->Surface(WinSurf).Name,
-                      state.dataSurface->Surface(WinSurf).ViewFactorSky,
-                      state.dataSurface->Surface(WinSurf).ViewFactorGround);
-                //      CALL SetupOutputVariable(state, 'View Factor To Outside Shelf []', &
-                //        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
-            }
-        }
-
-        // Warning that if Calculate Solar Reflection From Exterior Surfaces = Yes in Building input, then
-        // solar reflection calculated from obstructions will not be used in daylighting shelf or tubular device
-        // calculation
-
-        if (state.dataSurface->CalcSolRefl &&
-            (state.dataDaylightingDevicesData->NumOfTDDPipes > 0 || state.dataDaylightingDevicesData->NumOfShelf > 0)) {
-            ShowWarningError(state, "InitDaylightingDevices: Solar Distribution Model includes Solar Reflection calculations;");
-            ShowContinueError(state, "the resulting reflected solar values will not be used in the");
-            ShowContinueError(state, "DaylightingDevice:Shelf or DaylightingDevice:Tubular calculations.");
-        }
+        return FindTDDPipe;
     }
 
     void GetTDDInput(EnergyPlusData &state)
@@ -1300,6 +1070,403 @@ namespace DaylightingDevices {
         return CalcTDDTransSolAniso;
     }
 
+    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum) // Daylighting shelf object number
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   August 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Attempts to calculate exact analytical view factor from window to outside shelf.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses a standard analytical solution.  It is required that window and shelf have the same width, i.e.
+        // one edge (or two vertices) shared in common.  An error or warning is issued if not true.
+        // A more general routine should be implemented at some point to solve for more complicated geometries.
+        // Until then, the user has the option to specify their own solution for the view factor in the input object.
+
+        // REFERENCES:
+        // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 W; // Width, height, and length of window/shelf geometry
+        Real64 H;
+        Real64 L;
+        Real64 M; // Intermediate variables
+        Real64 N;
+        Real64 E1; // Intermediate equations
+        Real64 E2;
+        Real64 E3;
+        Real64 E4;
+        int VWin; // Vertex indices
+        int VShelf;
+        int NumMatch; // Number of vertices matched
+
+        W = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
+        H = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
+
+        // Find length, i.e. projection, of outside shelf
+        if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width == W) {
+            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height;
+        } else if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height == W) {
+            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width;
+        } else {
+            ShowFatalError(state,
+                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
+                               ":  Width of window and outside shelf do not match.");
+        }
+
+        // Error if more or less than two vertices match
+        NumMatch = 0;
+        for (VWin = 1; VWin <= 4; ++VWin) {
+            for (VShelf = 1; VShelf <= 4; ++VShelf) {
+                if (distance(state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Vertex(VWin),
+                             state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Vertex(VShelf)) == 0.0)
+                    ++NumMatch;
+            }
+        }
+
+        if (NumMatch < 2) {
+            ShowWarningError(state,
+                             "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
+                                 ":  Window and outside shelf must share two vertices.  View factor calculation may be inaccurate.");
+        } else if (NumMatch > 2) {
+            ShowFatalError(state,
+                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
+                               ":  Window and outside shelf share too many vertices.");
+        }
+
+        // Calculate exact analytical view factor from window to outside shelf
+        M = H / W;
+        N = L / W;
+
+        E1 = M * std::atan(1.0 / M) + N * std::atan(1.0 / N) - std::sqrt(pow_2(N) + pow_2(M)) * std::atan(std::pow(pow_2(N) + pow_2(M), -0.5));
+        E2 = ((1.0 + pow_2(M)) * (1.0 + pow_2(N))) / (1.0 + pow_2(M) + pow_2(N));
+        E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
+        E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
+
+        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
+    }
+
+    void InitDaylightingDevices(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   May 2003
+        //       MODIFIED       PGE, Aug 2003:  Added daylighting shelves.
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine initializes all daylighting device:  TDD pipes and daylighting shelves.
+        // This is only called once at the beginning of the simulation under the BeginSimFlag.
+
+        // METHODOLOGY EMPLOYED:
+        // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int PipeNum;   // TDD pipe object number
+        int StoredNum; // Stored TDD pipe object number
+        int AngleNum;
+        int TZoneNum;
+        int Loop;
+        Real64 Theta;       // Angle of entry in degrees, 0 is parallel to pipe axis
+        Real64 dTheta;      // Angle increment
+        Real64 Reflectance; // Visible or solar reflectance of surface
+        Real64 SumTZoneLengths;
+        bool Found;
+        int ShelfNum;  // Daylighting shelf object number
+        int ShelfSurf; // Daylighting shelf surface number
+        int WinSurf;   // Window surface number
+
+        int NumStored(0); // Counter for number of pipes stored as they are calculated
+
+        struct TDDPipeStoredData
+        {
+            // Members
+            Real64 AspectRatio;        // Aspect ratio, length / diameter
+            Real64 Reflectance;        // Reflectance of surface
+            Array1D<Real64> TransBeam; // Table of beam transmittance vs. cosine angle
+
+            // Default Constructor
+            TDDPipeStoredData() : AspectRatio(0.0), Reflectance(0.0), TransBeam(DataDaylightingDevices::NumOfAngles, 0.0)
+            {
+            }
+        };
+
+        // Object Data
+        Array1D<TDDPipeStoredData> TDDPipeStored;
+
+        // Initialize tubular daylighting devices (TDDs)
+        GetTDDInput(state);
+
+        if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+            DisplayString(state, "Initializing Tubular Daylighting Devices");
+            // Setup COSAngle list for all TDDs
+            state.dataDaylightingDevices->COSAngle(1) = 0.0;
+            state.dataDaylightingDevices->COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
+
+            dTheta = 90.0 * DataGlobalConstants::DegToRadians / (DataDaylightingDevices::NumOfAngles - 1.0);
+            Theta = 90.0 * DataGlobalConstants::DegToRadians;
+            for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
+                Theta -= dTheta;
+                state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
+            } // AngleNum
+
+            TDDPipeStored.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes * 2);
+
+            for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+                // Initialize optical properties
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio =
+                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength / state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter;
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectVis =
+                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction).InsideAbsorpVis;
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectSol =
+                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction).InsideAbsorpSolar;
+
+                // Calculate the beam transmittance table for visible and solar spectrum
+                // First time thru use the visible reflectance
+                Reflectance = state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectVis;
+                for (Loop = 1; Loop <= 2; ++Loop) {
+                    // For computational efficiency, search stored pipes to see if an identical pipe has already been calculated
+                    Found = false;
+                    for (StoredNum = 1; StoredNum <= NumStored; ++StoredNum) {
+                        if (TDDPipeStored(StoredNum).AspectRatio != state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio) continue;
+                        if (TDDPipeStored(StoredNum).Reflectance == Reflectance) {
+                            Found = true; // StoredNum points to the matching TDDPipeStored
+                            break;
+                        }
+                    } // StoredNum
+
+                    if (!Found) { // Not yet calculated
+
+                        // Add a new pipe to TDDPipeStored
+                        ++NumStored;
+                        TDDPipeStored(NumStored).AspectRatio = state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio;
+                        TDDPipeStored(NumStored).Reflectance = Reflectance;
+
+                        // Set beam transmittances for 0 and 90 degrees
+                        TDDPipeStored(NumStored).TransBeam(1) = 0.0;
+                        TDDPipeStored(NumStored).TransBeam(DataDaylightingDevices::NumOfAngles) = 1.0;
+
+                        // Calculate intermediate beam transmittances between 0 and 90 degrees
+                        Theta = 90.0 * DataGlobalConstants::DegToRadians;
+                        for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
+                            Theta -= dTheta;
+                            TDDPipeStored(NumStored).TransBeam(AngleNum) =
+                                CalcPipeTransBeam(Reflectance, state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio, Theta);
+                        } // AngleNum
+
+                        StoredNum = NumStored;
+                    }
+
+                    // Assign stored values to TDDPipe
+                    if (Loop == 1) { // Visible
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam = TDDPipeStored(StoredNum).TransBeam;
+                    } else { // Solar
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam = TDDPipeStored(StoredNum).TransBeam;
+                    }
+
+                    // Second time thru use the solar reflectance
+                    Reflectance = state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectSol;
+                } // Loop
+
+                // Calculate the solar isotropic diffuse and horizon transmittances.  These values are constant for a given TDD.
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso = CalcTDDTransSolIso(state, PipeNum);
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon = CalcTDDTransSolHorizon(state, PipeNum);
+
+                // Initialize thermal properties
+                SumTZoneLengths = 0.0;
+                for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
+                    SumTZoneLengths += state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum);
+
+                    SetupZoneInternalGain(state,
+                                          state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
+                                          "DaylightingDevice:Tubular",
+                                          state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
+                                          DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                          &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
+
+                } // TZoneNum
+
+                state.dataDaylightingDevicesData->TDDPipe(PipeNum).ExtLength =
+                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength - SumTZoneLengths;
+
+                // Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Transmitted Solar Radiation Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Heat Loss Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Beam Solar Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Beam Visible Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Diffuse Solar Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+                SetupOutputVariable(state,
+                                    "Tubular Daylighting Device Diffuse Visible Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
+
+            } // PipeNum
+
+            TDDPipeStored.deallocate();
+        }
+
+        // Initialize daylighting shelves
+        GetShelfInput(state);
+
+        if (state.dataDaylightingDevicesData->NumOfShelf > 0) DisplayString(state, "Initializing Light Shelf Daylighting Devices");
+
+        for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+            WinSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
+
+            ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
+            if (ShelfSurf > 0) {
+                // Double surface area so that both sides of the shelf are treated as internal mass
+                state.dataSurface->Surface(ShelfSurf).Area *= 2.0;
+            }
+
+            ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
+            if (ShelfSurf > 0) {
+                state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis =
+                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction).OutsideAbsorpVis;
+                state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol =
+                    1.0 - state.dataConstruction->Construct(state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction).OutsideAbsorpSolar;
+
+                if (state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor < 0) CalcViewFactorToShelf(state, ShelfNum);
+
+                adjustViewFactorsWithShelf(state,
+                                           state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor,
+                                           state.dataSurface->Surface(WinSurf).ViewFactorSky,
+                                           state.dataSurface->Surface(WinSurf).ViewFactorGround,
+                                           WinSurf,
+                                           ShelfNum);
+
+                // Report calculated view factor so that user knows what to make the view factor to ground
+                if (!state.dataDaylightingDevices->ShelfReported) {
+                    print(state.files.eio,
+                          "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
+                    state.dataDaylightingDevices->ShelfReported = true;
+                }
+                print(state.files.eio,
+                      "{},{:.2R},{},{:.2R},{:.2R}\n",
+                      state.dataDaylightingDevicesData->Shelf(ShelfNum).Name,
+                      state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor,
+                      state.dataSurface->Surface(WinSurf).Name,
+                      state.dataSurface->Surface(WinSurf).ViewFactorSky,
+                      state.dataSurface->Surface(WinSurf).ViewFactorGround);
+                //      CALL SetupOutputVariable(state, 'View Factor To Outside Shelf []', &
+                //        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
+            }
+        }
+
+        // Warning that if Calculate Solar Reflection From Exterior Surfaces = Yes in Building input, then
+        // solar reflection calculated from obstructions will not be used in daylighting shelf or tubular device
+        // calculation
+
+        if (state.dataSurface->CalcSolRefl &&
+            (state.dataDaylightingDevicesData->NumOfTDDPipes > 0 || state.dataDaylightingDevicesData->NumOfShelf > 0)) {
+            ShowWarningError(state, "InitDaylightingDevices: Solar Distribution Model includes Solar Reflection calculations;");
+            ShowContinueError(state, "the resulting reflected solar values will not be used in the");
+            ShowContinueError(state, "DaylightingDevice:Shelf or DaylightingDevice:Tubular calculations.");
+        }
+    }
+
+    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
+                                    Real64 const COSI,               // Cosine of the incident angle
+                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   July 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Interpolates the beam transmittance vs. cosine angle table.
+
+        // Using/Aliasing
+        using FluidProperties::FindArrayIndex; // Used code could be copied here to eliminate dependence on FluidProperties
+
+        // Return value
+        Real64 InterpolatePipeTransBeam;
+
+        // Argument array dimensioning
+        EP_SIZE_CHECK(transBeam, DataDaylightingDevices::NumOfAngles);
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int Lo;
+        int Hi;
+        Real64 m;
+        Real64 b;
+
+        InterpolatePipeTransBeam = 0.0;
+
+        // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
+        Lo = FindArrayIndex(COSI, state.dataDaylightingDevices->COSAngle);
+        Hi = Lo + 1;
+
+        if (Lo > 0 && Hi <= DataDaylightingDevices::NumOfAngles) {
+            m = (transBeam(Hi) - transBeam(Lo)) / (state.dataDaylightingDevices->COSAngle(Hi) - state.dataDaylightingDevices->COSAngle(Lo));
+            b = transBeam(Lo) - m * state.dataDaylightingDevices->COSAngle(Lo);
+
+            InterpolatePipeTransBeam = m * COSI + b;
+        } else {
+            InterpolatePipeTransBeam = 0.0;
+        }
+
+        return InterpolatePipeTransBeam;
+    }
+
     Real64 TransTDD(EnergyPlusData &state,
                     int const PipeNum,                                   // TDD pipe object number
                     Real64 const COSI,                                   // Cosine of the incident angle
@@ -1383,98 +1550,6 @@ namespace DaylightingDevices {
         return TransTDD;
     }
 
-    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
-                                    Real64 const COSI,               // Cosine of the incident angle
-                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Interpolates the beam transmittance vs. cosine angle table.
-
-        // METHODOLOGY EMPLOYED: na
-        // REFERENCES: na
-
-        // Using/Aliasing
-        using FluidProperties::FindArrayIndex; // USEd code could be copied here to eliminate dependence on FluidProperties
-
-        // Return value
-        Real64 InterpolatePipeTransBeam;
-
-        // Argument array dimensioning
-        EP_SIZE_CHECK(transBeam, DataDaylightingDevices::NumOfAngles);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Lo;
-        int Hi;
-        Real64 m;
-        Real64 b;
-
-        InterpolatePipeTransBeam = 0.0;
-
-        // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
-        Lo = FindArrayIndex(COSI, state.dataDaylightingDevices->COSAngle);
-        Hi = Lo + 1;
-
-        if (Lo > 0 && Hi <= DataDaylightingDevices::NumOfAngles) {
-            m = (transBeam(Hi) - transBeam(Lo)) / (state.dataDaylightingDevices->COSAngle(Hi) - state.dataDaylightingDevices->COSAngle(Lo));
-            b = transBeam(Lo) - m * state.dataDaylightingDevices->COSAngle(Lo);
-
-            InterpolatePipeTransBeam = m * COSI + b;
-        } else {
-            InterpolatePipeTransBeam = 0.0;
-        }
-
-        return InterpolatePipeTransBeam;
-    }
-
-    int FindTDDPipe(EnergyPlusData &state, int const WinNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   May 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
-
-        // Return value
-        int FindTDDPipe;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int PipeNum; // TDD pipe object number
-
-        FindTDDPipe = 0;
-
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
-            ShowFatalError(
-                state,
-                "FindTDDPipe: Surface=" + state.dataSurface->Surface(WinNum).Name +
-                    ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface.");
-        }
-
-        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
-            if ((WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) ||
-                (WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser)) {
-                FindTDDPipe = PipeNum;
-                break;
-            }
-        } // PipeNum
-
-        return FindTDDPipe;
-    }
-
     void DistributeTDDAbsorbedSolar(EnergyPlusData &state)
     {
 
@@ -1536,92 +1611,6 @@ namespace DaylightingDevices {
                                       state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength);
             } // TZoneNum
         }
-    }
-
-    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum) // Daylighting shelf object number
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Attempts to calculate exact analytical view factor from window to outside shelf.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses a standard analytical solution.  It is required that window and shelf have the same width, i.e.
-        // one edge (or two vertices) shared in common.  An error or warning is issued if not true.
-        // A more general routine should be implemented at some point to solve for more complicated geometries.
-        // Until then, the user has the option to specify their own solution for the view factor in the input object.
-
-        // REFERENCES:
-        // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 W; // Width, height, and length of window/shelf geometry
-        Real64 H;
-        Real64 L;
-        Real64 M; // Intermediate variables
-        Real64 N;
-        Real64 E1; // Intermediate equations
-        Real64 E2;
-        Real64 E3;
-        Real64 E4;
-        int VWin; // Vertex indices
-        int VShelf;
-        int NumMatch; // Number of vertices matched
-
-        W = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
-        H = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
-
-        // Find length, i.e. projection, of outside shelf
-        if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width == W) {
-            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height;
-        } else if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height == W) {
-            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width;
-        } else {
-            ShowFatalError(state,
-                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
-                               ":  Width of window and outside shelf do not match.");
-        }
-
-        // Error if more or less than two vertices match
-        NumMatch = 0;
-        for (VWin = 1; VWin <= 4; ++VWin) {
-            for (VShelf = 1; VShelf <= 4; ++VShelf) {
-                if (distance(state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Vertex(VWin),
-                             state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Vertex(VShelf)) == 0.0)
-                    ++NumMatch;
-            }
-        }
-
-        if (NumMatch < 2) {
-            ShowWarningError(state,
-                             "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
-                                 ":  Window and outside shelf must share two vertices.  View factor calculation may be inaccurate.");
-        } else if (NumMatch > 2) {
-            ShowFatalError(state,
-                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
-                               ":  Window and outside shelf share too many vertices.");
-        }
-
-        // Calculate exact analytical view factor from window to outside shelf
-        M = H / W;
-        N = L / W;
-
-        E1 = M * std::atan(1.0 / M) + N * std::atan(1.0 / N) - std::sqrt(pow_2(N) + pow_2(M)) * std::atan(std::pow(pow_2(N) + pow_2(M), -0.5));
-        E2 = ((1.0 + pow_2(M)) * (1.0 + pow_2(N))) / (1.0 + pow_2(M) + pow_2(N));
-        E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
-        E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
-
-        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
     }
 
     void adjustViewFactorsWithShelf(

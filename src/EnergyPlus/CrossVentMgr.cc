@@ -99,25 +99,6 @@ namespace CrossVentMgr {
     Real64 constexpr CrecFlow1(0.415); // First correlation constant for the recirculation flow rate
     Real64 constexpr CrecFlow2(0.466); // Second correlation constant for the recirculation flow rate
 
-    void ManageUCSDCVModel(EnergyPlusData &state,
-                           int const ZoneNum) // index number for the specified zone
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         G. Carrilho da Graca
-        //       DATE WRITTEN   October 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   manage the UCSD Cross Ventilation model
-
-        InitUCSDCV(state, ZoneNum);
-
-        // perform Cross Ventilation model calculations
-        CalcUCSDCV(state, ZoneNum);
-    }
-
     void InitUCSDCV(EnergyPlusData &state, int const ZoneNum)
     {
 
@@ -1035,6 +1016,25 @@ namespace CrossVentMgr {
                 state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
             }
         }
+    }
+
+    void ManageUCSDCVModel(EnergyPlusData &state,
+                           int const ZoneNum) // index number for the specified zone
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         G. Carrilho da Graca
+        //       DATE WRITTEN   October 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   manage the UCSD Cross Ventilation model
+
+        InitUCSDCV(state, ZoneNum);
+
+        // perform Cross Ventilation model calculations
+        CalcUCSDCV(state, ZoneNum);
     }
 
 } // namespace CrossVentMgr

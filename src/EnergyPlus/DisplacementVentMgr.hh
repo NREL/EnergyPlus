@@ -62,8 +62,6 @@ namespace DisplacementVentMgr {
 
     void ManageUCSDDVModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
-    void InitUCSDDV(EnergyPlusData &state, int ZoneNum);
-
     void HcUCSDDV(EnergyPlusData &state, int ZoneNum, Real64 FractionHeight);
 
     Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
@@ -75,8 +73,6 @@ namespace DisplacementVentMgr {
                                                Real64 nonAirSystemResponse,
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
-
-    void CalcUCSDDV(EnergyPlusData &state, int ZoneNum); // Which Zonenum
 
     constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
         DataHeatBalance::IntGainType::People,

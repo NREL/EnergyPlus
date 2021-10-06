@@ -100,34 +100,6 @@ namespace HeatBalFiniteDiffManager {
     using DataSurfaces::Ground;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
 
-    void ManageHeatBalFiniteDiff(EnergyPlusData &state,
-                                 int const SurfNum,
-                                 Real64 &SurfTempInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                                 Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard Liesen
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages the moisture balance method.  It is called
-        // from the HeatBalanceManager at the time step level.
-        // This driver manages the calls to all of
-        // the other drivers and simulation algorithms.
-
-        // Get the moisture balance input at the beginning of the simulation only
-        if (state.dataHeatBalFiniteDiffMgr->GetHBFiniteDiffInputFlag) {
-            // Obtains conduction FD related parameters from input file
-            GetCondFDInput(state);
-            state.dataHeatBalFiniteDiffMgr->GetHBFiniteDiffInputFlag = false;
-        }
-        // Solve the zone heat & moisture balance using a finite difference solution
-        CalcHeatBalFiniteDiff(state, SurfNum, SurfTempInTmp, TempSurfOutTmp);
-    }
-
     void GetCondFDInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
@@ -498,6 +470,145 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(SurfNum).EnthNew = SurfaceFD(SurfNum).EnthOld;
             SurfaceFD(SurfNum).EnthLast = SurfaceFD(SurfNum).EnthOld;
             SurfaceFD(SurfNum).TDpriortimestep = SurfaceFD(SurfNum).TDreport; // Save TD for heat flux calc
+        }
+    }
+
+    void ReportFiniteDiffInits(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Liesen
+        //       DATE WRITTEN   November 2003
+        //       MODIFIED       B. Griffith, May 2011 add reporting of node x locations
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine gives a detailed report to the user about
+        // the initializations for the Finite Difference calculations
+        // of each construction.
+
+        using General::ScanForReports;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool DoReport;
+        int ThisNum;
+        int Layer;
+        int OutwardMatLayerNum;
+        int LayerNode;
+        int Inodes;
+
+        auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
+
+        // Formats
+        static constexpr std::string_view Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
+
+        print(state.files.eio,
+              "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
+              "Temperature Convergence Criteria\n");
+        print(state.files.eio,
+              " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
+              CondFDSchemeTypeNamesCC[static_cast<int>(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType)],
+              state.dataHeatBalFiniteDiffMgr->SpaceDescritConstant,
+              state.dataHeatBal->CondFDRelaxFactorInput,
+              state.dataHeatBal->MaxAllowedDelTempCondFD);
+
+        ScanForReports(state, "Constructions", DoReport, "Constructions");
+
+        if (DoReport) {
+
+            //                                      Write Descriptions
+            print(state.files.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
+            print(state.files.eio,
+                  "{}\n",
+                  "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture "
+                  "Stability");
+
+            // HT Algo issue
+            if (state.dataHeatBal->AnyCondFD) {
+                print(state.files.eio,
+                      "{}\n",
+                      "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "
+                      "Name (or Face), Inward Material Name (or Face)");
+            }
+
+            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
+
+                if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
+                if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
+                if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
+                if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
+
+                static constexpr std::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
+                print(state.files.eio,
+                      Format_700,
+                      state.dataConstruction->Construct(ThisNum).Name,
+                      ThisNum,
+                      state.dataConstruction->Construct(ThisNum).TotLayers,
+                      int(ConstructFD(ThisNum).TotNodes + 1),
+                      ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour);
+
+                for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
+                    static constexpr std::string_view Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
+                    print(state.files.eio,
+                          Format_701,
+                          ConstructFD(ThisNum).Name(Layer),
+                          ConstructFD(ThisNum).Thickness(Layer),
+                          ConstructFD(ThisNum).NodeNumPoint(Layer),
+                          ConstructFD(ThisNum).DelX(Layer),
+                          ConstructFD(ThisNum).TempStability(Layer),
+                          ConstructFD(ThisNum).MoistStability(Layer));
+                }
+
+                // now list each CondFD Node with its X distance from outside face in m along with other identifiers
+                Inodes = 0;
+
+                for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
+                    OutwardMatLayerNum = Layer - 1;
+                    for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
+                        ++Inodes;
+                        if (Inodes == 1) {
+                            print(state.files.eio,
+                                  Format_702,
+                                  format("Node #{}", Inodes),
+                                  ConstructFD(ThisNum).NodeXlocation(Inodes),
+                                  state.dataConstruction->Construct(ThisNum).Name,
+                                  "Surface Outside Face",
+                                  ConstructFD(ThisNum).Name(Layer));
+
+                        } else if (LayerNode == 1) {
+
+                            if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= state.dataConstruction->Construct(ThisNum).TotLayers) {
+                                print(state.files.eio,
+                                      Format_702,
+                                      format("Node #{}", Inodes),
+                                      ConstructFD(ThisNum).NodeXlocation(Inodes),
+                                      state.dataConstruction->Construct(ThisNum).Name,
+                                      ConstructFD(ThisNum).Name(OutwardMatLayerNum),
+                                      ConstructFD(ThisNum).Name(Layer));
+                            }
+                        } else if (LayerNode > 1) {
+                            OutwardMatLayerNum = Layer;
+                            print(state.files.eio,
+                                  Format_702,
+                                  format("Node #{}", Inodes),
+                                  ConstructFD(ThisNum).NodeXlocation(Inodes),
+                                  state.dataConstruction->Construct(ThisNum).Name,
+                                  ConstructFD(ThisNum).Name(OutwardMatLayerNum),
+                                  ConstructFD(ThisNum).Name(Layer));
+                        }
+                    }
+                }
+
+                Layer = state.dataConstruction->Construct(ThisNum).TotLayers;
+                ++Inodes;
+                print(state.files.eio,
+                      Format_702,
+                      format("Node #{}", Inodes),
+                      ConstructFD(ThisNum).NodeXlocation(Inodes),
+                      state.dataConstruction->Construct(ThisNum).Name,
+                      ConstructFD(ThisNum).Name(Layer),
+                      "Surface Inside Face");
+            }
         }
     }
 
@@ -1017,311 +1128,6 @@ namespace HeatBalFiniteDiffManager {
         return s;
     }
 
-    void CalcHeatBalFiniteDiff(EnergyPlusData &state,
-                               int const Surf,        // Surface number
-                               Real64 &SurfTempInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                               Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard J. Liesen
-        //       DATE WRITTEN   Oct 2003
-        //       MODIFIED       Aug 2006 by C O Pedersen to include implicit solution and variable properties with
-        //                                material enthalpy added for Phase Change Materials.
-        //                      Sept 2010 B. Griffith, remove allocate/deallocate, use structure variables
-        //                      March 2011 P. Tabares, add relaxation factor and add surfIteration to
-        //                                 update TD and TDT, correct interzone partition
-        //                      May 2011  B. Griffith add logging and errors when inner GS loop does not converge
-        //                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls and PCM stability problems
-
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // this routine controls the calculation of the fluxes and temperatures using
-        //      finite difference procedures for
-        //      all building surface constructs.
-
-        Real64 MaxDelTemp(0.0);
-
-        auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
-        auto &SurfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD;
-
-        int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
-
-        int const TotNodes(ConstructFD(ConstrNum).TotNodes);
-        int const TotLayers(state.dataConstruction->Construct(ConstrNum).TotLayers);
-
-        SurfTempInTmp = 0.0;
-        TempSurfOutTmp = 0.0;
-
-        int const Delt(ConstructFD(ConstrNum).DeltaTime); //   (seconds)
-
-        // Aliases
-        auto &surfaceFD(SurfaceFD(Surf));
-        auto const &T(surfaceFD.T);
-        auto &TT(surfaceFD.TT);
-        auto const &Rhov(surfaceFD.Rhov);
-        auto &RhoT(surfaceFD.RhoT);
-        auto const &TD(surfaceFD.TD);
-        auto &TDT(surfaceFD.TDT);
-        auto &TDTLast(surfaceFD.TDTLast);
-        auto &TDreport(surfaceFD.TDreport);
-        auto &RH(surfaceFD.RH);
-        auto &EnthOld(surfaceFD.EnthOld);
-        auto &EnthNew(surfaceFD.EnthNew);
-        auto &EnthLast(surfaceFD.EnthLast);
-        auto &GSloopCounter(surfaceFD.GSloopCounter);
-        auto &MaxNodeDelTemp(surfaceFD.MaxNodeDelTemp);
-
-        Real64 HMovInsul = 0;
-        if (state.dataSurface->AnyMovableInsulation) HMovInsul = state.dataHeatBalSurf->SurfMovInsulHExt(Surf);
-        // Start stepping through the slab with time.
-        for (int J = 1, J_end = nint(state.dataGlobal->TimeStepZoneSec / Delt); J <= J_end; ++J) { // PT testing higher time steps
-
-            int GSiter;                                                                       // iteration counter for implicit repeat calculation
-            for (GSiter = 1; GSiter <= state.dataHeatBalFiniteDiffMgr->MaxGSiter; ++GSiter) { //  Iterate implicit equations
-                TDTLast = TDT;                                                                // Save last iteration's TDT (New temperature) values
-                EnthLast = EnthNew;                                                           // Last iterations new enthalpy value
-
-                // Original loop version
-                int i(1);                                    //  Node counter
-                for (int Lay = 1; Lay <= TotLayers; ++Lay) { // Begin layer loop ...
-
-                    // For the exterior surface node with a convective boundary condition
-                    if ((i == 1) && (Lay == 1)) {
-                        ExteriorBCEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TotNodes, HMovInsul);
-                    }
-
-                    // For the Layer Interior nodes.  Arrive here after exterior surface node or interface node
-                    if (TotNodes != 1) {
-                        for (int ctr = 2, ctr_end = ConstructFD(ConstrNum).NodeNumPoint(Lay); ctr <= ctr_end; ++ctr) {
-                            ++i;
-                            InteriorNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew);
-                        }
-                    }
-
-                    if ((Lay < TotLayers) && (TotNodes != 1)) { // Interface equations for 2 capacitive materials
-                        ++i;
-                        IntInterfaceNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, GSiter);
-                    } else if (Lay == TotLayers) { // For the Interior surface node with a convective boundary condition
-                        ++i;
-                        InteriorBCEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TDreport);
-                    }
-
-                } // layer loop
-
-                // Apply Relaxation factor for stability, use current (TDT) and previous (TDTLast) iteration temperature values
-                // to obtain the actual temperature that is going to be used for next iteration. This would mostly happen with PCM
-                // Tuned Function call to eliminate array temporaries and multiple relaxation passes
-                if (GSiter > 15) {
-                    relax_array(TDT, TDTLast, 0.9875);
-                } else if (GSiter > 10) {
-                    relax_array(TDT, TDTLast, 0.875);
-                } else if (GSiter > 5) {
-                    relax_array(TDT, TDTLast, 0.5);
-                }
-
-                // the following could blow up when all the node temps sum to less than 1.0.  seems poorly formulated for temperature in C.
-                // PT delete one zero and decrease number of minimum iterations, from 3 (which actually requires 4 iterations) to 2.
-
-                if ((GSiter > 2) && (std::abs(sum_array_diff(TDT, TDTLast) / sum(TDT)) < 0.00001)) break;
-
-            } // End of Gauss Seidell iteration loop
-
-            GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
-            if (state.dataHeatBal->CondFDRelaxFactor != 1.0) {
-                // Apply Relaxation factor for stability, use current (TDT) and previous (TDreport) temperature values
-                //   to obtain the actual temperature that is going to be exported/use
-                relax_array(TDT, TDreport, 1.0 - state.dataHeatBal->CondFDRelaxFactor);
-                EnthOld = EnthNew;
-            }
-
-            for (int I = 1; I <= (TotNodes + 1); I++) {
-                // When the phase change process reverses its direction while melting or freezing (without completing its phase
-                // to either liquid or solid), the temperature at which it changes its direction is saved
-                // in the variable PhaseChangeTemperatureReverse, and this variable will hold the value of the temperature until
-                // the next reverse in the process takes place.
-                if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
-                     SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
-                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                }
-            }
-
-            SurfaceFD(Surf).PhaseChangeStateOldOld = SurfaceFD(Surf).PhaseChangeStateOld;
-            SurfaceFD(Surf).PhaseChangeStateOld = SurfaceFD(Surf).PhaseChangeState;
-
-        } // Time Loop  //PT solving time steps
-
-        TempSurfOutTmp = TDT(1);
-        SurfTempInTmp = TDT(TotNodes + 1);
-        state.dataMstBal->RhoVaporSurfIn(Surf) = 0.0;
-
-        // For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
-        // Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
-        if (surfaceFD.CpDelXRhoS2(1) == -1.0) {
-            surfaceFD.CpDelXRhoS2(1) = surfaceFD.CpDelXRhoS1(2); // Set to node 2's outer half node heat capacity
-        }
-        CalcNodeHeatFlux(state, Surf, TotNodes);
-
-        // Determine largest change in node temps
-        MaxDelTemp = 0.0;
-        for (int NodeNum = 1; NodeNum <= TotNodes + 1; ++NodeNum) { // need to consider all nodes
-            MaxDelTemp = max(std::abs(TDT(NodeNum) - TDreport(NodeNum)), MaxDelTemp);
-        }
-        MaxNodeDelTemp = MaxDelTemp;
-        TDreport = TDT;
-        EnthOld = EnthNew;
-    }
-
-    void ReportFiniteDiffInits(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard Liesen
-        //       DATE WRITTEN   November 2003
-        //       MODIFIED       B. Griffith, May 2011 add reporting of node x locations
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine gives a detailed report to the user about
-        // the initializations for the Finite Difference calculations
-        // of each construction.
-
-        using General::ScanForReports;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool DoReport;
-        int ThisNum;
-        int Layer;
-        int OutwardMatLayerNum;
-        int LayerNode;
-        int Inodes;
-
-        auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
-
-        // Formats
-        static constexpr std::string_view Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
-
-        print(state.files.eio,
-              "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
-              "Temperature Convergence Criteria\n");
-        print(state.files.eio,
-              " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
-              CondFDSchemeTypeNamesCC[static_cast<int>(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType)],
-              state.dataHeatBalFiniteDiffMgr->SpaceDescritConstant,
-              state.dataHeatBal->CondFDRelaxFactorInput,
-              state.dataHeatBal->MaxAllowedDelTempCondFD);
-
-        ScanForReports(state, "Constructions", DoReport, "Constructions");
-
-        if (DoReport) {
-
-            //                                      Write Descriptions
-            print(state.files.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
-            print(state.files.eio,
-                  "{}\n",
-                  "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture "
-                  "Stability");
-
-            // HT Algo issue
-            if (state.dataHeatBal->AnyCondFD) {
-                print(state.files.eio,
-                      "{}\n",
-                      "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "
-                      "Name (or Face), Inward Material Name (or Face)");
-            }
-
-            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
-
-                if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
-                if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
-                if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
-                if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
-
-                static constexpr std::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
-                print(state.files.eio,
-                      Format_700,
-                      state.dataConstruction->Construct(ThisNum).Name,
-                      ThisNum,
-                      state.dataConstruction->Construct(ThisNum).TotLayers,
-                      int(ConstructFD(ThisNum).TotNodes + 1),
-                      ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour);
-
-                for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
-                    static constexpr std::string_view Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
-                    print(state.files.eio,
-                          Format_701,
-                          ConstructFD(ThisNum).Name(Layer),
-                          ConstructFD(ThisNum).Thickness(Layer),
-                          ConstructFD(ThisNum).NodeNumPoint(Layer),
-                          ConstructFD(ThisNum).DelX(Layer),
-                          ConstructFD(ThisNum).TempStability(Layer),
-                          ConstructFD(ThisNum).MoistStability(Layer));
-                }
-
-                // now list each CondFD Node with its X distance from outside face in m along with other identifiers
-                Inodes = 0;
-
-                for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
-                    OutwardMatLayerNum = Layer - 1;
-                    for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
-                        ++Inodes;
-                        if (Inodes == 1) {
-                            print(state.files.eio,
-                                  Format_702,
-                                  format("Node #{}", Inodes),
-                                  ConstructFD(ThisNum).NodeXlocation(Inodes),
-                                  state.dataConstruction->Construct(ThisNum).Name,
-                                  "Surface Outside Face",
-                                  ConstructFD(ThisNum).Name(Layer));
-
-                        } else if (LayerNode == 1) {
-
-                            if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= state.dataConstruction->Construct(ThisNum).TotLayers) {
-                                print(state.files.eio,
-                                      Format_702,
-                                      format("Node #{}", Inodes),
-                                      ConstructFD(ThisNum).NodeXlocation(Inodes),
-                                      state.dataConstruction->Construct(ThisNum).Name,
-                                      ConstructFD(ThisNum).Name(OutwardMatLayerNum),
-                                      ConstructFD(ThisNum).Name(Layer));
-                            }
-                        } else if (LayerNode > 1) {
-                            OutwardMatLayerNum = Layer;
-                            print(state.files.eio,
-                                  Format_702,
-                                  format("Node #{}", Inodes),
-                                  ConstructFD(ThisNum).NodeXlocation(Inodes),
-                                  state.dataConstruction->Construct(ThisNum).Name,
-                                  ConstructFD(ThisNum).Name(OutwardMatLayerNum),
-                                  ConstructFD(ThisNum).Name(Layer));
-                        }
-                    }
-                }
-
-                Layer = state.dataConstruction->Construct(ThisNum).TotLayers;
-                ++Inodes;
-                print(state.files.eio,
-                      Format_702,
-                      format("Node #{}", Inodes),
-                      ConstructFD(ThisNum).NodeXlocation(Inodes),
-                      state.dataConstruction->Construct(ThisNum).Name,
-                      ConstructFD(ThisNum).Name(Layer),
-                      "Surface Inside Face");
-            }
-        }
-    }
-
     Real64 terpld(Array2<Real64> const &a, Real64 const x1, int const nind, int const ndep)
     {
         // author:c. o. pedersen
@@ -1379,6 +1185,174 @@ namespace HeatBalFiniteDiffManager {
             Real64 const fract((x1 - a[lind - 1]) / (a[lind] - a[lind - 1])); // [ lind ] == ( nind, i ), [ lind - 1 ] == ( nind, i - 1 )
             return a[ldep - 1] + fract * (a[ldep] - a[ldep - 1]);             // [ ldep ] == ( ndep, i ), [ ldep - 1 ] == ( ndep, i - 1 )
         }
+    }
+
+    void InteriorBCEqns(EnergyPlusData &state,
+                        int const Delt,                               // Time Increment
+                        int const i,                                  // Node Index
+                        int const Lay,                                // Layer Number for Construction
+                        int const Surf,                               // Surface number
+                        [[maybe_unused]] Array1D<Real64> const &T,    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
+                        [[maybe_unused]] Array1D<Real64> &TT,         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
+                        [[maybe_unused]] Array1D<Real64> const &Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        [[maybe_unused]] Array1D<Real64> &RhoT,       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        [[maybe_unused]] Array1D<Real64> &RH,         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> const &TD,                    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> &TDT,                         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> &EnthOld,                     // Old Nodal enthalpy
+                        Array1D<Real64> &EnthNew,                     // New Nodal enthalpy
+                        Array1D<Real64> &TDreport                     // Temperature value from previous HeatSurfaceHeatManager iteration's value
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Liesen
+        //       DATE WRITTEN   November, 2003
+        //       MODIFIED       B. Griffith, P. Tabares, May 2011, add first order fully implicit, bug fixes, cleanup
+        //                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls
+        //                      November 2011 P. Tabares fixed problems PCM stability problems
+        //       RE-ENGINEERED  C. O. Pedersen 2006
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculate the heat transfer at the node on the surfaces inside face (facing zone)
+
+        auto const &surface(state.dataSurface->Surface(Surf));
+
+        int const ConstrNum(surface.Construction);
+
+        // Set the internal conditions to local variables
+        Real64 const NetLWRadToSurfFD(
+            state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(Surf)); // Net interior long wavelength radiation to surface from other surfaces
+        Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
+        Real64 const SurfQdotRadHVACInPerAreaFD(
+            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(Surf));                        // Total current radiant heat flux at a surface
+        Real64 const QRadThermInFD(state.dataHeatBal->SurfQdotRadIntGainsInPerArea(Surf)); // Thermal radiation absorbed on inside surfaces
+
+        // Boundary Conditions from Simulation for Interior
+        Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
+
+        Real64 const Tia(state.dataHeatBalFanSys->MAT(surface.Zone));
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
+        auto TDT_i(TDT(i));
+        Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
+        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+            int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
+            auto const &mat(state.dataMaterial->Material(MatLay));
+            auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
+            auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
+            auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
+
+            // Calculate the Dry Heat Conduction Equation
+
+            if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
+                // Use algebraic equation for TDT based on R
+                Real64 const IterDampConst(
+                    5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
+                Real64 const Rlayer(mat.Resistance);
+                if ((i == 1) && (surface.ExtBoundCond > 0)) { // this is for an adiabatic partition
+                    TDT_i = (TDT(i + 1) + (QFac + hconvi * Tia + TDreport(i) * IterDampConst) * Rlayer) / (1.0 + (hconvi + IterDampConst) * Rlayer);
+                } else { // regular wall
+                    TDT_i = (TDT(i - 1) + (QFac + hconvi * Tia + TDreport(i) * IterDampConst) * Rlayer) / (1.0 + (hconvi + IterDampConst) * Rlayer);
+                }
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) =
+                    0.0; // Save this for computing node flux values - rlayer has no capacitance
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
+
+            } else { //  Regular or PCM
+                auto const TDT_m(TDT(i - 1));
+
+                // Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
+                auto const &matFD_TempCond(matFD.TempCond);
+                assert(matFD_TempCond.u2() >= 3);
+                auto const lTC(matFD_TempCond.index(2, 1));
+                Real64 kt;
+                if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
+                    // Use average of surface and first node temp for determining k
+                    kt = terpld(matFD_TempCond, (TDT_i + TDT_m) / 2.0, 1, 2); // 1: Temperature, 2: Thermal conductivity
+                } else {
+                    kt = mat.Conductivity;       // 20C base conductivity
+                    Real64 const kt1(matFD.tk1); // linear coefficient (normally zero)
+                    if (kt1 != 0.0) kt = +kt1 * ((TDT_i + TDT_m) / 2.0 - 20.0);
+                }
+
+                Real64 RhoS(mat.Density);
+                auto const TD_i(TD(i));
+                Real64 const Cpo(mat.SpecHeat);
+                Real64 Cp(Cpo); // Will be changed if PCM
+                auto const &matFD_TempEnth(matFD.TempEnth);
+                assert(matFD_TempEnth.u2() >= 3);
+                auto const lTE(matFD_TempEnth.index(2, 1));
+                if (mat.phaseChange) {
+                    adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
+                } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
+                           0.0) {                                     // Phase change material: Use TempEnth data
+                    EnthOld(i) = terpld(matFD_TempEnth, TD_i, 1, 2);  // 1: Temperature, 2: Enthalpy
+                    EnthNew(i) = terpld(matFD_TempEnth, TDT_i, 1, 2); // 1: Temperature, 2: Enthalpy
+                    if ((std::abs(EnthNew(i) - EnthOld(i)) > smalldiff) && (std::abs(TDT_i - TD_i) > smalldiff)) {
+                        Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
+                    }
+                } // Phase change material check
+
+                // EMS Conductivity Override
+                if (condActuator.isActuated) {
+                    kt = condActuator.actuatedValue;
+                }
+
+                // EMS Specific Heat Override
+                if (specHeatActuator.isActuated) {
+                    Cp = specHeatActuator.actuatedValue;
+                }
+
+                // Update EMS internal variables
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt;
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp;
+
+                Real64 const DelX(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
+                Real64 const Delt_DelX(Delt * DelX);
+                Real64 const Two_Delt_DelX(2.0 * Delt_DelX);
+                Real64 const Delt_kt(Delt * kt);
+                Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
+                if ((surface.ExtBoundCond > 0) && (i == 1)) { // this is for an adiabatic or interzone partition
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
+                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
+                                 Delt_kt * (TD(i + 1) + TDT(i + 1))) /
+                                (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
+                               CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
+                        Real64 const Two_Delt_kt(2.0 * Delt_kt);
+                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT(i + 1)) /
+                                (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
+                    }
+                } else { // for regular or interzone walls
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
+                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
+                                 Delt_kt * (TD(i - 1) + TDT_m)) /
+                                (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
+                        Real64 const Two_Delt_kt(2.0 * Delt_kt);
+                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_m) /
+                                (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
+                    }
+                }
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) = (Cp * DelX * RhoS) / 2.0; // Save this for computing node flux values
+                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
+
+            } // Regular or R layer
+            // Limit clipping
+            if (TDT_i < MinSurfaceTempLimit) {
+                TDT_i = MinSurfaceTempLimit;
+            } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
+                TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
+            }
+
+            TDT(i) = TDT_i;
+
+        } //  End of Regular node or SigmaR SigmaC option
+
+        Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
+        //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf) = QNetSurfInside;
     }
 
     void ExteriorBCEqns(EnergyPlusData &state,
@@ -2137,174 +2111,6 @@ namespace HeatBalFiniteDiffManager {
         } // End of the CondFD if block
     }
 
-    void InteriorBCEqns(EnergyPlusData &state,
-                        int const Delt,                               // Time Increment
-                        int const i,                                  // Node Index
-                        int const Lay,                                // Layer Number for Construction
-                        int const Surf,                               // Surface number
-                        [[maybe_unused]] Array1D<Real64> const &T,    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
-                        [[maybe_unused]] Array1D<Real64> &TT,         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
-                        [[maybe_unused]] Array1D<Real64> const &Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        [[maybe_unused]] Array1D<Real64> &RhoT,       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        [[maybe_unused]] Array1D<Real64> &RH,         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1D<Real64> const &TD,                    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1D<Real64> &TDT,                         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1D<Real64> &EnthOld,                     // Old Nodal enthalpy
-                        Array1D<Real64> &EnthNew,                     // New Nodal enthalpy
-                        Array1D<Real64> &TDreport                     // Temperature value from previous HeatSurfaceHeatManager iteration's value
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard Liesen
-        //       DATE WRITTEN   November, 2003
-        //       MODIFIED       B. Griffith, P. Tabares, May 2011, add first order fully implicit, bug fixes, cleanup
-        //                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls
-        //                      November 2011 P. Tabares fixed problems PCM stability problems
-        //       RE-ENGINEERED  C. O. Pedersen 2006
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculate the heat transfer at the node on the surfaces inside face (facing zone)
-
-        auto const &surface(state.dataSurface->Surface(Surf));
-
-        int const ConstrNum(surface.Construction);
-
-        // Set the internal conditions to local variables
-        Real64 const NetLWRadToSurfFD(
-            state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(Surf)); // Net interior long wavelength radiation to surface from other surfaces
-        Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
-        Real64 const SurfQdotRadHVACInPerAreaFD(
-            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(Surf));                        // Total current radiant heat flux at a surface
-        Real64 const QRadThermInFD(state.dataHeatBal->SurfQdotRadIntGainsInPerArea(Surf)); // Thermal radiation absorbed on inside surfaces
-
-        // Boundary Conditions from Simulation for Interior
-        Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
-
-        Real64 const Tia(state.dataHeatBalFanSys->MAT(surface.Zone));
-
-        //++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
-        auto TDT_i(TDT(i));
-        Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
-        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
-            int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-            auto const &mat(state.dataMaterial->Material(MatLay));
-            auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
-            auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
-            auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
-
-            // Calculate the Dry Heat Conduction Equation
-
-            if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
-                // Use algebraic equation for TDT based on R
-                Real64 const IterDampConst(
-                    5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
-                Real64 const Rlayer(mat.Resistance);
-                if ((i == 1) && (surface.ExtBoundCond > 0)) { // this is for an adiabatic partition
-                    TDT_i = (TDT(i + 1) + (QFac + hconvi * Tia + TDreport(i) * IterDampConst) * Rlayer) / (1.0 + (hconvi + IterDampConst) * Rlayer);
-                } else { // regular wall
-                    TDT_i = (TDT(i - 1) + (QFac + hconvi * Tia + TDreport(i) * IterDampConst) * Rlayer) / (1.0 + (hconvi + IterDampConst) * Rlayer);
-                }
-                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) =
-                    0.0; // Save this for computing node flux values - rlayer has no capacitance
-                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
-
-            } else { //  Regular or PCM
-                auto const TDT_m(TDT(i - 1));
-
-                // Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
-                auto const &matFD_TempCond(matFD.TempCond);
-                assert(matFD_TempCond.u2() >= 3);
-                auto const lTC(matFD_TempCond.index(2, 1));
-                Real64 kt;
-                if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
-                    // Use average of surface and first node temp for determining k
-                    kt = terpld(matFD_TempCond, (TDT_i + TDT_m) / 2.0, 1, 2); // 1: Temperature, 2: Thermal conductivity
-                } else {
-                    kt = mat.Conductivity;       // 20C base conductivity
-                    Real64 const kt1(matFD.tk1); // linear coefficient (normally zero)
-                    if (kt1 != 0.0) kt = +kt1 * ((TDT_i + TDT_m) / 2.0 - 20.0);
-                }
-
-                Real64 RhoS(mat.Density);
-                auto const TD_i(TD(i));
-                Real64 const Cpo(mat.SpecHeat);
-                Real64 Cp(Cpo); // Will be changed if PCM
-                auto const &matFD_TempEnth(matFD.TempEnth);
-                assert(matFD_TempEnth.u2() >= 3);
-                auto const lTE(matFD_TempEnth.index(2, 1));
-                if (mat.phaseChange) {
-                    adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
-                } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
-                           0.0) {                                     // Phase change material: Use TempEnth data
-                    EnthOld(i) = terpld(matFD_TempEnth, TD_i, 1, 2);  // 1: Temperature, 2: Enthalpy
-                    EnthNew(i) = terpld(matFD_TempEnth, TDT_i, 1, 2); // 1: Temperature, 2: Enthalpy
-                    if ((std::abs(EnthNew(i) - EnthOld(i)) > smalldiff) && (std::abs(TDT_i - TD_i) > smalldiff)) {
-                        Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
-                    }
-                } // Phase change material check
-
-                // EMS Conductivity Override
-                if (condActuator.isActuated) {
-                    kt = condActuator.actuatedValue;
-                }
-
-                // EMS Specific Heat Override
-                if (specHeatActuator.isActuated) {
-                    Cp = specHeatActuator.actuatedValue;
-                }
-
-                // Update EMS internal variables
-                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt;
-                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp;
-
-                Real64 const DelX(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
-                Real64 const Delt_DelX(Delt * DelX);
-                Real64 const Two_Delt_DelX(2.0 * Delt_DelX);
-                Real64 const Delt_kt(Delt * kt);
-                Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
-                if ((surface.ExtBoundCond > 0) && (i == 1)) { // this is for an adiabatic or interzone partition
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
-                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
-                                 Delt_kt * (TD(i + 1) + TDT(i + 1))) /
-                                (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
-                               CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
-                        Real64 const Two_Delt_kt(2.0 * Delt_kt);
-                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT(i + 1)) /
-                                (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
-                    }
-                } else { // for regular or interzone walls
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
-                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
-                                 Delt_kt * (TD(i - 1) + TDT_m)) /
-                                (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
-                        Real64 const Two_Delt_kt(2.0 * Delt_kt);
-                        TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_m) /
-                                (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
-                    }
-                }
-                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) = (Cp * DelX * RhoS) / 2.0; // Save this for computing node flux values
-                state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
-
-            } // Regular or R layer
-              // Limit clipping
-            if (TDT_i < MinSurfaceTempLimit) {
-                TDT_i = MinSurfaceTempLimit;
-            } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-                TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-            }
-
-            TDT(i) = TDT_i;
-
-        } //  End of Regular node or SigmaR SigmaC option
-
-        Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
-        //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
-        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf) = QNetSurfInside;
-    }
-
     // todo - function not used
     void CheckFDSurfaceTempLimits(EnergyPlusData &state,
                                   int const SurfNum,            // surface number
@@ -2489,6 +2295,200 @@ namespace HeatBalFiniteDiffManager {
                 interNodeFlux - sourceFlux +
                 surfaceFD.CpDelXRhoS2(node) * (surfaceFD.TDT(node) - surfaceFD.TDpriortimestep(node)) / state.dataGlobal->TimeStepZoneSec;
         }
+    }
+
+    void CalcHeatBalFiniteDiff(EnergyPlusData &state,
+                               int const Surf,        // Surface number
+                               Real64 &SurfTempInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                               Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard J. Liesen
+        //       DATE WRITTEN   Oct 2003
+        //       MODIFIED       Aug 2006 by C O Pedersen to include implicit solution and variable properties with
+        //                                material enthalpy added for Phase Change Materials.
+        //                      Sept 2010 B. Griffith, remove allocate/deallocate, use structure variables
+        //                      March 2011 P. Tabares, add relaxation factor and add surfIteration to
+        //                                 update TD and TDT, correct interzone partition
+        //                      May 2011  B. Griffith add logging and errors when inner GS loop does not converge
+        //                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls and PCM stability problems
+
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // this routine controls the calculation of the fluxes and temperatures using
+        //      finite difference procedures for
+        //      all building surface constructs.
+
+        Real64 MaxDelTemp(0.0);
+
+        auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
+        auto &SurfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD;
+
+        int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
+
+        int const TotNodes(ConstructFD(ConstrNum).TotNodes);
+        int const TotLayers(state.dataConstruction->Construct(ConstrNum).TotLayers);
+
+        SurfTempInTmp = 0.0;
+        TempSurfOutTmp = 0.0;
+
+        int const Delt(ConstructFD(ConstrNum).DeltaTime); //   (seconds)
+
+        // Aliases
+        auto &surfaceFD(SurfaceFD(Surf));
+        auto const &T(surfaceFD.T);
+        auto &TT(surfaceFD.TT);
+        auto const &Rhov(surfaceFD.Rhov);
+        auto &RhoT(surfaceFD.RhoT);
+        auto const &TD(surfaceFD.TD);
+        auto &TDT(surfaceFD.TDT);
+        auto &TDTLast(surfaceFD.TDTLast);
+        auto &TDreport(surfaceFD.TDreport);
+        auto &RH(surfaceFD.RH);
+        auto &EnthOld(surfaceFD.EnthOld);
+        auto &EnthNew(surfaceFD.EnthNew);
+        auto &EnthLast(surfaceFD.EnthLast);
+        auto &GSloopCounter(surfaceFD.GSloopCounter);
+        auto &MaxNodeDelTemp(surfaceFD.MaxNodeDelTemp);
+
+        Real64 HMovInsul = 0;
+        if (state.dataSurface->AnyMovableInsulation) HMovInsul = state.dataHeatBalSurf->SurfMovInsulHExt(Surf);
+        // Start stepping through the slab with time.
+        for (int J = 1, J_end = nint(state.dataGlobal->TimeStepZoneSec / Delt); J <= J_end; ++J) { // PT testing higher time steps
+
+            int GSiter;                                                                       // iteration counter for implicit repeat calculation
+            for (GSiter = 1; GSiter <= state.dataHeatBalFiniteDiffMgr->MaxGSiter; ++GSiter) { //  Iterate implicit equations
+                TDTLast = TDT;                                                                // Save last iteration's TDT (New temperature) values
+                EnthLast = EnthNew;                                                           // Last iterations new enthalpy value
+
+                // Original loop version
+                int i(1);                                    //  Node counter
+                for (int Lay = 1; Lay <= TotLayers; ++Lay) { // Begin layer loop ...
+
+                    // For the exterior surface node with a convective boundary condition
+                    if ((i == 1) && (Lay == 1)) {
+                        ExteriorBCEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TotNodes, HMovInsul);
+                    }
+
+                    // For the Layer Interior nodes.  Arrive here after exterior surface node or interface node
+                    if (TotNodes != 1) {
+                        for (int ctr = 2, ctr_end = ConstructFD(ConstrNum).NodeNumPoint(Lay); ctr <= ctr_end; ++ctr) {
+                            ++i;
+                            InteriorNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew);
+                        }
+                    }
+
+                    if ((Lay < TotLayers) && (TotNodes != 1)) { // Interface equations for 2 capacitive materials
+                        ++i;
+                        IntInterfaceNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, GSiter);
+                    } else if (Lay == TotLayers) { // For the Interior surface node with a convective boundary condition
+                        ++i;
+                        InteriorBCEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TDreport);
+                    }
+
+                } // layer loop
+
+                // Apply Relaxation factor for stability, use current (TDT) and previous (TDTLast) iteration temperature values
+                // to obtain the actual temperature that is going to be used for next iteration. This would mostly happen with PCM
+                // Tuned Function call to eliminate array temporaries and multiple relaxation passes
+                if (GSiter > 15) {
+                    relax_array(TDT, TDTLast, 0.9875);
+                } else if (GSiter > 10) {
+                    relax_array(TDT, TDTLast, 0.875);
+                } else if (GSiter > 5) {
+                    relax_array(TDT, TDTLast, 0.5);
+                }
+
+                // the following could blow up when all the node temps sum to less than 1.0.  seems poorly formulated for temperature in C.
+                // PT delete one zero and decrease number of minimum iterations, from 3 (which actually requires 4 iterations) to 2.
+
+                if ((GSiter > 2) && (std::abs(sum_array_diff(TDT, TDTLast) / sum(TDT)) < 0.00001)) break;
+
+            } // End of Gauss Seidell iteration loop
+
+            GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
+            if (state.dataHeatBal->CondFDRelaxFactor != 1.0) {
+                // Apply Relaxation factor for stability, use current (TDT) and previous (TDreport) temperature values
+                //   to obtain the actual temperature that is going to be exported/use
+                relax_array(TDT, TDreport, 1.0 - state.dataHeatBal->CondFDRelaxFactor);
+                EnthOld = EnthNew;
+            }
+
+            for (int I = 1; I <= (TotNodes + 1); I++) {
+                // When the phase change process reverses its direction while melting or freezing (without completing its phase
+                // to either liquid or solid), the temperature at which it changes its direction is saved
+                // in the variable PhaseChangeTemperatureReverse, and this variable will hold the value of the temperature until
+                // the next reverse in the process takes place.
+                if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
+                     SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
+                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
+                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
+                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) {
+                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
+                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
+                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
+                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
+                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
+                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING)) {
+                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
+                }
+            }
+
+            SurfaceFD(Surf).PhaseChangeStateOldOld = SurfaceFD(Surf).PhaseChangeStateOld;
+            SurfaceFD(Surf).PhaseChangeStateOld = SurfaceFD(Surf).PhaseChangeState;
+
+        } // Time Loop  //PT solving time steps
+
+        TempSurfOutTmp = TDT(1);
+        SurfTempInTmp = TDT(TotNodes + 1);
+        state.dataMstBal->RhoVaporSurfIn(Surf) = 0.0;
+
+        // For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
+        // Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
+        if (surfaceFD.CpDelXRhoS2(1) == -1.0) {
+            surfaceFD.CpDelXRhoS2(1) = surfaceFD.CpDelXRhoS1(2); // Set to node 2's outer half node heat capacity
+        }
+        CalcNodeHeatFlux(state, Surf, TotNodes);
+
+        // Determine largest change in node temps
+        MaxDelTemp = 0.0;
+        for (int NodeNum = 1; NodeNum <= TotNodes + 1; ++NodeNum) { // need to consider all nodes
+            MaxDelTemp = max(std::abs(TDT(NodeNum) - TDreport(NodeNum)), MaxDelTemp);
+        }
+        MaxNodeDelTemp = MaxDelTemp;
+        TDreport = TDT;
+        EnthOld = EnthNew;
+    }
+
+    void ManageHeatBalFiniteDiff(EnergyPlusData &state,
+                                 int const SurfNum,
+                                 Real64 &SurfTempInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                                 Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Liesen
+        //       DATE WRITTEN   May 2000
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine manages the moisture balance method.  It is called
+        // from the HeatBalanceManager at the time step level.
+        // This driver manages the calls to all of
+        // the other drivers and simulation algorithms.
+
+        // Get the moisture balance input at the beginning of the simulation only
+        if (state.dataHeatBalFiniteDiffMgr->GetHBFiniteDiffInputFlag) {
+            // Obtains conduction FD related parameters from input file
+            GetCondFDInput(state);
+            state.dataHeatBalFiniteDiffMgr->GetHBFiniteDiffInputFlag = false;
+        }
+        // Solve the zone heat & moisture balance using a finite difference solution
+        CalcHeatBalFiniteDiff(state, SurfNum, SurfTempInTmp, TempSurfOutTmp);
     }
 
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,

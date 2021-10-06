@@ -92,458 +92,6 @@ namespace UserDefinedComponents {
     // PURPOSE OF THIS MODULE:
     // Collect component models for custom program with Erl.
 
-    PlantComponent *UserPlantComponentStruct::factory(EnergyPlusData &state, std::string const &objectName)
-    {
-        // Process the input data
-        if (state.dataUserDefinedComponents->GetPlantCompInput) {
-            GetUserDefinedPlantComponents(state);
-            state.dataUserDefinedComponents->GetPlantCompInput = false;
-        }
-        // Now look for this particular object
-        for (auto &thisComp : state.dataUserDefinedComponents->UserPlantComp) {
-            if (thisComp.Name == objectName) {
-                return &thisComp;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state, "LocalUserDefinedPlantComponentFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
-    {
-        bool anyEMSRan;
-        Real64 myLoad = 0.0;
-        int thisLoop = 0;
-
-        this->initialize(state, calledFromLocation.loopNum, myLoad);
-
-        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
-            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
-            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
-            thisLoop = loop;
-        }
-
-        if (thisLoop > 0) {
-            if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
-            } else if (this->Loop(thisLoop).initPluginLocation > -1) {
-                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
-            }
-
-            PlantUtilities::InitComponentNodes(state,
-                                               this->Loop(thisLoop).MassFlowRateMin,
-                                               this->Loop(thisLoop).MassFlowRateMax,
-                                               this->Loop(thisLoop).InletNodeNum,
-                                               this->Loop(thisLoop).OutletNodeNum,
-                                               this->Loop(thisLoop).LoopNum,
-                                               this->Loop(thisLoop).LoopSideNum,
-                                               this->Loop(thisLoop).BranchNum,
-                                               this->Loop(thisLoop).CompNum);
-
-            PlantUtilities::RegisterPlantCompDesignFlow(state, this->Loop(thisLoop).InletNodeNum, this->Loop(thisLoop).DesignVolumeFlowRate);
-
-        } else {
-            // throw warning
-            ShowFatalError(
-                state,
-                format("SimUserDefinedPlantComponent: did not find where called from loop number called from ={} , loop side called from ={}",
-                       calledFromLocation.loopNum,
-                       calledFromLocation.loopSideNum));
-        }
-    }
-
-    void UserPlantComponentStruct::getDesignCapacities(
-        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
-    {
-        int thisLoop = 0;
-        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
-            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
-            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
-            thisLoop = loop;
-        }
-
-        MinLoad = this->Loop(thisLoop).MinLoad;
-        MaxLoad = this->Loop(thisLoop).MaxLoad;
-        OptLoad = this->Loop(thisLoop).OptLoad;
-    }
-
-    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state,
-                                                                      const EnergyPlus::PlantLocation &calledFromLocation,
-                                                                      [[maybe_unused]] bool FirstHVACIteration,
-                                                                      Real64 &CurLoad,
-                                                                      [[maybe_unused]] bool RunFlag)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Jan 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // User Defined plant generic component
-
-        if (state.dataGlobal->BeginEnvrnFlag) {
-            this->onInitLoopEquip(state, calledFromLocation);
-        }
-
-        bool anyEMSRan;
-        int thisLoop = 0;
-
-        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
-            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
-            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
-            thisLoop = loop;
-        }
-
-        this->initialize(state, thisLoop, CurLoad);
-
-        if (thisLoop > 0) {
-            if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
-                EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
-            } else if (this->Loop(thisLoop).simPluginLocation > -1) {
-                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
-            }
-        }
-
-        if (this->ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
-        } else if (this->simPluginLocation > -1) {
-            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
-        }
-
-        this->report(state, thisLoop);
-    }
-
-    void SimCoilUserDefined(EnergyPlusData &state,
-                            std::string_view EquipName, // user name for component
-                            int &CompIndex,
-                            int const AirLoopNum,
-                            bool &HeatingActive,
-                            bool &CoolingActive)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Feb. 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        int CompNum;
-
-        if (state.dataUserDefinedComponents->GetPlantCompInput) {
-            GetUserDefinedPlantComponents(state);
-            state.dataUserDefinedComponents->GetPlantCompInput = false;
-        }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
-            if (CompNum == 0) {
-                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
-            }
-            CompIndex = CompNum;
-        } else {
-            CompNum = CompIndex;
-            if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserCoils) {
-                ShowFatalError(state,
-                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
-                                      CompNum,
-                                      state.dataUserDefinedComponents->NumUserCoils,
-                                      EquipName));
-            }
-            if (state.dataUserDefinedComponents->CheckUserCoilName(CompNum)) {
-                if (EquipName != state.dataUserDefinedComponents->UserCoil(CompNum).Name) {
-                    ShowFatalError(
-                        state,
-                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
-                               CompNum,
-                               EquipName,
-                               state.dataUserDefinedComponents->UserCoil(CompNum).Name));
-                }
-                state.dataUserDefinedComponents->CheckUserCoilName(CompNum) = false;
-            }
-        }
-        bool anyEMSRan;
-        if (state.dataGlobal->BeginEnvrnFlag) {
-            if (state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(state,
-                                      EMSManager::EMSCallFrom::UserDefinedComponentModel,
-                                      anyEMSRan,
-                                      state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr);
-            } else if (state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation > -1) {
-                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
-                    state, state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation);
-            }
-
-            if (state.dataUserDefinedComponents->UserCoil(CompNum).PlantIsConnected) {
-
-                PlantUtilities::InitComponentNodes(state,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMin,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMax,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.OutletNodeNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopSideNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.BranchNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.CompNum);
-
-                PlantUtilities::RegisterPlantCompDesignFlow(state,
-                                                            state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
-                                                            state.dataUserDefinedComponents->UserCoil(CompNum).Loop.DesignVolumeFlowRate);
-            }
-        }
-
-        state.dataUserDefinedComponents->UserCoil(CompNum).initialize(state);
-
-        if (state.dataUserDefinedComponents->UserCoil(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(state,
-                                  EMSManager::EMSCallFrom::UserDefinedComponentModel,
-                                  anyEMSRan,
-                                  state.dataUserDefinedComponents->UserCoil(CompNum).ErlSimProgramMngr);
-        } else if (state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation > -1) {
-            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state,
-                                                                               state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
-        }
-
-        state.dataUserDefinedComponents->UserCoil(CompNum).report(state);
-
-        if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
-            // determine if heating or cooling on primary air stream
-            HeatingActive = state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).InletNodeNum).Temp <
-                            state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).OutletNodeNum).Temp;
-
-            Real64 EnthInlet =
-                Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).InletNodeNum).Temp,
-                                           state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).InletNodeNum).HumRat);
-            Real64 EnthOutlet =
-                Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).OutletNodeNum).Temp,
-                                           state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).OutletNodeNum).HumRat);
-            CoolingActive = EnthInlet > EnthOutlet;
-        }
-    }
-
-    void SimZoneAirUserDefined(EnergyPlusData &state,
-                               std::string_view CompName,      // name of the packaged terminal heat pump
-                               int const ZoneNum,              // number of zone being served
-                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
-                               Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
-                               int &CompIndex                  // index to zone hvac unit
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   February, 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        int CompNum;
-
-        if (state.dataUserDefinedComponents->GetInput) {
-            GetUserDefinedComponents(state);
-            state.dataUserDefinedComponents->GetInput = false;
-        }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
-            if (CompNum == 0) {
-                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
-            }
-            CompIndex = CompNum;
-        } else {
-            CompNum = CompIndex;
-            if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserZoneAir) {
-                ShowFatalError(state,
-                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
-                                      CompNum,
-                                      state.dataUserDefinedComponents->NumUserZoneAir,
-                                      CompName));
-            }
-            if (state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum)) {
-                if (CompName != state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name) {
-                    ShowFatalError(
-                        state,
-                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
-                               CompNum,
-                               CompName,
-                               state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name));
-                }
-                state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum) = false;
-            }
-        }
-        bool anyEMSRan;
-        if (state.dataGlobal->BeginEnvrnFlag) {
-            state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
-
-            if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(state,
-                                      EMSManager::EMSCallFrom::UserDefinedComponentModel,
-                                      anyEMSRan,
-                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
-            } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
-                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
-                    state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation);
-            }
-            if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-                for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
-
-                    PlantUtilities::InitComponentNodes(state,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMin,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMax,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).CompNum);
-
-                    PlantUtilities::RegisterPlantCompDesignFlow(
-                        state,
-                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
-                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).DesignVolumeFlowRate);
-                }
-            }
-
-        } // BeginEnvrnFlag
-
-        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
-
-        if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(state,
-                                  EMSManager::EMSCallFrom::UserDefinedComponentModel,
-                                  anyEMSRan,
-                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
-        } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
-            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
-                state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
-        }
-
-        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report(state);
-
-        // calculate delivered capacity
-        Real64 AirMassFlow =
-            min(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate,
-                state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).MassFlowRate);
-        // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
-        Real64 MinHumRat = min(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat,
-                               state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat);
-        SensibleOutputProvided =
-            AirMassFlow *
-            (Psychrometrics::PsyHFnTdbW(
-                 state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).Temp, MinHumRat) -
-             Psychrometrics::PsyHFnTdbW(
-                 state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp, MinHumRat));
-
-        Real64 SpecHumOut = state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat;
-        Real64 SpecHumIn = state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat;
-        LatentOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
-    }
-
-    void SimAirTerminalUserDefined(EnergyPlusData &state,
-                                   std::string_view CompName,
-                                   [[maybe_unused]] bool const FirstHVACIteration,
-                                   int const ZoneNum,
-                                   [[maybe_unused]] int const ZoneNodeNum,
-                                   int &CompIndex)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // simulation call for generic air terminal
-
-        int CompNum;
-
-        if (state.dataUserDefinedComponents->GetInput) {
-            GetUserDefinedComponents(state);
-            state.dataUserDefinedComponents->GetInput = false;
-        }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
-            if (CompNum == 0) {
-                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
-            }
-            CompIndex = CompNum;
-        } else {
-            CompNum = CompIndex;
-            if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserAirTerminals) {
-                ShowFatalError(state,
-                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
-                                      CompNum,
-                                      state.dataUserDefinedComponents->NumUserAirTerminals,
-                                      CompName));
-            }
-            if (state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum)) {
-                if (CompName != state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name) {
-                    ShowFatalError(
-                        state,
-                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
-                               CompNum,
-                               CompName,
-                               state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name));
-                }
-                state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum) = false;
-            }
-        }
-        bool anyEMSRan;
-        if (state.dataGlobal->BeginEnvrnFlag) {
-            state.dataUserDefinedComponents->UserAirTerminal(CompNum).initialize(state, ZoneNum);
-
-            if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(state,
-                                      EMSManager::EMSCallFrom::UserDefinedComponentModel,
-                                      anyEMSRan,
-                                      state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlInitProgramMngr);
-            } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation > -1) {
-                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
-                    state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation);
-            }
-            if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections > 0) {
-                for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
-
-                    PlantUtilities::InitComponentNodes(state,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMin,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMax,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).BranchNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).CompNum);
-
-                    PlantUtilities::RegisterPlantCompDesignFlow(
-                        state,
-                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
-                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).DesignVolumeFlowRate);
-                }
-            }
-
-        } // BeginEnvrnFlag
-
-        state.dataUserDefinedComponents->UserAirTerminal(CompNum).initialize(state, ZoneNum);
-
-        if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(state,
-                                  EMSManager::EMSCallFrom::UserDefinedComponentModel,
-                                  anyEMSRan,
-                                  state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlSimProgramMngr);
-        } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation > -1) {
-            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
-                state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
-        }
-
-        state.dataUserDefinedComponents->UserAirTerminal(CompNum).report(state);
-    }
-
     void GetUserDefinedPlantComponents(EnergyPlusData &state)
     {
         bool ErrorsFound(false);
@@ -2355,6 +1903,458 @@ namespace UserDefinedComponents {
         if (ErrorsFound) {
             ShowFatalError(state, "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
         }
+    }
+
+    PlantComponent *UserPlantComponentStruct::factory(EnergyPlusData &state, std::string const &objectName)
+    {
+        // Process the input data
+        if (state.dataUserDefinedComponents->GetPlantCompInput) {
+            GetUserDefinedPlantComponents(state);
+            state.dataUserDefinedComponents->GetPlantCompInput = false;
+        }
+        // Now look for this particular object
+        for (auto &thisComp : state.dataUserDefinedComponents->UserPlantComp) {
+            if (thisComp.Name == objectName) {
+                return &thisComp;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(state, "LocalUserDefinedPlantComponentFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    {
+        bool anyEMSRan;
+        Real64 myLoad = 0.0;
+        int thisLoop = 0;
+
+        this->initialize(state, calledFromLocation.loopNum, myLoad);
+
+        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
+            thisLoop = loop;
+        }
+
+        if (thisLoop > 0) {
+            if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
+                EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+            } else if (this->Loop(thisLoop).initPluginLocation > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
+            }
+
+            PlantUtilities::InitComponentNodes(state,
+                                               this->Loop(thisLoop).MassFlowRateMin,
+                                               this->Loop(thisLoop).MassFlowRateMax,
+                                               this->Loop(thisLoop).InletNodeNum,
+                                               this->Loop(thisLoop).OutletNodeNum,
+                                               this->Loop(thisLoop).LoopNum,
+                                               this->Loop(thisLoop).LoopSideNum,
+                                               this->Loop(thisLoop).BranchNum,
+                                               this->Loop(thisLoop).CompNum);
+
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->Loop(thisLoop).InletNodeNum, this->Loop(thisLoop).DesignVolumeFlowRate);
+
+        } else {
+            // throw warning
+            ShowFatalError(
+                state,
+                format("SimUserDefinedPlantComponent: did not find where called from loop number called from ={} , loop side called from ={}",
+                       calledFromLocation.loopNum,
+                       calledFromLocation.loopSideNum));
+        }
+    }
+
+    void UserPlantComponentStruct::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        int thisLoop = 0;
+        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
+            thisLoop = loop;
+        }
+
+        MinLoad = this->Loop(thisLoop).MinLoad;
+        MaxLoad = this->Loop(thisLoop).MaxLoad;
+        OptLoad = this->Loop(thisLoop).OptLoad;
+    }
+
+    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state,
+                                                                      const EnergyPlus::PlantLocation &calledFromLocation,
+                                                                      [[maybe_unused]] bool FirstHVACIteration,
+                                                                      Real64 &CurLoad,
+                                                                      [[maybe_unused]] bool RunFlag)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   Jan 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // User Defined plant generic component
+
+        if (state.dataGlobal->BeginEnvrnFlag) {
+            this->onInitLoopEquip(state, calledFromLocation);
+        }
+
+        bool anyEMSRan;
+        int thisLoop = 0;
+
+        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
+            thisLoop = loop;
+        }
+
+        this->initialize(state, thisLoop, CurLoad);
+
+        if (thisLoop > 0) {
+            if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
+                EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
+            } else if (this->Loop(thisLoop).simPluginLocation > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
+            }
+        }
+
+        if (this->ErlSimProgramMngr > 0) {
+            EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
+        } else if (this->simPluginLocation > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
+        }
+
+        this->report(state, thisLoop);
+    }
+
+    void SimCoilUserDefined(EnergyPlusData &state,
+                            std::string_view EquipName, // user name for component
+                            int &CompIndex,
+                            int const AirLoopNum,
+                            bool &HeatingActive,
+                            bool &CoolingActive)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   Feb. 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        int CompNum;
+
+        if (state.dataUserDefinedComponents->GetPlantCompInput) {
+            GetUserDefinedPlantComponents(state);
+            state.dataUserDefinedComponents->GetPlantCompInput = false;
+        }
+
+        // Find the correct Equipment
+        if (CompIndex == 0) {
+            CompNum = UtilityRoutines::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
+            if (CompNum == 0) {
+                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
+            }
+            CompIndex = CompNum;
+        } else {
+            CompNum = CompIndex;
+            if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserCoils) {
+                ShowFatalError(state,
+                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      state.dataUserDefinedComponents->NumUserCoils,
+                                      EquipName));
+            }
+            if (state.dataUserDefinedComponents->CheckUserCoilName(CompNum)) {
+                if (EquipName != state.dataUserDefinedComponents->UserCoil(CompNum).Name) {
+                    ShowFatalError(
+                        state,
+                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               EquipName,
+                               state.dataUserDefinedComponents->UserCoil(CompNum).Name));
+                }
+                state.dataUserDefinedComponents->CheckUserCoilName(CompNum) = false;
+            }
+        }
+        bool anyEMSRan;
+        if (state.dataGlobal->BeginEnvrnFlag) {
+            if (state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr > 0) {
+                EMSManager::ManageEMS(state,
+                                      EMSManager::EMSCallFrom::UserDefinedComponentModel,
+                                      anyEMSRan,
+                                      state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr);
+            } else if (state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
+                    state, state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation);
+            }
+
+            if (state.dataUserDefinedComponents->UserCoil(CompNum).PlantIsConnected) {
+
+                PlantUtilities::InitComponentNodes(state,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMin,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMax,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.OutletNodeNum,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopNum,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopSideNum,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.BranchNum,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.CompNum);
+
+                PlantUtilities::RegisterPlantCompDesignFlow(state,
+                                                            state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
+                                                            state.dataUserDefinedComponents->UserCoil(CompNum).Loop.DesignVolumeFlowRate);
+            }
+        }
+
+        state.dataUserDefinedComponents->UserCoil(CompNum).initialize(state);
+
+        if (state.dataUserDefinedComponents->UserCoil(CompNum).ErlSimProgramMngr > 0) {
+            EMSManager::ManageEMS(state,
+                                  EMSManager::EMSCallFrom::UserDefinedComponentModel,
+                                  anyEMSRan,
+                                  state.dataUserDefinedComponents->UserCoil(CompNum).ErlSimProgramMngr);
+        } else if (state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state,
+                                                                               state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
+        }
+
+        state.dataUserDefinedComponents->UserCoil(CompNum).report(state);
+
+        if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
+            // determine if heating or cooling on primary air stream
+            HeatingActive = state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).InletNodeNum).Temp <
+                            state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).OutletNodeNum).Temp;
+
+            Real64 EnthInlet =
+                Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).InletNodeNum).Temp,
+                                           state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).InletNodeNum).HumRat);
+            Real64 EnthOutlet =
+                Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).OutletNodeNum).Temp,
+                                           state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserCoil(CompNum).Air(1).OutletNodeNum).HumRat);
+            CoolingActive = EnthInlet > EnthOutlet;
+        }
+    }
+
+    void SimZoneAirUserDefined(EnergyPlusData &state,
+                               std::string_view CompName,      // name of the packaged terminal heat pump
+                               int const ZoneNum,              // number of zone being served
+                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
+                               Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
+                               int &CompIndex                  // index to zone hvac unit
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   February, 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        int CompNum;
+
+        if (state.dataUserDefinedComponents->GetInput) {
+            GetUserDefinedComponents(state);
+            state.dataUserDefinedComponents->GetInput = false;
+        }
+
+        // Find the correct Equipment
+        if (CompIndex == 0) {
+            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
+            if (CompNum == 0) {
+                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
+            }
+            CompIndex = CompNum;
+        } else {
+            CompNum = CompIndex;
+            if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserZoneAir) {
+                ShowFatalError(state,
+                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      state.dataUserDefinedComponents->NumUserZoneAir,
+                                      CompName));
+            }
+            if (state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum)) {
+                if (CompName != state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name) {
+                    ShowFatalError(
+                        state,
+                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               CompName,
+                               state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name));
+                }
+                state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum) = false;
+            }
+        }
+        bool anyEMSRan;
+        if (state.dataGlobal->BeginEnvrnFlag) {
+            state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
+
+            if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
+                EMSManager::ManageEMS(state,
+                                      EMSManager::EMSCallFrom::UserDefinedComponentModel,
+                                      anyEMSRan,
+                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
+            } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
+                    state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation);
+            }
+            if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
+                for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+
+                    PlantUtilities::InitComponentNodes(state,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMin,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMax,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).CompNum);
+
+                    PlantUtilities::RegisterPlantCompDesignFlow(
+                        state,
+                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
+                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).DesignVolumeFlowRate);
+                }
+            }
+
+        } // BeginEnvrnFlag
+
+        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
+
+        if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
+            EMSManager::ManageEMS(state,
+                                  EMSManager::EMSCallFrom::UserDefinedComponentModel,
+                                  anyEMSRan,
+                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
+        } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
+                state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
+        }
+
+        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report(state);
+
+        // calculate delivered capacity
+        Real64 AirMassFlow =
+            min(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate,
+                state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).MassFlowRate);
+        // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
+        Real64 MinHumRat = min(state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat,
+                               state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat);
+        SensibleOutputProvided =
+            AirMassFlow *
+            (Psychrometrics::PsyHFnTdbW(
+                 state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).Temp, MinHumRat) -
+             Psychrometrics::PsyHFnTdbW(
+                 state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp, MinHumRat));
+
+        Real64 SpecHumOut = state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat;
+        Real64 SpecHumIn = state.dataLoopNodes->Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat;
+        LatentOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
+    }
+
+    void SimAirTerminalUserDefined(EnergyPlusData &state,
+                                   std::string_view CompName,
+                                   [[maybe_unused]] bool const FirstHVACIteration,
+                                   int const ZoneNum,
+                                   [[maybe_unused]] int const ZoneNodeNum,
+                                   int &CompIndex)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   March 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // simulation call for generic air terminal
+
+        int CompNum;
+
+        if (state.dataUserDefinedComponents->GetInput) {
+            GetUserDefinedComponents(state);
+            state.dataUserDefinedComponents->GetInput = false;
+        }
+
+        // Find the correct Equipment
+        if (CompIndex == 0) {
+            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
+            if (CompNum == 0) {
+                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
+            }
+            CompIndex = CompNum;
+        } else {
+            CompNum = CompIndex;
+            if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserAirTerminals) {
+                ShowFatalError(state,
+                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      state.dataUserDefinedComponents->NumUserAirTerminals,
+                                      CompName));
+            }
+            if (state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum)) {
+                if (CompName != state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name) {
+                    ShowFatalError(
+                        state,
+                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               CompName,
+                               state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name));
+                }
+                state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum) = false;
+            }
+        }
+        bool anyEMSRan;
+        if (state.dataGlobal->BeginEnvrnFlag) {
+            state.dataUserDefinedComponents->UserAirTerminal(CompNum).initialize(state, ZoneNum);
+
+            if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
+                EMSManager::ManageEMS(state,
+                                      EMSManager::EMSCallFrom::UserDefinedComponentModel,
+                                      anyEMSRan,
+                                      state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlInitProgramMngr);
+            } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
+                    state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation);
+            }
+            if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections > 0) {
+                for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+
+                    PlantUtilities::InitComponentNodes(state,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMin,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMax,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopNum,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).BranchNum,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).CompNum);
+
+                    PlantUtilities::RegisterPlantCompDesignFlow(
+                        state,
+                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
+                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).DesignVolumeFlowRate);
+                }
+            }
+
+        } // BeginEnvrnFlag
+
+        state.dataUserDefinedComponents->UserAirTerminal(CompNum).initialize(state, ZoneNum);
+
+        if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
+            EMSManager::ManageEMS(state,
+                                  EMSManager::EMSCallFrom::UserDefinedComponentModel,
+                                  anyEMSRan,
+                                  state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlSimProgramMngr);
+        } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
+                state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
+        }
+
+        state.dataUserDefinedComponents->UserAirTerminal(CompNum).report(state);
     }
 
     void UserPlantComponentStruct::initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad)
