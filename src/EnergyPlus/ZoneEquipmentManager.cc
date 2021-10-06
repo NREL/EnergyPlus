@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -142,6 +143,76 @@ using Psychrometrics::PsyHgAirFnWTdb;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
 using Psychrometrics::PsyWFnTdbRhPb;
 using Psychrometrics::PsyWFnTdpPb;
+
+void ManageZoneEquipment(EnergyPlusData &state,
+                         bool const FirstHVACIteration,
+                         bool &SimZone, // Set to false at the end of the routine
+                         bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Russ Taylor
+    //       DATE WRITTEN   May 1997
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Calls the zone thermal control simulations and the interfaces
+    // (water-air, refrigerant-air, steam-air, electric-electric,
+    // water-water, etc)
+
+    if (state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag) {
+        GetZoneEquipment(state);
+        state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag = false;
+        state.dataZoneEquip->ZoneEquipInputsFilled = true;
+    }
+
+    InitZoneEquipment(state, FirstHVACIteration);
+
+    if (state.dataGlobal->ZoneSizingCalc) {
+        SizeZoneEquipment(state);
+    } else {
+        SimZoneEquipment(state, FirstHVACIteration, SimAir);
+        state.dataZoneEquip->ZoneEquipSimulatedOnce = true;
+    }
+
+    UpdateZoneEquipment(state, SimAir);
+
+    SimZone = false;
+}
+
+void GetZoneEquipment(EnergyPlusData &state)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Russ Taylor
+    //       DATE WRITTEN   June 1997
+    //       MODIFIED       Aug 2003, FCW: set ZoneEquipConfig number for each zone
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Get all the system related equipment which may be attached to
+    // a zone
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Counter;
+    int MaxNumOfEquipTypes;
+
+    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
+        GetZoneEquipmentData(state);
+    }
+
+    state.dataZoneEquipmentManager->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+
+    MaxNumOfEquipTypes = 0;
+    for (Counter = 1; Counter <= state.dataGlobal->NumOfZones; ++Counter) {
+        if (!state.dataZoneEquip->ZoneEquipConfig(Counter).IsControlled) continue;
+        MaxNumOfEquipTypes = max(MaxNumOfEquipTypes, state.dataZoneEquip->ZoneEquipList(Counter).NumOfEquipTypes);
+    }
+
+    state.dataZoneEquipmentManager->PrioritySimOrder.allocate(MaxNumOfEquipTypes);
+}
 
 void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // unused 1208
 {
@@ -330,111 +401,6 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
         state.dataAirLoop->AirLoopFlow(airLoop).LeakFlow = 0.0;
         state.dataAirLoop->AirLoopFlow(airLoop).ExcessZoneExhFlow = 0.0;
     }
-}
-
-void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Russ Taylor
-    //       DATE WRITTEN   Nov 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine performs the update for Zone Equipment Management.
-    // Specifically, it transfers the conditions from the zone equipment return air nodes across
-    // to the air loop side, allowing for multiple return air nodes
-
-    // Using/Aliasing
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    using HVACInterfaceManager::UpdateHVACInterface;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneGroupNum;
-    int RetAirPathNum;
-
-    // Transfer the conditions from the zone equipment return air nodes across
-    // to the air loop side, allowing for multiple return air nodes
-    for (ZoneGroupNum = 1; ZoneGroupNum <= NumPrimaryAirSys; ++ZoneGroupNum) {
-        for (RetAirPathNum = 1; RetAirPathNum <= state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).NumReturnNodes; ++RetAirPathNum) {
-            UpdateHVACInterface(state,
-                                ZoneGroupNum,
-                                DataConvergParams::iCalledFrom::AirSystemDemandSide,
-                                state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).ZoneEquipReturnNodeNum(RetAirPathNum),
-                                state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).AirLoopReturnNodeNum(RetAirPathNum),
-                                SimAir);
-        }
-    }
-}
-
-void ManageZoneEquipment(EnergyPlusData &state,
-                         bool const FirstHVACIteration,
-                         bool &SimZone, // Set to false at the end of the routine
-                         bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Russ Taylor
-    //       DATE WRITTEN   May 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Calls the zone thermal control simulations and the interfaces
-    // (water-air, refrigerant-air, steam-air, electric-electric,
-    // water-water, etc)
-
-    if (state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag) {
-        GetZoneEquipment(state);
-        state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag = false;
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
-    InitZoneEquipment(state, FirstHVACIteration);
-
-    if (state.dataGlobal->ZoneSizingCalc) {
-        SizeZoneEquipment(state);
-    } else {
-        SimZoneEquipment(state, FirstHVACIteration, SimAir);
-        state.dataZoneEquip->ZoneEquipSimulatedOnce = true;
-    }
-
-    UpdateZoneEquipment(state, SimAir);
-
-    SimZone = false;
-}
-
-void GetZoneEquipment(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Russ Taylor
-    //       DATE WRITTEN   June 1997
-    //       MODIFIED       Aug 2003, FCW: set ZoneEquipConfig number for each zone
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Get all the system related equipment which may be attached to
-    // a zone
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Counter;
-    int MaxNumOfEquipTypes;
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-    }
-
-    state.dataZoneEquipmentManager->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
-
-    MaxNumOfEquipTypes = 0;
-    for (Counter = 1; Counter <= state.dataGlobal->NumOfZones; ++Counter) {
-        if (!state.dataZoneEquip->ZoneEquipConfig(Counter).IsControlled) continue;
-        MaxNumOfEquipTypes = max(MaxNumOfEquipTypes, state.dataZoneEquip->ZoneEquipList(Counter).NumOfEquipTypes);
-    }
-
-    state.dataZoneEquipmentManager->PrioritySimOrder.allocate(MaxNumOfEquipTypes);
 }
 
 void SizeZoneEquipment(EnergyPlusData &state)
@@ -4335,134 +4301,6 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
     }
 }
 
-void CalcZoneMixingFlowRateOfSourceZone(EnergyPlusData &state, int const ZoneNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Bereket Nigusse
-    //       DATE WRITTEN   February 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine calculates the zone mixing flow rate such that it ensures the zone
-    // air mass balance.
-
-    int Loop;
-    int MixingNum;
-    int ZoneMixingNum;
-    int NumOfSourceZoneMixingObjects;
-    Real64 ZoneSourceMassFlowRate; // current zone as a source mass flow rate for zone mixing in other zones, [kg/s]
-
-    ZoneSourceMassFlowRate = 0.0;
-    NumOfSourceZoneMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject;
-    if (NumOfSourceZoneMixingObjects > 0) {
-        for (ZoneMixingNum = 1; ZoneMixingNum <= NumOfSourceZoneMixingObjects; ++ZoneMixingNum) {
-            MixingNum = state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
-            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                if (Loop == MixingNum) {
-                    ZoneSourceMassFlowRate += state.dataHeatBal->Mixing(Loop).MixingMassFlowRate;
-                }
-            }
-        }
-    }
-    state.dataHeatBal->MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
-}
-
-void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int const ZoneNum, Real64 &ZoneMixingMassFlowRate)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Bereket Nigusse
-    //       DATE WRITTEN   February 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine updates the receiving zone mixing flow rate to ensure the zone
-    // air mass balance.
-
-    int Loop;
-    int MixingNum;
-    int NumOfReceivingZoneMixingObjects;
-    Real64 MixingMassFlowRate; // current zone mixing mass flow rate, [kg/s]
-
-    MixingMassFlowRate = 0.0;
-    NumOfReceivingZoneMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumReceivingZonesMixingObject;
-    if (NumOfReceivingZoneMixingObjects > 0) {
-        // distribute the total zone mixing flow rate to the source zones
-        for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
-            MixingNum = state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
-            state.dataHeatBal->Mixing(MixingNum).MixingMassFlowRate =
-                state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
-            MixingMassFlowRate += state.dataHeatBal->Mixing(MixingNum).MixingMassFlowRate;
-            CalcZoneMixingFlowRateOfSourceZone(state, state.dataHeatBal->Mixing(MixingNum).FromZone);
-        }
-    }
-    state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
-    ZoneMixingMassFlowRate = MixingMassFlowRate;
-}
-
-void CalcZoneInfiltrationFlows(EnergyPlusData &state,
-                               int const ZoneNum,                // current zone index
-                               Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
-)
-{
-    Real64 const ConvergenceTolerance(0.000010);
-    Real64 ZoneInfiltrationMassFlowRate = 0.0;
-
-    // Set zone infiltration flow rate
-    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) {
-        if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {
-            if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone ||
-                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::AllZones)) {
-                ZoneInfiltrationMassFlowRate = state.dataHeatBal->MassConservation(ZoneNum).MixingSourceMassFlowRate -
-                                               state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate +
-                                               state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
-                                               state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
-                    if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
-                        state.dataHeatBalFanSys->ZoneInfiltrationFlag(ZoneNum) = true;
-                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-                        state.dataHeatBal->MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
-                            ZoneInfiltrationMassFlowRate;
-                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
-                            max(0.0, state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
-                    } else {
-                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
-                    }
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
-                    if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
-                        state.dataHeatBalFanSys->ZoneInfiltrationFlag(ZoneNum) = true;
-                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-                        state.dataHeatBal->MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate +=
-                            ZoneInfiltrationMassFlowRate;
-                    } else {
-                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                    }
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
-                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                }
-            } else {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
-                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate =
-                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
-                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
-                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                }
-            }
-        } else {
-            // Zone has no infiltration objects
-            state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-        }
-    }
-}
-
 void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 {
 
@@ -5015,6 +4853,66 @@ void CalcZoneReturnFlows(EnergyPlusData &state,
     }
 }
 
+void CalcZoneInfiltrationFlows(EnergyPlusData &state,
+                               int const ZoneNum,                // current zone index
+                               Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
+)
+{
+    Real64 const ConvergenceTolerance(0.000010);
+    Real64 ZoneInfiltrationMassFlowRate = 0.0;
+
+    // Set zone infiltration flow rate
+    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No) {
+        if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {
+            if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone ||
+                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::AllZones)) {
+                ZoneInfiltrationMassFlowRate = state.dataHeatBal->MassConservation(ZoneNum).MixingSourceMassFlowRate -
+                                               state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate +
+                                               state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
+                                               state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
+                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
+                    if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
+                        state.dataHeatBalFanSys->ZoneInfiltrationFlag(ZoneNum) = true;
+                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+                        state.dataHeatBal->MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
+                            ZoneInfiltrationMassFlowRate;
+                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
+                            max(0.0, state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
+                    } else {
+                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
+                    }
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
+                    if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
+                        state.dataHeatBalFanSys->ZoneInfiltrationFlag(ZoneNum) = true;
+                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+                        state.dataHeatBal->MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate +=
+                            ZoneInfiltrationMassFlowRate;
+                    } else {
+                        state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    }
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::No) {
+                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                }
+            } else {
+                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
+                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate =
+                        state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
+                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::No) {
+                    state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                }
+            }
+        } else {
+            // Zone has no infiltration objects
+            state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+        }
+    }
+}
+
 void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIteration)
 {
 
@@ -5072,7 +4970,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
 
             // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
             // Add sensible heat gain from refrigerated cases with under case returns
-            SumAllReturnAirConvectionGains(state, ActualZoneNum, QRetAir, ReturnNode);
+            QRetAir = SumAllReturnAirConvectionGains(state, ActualZoneNum, ReturnNode);
 
             // Need to add the energy to the return air from lights and from airflow windows. Where the heat
             // is added depends on if there is system flow or not.  If there is system flow the heat is added
@@ -5177,7 +5075,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             // Include impact of under case returns for refrigerated display case when updating the return air node humidity
             if (!state.dataHeatBal->Zone(ActualZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0) {
-                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                     H2OHtOfVap = PsyHgAirFnWTdb(state.dataLoopNodes->Node(ZoneNode).HumRat, state.dataLoopNodes->Node(ReturnNode).Temp);
                     state.dataLoopNodes->Node(ReturnNode).HumRat =
                         state.dataLoopNodes->Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
@@ -5187,7 +5085,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                     state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone +=
                         state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
-                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                     state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
@@ -5195,7 +5093,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                 state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone +=
                     state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
-                SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                 state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
             }
 
@@ -5214,55 +5112,37 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
     }
 }
 
-void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum) // Zone Air Balance Outdoor index
+void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir)
 {
-
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Lixing Gu
-    //       DATE WRITTEN   July 2010
+    //       AUTHOR         Russ Taylor
+    //       DATE WRITTEN   Nov 1997
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine gets node numbers of stand alone ERVs to calculate combined outdoor air flows.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses program data structures ZoneEquipInfo
+    // This subroutine performs the update for Zone Equipment Management.
+    // Specifically, it transfers the conditions from the zone equipment return air nodes across
+    // to the air loop side, allowing for multiple return air nodes
 
     // Using/Aliasing
-    using DataHeatBalance::AirBalanceQuadrature;
-    using DataZoneEquipment::ERVStandAlone_Num;
-    using HVACStandAloneERV::GetStandAloneERVOutAirNode;
-    using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
+    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    using HVACInterfaceManager::UpdateHVACInterface;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNum(0); // zone index
-    int j;          // index
-    int I;          // index
+    int ZoneGroupNum;
+    int RetAirPathNum;
 
-    if (allocated(state.dataZoneEquip->ZoneEquipList)) {
-        ZoneNum = state.dataHeatBal->ZoneAirBalance(OutdoorNum).ZonePtr;
-        state.dataHeatBal->ZoneAirBalance(OutdoorNum).OneTimeFlag = true;
-        if (state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes > 0) {
-            for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
-                if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
-                    ++state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs;
-                }
-            }
-            if (state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs > 0) {
-                state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVInletNode.allocate(state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs);
-                state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVExhaustNode.allocate(state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs);
-                j = 1;
-                for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
-                    if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
-                        state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVInletNode(j) =
-                            GetStandAloneERVOutAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
-                        state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVExhaustNode(j) =
-                            GetStandAloneERVReturnAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
-                        ++j;
-                    }
-                }
-            }
+    // Transfer the conditions from the zone equipment return air nodes across
+    // to the air loop side, allowing for multiple return air nodes
+    for (ZoneGroupNum = 1; ZoneGroupNum <= NumPrimaryAirSys; ++ZoneGroupNum) {
+        for (RetAirPathNum = 1; RetAirPathNum <= state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).NumReturnNodes; ++RetAirPathNum) {
+            UpdateHVACInterface(state,
+                                ZoneGroupNum,
+                                DataConvergParams::iCalledFrom::AirSystemDemandSide,
+                                state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).ZoneEquipReturnNodeNum(RetAirPathNum),
+                                state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).AirLoopReturnNodeNum(RetAirPathNum),
+                                SimAir);
         }
     }
 }
@@ -5586,7 +5466,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (j == I) state.dataHeatBal->Ventilation(j).HybridControlMasterStatus = true;
         }
 
-        if (state.dataHeatBal->Ventilation(j).ModelType == VentilationDesignFlowRate) {
+        if (state.dataHeatBal->Ventilation(j).ModelType == DataHeatBalance::VentilationModelType::DesignFlowRate) {
             // CR6845 if calculated < 0, don't propagate.
             VVF = state.dataHeatBal->Ventilation(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(j).SchedPtr);
 
@@ -5669,7 +5549,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 state.dataHeatBalFanSys->MCPTV(NZ) += state.dataZoneEquip->VentMCP(j) * state.dataHeatBal->Ventilation(j).AirTemp;
         }
 
-        if (state.dataHeatBal->Ventilation(j).ModelType == VentilationWindAndStack) {
+        if (state.dataHeatBal->Ventilation(j).ModelType == DataHeatBalance::VentilationModelType::WindAndStack) {
             if (state.dataHeatBal->Ventilation(j).OpenEff != DataGlobalConstants::AutoCalculate) {
                 Cw = state.dataHeatBal->Ventilation(j).OpenEff;
             } else {
@@ -6205,7 +6085,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         {
             auto const SELECT_CASE_var(state.dataHeatBal->Infiltration(j).ModelType);
 
-            if (SELECT_CASE_var == InfiltrationDesignFlowRate) {
+            if (SELECT_CASE_var == DataHeatBalance::InfiltrationModelType::DesignFlowRate) {
 
                 IVF = state.dataHeatBal->Infiltration(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr);
                 // CR6845 if calculated < 0.0, don't propagate
@@ -6219,13 +6099,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                 state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         // if ( Infiltration(j).MassFlowRate > 0.0 ) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
                         MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
                         //}
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate =
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate +
                             state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
@@ -6233,7 +6113,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     }
                 }
                 state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-            } else if (SELECT_CASE_var == InfiltrationShermanGrimsrud) {
+            } else if (SELECT_CASE_var == DataHeatBalance::InfiltrationModelType::ShermanGrimsrud) {
                 // Sherman Grimsrud model as formulated in ASHRAE HoF
                 WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
                 IVF = GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr) * state.dataHeatBal->Infiltration(j).LeakageArea /
@@ -6245,13 +6125,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                 state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         if (state.dataHeatBal->Infiltration(j).MassFlowRate > 0.0) {
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
                             MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
                         }
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate =
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate +
                             state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
@@ -6259,7 +6139,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     }
                 }
                 state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-            } else if (SELECT_CASE_var == InfiltrationAIM2) {
+            } else if (SELECT_CASE_var == DataHeatBalance::InfiltrationModelType::AIM2) {
                 // Walker Wilson model as formulated in ASHRAE HoF
                 IVF = GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr) *
                       std::sqrt(
@@ -6273,13 +6153,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                 state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         if (state.dataHeatBal->Infiltration(j).MassFlowRate > 0.0) {
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
                             MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
                         }
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate =
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate +
                             state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
@@ -6316,7 +6196,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
     // Calculate combined outdoor air flows
     for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
-        if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature) {
+        if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == AirBalance::Quadrature) {
             if (!state.dataHeatBal->ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(state, j);
             if (state.dataHeatBal->ZoneAirBalance(j).NumOfERVs > 0) {
                 for (I = 1; I <= state.dataHeatBal->ZoneAirBalance(j).NumOfERVs; ++I) {
@@ -6344,45 +6224,124 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     }
 }
 
-void ReportZoneSizingDOASInputs(EnergyPlusData &state,
-                                std::string const &ZoneName,         // the name of the zone
-                                std::string const &DOASCtrlStrategy, // DOAS control strategy
-                                Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
-                                Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
-)
+void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum) // Zone Air Balance Outdoor index
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   March 2016
+    //       AUTHOR         Lixing Gu
+    //       DATE WRITTEN   July 2010
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine writes the DOAS Sizing:Zone input for 1 zone to the eio file
+    // This subroutine gets node numbers of stand alone ERVs to calculate combined outdoor air flows.
+
+    // METHODOLOGY EMPLOYED:
+    // Uses program data structures ZoneEquipInfo
 
     // Using/Aliasing
+    using DataZoneEquipment::ERVStandAlone_Num;
+    using HVACStandAloneERV::GetStandAloneERVOutAirNode;
+    using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
 
-    // Formats
-    static constexpr std::string_view Format_990(
-        "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
-        "{C}, DOAS Design High Setpoint Temperature {C} ");
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int ZoneNum(0); // zone index
+    int j;          // index
+    int I;          // index
 
-    if (state.dataZoneEquipmentManager->reportDOASZoneSizingHeader) {
-        print(state.files.eio, "{}\n", Format_990);
-        state.dataZoneEquipmentManager->reportDOASZoneSizingHeader = false;
+    if (allocated(state.dataZoneEquip->ZoneEquipList)) {
+        ZoneNum = state.dataHeatBal->ZoneAirBalance(OutdoorNum).ZonePtr;
+        state.dataHeatBal->ZoneAirBalance(OutdoorNum).OneTimeFlag = true;
+        if (state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes > 0) {
+            for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
+                if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
+                    ++state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs;
+                }
+            }
+            if (state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs > 0) {
+                state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVInletNode.allocate(state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs);
+                state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVExhaustNode.allocate(state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs);
+                j = 1;
+                for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
+                    if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
+                        state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVInletNode(j) =
+                            GetStandAloneERVOutAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
+                        state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVExhaustNode(j) =
+                            GetStandAloneERVReturnAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
+                        ++j;
+                    }
+                }
+            }
+        }
     }
+}
 
-    static constexpr std::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
-    print(state.files.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
+void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int const ZoneNum, Real64 &ZoneMixingMassFlowRate)
+{
 
-    // BSLLC Start
-    // if ( sqlite ) {
-    //     state.dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow,
-    //     DesDayName, PeakHrMin,
-    //         PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
-    // }
-    // BSLLC Finish
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Bereket Nigusse
+    //       DATE WRITTEN   February 2014
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine updates the receiving zone mixing flow rate to ensures the zone
+    // air mass balance.
+
+    int Loop;
+    int MixingNum;
+    int NumOfReceivingZoneMixingObjects;
+    Real64 MixingMassFlowRate; // current zone mixing mass flow rate, [kg/s]
+
+    MixingMassFlowRate = 0.0;
+    NumOfReceivingZoneMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+    if (NumOfReceivingZoneMixingObjects > 0) {
+        // distribute the total zone mixing flow rate to the source zones
+        for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
+            MixingNum = state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
+            state.dataHeatBal->Mixing(MixingNum).MixingMassFlowRate =
+                state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
+            MixingMassFlowRate += state.dataHeatBal->Mixing(MixingNum).MixingMassFlowRate;
+            CalcZoneMixingFlowRateOfSourceZone(state, state.dataHeatBal->Mixing(MixingNum).FromZone);
+        }
+    }
+    state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
+    ZoneMixingMassFlowRate = MixingMassFlowRate;
+}
+
+void CalcZoneMixingFlowRateOfSourceZone(EnergyPlusData &state, int const ZoneNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Bereket Nigusse
+    //       DATE WRITTEN   February 2014
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine calculates the zone mixing flow rate such that it ensures the zone
+    // air mass balance.
+
+    int Loop;
+    int MixingNum;
+    int ZoneMixingNum;
+    int NumOfSourceZoneMixingObjects;
+    Real64 ZoneSourceMassFlowRate; // current zone as a source mass flow rate for zone mixing in other zones, [kg/s]
+
+    ZoneSourceMassFlowRate = 0.0;
+    NumOfSourceZoneMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject;
+    if (NumOfSourceZoneMixingObjects > 0) {
+        for (ZoneMixingNum = 1; ZoneMixingNum <= NumOfSourceZoneMixingObjects; ++ZoneMixingNum) {
+            MixingNum = state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
+            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+                if (Loop == MixingNum) {
+                    ZoneSourceMassFlowRate += state.dataHeatBal->Mixing(Loop).MixingMassFlowRate;
+                }
+            }
+        }
+    }
+    state.dataHeatBal->MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
 }
 
 void AutoCalcDOASControlStrategy(EnergyPlusData &state)
@@ -6472,6 +6431,47 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
     if (ErrorsFound) {
         ShowFatalError(state, "Errors found in DOAS sizing input. Program terminates.");
     }
+}
+
+void ReportZoneSizingDOASInputs(EnergyPlusData &state,
+                                std::string const &ZoneName,         // the name of the zone
+                                std::string const &DOASCtrlStrategy, // DOAS control strategy
+                                Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
+                                Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   March 2016
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine writes the DOAS Sizing:Zone input for 1 zone to the eio file
+
+    // Using/Aliasing
+
+    // Formats
+    static constexpr std::string_view Format_990(
+        "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
+        "{C}, DOAS Design High Setpoint Temperature {C} ");
+
+    if (state.dataZoneEquipmentManager->reportDOASZoneSizingHeader) {
+        print(state.files.eio, "{}\n", Format_990);
+        state.dataZoneEquipmentManager->reportDOASZoneSizingHeader = false;
+    }
+
+    static constexpr std::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
+    print(state.files.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
+
+    // BSLLC Start
+    // if ( sqlite ) {
+    //     state.dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow,
+    //     DesDayName, PeakHrMin,
+    //         PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
+    // }
+    // BSLLC Finish
 }
 
 } // namespace EnergyPlus::ZoneEquipmentManager

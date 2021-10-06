@@ -58,6 +58,7 @@
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -97,6 +98,25 @@ namespace CrossVentMgr {
     Real64 constexpr CrecTemp(1.385);  // Correlation constant for the recirculation temperature rise
     Real64 constexpr CrecFlow1(0.415); // First correlation constant for the recirculation flow rate
     Real64 constexpr CrecFlow2(0.466); // Second correlation constant for the recirculation flow rate
+
+    void ManageUCSDCVModel(EnergyPlusData &state,
+                           int const ZoneNum) // index number for the specified zone
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         G. Carrilho da Graca
+        //       DATE WRITTEN   October 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   manage the UCSD Cross Ventilation model
+
+        InitUCSDCV(state, ZoneNum);
+
+        // perform Cross Ventilation model calculations
+        CalcUCSDCV(state, ZoneNum);
+    }
 
     void InitUCSDCV(EnergyPlusData &state, int const ZoneNum)
     {
@@ -328,203 +348,6 @@ namespace CrossVentMgr {
                 state.dataRoomAirMod->CVHcIn(SurfNum) = state.dataUCSDShared->HFloor(Ctd);
             } // END FLOOR
         }
-    }
-
-    void CalcUCSDCV(EnergyPlusData &state,
-                    int const ZoneNum) // Which Zonenum
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         G. Carrilho da Graca
-        //       DATE WRITTEN   October 2004
-        //       MODIFIED       8/2013 - Sam Brunswick
-        //                      To incorporate improved temperature calculations
-        //       RE-ENGINEERED  -
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Subroutine for cross ventilation modelling.
-
-        // REFERENCES:
-        // Model developed by Paul Linden (UCSD), G. Carrilho da Graca (UCSD) and P. Haves (LBL).
-        // Work funded by the California Energy Comission. More information on the model can found in:
-        // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graca, Ph.D. thesis UCSD. December 2003.
-
-        using namespace DataHeatBalFanSys;
-        using namespace DataEnvironment;
-        using namespace DataHeatBalance;
-        using InternalHeatGains::SumAllInternalConvectionGains;
-        using InternalHeatGains::SumAllReturnAirConvectionGains;
-        using Psychrometrics::PsyCpAirFnW;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using ScheduleManager::GetCurrentScheduleValue;
-        using ScheduleManager::GetScheduleIndex;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 GainsFrac;    // Fraction of lower subzone internal gains that mix as opposed to forming plumes
-        Real64 ConvGains;    // Total convective gains in the room
-        Real64 ConvGainsJet; // Total convective gains released in jet subzone
-        Real64 ConvGainsRec; // Total convective gains released in recirculation subzone
-        Real64 MCp_Total;    // Total capacity rate into the zone - assumed to enter at low level
-        Real64 ZTAveraged;
-
-        auto &Zone(state.dataHeatBal->Zone);
-
-        int Ctd;
-        Real64 MCpT_Total;
-        Real64 L;
-        Real64 ZoneMult; // total zone multiplier
-        Real64 RetAirConvGain;
-
-        GainsFrac = 0.0;
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-
-        for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
-            if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
-                GainsFrac = GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneUCSDCV(Ctd).SchedGainsPtr);
-            }
-        }
-
-        SumAllInternalConvectionGains(state, ZoneNum, ConvGains);
-        ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
-                     state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
-
-        // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
-        if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
-            ConvGains += RetAirConvGain;
-        }
-
-        ConvGainsJet = ConvGains * GainsFrac;
-        ConvGainsRec = ConvGains * (1.0 - GainsFrac);
-        MCp_Total = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
-                    state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
-        MCpT_Total = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
-                     state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
-            MCp_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
-            MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
-                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
-                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
-        }
-
-        EvolveParaUCSDCV(state, ZoneNum);
-        L = state.dataRoomAirMod->Droom(ZoneNum);
-
-        if (state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel) {
-            //=============================== CROSS VENTILATION  Calculation ==============================================
-            state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 0.0;
-            state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 1.0;
-            for (Ctd = 1; Ctd <= 4; ++Ctd) {
-                HcUCSDCV(state, ZoneNum);
-                if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) != 1.0) {
-                    state.dataRoomAirMod->ZTREC(ZoneNum) =
-                        (ConvGainsRec * CrecTemp + CrecTemp * state.dataCrossVentMgr->HAT_R + state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total) /
-                        (CrecTemp * state.dataCrossVentMgr->HA_R + MCp_Total);
-                }
-                state.dataRoomAirMod->ZTJET(ZoneNum) = (ConvGainsJet * CjetTemp + ConvGainsRec * CjetTemp + CjetTemp * state.dataCrossVentMgr->HAT_J +
-                                                        CjetTemp * state.dataCrossVentMgr->HAT_R + state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total -
-                                                        CjetTemp * state.dataCrossVentMgr->HA_R * state.dataRoomAirMod->ZTREC(ZoneNum)) /
-                                                       (CjetTemp * state.dataCrossVentMgr->HA_J + MCp_Total);
-                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) =
-                    (ConvGainsJet + ConvGainsRec + state.dataCrossVentMgr->HAT_J + state.dataCrossVentMgr->HAT_R +
-                     state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total - state.dataCrossVentMgr->HA_J * state.dataRoomAirMod->ZTJET(ZoneNum) -
-                     state.dataCrossVentMgr->HA_R * state.dataRoomAirMod->ZTREC(ZoneNum)) /
-                    MCp_Total;
-            }
-            if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) == 1.0) {
-                state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(ZoneNum);
-                state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
-                state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
-            }
-            // If temperature increase is above 1.5C then go to mixing
-            if (state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) - state.dataRoomAirMod->Tin(ZoneNum) > 1.5) {
-                state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 1.0;
-                state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
-                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-                state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
-                state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
-                state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
-                state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-                for (auto &e : state.dataRoomAirMod->CVJetRecFlows) {
-                    e.Ujet = 0.0;
-                    e.Urec = 0.0;
-                }
-                for (Ctd = 1; Ctd <= 3; ++Ctd) {
-                    ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                    HcUCSDCV(state, ZoneNum);
-                    ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                }
-            }
-        } else {
-            //=============================== M I X E D  Calculation ======================================================
-            state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 1.0;
-            state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
-            state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
-            state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
-            state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
-            state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-            for (auto &e : state.dataRoomAirMod->CVJetRecFlows) {
-                e.Ujet = 0.0;
-                e.Urec = 0.0;
-            }
-            for (Ctd = 1; Ctd <= 3; ++Ctd) {
-                ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
-                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                HcUCSDCV(state, ZoneNum);
-                ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
-                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-            }
-        }
-    }
-
-    void ManageUCSDCVModel(EnergyPlusData &state,
-                           int const ZoneNum) // index number for the specified zone
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         G. Carrilho da Graca
-        //       DATE WRITTEN   October 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   manage the UCSD Cross Ventilation model
-
-        InitUCSDCV(state, ZoneNum);
-
-        // perform Cross Ventilation model calculations
-        CalcUCSDCV(state, ZoneNum);
     }
 
     void EvolveParaUCSDCV(EnergyPlusData &state, int const ZoneNum)
@@ -1032,6 +855,184 @@ namespace CrossVentMgr {
                     state.dataRoomAirMod->Tin(ZoneNum) = state.dataHeatBalFanSys->MAT(
                         state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(MaxSurf).SurfNum).Zone);
                 }
+            }
+        }
+    }
+
+    void CalcUCSDCV(EnergyPlusData &state,
+                    int const ZoneNum) // Which Zonenum
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         G. Carrilho da Graca
+        //       DATE WRITTEN   October 2004
+        //       MODIFIED       8/2013 - Sam Brunswick
+        //                      To incorporate improved temperature calculations
+        //       RE-ENGINEERED  -
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Subroutine for cross ventilation modelling.
+
+        // REFERENCES:
+        // Model developed by Paul Linden (UCSD), G. Carrilho da Graca (UCSD) and P. Haves (LBL).
+        // Work funded by the California Energy Comission. More information on the model can found in:
+        // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graca, Ph.D. thesis UCSD. December 2003.
+
+        using namespace DataHeatBalFanSys;
+        using namespace DataEnvironment;
+        using namespace DataHeatBalance;
+        using InternalHeatGains::SumAllInternalConvectionGains;
+        using InternalHeatGains::SumAllReturnAirConvectionGains;
+        using Psychrometrics::PsyCpAirFnW;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
+        using ScheduleManager::GetCurrentScheduleValue;
+        using ScheduleManager::GetScheduleIndex;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 GainsFrac;    // Fraction of lower subzone internal gains that mix as opposed to forming plumes
+        Real64 ConvGains;    // Total convective gains in the room
+        Real64 ConvGainsJet; // Total convective gains released in jet subzone
+        Real64 ConvGainsRec; // Total convective gains released in recirculation subzone
+        Real64 MCp_Total;    // Total capacity rate into the zone - assumed to enter at low level
+        Real64 ZTAveraged;
+
+        auto &Zone(state.dataHeatBal->Zone);
+
+        int Ctd;
+        Real64 MCpT_Total;
+        Real64 L;
+        Real64 ZoneMult; // total zone multiplier
+        Real64 RetAirConvGain;
+
+        GainsFrac = 0.0;
+        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+
+        for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
+            if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
+                GainsFrac = GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneUCSDCV(Ctd).SchedGainsPtr);
+            }
+        }
+
+        ConvGains = SumAllInternalConvectionGains(state, ZoneNum);
+        ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
+                     state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
+
+        // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
+        if (Zone(ZoneNum).NoHeatToReturnAir) {
+            RetAirConvGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
+            ConvGains += RetAirConvGain;
+        }
+
+        ConvGainsJet = ConvGains * GainsFrac;
+        ConvGainsRec = ConvGains * (1.0 - GainsFrac);
+        MCp_Total = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
+                    state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
+        MCpT_Total = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
+                     state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
+                     state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
+
+        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+            MCp_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
+            MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
+                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
+                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
+        }
+
+        EvolveParaUCSDCV(state, ZoneNum);
+        L = state.dataRoomAirMod->Droom(ZoneNum);
+
+        if (state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel) {
+            //=============================== CROSS VENTILATION  Calculation ==============================================
+            state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 0.0;
+            state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 1.0;
+            for (Ctd = 1; Ctd <= 4; ++Ctd) {
+                HcUCSDCV(state, ZoneNum);
+                if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) != 1.0) {
+                    state.dataRoomAirMod->ZTREC(ZoneNum) =
+                        (ConvGainsRec * CrecTemp + CrecTemp * state.dataCrossVentMgr->HAT_R + state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total) /
+                        (CrecTemp * state.dataCrossVentMgr->HA_R + MCp_Total);
+                }
+                state.dataRoomAirMod->ZTJET(ZoneNum) = (ConvGainsJet * CjetTemp + ConvGainsRec * CjetTemp + CjetTemp * state.dataCrossVentMgr->HAT_J +
+                                                        CjetTemp * state.dataCrossVentMgr->HAT_R + state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total -
+                                                        CjetTemp * state.dataCrossVentMgr->HA_R * state.dataRoomAirMod->ZTREC(ZoneNum)) /
+                                                       (CjetTemp * state.dataCrossVentMgr->HA_J + MCp_Total);
+                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) =
+                    (ConvGainsJet + ConvGainsRec + state.dataCrossVentMgr->HAT_J + state.dataCrossVentMgr->HAT_R +
+                     state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total - state.dataCrossVentMgr->HA_J * state.dataRoomAirMod->ZTJET(ZoneNum) -
+                     state.dataCrossVentMgr->HA_R * state.dataRoomAirMod->ZTREC(ZoneNum)) /
+                    MCp_Total;
+            }
+            if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) == 1.0) {
+                state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(ZoneNum);
+                state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
+                state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
+            }
+            // If temperature increase is above 1.5C then go to mixing
+            if (state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) - state.dataRoomAirMod->Tin(ZoneNum) > 1.5) {
+                state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 1.0;
+                state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
+                state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
+                state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
+                state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
+                state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
+                for (auto &e : state.dataRoomAirMod->CVJetRecFlows) {
+                    e.Ujet = 0.0;
+                    e.Urec = 0.0;
+                }
+                for (Ctd = 1; Ctd <= 3; ++Ctd) {
+                    ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
+                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                    HcUCSDCV(state, ZoneNum);
+                    ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
+                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                    state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                }
+            }
+        } else {
+            //=============================== M I X E D  Calculation ======================================================
+            state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 1.0;
+            state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
+            state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
+            state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
+            state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
+            state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
+            for (auto &e : state.dataRoomAirMod->CVJetRecFlows) {
+                e.Ujet = 0.0;
+                e.Urec = 0.0;
+            }
+            for (Ctd = 1; Ctd <= 3; ++Ctd) {
+                ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
+                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                HcUCSDCV(state, ZoneNum);
+                ZTAveraged = state.dataHeatBalFanSys->MAT(ZoneNum);
+                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
+                state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
             }
         }
     }

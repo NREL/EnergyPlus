@@ -170,543 +170,6 @@ namespace DaylightingDevices {
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::SurfaceClass;
 
-    Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
-                             Real64 const A,    // Aspect ratio, L / d
-                             Real64 const Theta // Angle of entry in radians
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   May 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the numerical integral for the transmittance of a reflective cylinder with
-        // incident collimated beam radiation as described in Swift and Smith.
-
-        // METHODOLOGY EMPLOYED:
-        // Since this integral can be slow, a table of values is calculated and stored during
-        // initialization of the TDD.  Intermediate values are calculated by interpolation.
-        // Transmittance of sky and ground diffuse radiation is done by other functions.
-
-        // REFERENCES:
-        // Swift, P. D., and Smith, G. B.  "Cylindrical Mirror Light Pipes",
-        //   Solar Energy Materials and Solar Cells 36 (1995), pp. 159-168.
-
-        // OTHER NOTES:
-        // The execution time of this function can be reduced by adjusting parameters N and xTol below.
-        // However, there is some penalty in accuracy for N < 100,000 and xTol > 150.
-
-        // USE STATEMENTS: na
-
-        // Return value
-        Real64 CalcPipeTransBeam;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const N(100000.0); // Number of integration points
-        Real64 const xTol(150.0); // Tolerance factor to skip iterations where dT is approximately 0
-        // Must be >= 1.0, increase this number to decrease the execution time
-        Real64 const myLocalTiny(TINY(1.0));
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 i; // Integration interval between points
-        Real64 s; // Entry point
-        Real64 dT;
-        Real64 T; // Beam transmittance for collimated solar real
-        Real64 x; // Intermediate variables for speed optimization
-        Real64 c1;
-        Real64 c2;
-        Real64 xLimit; // Limiting x value to prevent floating point underflow
-
-        CalcPipeTransBeam = 0.0;
-
-        T = 0.0;
-        i = 1.0 / N;
-
-        xLimit = (std::log(pow_2(N) * myLocalTiny) / std::log(R)) / xTol;
-
-        c1 = A * std::tan(Theta);
-        c2 = 4.0 / DataGlobalConstants::Pi;
-
-        s = i;
-        while (s < (1.0 - i)) {
-            x = c1 / s;
-
-            if (x < xLimit) {
-                dT = c2 * std::pow(R, int(x)) * (1.0 - (1.0 - R) * (x - int(x))) * pow_2(s) / std::sqrt(1.0 - pow_2(s));
-                T += dT;
-            }
-
-            s += i;
-        }
-
-        T /= (N - 1.0); // - 1.0, because started on i, not 0
-
-        CalcPipeTransBeam = T;
-
-        return CalcPipeTransBeam;
-    }
-
-    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the transmittance of sky isotropic radiation for use with the anisotropic sky transmittance.
-        // This value is also used for all ground reflected solar radiation (which is isotropic).
-
-        // METHODOLOGY EMPLOYED:
-        // The transmittance is calculated and stored once at initialization because the value is a constant.
-        // The routine numerically integrates over the entire sky.  All radiation is isotropic, but incident
-        // angle varies over the hemisphere.
-        // Trans = Flux Transmitted / Flux Incident
-        // Not sure if shading and tilt is adequately accounted for by DifShdgRatioIsoSky later on or not...
-
-        // REFERENCES:
-        // See AnisoSkyViewFactors in SolarShading.cc.
-
-        // USE STATEMENTS: na
-
-        // Return value
-        Real64 CalcTDDTransSolIso;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        int const NPH(1000); // Number of altitude integration points
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 FluxInc = 0.0;   // Incident solar flux
-        Real64 FluxTrans = 0.0; // Transmitted solar flux
-        Real64 trans;           // Total beam solar transmittance of TDD
-        Real64 COSI;            // Cosine of incident angle
-        Real64 SINI;            // Sine of incident angle
-
-        Real64 const dPH = 90.0 * DataGlobalConstants::DegToRadians / NPH; // Altitude angle of sky element
-        Real64 PH = 0.5 * dPH;                                             // Altitude angle increment
-
-        // Integrate from 0 to Pi/2 altitude
-        for (int N = 1; N <= NPH; ++N) {
-            COSI = std::cos(DataGlobalConstants::PiOvr2 - PH);
-            SINI = std::sin(DataGlobalConstants::PiOvr2 - PH);
-
-            Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
-
-            // Calculate total TDD transmittance for given angle
-            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam);
-
-            FluxInc += P * SINI * dPH;
-            FluxTrans += trans * P * SINI * dPH;
-
-            PH += dPH; // Increment the altitude angle
-        }              // N
-
-        CalcTDDTransSolIso = FluxTrans / FluxInc;
-
-        return CalcTDDTransSolIso;
-    }
-
-    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the transmittance of sky horizon radiation for use with the anisotropic sky transmittance.
-
-        // METHODOLOGY EMPLOYED:
-        // The transmittance is calculated and stored once at initialization because the value is a constant.
-        // The routine numerically integrates over the horizon as an infinitesimally narrow strip of the sky.
-        // Horizon radiation is isotropic, but incident angle varies over the semicircle.
-        // Trans = Flux Transmitted / Flux Incident
-        // Not sure if shading is adequately accounted for by DifShdgRatioHoriz later on or not...
-
-        // REFERENCES:
-        // See AnisoSkyViewFactors in SolarShading.cc.
-
-        // Using/Aliasing
-        using namespace DataSurfaces;
-
-        // Return value
-        Real64 CalcTDDTransSolHorizon;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        int const NTH(18); // Number of azimuth integration points
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 FluxInc = 0.0;   // Incident solar flux
-        Real64 FluxTrans = 0.0; // Transmitted solar flux
-        Real64 CosPhi;          // Cosine of TDD:DOME altitude angle
-        Real64 Theta;           // TDD:DOME azimuth angle
-
-        CosPhi = std::cos(DataGlobalConstants::PiOvr2 - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt *
-                                                            DataGlobalConstants::DegToRadians);
-        Theta = state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * DataGlobalConstants::DegToRadians;
-
-        if (CosPhi > 0.01) { // Dome has a view of the horizon
-            // Integrate over the semicircle
-            Real64 const THMIN = Theta - DataGlobalConstants::PiOvr2; // Minimum azimuth integration limit
-            // Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
-            Real64 const dTH = 180.0 * DataGlobalConstants::DegToRadians / NTH; // Azimuth angle increment
-            Real64 TH = THMIN + 0.5 * dTH;                                      // Azimuth angle of sky horizon element
-
-            for (int N = 1; N <= NTH; ++N) {
-                // Calculate incident angle between dome outward normal and horizon element
-                Real64 COSI = CosPhi * std::cos(TH - Theta); // Cosine of the incident angle
-
-                // Calculate total TDD transmittance for given angle
-                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam); // Total beam solar transmittance of TDD
-
-                FluxInc += COSI * dTH;
-                FluxTrans += trans * COSI * dTH;
-
-                TH += dTH; // Increment the azimuth angle
-            }              // N
-
-            CalcTDDTransSolHorizon = FluxTrans / FluxInc;
-
-        } else {                          // Dome is nearly horizontal and has almost no view of the horizon
-            CalcTDDTransSolHorizon = 0.0; // = TransTDD(state, PipeNum, ???, SolarBeam) ! Could change to an angle near the horizon
-        }
-
-        return CalcTDDTransSolHorizon;
-    }
-
-    void GetShelfInput(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Gets the input for light shelves and does some error checking.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStatus;   // Used in GetObjectItem
-        int NumAlphas;  // Number of Alphas for each GetObjectItem call
-        int NumNumbers; // Number of Numbers for each GetObjectItem call
-        int ShelfNum;   // Daylighting shelf object number
-        int SurfNum;    // Window, inside, or outside shelf surfaces
-        int ConstrNum;  // Outside shelf construction object number
-
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-
-        cCurrentModuleObject = "DaylightingDevice:Shelf";
-        state.dataDaylightingDevicesData->NumOfShelf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-
-        if (state.dataDaylightingDevicesData->NumOfShelf > 0) {
-            state.dataDaylightingDevicesData->Shelf.allocate(state.dataDaylightingDevicesData->NumOfShelf);
-
-            for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         ShelfNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(
-                    state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetShelfInputErrorsFound);
-                // Shelf name
-                state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-
-                // Get window object
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
-
-                if (SurfNum == 0) {
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                        state.dataIPShortCut->cAlphaArgs(2) + " not found.");
-                    state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                } else {
-                    if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                            state.dataIPShortCut->cAlphaArgs(2) + " is not of surface type WINDOW.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    }
-
-                    if (state.dataSurface->SurfDaylightingShelfInd(SurfNum) > 0) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                            state.dataIPShortCut->cAlphaArgs(2) + " is referenced by more than one shelf.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    }
-
-                    if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                            state.dataIPShortCut->cAlphaArgs(2) + " must not have a shading control.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    }
-
-                    if (state.dataSurface->Surface(SurfNum).FrameDivider > 0) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                            state.dataIPShortCut->cAlphaArgs(2) + " must not have a frame/divider.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    }
-
-                    if (state.dataSurface->Surface(SurfNum).Sides != 4) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                            state.dataIPShortCut->cAlphaArgs(2) + " must have 4 sides.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    }
-                    if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
-                                            state.dataIPShortCut->cAlphaArgs(2) + " Equivalent Layer Window is not supported.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    }
-
-                    state.dataDaylightingDevicesData->Shelf(ShelfNum).Window = SurfNum;
-                    state.dataSurface->SurfDaylightingShelfInd(SurfNum) = ShelfNum;
-                }
-
-                // Get inside shelf heat transfer surface (optional)
-                if (state.dataIPShortCut->cAlphaArgs(3) != "") {
-                    SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
-
-                    if (SurfNum == 0) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " +
-                                            state.dataIPShortCut->cAlphaArgs(3) + " not found.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    } else {
-                        // No error if shelf belongs to more than one window, e.g. concave corners
-
-                        if (state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " +
-                                                state.dataIPShortCut->cAlphaArgs(3) + " must be its own Outside Boundary Condition Object.");
-                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                        }
-
-                        if (state.dataSurface->Surface(SurfNum).Sides != 4) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " +
-                                                state.dataIPShortCut->cAlphaArgs(3) + " must have 4 sides.");
-                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                        }
-
-                        state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf = SurfNum;
-                    }
-                }
-
-                // Get outside shelf attached shading surface (optional)
-                if (state.dataIPShortCut->cAlphaArgs(4) != "") {
-                    SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->Surface);
-
-                    if (SurfNum == 0) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
-                                            state.dataIPShortCut->cAlphaArgs(4) + " not found.");
-                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                    } else {
-                        // No error if shelf belongs to more than one window, e.g. concave corners
-
-                        if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Shading) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
-                                                state.dataIPShortCut->cAlphaArgs(4) + " is not a Shading:Zone:Detailed object.");
-                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                        }
-
-                        if (state.dataSurface->Surface(SurfNum).SchedShadowSurfIndex > 0) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
-                                                state.dataIPShortCut->cAlphaArgs(4) + " must not have a transmittance schedule.");
-                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                        }
-
-                        if (state.dataSurface->Surface(SurfNum).Sides != 4) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
-                                                state.dataIPShortCut->cAlphaArgs(4) + " must have 4 sides.");
-                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                        }
-
-                        // Get outside shelf construction (required if outside shelf is specified)
-                        if (state.dataIPShortCut->cAlphaArgs(5) != "") {
-                            ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataConstruction->Construct);
-
-                            if (ConstrNum == 0) {
-                                ShowSevereError(state,
-                                                cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                    ":  Outside shelf construction " + state.dataIPShortCut->cAlphaArgs(5) + " not found.");
-                                state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                            } else if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
-                                ShowSevereError(state,
-                                                cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                    ":  Outside shelf construction " + state.dataIPShortCut->cAlphaArgs(5) +
-                                                    " must not have WindowMaterial:Glazing.");
-                                state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                            } else {
-                                state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction = ConstrNum;
-                                state.dataConstruction->Construct(ConstrNum).IsUsed = true;
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ":  Outside shelf requires an outside shelf construction to be specified.");
-                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
-                        }
-
-                        // Get view factor to outside shelf (optional)
-                        if (NumNumbers > 0) {
-                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = state.dataIPShortCut->rNumericArgs(1);
-
-                            if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
-                                ShowWarningError(state,
-                                                 cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                     ":  View factor to outside shelf is zero.  Shelf does not reflect on window.");
-                            }
-                        } else {
-                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor =
-                                -1.0; // Flag to have the view factor calculated during initialization
-                        }
-
-                        state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf = SurfNum;
-
-                        // Reset some properties of the SURFACE:SHADING:ATTACHED object in order to receive radiation and shading
-                        // Normally this would be done during initialization, but that's not early enough for some shading calculations
-                        state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
-                        state.dataSurface->Surface(SurfNum).HeatTransSurf = true;
-                        state.dataSurface->Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
-                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
-                        state.dataConstruction->Construct(ConstrNum).IsUsed = true;
-                    }
-                }
-
-                if (state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf == 0 && state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf == 0)
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                         ":  No inside shelf or outside shelf was specified.");
-
-            } // ShelfNum
-
-            if (state.dataDaylightingDevices->GetShelfInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Shelf input.");
-        }
-    }
-
-    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum) // Daylighting shelf object number
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Attempts to calculate exact analytical view factor from window to outside shelf.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses a standard analytical solution.  It is required that window and shelf have the same width, i.e.
-        // one edge (or two vertices) shared in common.  An error or warning is issued if not true.
-        // A more general routine should be implemented at some point to solve for more complicated geometries.
-        // Until then, the user has the option to specify their own solution for the view factor in the input object.
-
-        // REFERENCES:
-        // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 W; // Width, height, and length of window/shelf geometry
-        Real64 H;
-        Real64 L;
-        Real64 M; // Intermediate variables
-        Real64 N;
-        Real64 E1; // Intermediate equations
-        Real64 E2;
-        Real64 E3;
-        Real64 E4;
-        int VWin; // Vertex indices
-        int VShelf;
-        int NumMatch; // Number of vertices matched
-
-        W = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
-        H = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
-
-        // Find length, i.e. projection, of outside shelf
-        if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width == W) {
-            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height;
-        } else if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height == W) {
-            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width;
-        } else {
-            ShowFatalError(state,
-                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
-                               ":  Width of window and outside shelf do not match.");
-        }
-
-        // Error if more or less than two vertices match
-        NumMatch = 0;
-        for (VWin = 1; VWin <= 4; ++VWin) {
-            for (VShelf = 1; VShelf <= 4; ++VShelf) {
-                if (distance(state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Vertex(VWin),
-                             state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Vertex(VShelf)) == 0.0)
-                    ++NumMatch;
-            }
-        }
-
-        if (NumMatch < 2) {
-            ShowWarningError(state,
-                             "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
-                                 ":  Window and outside shelf must share two vertices.  View factor calculation may be inaccurate.");
-        } else if (NumMatch > 2) {
-            ShowFatalError(state,
-                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
-                               ":  Window and outside shelf share too many vertices.");
-        }
-
-        // Calculate exact analytical view factor from window to outside shelf
-        M = H / W;
-        N = L / W;
-
-        E1 = M * std::atan(1.0 / M) + N * std::atan(1.0 / N) - std::sqrt(pow_2(N) + pow_2(M)) * std::atan(std::pow(pow_2(N) + pow_2(M), -0.5));
-        E2 = ((1.0 + pow_2(M)) * (1.0 + pow_2(N))) / (1.0 + pow_2(M) + pow_2(N));
-        E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
-        E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
-
-        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
-    }
-
     void InitDaylightingDevices(EnergyPlusData &state)
     {
 
@@ -722,9 +185,6 @@ namespace DaylightingDevices {
 
         // METHODOLOGY EMPLOYED:
         // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
-
-        // Using/Aliasing
-        using DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -846,7 +306,7 @@ namespace DaylightingDevices {
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
                                           "DaylightingDevice:Tubular",
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
-                                          IntGainTypeOf_DaylightingDeviceTubular,
+                                          DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                           &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum
@@ -976,44 +436,6 @@ namespace DaylightingDevices {
             ShowContinueError(state, "the resulting reflected solar values will not be used in the");
             ShowContinueError(state, "DaylightingDevice:Shelf or DaylightingDevice:Tubular calculations.");
         }
-    }
-
-    int FindTDDPipe(EnergyPlusData &state, int const WinNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   May 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
-
-        // Return value
-        int FindTDDPipe;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int PipeNum; // TDD pipe object number
-
-        FindTDDPipe = 0;
-
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
-            ShowFatalError(
-                state,
-                "FindTDDPipe: Surface=" + state.dataSurface->Surface(WinNum).Name +
-                    ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface.");
-        }
-
-        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
-            if ((WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) ||
-                (WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser)) {
-                FindTDDPipe = PipeNum;
-                break;
-            }
-        } // PipeNum
-
-        return FindTDDPipe;
     }
 
     void GetTDDInput(EnergyPlusData &state)
@@ -1357,6 +779,457 @@ namespace DaylightingDevices {
         }
     }
 
+    void GetShelfInput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   August 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Gets the input for light shelves and does some error checking.
+
+        // METHODOLOGY EMPLOYED:
+        // Standard EnergyPlus methodology.
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int IOStatus;   // Used in GetObjectItem
+        int NumAlphas;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers; // Number of Numbers for each GetObjectItem call
+        int ShelfNum;   // Daylighting shelf object number
+        int SurfNum;    // Window, inside, or outside shelf surfaces
+        int ConstrNum;  // Outside shelf construction object number
+
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+
+        cCurrentModuleObject = "DaylightingDevice:Shelf";
+        state.dataDaylightingDevicesData->NumOfShelf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        if (state.dataDaylightingDevicesData->NumOfShelf > 0) {
+            state.dataDaylightingDevicesData->Shelf.allocate(state.dataDaylightingDevicesData->NumOfShelf);
+
+            for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         cCurrentModuleObject,
+                                                                         ShelfNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(
+                    state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetShelfInputErrorsFound);
+                // Shelf name
+                state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+
+                // Get window object
+                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+
+                if (SurfNum == 0) {
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                        state.dataIPShortCut->cAlphaArgs(2) + " not found.");
+                    state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                } else {
+                    if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " is not of surface type WINDOW.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    }
+
+                    if (state.dataSurface->SurfDaylightingShelfInd(SurfNum) > 0) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " is referenced by more than one shelf.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    }
+
+                    if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " must not have a shading control.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    }
+
+                    if (state.dataSurface->Surface(SurfNum).FrameDivider > 0) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " must not have a frame/divider.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    }
+
+                    if (state.dataSurface->Surface(SurfNum).Sides != 4) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " must have 4 sides.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    }
+                    if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " Equivalent Layer Window is not supported.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    }
+
+                    state.dataDaylightingDevicesData->Shelf(ShelfNum).Window = SurfNum;
+                    state.dataSurface->SurfDaylightingShelfInd(SurfNum) = ShelfNum;
+                }
+
+                // Get inside shelf heat transfer surface (optional)
+                if (state.dataIPShortCut->cAlphaArgs(3) != "") {
+                    SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+
+                    if (SurfNum == 0) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " +
+                                            state.dataIPShortCut->cAlphaArgs(3) + " not found.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    } else {
+                        // No error if shelf belongs to more than one window, e.g. concave corners
+
+                        if (state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " +
+                                                state.dataIPShortCut->cAlphaArgs(3) + " must be its own Outside Boundary Condition Object.");
+                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                        }
+
+                        if (state.dataSurface->Surface(SurfNum).Sides != 4) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Inside shelf " +
+                                                state.dataIPShortCut->cAlphaArgs(3) + " must have 4 sides.");
+                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                        }
+
+                        state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf = SurfNum;
+                    }
+                }
+
+                // Get outside shelf attached shading surface (optional)
+                if (state.dataIPShortCut->cAlphaArgs(4) != "") {
+                    SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->Surface);
+
+                    if (SurfNum == 0) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
+                                            state.dataIPShortCut->cAlphaArgs(4) + " not found.");
+                        state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                    } else {
+                        // No error if shelf belongs to more than one window, e.g. concave corners
+
+                        if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Shading) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
+                                                state.dataIPShortCut->cAlphaArgs(4) + " is not a Shading:Zone:Detailed object.");
+                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                        }
+
+                        if (state.dataSurface->Surface(SurfNum).SchedShadowSurfIndex > 0) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
+                                                state.dataIPShortCut->cAlphaArgs(4) + " must not have a transmittance schedule.");
+                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                        }
+
+                        if (state.dataSurface->Surface(SurfNum).Sides != 4) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Outside shelf " +
+                                                state.dataIPShortCut->cAlphaArgs(4) + " must have 4 sides.");
+                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                        }
+
+                        // Get outside shelf construction (required if outside shelf is specified)
+                        if (state.dataIPShortCut->cAlphaArgs(5) != "") {
+                            ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataConstruction->Construct);
+
+                            if (ConstrNum == 0) {
+                                ShowSevereError(state,
+                                                cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                                    ":  Outside shelf construction " + state.dataIPShortCut->cAlphaArgs(5) + " not found.");
+                                state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                            } else if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
+                                ShowSevereError(state,
+                                                cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                                    ":  Outside shelf construction " + state.dataIPShortCut->cAlphaArgs(5) +
+                                                    " must not have WindowMaterial:Glazing.");
+                                state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                            } else {
+                                state.dataDaylightingDevicesData->Shelf(ShelfNum).Construction = ConstrNum;
+                                state.dataConstruction->Construct(ConstrNum).IsUsed = true;
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                                ":  Outside shelf requires an outside shelf construction to be specified.");
+                            state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
+                        }
+
+                        // Get view factor to outside shelf (optional)
+                        if (NumNumbers > 0) {
+                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = state.dataIPShortCut->rNumericArgs(1);
+
+                            if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
+                                ShowWarningError(state,
+                                                 cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                                     ":  View factor to outside shelf is zero.  Shelf does not reflect on window.");
+                            }
+                        } else {
+                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor =
+                                -1.0; // Flag to have the view factor calculated during initialization
+                        }
+
+                        state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf = SurfNum;
+
+                        // Reset some properties of the SURFACE:SHADING:ATTACHED object in order to receive radiation and shading
+                        // Normally this would be done during initialization, but that's not early enough for some shading calculations
+                        state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+                        state.dataSurface->Surface(SurfNum).HeatTransSurf = true;
+                        state.dataSurface->Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
+                        state.dataConstruction->Construct(ConstrNum).IsUsed = true;
+                    }
+                }
+
+                if (state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf == 0 && state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf == 0)
+                    ShowWarningError(state,
+                                     cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                         ":  No inside shelf or outside shelf was specified.");
+
+            } // ShelfNum
+
+            if (state.dataDaylightingDevices->GetShelfInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Shelf input.");
+        }
+    }
+
+    Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
+                             Real64 const A,    // Aspect ratio, L / d
+                             Real64 const Theta // Angle of entry in radians
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   May 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates the numerical integral for the transmittance of a reflective cylinder with
+        // incident collimated beam radiation as described in Swift and Smith.
+
+        // METHODOLOGY EMPLOYED:
+        // Since this integral can be slow, a table of values is calculated and stored during
+        // initialization of the TDD.  Intermediate values are calculated by interpolation.
+        // Transmittance of sky and ground diffuse radiation is done by other functions.
+
+        // REFERENCES:
+        // Swift, P. D., and Smith, G. B.  "Cylindrical Mirror Light Pipes",
+        //   Solar Energy Materials and Solar Cells 36 (1995), pp. 159-168.
+
+        // OTHER NOTES:
+        // The execution time of this function can be reduced by adjusting parameters N and xTol below.
+        // However, there is some penalty in accuracy for N < 100,000 and xTol > 150.
+
+        // USE STATEMENTS: na
+
+        // Return value
+        Real64 CalcPipeTransBeam;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        Real64 const N(100000.0); // Number of integration points
+        Real64 const xTol(150.0); // Tolerance factor to skip iterations where dT is approximately 0
+        // Must be >= 1.0, increase this number to decrease the execution time
+        Real64 const myLocalTiny(TINY(1.0));
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 i; // Integration interval between points
+        Real64 s; // Entry point
+        Real64 dT;
+        Real64 T; // Beam transmittance for collimated solar real
+        Real64 x; // Intermediate variables for speed optimization
+        Real64 c1;
+        Real64 c2;
+        Real64 xLimit; // Limiting x value to prevent floating point underflow
+
+        CalcPipeTransBeam = 0.0;
+
+        T = 0.0;
+        i = 1.0 / N;
+
+        xLimit = (std::log(pow_2(N) * myLocalTiny) / std::log(R)) / xTol;
+
+        c1 = A * std::tan(Theta);
+        c2 = 4.0 / DataGlobalConstants::Pi;
+
+        s = i;
+        while (s < (1.0 - i)) {
+            x = c1 / s;
+
+            if (x < xLimit) {
+                dT = c2 * std::pow(R, int(x)) * (1.0 - (1.0 - R) * (x - int(x))) * pow_2(s) / std::sqrt(1.0 - pow_2(s));
+                T += dT;
+            }
+
+            s += i;
+        }
+
+        T /= (N - 1.0); // - 1.0, because started on i, not 0
+
+        CalcPipeTransBeam = T;
+
+        return CalcPipeTransBeam;
+    }
+
+    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   July 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates the transmittance of sky isotropic radiation for use with the anisotropic sky transmittance.
+        // This value is also used for all ground reflected solar radiation (which is isotropic).
+
+        // METHODOLOGY EMPLOYED:
+        // The transmittance is calculated and stored once at initialization because the value is a constant.
+        // The routine numerically integrates over the entire sky.  All radiation is isotropic, but incident
+        // angle varies over the hemisphere.
+        // Trans = Flux Transmitted / Flux Incident
+        // Not sure if shading and tilt is adequately accounted for by DifShdgRatioIsoSky later on or not...
+
+        // REFERENCES:
+        // See AnisoSkyViewFactors in SolarShading.cc.
+
+        // USE STATEMENTS: na
+
+        // Return value
+        Real64 CalcTDDTransSolIso;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        int const NPH(1000); // Number of altitude integration points
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 FluxInc = 0.0;   // Incident solar flux
+        Real64 FluxTrans = 0.0; // Transmitted solar flux
+        Real64 trans;           // Total beam solar transmittance of TDD
+        Real64 COSI;            // Cosine of incident angle
+        Real64 SINI;            // Sine of incident angle
+
+        Real64 const dPH = 90.0 * DataGlobalConstants::DegToRadians / NPH; // Altitude angle of sky element
+        Real64 PH = 0.5 * dPH;                                             // Altitude angle increment
+
+        // Integrate from 0 to Pi/2 altitude
+        for (int N = 1; N <= NPH; ++N) {
+            COSI = std::cos(DataGlobalConstants::PiOvr2 - PH);
+            SINI = std::sin(DataGlobalConstants::PiOvr2 - PH);
+
+            Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
+
+            // Calculate total TDD transmittance for given angle
+            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam);
+
+            FluxInc += P * SINI * dPH;
+            FluxTrans += trans * P * SINI * dPH;
+
+            PH += dPH; // Increment the altitude angle
+        }              // N
+
+        CalcTDDTransSolIso = FluxTrans / FluxInc;
+
+        return CalcTDDTransSolIso;
+    }
+
+    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   July 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates the transmittance of sky horizon radiation for use with the anisotropic sky transmittance.
+
+        // METHODOLOGY EMPLOYED:
+        // The transmittance is calculated and stored once at initialization because the value is a constant.
+        // The routine numerically integrates over the horizon as an infinitesimally narrow strip of the sky.
+        // Horizon radiation is isotropic, but incident angle varies over the semicircle.
+        // Trans = Flux Transmitted / Flux Incident
+        // Not sure if shading is adequately accounted for by DifShdgRatioHoriz later on or not...
+
+        // REFERENCES:
+        // See AnisoSkyViewFactors in SolarShading.cc.
+
+        // Using/Aliasing
+        using namespace DataSurfaces;
+
+        // Return value
+        Real64 CalcTDDTransSolHorizon;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        int const NTH(18); // Number of azimuth integration points
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 FluxInc = 0.0;   // Incident solar flux
+        Real64 FluxTrans = 0.0; // Transmitted solar flux
+        Real64 CosPhi;          // Cosine of TDD:DOME altitude angle
+        Real64 Theta;           // TDD:DOME azimuth angle
+
+        CosPhi = std::cos(DataGlobalConstants::PiOvr2 - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt *
+                                                            DataGlobalConstants::DegToRadians);
+        Theta = state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * DataGlobalConstants::DegToRadians;
+
+        if (CosPhi > 0.01) { // Dome has a view of the horizon
+            // Integrate over the semicircle
+            Real64 const THMIN = Theta - DataGlobalConstants::PiOvr2; // Minimum azimuth integration limit
+            // Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
+            Real64 const dTH = 180.0 * DataGlobalConstants::DegToRadians / NTH; // Azimuth angle increment
+            Real64 TH = THMIN + 0.5 * dTH;                                      // Azimuth angle of sky horizon element
+
+            for (int N = 1; N <= NTH; ++N) {
+                // Calculate incident angle between dome outward normal and horizon element
+                Real64 COSI = CosPhi * std::cos(TH - Theta); // Cosine of the incident angle
+
+                // Calculate total TDD transmittance for given angle
+                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam); // Total beam solar transmittance of TDD
+
+                FluxInc += COSI * dTH;
+                FluxTrans += trans * COSI * dTH;
+
+                TH += dTH; // Increment the azimuth angle
+            }              // N
+
+            CalcTDDTransSolHorizon = FluxTrans / FluxInc;
+
+        } else {                          // Dome is nearly horizontal and has almost no view of the horizon
+            CalcTDDTransSolHorizon = 0.0; // = TransTDD(state, PipeNum, ???, SolarBeam) ! Could change to an angle near the horizon
+        }
+
+        return CalcTDDTransSolHorizon;
+    }
+
     Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
                                 int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
@@ -1425,60 +1298,6 @@ namespace DaylightingDevices {
         }
 
         return CalcTDDTransSolAniso;
-    }
-
-    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
-                                    Real64 const COSI,               // Cosine of the incident angle
-                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Interpolates the beam transmittance vs. cosine angle table.
-
-        // METHODOLOGY EMPLOYED: na
-        // REFERENCES: na
-
-        // Using/Aliasing
-        using FluidProperties::FindArrayIndex; // USEd code could be copied here to eliminate dependence on FluidProperties
-
-        // Return value
-        Real64 InterpolatePipeTransBeam;
-
-        // Argument array dimensioning
-        EP_SIZE_CHECK(transBeam, DataDaylightingDevices::NumOfAngles);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Lo;
-        int Hi;
-        Real64 m;
-        Real64 b;
-
-        InterpolatePipeTransBeam = 0.0;
-
-        // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
-        Lo = FindArrayIndex(COSI, state.dataDaylightingDevices->COSAngle);
-        Hi = Lo + 1;
-
-        if (Lo > 0 && Hi <= DataDaylightingDevices::NumOfAngles) {
-            m = (transBeam(Hi) - transBeam(Lo)) / (state.dataDaylightingDevices->COSAngle(Hi) - state.dataDaylightingDevices->COSAngle(Lo));
-            b = transBeam(Lo) - m * state.dataDaylightingDevices->COSAngle(Lo);
-
-            InterpolatePipeTransBeam = m * COSI + b;
-        } else {
-            InterpolatePipeTransBeam = 0.0;
-        }
-
-        return InterpolatePipeTransBeam;
     }
 
     Real64 TransTDD(EnergyPlusData &state,
@@ -1564,6 +1383,98 @@ namespace DaylightingDevices {
         return TransTDD;
     }
 
+    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
+                                    Real64 const COSI,               // Cosine of the incident angle
+                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   July 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Interpolates the beam transmittance vs. cosine angle table.
+
+        // METHODOLOGY EMPLOYED: na
+        // REFERENCES: na
+
+        // Using/Aliasing
+        using FluidProperties::FindArrayIndex; // USEd code could be copied here to eliminate dependence on FluidProperties
+
+        // Return value
+        Real64 InterpolatePipeTransBeam;
+
+        // Argument array dimensioning
+        EP_SIZE_CHECK(transBeam, DataDaylightingDevices::NumOfAngles);
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int Lo;
+        int Hi;
+        Real64 m;
+        Real64 b;
+
+        InterpolatePipeTransBeam = 0.0;
+
+        // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
+        Lo = FindArrayIndex(COSI, state.dataDaylightingDevices->COSAngle);
+        Hi = Lo + 1;
+
+        if (Lo > 0 && Hi <= DataDaylightingDevices::NumOfAngles) {
+            m = (transBeam(Hi) - transBeam(Lo)) / (state.dataDaylightingDevices->COSAngle(Hi) - state.dataDaylightingDevices->COSAngle(Lo));
+            b = transBeam(Lo) - m * state.dataDaylightingDevices->COSAngle(Lo);
+
+            InterpolatePipeTransBeam = m * COSI + b;
+        } else {
+            InterpolatePipeTransBeam = 0.0;
+        }
+
+        return InterpolatePipeTransBeam;
+    }
+
+    int FindTDDPipe(EnergyPlusData &state, int const WinNum)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   May 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
+
+        // Return value
+        int FindTDDPipe;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int PipeNum; // TDD pipe object number
+
+        FindTDDPipe = 0;
+
+        if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
+            ShowFatalError(
+                state,
+                "FindTDDPipe: Surface=" + state.dataSurface->Surface(WinNum).Name +
+                    ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface.");
+        }
+
+        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+            if ((WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) ||
+                (WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser)) {
+                FindTDDPipe = PipeNum;
+                break;
+            }
+        } // PipeNum
+
+        return FindTDDPipe;
+    }
+
     void DistributeTDDAbsorbedSolar(EnergyPlusData &state)
     {
 
@@ -1625,6 +1536,92 @@ namespace DaylightingDevices {
                                       state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength);
             } // TZoneNum
         }
+    }
+
+    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum) // Daylighting shelf object number
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   August 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Attempts to calculate exact analytical view factor from window to outside shelf.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses a standard analytical solution.  It is required that window and shelf have the same width, i.e.
+        // one edge (or two vertices) shared in common.  An error or warning is issued if not true.
+        // A more general routine should be implemented at some point to solve for more complicated geometries.
+        // Until then, the user has the option to specify their own solution for the view factor in the input object.
+
+        // REFERENCES:
+        // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
+
+        // USE STATEMENTS:
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 W; // Width, height, and length of window/shelf geometry
+        Real64 H;
+        Real64 L;
+        Real64 M; // Intermediate variables
+        Real64 N;
+        Real64 E1; // Intermediate equations
+        Real64 E2;
+        Real64 E3;
+        Real64 E4;
+        int VWin; // Vertex indices
+        int VShelf;
+        int NumMatch; // Number of vertices matched
+
+        W = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
+        H = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
+
+        // Find length, i.e. projection, of outside shelf
+        if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width == W) {
+            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height;
+        } else if (state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Height == W) {
+            L = state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Width;
+        } else {
+            ShowFatalError(state,
+                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
+                               ":  Width of window and outside shelf do not match.");
+        }
+
+        // Error if more or less than two vertices match
+        NumMatch = 0;
+        for (VWin = 1; VWin <= 4; ++VWin) {
+            for (VShelf = 1; VShelf <= 4; ++VShelf) {
+                if (distance(state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Vertex(VWin),
+                             state.dataSurface->Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf).Vertex(VShelf)) == 0.0)
+                    ++NumMatch;
+            }
+        }
+
+        if (NumMatch < 2) {
+            ShowWarningError(state,
+                             "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
+                                 ":  Window and outside shelf must share two vertices.  View factor calculation may be inaccurate.");
+        } else if (NumMatch > 2) {
+            ShowFatalError(state,
+                           "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name +
+                               ":  Window and outside shelf share too many vertices.");
+        }
+
+        // Calculate exact analytical view factor from window to outside shelf
+        M = H / W;
+        N = L / W;
+
+        E1 = M * std::atan(1.0 / M) + N * std::atan(1.0 / N) - std::sqrt(pow_2(N) + pow_2(M)) * std::atan(std::pow(pow_2(N) + pow_2(M), -0.5));
+        E2 = ((1.0 + pow_2(M)) * (1.0 + pow_2(N))) / (1.0 + pow_2(M) + pow_2(N));
+        E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
+        E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
+
+        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
     }
 
     void adjustViewFactorsWithShelf(

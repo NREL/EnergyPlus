@@ -93,6 +93,27 @@ using namespace DataSurfaces;
 using namespace DataRoomAirModel;
 using ConvectionCoefficients::CalcDetailedHcInForDVModel;
 
+void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         G. Carrilho da Graca
+    //       DATE WRITTEN   February 2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    //   manage the UCSD Displacement Ventilation model
+
+    // initialize Displacement Ventilation model
+    InitUCSDDV(state, ZoneNum);
+
+    // perform Displacement Ventilation model calculations
+    CalcUCSDDV(state, ZoneNum);
+}
+
+//**************************************************************************************************
+
 void InitUCSDDV(EnergyPlusData &state, int const ZoneNum)
 {
 
@@ -134,6 +155,336 @@ void InitUCSDDV(EnergyPlusData &state, int const ZoneNum)
 
     // initialize these module variables every timestep
     state.dataDispVentMgr->HeightIntMass = state.dataDispVentMgr->HeightIntMassDefault;
+}
+
+//**************************************************************************************************
+
+void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         G. Carrilho da Graca
+    //       DATE WRITTEN   February 2004
+    //       MODIFIED       -
+    //       RE-ENGINEERED  -
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Main subroutine for convection calculation in the UCSD Displacement Ventilation model.
+    // It calls CalcDetailedHcInForDVModel for convection coefficient
+    // initial calculations and averages the final result comparing the position of the surface with
+    // the interface subzone height.
+
+    // Using/Aliasing
+    using namespace DataHeatBalFanSys;
+    using namespace DataEnvironment;
+    using namespace DataHeatBalance;
+    using ScheduleManager::GetScheduleIndex;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Ctd;         // DO loop counter for surfaces
+    Real64 HLD;      // Convection coefficient for the lower area of surface
+    Real64 TmedDV;   // Average temperature for DV
+    Real64 Z1;       // auxiliary var for lowest height
+    Real64 Z2;       // auxiliary var for highest height
+    Real64 ZSupSurf; // highest height for this surface
+    Real64 ZInfSurf; // lowest height for this surface
+    Real64 HLU;      // Convection coefficient for the upper area of surface
+    Real64 LayH;     // Height of the Occupied/Mixed subzone interface
+    Real64 LayFrac;  // Fraction height of the Occupied/Mixed subzone interface
+    int SurfNum;     // Surface number
+
+    state.dataDispVentMgr->HAT_MX = 0.0;
+    state.dataDispVentMgr->HAT_OC = 0.0;
+    state.dataDispVentMgr->HA_MX = 0.0;
+    state.dataDispVentMgr->HA_OC = 0.0;
+    state.dataDispVentMgr->HAT_FLOOR = 0.0;
+    state.dataDispVentMgr->HA_FLOOR = 0.0;
+    auto &SurfTempIn(state.dataHeatBalSurf->SurfTempIn);
+
+    // Is the air flow model for this zone set to UCSDDV Displacement Ventilation?
+    if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
+        LayFrac = FractionHeight;
+        LayH = FractionHeight *
+               (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1));
+        // WALL Hc, HA and HAT calculation
+        for (Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2); ++Ctd) {
+            SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+            if (SurfNum == 0) continue;
+            Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+            Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+            ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+            ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+
+            // The Wall surface is in the upper subzone
+            if (ZInfSurf > LayH) {
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HWall(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWall(Ctd);
+                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
+            }
+
+            // The Wall surface is in the lower subzone
+            if (ZSupSurf < LayH) {
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HWall(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_OC += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWall(Ctd);
+                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
+            }
+
+            // The Wall surface is partially in upper and partially in lower subzone
+            if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
+                TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
+                         (ZSupSurf - ZInfSurf);
+                state.dataUCSDShared->HWall(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
+                state.dataDispVentMgr->HAT_MX +=
+                    state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
+                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                state.dataDispVentMgr->HAT_OC +=
+                    state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
+                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
+            }
+
+            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HWall(Ctd);
+
+        } // END WALL
+
+        // WINDOW Hc, HA and HAT CALCULATION
+        for (Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
+            SurfNum = state.dataUCSDShared->APos_Window(Ctd);
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+            if (SurfNum == 0) continue;
+            if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Window Wall
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+                ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+
+                if (ZInfSurf > LayH) {
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    state.dataDispVentMgr->HAT_MX +=
+                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
+                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
+                }
+
+                if (ZSupSurf < LayH) {
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    state.dataDispVentMgr->HAT_OC +=
+                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
+                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
+                }
+
+                if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
+                             (ZSupSurf - ZInfSurf);
+                    state.dataUCSDShared->HWindow(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
+                    state.dataDispVentMgr->HAT_MX +=
+                        state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
+                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    state.dataDispVentMgr->HAT_OC +=
+                        state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
+                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
+                }
+            }
+
+            if (state.dataSurface->Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
+                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
+            }
+
+            if (state.dataSurface->Surface(SurfNum).Tilt >= 170.0) { // Window Floor
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_OC += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
+                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
+            }
+
+            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HWindow(Ctd);
+
+        } // END WINDOW
+
+        // DOOR Hc, HA and HAT CALCULATION
+        for (Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
+             ++Ctd) { // DOOR
+            SurfNum = state.dataUCSDShared->APos_Door(Ctd);
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+            if (SurfNum == 0) continue;
+            if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Door Wall
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+                ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+
+                if (ZInfSurf > LayH) {
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    state.dataDispVentMgr->HAT_MX +=
+                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
+                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
+                }
+
+                if (ZSupSurf < LayH) {
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    state.dataDispVentMgr->HAT_OC +=
+                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
+                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
+                }
+
+                if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                    HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
+                    TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
+                             (ZSupSurf - ZInfSurf);
+                    state.dataUCSDShared->HDoor(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
+                    state.dataDispVentMgr->HAT_MX +=
+                        state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
+                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    state.dataDispVentMgr->HAT_OC +=
+                        state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
+                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
+                }
+            }
+
+            if (state.dataSurface->Surface(SurfNum).Tilt <= 10.0) { // Door Ceiling
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
+                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
+            }
+
+            if (state.dataSurface->Surface(SurfNum).Tilt >= 170.0) { // Door Floor
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_OC += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
+                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
+            }
+
+            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HDoor(Ctd);
+
+        } // END DOOR
+
+        // INTERNAL Hc, HA and HAT CALCULATION
+        state.dataDispVentMgr->HeightIntMass =
+            min(state.dataDispVentMgr->HeightIntMassDefault,
+                (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1)));
+        for (Ctd = state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 2);
+             ++Ctd) {
+            SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+            if (SurfNum == 0) continue;
+            ZSupSurf = state.dataDispVentMgr->HeightIntMass;
+            ZInfSurf = 0.0;
+
+            if (ZSupSurf < LayH) {
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                state.dataUCSDShared->HInternal(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataDispVentMgr->HAT_OC +=
+                    state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HInternal(Ctd);
+                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HInternal(Ctd);
+            }
+
+            if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+                HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
+                TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
+                         (ZSupSurf - ZInfSurf);
+                state.dataUCSDShared->HInternal(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
+                state.dataDispVentMgr->HAT_MX +=
+                    state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
+                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                state.dataDispVentMgr->HAT_OC +=
+                    state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
+                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
+            }
+
+            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HInternal(Ctd);
+        } // END INTERNAL
+
+        // CEILING Hc, HA and HAT CALCULATION
+        for (Ctd = state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 2);
+             ++Ctd) {
+            SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+            if (SurfNum == 0) continue;
+            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+            CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+            state.dataUCSDShared->HCeiling(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+            state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HCeiling(Ctd);
+            state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HCeiling(Ctd);
+            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HCeiling(Ctd);
+        } // END CEILING
+
+        // FLOOR Hc, HA and HAT CALCULATION
+        for (Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2); ++Ctd) {
+            SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
+            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+            if (SurfNum == 0) continue;
+            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
+            CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
+            state.dataUCSDShared->HFloor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
+            state.dataDispVentMgr->HAT_FLOOR += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HFloor(Ctd);
+            state.dataDispVentMgr->HA_FLOOR += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HFloor(Ctd);
+            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
+            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HFloor(Ctd);
+        } // END FLOOR
+    }
+}
+
+//**************************************************************************************************
+
+Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
+                                           Real64 HAT_floor,
+                                           Real64 HA_floor,
+                                           Real64 MCpT_Total,
+                                           Real64 MCp_Total,
+                                           Real64 occupiedTemp,
+                                           Real64 nonAirSystemResponse,
+                                           Real64 zoneMultiplier,
+                                           Real64 airCap)
+{
+    const Real64 elevenOverSix = 11.0 / 6.0;
+    return (temperatureHistoryTerm + HAT_floor + MCpT_Total + 0.6 * occupiedTemp * MCp_Total + nonAirSystemResponse / zoneMultiplier) /
+           (elevenOverSix * airCap + HA_floor + 1.6 * MCp_Total);
 }
 
 void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
@@ -256,22 +607,22 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         }
     }
 
-    SumInternalConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesOccupied, ConvGainsOccupiedSubzone);
+    ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
 
     ConvGainsOccupiedSubzone += 0.5 * state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesOccupied, RetAirGain);
+        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
         ConvGainsOccupiedSubzone += RetAirGain;
     }
 
-    SumInternalConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesMixedSubzone, ConvGainsMixedSubzone);
+    ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
     ConvGainsMixedSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                              0.5 * state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesMixedSubzone, RetAirGain);
+        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += RetAirGain;
     }
 
@@ -762,351 +1113,6 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     } else {
         state.dataRoomAirMod->ZoneDVMixedFlagRep(ZoneNum) = 0.0;
     }
-}
-
-void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         G. Carrilho da Graca
-    //       DATE WRITTEN   February 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //   manage the UCSD Displacement Ventilation model
-
-    // initialize Displacement Ventilation model
-    InitUCSDDV(state, ZoneNum);
-
-    // perform Displacement Ventilation model calculations
-    CalcUCSDDV(state, ZoneNum);
-}
-
-void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         G. Carrilho da Graca
-    //       DATE WRITTEN   February 2004
-    //       MODIFIED       -
-    //       RE-ENGINEERED  -
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Main subroutine for convection calculation in the UCSD Displacement Ventilation model.
-    // It calls CalcDetailedHcInForDVModel for convection coefficient
-    // initial calculations and averages the final result comparing the position of the surface with
-    // the interface subzone height.
-
-    // Using/Aliasing
-    using namespace DataHeatBalFanSys;
-    using namespace DataEnvironment;
-    using namespace DataHeatBalance;
-    using ScheduleManager::GetScheduleIndex;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Ctd;         // DO loop counter for surfaces
-    Real64 HLD;      // Convection coefficient for the lower area of surface
-    Real64 TmedDV;   // Average temperature for DV
-    Real64 Z1;       // auxiliary var for lowest height
-    Real64 Z2;       // auxiliary var for highest height
-    Real64 ZSupSurf; // highest height for this surface
-    Real64 ZInfSurf; // lowest height for this surface
-    Real64 HLU;      // Convection coefficient for the upper area of surface
-    Real64 LayH;     // Height of the Occupied/Mixed subzone interface
-    Real64 LayFrac;  // Fraction height of the Occupied/Mixed subzone interface
-    int SurfNum;     // Surface number
-
-    state.dataDispVentMgr->HAT_MX = 0.0;
-    state.dataDispVentMgr->HAT_OC = 0.0;
-    state.dataDispVentMgr->HA_MX = 0.0;
-    state.dataDispVentMgr->HA_OC = 0.0;
-    state.dataDispVentMgr->HAT_FLOOR = 0.0;
-    state.dataDispVentMgr->HA_FLOOR = 0.0;
-    auto &SurfTempIn(state.dataHeatBalSurf->SurfTempIn);
-
-    // Is the air flow model for this zone set to UCSDDV Displacement Ventilation?
-    if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
-        LayFrac = FractionHeight;
-        LayH = FractionHeight *
-               (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1));
-        // WALL Hc, HA and HAT calculation
-        for (Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2); ++Ctd) {
-            SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-            if (SurfNum == 0) continue;
-            Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-            Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-            ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-            ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-
-            // The Wall surface is in the upper subzone
-            if (ZInfSurf > LayH) {
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HWall(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWall(Ctd);
-                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
-            }
-
-            // The Wall surface is in the lower subzone
-            if (ZSupSurf < LayH) {
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HWall(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_OC += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWall(Ctd);
-                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
-            }
-
-            // The Wall surface is partially in upper and partially in lower subzone
-            if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
-                TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
-                         (ZSupSurf - ZInfSurf);
-                state.dataUCSDShared->HWall(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                state.dataDispVentMgr->HAT_MX +=
-                    state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
-                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                state.dataDispVentMgr->HAT_OC +=
-                    state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
-                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
-            }
-
-            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HWall(Ctd);
-
-        } // END WALL
-
-        // WINDOW Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
-            SurfNum = state.dataUCSDShared->APos_Window(Ctd);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-            if (SurfNum == 0) continue;
-            if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Window Wall
-                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-                ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-                ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-
-                if (ZInfSurf > LayH) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    state.dataDispVentMgr->HAT_MX +=
-                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
-                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
-                }
-
-                if (ZSupSurf < LayH) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    state.dataDispVentMgr->HAT_OC +=
-                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
-                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
-                }
-
-                if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
-                             (ZSupSurf - ZInfSurf);
-                    state.dataUCSDShared->HWindow(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                    state.dataDispVentMgr->HAT_MX +=
-                        state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
-                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataDispVentMgr->HAT_OC +=
-                        state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
-                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
-                }
-            }
-
-            if (state.dataSurface->Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
-                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
-            }
-
-            if (state.dataSurface->Surface(SurfNum).Tilt >= 170.0) { // Window Floor
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_OC += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
-                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
-            }
-
-            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HWindow(Ctd);
-
-        } // END WINDOW
-
-        // DOOR Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
-             ++Ctd) { // DOOR
-            SurfNum = state.dataUCSDShared->APos_Door(Ctd);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-            if (SurfNum == 0) continue;
-            if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Door Wall
-                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-                ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-                ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-
-                if (ZInfSurf > LayH) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    state.dataDispVentMgr->HAT_MX +=
-                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
-                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
-                }
-
-                if (ZSupSurf < LayH) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    state.dataDispVentMgr->HAT_OC +=
-                        state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
-                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
-                }
-
-                if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                    HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
-                    TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
-                             (ZSupSurf - ZInfSurf);
-                    state.dataUCSDShared->HDoor(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                    state.dataDispVentMgr->HAT_MX +=
-                        state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
-                    state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataDispVentMgr->HAT_OC +=
-                        state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
-                    state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
-                }
-            }
-
-            if (state.dataSurface->Surface(SurfNum).Tilt <= 10.0) { // Door Ceiling
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
-                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
-            }
-
-            if (state.dataSurface->Surface(SurfNum).Tilt >= 170.0) { // Door Floor
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_OC += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
-                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
-            }
-
-            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HDoor(Ctd);
-
-        } // END DOOR
-
-        // INTERNAL Hc, HA and HAT CALCULATION
-        state.dataDispVentMgr->HeightIntMass =
-            min(state.dataDispVentMgr->HeightIntMassDefault,
-                (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1)));
-        for (Ctd = state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 2);
-             ++Ctd) {
-            SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-            if (SurfNum == 0) continue;
-            ZSupSurf = state.dataDispVentMgr->HeightIntMass;
-            ZInfSurf = 0.0;
-
-            if (ZSupSurf < LayH) {
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                state.dataUCSDShared->HInternal(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataDispVentMgr->HAT_OC +=
-                    state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HInternal(Ctd);
-                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HInternal(Ctd);
-            }
-
-            if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-                HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
-                TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) /
-                         (ZSupSurf - ZInfSurf);
-                state.dataUCSDShared->HInternal(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                state.dataDispVentMgr->HAT_MX +=
-                    state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLU;
-                state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                state.dataDispVentMgr->HAT_OC +=
-                    state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * SurfTempIn(SurfNum) * HLD;
-                state.dataDispVentMgr->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
-            }
-
-            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HInternal(Ctd);
-        } // END INTERNAL
-
-        // CEILING Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 2);
-             ++Ctd) {
-            SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-            if (SurfNum == 0) continue;
-            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-            CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-            state.dataUCSDShared->HCeiling(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-            state.dataDispVentMgr->HAT_MX += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HCeiling(Ctd);
-            state.dataDispVentMgr->HA_MX += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HCeiling(Ctd);
-            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HCeiling(Ctd);
-        } // END CEILING
-
-        // FLOOR Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2); ++Ctd) {
-            SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-            if (SurfNum == 0) continue;
-            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
-            CalcDetailedHcInForDVModel(state, SurfNum, SurfTempIn, state.dataRoomAirMod->DVHcIn);
-            state.dataUCSDShared->HFloor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
-            state.dataDispVentMgr->HAT_FLOOR += state.dataSurface->Surface(SurfNum).Area * SurfTempIn(SurfNum) * state.dataUCSDShared->HFloor(Ctd);
-            state.dataDispVentMgr->HA_FLOOR += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HFloor(Ctd);
-            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
-            state.dataRoomAirMod->DVHcIn(SurfNum) = state.dataUCSDShared->HFloor(Ctd);
-        } // END FLOOR
-    }
-}
-
-Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
-                                           Real64 HAT_floor,
-                                           Real64 HA_floor,
-                                           Real64 MCpT_Total,
-                                           Real64 MCp_Total,
-                                           Real64 occupiedTemp,
-                                           Real64 nonAirSystemResponse,
-                                           Real64 zoneMultiplier,
-                                           Real64 airCap)
-{
-    const Real64 elevenOverSix = 11.0 / 6.0;
-    return (temperatureHistoryTerm + HAT_floor + MCpT_Total + 0.6 * occupiedTemp * MCp_Total + nonAirSystemResponse / zoneMultiplier) /
-           (elevenOverSix * airCap + HA_floor + 1.6 * MCp_Total);
 }
 
 } // namespace EnergyPlus::DisplacementVentMgr
