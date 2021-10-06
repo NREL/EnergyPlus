@@ -197,11 +197,6 @@ namespace WaterToAirHeatPump {
                                  int const CompOp,
                                  Real64 const PartLoadRatio);
 
-    Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
-                                       Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1D<Real64> const &Par    // Function parameters
-    );
-
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
@@ -212,8 +207,6 @@ namespace WaterToAirHeatPump {
                                  int const CompOp,
                                  Real64 const PartLoadRatio);
 
-    void UpdateWatertoAirHP(EnergyPlusData &state, int const HPNum);
-
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
@@ -223,12 +216,6 @@ namespace WaterToAirHeatPump {
                             Real64 const QLatActual, // Actual latent capacity
                             Real64 const EnteringDB, // Entering air dry-bulb temperature
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
-    );
-
-    Real64 DegradF(EnergyPlusData &state,
-                   std::string &FluidName, // Name of glycol used in source side
-                   Real64 &Temp,           // Temperature of the fluid
-                   int &FluidIndex         // Index number for the fluid
     );
 
     int GetCoilIndex(EnergyPlusData &state,

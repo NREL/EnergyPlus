@@ -91,8 +91,6 @@ namespace ZoneEquipmentManager {
 
     void GetZoneEquipment(EnergyPlusData &state);
 
-    void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration); // unused 1208
-
     void SizeZoneEquipment(EnergyPlusData &state);
 
     void SetUpZoneSizingArrays(EnergyPlusData &state);
@@ -124,26 +122,13 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
 
-    void CalcZoneInfiltrationFlows(EnergyPlusData &state,
-                                   int const ZoneNum,                // current zone index
-                                   Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
-    );
-
     void CalcAirFlowSimple(EnergyPlusData &state,
                            int const SysTimestepLoop = 0,                    // System time step index
                            bool const AdjustZoneMixingFlowFlag = false,      // flags to adjust zone mxing mass flow rate
                            bool const AdjustZoneInfiltrationFlowFlag = false // flags to djust zone infiltration air flow rate
     );
 
-    void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum); // Zone Air Balance Outdoor index
-
-    void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int const ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
-
-    void CalcZoneMixingFlowRateOfSourceZone(EnergyPlusData &state, int const ZoneNum);
-
     void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIteration);
-
-    void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir);
 
     void CalcDOASSupCondsForSizing(EnergyPlusData &state,
                                    Real64 OutDB,        // outside air temperature [C]
@@ -160,13 +145,6 @@ namespace ZoneEquipmentManager {
     void AutoCalcDOASControlStrategy(EnergyPlusData &state);
 
     void ReportInfiltrations(EnergyPlusData &state);
-
-    void ReportZoneSizingDOASInputs(EnergyPlusData &state,
-                                    std::string const &ZoneName,         // the name of the zone
-                                    std::string const &DOASCtrlStrategy, // DOAS control strategy
-                                    Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
-                                    Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
-    );
 
 } // namespace ZoneEquipmentManager
 

@@ -85,72 +85,6 @@ namespace ZoneAirLoopEquipmentManager {
 
     using namespace DataDefineEquip;
 
-    void ManageZoneAirLoopEquipment(EnergyPlusData &state,
-                                    std::string const &ZoneAirLoopEquipName,
-                                    bool const FirstHVACIteration,
-                                    Real64 &SysOutputProvided,
-                                    Real64 &NonAirSysOutput,
-                                    Real64 &LatOutputProvided, // Latent add/removal supplied by air dist unit (kg/s), dehumid = negative
-                                    int const ActualZoneNum,
-                                    int &ControlledZoneNum,
-                                    int &CompIndex)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Russ Taylor
-        //       DATE WRITTEN   May 1997
-        //       MODIFIED       Don Shirey, Aug 2009 (LatOutputProvided)
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calls the zone thermal control simulations and the interfaces
-        // (water-air, refrigerant-air, steam-air, electric-electric,
-        // water-water, etc)
-
-        int AirDistUnitNum;
-
-        // Beginning of Code
-
-        // make sure the input data is read in only once
-        if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
-            GetZoneAirLoopEquipment(state);
-            state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
-        }
-
-        // Find the correct Zone Air Distribution Unit Equipment
-        if (CompIndex == 0) {
-            AirDistUnitNum = UtilityRoutines::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
-            if (AirDistUnitNum == 0) {
-                ShowFatalError(state, "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName);
-            }
-            CompIndex = AirDistUnitNum;
-        } else {
-            AirDistUnitNum = CompIndex;
-            if (AirDistUnitNum > state.dataDefineEquipment->NumAirDistUnits || AirDistUnitNum < 1) {
-                ShowFatalError(state,
-                               format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
-                                      AirDistUnitNum,
-                                      state.dataDefineEquipment->NumAirDistUnits,
-                                      ZoneAirLoopEquipName));
-            }
-            if (ZoneAirLoopEquipName != state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name) {
-                ShowFatalError(state,
-                               format("ManageZoneAirLoopEquipment: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
-                                      AirDistUnitNum,
-                                      ZoneAirLoopEquipName,
-                                      state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
-            }
-        }
-        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
-        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
-        InitZoneAirLoopEquipmentTimeStep(state, AirDistUnitNum);
-
-        SimZoneAirLoopEquipment(
-            state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
-
-        // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
-        // matched to zone euqip config nodes
-        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
-    }
-
     void GetZoneAirLoopEquipment(EnergyPlusData &state)
     {
 
@@ -907,6 +841,72 @@ namespace ZoneAirLoopEquipmentManager {
             SysOutputProvided = 0.0;
             LatOutputProvided = 0.0;
         }
+    }
+
+    void ManageZoneAirLoopEquipment(EnergyPlusData &state,
+                                    std::string const &ZoneAirLoopEquipName,
+                                    bool const FirstHVACIteration,
+                                    Real64 &SysOutputProvided,
+                                    Real64 &NonAirSysOutput,
+                                    Real64 &LatOutputProvided, // Latent add/removal supplied by air dist unit (kg/s), dehumid = negative
+                                    int const ActualZoneNum,
+                                    int &ControlledZoneNum,
+                                    int &CompIndex)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Russ Taylor
+        //       DATE WRITTEN   May 1997
+        //       MODIFIED       Don Shirey, Aug 2009 (LatOutputProvided)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calls the zone thermal control simulations and the interfaces
+        // (water-air, refrigerant-air, steam-air, electric-electric,
+        // water-water, etc)
+
+        int AirDistUnitNum;
+
+        // Beginning of Code
+
+        // make sure the input data is read in only once
+        if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
+            GetZoneAirLoopEquipment(state);
+            state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+        }
+
+        // Find the correct Zone Air Distribution Unit Equipment
+        if (CompIndex == 0) {
+            AirDistUnitNum = UtilityRoutines::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
+            if (AirDistUnitNum == 0) {
+                ShowFatalError(state, "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName);
+            }
+            CompIndex = AirDistUnitNum;
+        } else {
+            AirDistUnitNum = CompIndex;
+            if (AirDistUnitNum > state.dataDefineEquipment->NumAirDistUnits || AirDistUnitNum < 1) {
+                ShowFatalError(state,
+                               format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      AirDistUnitNum,
+                                      state.dataDefineEquipment->NumAirDistUnits,
+                                      ZoneAirLoopEquipName));
+            }
+            if (ZoneAirLoopEquipName != state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name) {
+                ShowFatalError(state,
+                               format("ManageZoneAirLoopEquipment: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                      AirDistUnitNum,
+                                      ZoneAirLoopEquipName,
+                                      state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
+            }
+        }
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
+        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipmentTimeStep(state, AirDistUnitNum);
+
+        SimZoneAirLoopEquipment(
+            state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
+
+        // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
+        // matched to zone euqip config nodes
+        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
     }
 
 } // namespace ZoneAirLoopEquipmentManager

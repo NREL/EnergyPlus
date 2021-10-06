@@ -90,123 +90,6 @@ using Psychrometrics::PsyTdbFnHW;
 
 // Functions
 
-void SimAirZonePlenum(EnergyPlusData &state,
-                      std::string_view CompName,
-                      int const iCompType,
-                      int &CompIndex,
-                      Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
-                      Optional_bool_const FirstCall,          // Autodesk:OPTIONAL Used without PRESENT check
-                      Optional_bool PlenumInletChanged        // Autodesk:OPTIONAL Used without PRESENT check
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Peter Graham Ellis
-    //       DATE WRITTEN   November 2000
-    //       MODIFIED       March 2000
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine manages the ZonePlenum component simulation for both
-    // return and supply plenums.
-    // It is called from the SimAirLoopComponent at the system time step.
-
-    // Using/Aliasing
-    using DataZoneEquipment::ZoneReturnPlenum_Type;
-    using DataZoneEquipment::ZoneSupplyPlenum_Type;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
-
-    // Obtains and Allocates ZonePlenum related parameters from input file
-    if (state.dataZonePlenum->GetInputFlag) { // First time subroutine has been entered
-        GetZonePlenumInput(state);
-        state.dataZonePlenum->GetInputFlag = false;
-    }
-
-    if (iCompType == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
-        // Find the correct ZonePlenumNumber
-        if (CompIndex == 0) {
-            ZonePlenumNum =
-                UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
-            if (ZonePlenumNum == 0) {
-                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + std::string{CompName});
-            }
-            CompIndex = ZonePlenumNum;
-        } else {
-            ZonePlenumNum = CompIndex;
-            if (ZonePlenumNum > state.dataZonePlenum->NumZoneReturnPlenums || ZonePlenumNum < 1) {
-                ShowFatalError(
-                    state,
-                    format("SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:ReturnPlenum={}, AirLoopHVAC:ReturnPlenum name={}",
-                           ZonePlenumNum,
-                           state.dataZonePlenum->NumZoneReturnPlenums,
-                           CompName));
-            }
-            if (state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum)) {
-                if (CompName != state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName) {
-                    ShowFatalError(state,
-                                   format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:ReturnPlenum name={}, stored "
-                                          "AirLoopHVAC:ReturnPlenum Name for that index={}",
-                                          ZonePlenumNum,
-                                          CompName,
-                                          state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName));
-                }
-                state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum) = false;
-            }
-        }
-
-        InitAirZoneReturnPlenum(state, ZonePlenumNum); // Initialize all ZonePlenum related parameters
-
-        CalcAirZoneReturnPlenum(state, ZonePlenumNum);
-
-        UpdateAirZoneReturnPlenum(state, ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
-
-    } else if (iCompType == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
-        // Find the correct ZonePlenumNumber
-        if (CompIndex == 0) {
-            ZonePlenumNum =
-                UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
-            if (ZonePlenumNum == 0) {
-                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + std::string{CompName});
-            }
-            CompIndex = ZonePlenumNum;
-        } else {
-            ZonePlenumNum = CompIndex;
-            if (ZonePlenumNum > state.dataZonePlenum->NumZoneSupplyPlenums || ZonePlenumNum < 1) {
-                ShowFatalError(
-                    state,
-                    format("SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:SupplyPlenum={}, AirLoopHVAC:SupplyPlenum name={}",
-                           ZonePlenumNum,
-                           state.dataZonePlenum->NumZoneReturnPlenums,
-                           CompName));
-            }
-            if (state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum)) {
-                if (CompName != state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName) {
-                    ShowFatalError(state,
-                                   format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:SupplyPlenum name={}, stored "
-                                          "AirLoopHVAC:SupplyPlenum Name for that index={}",
-                                          ZonePlenumNum,
-                                          CompName,
-                                          state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName));
-                }
-                state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum) = false;
-            }
-        }
-
-        InitAirZoneSupplyPlenum(state, ZonePlenumNum, FirstHVACIteration, FirstCall); // Initialize all ZonePlenum related parameters
-
-        CalcAirZoneSupplyPlenum(state, ZonePlenumNum, FirstCall);
-        // Update the current ZonePlenum to the outlet nodes
-        UpdateAirZoneSupplyPlenum(state, ZonePlenumNum, PlenumInletChanged, FirstCall);
-
-    } else {
-        ShowSevereError(state, "SimAirZonePlenum: Errors in Plenum=" + std::string{CompName});
-        ShowContinueError(state, format("ZonePlenum: Unhandled plenum type found:{}", iCompType));
-        ShowFatalError(state, "Preceding conditions cause termination.");
-    }
-}
-
 void GetZonePlenumInput(EnergyPlusData &state)
 {
 
@@ -1096,12 +979,6 @@ void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, boo
     }
 }
 
-// End Algorithm Section of the Module
-// *****************************************************************************
-
-// Beginning of Update subroutines for the ZonePlenum Module
-// *****************************************************************************
-
 void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
 {
 
@@ -1258,6 +1135,123 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
         Node(ZoneNode).MassFlowRateMinAvail = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletMassFlowRateMinAvail;
 
     } // For FirstCall
+}
+
+void SimAirZonePlenum(EnergyPlusData &state,
+                      std::string_view CompName,
+                      int const iCompType,
+                      int &CompIndex,
+                      Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
+                      Optional_bool_const FirstCall,          // Autodesk:OPTIONAL Used without PRESENT check
+                      Optional_bool PlenumInletChanged        // Autodesk:OPTIONAL Used without PRESENT check
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Peter Graham Ellis
+    //       DATE WRITTEN   November 2000
+    //       MODIFIED       March 2000
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine manages the ZonePlenum component simulation for both
+    // return and supply plenums.
+    // It is called from the SimAirLoopComponent at the system time step.
+
+    // Using/Aliasing
+    using DataZoneEquipment::ZoneReturnPlenum_Type;
+    using DataZoneEquipment::ZoneSupplyPlenum_Type;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
+
+    // Obtains and Allocates ZonePlenum related parameters from input file
+    if (state.dataZonePlenum->GetInputFlag) { // First time subroutine has been entered
+        GetZonePlenumInput(state);
+        state.dataZonePlenum->GetInputFlag = false;
+    }
+
+    if (iCompType == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
+        // Find the correct ZonePlenumNumber
+        if (CompIndex == 0) {
+            ZonePlenumNum =
+                UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
+            if (ZonePlenumNum == 0) {
+                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + std::string{CompName});
+            }
+            CompIndex = ZonePlenumNum;
+        } else {
+            ZonePlenumNum = CompIndex;
+            if (ZonePlenumNum > state.dataZonePlenum->NumZoneReturnPlenums || ZonePlenumNum < 1) {
+                ShowFatalError(
+                    state,
+                    format("SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:ReturnPlenum={}, AirLoopHVAC:ReturnPlenum name={}",
+                           ZonePlenumNum,
+                           state.dataZonePlenum->NumZoneReturnPlenums,
+                           CompName));
+            }
+            if (state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum)) {
+                if (CompName != state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName) {
+                    ShowFatalError(state,
+                                   format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:ReturnPlenum name={}, stored "
+                                          "AirLoopHVAC:ReturnPlenum Name for that index={}",
+                                          ZonePlenumNum,
+                                          CompName,
+                                          state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName));
+                }
+                state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum) = false;
+            }
+        }
+
+        InitAirZoneReturnPlenum(state, ZonePlenumNum); // Initialize all ZonePlenum related parameters
+
+        CalcAirZoneReturnPlenum(state, ZonePlenumNum);
+
+        UpdateAirZoneReturnPlenum(state, ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
+
+    } else if (iCompType == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
+        // Find the correct ZonePlenumNumber
+        if (CompIndex == 0) {
+            ZonePlenumNum =
+                UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
+            if (ZonePlenumNum == 0) {
+                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + std::string{CompName});
+            }
+            CompIndex = ZonePlenumNum;
+        } else {
+            ZonePlenumNum = CompIndex;
+            if (ZonePlenumNum > state.dataZonePlenum->NumZoneSupplyPlenums || ZonePlenumNum < 1) {
+                ShowFatalError(
+                    state,
+                    format("SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:SupplyPlenum={}, AirLoopHVAC:SupplyPlenum name={}",
+                           ZonePlenumNum,
+                           state.dataZonePlenum->NumZoneReturnPlenums,
+                           CompName));
+            }
+            if (state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum)) {
+                if (CompName != state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName) {
+                    ShowFatalError(state,
+                                   format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:SupplyPlenum name={}, stored "
+                                          "AirLoopHVAC:SupplyPlenum Name for that index={}",
+                                          ZonePlenumNum,
+                                          CompName,
+                                          state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName));
+                }
+                state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum) = false;
+            }
+        }
+
+        InitAirZoneSupplyPlenum(state, ZonePlenumNum, FirstHVACIteration, FirstCall); // Initialize all ZonePlenum related parameters
+
+        CalcAirZoneSupplyPlenum(state, ZonePlenumNum, FirstCall);
+        // Update the current ZonePlenum to the outlet nodes
+        UpdateAirZoneSupplyPlenum(state, ZonePlenumNum, PlenumInletChanged, FirstCall);
+
+    } else {
+        ShowSevereError(state, "SimAirZonePlenum: Errors in Plenum=" + std::string{CompName});
+        ShowContinueError(state, format("ZonePlenum: Unhandled plenum type found:{}", iCompType));
+        ShowFatalError(state, "Preceding conditions cause termination.");
+    }
 }
 
 int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)

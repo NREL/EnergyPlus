@@ -893,17 +893,9 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
 
-    bool getDesuperHtrInput(EnergyPlusData &state);
-
-    bool getHPWaterHeaterInput(EnergyPlusData &state);
-
     bool getWaterHeaterMixedInputs(EnergyPlusData &state);
 
     bool getWaterHeaterStratifiedInput(EnergyPlusData &state);
-
-    bool getWaterTankMixedInput(EnergyPlusData &state);
-
-    bool getWaterTankStratifiedInput(EnergyPlusData &state);
 
     bool GetWaterThermalTankInput(EnergyPlusData &state);
 

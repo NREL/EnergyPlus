@@ -303,127 +303,9 @@ namespace WaterCoils {
                      Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CoilCompletelyDry(EnergyPlusData &state,
-                           int const CoilNum,
-                           Real64 const WaterTempIn,  // Entering water temperature
-                           Real64 const AirTempIn,    // Entering air dry bulb temperature
-                           Real64 const CoilUA,       // Overall heat transfer coefficient
-                           Real64 &OutletWaterTemp,   // Leaving water temperature
-                           Real64 &OutletAirTemp,     // Leaving air dry bulb temperature
-                           Real64 &OutletAirHumRat,   // Leaving air humidity ratio
-                           Real64 &Q,                 // Heat transfer rate
-                           int const FanOpMode,       // fan operating mode
-                           Real64 const PartLoadRatio // part-load ratio of heating coil
-    );
-
-    // Coil Completely Wet Subroutine for Cooling Coil
-
-    void CoilCompletelyWet(EnergyPlusData &state,
-                           int const CoilNum,            // Number of Coil
-                           Real64 const WaterTempIn,     // Water temperature IN to this function (C)
-                           Real64 const AirTempIn,       // Air dry bulb temperature IN to this function(C)
-                           Real64 const AirHumRat,       // Air Humidity Ratio IN to this funcation (C)
-                           Real64 const UAInternalTotal, // Internal overall heat transfer coefficient(W/m2 C)
-                           Real64 const UAExternalTotal, // External overall heat transfer coefficient(W/m2 C)
-                           Real64 &OutletWaterTemp,      // Leaving water temperature (C)
-                           Real64 &OutletAirTemp,        // Leaving air dry bulb temperature(C)
-                           Real64 &OutletAirHumRat,      // Leaving air humidity ratio
-                           Real64 &TotWaterCoilLoad,     // Total heat transfer rate(W)
-                           Real64 &SenWaterCoilLoad,     // Sensible heat transfer rate(W)
-                           Real64 &SurfAreaWetFraction,  // Fraction of surface area wet
-                           Real64 &AirInletCoilSurfTemp, // Surface temperature at air entrance(C)
-                           int const FanOpMode,          // fan operating mode
-                           Real64 const PartLoadRatio    // part-load ratio of heating coil
-    );
-
-    // Coil Part Wet Part Dry Subroutine for Cooling Coil
-
-    void CoilPartWetPartDry(EnergyPlusData &state,
-                            int const CoilNum,             // Number of Coil
-                            bool const FirstHVACIteration, // Saving Old values
-                            Real64 const InletWaterTemp,   // Entering liquid temperature(C)
-                            Real64 const InletAirTemp,     // Entering air dry bulb temperature(C)
-                            Real64 const AirDewPointTemp,  // Entering air dew point(C)
-                            Real64 &OutletWaterTemp,       // Leaving liquid temperature(C)
-                            Real64 &OutletAirTemp,         // Leaving air dry bulb temperature(C)
-                            Real64 &OutletAirHumRat,       // Leaving air humidity ratio
-                            Real64 &TotWaterCoilLoad,      // Total heat transfer rate (W)
-                            Real64 &SenWaterCoilLoad,      // Sensible heat transfer rate (W)
-                            Real64 &SurfAreaWetFraction,   // Fraction of surface area wet
-                            int const FanOpMode,           // fan operating mode
-                            Real64 const PartLoadRatio     // part-load ratio of heating coil
-    );
-
-    // Calculating coil UA for Cooling Coil
-
-    Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
-                                 int const CoilNum,
-                                 Real64 const CapacityStream1,     // Capacity rate of stream1.(W/C)
-                                 Real64 const EnergyInStreamOne,   // Inlet state of stream1.(C)
-                                 Real64 const CapacityStream2,     // Capacity rate of stream2.(W/C)
-                                 Real64 const EnergyInStreamTwo,   // Inlet state of stream2.(C)
-                                 Real64 const DesTotalHeatTransfer // Heat transfer rate(W)
-    );
-
-    // Calculating coil outlet stream conditions and coil UA for Cooling Coil
-
-    void CoilOutletStreamCondition(EnergyPlusData &state,
-                                   int const CoilNum,
-                                   Real64 const CapacityStream1,   // Capacity rate of stream1(W/C)
-                                   Real64 const EnergyInStreamOne, // Inlet state of stream1 (C)
-                                   Real64 const CapacityStream2,   // Capacity rate of stream2 (W/C)
-                                   Real64 const EnergyInStreamTwo, // Inlet state of stream2 (C)
-                                   Real64 const CoilUA,            // Heat transfer rateW)
-                                   Real64 &EnergyOutStreamOne,     // Outlet state of stream1 (C)
-                                   Real64 &EnergyOutStreamTwo      // Outlet state of stream2 (C)
-    );
-
-    // Subroutine for caculating outlet condition if coil is wet , for Cooling Coil
-
-    void WetCoilOutletCondition(EnergyPlusData &state,
-                                int const CoilNum,
-                                Real64 const AirTempIn,      // Entering air dry bulb temperature(C)
-                                Real64 const EnthAirInlet,   // Entering air enthalpy(J/kg)
-                                Real64 const EnthAirOutlet,  // Leaving air enthalpy(J/kg)
-                                Real64 const UACoilExternal, // Heat transfer coefficient for external surface (W/C)
-                                Real64 &OutletAirTemp,       // Leaving air dry bulb temperature(C)
-                                Real64 &OutletAirHumRat,     // Leaving air humidity ratio
-                                Real64 &SenWaterCoilLoad     // Sensible heat transfer rate(W)
-    );
-
-    void UpdateWaterCoil(EnergyPlusData &state, int const CoilNum);
-
-    void ReportWaterCoil(EnergyPlusData &state, int const CoilNum);
-
-    void CalcDryFinEffCoef(EnergyPlusData &state, Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef);
-
-    void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode);
-
-    void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode);
-
-    void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
-
     Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
                                        Real64 const UA,           // UA of coil
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
-    Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
-    // Iterate Routine for Cooling Coil
-
-    void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
-                          Real64 const SurfAreaFracCurrent, // Driver Value
-                          Real64 const ErrorCurrent,        // Objective Function
-                          Real64 &SurfAreaFracPrevious,     // First Previous value of Surf Area Fraction
-                          Real64 &ErrorPrevious,            // First Previous value of error
-                          Real64 &SurfAreaFracLast,         // Second Previous value of Surf Area Fraction
-                          Real64 &ErrorLast,                // Second Previous value of error
-                          int const IterNum,                // Number of Iterations
-                          int &icvg                         // Iteration convergence flag
     );
 
     void CheckWaterCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
@@ -489,13 +371,6 @@ namespace WaterCoils {
                       Real64 const PB  // barometric pressure {Pascals}
     );
 
-    Real64 EnthalpyResidual(EnergyPlusData &state,
-                            Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
-    );
-
-    Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
-
     int GetWaterCoilIndex(EnergyPlusData &state,
                           std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
@@ -506,17 +381,6 @@ namespace WaterCoils {
                                 std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
-    );
-
-    void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
-                                             int const CoilTypeNum,
-                                             std::string const &CoilName,
-                                             int const EquipFlowCtrl, // Flow control mode for the equipment
-                                             int const LoopNum,       // Plant loop index for where called from
-                                             int const LoopSide,      // Plant loop side index for where called from
-                                             int &CompIndex,          // Chiller number pointer
-                                             bool const FirstHVACIteration,
-                                             bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     );
 
     int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state,

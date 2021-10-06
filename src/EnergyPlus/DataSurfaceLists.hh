@@ -105,8 +105,6 @@ namespace DataSurfaceLists {
 
     int GetNumberOfSurfaceLists(EnergyPlusData &state);
 
-    int GetNumberOfSurfListVentSlab(EnergyPlusData &state);
-
 } // namespace DataSurfaceLists
 
 struct SurfaceListsData : BaseGlobalStruct

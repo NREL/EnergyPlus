@@ -160,44 +160,6 @@ namespace WindowAC {
 
     void GetWindowAC(EnergyPlusData &state);
 
-    void InitWindowAC(EnergyPlusData &state,
-                      int const WindACNum,          // number of the current window AC unit being simulated
-                      Real64 &QZnReq,               // zone load (modified as needed) (W)
-                      int const ZoneNum,            // index to zone
-                      bool const FirstHVACIteration // TRUE when first HVAC iteration
-    );
-
-    void SizeWindowAC(EnergyPlusData &state, int const WindACNum);
-
-    void SimCyclingWindowAC(EnergyPlusData &state,
-                            int const WindACNum,           // number of the current window AC unit being simulated
-                            int const ZoneNum,             // number of zone being served !unused1208
-                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                            Real64 &PowerMet,              // Sensible power supplied (W)
-                            Real64 const QZnReq,           // Sensible load to be met (W)
-                            Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
-    );
-
-    void ReportWindowAC(EnergyPlusData &state, int const WindACNum); // number of the current AC unit being simulated
-
-    void CalcWindowACOutput(EnergyPlusData &state,
-                            int const WindACNum,           // Unit index in fan coil array
-                            bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
-                            Real64 const PartLoadFrac,     // unit part load fraction
-                            bool const HXUnitOn,           // Flag to toggle HX heat recovery as needed
-                            Real64 &LoadMet                // load met by unit (watts)
-    );
-
-    void ControlCycWindACOutput(EnergyPlusData &state,
-                                int const WindACNum,           // Unit index in fan coil array
-                                bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                                int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
-                                Real64 const QZnReq,           // cooling output needed by zone [W]
-                                Real64 &PartLoadFrac,          // unit part load fraction
-                                bool &HXUnitOn                 // Used to control HX heat recovery as needed
-    );
-
     int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum);
 
     int GetWindowACOutAirNode(EnergyPlusData &state, int const WindACNum);

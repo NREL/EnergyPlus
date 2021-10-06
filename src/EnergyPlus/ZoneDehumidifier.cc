@@ -110,77 +110,6 @@ namespace ZoneDehumidifier {
     using namespace DataLoopNode;
     using namespace ScheduleManager;
 
-    void SimZoneDehumidifier(EnergyPlusData &state,
-                             std::string const &CompName,                    // Name of the zone dehumidifier
-                             int const ZoneNum,                              // Number of zone being served
-                             [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                             Real64 &QSensOut,                               // Sensible capacity delivered to zone (W)
-                             Real64 &QLatOut,                                // Latent capacity delivered to zone (kg/s), dehumidify = negative
-                             int &CompIndex                                  // Index to the zone dehumidifier
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Don Shirey, FSEC
-        //       DATE WRITTEN   July/Aug 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Simulate a zone dehumidifier.
-
-        // METHODOLOGY EMPLOYED:
-        // Call appropriate subroutines to get input values, initialize variables, model performanc
-        // update node information, report model outputs.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneDehumidNum;   // Index of zone dehumidifier being simulated
-        Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
-
-        if (state.dataZoneDehumidifier->GetInputFlag) {
-            GetZoneDehumidifierInput(state);
-            state.dataZoneDehumidifier->GetInputFlag = false;
-        }
-
-        // Find the correct zone dehumidifier
-        if (CompIndex == 0) {
-            ZoneDehumidNum = UtilityRoutines::FindItemInList(CompName, state.dataZoneDehumidifier->ZoneDehumid);
-            if (ZoneDehumidNum == 0) {
-                ShowFatalError(state, "SimZoneDehumidifier: Unit not found= " + CompName);
-            }
-            CompIndex = ZoneDehumidNum;
-        } else {
-            ZoneDehumidNum = CompIndex;
-            if (ZoneDehumidNum > state.dataZoneDehumidifier->NumDehumidifiers || ZoneDehumidNum < 1) {
-                ShowFatalError(state,
-                               format("SimZoneDehumidifier:  Invalid CompIndex passed= {}, Number of Units= {}, Entered Unit name= {}",
-                                      ZoneDehumidNum,
-                                      state.dataZoneDehumidifier->NumDehumidifiers,
-                                      CompName));
-            }
-            if (state.dataZoneDehumidifier->CheckEquipName(ZoneDehumidNum)) {
-                if (CompName != state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).Name) {
-                    ShowFatalError(state,
-                                   format("SimZoneDehumidifier: Invalid CompIndex passed={}, Unit name= {}, stored Unit Name for that index= {}",
-                                          ZoneDehumidNum,
-                                          CompName,
-                                          state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).Name));
-                }
-                state.dataZoneDehumidifier->CheckEquipName(ZoneDehumidNum) = false;
-            }
-        }
-
-        QZnDehumidReq = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
-
-        InitZoneDehumidifier(state, ZoneDehumidNum);
-
-        CalcZoneDehumidifier(state, ZoneDehumidNum, QZnDehumidReq, QSensOut, QLatOut);
-
-        UpdateZoneDehumidifier(state, ZoneDehumidNum);
-
-        ReportZoneDehumidifier(state, ZoneDehumidNum);
-    }
-
     void GetZoneDehumidifierInput(EnergyPlusData &state)
     {
 
@@ -1238,6 +1167,77 @@ namespace ZoneDehumidifier {
         }
 
         return FindZoneDehumidifierNodeNumber;
+    }
+
+    void SimZoneDehumidifier(EnergyPlusData &state,
+                             std::string const &CompName,                    // Name of the zone dehumidifier
+                             int const ZoneNum,                              // Number of zone being served
+                             [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                             Real64 &QSensOut,                               // Sensible capacity delivered to zone (W)
+                             Real64 &QLatOut,                                // Latent capacity delivered to zone (kg/s), dehumidify = negative
+                             int &CompIndex                                  // Index to the zone dehumidifier
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Don Shirey, FSEC
+        //       DATE WRITTEN   July/Aug 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Simulate a zone dehumidifier.
+
+        // METHODOLOGY EMPLOYED:
+        // Call appropriate subroutines to get input values, initialize variables, model performanc
+        // update node information, report model outputs.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int ZoneDehumidNum;   // Index of zone dehumidifier being simulated
+        Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
+
+        if (state.dataZoneDehumidifier->GetInputFlag) {
+            GetZoneDehumidifierInput(state);
+            state.dataZoneDehumidifier->GetInputFlag = false;
+        }
+
+        // Find the correct zone dehumidifier
+        if (CompIndex == 0) {
+            ZoneDehumidNum = UtilityRoutines::FindItemInList(CompName, state.dataZoneDehumidifier->ZoneDehumid);
+            if (ZoneDehumidNum == 0) {
+                ShowFatalError(state, "SimZoneDehumidifier: Unit not found= " + CompName);
+            }
+            CompIndex = ZoneDehumidNum;
+        } else {
+            ZoneDehumidNum = CompIndex;
+            if (ZoneDehumidNum > state.dataZoneDehumidifier->NumDehumidifiers || ZoneDehumidNum < 1) {
+                ShowFatalError(state,
+                               format("SimZoneDehumidifier:  Invalid CompIndex passed= {}, Number of Units= {}, Entered Unit name= {}",
+                                      ZoneDehumidNum,
+                                      state.dataZoneDehumidifier->NumDehumidifiers,
+                                      CompName));
+            }
+            if (state.dataZoneDehumidifier->CheckEquipName(ZoneDehumidNum)) {
+                if (CompName != state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).Name) {
+                    ShowFatalError(state,
+                                   format("SimZoneDehumidifier: Invalid CompIndex passed={}, Unit name= {}, stored Unit Name for that index= {}",
+                                          ZoneDehumidNum,
+                                          CompName,
+                                          state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).Name));
+                }
+                state.dataZoneDehumidifier->CheckEquipName(ZoneDehumidNum) = false;
+            }
+        }
+
+        QZnDehumidReq = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
+
+        InitZoneDehumidifier(state, ZoneDehumidNum);
+
+        CalcZoneDehumidifier(state, ZoneDehumidNum, QZnDehumidReq, QSensOut, QLatOut);
+
+        UpdateZoneDehumidifier(state, ZoneDehumidNum);
+
+        ReportZoneDehumidifier(state, ZoneDehumidNum);
     }
 
 } // namespace ZoneDehumidifier

@@ -108,9 +108,6 @@ namespace WindowManager {
     // using LayersBSDF_Map = std::map< int, std::shared_ptr< IGU_BSDFLayers > >;
     using Layers_Map = std::map<int, IGU_Layers>;
 
-    // Test if surface is hit by beam defined with vector
-    bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
-
     // Converts world coordinates (E+) into local surface coordinates that suites better for
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
     std::pair<Real64, Real64> getWCECoordinates(EnergyPlusData &state,

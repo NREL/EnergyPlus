@@ -97,7 +97,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -138,6 +137,157 @@ using Psychrometrics::PsyWFnTdbRhPb;
 using Psychrometrics::PsyWFnTdbTwbPb;
 using Psychrometrics::PsyWFnTdpPb;
 using namespace ScheduleManager;
+
+void UpdateWaterCoil(EnergyPlusData &state, int const CoilNum)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard Liesen
+    //       DATE WRITTEN   1998
+    //       MODIFIED       April 2004: Rahul Chillar
+    //                      Feb 2010 B. Griffith, plant upgrades
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine updates the coil outlet nodes.
+
+    // METHODOLOGY EMPLOYED:
+    // Data is moved from the coil data structure to the coil outlet nodes.
+
+    // Using/Aliasing
+    using PlantUtilities::SetComponentFlowRate;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int AirInletNode;
+    int AirOutletNode;
+    int WaterOutletNode;
+
+    AirInletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum;
+    AirOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum;
+    WaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
+
+    // Set the outlet air nodes of the WaterCoil
+    state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirMassFlowRate;
+    state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
+    state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
+    state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirEnthalpy;
+
+    state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp;
+    state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy;
+
+    // Set the outlet nodes for properties that just pass through & not used
+    state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
+    state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
+    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
+    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
+    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
+    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
+    }
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
+    }
+}
+
+void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard Liesen
+    //       DATE WRITTEN   1998
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine updates the report variable for the coils.
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("ReportWaterCoil");
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 RhoWater;
+    Real64 Tavg;
+    Real64 SpecHumOut;
+    Real64 SpecHumIn;
+    Real64 ReportingConstant;
+
+    if (state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes) {
+        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
+            std::string coilObjClassName;
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
+                coilObjClassName = "Coil:Heating:Water";
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
+                    state,
+                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilObjClassName,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
+                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
+            } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling) {
+                coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
+                    state,
+                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilObjClassName,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
+                    -999.0,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
+                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
+            } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
+                coilObjClassName = "Coil:Cooling:Water";
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
+                    state,
+                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilObjClassName,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
+                    -999.0,
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
+                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
+            }
+        }
+    }
+    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    // report the WaterCoil energy from this component
+    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy =
+        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate * ReportingConstant;
+    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy =
+        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate * ReportingConstant;
+    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy =
+        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate * ReportingConstant;
+
+    // report the WaterCoil water collection to water storage tank (if needed)
+
+    if (state.dataWaterCoils->WaterCoil(CoilNum).CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
+        // calculate and report condensation rates  (how much water extracted from the air stream)
+        // water volumetric flow of water in m3/s for water system interactions
+        //  put here to catch all types of DX coils
+        Tavg = (state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp - state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp) / 2.0;
+
+        RhoWater = GetDensityGlycol(state,
+                                    state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                    Tavg,
+                                    state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                    RoutineName);
+        //   CR9155 Remove specific humidity calculations
+        SpecHumIn = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
+        SpecHumOut = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
+        //  mdot * del HumRat / rho water
+        state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot =
+            max(0.0, (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
+        state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol = state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot * ReportingConstant;
+
+        state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID)
+            .VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot;
+        state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID)
+            .TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
+    }
+}
 
 void SimulateWaterCoilComponents(EnergyPlusData &state,
                                  std::string_view CompName,
@@ -970,6 +1120,527 @@ void GetWaterCoilInput(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 }
 
+void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR   Unknown
+    //       DATE WRITTEN   Unknown
+    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // To calculate the modified Bessel Function from order 0 to BessFuncOrd
+    // BessFuncArg    ARGUMENT OF BESSEL FUNCTION
+    // BessFuncOrd    ORDER OF BESSEL FUNCTION, GREATER THAN OR EQUAL TO ZERO
+    // IBessFunc   RESULTANT VALUE OF I BESSEL FUNCTION
+    // ErrorCode  RESULTANT ERROR CODE:
+    //       ErrorCode = 0   NO ERROR
+    //       ErrorCode = 1   BessFuncOrd .LT. 0
+    //       ErrorCode = 2   BessFuncArg .LT. 0
+    //       ErrorCode = 3   IBessFunc .LT. 10**(-30),     IBessFunc IS SET TO 0
+    //       ErrorCode = 4   BessFuncArg .GT. BessFuncOrd & BessFuncArg .GT. 90,  IBessFunc IS SET TO 10**38
+
+    // REFERENCES:
+    // First found in MODSIM.
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    Real64 constexpr ErrorTol(1.0e-06);
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int LoopCount;
+    Real64 FI;
+    Real64 FK;
+    Real64 TERM;
+
+    ErrorCode = 0;
+    IBessFunc = 1.0;
+    if (BessFuncArg == 0.0 && BessFuncOrd == 0) return;
+
+    if (BessFuncOrd < 0) {
+        ErrorCode = 1;
+        return;
+    } else if (BessFuncArg < 0.0) {
+        ErrorCode = 2;
+        return;
+    } else if (BessFuncArg > 12.0 && BessFuncArg > BessFuncOrd) {
+        if (BessFuncArg > 90.0) {
+            ErrorCode = 4;
+            IBessFunc = 1.0e30;
+            return;
+        }
+        TERM = 1.0;
+        IBessFunc = 1.0;
+        for (LoopCount = 1; LoopCount <= 30; ++LoopCount) { // Start of 1st LoopCount Loop
+            if (std::abs(TERM) <= std::abs(ErrorTol * IBessFunc)) {
+                IBessFunc *= std::exp(BessFuncArg) / std::sqrt(2.0 * DataGlobalConstants::Pi * BessFuncArg);
+                return;
+            }
+            TERM *= 0.125 / BessFuncArg * (pow_2(2 * LoopCount - 1) - 4 * BessFuncOrd * BessFuncOrd) / double(LoopCount);
+            IBessFunc += TERM;
+        } // End of 1st LoopCount loop
+    }
+
+    TERM = 1.0;
+    if (BessFuncOrd > 0) {
+        for (LoopCount = 1; LoopCount <= BessFuncOrd; ++LoopCount) { // Start of 2nd LoopCount Loop
+            FI = LoopCount;
+            if (std::abs(TERM) < 1.0e-30 * FI / (BessFuncArg * 2.0)) {
+                ErrorCode = 3;
+                IBessFunc = 0.0;
+                return;
+            }
+            TERM *= BessFuncArg / (2.0 * FI);
+        } // End of 2nd LoopCount loop
+    }
+
+    IBessFunc = TERM;
+    for (LoopCount = 1; LoopCount <= 1000; ++LoopCount) { // Start of 3rd LoopCount Loop
+        if (std::abs(TERM) <= std::abs(IBessFunc * ErrorTol)) return;
+        FK = LoopCount * (BessFuncOrd + LoopCount);
+        TERM *= pow_2(BessFuncArg) / (4.0 * FK);
+        IBessFunc += TERM;
+    } // End of  3rd LoopCount loop
+}
+
+void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR   Unknown
+    //       DATE WRITTEN   Unknown
+    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // To calculate the K Bessel Function for a given argument and
+    // order
+    //  BessFuncArg    THE ARGUMENT OF THE K BESSEL FUNCTION DESIRED
+    //  BessFuncOrd    THE ORDER OF THE K BESSEL FUNCTION DESIRED
+    //  KBessFunc   THE RESULTANT K BESSEL FUNCTION
+    //  ErrorCode  RESULTANT ERROR CODE:
+    //        ErrorCode=0  NO ERROR
+    //        ErrorCode=1  BessFuncOrd IS NEGATIVE
+    //        ErrorCode=2  BessFuncArg IS ZERO OR NEGATIVE
+    //        ErrorCode=3  BessFuncArg .GT. 85, KBessFunc .LT. 10**-38; KBessFunc SET TO 0.
+    //        ErrorCode=4  KBessFunc .GT. 10**38; KBessFunc SET TO 10**38
+    // NOTE: BessFuncOrd MUST BE GREATER THAN OR EQUAL TO ZERO
+    // METHOD:
+    //  COMPUTES ZERO ORDER AND FIRST ORDER BESSEL FUNCTIONS USING
+    //  SERIES APPROXIMATIONS AND THEN COMPUTES BessFuncOrd TH ORDER FUNCTION
+    //  USING RECURRENCE RELATION.
+    //  RECURRENCE RELATION AND POLYNOMIAL APPROXIMATION TECHNIQUE
+    //  AS DESCRIBED BY A.J.M. HITCHCOCK, 'POLYNOMIAL APPROXIMATIONS
+    //  TO BESSEL FUNCTIONS OF ORDER ZERO AND ONE AND TO RELATED
+    //  FUNCTIONS,' M.T.A.C., V.11, 1957, PP. 86-88, AND G.BessFuncOrd. WATSON,
+    //  'A TREATISE ON THE THEORY OF BESSEL FUNCTIONS,' CAMBRIDGE
+    //  UNIVERSITY PRESS, 1958, P.62
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    Real64 constexpr GJMAX(1.0e+38);
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int LoopCount;
+    bool StopLoop;
+
+    Real64 FACT;
+    Real64 G0;
+    Real64 G1;
+    Real64 GJ;
+    Real64 HJ;
+    Array1D<Real64> T(12);
+    Real64 X2J;
+
+    KBessFunc = 0.0;
+    G0 = 0.0;
+    GJ = 0.0;
+
+    if (BessFuncOrd < 0.0) {
+        ErrorCode = 1;
+        return;
+    } else if (BessFuncArg <= 0.0) {
+        ErrorCode = 2;
+        return;
+    } else if (BessFuncArg > 85.0) {
+        ErrorCode = 3;
+        KBessFunc = 0.0;
+        return;
+    }
+
+    ErrorCode = 0;
+
+    //     Use polynomial approximation if BessFuncArg > 1.
+
+    if (BessFuncArg > 1.0) {
+        T(1) = 1.0 / BessFuncArg;
+        for (LoopCount = 2; LoopCount <= 12; ++LoopCount) {
+            T(LoopCount) = T(LoopCount - 1) / BessFuncArg;
+        } // End of LoopCount Loop
+        if (BessFuncOrd != 1) {
+
+            //     Compute K0 using polynomial approximation
+
+            G0 = std::exp(-BessFuncArg) *
+                 (1.2533141 - 0.1566642 * T(1) + 0.08811128 * T(2) - 0.09139095 * T(3) + 0.1344596 * T(4) - 0.2299850 * T(5) + 0.3792410 * T(6) -
+                  0.5247277 * T(7) + 0.5575368 * T(8) - 0.4262633 * T(9) + 0.2184518 * T(10) - 0.06680977 * T(11) + 0.009189383 * T(12)) *
+                 std::sqrt(1.0 / BessFuncArg);
+            if (BessFuncOrd == 0) {
+                KBessFunc = G0;
+                return;
+            }
+        }
+
+        //     Compute K1 using polynomial approximation
+
+        G1 = std::exp(-BessFuncArg) *
+             (1.2533141 + 0.4699927 * T(1) - 0.1468583 * T(2) + 0.1280427 * T(3) - 0.1736432 * T(4) + 0.2847618 * T(5) - 0.4594342 * T(6) +
+              0.6283381 * T(7) - 0.6632295 * T(8) + 0.5050239 * T(9) - 0.2581304 * T(10) + 0.07880001 * T(11) - 0.01082418 * T(12)) *
+             std::sqrt(1.0 / BessFuncArg);
+        if (BessFuncOrd == 1) {
+            KBessFunc = G1;
+            return;
+        }
+    } else {
+
+        //     Use series expansion if BessFuncArg <= 1.
+
+        if (BessFuncOrd != 1) {
+
+            //     Compute K0 using series expansion
+
+            G0 = -(0.5772157 + std::log(BessFuncArg / 2.0));
+            X2J = 1.0;
+            FACT = 1.0;
+            HJ = 0.0;
+            for (LoopCount = 1; LoopCount <= 6; ++LoopCount) {
+                X2J *= pow_2(BessFuncArg) / 4.0;
+                FACT *= pow_2(1.0 / double(LoopCount));
+                HJ += 1.0 / double(LoopCount);
+                G0 += X2J * FACT * (HJ - (0.5772157 + std::log(BessFuncArg / 2.0)));
+            } // End of LoopCount Loop
+            if (BessFuncOrd == 0.0) {
+                KBessFunc = G0;
+                return;
+            }
+        }
+
+        //     Compute K1 using series expansion
+
+        X2J = BessFuncArg / 2.0;
+        FACT = 1.0;
+        HJ = 1.0;
+        G1 = 1.0 / BessFuncArg + X2J * (0.5 + (0.5772157 + std::log(BessFuncArg / 2.0)) - HJ);
+        for (LoopCount = 2; LoopCount <= 8; ++LoopCount) {
+            X2J *= pow_2(BessFuncArg) / 4.0;
+            FACT *= pow_2(1.0 / double(LoopCount));
+            HJ += 1.0 / double(LoopCount);
+            G1 += X2J * FACT * (0.5 + ((0.5772157 + std::log(BessFuncArg / 2.0)) - HJ) * double(LoopCount));
+        } // End of LoopCount Loop
+        if (BessFuncOrd == 1) {
+            KBessFunc = G1;
+            return;
+        }
+    }
+
+    //     From K0 and K1 compute KN using recurrence relation
+
+    LoopCount = 2;
+    StopLoop = false;
+    while (LoopCount <= BessFuncOrd && !StopLoop) {
+        GJ = 2.0 * (double(LoopCount) - 1.0) * G1 / BessFuncArg + G0;
+        if (GJ - GJMAX > 0.0) {
+            ErrorCode = 4;
+            GJ = GJMAX;
+            StopLoop = true;
+        } else {
+            G0 = G1;
+            G1 = GJ;
+            ++LoopCount;
+        }
+    } // End of LoopCount Loop
+    KBessFunc = GJ;
+}
+
+void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR   Unknown
+    //       DATE WRITTEN   Unknown
+    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Fits polynomial of order from 1 to MaxPolynomOrder to the
+    // ordered pairs of data points X,Y
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    bool Converged;
+    Real64 B;
+    int I;
+    int II;
+    int J;
+    int PolynomOrder;
+    int CurrentOrder;
+    int CurrentOrdPair;
+    Real64 S1;
+    Real64 S2;
+
+    auto &OrdPairSum(state.dataWaterCoils->OrdPairSum);
+    auto &OrdPairSumMatrix(state.dataWaterCoils->OrdPairSumMatrix);
+
+    OrdPairSum = 0.0;
+    OrdPairSum(1, 1) = WaterCoils::MaxOrderedPairs;
+    PolynomCoef = 0.0;
+    for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
+        OrdPairSum(2, 1) += OrderedPair(CurrentOrdPair, 1);
+        OrdPairSum(3, 1) += OrderedPair(CurrentOrdPair, 1) * OrderedPair(CurrentOrdPair, 1);
+        OrdPairSum(1, 2) += OrderedPair(CurrentOrdPair, 2);
+        OrdPairSum(2, 2) += OrderedPair(CurrentOrdPair, 1) * OrderedPair(CurrentOrdPair, 2);
+    }
+    PolynomOrder = 1;
+    Converged = false;
+    while (!Converged) {
+        for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
+            for (J = 1; J <= PolynomOrder + 1; ++J) {
+                OrdPairSumMatrix(J, CurrentOrder) = OrdPairSum(J - 1 + CurrentOrder, 1);
+            } // End of J loop
+            OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder) = OrdPairSum(CurrentOrder, 2);
+        } // End of CurrentOrder loop
+
+        for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
+            OrdPairSumMatrix(CurrentOrder, PolynomOrder + 2) = -1.0;
+            for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
+                OrdPairSumMatrix(J, PolynomOrder + 2) = 0.0;
+            } // End of J loop
+
+            for (II = 2; II <= PolynomOrder + 2; ++II) {
+                for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
+                    OrdPairSumMatrix(J, II) -= OrdPairSumMatrix(J, 1) * OrdPairSumMatrix(CurrentOrder, II) / OrdPairSumMatrix(CurrentOrder, 1);
+                } // End of J loop
+            }     // End of II loop
+            for (II = 1; II <= PolynomOrder + 1; ++II) {
+                for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
+                    OrdPairSumMatrix(J, II) = OrdPairSumMatrix(J, II + 1);
+                } // End of J loop
+            }     // End of II loop
+        }         // End of CurrentOrder loop
+
+        S2 = 0.0;
+        for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
+            S1 = OrdPairSumMatrix(PolynomOrder + 2, 1);
+            auto const OrderedPair1C(OrderedPair(CurrentOrdPair, 1));
+            auto OrderedPair1C_pow(1.0);
+            for (CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder) {
+                OrderedPair1C_pow *= OrderedPair1C;
+                S1 += OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder + 1) * OrderedPair1C_pow;
+            } // End of CurrentOrder loop
+            S2 += (S1 - OrderedPair(CurrentOrdPair, 2)) * (S1 - OrderedPair(CurrentOrdPair, 2));
+        } // End of CurrentOrdPair loop
+        B = WaterCoils::MaxOrderedPairs - (PolynomOrder + 1);
+        if (S2 > 0.0001) S2 = std::sqrt(S2 / B);
+        for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
+            PolynomCoef(CurrentOrder) = OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder);
+        } // End of CurrentOrder loop
+
+        if ((PolynomOrder - WaterCoils::MaxPolynomOrder < 0) && (S2 - WaterCoils::PolyConvgTol > 0.0)) {
+            ++PolynomOrder;
+            J = 2 * PolynomOrder;
+            OrdPairSum(J, 1) = OrdPairSum(J + 1, 1) = 0.0;
+            auto OrdPairSum2P = OrdPairSum(PolynomOrder + 1, 2) = 0.0;
+            for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
+                auto const OrderedPair1I(OrderedPair(I, 1));
+                auto OrderedPair_pow(std::pow(OrderedPair1I, J - 1));
+                OrdPairSum(J, 1) += OrderedPair_pow;
+                OrderedPair_pow *= OrderedPair1I;
+                OrdPairSum(J + 1, 1) += OrderedPair_pow;
+                OrdPairSum2P += OrderedPair(I, 2) * std::pow(OrderedPair1I, PolynomOrder);
+            }
+            OrdPairSum(PolynomOrder + 1, 2) = OrdPairSum2P;
+        } else {
+            Converged = true;
+        }
+    }
+}
+
+void CalcDryFinEffCoef(EnergyPlusData &state, Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR   Unknown
+    //       DATE WRITTEN   Unknown
+    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // The following subroutines are used once per cooling coil
+    // simulation to obtain the coefficients of the dry fin
+    // efficiency equation.  CalcDryFinEffCoef is the main calling
+    // routine which manages calls to the Bessel funtion and polynomial
+    // fit routines.
+
+    // REFERENCES:
+    // First found in MODSIM.
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 FAI;
+    Real64 FED;
+    Real64 FEDnumerator;
+    int I;
+    int IE1;
+    int IE2;
+    int IE3;
+    int IE4;
+    int IE5;
+    int IE6;
+    Real64 R1;
+    Real64 R1I1;
+    Real64 R1K1;
+    Real64 R2;
+    Real64 R2I0;
+    Real64 R2I1;
+    Real64 R2K0;
+    Real64 R2K1;
+    Real64 RO;
+
+    FAI = 0.02;
+    for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
+        FAI += 0.035;
+        R1 = FAI / (1.0 - OutTubeEffFinDiamRatio);
+        R2 = R1 * OutTubeEffFinDiamRatio;
+        RO = 2.0 * OutTubeEffFinDiamRatio / (FAI * (1.0 + OutTubeEffFinDiamRatio));
+        CalcIBesselFunc(R1, 1, R1I1, IE1);
+        CalcKBesselFunc(R2, 1, R2K1, IE2);
+        CalcIBesselFunc(R2, 1, R2I1, IE3);
+        CalcKBesselFunc(R1, 1, R1K1, IE4);
+        CalcIBesselFunc(R2, 0, R2I0, IE5);
+        CalcKBesselFunc(R2, 0, R2K0, IE6);
+        FEDnumerator = RO * (R1I1 * R2K1 - R2I1 * R1K1);
+        if (FEDnumerator != 0.0) {
+            FED = FEDnumerator / (R2I0 * R1K1 + R1I1 * R2K0);
+        } else {
+            FED = 0.0;
+        }
+        //      FED = RO * (R1I1 * R2K1 - R2I1 * R1K1) / (R2I0 * R1K1 + R1I1 * R2K0)
+        state.dataWaterCoils->OrderedPair(I, 1) = FAI;
+        state.dataWaterCoils->OrderedPair(I, 2) = FED;
+    }
+    CalcPolynomCoef(state, state.dataWaterCoils->OrderedPair, PolynomCoef);
+}
+
+Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil number, [-]
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Bereket A Nigusse, FSEC
+    //       DATE WRITTEN   July 2010
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS FUNCTION:
+    // Splits the UA value of a simple coil:cooling:water heat exchanger model into
+    // "A" and U" values.
+
+    // METHODOLOGY EMPLOYED:
+    // A typical design U overall heat transfer coefficient is used to split the "UA" into "A"
+    // and "U" values. Currently a constant U value calculated for a typical cooling coil is
+    // used. The assumptions used to calculate a typical U value are:
+    //     (1) tube side water velocity of 2.0 [m/s]
+    //     (2) inside to outside total surface area ratio (Ai/Ao) =  0.07 [-]
+    //     (3) fins overall efficiency = 0.92 based on aluminum fin, 12 fins per inch, and
+    //         fins area to total outside surafce area ratio of about 90%.
+    //     (4) air side convection coefficient of 140.0 [W/m2C].  Assumes sensible convection
+    //         of 58.0 [W/m2C] and 82.0 [W/m2C] sensible convection equivalent of the mass
+    //         transfer coefficient converted using the approximate relation:
+    //         hequivalent = hmasstransfer/CpAir.
+
+    // REFERENCES:
+
+    // USE STATEMENTS:
+
+    // Return value
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    constexpr Real64 OverallFinEfficiency(0.92); // Assumes aluminum fins, 12 fins per inch, fins
+    // area of about 90% of external surface area Ao.
+
+    constexpr Real64 AreaRatio(0.07); // Heat exchanger Inside to Outside surface area ratio
+    // design values range from (Ai/Ao) = 0.06 to 0.08
+
+    // Constant value air side heat transfer coefficient is assumed. This coefficient has sensible
+    // (58.d0 [W/m2C]) and latent (82.d0 [W/m2C]) heat transfer coefficient components.
+    constexpr Real64 hAirTubeOutside(58.0 + 82.0); // Air side heat transfer coefficient [W/m2C]
+
+    // Tube side water convection heat transfer coefficient of the cooling coil is calculated for
+    // inside tube diameter of 0.0122m (~0.5 inch nominal diameter) and water velocity 2.0 m/s:
+    static Real64 const hWaterTubeInside(1429.0 * std::pow(2.0, 0.8) * std::pow(0.0122, -0.2)); // water (tube) side heat transfer coefficient [W/m2C]
+
+    // Estimate the overall heat transfer coefficient, UOverallHeatTransferCoef in [W/(m2C)].
+    // Neglecting tube wall and fouling resistance, the overall U value can be estimated as:
+    // 1/UOverallHeatTransferCoef = 1/(hi*AreaRatio) + 1/(ho*OverallFinEfficiency)
+    static Real64 const UOverallHeatTransferCoef_inv(
+        1.0 / (hWaterTubeInside * AreaRatio) +
+        1.0 / (hAirTubeOutside * OverallFinEfficiency)); // Inverse of overall heat transfer coefficient for coil [W/m2C]
+
+    state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal =
+        1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
+
+    // the heat exchanger surface area is calculated as follows:
+    return state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal * UOverallHeatTransferCoef_inv; // Heat exchanger surface area [m2]
+}
+
+Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
+                                   Real64 const UA,           // UA of coil
+                                   Array1D<Real64> const &Par // par(1) = design coil load [W]
+)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   September 2011
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculates residual function (Design Coil Load - Coil Cooling Output) / Design Coil Load.
+    // Coil Cooling Output depends on the UA which is being varied to zero the residual.
+
+    // METHODOLOGY EMPLOYED:
+    // Puts UA into the water coil data structure, calls CoolingCoil, and calculates
+    // the residual as defined above.
+
+    // Return value
+    Real64 Residuum; // residual to be minimized to zero
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    int CoilIndex;
+    int FanOpMode;
+    Real64 PartLoadRatio;
+
+    CoilIndex = int(Par(2));
+    FanOpMode = (Par(3) == 1.0 ? CycFanCycCoil : ContFanCycCoil);
+    PartLoadRatio = Par(4);
+    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal = UA;
+    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal * 3.3;
+    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilTotal =
+        1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal);
+    state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea = EstimateHEXSurfaceArea(state, CoilIndex);
+    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternalPerUnitArea =
+        state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea;
+    state.dataWaterCoils->WaterCoil(CoilIndex).UAWetExtPerUnitArea =
+        state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal / state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea;
+    state.dataWaterCoils->WaterCoil(CoilIndex).UADryExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilIndex).UAWetExtPerUnitArea;
+
+    CoolingCoil(state, CoilIndex, true, state.dataWaterCoils->DesignCalc, FanOpMode, PartLoadRatio);
+
+    Residuum = (Par(1) - state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterCoolingCoilRate) / Par(1);
+
+    return Residuum;
+}
+
 void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration)
 {
 
@@ -986,11 +1657,8 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger initializations.
 
-    // REFERENCES:
-
     // Using/Aliasing
     using General::Iterate;
-
     using General::SafeDivide;
     using General::SolveRoot;
     using namespace OutputReportPredefined;
@@ -2067,7 +2735,6 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
 }
 
-// refactor coilUA adjustment into separate routine, for use with rating calc
 void CalcAdjustedCoilUA(EnergyPlusData &state, int const CoilNum)
 {
     // Pull these precalc routines out of big init routine
@@ -3061,19 +3728,8 @@ void CalcSimpleHeatingCoil(EnergyPlusData &state,
     // REFERENCES:
     // See for instance ASHRAE HVAC 2 Toolkit, page 4-4, formula (4-7)
 
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcSimpleHeatingCoil");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 WaterMassFlowRate;
@@ -3257,18 +3913,10 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
     // Changed from m2K/W to m2K/kW for consistency with the
     // other parameters in "TubeFoulThermResis" calculation
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CoefPointer;
-    //    INTEGER :: CoolCoilErrs = 0
     int PartWetIterations;
     int WaterTempConvgLoop;
-
     bool CoilPartWetConvg;
     bool WaterTempConvg;
 
@@ -3710,15 +4358,6 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
                     //          write(outputfiledebug,*) ' wcc=',wetcoilcoeff
                     denom = (state.dataWaterCoils->WaterCoil(CoilNum).EnthVsTempCurveAppxSlope - WetCoilCoeff * ScaledWaterSpecHeat -
                              (1.0 - WetCoilCoeff) * K1 * MoistAirSpecificHeat);
-                    //          write(outputfiledebug,*) ' denom=',denom
-                    //          WetDryInterfcWaterTemp = ((1.0 - WetCoilCoeff) * (InletAirEnthalpy - WaterCoil(CoilNum)%EnthVsTempCurveConst -
-                    //          K1
-                    //          *  &
-                    //                                     MoistAirSpecificHeat * TempAirIn) + WetCoilCoeff * &
-                    //                                     TempWaterIn * (WaterCoil(CoilNum)%EnthVsTempCurveAppxSlope -  &
-                    //                                     ScaledWaterSpecHeat)) / (WaterCoil(CoilNum)%EnthVsTempCurveAppxSlope -  &
-                    //                                      WetCoilCoeff * ScaledWaterSpecHeat - (1.0 - WetCoilCoeff) * K1 * &
-                    //                                     MoistAirSpecificHeat)
                     WetDryInterfcWaterTemp =
                         ((1.0 - WetCoilCoeff) * (InletAirEnthalpy - state.dataWaterCoils->WaterCoil(CoilNum).EnthVsTempCurveConst -
                                                  K1 * MoistAirSpecificHeat * TempAirIn) +
@@ -3818,10 +4457,6 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
                                            state.dataWaterCoils->WaterCoil(CoilNum).Name +
                                                " not converged (40 iterations) due to \"Partial Wet Convergence\" conditions.",
                                            state.dataWaterCoils->PartWetCoolCoilErrs(CoilNum));
-            //      CoolCoilErrs = CoolCoilErrs + 1
-            //      IF (CoolCoilErrs .LE. MaxCoolCoilErrs) THEN
-            //        CALL ShowWarningError(state, 'tp12c0:  not converged in 20 CoolCoilErrs')
-            //      END IF
         }
         if (state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction > 0 && state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction < 1) {
             state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetSaved = SurfAreaWet;
@@ -3891,6 +4526,849 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
     state.dataWaterCoils->WaterCoil(CoilNum).OutWaterTempSaved = TempWaterOut;
 }
 
+void CoilOutletStreamCondition(EnergyPlusData &state,
+                               int const CoilNum,
+                               Real64 const CapacityStream1,   // Capacity rate of stream1(W/C)
+                               Real64 const EnergyInStreamOne, // Inlet state of stream1 (C)
+                               Real64 const CapacityStream2,   // Capacity rate of stream2 (W/C)
+                               Real64 const EnergyInStreamTwo, // Inlet state of stream2 (C)
+                               Real64 const CoilUA,            // Heat transfer rateW)
+                               Real64 &EnergyOutStreamOne,     // Outlet state of stream1 (C)
+                               Real64 &EnergyOutStreamTwo      // Outlet state of stream2 (C)
+)
+{
+
+    // FUNCTION INFORMATION:
+    // AUTHOR         Rahul Chillar
+    // DATE WRITTEN   March 2004
+    // MODIFIED       na
+    // RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculate the outlet states of a simple heat exchanger using the effectiveness-Ntu
+    // method of analysis.
+
+    // REFERENCES:
+    // Kays, W.M. and A.L. London.  1964.Compact Heat Exchangers, 2nd Ed.McGraw-Hill:New York.
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    Real64 constexpr LargeNo(1.e10);  // value used in place of infinity
+    Real64 constexpr SmallNo(1.e-15); // value used in place of zero
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 MinimumCapacityStream; // Minimum capacity rate of the streams(W/C)
+    Real64 MaximumCapacityStream; // Maximum capacity rate of the streams(W/C)
+    Real64 RatioStreamCapacity;   // Ratio of minimum to maximum capacity rate
+    Real64 NTU;                   // Number of transfer units
+    Real64 effectiveness(0.0);    // Heat exchanger effectiveness
+    Real64 MaxHeatTransfer;       // Maximum heat transfer possible(W)
+    Real64 e;                     // Intermediate variables in effectiveness equation
+    Real64 eta;
+    Real64 b;
+    Real64 d;
+
+    // NTU and MinimumCapacityStream/MaximumCapacityStream (RatioStreamCapacity) calculations
+    MinimumCapacityStream = min(CapacityStream1, CapacityStream2);
+    MaximumCapacityStream = max(CapacityStream1, CapacityStream2);
+
+    if (std::abs(MaximumCapacityStream) <= 1.e-6) { // .EQ. 0.0d0) THEN
+        RatioStreamCapacity = 1.0;
+    } else {
+        RatioStreamCapacity = MinimumCapacityStream / MaximumCapacityStream;
+    }
+
+    if (std::abs(MinimumCapacityStream) <= 1.e-6) { // .EQ. 0.0d0) THEN
+        NTU = LargeNo;
+    } else {
+        NTU = CoilUA / MinimumCapacityStream;
+    }
+
+    // Calculate effectiveness for special limiting cases
+    if (NTU <= 0.0) {
+        effectiveness = 0.0;
+
+    } else if (RatioStreamCapacity < SmallNo) {
+        // MinimumCapacityStream/MaximumCapacityStream = 0 and effectiveness is independent of configuration
+        // 20 is the Limit Chosen for Exponential Function, beyond which there is float point error.
+        if (NTU > 20.0) {
+            effectiveness = 1.0;
+        } else {
+            effectiveness = 1.0 - std::exp(-NTU);
+        }
+        // Calculate effectiveness depending on heat exchanger configuration
+    } else if (state.dataWaterCoils->WaterCoil(CoilNum).HeatExchType == state.dataWaterCoils->CounterFlow) {
+
+        // Counterflow Heat Exchanger Configuration
+        if (std::abs(RatioStreamCapacity - 1.0) < SmallNo) {
+            effectiveness = NTU / (NTU + 1.0);
+        } else {
+            if (NTU * (1.0 - RatioStreamCapacity) > 20.0) {
+                e = 0.0;
+            } else {
+                e = std::exp(-NTU * (1.0 - RatioStreamCapacity));
+            }
+            effectiveness = (1.0 - e) / (1.0 - RatioStreamCapacity * e);
+        }
+
+    } else if (state.dataWaterCoils->WaterCoil(CoilNum).HeatExchType == state.dataWaterCoils->CrossFlow) {
+        // Cross flow, both streams unmixed
+        eta = std::pow(NTU, -0.22);
+        if ((NTU * RatioStreamCapacity * eta) > 20.0) {
+            b = 1.0 / (RatioStreamCapacity * eta);
+            if (b > 20.0) {
+                effectiveness = 1.0;
+            } else {
+                effectiveness = 1.0 - std::exp(-b);
+                if (effectiveness < 0.0) effectiveness = 0.0;
+            }
+        } else {
+            d = ((std::exp(-NTU * RatioStreamCapacity * eta) - 1.0) / (RatioStreamCapacity * eta));
+            if (d < -20.0 || d > 0.0) {
+                effectiveness = 1.0;
+            } else {
+                effectiveness = 1.0 - std::exp((std::exp(-NTU * RatioStreamCapacity * eta) - 1.0) / (RatioStreamCapacity * eta));
+                if (effectiveness < 0.0) effectiveness = 0.0;
+            }
+        }
+    }
+
+    // Determine leaving conditions for the two streams
+    MaxHeatTransfer = max(MinimumCapacityStream, SmallNo) * (EnergyInStreamOne - EnergyInStreamTwo);
+    EnergyOutStreamOne = EnergyInStreamOne - effectiveness * MaxHeatTransfer / max(CapacityStream1, SmallNo);
+    EnergyOutStreamTwo = EnergyInStreamTwo + effectiveness * MaxHeatTransfer / max(CapacityStream2, SmallNo);
+}
+
+void CoilCompletelyDry(EnergyPlusData &state,
+                       int const CoilNum,
+                       Real64 const WaterTempIn,  // Entering water temperature
+                       Real64 const AirTempIn,    // Entering air dry bulb temperature
+                       Real64 const CoilUA,       // Overall heat transfer coefficient
+                       Real64 &OutletWaterTemp,   // Leaving water temperature
+                       Real64 &OutletAirTemp,     // Leaving air dry bulb temperature
+                       Real64 &OutletAirHumRat,   // Leaving air humidity ratio
+                       Real64 &Q,                 // Heat transfer rate
+                       int const FanOpMode,       // fan operating mode
+                       Real64 const PartLoadRatio // part-load ratio of heating coil
+)
+{
+
+    // FUNCTION INFORMATION:
+    // AUTHOR         Rahul Chillar
+    // DATE WRITTEN   March 2004
+    // MODIFIED       na
+    // RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculate the performance of a sensible air-liquid heat exchanger.  Calculated
+    // results include outlet air temperature and humidity, outlet water temperature,
+    // and heat transfer rate.
+
+    // METHODOLOGY EMPLOYED:
+    // Models coil using effectiveness-NTU model.
+
+    // REFERENCES:
+    // Kays, W.M. and A.L. London.  1964,Compact Heat Exchangers, 2nd Edition,
+    // New York: McGraw-Hill.
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("CoilCompletelyDry");
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 CapacitanceAir;   // Air-side capacity rate(W/C)
+    Real64 CapacitanceWater; // Water-side capacity rate(W/C)
+    Real64 AirMassFlow;
+    Real64 WaterMassFlowRate;
+    Real64 Cp;
+
+    //  adjust mass flow rates for cycling fan cycling coil operation
+    if (FanOpMode == CycFanCycCoil) {
+        if (PartLoadRatio > 0.0) {
+            AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
+            WaterMassFlowRate = min(state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate / PartLoadRatio,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate);
+        } else {
+            AirMassFlow = 0.0;
+            WaterMassFlowRate = 0.0;
+        }
+    } else {
+        AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
+        WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
+    }
+
+    // Calculate air and water capacity rates
+    CapacitanceAir = AirMassFlow * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
+    // Water Capacity Rate
+    Cp = GetSpecificHeatGlycol(state,
+                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                               WaterTempIn,
+                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                               RoutineName);
+
+    CapacitanceWater = WaterMassFlowRate * Cp;
+
+    // Determine the air and water outlet conditions
+    CoilOutletStreamCondition(state, CoilNum, CapacitanceWater, WaterTempIn, CapacitanceAir, AirTempIn, CoilUA, OutletWaterTemp, OutletAirTemp);
+
+    // Calculate the total and sensible heat transfer rate both are equal in case of Dry Coil
+    Q = CapacitanceAir * (AirTempIn - OutletAirTemp);
+
+    // Outlet humidity is equal to Inlet Humidity because its a dry coil
+    OutletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
+}
+
+void WetCoilOutletCondition(EnergyPlusData &state,
+                            int const CoilNum,
+                            Real64 const AirTempIn,      // Entering air dry bulb temperature(C)
+                            Real64 const EnthAirInlet,   // Entering air enthalpy(J/kg)
+                            Real64 const EnthAirOutlet,  // Leaving air enthalpy(J/kg)
+                            Real64 const UACoilExternal, // Heat transfer coefficient for external surface (W/C)
+                            Real64 &OutletAirTemp,       // Leaving air dry bulb temperature(C)
+                            Real64 &OutletAirHumRat,     // Leaving air humidity ratio
+                            Real64 &SenWaterCoilLoad     // Sensible heat transfer rate(W)
+)
+{
+
+    // FUNCTION INFORMATION:
+    // AUTHOR         Rahul Chillar
+    // DATE WRITTEN   Mar 2004
+    // MODIFIED       na
+    // RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculate the leaving air temperature,the leaving air humidity ratio and the
+    // sensible cooling capacity of wet cooling coil.
+
+    // METHODOLOGY EMPLOYED:
+    // Assumes condensate at uniform temperature.
+
+    // REFERENCES:
+    // Elmahdy, A.H. and Mitalas, G.P.  1977."A Simple Model for Cooling and
+    // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
+    // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    Real64 constexpr SmallNo(1.e-9); // SmallNo value used in place of zero
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 CapacitanceAir;        // Air capacity rate(W/C)
+    Real64 NTU;                   // Number of heat transfer units
+    Real64 effectiveness;         // Heat exchanger effectiveness
+    Real64 EnthAirCondensateTemp; // Saturated air enthalpy at temperature of condensate(J/kg)
+    Real64 TempCondensation;      // Temperature of condensate(C)
+    Real64 TempAirDewPoint;       // Temperature air dew point
+
+    // Determine the temperature effectiveness, assuming the temperature
+    // of the condensate is constant (MinimumCapacityStream/MaximumCapacityStream = 0) and the specific heat
+    // of moist air is constant
+    CapacitanceAir =
+        state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
+
+    // Calculating NTU from UA and Capacitance.
+    if (UACoilExternal > 0.0) {
+        if (CapacitanceAir > 0.0) {
+            NTU = UACoilExternal / CapacitanceAir;
+        } else {
+            NTU = 0.0;
+        }
+        effectiveness = 1.0 - std::exp(-NTU);
+    } else {
+        effectiveness = 0.0;
+    }
+
+    // Calculate coil surface enthalpy and temperature at the exit
+    // of the wet part of the coil using the effectiveness relation
+    effectiveness = max(effectiveness, SmallNo);
+    EnthAirCondensateTemp = EnthAirInlet - (EnthAirInlet - EnthAirOutlet) / effectiveness;
+
+    // Calculate condensate temperature as the saturation temperature
+    // at given saturation enthalpy
+    TempCondensation = PsyTsatFnHPb(state, EnthAirCondensateTemp, state.dataEnvrn->OutBaroPress);
+
+    TempAirDewPoint = PsyTdpFnWPb(state, state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat, state.dataEnvrn->OutBaroPress);
+
+    if ((TempAirDewPoint - TempCondensation) > 0.1) {
+
+        // Calculate Outlet Air Temperature using effectivness
+        OutletAirTemp = AirTempIn - (AirTempIn - TempCondensation) * effectiveness;
+        // Calculate Outlet air humidity ratio from PsyWFnTdbH routine
+        OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, EnthAirOutlet);
+
+    } else {
+        OutletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
+        OutletAirTemp = PsyTdbFnHW(EnthAirOutlet, OutletAirHumRat);
+    }
+
+    // Calculate Sensible Coil Load
+    SenWaterCoilLoad = CapacitanceAir * (AirTempIn - OutletAirTemp);
+}
+
+void CoilCompletelyWet(EnergyPlusData &state,
+                       int const CoilNum,            // Number of Coil
+                       Real64 const WaterTempIn,     // Water temperature IN to this function (C)
+                       Real64 const AirTempIn,       // Air dry bulb temperature IN to this function(C)
+                       Real64 const AirHumRat,       // Air Humidity Ratio IN to this function (C)
+                       Real64 const UAInternalTotal, // Internal overall heat transfer coefficient(W/m2 C)
+                       Real64 const UAExternalTotal, // External overall heat transfer coefficient(W/m2 C)
+                       Real64 &OutletWaterTemp,      // Leaving water temperature (C)
+                       Real64 &OutletAirTemp,        // Leaving air dry bulb temperature(C)
+                       Real64 &OutletAirHumRat,      // Leaving air humidity ratio
+                       Real64 &TotWaterCoilLoad,     // Total heat transfer rate(W)
+                       Real64 &SenWaterCoilLoad,     // Sensible heat transfer rate(W)
+                       Real64 &SurfAreaWetFraction,  // Fraction of surface area wet
+                       Real64 &AirInletCoilSurfTemp, // Surface temperature at air entrance(C)
+                       int const FanOpMode,          // fan operating mode
+                       Real64 const PartLoadRatio    // part-load ratio of heating coil
+)
+{
+
+    // FUNCTION INFORMATION:
+    // AUTHOR         Rahul Chillar
+    // DATE WRITTEN   Mar 2004
+    // MODIFIED       na
+    // RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculate the performance of a cooling coil when the external fin surface is
+    // complete wet.  Results include outlet air temperature and humidity,
+    // outlet water temperature, sensible and total cooling capacities, and the wet
+    // fraction of the air-side surface area.
+
+    // METHODOLOGY EMPLOYED:
+    // Models coil as counterflow heat exchanger. Approximates saturated air enthalpy as
+    // a linear function of temperature
+    // TRNSYS.  1990.  A Transient System Simulation Program: Reference Manual.
+    // Solar Energy Laboratory, Univ. Wisconsin Madison, pp. 4.6.8-1 - 4.6.8-12.
+    // Threlkeld, J.L.  1970.  Thermal Environmental Engineering, 2nd Edition,
+    // Englewood Cliffs: Prentice-Hall,Inc. pp. 254-270.
+    // Coil Uses Enthalpy Based Heat Transfer Coefficents and converts them to
+    // convential UA values. Intermediate value of fictitious Cp is defined. This follow
+    // the same procedure followed in the Design Calculation of the Coil. See the node in
+    // the one time calculation for design condition.
+
+    // REFERENCES:
+    // Elmahdy, A.H. and Mitalas, G.P.  1977."A Simple Model for Cooling and
+    // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
+    // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("CoilCompletelyWet");
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 AirSideResist;                  // Air-side resistance to heat transfer(m2 C/W)
+    Real64 WaterSideResist;                // Liquid-side resistance to heat transfer(m2 C/W)
+    Real64 EnteringAirDewPt;               // Entering air dew point(C)
+    Real64 UACoilTotalEnth;                // Overall enthalpy heat transfer coefficient(kg/s)
+    Real64 CapacityRateAirWet;             // Air-side capacity rate(kg/s)
+    Real64 CapacityRateWaterWet;           // Liquid-side capacity rate(kg/s)
+    Real64 ResistRatio;                    // Ratio of resistances
+    Real64 EnthAirOutlet;                  // Outlet air enthalpy
+    Real64 EnthSatAirInletWaterTemp;       // Saturated enthalpy of air at entering water temperature(J/kg)
+    Real64 EnthSatAirOutletWaterTemp;      // Saturated enthalpy of air at exit water temperature(J/kg)
+    Real64 EnthSatAirCoilSurfaceEntryTemp; // Saturated enthalpy of air at entering surface temperature(J/kg)
+    Real64 EnthSatAirCoilSurfaceExitTemp;  // Saturated enthalpy of air at exit surface temperature(J/kg)
+    Real64 EnthAirInlet;                   // Enthalpy of air at inlet
+    Real64 IntermediateCpSat;              // Coefficient for equation below(J/kg C)
+    // EnthSat1-EnthSat2 = IntermediateCpSat*(TSat1-TSat2)
+    // (all water and surface temperatures are
+    // related to saturated air enthalpies for
+    // wet surface heat transfer calculations)
+    Real64 const SmallNo(1.e-9); // smallNo used in place of 0
+    Real64 AirMassFlow;
+    Real64 WaterMassFlowRate;
+    Real64 Cp;
+
+    SurfAreaWetFraction = 1.0;
+    AirSideResist = 1.0 / max(UAExternalTotal, SmallNo);
+    WaterSideResist = 1.0 / max(UAInternalTotal, SmallNo);
+
+    //  adjust mass flow rates for cycling fan cycling coil operation
+    if (FanOpMode == CycFanCycCoil) {
+        if (PartLoadRatio > 0.0) {
+            AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
+            WaterMassFlowRate = min(state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate / PartLoadRatio,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate);
+        } else {
+            AirMassFlow = 0.0;
+            WaterMassFlowRate = 0.0;
+        }
+    } else {
+        AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
+        WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
+    }
+
+    // Calculate enthalpies of entering air and water
+
+    // Enthalpy of air at inlet to the coil
+    EnthAirInlet = PsyHFnTdbW(AirTempIn, AirHumRat);
+
+    // Saturation Enthalpy of Air at inlet water temperature
+    EnthSatAirInletWaterTemp = PsyHFnTdbW(WaterTempIn, PsyWFnTdpPb(state, WaterTempIn, state.dataEnvrn->OutBaroPress));
+
+    // Estimate IntermediateCpSat using entering air dewpoint and water temperature
+    EnteringAirDewPt = PsyTdpFnWPb(state, AirHumRat, state.dataEnvrn->OutBaroPress);
+
+    // An intermediate value of Specific heat . EnthSat1-EnthSat2 = IntermediateCpSat*(TSat1-TSat2)
+    IntermediateCpSat =
+        (PsyHFnTdbW(EnteringAirDewPt, PsyWFnTdpPb(state, EnteringAirDewPt, state.dataEnvrn->OutBaroPress)) - EnthSatAirInletWaterTemp) /
+        (EnteringAirDewPt - WaterTempIn);
+
+    // Determine air and water enthalpy outlet conditions by modeling
+    // coil as counterflow enthalpy heat exchanger
+    UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnW(0.0));
+    CapacityRateAirWet = AirMassFlow;
+    Cp = GetSpecificHeatGlycol(state,
+                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                               WaterTempIn,
+                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                               RoutineName);
+    CapacityRateWaterWet = WaterMassFlowRate * (Cp / IntermediateCpSat);
+    CoilOutletStreamCondition(state,
+                              CoilNum,
+                              CapacityRateAirWet,
+                              EnthAirInlet,
+                              CapacityRateWaterWet,
+                              EnthSatAirInletWaterTemp,
+                              UACoilTotalEnth,
+                              EnthAirOutlet,
+                              EnthSatAirOutletWaterTemp);
+
+    // Calculate entering and leaving external surface conditions from
+    // air and water conditions and the ratio of resistances
+    ResistRatio = (WaterSideResist) / (WaterSideResist + PsyCpAirFnW(0.0) / IntermediateCpSat * AirSideResist);
+    EnthSatAirCoilSurfaceEntryTemp = EnthSatAirOutletWaterTemp + ResistRatio * (EnthAirInlet - EnthSatAirOutletWaterTemp);
+    EnthSatAirCoilSurfaceExitTemp = EnthSatAirInletWaterTemp + ResistRatio * (EnthAirOutlet - EnthSatAirInletWaterTemp);
+
+    // Calculate Coil Surface Temperature at air entry to the coil
+    AirInletCoilSurfTemp = PsyTsatFnHPb(state, EnthSatAirCoilSurfaceEntryTemp, state.dataEnvrn->OutBaroPress);
+
+    // Calculate outlet air temperature and humidity from enthalpies and surface conditions.
+    TotWaterCoilLoad = AirMassFlow * (EnthAirInlet - EnthAirOutlet);
+    OutletWaterTemp = WaterTempIn + TotWaterCoilLoad / max(WaterMassFlowRate, SmallNo) / Cp;
+
+    // Calculates out put variable for  the completely wet coil
+    WetCoilOutletCondition(state, CoilNum, AirTempIn, EnthAirInlet, EnthAirOutlet, UAExternalTotal, OutletAirTemp, OutletAirHumRat, SenWaterCoilLoad);
+}
+
+void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
+                      Real64 const SurfAreaFracCurrent, // Driver Value
+                      Real64 const ErrorCurrent,        // Objective Function
+                      Real64 &SurfAreaFracPrevious,     // First Previous value of Surf Area Fraction
+                      Real64 &ErrorPrevious,            // First Previous value of error
+                      Real64 &SurfAreaFracLast,         // Second Previous value of Surf Area Fraction
+                      Real64 &ErrorLast,                // Second Previous value of error
+                      int const IterNum,                // Number of Iterations
+                      int &icvg                         // Iteration convergence flag
+)
+{
+    // FUNCTION INFORMATION:
+    // AUTHOR         Rahul Chillar
+    // DATE WRITTEN   June 2004
+    // MODIFIED       na
+    // RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Iterately solves for the value of SurfAreaWetFraction for the Cooling Coil.
+
+    // METHODOLOGY EMPLOYED:
+    // First function generates 2 sets of guess points by perturbation and subsequently
+    // by Linear Fit and using the generated points calculates coeffecients for Quadratic
+    // fit to predict the next value of surface area wet fraction.
+
+    // REFERENCES:
+    // ME 423 Design of Thermal Systems Class Notes.UIUC. W.F.Stoecker
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    Real64 constexpr Tolerance(1.e-5);         // Relative error tolerance
+    Real64 constexpr PerturbSurfAreaFrac(0.1); // Perturbation applied to Surf Fraction to initialize iteration
+    Real64 constexpr SmallNum(1.e-9);          // Small Number
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 check;             // Validity Check for moving to Quad Solution
+    Real64 QuadCoefThree;     // Term under radical in quadratic solution
+    Real64 QuadCoefOne;       // Term under radical in quadratic solution
+    Real64 QuadCoefTwo;       // Term under radical in quadratic solution
+    Real64 Slope;             // Slope for linear fit
+    Real64 SurfAreaFracOther; // Intermediate Value of Surf Area
+    int mode;                 // Linear/ perturbation option
+
+    // Convergence Check  by comparing previous and current value of surf area fraction
+    if ((std::abs(SurfAreaFracCurrent - SurfAreaFracPrevious) < Tolerance * max(std::abs(SurfAreaFracCurrent), SmallNum) && IterNum != 1) ||
+        ErrorCurrent == 0.0) {
+        // Setting value for surface area fraction for coil
+        NewSurfAreaWetFrac = SurfAreaFracCurrent;
+        icvg = 1; // Convergance Flag
+        return;
+    }
+
+    // If Icvg = 0 , it has not converged.By perturbation for getting second set of
+    // data (mode=1), Getting Third set of data by performing a  linear fit(Mode=2).
+    // Now using the above 3 points generated by perturbation and Linear Fit to perform
+    // a quadratic fit.This will happen after second iteration only.
+    icvg = 0; // Convergance flag = false
+    // For First Iteration Start with perturbation, For second iteration start with linear fit
+    // from the previous two values
+    mode = IterNum;
+
+Label10:;
+    if (mode == 1) {
+
+        // FirstGuess Set of Points provided by perturbation
+        if (std::abs(SurfAreaFracCurrent) > SmallNum) {
+            NewSurfAreaWetFrac = SurfAreaFracCurrent * (1.0 + PerturbSurfAreaFrac);
+        } else {
+            NewSurfAreaWetFrac = PerturbSurfAreaFrac;
+        }
+
+        // Second set of values being calculated from the first set of values (incoming & perturb)
+    } else if (mode == 2) {
+
+        // Calculating Slope for interpolating to the New Point (Simple Linear Extrapolation)
+        Slope = (ErrorPrevious - ErrorCurrent) / (SurfAreaFracPrevious - SurfAreaFracCurrent);
+        // Error Check for value or Slope
+        if (Slope == 0.0) {
+            mode = 1; // Go back to Perturbation
+            goto Label10;
+        }
+        // Guessing New Value for Surface Area Fraction
+        NewSurfAreaWetFrac = SurfAreaFracCurrent - ErrorCurrent / Slope;
+    } else {
+
+        // Check for Quadratic Fit possible here ,Previous value of surf area fraction
+        // equals current value then Try linear fit for another point.
+        if (SurfAreaFracCurrent == SurfAreaFracPrevious) {
+            // Assign Value of previous point to Last Variable for storing
+            // Go back and calculate new value for Previous.
+            SurfAreaFracPrevious = SurfAreaFracLast;
+            ErrorPrevious = ErrorLast;
+            mode = 2;
+            goto Label10;
+        } else if (SurfAreaFracCurrent == SurfAreaFracLast) {
+            // Calculate another value using Linear Fit.
+            mode = 2;
+            goto Label10;
+        }
+
+        // Now We have enough previous points to calculate coefficients and
+        // perform a quadratic fit for new guess value of surface area fraction
+
+        // Calculating First Coefficients for Quadratic Curve Fit
+        QuadCoefThree = ((ErrorLast - ErrorCurrent) / (SurfAreaFracLast - SurfAreaFracCurrent) -
+                         (ErrorPrevious - ErrorCurrent) / (SurfAreaFracPrevious - SurfAreaFracCurrent)) /
+                        (SurfAreaFracLast - SurfAreaFracPrevious);
+        // Calculating Second Coefficients for Quadratic Curve Fit
+        QuadCoefTwo = (ErrorPrevious - ErrorCurrent) / (SurfAreaFracPrevious - SurfAreaFracCurrent) -
+                      (SurfAreaFracPrevious + SurfAreaFracCurrent) * QuadCoefThree;
+
+        // Calculating Third Coefficients for Quadratic Curve Fit
+        QuadCoefOne = ErrorCurrent - (QuadCoefTwo + QuadCoefThree * SurfAreaFracCurrent) * SurfAreaFracCurrent;
+
+        // Check for validity of coefficients , if not REAL(r64) ,Then fit is linear
+        if (std::abs(QuadCoefThree) < 1.E-10) {
+            mode = 2; // going to Linear mode, due to colinear points.
+            goto Label10;
+        }
+
+        // If value of Quadratic coefficients not suitable enought due to round off errors
+        // to predict new point go to linear fit and acertain new values for the coefficients.
+        if (std::abs((QuadCoefOne + (QuadCoefTwo + QuadCoefThree * SurfAreaFracPrevious) * SurfAreaFracPrevious - ErrorPrevious) / ErrorPrevious) >
+            1.E-4) {
+            mode = 2; // go to linear mode
+            goto Label10;
+        }
+
+        // Validity Check for Imaginary roots, In this case go back to linear fit.
+        check = pow_2(QuadCoefTwo) - 4.0 * QuadCoefOne * QuadCoefThree;
+        // Imaginary Root Exist
+        if (check < 0) {
+            mode = 2;
+            goto Label10;
+        } else if (check > 0) {
+            // real unequal roots exist, Determine the roots nearest to most recent guess
+            NewSurfAreaWetFrac = (-QuadCoefTwo + std::sqrt(check)) / QuadCoefThree / 2.0;
+            SurfAreaFracOther = -NewSurfAreaWetFrac - QuadCoefTwo / QuadCoefThree;
+            // Assigning value to Surface Area Fraction with recent
+            if (std::abs(NewSurfAreaWetFrac - SurfAreaFracCurrent) > std::abs(SurfAreaFracOther - SurfAreaFracCurrent))
+                NewSurfAreaWetFrac = SurfAreaFracOther;
+        } else {
+            // The roots are real, one solution exists.
+            NewSurfAreaWetFrac = -QuadCoefTwo / QuadCoefThree / 2;
+        }
+    }
+
+    if (mode < 3) {
+        // No valid previous points to eliminate, since it just has 2 points.
+        // Loading previous values into last
+        SurfAreaFracLast = SurfAreaFracPrevious;
+        ErrorLast = ErrorPrevious;
+        // Loading Current Values into previous
+        SurfAreaFracPrevious = SurfAreaFracCurrent;
+        ErrorPrevious = ErrorCurrent;
+    } else {
+
+        // Elimination the most distance previous point from the answer based on sign and
+        // magnitute of the error. Keeping Current Point
+        if (ErrorPrevious * ErrorCurrent > 0 && ErrorLast * ErrorCurrent > 0) {
+            // If sign are same , simply eliminate the one with biggest error value.
+            if (std::abs(ErrorLast) > std::abs(ErrorPrevious)) {
+                // Eliminating Last Value
+                SurfAreaFracLast = SurfAreaFracPrevious;
+                ErrorLast = ErrorPrevious;
+            }
+        } else {
+            // If signs are different eliminate previous error with same sign as current error
+            if (ErrorLast * ErrorCurrent > 0) {
+                // Previous Loaded to Last
+                SurfAreaFracLast = SurfAreaFracPrevious;
+                ErrorLast = ErrorPrevious;
+            }
+        }
+        // Current Loaded into previous.
+        SurfAreaFracPrevious = SurfAreaFracCurrent;
+        ErrorPrevious = ErrorCurrent;
+    }
+}
+
+void CoilPartWetPartDry(EnergyPlusData &state,
+                        int const CoilNum,             // Number of Coil
+                        bool const FirstHVACIteration, // Saving Old values
+                        Real64 const InletWaterTemp,   // Entering liquid temperature(C)
+                        Real64 const InletAirTemp,     // Entering air dry bulb temperature(C)
+                        Real64 const AirDewPointTemp,  // Entering air dew point(C)
+                        Real64 &OutletWaterTemp,       // Leaving liquid temperature(C)
+                        Real64 &OutletAirTemp,         // Leaving air dry bulb temperature(C)
+                        Real64 &OutletAirHumRat,       // Leaving air humidity ratio
+                        Real64 &TotWaterCoilLoad,      // Total heat transfer rate (W)
+                        Real64 &SenWaterCoilLoad,      // Sensible heat transfer rate (W)
+                        Real64 &SurfAreaWetFraction,   // Fraction of surface area wet
+                        int const FanOpMode,           // fan operating mode
+                        Real64 const PartLoadRatio     // part-load ratio of heating coil
+)
+{
+
+    // FUNCTION INFORMATION:
+    // AUTHOR         Rahul Chillar
+    // DATE WRITTEN   March 2004
+    // MODIFIED       na
+    // RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculate the performance of a cooling  coil when the external fin surface is
+    // part wet and part dry.  Results include outlet air temperature and humidity,
+    // outlet liquid temperature, sensible and total cooling capacities, and the wet
+    // fraction of the air-side surface area.
+
+    // METHODOLOGY EMPLOYED:
+    // Models coil using effectiveness NTU model
+
+    // REFERENCES:
+    // Elmahdy, A.H. and Mitalas, G.P.  1977. "A Simple Model for Cooling and
+    // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
+    // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
+    // TRNSYS.  1990.  A Transient System Simulation Program: Reference Manual.
+    // Solar Energy Laboratory, Univ. Wisconsin- Madison, pp. 4.6.8-1 - 4.6.8-12.
+    // Threlkeld, J.L.  1970.  Thermal Environmental Engineering, 2nd Edition,
+    // Englewood Cliffs: Prentice-Hall,Inc. pp. 254-270.
+
+    // Using/Aliasing
+    using General::Iterate;
+
+    // FUNCTION PARAMETER DEFINITIONS:
+    int constexpr itmax(60);
+    Real64 constexpr smalltempdiff(1.0e-9);
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 DryCoilHeatTranfer;             // Heat transfer rate for dry coil(W)
+    Real64 WetCoilTotalHeatTransfer;       // Total heat transfer rate for wet coil(W)
+    Real64 WetCoilSensibleHeatTransfer;    // Sensible heat transfer rate for wet coil(W)
+    Real64 SurfAreaWet;                    // Air-side area of wet coil(m2)
+    Real64 SurfAreaDry;                    // Air-side area of dry coil(m2)
+    Real64 DryCoilUA;                      // Overall heat transfer coefficient for dry coil(W/C)
+    Real64 WetDryInterfcWaterTemp;         // Liquid temperature at wet/dry boundary(C)
+    Real64 WetDryInterfcAirTemp;           // Air temperature at wet/dry boundary(C)
+    Real64 WetDryInterfcSurfTemp;          // Surface temperature at wet/dry boundary(C)
+    Real64 EstimateWetDryInterfcWaterTemp; // Estimated liquid temperature at wet/dry boundary(C)
+    Real64 EstimateSurfAreaWetFraction;    // Initial Estimate for Fraction of Surface Wet with condensation
+    Real64 WetPartUAInternal;              // UA of Wet Coil Internal
+    Real64 WetPartUAExternal;              // UA of Dry Coil External
+    Real64 WetDryInterfcHumRat;            // Humidity Ratio at interface of the wet dry transition
+    Real64 X1T;                            // Variables used in the two iteration in this subroutine.
+    Real64 NewSurfAreaWetFrac;             // Variables used in the two iteration in this subroutine.
+    Real64 ResultXT;                       // Variables used in the two iteration in this subroutine.
+    Real64 Y1T;                            // Variables used in the two iterations in this subroutine.
+    Real64 errorT;                         // Error in interation for First If loop
+    Real64 error;                          // Deviation of dependent variable in iteration
+    Real64 SurfAreaFracPrevious;
+    Real64 ErrorPrevious;
+    Real64 SurfAreaFracLast;
+    Real64 ErrorLast;
+    int iter;  // Iteration counter
+    int icvg;  // Iteration convergence flag
+    int icvgT; // Iteration Convergence Flag for First If loop
+    int itT;   // Iteration Counter for First If Loop
+
+    // Iterates on SurfAreaWetFraction to converge on surface temperature equal to
+    // entering air dewpoint at wet/dry boundary.
+
+    // Preliminary estimates of coil performance to begin iteration
+    OutletWaterTemp = InletAirTemp;
+    DryCoilHeatTranfer = 0.0;
+    WetCoilTotalHeatTransfer = 0.0;
+    WetCoilSensibleHeatTransfer = 0.0;
+
+    if (FirstHVACIteration) {
+        // Estimate liquid temperature at boundary as entering air dew point
+        WetDryInterfcWaterTemp = AirDewPointTemp;
+
+        // Estimate fraction wet surface area based on liquid temperatures
+        if (std::abs(OutletWaterTemp - InletWaterTemp) > smalltempdiff) {
+            SurfAreaWetFraction = (WetDryInterfcWaterTemp - InletWaterTemp) / (OutletWaterTemp - InletWaterTemp);
+        } else {
+            SurfAreaWetFraction = 0.0;
+        }
+
+    } else {
+        SurfAreaWetFraction = state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFractionSaved;
+    }
+    // BEGIN LOOP to converge on SurfAreaWetFraction
+    // The method employed in this loop is as follows: The coil is partially wet and partially dry,
+    // we calculate the temperature of the coil at the interface, (the point at which the moisture begins
+    // to condense) temperature of the  water  at interface and air temp is dew point at that location.
+    // This is done by Iterating between the Completely Dry and Completely Wet Coil until the outlet
+    // water temperature of one coil equals the inlet water temperature of another.
+    // Using this value of interface temperature we now iterate to calculate Surface Fraction Wet, Iterate
+    // function perturbs the value of Surface Fraction Wet and based on this new value the entire loop is
+    // repeated to get a new interface water temperature and then surface fraction wet is again calculated.
+    // This process continues till the error between the Wet Dry Interface Temp and Air Dew Point becomes
+    // very negligible and in 95% of the cases its is a complete convergence to give the exact surface Wet
+    // fraction.
+    NewSurfAreaWetFrac = SurfAreaWetFraction;
+    error = 0.0;
+    SurfAreaFracPrevious = SurfAreaWetFraction;
+    ErrorPrevious = 0.0;
+    SurfAreaFracLast = SurfAreaWetFraction;
+    ErrorLast = 0.0;
+
+    for (iter = 1; iter <= itmax; ++iter) {
+
+        // Calculating Surface Area Wet and Surface Area Dry
+        SurfAreaWet = SurfAreaWetFraction * state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
+        SurfAreaDry = state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea - SurfAreaWet;
+
+        // Calculating UA values for the Dry Part of the Coil
+        DryCoilUA = SurfAreaDry / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea +
+                                   1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea);
+
+        // Calculating UA Value for the Wet part of the Coil
+        WetPartUAExternal = state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea * SurfAreaWet;
+        WetPartUAInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea * SurfAreaWet;
+
+        // Calculating Water Temperature at Wet Dry Interface of the coil
+        WetDryInterfcWaterTemp = InletWaterTemp + SurfAreaWetFraction * (OutletWaterTemp - InletWaterTemp);
+
+        // BEGIN LOOP to converge on liquid temperature at wet/dry boundary
+        for (itT = 1; itT <= itmax; ++itT) {
+
+            // Calculate dry coil performance with estimated liquid temperature at the boundary.
+            CoilCompletelyDry(state,
+                              CoilNum,
+                              WetDryInterfcWaterTemp,
+                              InletAirTemp,
+                              DryCoilUA,
+                              OutletWaterTemp,
+                              WetDryInterfcAirTemp,
+                              WetDryInterfcHumRat,
+                              DryCoilHeatTranfer,
+                              FanOpMode,
+                              PartLoadRatio);
+
+            // Calculate wet coil performance with calculated air temperature at the boundary.
+            CoilCompletelyWet(state,
+                              CoilNum,
+                              InletWaterTemp,
+                              WetDryInterfcAirTemp,
+                              WetDryInterfcHumRat,
+                              WetPartUAInternal,
+                              WetPartUAExternal,
+                              EstimateWetDryInterfcWaterTemp,
+                              OutletAirTemp,
+                              OutletAirHumRat,
+                              WetCoilTotalHeatTransfer,
+                              WetCoilSensibleHeatTransfer,
+                              EstimateSurfAreaWetFraction,
+                              WetDryInterfcSurfTemp,
+                              FanOpMode,
+                              PartLoadRatio);
+
+            // Iterating to calculate the actual wet dry interface water temperature.
+            errorT = EstimateWetDryInterfcWaterTemp - WetDryInterfcWaterTemp;
+            Iterate(ResultXT, 0.001, WetDryInterfcWaterTemp, errorT, X1T, Y1T, itT, icvgT);
+            WetDryInterfcWaterTemp = ResultXT;
+
+            // IF convergence is achieved then exit the itT to itmax Do loop.
+            if (icvgT == 1) break;
+
+        } // End Do for Liq Boundary temp Convergence
+
+        // Wet Dry Interface temperature not converged after maximum specified iterations.
+        // Print error message, set return error flag
+        if ((itT > itmax) && (!state.dataGlobal->WarmupFlag)) {
+            ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+            ShowContinueError(state, "CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface");
+        }
+
+        // If Following condition prevails then surface is dry, calculate dry coil performance and return
+        if (SurfAreaWetFraction <= 0.0 && WetDryInterfcSurfTemp >= AirDewPointTemp) {
+
+            // Calculating Value of Dry UA for the coil
+            DryCoilUA = state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea /
+                        (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea +
+                         1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea);
+
+            // Calling the Completely Dry Coil for outputs
+            CoilCompletelyDry(state,
+                              CoilNum,
+                              InletWaterTemp,
+                              InletAirTemp,
+                              DryCoilUA,
+                              OutletWaterTemp,
+                              OutletAirTemp,
+                              OutletAirHumRat,
+                              TotWaterCoilLoad,
+                              FanOpMode,
+                              PartLoadRatio);
+
+            // Sensible load = Total load in a Completely Dry Coil
+            SenWaterCoilLoad = TotWaterCoilLoad;
+
+            // All coil is Dry so fraction wet is of course = 0
+            SurfAreaWetFraction = 0.0;
+            return;
+        }
+
+        // IF the coil is not Dry then iterate to calculate Fraction of surface area that is wet.
+        error = WetDryInterfcSurfTemp - AirDewPointTemp;
+        CoilAreaFracIter(
+            NewSurfAreaWetFrac, SurfAreaWetFraction, error, SurfAreaFracPrevious, ErrorPrevious, SurfAreaFracLast, ErrorLast, iter, icvg);
+        SurfAreaWetFraction = NewSurfAreaWetFrac;
+
+        // If converged, leave iteration loop
+        if (icvg == 1) break;
+
+        // Surface temperature not converged.  Repeat calculations with new
+        // estimate of fraction wet surface area.
+        if (SurfAreaWetFraction > 1.0) SurfAreaWetFraction = 1.0;
+        if (SurfAreaWetFraction <= 0.0) SurfAreaWetFraction = 0.0098;
+
+    } // End do for the overall iteration
+
+    // Calculate sum of total and sensible heat transfer from dry and wet parts.
+    TotWaterCoilLoad = DryCoilHeatTranfer + WetCoilTotalHeatTransfer;
+    SenWaterCoilLoad = DryCoilHeatTranfer + WetCoilSensibleHeatTransfer;
+
+    // Save last iterations values for this current time step
+    state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFractionSaved = SurfAreaWetFraction;
+}
+
 void CoolingCoil(EnergyPlusData &state,
                  int const CoilNum,
                  bool const FirstHVACIteration,
@@ -3926,20 +5404,6 @@ void CoolingCoil(EnergyPlusData &state,
 
     // Using/Aliasing
     using General::SafeDivide;
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 AirInletCoilSurfTemp; // Coil surface temperature at air entrance(C)
@@ -4125,520 +5589,6 @@ void CoolingCoil(EnergyPlusData &state,
         PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat);
 }
 
-// End Algorithm Section of the Module
-
-// Coil Completely Dry Subroutine for Cooling Coil
-
-void CoilCompletelyDry(EnergyPlusData &state,
-                       int const CoilNum,
-                       Real64 const WaterTempIn,  // Entering water temperature
-                       Real64 const AirTempIn,    // Entering air dry bulb temperature
-                       Real64 const CoilUA,       // Overall heat transfer coefficient
-                       Real64 &OutletWaterTemp,   // Leaving water temperature
-                       Real64 &OutletAirTemp,     // Leaving air dry bulb temperature
-                       Real64 &OutletAirHumRat,   // Leaving air humidity ratio
-                       Real64 &Q,                 // Heat transfer rate
-                       int const FanOpMode,       // fan operating mode
-                       Real64 const PartLoadRatio // part-load ratio of heating coil
-)
-{
-
-    // FUNCTION INFORMATION:
-    // AUTHOR         Rahul Chillar
-    // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the performance of a sensible air-liquid heat exchanger.  Calculated
-    // results include outlet air temperature and humidity, outlet water temperature,
-    // and heat transfer rate.
-
-    // METHODOLOGY EMPLOYED:
-    // Models coil using effectiveness-NTU model.
-
-    // REFERENCES:
-    // Kays, W.M. and A.L. London.  1964,Compact Heat Exchangers, 2nd Edition,
-    // New York: McGraw-Hill.
-
-    // USE STATEMENTS:
-    // na
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CoilCompletelyDry");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 CapacitanceAir;   // Air-side capacity rate(W/C)
-    Real64 CapacitanceWater; // Water-side capacity rate(W/C)
-    Real64 AirMassFlow;
-    Real64 WaterMassFlowRate;
-    Real64 Cp;
-
-    //  adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
-        if (PartLoadRatio > 0.0) {
-            AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
-            WaterMassFlowRate = min(state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate / PartLoadRatio,
-                                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate);
-        } else {
-            AirMassFlow = 0.0;
-            WaterMassFlowRate = 0.0;
-        }
-    } else {
-        AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
-        WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
-    }
-
-    // Calculate air and water capacity rates
-    CapacitanceAir = AirMassFlow * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
-    // Water Capacity Rate
-    Cp = GetSpecificHeatGlycol(state,
-                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
-                               WaterTempIn,
-                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
-                               RoutineName);
-
-    CapacitanceWater = WaterMassFlowRate * Cp;
-
-    // Determine the air and water outlet conditions
-    CoilOutletStreamCondition(state, CoilNum, CapacitanceWater, WaterTempIn, CapacitanceAir, AirTempIn, CoilUA, OutletWaterTemp, OutletAirTemp);
-
-    // Calculate the total and sensible heat transfer rate both are equal in case of Dry Coil
-    Q = CapacitanceAir * (AirTempIn - OutletAirTemp);
-
-    // Outlet humidity is equal to Inlet Humidity because its a dry coil
-    OutletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
-}
-
-// Coil Completely Wet Subroutine for Cooling Coil
-
-void CoilCompletelyWet(EnergyPlusData &state,
-                       int const CoilNum,            // Number of Coil
-                       Real64 const WaterTempIn,     // Water temperature IN to this function (C)
-                       Real64 const AirTempIn,       // Air dry bulb temperature IN to this function(C)
-                       Real64 const AirHumRat,       // Air Humidity Ratio IN to this funcation (C)
-                       Real64 const UAInternalTotal, // Internal overall heat transfer coefficient(W/m2 C)
-                       Real64 const UAExternalTotal, // External overall heat transfer coefficient(W/m2 C)
-                       Real64 &OutletWaterTemp,      // Leaving water temperature (C)
-                       Real64 &OutletAirTemp,        // Leaving air dry bulb temperature(C)
-                       Real64 &OutletAirHumRat,      // Leaving air humidity ratio
-                       Real64 &TotWaterCoilLoad,     // Total heat transfer rate(W)
-                       Real64 &SenWaterCoilLoad,     // Sensible heat transfer rate(W)
-                       Real64 &SurfAreaWetFraction,  // Fraction of surface area wet
-                       Real64 &AirInletCoilSurfTemp, // Surface temperature at air entrance(C)
-                       int const FanOpMode,          // fan operating mode
-                       Real64 const PartLoadRatio    // part-load ratio of heating coil
-)
-{
-
-    // FUNCTION INFORMATION:
-    // AUTHOR         Rahul Chillar
-    // DATE WRITTEN   Mar 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the performance of a cooling coil when the external fin surface is
-    // complete wet.  Results include outlet air temperature and humidity,
-    // outlet water temperature, sensible and total cooling capacities, and the wet
-    // fraction of the air-side surface area.
-
-    // METHODOLOGY EMPLOYED:
-    // Models coil as counterflow heat exchanger. Approximates saturated air enthalpy as
-    // a linear function of temperature
-    // TRNSYS.  1990.  A Transient System Simulation Program: Reference Manual.
-    // Solar Energy Laboratory, Univ. Wisconsin Madison, pp. 4.6.8-1 - 4.6.8-12.
-    // Threlkeld, J.L.  1970.  Thermal Environmental Engineering, 2nd Edition,
-    // Englewood Cliffs: Prentice-Hall,Inc. pp. 254-270.
-    // Coil Uses Enthalpy Based Heat Transfer Coefficents and converts them to
-    // convential UA values. Intermediate value of fictitious Cp is defined. This follow
-    // the same procedure followed in the Design Calculation of the Coil. See the node in
-    // the one time calculation for design condition.
-
-    // REFERENCES:
-    // Elmahdy, A.H. and Mitalas, G.P.  1977."A Simple Model for Cooling and
-    // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
-    // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
-
-    // USE STATEMENTS:
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CoilCompletelyWet");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 AirSideResist;                  // Air-side resistance to heat transfer(m2 C/W)
-    Real64 WaterSideResist;                // Liquid-side resistance to heat transfer(m2 C/W)
-    Real64 EnteringAirDewPt;               // Entering air dew point(C)
-    Real64 UACoilTotalEnth;                // Overall enthalpy heat transfer coefficient(kg/s)
-    Real64 CapacityRateAirWet;             // Air-side capacity rate(kg/s)
-    Real64 CapacityRateWaterWet;           // Liquid-side capacity rate(kg/s)
-    Real64 ResistRatio;                    // Ratio of resistances
-    Real64 EnthAirOutlet;                  // Outlet air enthalpy
-    Real64 EnthSatAirInletWaterTemp;       // Saturated enthalpy of air at entering water temperature(J/kg)
-    Real64 EnthSatAirOutletWaterTemp;      // Saturated enthalpy of air at exit water temperature(J/kg)
-    Real64 EnthSatAirCoilSurfaceEntryTemp; // Saturated enthalpy of air at entering surface temperature(J/kg)
-    Real64 EnthSatAirCoilSurfaceExitTemp;  // Saturated enthalpy of air at exit surface temperature(J/kg)
-    Real64 EnthAirInlet;                   // Enthalpy of air at inlet
-    Real64 IntermediateCpSat;              // Coefficient for equation below(J/kg C)
-    // EnthSat1-EnthSat2 = IntermediateCpSat*(TSat1-TSat2)
-    // (all water and surface temperatures are
-    // related to saturated air enthalpies for
-    // wet surface heat transfer calculations)
-    Real64 const SmallNo(1.e-9); // smallNo used in place of 0
-    Real64 AirMassFlow;
-    Real64 WaterMassFlowRate;
-    Real64 Cp;
-
-    SurfAreaWetFraction = 1.0;
-    AirSideResist = 1.0 / max(UAExternalTotal, SmallNo);
-    WaterSideResist = 1.0 / max(UAInternalTotal, SmallNo);
-
-    //  adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
-        if (PartLoadRatio > 0.0) {
-            AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
-            WaterMassFlowRate = min(state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate / PartLoadRatio,
-                                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate);
-        } else {
-            AirMassFlow = 0.0;
-            WaterMassFlowRate = 0.0;
-        }
-    } else {
-        AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
-        WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
-    }
-
-    // Calculate enthalpies of entering air and water
-
-    // Enthalpy of air at inlet to the coil
-    EnthAirInlet = PsyHFnTdbW(AirTempIn, AirHumRat);
-
-    // Saturation Enthalpy of Air at inlet water temperature
-    EnthSatAirInletWaterTemp = PsyHFnTdbW(WaterTempIn, PsyWFnTdpPb(state, WaterTempIn, state.dataEnvrn->OutBaroPress));
-
-    // Estimate IntermediateCpSat using entering air dewpoint and water temperature
-    EnteringAirDewPt = PsyTdpFnWPb(state, AirHumRat, state.dataEnvrn->OutBaroPress);
-
-    // An intermediate value of Specific heat . EnthSat1-EnthSat2 = IntermediateCpSat*(TSat1-TSat2)
-    IntermediateCpSat =
-        (PsyHFnTdbW(EnteringAirDewPt, PsyWFnTdpPb(state, EnteringAirDewPt, state.dataEnvrn->OutBaroPress)) - EnthSatAirInletWaterTemp) /
-        (EnteringAirDewPt - WaterTempIn);
-
-    // Determine air and water enthalpy outlet conditions by modeling
-    // coil as counterflow enthalpy heat exchanger
-    UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnW(0.0));
-    CapacityRateAirWet = AirMassFlow;
-    Cp = GetSpecificHeatGlycol(state,
-                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
-                               WaterTempIn,
-                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
-                               RoutineName);
-    CapacityRateWaterWet = WaterMassFlowRate * (Cp / IntermediateCpSat);
-    CoilOutletStreamCondition(state,
-                              CoilNum,
-                              CapacityRateAirWet,
-                              EnthAirInlet,
-                              CapacityRateWaterWet,
-                              EnthSatAirInletWaterTemp,
-                              UACoilTotalEnth,
-                              EnthAirOutlet,
-                              EnthSatAirOutletWaterTemp);
-
-    // Calculate entering and leaving external surface conditions from
-    // air and water conditions and the ratio of resistances
-    ResistRatio = (WaterSideResist) / (WaterSideResist + PsyCpAirFnW(0.0) / IntermediateCpSat * AirSideResist);
-    EnthSatAirCoilSurfaceEntryTemp = EnthSatAirOutletWaterTemp + ResistRatio * (EnthAirInlet - EnthSatAirOutletWaterTemp);
-    EnthSatAirCoilSurfaceExitTemp = EnthSatAirInletWaterTemp + ResistRatio * (EnthAirOutlet - EnthSatAirInletWaterTemp);
-
-    // Calculate Coil Surface Temperature at air entry to the coil
-    AirInletCoilSurfTemp = PsyTsatFnHPb(state, EnthSatAirCoilSurfaceEntryTemp, state.dataEnvrn->OutBaroPress);
-
-    // Calculate outlet air temperature and humidity from enthalpies and surface conditions.
-    TotWaterCoilLoad = AirMassFlow * (EnthAirInlet - EnthAirOutlet);
-    OutletWaterTemp = WaterTempIn + TotWaterCoilLoad / max(WaterMassFlowRate, SmallNo) / Cp;
-
-    // Calculates out put variable for  the completely wet coil
-    WetCoilOutletCondition(state, CoilNum, AirTempIn, EnthAirInlet, EnthAirOutlet, UAExternalTotal, OutletAirTemp, OutletAirHumRat, SenWaterCoilLoad);
-}
-
-// Coil Part Wet Part Dry Subroutine for Cooling Coil
-
-void CoilPartWetPartDry(EnergyPlusData &state,
-                        int const CoilNum,             // Number of Coil
-                        bool const FirstHVACIteration, // Saving Old values
-                        Real64 const InletWaterTemp,   // Entering liquid temperature(C)
-                        Real64 const InletAirTemp,     // Entering air dry bulb temperature(C)
-                        Real64 const AirDewPointTemp,  // Entering air dew point(C)
-                        Real64 &OutletWaterTemp,       // Leaving liquid temperature(C)
-                        Real64 &OutletAirTemp,         // Leaving air dry bulb temperature(C)
-                        Real64 &OutletAirHumRat,       // Leaving air humidity ratio
-                        Real64 &TotWaterCoilLoad,      // Total heat transfer rate (W)
-                        Real64 &SenWaterCoilLoad,      // Sensible heat transfer rate (W)
-                        Real64 &SurfAreaWetFraction,   // Fraction of surface area wet
-                        int const FanOpMode,           // fan operating mode
-                        Real64 const PartLoadRatio     // part-load ratio of heating coil
-)
-{
-
-    // FUNCTION INFORMATION:
-    // AUTHOR         Rahul Chillar
-    // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the performance of a cooling  coil when the external fin surface is
-    // part wet and part dry.  Results include outlet air temperature and humidity,
-    // outlet liquid temperature, sensible and total cooling capacities, and the wet
-    // fraction of the air-side surface area.
-
-    // METHODOLOGY EMPLOYED:
-    // Models coil using effectiveness NTU model
-
-    // REFERENCES:
-    // Elmahdy, A.H. and Mitalas, G.P.  1977. "A Simple Model for Cooling and
-    // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
-    // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
-    // TRNSYS.  1990.  A Transient System Simulation Program: Reference Manual.
-    // Solar Energy Laboratory, Univ. Wisconsin- Madison, pp. 4.6.8-1 - 4.6.8-12.
-    // Threlkeld, J.L.  1970.  Thermal Environmental Engineering, 2nd Edition,
-    // Englewood Cliffs: Prentice-Hall,Inc. pp. 254-270.
-
-    // Using/Aliasing
-    using General::Iterate;
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    int const itmax(60);
-    Real64 const smalltempdiff(1.0e-9);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 DryCoilHeatTranfer;             // Heat transfer rate for dry coil(W)
-    Real64 WetCoilTotalHeatTransfer;       // Total heat transfer rate for wet coil(W)
-    Real64 WetCoilSensibleHeatTransfer;    // Sensible heat transfer rate for wet coil(W)
-    Real64 SurfAreaWet;                    // Air-side area of wet coil(m2)
-    Real64 SurfAreaDry;                    // Air-side area of dry coil(m2)
-    Real64 DryCoilUA;                      // Overall heat transfer coefficient for dry coil(W/C)
-    Real64 WetDryInterfcWaterTemp;         // Liquid temperature at wet/dry boundary(C)
-    Real64 WetDryInterfcAirTemp;           // Air temperature at wet/dry boundary(C)
-    Real64 WetDryInterfcSurfTemp;          // Surface temperature at wet/dry boundary(C)
-    Real64 EstimateWetDryInterfcWaterTemp; // Estimated liquid temperature at wet/dry boundary(C)
-    Real64 EstimateSurfAreaWetFraction;    // Initial Estimate for Fraction of Surface Wet with condensation
-    Real64 WetPartUAInternal;              // UA of Wet Coil Internal
-    Real64 WetPartUAExternal;              // UA of Dry Coil External
-    Real64 WetDryInterfcHumRat;            // Humidity Ratio at interface of the wet dry transition
-    Real64 X1T;                            // Variables used in the two iteration in this subroutine.
-    Real64 NewSurfAreaWetFrac;             // Variables used in the two iteration in this subroutine.
-    Real64 ResultXT;                       // Variables used in the two iteration in this subroutine.
-    Real64 Y1T;                            // Variables used in the two iterations in this subroutine.
-    Real64 errorT;                         // Error in interation for First If loop
-    Real64 error;                          // Deviation of dependent variable in iteration
-    Real64 SurfAreaFracPrevious;
-    Real64 ErrorPrevious;
-    Real64 SurfAreaFracLast;
-    Real64 ErrorLast;
-    int iter;  // Iteration counter
-    int icvg;  // Iteration convergence flag
-    int icvgT; // Iteration Convergence Flag for First If loop
-    int itT;   // Iteration Counter for First If Loop
-
-    // Iterates on SurfAreaWetFraction to converge on surface temperature equal to
-    // entering air dewpoint at wet/dry boundary.
-
-    // Preliminary estimates of coil performance to begin iteration
-    OutletWaterTemp = InletAirTemp;
-    DryCoilHeatTranfer = 0.0;
-    WetCoilTotalHeatTransfer = 0.0;
-    WetCoilSensibleHeatTransfer = 0.0;
-
-    if (FirstHVACIteration) {
-        // Estimate liquid temperature at boundary as entering air dew point
-        WetDryInterfcWaterTemp = AirDewPointTemp;
-
-        // Estimate fraction wet surface area based on liquid temperatures
-        if (std::abs(OutletWaterTemp - InletWaterTemp) > smalltempdiff) {
-            SurfAreaWetFraction = (WetDryInterfcWaterTemp - InletWaterTemp) / (OutletWaterTemp - InletWaterTemp);
-        } else {
-            SurfAreaWetFraction = 0.0;
-        }
-
-    } else {
-        SurfAreaWetFraction = state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFractionSaved;
-    }
-    // BEGIN LOOP to converge on SurfAreaWetFraction
-    // The method employed in this loop is as follows: The coil is partially wet and partially dry,
-    // we calculate the temperature of the coil at the interface, (the point at which the moisture begins
-    // to condense) temperature of the  water  at interface and air temp is dew point at that location.
-    // This is done by Iterating between the Completely Dry and Completely Wet Coil until the outlet
-    // water temperature of one coil equals the inlet water temperature of another.
-    // Using this value of interface temperature we now iterate to calculate Surface Fraction Wet, Iterate
-    // function perturbs the value of Surface Fraction Wet and based on this new value the entire loop is
-    // repeated to get a new interface water temperature and then surface fraction wet is again calculated.
-    // This process continues till the error between the Wet Dry Interface Temp and Air Dew Point becomes
-    // very negligible and in 95% of the cases its is a complete convergence to give the exact surface Wet
-    // fraction.
-    NewSurfAreaWetFrac = SurfAreaWetFraction;
-    error = 0.0;
-    SurfAreaFracPrevious = SurfAreaWetFraction;
-    ErrorPrevious = 0.0;
-    SurfAreaFracLast = SurfAreaWetFraction;
-    ErrorLast = 0.0;
-
-    for (iter = 1; iter <= itmax; ++iter) {
-
-        // Calculating Surface Area Wet and Surface Area Dry
-        SurfAreaWet = SurfAreaWetFraction * state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
-        SurfAreaDry = state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea - SurfAreaWet;
-
-        // Calculating UA values for the Dry Part of the Coil
-        DryCoilUA = SurfAreaDry / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea +
-                                   1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea);
-
-        // Calculating UA Value for the Wet part of the Coil
-        WetPartUAExternal = state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea * SurfAreaWet;
-        WetPartUAInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea * SurfAreaWet;
-
-        // Calculating Water Temperature at Wet Dry Interface of the coil
-        WetDryInterfcWaterTemp = InletWaterTemp + SurfAreaWetFraction * (OutletWaterTemp - InletWaterTemp);
-
-        // BEGIN LOOP to converge on liquid temperature at wet/dry boundary
-        for (itT = 1; itT <= itmax; ++itT) {
-
-            // Calculate dry coil performance with estimated liquid temperature at the boundary.
-            CoilCompletelyDry(state,
-                              CoilNum,
-                              WetDryInterfcWaterTemp,
-                              InletAirTemp,
-                              DryCoilUA,
-                              OutletWaterTemp,
-                              WetDryInterfcAirTemp,
-                              WetDryInterfcHumRat,
-                              DryCoilHeatTranfer,
-                              FanOpMode,
-                              PartLoadRatio);
-
-            // Calculate wet coil performance with calculated air temperature at the boundary.
-            CoilCompletelyWet(state,
-                              CoilNum,
-                              InletWaterTemp,
-                              WetDryInterfcAirTemp,
-                              WetDryInterfcHumRat,
-                              WetPartUAInternal,
-                              WetPartUAExternal,
-                              EstimateWetDryInterfcWaterTemp,
-                              OutletAirTemp,
-                              OutletAirHumRat,
-                              WetCoilTotalHeatTransfer,
-                              WetCoilSensibleHeatTransfer,
-                              EstimateSurfAreaWetFraction,
-                              WetDryInterfcSurfTemp,
-                              FanOpMode,
-                              PartLoadRatio);
-
-            // Iterating to calculate the actual wet dry interface water temperature.
-            errorT = EstimateWetDryInterfcWaterTemp - WetDryInterfcWaterTemp;
-            Iterate(ResultXT, 0.001, WetDryInterfcWaterTemp, errorT, X1T, Y1T, itT, icvgT);
-            WetDryInterfcWaterTemp = ResultXT;
-
-            // IF convergence is achieved then exit the itT to itmax Do loop.
-            if (icvgT == 1) break;
-
-        } // End Do for Liq Boundary temp Convergence
-
-        // Wet Dry Interface temperature not converged after maximum specified iterations.
-        // Print error message, set return error flag
-        if ((itT > itmax) && (!state.dataGlobal->WarmupFlag)) {
-            ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-            ShowContinueError(state, "CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface");
-        }
-
-        // If Following condition prevails then surface is dry, calculate dry coil performance and return
-        if (SurfAreaWetFraction <= 0.0 && WetDryInterfcSurfTemp >= AirDewPointTemp) {
-
-            // Calculating Value of Dry UA for the coil
-            DryCoilUA = state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea /
-                        (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea +
-                         1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea);
-
-            // Calling the Completely Dry Coil for outputs
-            CoilCompletelyDry(state,
-                              CoilNum,
-                              InletWaterTemp,
-                              InletAirTemp,
-                              DryCoilUA,
-                              OutletWaterTemp,
-                              OutletAirTemp,
-                              OutletAirHumRat,
-                              TotWaterCoilLoad,
-                              FanOpMode,
-                              PartLoadRatio);
-
-            // Sensible load = Total load in a Completely Dry Coil
-            SenWaterCoilLoad = TotWaterCoilLoad;
-
-            // All coil is Dry so fraction wet is ofcourse =0
-            SurfAreaWetFraction = 0.0;
-            return;
-        }
-
-        // IF the coil is not Dry then iterate to calculate Fraction of surface area that is wet.
-        error = WetDryInterfcSurfTemp - AirDewPointTemp;
-        CoilAreaFracIter(
-            NewSurfAreaWetFrac, SurfAreaWetFraction, error, SurfAreaFracPrevious, ErrorPrevious, SurfAreaFracLast, ErrorLast, iter, icvg);
-        SurfAreaWetFraction = NewSurfAreaWetFrac;
-
-        // If converged, leave iteration loop
-        if (icvg == 1) break;
-
-        // Surface temperature not converged.  Repeat calculations with new
-        // estimate of fraction wet surface area.
-        if (SurfAreaWetFraction > 1.0) SurfAreaWetFraction = 1.0;
-        if (SurfAreaWetFraction <= 0.0) SurfAreaWetFraction = 0.0098;
-
-    } // End do for the overall iteration
-
-    // Calculate sum of total and sensible heat transfer from dry and wet parts.
-    TotWaterCoilLoad = DryCoilHeatTranfer + WetCoilTotalHeatTransfer;
-    SenWaterCoilLoad = DryCoilHeatTranfer + WetCoilSensibleHeatTransfer;
-
-    // Save last iterations values for this current time step
-    state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFractionSaved = SurfAreaWetFraction;
-}
-
-// Calculating coil UA for Cooling Coil
-
 Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
                              int const CoilNum,
                              Real64 const CapacityStream1,     // Capacity rate of stream1.(W/C)
@@ -4663,29 +5613,15 @@ Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Models coil using effectiveness NTU model
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using General::Iterate;
-
-    // Enforce explicit typing of all variables in this routine
 
     // Return value
     Real64 CalcCoilUAbyEffectNTU; // Overall heat transfer coefficient(W/C)
 
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const SmallNo(1.e-9);
-    int const itmax(12);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
+    Real64 constexpr SmallNo(1.e-9);
+    int constexpr itmax(12);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 MaxHeatTransfer;       // Maximum heat transfer from inlet conditions (W)
@@ -4764,905 +5700,6 @@ Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
     return CalcCoilUAbyEffectNTU;
 }
 
-// Calculating coil outlet stream conditions and coil UA for Cooling Coil
-
-void CoilOutletStreamCondition(EnergyPlusData &state,
-                               int const CoilNum,
-                               Real64 const CapacityStream1,   // Capacity rate of stream1(W/C)
-                               Real64 const EnergyInStreamOne, // Inlet state of stream1 (C)
-                               Real64 const CapacityStream2,   // Capacity rate of stream2 (W/C)
-                               Real64 const EnergyInStreamTwo, // Inlet state of stream2 (C)
-                               Real64 const CoilUA,            // Heat transfer rateW)
-                               Real64 &EnergyOutStreamOne,     // Outlet state of stream1 (C)
-                               Real64 &EnergyOutStreamTwo      // Outlet state of stream2 (C)
-)
-{
-
-    // FUNCTION INFORMATION:
-    // AUTHOR         Rahul Chillar
-    // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the outlet states of a simple heat exchanger using the effectiveness-Ntu
-    // method of analysis.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // Kays, W.M. and A.L. London.  1964.Compact Heat Exchangers, 2nd Ed.McGraw-Hill:New York.
-
-    // USE STATEMENTS:
-    // na
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const LargeNo(1.e10);  // value used in place of infinity
-    Real64 const SmallNo(1.e-15); // value used in place of zero
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 MinimumCapacityStream; // Minimum capacity rate of the streams(W/C)
-    Real64 MaximumCapacityStream; // Maximum capacity rate of the streams(W/C)
-    Real64 RatioStreamCapacity;   // Ratio of minimum to maximum capacity rate
-    Real64 NTU;                   // Number of transfer units
-    Real64 effectiveness(0.0);    // Heat exchanger effectiveness
-    Real64 MaxHeatTransfer;       // Maximum heat transfer possible(W)
-    Real64 e;                     // Intermediate variables in effectiveness equation
-    Real64 eta;
-    Real64 b;
-    Real64 d;
-
-    // NTU and MinimumCapacityStream/MaximumCapacityStream (RatioStreamCapacity) calculations
-    MinimumCapacityStream = min(CapacityStream1, CapacityStream2);
-    MaximumCapacityStream = max(CapacityStream1, CapacityStream2);
-
-    if (std::abs(MaximumCapacityStream) <= 1.e-6) { // .EQ. 0.0d0) THEN
-        RatioStreamCapacity = 1.0;
-    } else {
-        RatioStreamCapacity = MinimumCapacityStream / MaximumCapacityStream;
-    }
-
-    if (std::abs(MinimumCapacityStream) <= 1.e-6) { // .EQ. 0.0d0) THEN
-        NTU = LargeNo;
-    } else {
-        NTU = CoilUA / MinimumCapacityStream;
-    }
-
-    // Calculate effectiveness for special limiting cases
-    if (NTU <= 0.0) {
-        effectiveness = 0.0;
-
-    } else if (RatioStreamCapacity < SmallNo) {
-        // MinimumCapacityStream/MaximumCapacityStream = 0 and effectiveness is independent of configuration
-        // 20 is the Limit Chosen for Exponential Function, beyond which there is float point error.
-        if (NTU > 20.0) {
-            effectiveness = 1.0;
-        } else {
-            effectiveness = 1.0 - std::exp(-NTU);
-        }
-        // Calculate effectiveness depending on heat exchanger configuration
-    } else if (state.dataWaterCoils->WaterCoil(CoilNum).HeatExchType == state.dataWaterCoils->CounterFlow) {
-
-        // Counterflow Heat Exchanger Configuration
-        if (std::abs(RatioStreamCapacity - 1.0) < SmallNo) {
-            effectiveness = NTU / (NTU + 1.0);
-        } else {
-            if (NTU * (1.0 - RatioStreamCapacity) > 20.0) {
-                e = 0.0;
-            } else {
-                e = std::exp(-NTU * (1.0 - RatioStreamCapacity));
-            }
-            effectiveness = (1.0 - e) / (1.0 - RatioStreamCapacity * e);
-        }
-
-    } else if (state.dataWaterCoils->WaterCoil(CoilNum).HeatExchType == state.dataWaterCoils->CrossFlow) {
-        // Cross flow, both streams unmixed
-        eta = std::pow(NTU, -0.22);
-        if ((NTU * RatioStreamCapacity * eta) > 20.0) {
-            b = 1.0 / (RatioStreamCapacity * eta);
-            if (b > 20.0) {
-                effectiveness = 1.0;
-            } else {
-                effectiveness = 1.0 - std::exp(-b);
-                if (effectiveness < 0.0) effectiveness = 0.0;
-            }
-        } else {
-            d = ((std::exp(-NTU * RatioStreamCapacity * eta) - 1.0) / (RatioStreamCapacity * eta));
-            if (d < -20.0 || d > 0.0) {
-                effectiveness = 1.0;
-            } else {
-                effectiveness = 1.0 - std::exp((std::exp(-NTU * RatioStreamCapacity * eta) - 1.0) / (RatioStreamCapacity * eta));
-                if (effectiveness < 0.0) effectiveness = 0.0;
-            }
-        }
-    }
-
-    // Determine leaving conditions for the two streams
-    MaxHeatTransfer = max(MinimumCapacityStream, SmallNo) * (EnergyInStreamOne - EnergyInStreamTwo);
-    EnergyOutStreamOne = EnergyInStreamOne - effectiveness * MaxHeatTransfer / max(CapacityStream1, SmallNo);
-    EnergyOutStreamTwo = EnergyInStreamTwo + effectiveness * MaxHeatTransfer / max(CapacityStream2, SmallNo);
-}
-
-// Subroutine for caculating outlet condition if coil is wet , for Cooling Coil
-
-void WetCoilOutletCondition(EnergyPlusData &state,
-                            int const CoilNum,
-                            Real64 const AirTempIn,      // Entering air dry bulb temperature(C)
-                            Real64 const EnthAirInlet,   // Entering air enthalpy(J/kg)
-                            Real64 const EnthAirOutlet,  // Leaving air enthalpy(J/kg)
-                            Real64 const UACoilExternal, // Heat transfer coefficient for external surface (W/C)
-                            Real64 &OutletAirTemp,       // Leaving air dry bulb temperature(C)
-                            Real64 &OutletAirHumRat,     // Leaving air humidity ratio
-                            Real64 &SenWaterCoilLoad     // Sensible heat transfer rate(W)
-)
-{
-
-    // FUNCTION INFORMATION:
-    // AUTHOR         Rahul Chillar
-    // DATE WRITTEN   Mar 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the leaving air temperature,the leaving air humidity ratio and the
-    // sensible cooling capacity of wet cooling coil.
-
-    // METHODOLOGY EMPLOYED:
-    // Assumes condensate at uniform temperature.
-
-    // REFERENCES:
-    // Elmahdy, A.H. and Mitalas, G.P.  1977."A Simple Model for Cooling and
-    // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
-    // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
-
-    // USE STATEMENTS:
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const SmallNo(1.e-9); // SmallNo value used in place of zero
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 CapacitanceAir;        // Air capacity rate(W/C)
-    Real64 NTU;                   // Number of heat transfer units
-    Real64 effectiveness;         // Heat exchanger effectiveness
-    Real64 EnthAirCondensateTemp; // Saturated air enthalpy at temperature of condensate(J/kg)
-    Real64 TempCondensation;      // Temperature of condensate(C)
-    Real64 TempAirDewPoint;       // Temperature air dew point
-
-    // Determine the temperature effectiveness, assuming the temperature
-    // of the condensate is constant (MinimumCapacityStream/MaximumCapacityStream = 0) and the specific heat
-    // of moist air is constant
-    CapacitanceAir =
-        state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
-
-    // Calculating NTU from UA and Capacitance.
-    // del      NTU = UACoilExternal/MAX(CapacitanceAir,SmallNo)
-    // del      effectiveness = 1 - EXP(-MAX(0.0d0,NTU))
-    // Calculating NTU from UA and Capacitance.
-    if (UACoilExternal > 0.0) {
-        if (CapacitanceAir > 0.0) {
-            NTU = UACoilExternal / CapacitanceAir;
-        } else {
-            NTU = 0.0;
-        }
-        effectiveness = 1.0 - std::exp(-NTU);
-    } else {
-        effectiveness = 0.0;
-    }
-
-    // Calculate coil surface enthalpy and temperature at the exit
-    // of the wet part of the coil using the effectiveness relation
-    effectiveness = max(effectiveness, SmallNo);
-    EnthAirCondensateTemp = EnthAirInlet - (EnthAirInlet - EnthAirOutlet) / effectiveness;
-
-    // Calculate condensate temperature as the saturation temperature
-    // at given saturation enthalpy
-    TempCondensation = PsyTsatFnHPb(state, EnthAirCondensateTemp, state.dataEnvrn->OutBaroPress);
-
-    TempAirDewPoint = PsyTdpFnWPb(state, state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat, state.dataEnvrn->OutBaroPress);
-
-    if ((TempAirDewPoint - TempCondensation) > 0.1) {
-
-        // Calculate Outlet Air Temperature using effectivness
-        OutletAirTemp = AirTempIn - (AirTempIn - TempCondensation) * effectiveness;
-        // Calculate Outlet air humidity ratio from PsyWFnTdbH routine
-        OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, EnthAirOutlet);
-
-    } else {
-        OutletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
-        OutletAirTemp = PsyTdbFnHW(EnthAirOutlet, OutletAirHumRat);
-    }
-
-    // Calculate Sensible Coil Load
-    SenWaterCoilLoad = CapacitanceAir * (AirTempIn - OutletAirTemp);
-}
-
-// Beginning of Update subroutines for the WaterCoil Module
-// *****************************************************************************
-
-void UpdateWaterCoil(EnergyPlusData &state, int const CoilNum)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard Liesen
-    //       DATE WRITTEN   1998
-    //       MODIFIED       April 2004: Rahul Chillar
-    //                      Feb 2010 B. Griffith, plant upgrades
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine updates the coil outlet nodes.
-
-    // METHODOLOGY EMPLOYED:
-    // Data is moved from the coil data structure to the coil outlet nodes.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using PlantUtilities::SetComponentFlowRate;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirInletNode;
-    int WaterInletNode;
-    int AirOutletNode;
-    int WaterOutletNode;
-
-    AirInletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum;
-    WaterInletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
-    AirOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum;
-    WaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
-
-    // Set the outlet air nodes of the WaterCoil
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirMassFlowRate;
-    state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
-    state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
-    state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirEnthalpy;
-
-    state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp;
-    state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy;
-
-    // Set the outlet nodes for properties that just pass through & not used
-    state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
-    state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
-    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
-    }
-    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
-    }
-}
-
-//        End of Update subroutines for the WaterCoil Module
-// *****************************************************************************
-
-// Beginning of Reporting subroutines for the WaterCoil Module
-// *****************************************************************************
-
-void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Richard Liesen
-    //       DATE WRITTEN   1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine updates the report variable for the coils.
-
-    // METHODOLOGY EMPLOYED:
-    // NA
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("ReportWaterCoil");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoWater;
-    Real64 Tavg;
-    Real64 SpecHumOut;
-    Real64 SpecHumIn;
-    Real64 ReportingConstant;
-
-    if (state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes) {
-        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
-            std::string coilObjClassName;
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
-                coilObjClassName = "Coil:Heating:Water";
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
-                    state,
-                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                    coilObjClassName,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
-                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
-                state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
-            } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling) {
-                coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
-                    state,
-                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                    coilObjClassName,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
-                    -999.0,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
-                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
-                state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
-            } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
-                coilObjClassName = "Coil:Cooling:Water";
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
-                    state,
-                    state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                    coilObjClassName,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
-                    -999.0,
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
-                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
-                state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
-            }
-        }
-    }
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    // report the WaterCoil energy from this component
-    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy =
-        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate * ReportingConstant;
-    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy =
-        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate * ReportingConstant;
-    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy =
-        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate * ReportingConstant;
-
-    // report the WaterCoil water collection to water storage tank (if needed)
-
-    if (state.dataWaterCoils->WaterCoil(CoilNum).CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
-        // calculate and report condensation rates  (how much water extracted from the air stream)
-        // water volumetric flow of water in m3/s for water system interactions
-        //  put here to catch all types of DX coils
-        Tavg = (state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp - state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp) / 2.0;
-
-        RhoWater = GetDensityGlycol(state,
-                                    state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
-                                    Tavg,
-                                    state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
-                                    RoutineName);
-        //   CR9155 Remove specific humidity calculations
-        SpecHumIn = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
-        SpecHumOut = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
-        //  mdot * del HumRat / rho water
-        state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot =
-            max(0.0, (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
-        state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol = state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot * ReportingConstant;
-
-        state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID)
-            .VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
-            state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot;
-        state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID)
-            .TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
-            state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
-    }
-}
-
-//        End of Reporting subroutines for the WaterCoil Module
-// *****************************************************************************
-
-// Beginning of Coil Utility subroutines for the Detailed Model
-// *****************************************************************************
-
-void CalcDryFinEffCoef(EnergyPlusData &state, Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR   Unknown
-    //       DATE WRITTEN   Unknown
-    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // The following subroutines are used once per cooling coil
-    // simulation to obtain the coefficients of the dry fin
-    // efficiency equation.  CalcDryFinEffCoef is the main calling
-    // routine which manages calls to the Bessel funtion and polynomial
-    // fit routines.
-
-    // REFERENCES:
-    // First found in MODSIM.
-    // USE STATEMENTS:
-    // na
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 FAI;
-    Real64 FED;
-    Real64 FEDnumerator;
-    int I;
-    int IE1;
-    int IE2;
-    int IE3;
-    int IE4;
-    int IE5;
-    int IE6;
-    Real64 R1;
-    Real64 R1I1;
-    Real64 R1K1;
-    Real64 R2;
-    Real64 R2I0;
-    Real64 R2I1;
-    Real64 R2K0;
-    Real64 R2K1;
-    Real64 RO;
-
-    FAI = 0.02;
-    for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
-        FAI += 0.035;
-        R1 = FAI / (1.0 - OutTubeEffFinDiamRatio);
-        R2 = R1 * OutTubeEffFinDiamRatio;
-        RO = 2.0 * OutTubeEffFinDiamRatio / (FAI * (1.0 + OutTubeEffFinDiamRatio));
-        CalcIBesselFunc(R1, 1, R1I1, IE1);
-        CalcKBesselFunc(R2, 1, R2K1, IE2);
-        CalcIBesselFunc(R2, 1, R2I1, IE3);
-        CalcKBesselFunc(R1, 1, R1K1, IE4);
-        CalcIBesselFunc(R2, 0, R2I0, IE5);
-        CalcKBesselFunc(R2, 0, R2K0, IE6);
-        FEDnumerator = RO * (R1I1 * R2K1 - R2I1 * R1K1);
-        if (FEDnumerator != 0.0) {
-            FED = FEDnumerator / (R2I0 * R1K1 + R1I1 * R2K0);
-        } else {
-            FED = 0.0;
-        }
-        //      FED = RO * (R1I1 * R2K1 - R2I1 * R1K1) / (R2I0 * R1K1 + R1I1 * R2K0)
-        state.dataWaterCoils->OrderedPair(I, 1) = FAI;
-        state.dataWaterCoils->OrderedPair(I, 2) = FED;
-    }
-    CalcPolynomCoef(state, state.dataWaterCoils->OrderedPair, PolynomCoef);
-}
-
-void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR   Unknown
-    //       DATE WRITTEN   Unknown
-    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // To calculate the modified Bessel Function from order 0 to BessFuncOrd
-    // BessFuncArg    ARGUMENT OF BESSEL FUNCTION
-    // BessFuncOrd    ORDER OF BESSEL FUNCTION, GREATER THAN OR EQUAL TO ZERO
-    // IBessFunc   RESULTANT VALUE OF I BESSEL FUNCTION
-    // ErrorCode  RESULTANT ERROR CODE:
-    //       ErrorCode = 0   NO ERROR
-    //       ErrorCode = 1   BessFuncOrd .LT. 0
-    //       ErrorCode = 2   BessFuncArg .LT. 0
-    //       ErrorCode = 3   IBessFunc .LT. 10**(-30),     IBessFunc IS SET TO 0
-    //       ErrorCode = 4   BessFuncArg .GT. BessFuncOrd & BessFuncArg .GT. 90,  IBessFunc IS SET TO 10**38
-
-    // REFERENCES:
-    // First found in MODSIM.
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const ErrorTol(1.0e-06);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoopCount;
-
-    Real64 FI;
-    Real64 FK;
-    Real64 TERM;
-
-    ErrorCode = 0;
-    IBessFunc = 1.0;
-    if (BessFuncArg == 0.0 && BessFuncOrd == 0) return;
-
-    if (BessFuncOrd < 0) {
-        ErrorCode = 1;
-        return;
-    } else if (BessFuncArg < 0.0) {
-        ErrorCode = 2;
-        return;
-    } else if (BessFuncArg > 12.0 && BessFuncArg > BessFuncOrd) {
-        if (BessFuncArg > 90.0) {
-            ErrorCode = 4;
-            IBessFunc = 1.0e30;
-            return;
-        }
-        TERM = 1.0;
-        IBessFunc = 1.0;
-        for (LoopCount = 1; LoopCount <= 30; ++LoopCount) { // Start of 1st LoopCount Loop
-            if (std::abs(TERM) <= std::abs(ErrorTol * IBessFunc)) {
-                IBessFunc *= std::exp(BessFuncArg) / std::sqrt(2.0 * DataGlobalConstants::Pi * BessFuncArg);
-                return;
-            }
-            TERM *= 0.125 / BessFuncArg * (pow_2(2 * LoopCount - 1) - 4 * BessFuncOrd * BessFuncOrd) / double(LoopCount);
-            IBessFunc += TERM;
-        } // End of 1st LoopCount loop
-    }
-
-    TERM = 1.0;
-    if (BessFuncOrd > 0) {
-        for (LoopCount = 1; LoopCount <= BessFuncOrd; ++LoopCount) { // Start of 2nd LoopCount Loop
-            FI = LoopCount;
-            if (std::abs(TERM) < 1.0e-30 * FI / (BessFuncArg * 2.0)) {
-                ErrorCode = 3;
-                IBessFunc = 0.0;
-                return;
-            }
-            TERM *= BessFuncArg / (2.0 * FI);
-        } // End of 2nd LoopCount loop
-    }
-
-    IBessFunc = TERM;
-    for (LoopCount = 1; LoopCount <= 1000; ++LoopCount) { // Start of 3rd LoopCount Loop
-        if (std::abs(TERM) <= std::abs(IBessFunc * ErrorTol)) return;
-        FK = LoopCount * (BessFuncOrd + LoopCount);
-        TERM *= pow_2(BessFuncArg) / (4.0 * FK);
-        IBessFunc += TERM;
-    } // End of  3rd LoopCount loop
-}
-
-void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR   Unknown
-    //       DATE WRITTEN   Unknown
-    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // To calculate the K Bessel Function for a given argument and
-    // order
-    //  BessFuncArg    THE ARGUMENT OF THE K BESSEL FUNCTION DESIRED
-    //  BessFuncOrd    THE ORDER OF THE K BESSEL FUNCTION DESIRED
-    //  KBessFunc   THE RESULTANT K BESSEL FUNCTION
-    //  ErrorCode  RESULTANT ERROR CODE:
-    //        ErrorCode=0  NO ERROR
-    //        ErrorCode=1  BessFuncOrd IS NEGATIVE
-    //        ErrorCode=2  BessFuncArg IS ZERO OR NEGATIVE
-    //        ErrorCode=3  BessFuncArg .GT. 85, KBessFunc .LT. 10**-38; KBessFunc SET TO 0.
-    //        ErrorCode=4  KBessFunc .GT. 10**38; KBessFunc SET TO 10**38
-    // NOTE: BessFuncOrd MUST BE GREATER THAN OR EQUAL TO ZERO
-    // METHOD:
-    //  COMPUTES ZERO ORDER AND FIRST ORDER BESSEL FUNCTIONS USING
-    //  SERIES APPROXIMATIONS AND THEN COMPUTES BessFuncOrd TH ORDER FUNCTION
-    //  USING RECURRENCE RELATION.
-    //  RECURRENCE RELATION AND POLYNOMIAL APPROXIMATION TECHNIQUE
-    //  AS DESCRIBED BY A.J.M. HITCHCOCK, 'POLYNOMIAL APPROXIMATIONS
-    //  TO BESSEL FUNCTIONS OF ORDER ZERO AND ONE AND TO RELATED
-    //  FUNCTIONS,' M.T.A.C., V.11, 1957, PP. 86-88, AND G.BessFuncOrd. WATSON,
-    //  'A TREATISE ON THE THEORY OF BESSEL FUNCTIONS,' CAMBRIDGE
-    //  UNIVERSITY PRESS, 1958, P.62
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const GJMAX(1.0e+38);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoopCount;
-    bool StopLoop;
-
-    Real64 FACT;
-    Real64 G0;
-    Real64 G1;
-    Real64 GJ;
-    Real64 HJ;
-    Array1D<Real64> T(12);
-    Real64 X2J;
-
-    KBessFunc = 0.0;
-    G0 = 0.0;
-    GJ = 0.0;
-
-    if (BessFuncOrd < 0.0) {
-        ErrorCode = 1;
-        return;
-    } else if (BessFuncArg <= 0.0) {
-        ErrorCode = 2;
-        return;
-    } else if (BessFuncArg > 85.0) {
-        ErrorCode = 3;
-        KBessFunc = 0.0;
-        return;
-    }
-
-    ErrorCode = 0;
-
-    //     Use polynomial approximation if BessFuncArg > 1.
-
-    if (BessFuncArg > 1.0) {
-        T(1) = 1.0 / BessFuncArg;
-        for (LoopCount = 2; LoopCount <= 12; ++LoopCount) {
-            T(LoopCount) = T(LoopCount - 1) / BessFuncArg;
-        } // End of LoopCount Loop
-        if (BessFuncOrd != 1) {
-
-            //     Compute K0 using polynomial approximation
-
-            G0 = std::exp(-BessFuncArg) *
-                 (1.2533141 - 0.1566642 * T(1) + 0.08811128 * T(2) - 0.09139095 * T(3) + 0.1344596 * T(4) - 0.2299850 * T(5) + 0.3792410 * T(6) -
-                  0.5247277 * T(7) + 0.5575368 * T(8) - 0.4262633 * T(9) + 0.2184518 * T(10) - 0.06680977 * T(11) + 0.009189383 * T(12)) *
-                 std::sqrt(1.0 / BessFuncArg);
-            if (BessFuncOrd == 0) {
-                KBessFunc = G0;
-                return;
-            }
-        }
-
-        //     Compute K1 using polynomial approximation
-
-        G1 = std::exp(-BessFuncArg) *
-             (1.2533141 + 0.4699927 * T(1) - 0.1468583 * T(2) + 0.1280427 * T(3) - 0.1736432 * T(4) + 0.2847618 * T(5) - 0.4594342 * T(6) +
-              0.6283381 * T(7) - 0.6632295 * T(8) + 0.5050239 * T(9) - 0.2581304 * T(10) + 0.07880001 * T(11) - 0.01082418 * T(12)) *
-             std::sqrt(1.0 / BessFuncArg);
-        if (BessFuncOrd == 1) {
-            KBessFunc = G1;
-            return;
-        }
-    } else {
-
-        //     Use series expansion if BessFuncArg <= 1.
-
-        if (BessFuncOrd != 1) {
-
-            //     Compute K0 using series expansion
-
-            G0 = -(0.5772157 + std::log(BessFuncArg / 2.0));
-            X2J = 1.0;
-            FACT = 1.0;
-            HJ = 0.0;
-            for (LoopCount = 1; LoopCount <= 6; ++LoopCount) {
-                X2J *= pow_2(BessFuncArg) / 4.0;
-                FACT *= pow_2(1.0 / double(LoopCount));
-                HJ += 1.0 / double(LoopCount);
-                G0 += X2J * FACT * (HJ - (0.5772157 + std::log(BessFuncArg / 2.0)));
-            } // End of LoopCount Loop
-            if (BessFuncOrd == 0.0) {
-                KBessFunc = G0;
-                return;
-            }
-        }
-
-        //     Compute K1 using series expansion
-
-        X2J = BessFuncArg / 2.0;
-        FACT = 1.0;
-        HJ = 1.0;
-        G1 = 1.0 / BessFuncArg + X2J * (0.5 + (0.5772157 + std::log(BessFuncArg / 2.0)) - HJ);
-        for (LoopCount = 2; LoopCount <= 8; ++LoopCount) {
-            X2J *= pow_2(BessFuncArg) / 4.0;
-            FACT *= pow_2(1.0 / double(LoopCount));
-            HJ += 1.0 / double(LoopCount);
-            G1 += X2J * FACT * (0.5 + ((0.5772157 + std::log(BessFuncArg / 2.0)) - HJ) * double(LoopCount));
-        } // End of LoopCount Loop
-        if (BessFuncOrd == 1) {
-            KBessFunc = G1;
-            return;
-        }
-    }
-
-    //     From K0 and K1 compute KN using recurrence relation
-
-    LoopCount = 2;
-    StopLoop = false;
-    while (LoopCount <= BessFuncOrd && !StopLoop) {
-        GJ = 2.0 * (double(LoopCount) - 1.0) * G1 / BessFuncArg + G0;
-        if (GJ - GJMAX > 0.0) {
-            ErrorCode = 4;
-            GJ = GJMAX;
-            StopLoop = true;
-        } else {
-            G0 = G1;
-            G1 = GJ;
-            ++LoopCount;
-        }
-    } // End of LoopCount Loop
-    KBessFunc = GJ;
-}
-
-void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR   Unknown
-    //       DATE WRITTEN   Unknown
-    //       DATE REWRITTEN  April 1997 by Russell D. Taylor, Ph.D.
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Fits polynomial of order from 1 to MaxPolynomOrder to the
-    // ordered pairs of data points X,Y
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool Converged;
-    Real64 B;
-    int I;
-    int II;
-    int J;
-    int PolynomOrder;
-    int CurrentOrder;
-    int CurrentOrdPair;
-    Real64 S1;
-    Real64 S2;
-
-    auto &OrdPairSum(state.dataWaterCoils->OrdPairSum);
-    auto &OrdPairSumMatrix(state.dataWaterCoils->OrdPairSumMatrix);
-
-    OrdPairSum = 0.0;
-    OrdPairSum(1, 1) = WaterCoils::MaxOrderedPairs;
-    PolynomCoef = 0.0;
-    for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
-        OrdPairSum(2, 1) += OrderedPair(CurrentOrdPair, 1);
-        OrdPairSum(3, 1) += OrderedPair(CurrentOrdPair, 1) * OrderedPair(CurrentOrdPair, 1);
-        OrdPairSum(1, 2) += OrderedPair(CurrentOrdPair, 2);
-        OrdPairSum(2, 2) += OrderedPair(CurrentOrdPair, 1) * OrderedPair(CurrentOrdPair, 2);
-    }
-    PolynomOrder = 1;
-    Converged = false;
-    while (!Converged) {
-        for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
-            for (J = 1; J <= PolynomOrder + 1; ++J) {
-                OrdPairSumMatrix(J, CurrentOrder) = OrdPairSum(J - 1 + CurrentOrder, 1);
-            } // End of J loop
-            OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder) = OrdPairSum(CurrentOrder, 2);
-        } // End of CurrentOrder loop
-
-        for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
-            OrdPairSumMatrix(CurrentOrder, PolynomOrder + 2) = -1.0;
-            for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
-                OrdPairSumMatrix(J, PolynomOrder + 2) = 0.0;
-            } // End of J loop
-
-            for (II = 2; II <= PolynomOrder + 2; ++II) {
-                for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
-                    OrdPairSumMatrix(J, II) -= OrdPairSumMatrix(J, 1) * OrdPairSumMatrix(CurrentOrder, II) / OrdPairSumMatrix(CurrentOrder, 1);
-                } // End of J loop
-            }     // End of II loop
-            for (II = 1; II <= PolynomOrder + 1; ++II) {
-                for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
-                    OrdPairSumMatrix(J, II) = OrdPairSumMatrix(J, II + 1);
-                } // End of J loop
-            }     // End of II loop
-        }         // End of CurrentOrder loop
-
-        S2 = 0.0;
-        for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
-            S1 = OrdPairSumMatrix(PolynomOrder + 2, 1);
-            auto const OrderedPair1C(OrderedPair(CurrentOrdPair, 1));
-            auto OrderedPair1C_pow(1.0);
-            for (CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder) {
-                OrderedPair1C_pow *= OrderedPair1C;
-                S1 += OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder + 1) * OrderedPair1C_pow;
-            } // End of CurrentOrder loop
-            S2 += (S1 - OrderedPair(CurrentOrdPair, 2)) * (S1 - OrderedPair(CurrentOrdPair, 2));
-        } // End of CurrentOrdPair loop
-        B = WaterCoils::MaxOrderedPairs - (PolynomOrder + 1);
-        if (S2 > 0.0001) S2 = std::sqrt(S2 / B);
-        for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
-            PolynomCoef(CurrentOrder) = OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder);
-        } // End of CurrentOrder loop
-
-        if ((PolynomOrder - WaterCoils::MaxPolynomOrder < 0) && (S2 - WaterCoils::PolyConvgTol > 0.0)) {
-            ++PolynomOrder;
-            J = 2 * PolynomOrder;
-            OrdPairSum(J, 1) = OrdPairSum(J + 1, 1) = 0.0;
-            auto OrdPairSum2P = OrdPairSum(PolynomOrder + 1, 2) = 0.0;
-            for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
-                auto const OrderedPair1I(OrderedPair(I, 1));
-                auto OrderedPair_pow(std::pow(OrderedPair1I, J - 1));
-                OrdPairSum(J, 1) += OrderedPair_pow;
-                OrderedPair_pow *= OrderedPair1I;
-                OrdPairSum(J + 1, 1) += OrderedPair_pow;
-                OrdPairSum2P += OrderedPair(I, 2) * std::pow(OrderedPair1I, PolynomOrder);
-            }
-            OrdPairSum(PolynomOrder + 1, 2) = OrdPairSum2P;
-        } else {
-            Converged = true;
-        }
-    }
-}
-
 Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
                                    Real64 const UA,           // UA of coil
                                    Array1D<Real64> const &Par // par(1) = design coil load [W]
@@ -5700,269 +5737,6 @@ Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
     state.dataSize->DataDesignCoilCapacity = state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterHeatingCoilRate;
 
     return Residuum;
-}
-
-Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                   Real64 const UA,           // UA of coil
-                                   Array1D<Real64> const &Par // par(1) = design coil load [W]
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   September 2011
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Design Coil Load - Coil Cooling Output) / Design Coil Load.
-    // Coil Cooling Output depends on the UA which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts UA into the water coil data structure, calls CoolingCoil, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int CoilIndex;
-    int FanOpMode;
-    Real64 PartLoadRatio;
-
-    CoilIndex = int(Par(2));
-    FanOpMode = (Par(3) == 1.0 ? CycFanCycCoil : ContFanCycCoil);
-    PartLoadRatio = Par(4);
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal = UA;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal * 3.3;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilTotal =
-        1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal);
-    state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea = EstimateHEXSurfaceArea(state, CoilIndex);
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternalPerUnitArea =
-        state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UAWetExtPerUnitArea =
-        state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal / state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UADryExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilIndex).UAWetExtPerUnitArea;
-
-    CoolingCoil(state, CoilIndex, true, state.dataWaterCoils->DesignCalc, FanOpMode, PartLoadRatio);
-
-    Residuum = (Par(1) - state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterCoolingCoilRate) / Par(1);
-
-    return Residuum;
-}
-
-// Iterate Routine for Cooling Coil
-
-void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
-                      Real64 const SurfAreaFracCurrent, // Driver Value
-                      Real64 const ErrorCurrent,        // Objective Function
-                      Real64 &SurfAreaFracPrevious,     // First Previous value of Surf Area Fraction
-                      Real64 &ErrorPrevious,            // First Previous value of error
-                      Real64 &SurfAreaFracLast,         // Second Previous value of Surf Area Fraction
-                      Real64 &ErrorLast,                // Second Previous value of error
-                      int const IterNum,                // Number of Iterations
-                      int &icvg                         // Iteration convergence flag
-)
-{
-    // FUNCTION INFORMATION:
-    // AUTHOR         Rahul Chillar
-    // DATE WRITTEN   June 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Iterately solves for the value of SurfAreaWetFraction for the Cooling Coil.
-
-    // METHODOLOGY EMPLOYED:
-    // First function generates 2 sets of guess points by perturbation and subsequently
-    // by Linear Fit and using the generated points calculates coeffecients for Quadratic
-    // fit to predict the next value of surface area wet fraction.
-
-    // REFERENCES:
-    // ME 423 Design of Thermal Systems Class Notes.UIUC. W.F.Stoecker
-
-    // USE STATEMENTS:
-    // na
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Tolerance(1.e-5);         // Relative error tolerance
-    Real64 const PerturbSurfAreaFrac(0.1); // Perturbation applied to Surf Fraction to initialize iteration
-    Real64 const SmallNum(1.e-9);          // Small Number
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 check;             // Validity Check for moving to Quad Solution
-    Real64 QuadCoefThree;     // Term under radical in quadratic solution
-    Real64 QuadCoefOne;       // Term under radical in quadratic solution
-    Real64 QuadCoefTwo;       // Term under radical in quadratic solution
-    Real64 Slope;             // Slope for linear fit
-    Real64 SurfAreaFracOther; // Intermediate Value of Surf Area
-    int mode;                 // Linear/ perturbation option
-
-    // Convergence Check  by comparing previous and current value of surf area fraction
-    if ((std::abs(SurfAreaFracCurrent - SurfAreaFracPrevious) < Tolerance * max(std::abs(SurfAreaFracCurrent), SmallNum) && IterNum != 1) ||
-        ErrorCurrent == 0.0) {
-        // Setting value for surface area fraction for coil
-        NewSurfAreaWetFrac = SurfAreaFracCurrent;
-        icvg = 1; // Convergance Flag
-        return;
-    }
-
-    // If Icvg = 0 , it has not converged.By perturbation for getting second set of
-    // data (mode=1), Getting Third set of data by performing a  linear fit(Mode=2).
-    // Now using the above 3 points generated by perturbation and Linear Fit to perform
-    // a quadratic fit.This will happen after second iteration only.
-    icvg = 0; // Convergance flag = false
-    // For First Iteration Start with perturbation, For second iteration start with linear fit
-    // from the previous two values
-    mode = IterNum;
-
-Label10:;
-    if (mode == 1) {
-
-        // FirstGuess Set of Points provided by perturbation
-        if (std::abs(SurfAreaFracCurrent) > SmallNum) {
-            NewSurfAreaWetFrac = SurfAreaFracCurrent * (1.0 + PerturbSurfAreaFrac);
-        } else {
-            NewSurfAreaWetFrac = PerturbSurfAreaFrac;
-        }
-
-        // Second set of values being calculated from the first set of values (incoming & perturb)
-    } else if (mode == 2) {
-
-        // Calculating Slope for interpolating to the New Point (Simple Linear Extrapolation)
-        Slope = (ErrorPrevious - ErrorCurrent) / (SurfAreaFracPrevious - SurfAreaFracCurrent);
-        // Error Check for value or Slope
-        if (Slope == 0.0) {
-            mode = 1; // Go back to Perturbation
-            goto Label10;
-        }
-        // Guessing New Value for Surface Area Fraction
-        NewSurfAreaWetFrac = SurfAreaFracCurrent - ErrorCurrent / Slope;
-    } else {
-
-        // Check for Quadratic Fit possible here ,Previous value of surf area fraction
-        // equals current value then Try linear fit for another point.
-        if (SurfAreaFracCurrent == SurfAreaFracPrevious) {
-            // Assign Value of previous point to Last Variable for storing
-            // Go back and calculate new value for Previous.
-            SurfAreaFracPrevious = SurfAreaFracLast;
-            ErrorPrevious = ErrorLast;
-            mode = 2;
-            goto Label10;
-        } else if (SurfAreaFracCurrent == SurfAreaFracLast) {
-            // Calculate another value using Linear Fit.
-            mode = 2;
-            goto Label10;
-        }
-
-        // Now We have enough previous points to calculate coefficients and
-        // perform a quadratic fit for new guess value of surface area fraction
-
-        // Calculating First Coefficients for Quadratic Curve Fit
-        QuadCoefThree = ((ErrorLast - ErrorCurrent) / (SurfAreaFracLast - SurfAreaFracCurrent) -
-                         (ErrorPrevious - ErrorCurrent) / (SurfAreaFracPrevious - SurfAreaFracCurrent)) /
-                        (SurfAreaFracLast - SurfAreaFracPrevious);
-        // Calculating Second Coefficients for Quadratic Curve Fit
-        QuadCoefTwo = (ErrorPrevious - ErrorCurrent) / (SurfAreaFracPrevious - SurfAreaFracCurrent) -
-                      (SurfAreaFracPrevious + SurfAreaFracCurrent) * QuadCoefThree;
-
-        // Calculating Third Coefficients for Quadratic Curve Fit
-        QuadCoefOne = ErrorCurrent - (QuadCoefTwo + QuadCoefThree * SurfAreaFracCurrent) * SurfAreaFracCurrent;
-
-        // Check for validity of coefficients , if not REAL(r64) ,Then fit is linear
-        if (std::abs(QuadCoefThree) < 1.E-10) {
-            mode = 2; // going to Linear mode, due to colinear points.
-            goto Label10;
-        }
-
-        // If value of Quadratic coefficients not suitable enought due to round off errors
-        // to predict new point go to linear fit and acertain new values for the coefficients.
-        if (std::abs((QuadCoefOne + (QuadCoefTwo + QuadCoefThree * SurfAreaFracPrevious) * SurfAreaFracPrevious - ErrorPrevious) / ErrorPrevious) >
-            1.E-4) {
-            mode = 2; // go to linear mode
-            goto Label10;
-        }
-
-        // Validity Check for Imaginary roots, In this case go back to linear fit.
-        check = pow_2(QuadCoefTwo) - 4.0 * QuadCoefOne * QuadCoefThree;
-        // Imaginary Root Exist
-        if (check < 0) {
-            mode = 2;
-            goto Label10;
-        } else if (check > 0) {
-            // real unequal roots exist, Determine the roots nearest to most recent guess
-            NewSurfAreaWetFrac = (-QuadCoefTwo + std::sqrt(check)) / QuadCoefThree / 2.0;
-            SurfAreaFracOther = -NewSurfAreaWetFrac - QuadCoefTwo / QuadCoefThree;
-            // Assigning value to Surface Area Fraction with recent
-            if (std::abs(NewSurfAreaWetFrac - SurfAreaFracCurrent) > std::abs(SurfAreaFracOther - SurfAreaFracCurrent))
-                NewSurfAreaWetFrac = SurfAreaFracOther;
-        } else {
-            // The roots are real, one solution exists.
-            NewSurfAreaWetFrac = -QuadCoefTwo / QuadCoefThree / 2;
-        }
-    }
-
-    if (mode < 3) {
-        // No valid previous points to eliminate, since it just has 2 points.
-        // Loading previous values into last
-        SurfAreaFracLast = SurfAreaFracPrevious;
-        ErrorLast = ErrorPrevious;
-        // Loading Current Values into previous
-        SurfAreaFracPrevious = SurfAreaFracCurrent;
-        ErrorPrevious = ErrorCurrent;
-    } else {
-
-        // Elimination the most distance previous point from the answer based on sign and
-        // magnitute of the error. Keeping Current Point
-        if (ErrorPrevious * ErrorCurrent > 0 && ErrorLast * ErrorCurrent > 0) {
-            // If sign are same , simply eliminate the one with biggest error value.
-            if (std::abs(ErrorLast) > std::abs(ErrorPrevious)) {
-                // Eliminating Last Value
-                SurfAreaFracLast = SurfAreaFracPrevious;
-                ErrorLast = ErrorPrevious;
-            }
-        } else {
-            // If signs are different eliminate previous error with same sign as current error
-            if (ErrorLast * ErrorCurrent > 0) {
-                // Previous Loaded to Last
-                SurfAreaFracLast = SurfAreaFracPrevious;
-                ErrorLast = ErrorPrevious;
-            }
-        }
-        // Current Loaded into previous.
-        SurfAreaFracPrevious = SurfAreaFracCurrent;
-        ErrorPrevious = ErrorCurrent;
-    }
 }
 
 void CheckWaterCoilSchedule(
@@ -6520,6 +6294,42 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
     }
 }
 
+Real64 EnthalpyResidual(EnergyPlusData &state,
+                        Real64 const Tprov,        // test value of Tdb [C]
+                        Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
+)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   April 2009
+    //       MODIFIED
+    //       RE-ENGINEERED
+
+    // PURPOSE OF THIS FUNCTION:
+    // Calculates residual function Hdesired - H(Tdb,Rh,Pb)
+
+    // METHODOLOGY EMPLOYED:
+    // Calls PsyHFnTdbRhPb
+
+    // Using/Aliasing
+    using Psychrometrics::PsyHFnTdbRhPb;
+
+    // Return value
+    Real64 Residuum; // residual to be minimized to zero
+
+    // Argument array dimensioning
+
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // Par(2) = desired relative humidity (0.0 - 1.0)
+    // Par(3) = barometric pressure [N/m2 (Pascals)]
+
+    Residuum = Par(1) - PsyHFnTdbRhPb(state, Tprov, Par(2), Par(3));
+
+    return Residuum;
+}
+
 Real64 TdbFnHRhPb(EnergyPlusData &state,
                   Real64 const H,  // specific enthalpy {J/kg}
                   Real64 const RH, // relative humidity value (0.0-1.0)
@@ -6550,18 +6360,9 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     // Return value
     Real64 T; // result=> humidity ratio
 
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
-    int const MaxIte(500); // Maximum number of iterations
-    Real64 const Acc(1.0); // Accuracy of result
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
+    int constexpr MaxIte(500); // Maximum number of iterations
+    Real64 constexpr Acc(1.0); // Accuracy of result
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int SolFla;             // Flag of solver
@@ -6595,127 +6396,6 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     }
 
     return T;
-}
-
-Real64 EnthalpyResidual(EnergyPlusData &state,
-                        Real64 const Tprov,        // test value of Tdb [C]
-                        Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   April 2009
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function Hdesired - H(Tdb,Rh,Pb)
-
-    // METHODOLOGY EMPLOYED:
-    // Calls PsyHFnTdbRhPb
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyHFnTdbRhPb;
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = desired relative humidity (0.0 - 1.0)
-    // Par(3) = barometric pressure [N/m2 (Pascals)]
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-    Residuum = Par(1) - PsyHFnTdbRhPb(state, Tprov, Par(2), Par(3));
-
-    return Residuum;
-}
-
-Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil number, [-]
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Bereket A Nigusse, FSEC
-    //       DATE WRITTEN   July 2010
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Splits the UA value of a simple coil:cooling:water heat exchanger model into
-    // "A" and U" values.
-
-    // METHODOLOGY EMPLOYED:
-    // A typical design U overall heat transfer coefficient is used to split the "UA" into "A"
-    // and "U" values. Currently a constant U value calculated for a typical cooling coil is
-    // used. The assumptions used to calculate a typical U value are:
-    //     (1) tube side water velocity of 2.0 [m/s]
-    //     (2) inside to outside total surface area ratio (Ai/Ao) =  0.07 [-]
-    //     (3) fins overall efficiency = 0.92 based on aluminum fin, 12 fins per inch, and
-    //         fins area to total outside surafce area ratio of about 90%.
-    //     (4) air side convection coefficient of 140.0 [W/m2C].  Assumes sensible convection
-    //         of 58.0 [W/m2C] and 82.0 [W/m2C] sensible convection equivalent of the mass
-    //         transfer coefficient converted using the approximate relation:
-    //         hequivalent = hmasstransfer/CpAir.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-
-    // Return value
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    constexpr Real64 OverallFinEfficiency(0.92); // Assumes aluminum fins, 12 fins per inch, fins
-    // area of about 90% of external surface area Ao.
-
-    constexpr Real64 AreaRatio(0.07); // Heat exchanger Inside to Outside surface area ratio
-    // design values range from (Ai/Ao) = 0.06 to 0.08
-
-    // Constant value air side heat transfer coefficient is assumed. This coefficient has sensible
-    // (58.d0 [W/m2C]) and latent (82.d0 [W/m2C]) heat transfer coefficient components.
-    constexpr Real64 hAirTubeOutside(58.0 + 82.0); // Air side heat transfer coefficient [W/m2C]
-
-    // Tube side water convection heat transfer coefficient of the cooling coil is calculated for
-    // inside tube diameter of 0.0122m (~0.5 inch nominal diameter) and water velocity 2.0 m/s:
-    static Real64 const hWaterTubeInside(1429.0 * std::pow(2.0, 0.8) * std::pow(0.0122, -0.2)); // water (tube) side heat transfer coefficient [W/m2C]
-
-    // Estimate the overall heat transfer coefficient, UOverallHeatTransferCoef in [W/(m2C)].
-    // Neglecting tube wall and fouling resistance, the overall U value can be estimated as:
-    // 1/UOverallHeatTransferCoef = 1/(hi*AreaRatio) + 1/(ho*OverallFinEfficiency)
-    static Real64 const UOverallHeatTransferCoef_inv(
-        1.0 / (hWaterTubeInside * AreaRatio) +
-        1.0 / (hAirTubeOutside * OverallFinEfficiency)); // Inverse of overall heat transfer coefficient for coil [W/m2C]
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-    state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal =
-        1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
-
-    // the heat exchanger surface area is calculated as follows:
-    return state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal * UOverallHeatTransferCoef_inv; // Heat exchanger surface area [m2]
 }
 
 int GetWaterCoilIndex(EnergyPlusData &state,
@@ -7035,23 +6715,9 @@ void EstimateCoilInletWaterTemp(EnergyPlusData &state,
     // applies energy balance around the water coil and estimates coil water inlet temperature
     // assuming coil effectiveness of 0.8
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("EstimateCoilInletWaterTemp");
     constexpr Real64 EffectivenessMaxAssumed(0.80);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 WaterMassFlowRate;
@@ -7141,8 +6807,5 @@ void EstimateCoilInletWaterTemp(EnergyPlusData &state,
         DesCoilInletWaterTempUsed = max(DesCoilInletWaterTempUsed, DesCoilHWInletTempMin);
     }
 }
-
-// End of Coil Utility subroutines
-// *****************************************************************************
 
 } // namespace EnergyPlus::WaterCoils

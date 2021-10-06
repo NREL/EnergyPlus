@@ -72,8 +72,6 @@
 
 namespace EnergyPlus {
 
-// (ref: Object: Generator:WindTurbine)
-
 namespace WindTurbine {
     // Module containing the data for wind turbine system
 
@@ -93,93 +91,6 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
-    void SimWindTurbine(EnergyPlusData &state,
-                        [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
-                        std::string const &GeneratorName,                   // User specified name of Generator
-                        int &GeneratorIndex,                                // Generator index
-                        bool const RunFlag,                                 // ON or OFF
-                        [[maybe_unused]] Real64 const WTLoad                // Electrical load on WT (not used)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Daeho Kang
-        //       DATE WRITTEN   October 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages the simulation of wind turbine component.
-        // This drivers manages the calls to all of the other drivers and simulation algorithms.
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int WindTurbineNum;
-        // Obtains and allocates heat balance related parameters from input
-
-        if (state.dataWindTurbine->GetInputFlag) {
-            GetWindTurbineInput(state);
-            state.dataWindTurbine->GetInputFlag = false;
-        }
-
-        if (GeneratorIndex == 0) {
-            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
-            if (WindTurbineNum == 0) {
-                ShowFatalError(state, "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName);
-            }
-            GeneratorIndex = WindTurbineNum;
-        } else {
-            WindTurbineNum = GeneratorIndex;
-            if (WindTurbineNum > state.dataWindTurbine->NumWindTurbines || WindTurbineNum < 1) {
-                ShowFatalError(state,
-                               format("SimWindTurbine: Invalid GeneratorIndex passed={}, Number of Wind Turbine Generators={}, Generator name={}",
-                                      WindTurbineNum,
-                                      state.dataWindTurbine->NumWindTurbines,
-                                      GeneratorName));
-            }
-            if (GeneratorName != state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name) {
-                ShowFatalError(state,
-                               format("SimMWindTurbine: Invalid GeneratorIndex passed={}, Generator name={}, stored Generator Name for that index={}",
-                                      WindTurbineNum,
-                                      GeneratorName,
-                                      state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name));
-            }
-        }
-
-        InitWindTurbine(state, WindTurbineNum);
-
-        CalcWindTurbine(state, WindTurbineNum, RunFlag);
-
-        ReportWindTurbine(state, WindTurbineNum);
-    }
-
-    void GetWTGeneratorResults(EnergyPlusData &state,
-                               [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
-                               int const GeneratorIndex,                           // Generator number
-                               Real64 &GeneratorPower,                             // Electrical power
-                               Real64 &GeneratorEnergy,                            // Electrical energy
-                               Real64 &ThermalPower,
-                               Real64 &ThermalEnergy)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Aug. 2008
-        //       MODIFIED       D Kang, October 2009 for Wind Turbine
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine provides a "get" method to collect results for individual electic load centers.
-
-        GeneratorPower = state.dataWindTurbine->WindTurbineSys(GeneratorIndex).Power;
-        GeneratorEnergy = state.dataWindTurbine->WindTurbineSys(GeneratorIndex).Energy;
-
-        // Thermal energy is ignored
-        ThermalPower = 0.0;
-        ThermalEnergy = 0.0;
-    }
-
     void GetWindTurbineInput(EnergyPlusData &state)
     {
 
@@ -193,17 +104,15 @@ namespace WindTurbine {
         // This subroutine gets input data for wind turbine components
         // and stores it in the wind turbine data structure.
 
-        // Using/Aliasing
-
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("Generator:WindTurbine");
-        Real64 const SysEffDefault(0.835); // Default value of overall system efficiency
-        Real64 const MaxTSR(12.0);         // Maximum tip speed ratio
-        Real64 const DefaultPC(0.25);      // Default power coefficient
-        Real64 const MaxPowerCoeff(0.59);  // Maximum power coefficient
-        Real64 const DefaultH(50.0);       // Default of height for local wind speed
+        Real64 constexpr SysEffDefault(0.835); // Default value of overall system efficiency
+        Real64 constexpr MaxTSR(12.0);         // Maximum tip speed ratio
+        Real64 constexpr DefaultPC(0.25);      // Default power coefficient
+        Real64 constexpr MaxPowerCoeff(0.59);  // Maximum power coefficient
+        Real64 constexpr DefaultH(50.0);       // Default of height for local wind speed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -732,6 +641,32 @@ namespace WindTurbine {
         }
     }
 
+    void GetWTGeneratorResults(EnergyPlusData &state,
+                               [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
+                               int const GeneratorIndex,                           // Generator number
+                               Real64 &GeneratorPower,                             // Electrical power
+                               Real64 &GeneratorEnergy,                            // Electrical energy
+                               Real64 &ThermalPower,
+                               Real64 &ThermalEnergy)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   Aug. 2008
+        //       MODIFIED       D Kang, October 2009 for Wind Turbine
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine provides a "get" method to collect results for individual electic load centers.
+
+        GeneratorPower = state.dataWindTurbine->WindTurbineSys(GeneratorIndex).Power;
+        GeneratorEnergy = state.dataWindTurbine->WindTurbineSys(GeneratorIndex).Energy;
+
+        // Thermal energy is ignored
+        ThermalPower = 0.0;
+        ThermalEnergy = 0.0;
+    }
+
     void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum)
     {
 
@@ -1113,6 +1048,67 @@ namespace WindTurbine {
 
         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy =
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
+    }
+
+    void SimWindTurbine(EnergyPlusData &state,
+                        [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
+                        std::string const &GeneratorName,                   // User specified name of Generator
+                        int &GeneratorIndex,                                // Generator index
+                        bool const RunFlag,                                 // ON or OFF
+                        [[maybe_unused]] Real64 const WTLoad                // Electrical load on WT (not used)
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Daeho Kang
+        //       DATE WRITTEN   October 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine manages the simulation of wind turbine component.
+        // This drivers manages the calls to all of the other drivers and simulation algorithms.
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int WindTurbineNum;
+        // Obtains and allocates heat balance related parameters from input
+
+        if (state.dataWindTurbine->GetInputFlag) {
+            GetWindTurbineInput(state);
+            state.dataWindTurbine->GetInputFlag = false;
+        }
+
+        if (GeneratorIndex == 0) {
+            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
+            if (WindTurbineNum == 0) {
+                ShowFatalError(state, "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName);
+            }
+            GeneratorIndex = WindTurbineNum;
+        } else {
+            WindTurbineNum = GeneratorIndex;
+            if (WindTurbineNum > state.dataWindTurbine->NumWindTurbines || WindTurbineNum < 1) {
+                ShowFatalError(state,
+                               format("SimWindTurbine: Invalid GeneratorIndex passed={}, Number of Wind Turbine Generators={}, Generator name={}",
+                                      WindTurbineNum,
+                                      state.dataWindTurbine->NumWindTurbines,
+                                      GeneratorName));
+            }
+            if (GeneratorName != state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name) {
+                ShowFatalError(state,
+                               format("SimMWindTurbine: Invalid GeneratorIndex passed={}, Generator name={}, stored Generator Name for that index={}",
+                                      WindTurbineNum,
+                                      GeneratorName,
+                                      state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name));
+            }
+        }
+
+        InitWindTurbine(state, WindTurbineNum);
+
+        CalcWindTurbine(state, WindTurbineNum, RunFlag);
+
+        ReportWindTurbine(state, WindTurbineNum);
     }
 
 } // namespace WindTurbine

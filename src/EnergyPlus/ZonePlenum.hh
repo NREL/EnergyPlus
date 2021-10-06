@@ -172,15 +172,7 @@ namespace ZonePlenum {
 
     void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
-
-    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
-
-    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstCall);
-
     void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
-
-    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 

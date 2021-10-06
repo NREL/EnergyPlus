@@ -159,17 +159,6 @@ namespace WindTurbine {
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy);
 
-    void GetWindTurbineInput(EnergyPlusData &state);
-
-    void InitWindTurbine(EnergyPlusData &state, int WindTurbineNum);
-
-    void CalcWindTurbine(EnergyPlusData &state,
-                         int WindTurbineNum, // System is on
-                         bool RunFlag        // System is on
-    );
-
-    void ReportWindTurbine(EnergyPlusData &state, int WindTurbineNum);
-
 } // namespace WindTurbine
 
 struct WindTurbineData : BaseGlobalStruct

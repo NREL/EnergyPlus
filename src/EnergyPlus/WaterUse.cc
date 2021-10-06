@@ -84,6 +84,40 @@ namespace WaterUse {
     //       MODIFIED       Brent Griffith, plant upgrade
     //       RE-ENGINEERED  na
 
+    void ReportStandAloneWaterUse(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith, Peter Graham Ellis
+        //       DATE WRITTEN   Nov. 2011
+        //       MODIFIED       Brent Griffith, March 2010 added argument
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates report variables for stand-alone water use
+
+        for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
+            auto &thisWEq = state.dataWaterUse->WaterEquipment(WaterEquipNum);
+            thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
+
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
+            if (thisWEq.Connections == 0) {
+                thisWEq.Power =
+                    thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
+            } else {
+                thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) *
+                                (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
+            }
+
+            thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        }
+    }
+
     void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration)
     {
 
@@ -1583,40 +1617,6 @@ namespace WaterUse {
             // Set outlet node variables that are possibly changed
             state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
             // should add enthalpy update to return?
-        }
-    }
-
-    void ReportStandAloneWaterUse(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith, Peter Graham Ellis
-        //       DATE WRITTEN   Nov. 2011
-        //       MODIFIED       Brent Griffith, March 2010 added argument
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates report variables for stand alone water use
-
-        for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
-            auto &thisWEq = state.dataWaterUse->WaterEquipment(WaterEquipNum);
-            thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
-            thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
-            thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
-
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-
-            if (thisWEq.Connections == 0) {
-                thisWEq.Power =
-                    thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
-            } else {
-                thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) *
-                                (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
-            }
-
-            thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         }
     }
 

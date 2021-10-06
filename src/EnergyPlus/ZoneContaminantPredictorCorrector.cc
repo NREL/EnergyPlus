@@ -103,58 +103,6 @@ using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
 using ZoneTempPredictorCorrector::DownInterpolate4HistoryValues;
 
-void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                                 bool const ShortenTimeStepSys,
-                                 bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                                 Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
-)
-{
-
-    // SUBROUTINE INFORMATION
-    //       AUTHOR         Lixing Gu
-    //       DATE WRITTEN   July, 2010
-    //       MODIFIED       na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine predicts or corrects the zone air temperature
-    // depending on the simulation status and determines the correct
-    // temperature setpoint for each zone from the schedule manager.
-    // This module is revised from subroutine ManageZoneAirUpdates in
-    // ZoneTempPredictorCorrector module.
-
-    if (state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag) {
-        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) GetZoneContaminanInputs(state);
-        GetZoneContaminanSetPoints(state);
-        state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag = false;
-    }
-
-    if (!state.dataContaminantBalance->Contaminant.SimulateContaminants) return;
-
-    {
-        auto const SELECT_CASE_var(UpdateType);
-
-        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
-            InitZoneContSetPoints(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
-            PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
-            CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
-            RevertZoneTimestepHistories(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
-            PushZoneTimestepHistories(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
-            PushSystemTimestepHistories(state);
-        }
-    }
-}
-
 void GetZoneContaminanInputs(EnergyPlusData &state)
 {
 
@@ -1757,6 +1705,58 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     }
 }
 
+void ManageZoneContaminanUpdates(EnergyPlusData &state,
+                                 DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                                 bool const ShortenTimeStepSys,
+                                 bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                                 Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+)
+{
+
+    // SUBROUTINE INFORMATION
+    //       AUTHOR         Lixing Gu
+    //       DATE WRITTEN   July, 2010
+    //       MODIFIED       na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine predicts or corrects the zone air temperature
+    // depending on the simulation status and determines the correct
+    // temperature setpoint for each zone from the schedule manager.
+    // This module is revised from subroutine ManageZoneAirUpdates in
+    // ZoneTempPredictorCorrector module.
+
+    if (state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) GetZoneContaminanInputs(state);
+        GetZoneContaminanSetPoints(state);
+        state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag = false;
+    }
+
+    if (!state.dataContaminantBalance->Contaminant.SimulateContaminants) return;
+
+    {
+        auto const SELECT_CASE_var(UpdateType);
+
+        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
+            InitZoneContSetPoints(state);
+
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
+            PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
+            CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
+            RevertZoneTimestepHistories(state);
+
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
+            PushZoneTimestepHistories(state);
+
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
+            PushSystemTimestepHistories(state);
+        }
+    }
+}
+
 void PredictZoneContaminants(EnergyPlusData &state,
                              bool const ShortenTimeStepSys,
                              bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -2313,7 +2313,6 @@ void InverseModelCO2(EnergyPlusData &state,
     Real64 BB(0.0);
     Real64 CC(0.0);
     Real64 DD(0.0);
-    Real64 zone_M_CO2(0.0);
     Real64 delta_CO2(0.0);
     Real64 AirDensity(0.0);
     Real64 CpAir(0.0);
@@ -2374,7 +2373,6 @@ void InverseModelCO2(EnergyPlusData &state,
                   (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                   (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum));
 
-            zone_M_CO2 = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
             delta_CO2 = (state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration - state.dataContaminantBalance->OutdoorCO2) / 1000;
             CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
             AirDensity = PsyRhoAirFnPbTdbW(state,

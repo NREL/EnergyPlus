@@ -258,8 +258,6 @@ namespace WaterUse {
 
     void GetWaterUseInput(EnergyPlusData &state);
 
-    void ReportStandAloneWaterUse(EnergyPlusData &state);
-
     void CalcWaterUseZoneGains(EnergyPlusData &state);
 
 } // namespace WaterUse

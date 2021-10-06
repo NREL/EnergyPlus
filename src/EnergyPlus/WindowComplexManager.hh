@@ -111,42 +111,11 @@ namespace WindowComplexManager {
 
     // Functions
 
-    // void clear_state();
-
-    void InitBSDFWindows(EnergyPlusData &state);
-
-    void AllocateCFSStateHourlyData(EnergyPlusData &state,
-                                    int const iSurf, // Surface number
-                                    int const iState // Complex fenestration state number
-    );
-
-    void ExpandComplexState(EnergyPlusData &state,
-                            int const iSurf, // Surface number
-                            int const iConst // Construction number
-    );
-
     void CheckCFSStates(EnergyPlusData &state, int const iSurf); // Surface number
 
     void InitComplexWindows(EnergyPlusData &state);
 
     void UpdateComplexWindows(EnergyPlusData &state);
-
-    void CFSShadeAndBeamInitialization(EnergyPlusData &state,
-                                       int const iSurf, // Window surface number
-                                       int const iState // Window state number
-    );
-
-    void CalculateWindowBeamProperties(EnergyPlusData &state,
-                                       int const ISurf,                   // Window surface number
-                                       int const IState,                  // Window state number
-                                       BSDFWindowGeomDescr const &Window, // Window Geometry
-                                       BSDFGeomDescr const &Geom,         // State Geometry
-                                       BSDFStateDescr &State,             // State Description
-                                       int const Hour,                    // Hour number
-                                       int const TS                       // Timestep number
-    );
-
-    void CalcStaticProperties(EnergyPlusData &state);
 
     void CalculateBasisLength(EnergyPlusData &state,
                               BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
@@ -154,41 +123,7 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void ConstructBasis(EnergyPlusData &state,
-                        int const IConst, // Index for accessing Construct array
-                        BasisStruct &Basis);
-
-    void FillBasisElement(EnergyPlusData &state,
-                          Real64 const Theta, // Central polar angle of element
-                          Real64 const Phi,   // Central azimuthal angle of element
-                          int const Elem,     // Index number of element in basis
-                          BasisElemDescr &BasisElem,
-                          Real64 const LowerTheta,              // Lower edge of element (polar angle)
-                          Real64 const UpperTheta,              // Upper edge of element (polar angle)
-                          Real64 const DPhi,                    // Width of element (azimuthal angle)
-                          DataBSDFWindow::Basis const InputType // Basis type
-    );
-
-    void SetupComplexWindowStateGeometry(EnergyPlusData &state,
-                                         int const ISurf,             // Surface number of the complex fenestration
-                                         int const IState,            // State number of the complex fenestration state
-                                         int const IConst,            // Pointer to construction for this state
-                                         BSDFWindowGeomDescr &Window, // Window Geometry
-                                         BSDFGeomDescr &Geom,         // State Geometry
-                                         BSDFStateDescr &State        // State Description
-    );
-
-    void CalcWindowStaticProperties(EnergyPlusData &state,
-                                    int const ISurf,             // Surface number of the complex fenestration
-                                    int const IState,            // State number of the complex fenestration state
-                                    BSDFWindowGeomDescr &Window, // Window Geometry
-                                    BSDFGeomDescr &Geom,         // State Geometry
-                                    BSDFStateDescr &State        // State Description
-    );
-
     Real64 SkyWeight(Vector const &DirVec); // Direction of the element to be weighted
-
-    Real64 SkyGndWeight(Vector const &PosVec); // x,y,z(=0) of ground intersection pt
 
     BSDFDaylghtPosition DaylghtAltAndAzimuth(Vector const &UnitVect); // vector which needs to be converted
 
@@ -198,16 +133,6 @@ namespace WindowComplexManager {
                            int const RadType,  // Type of radiation: Front_Incident, etc.
                            Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
                            Real64 const Alpha  // Surface azimuth, radians, world coordinate system
-    );
-
-    int FindInBasis(EnergyPlusData &state,
-                    Vector const &RayToFind,  // Ray vector direction in world CS
-                    int const RadType,        // Type of radiation: Front_Incident, etc.
-                    int const ISurf,          // Window Surface number
-                    int const IState,         // Complex Fenestration state number
-                    BasisStruct const &Basis, // Complex Fenestration basis root
-                    Real64 &Theta,            // Theta value for ray
-                    Real64 &Phi               // Phi value for ray
     );
 
     void W6CoordsFromWorldVect(EnergyPlusData &state,
@@ -227,16 +152,6 @@ namespace WindowComplexManager {
                                   Real64 &SurfOutsideTemp,    // Outside surface temperature (C)
                                   Real64 &SurfOutsideEmiss,
                                   DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
-    );
-
-    // This function check if gas with molecular weight has already been feed into coefficients and
-    // feed arrays
-
-    void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1D<Real64> &wght, bool &feedData);
-
-    int SearchAscTable(Real64 const y,            // Value to be found in the table
-                       int const n,               // Number of values in the table
-                       Array1S<Real64> const ytab // Table of values, monotonic, ascending order
     );
 
 } // namespace WindowComplexManager

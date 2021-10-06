@@ -198,8 +198,6 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcZoneAirTempSetPoints(EnergyPlusData &state);
 
-    void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
-
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
@@ -216,8 +214,6 @@ namespace ZoneTempPredictorCorrector {
                                            Real64 const LoadCorrFactor,
                                            Real64 const ZoneMultiplier,
                                            Real64 const ZoneMultiplierList);
-
-    void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
     void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
@@ -257,30 +253,6 @@ namespace ZoneTempPredictorCorrector {
                                        Real64 &newVal4  // unused 1208
     );
 
-    void InverseModelTemperature(EnergyPlusData &state,
-                                 int const ZoneNum,              // Zone number
-                                 Real64 &SumIntGain,             // Zone sum of convective internal gains
-                                 Real64 &SumIntGainExceptPeople, // Zone sum of convective internal gains except for people
-                                 Real64 &SumHA,                  // Zone sum of Hc*Area
-                                 Real64 &SumHATsurf,             // Zone sum of Hc*Area*Tsurf
-                                 Real64 &SumHATref,              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-                                 Real64 &SumMCp,                 // Zone sum of MassFlowRate*Cp
-                                 Real64 &SumMCpT,                // Zone sum of MassFlowRate*Cp*T
-                                 Real64 &SumSysMCp,              // Zone sum of air system MassFlowRate*Cp
-                                 Real64 &SumSysMCpT,             // Zone sum of air system MassFlowRate*Cp*T
-                                 Real64 &AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
-    );
-
-    void InverseModelHumidity(EnergyPlusData &state,
-                              int const ZoneNum,              // Zone number
-                              Real64 &LatentGain,             // Zone sum of latent gain
-                              Real64 &LatentGainExceptPeople, // Zone sum of latent gain except for people
-                              Real64 &ZoneMassFlowRate,       // Zone air mass flow rate
-                              Real64 &MoistureMassFlowRate,   // Zone moisture mass flow rate
-                              Real64 &H2OHtOfVap,             // Heat of vaporization of air
-                              Real64 &RhoAir                  // Air density
-    );
-
     void CalcZoneSums(EnergyPlusData &state,
                       int const ZoneNum,              // Zone number
                       Real64 &SumIntGain,             // Zone sum of convective internal gains
@@ -312,32 +284,9 @@ namespace ZoneTempPredictorCorrector {
 
     bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 
-    bool VerifyControlledZoneForThermostat(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
-
     void DetectOscillatingZoneTemp(EnergyPlusData &state);
 
-    void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
-
     void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
-
-    void CalcZoneAirComfortSetPoints(EnergyPlusData &state);
-
-    void GetComfortSetPoints(EnergyPlusData &state,
-                             int const PeopleNum,
-                             int const ComfortControlNum,
-                             Real64 const PMVSet,
-                             Real64 &Tset // drybulb setpoint temperature for a given PMV value
-    );
-
-    Real64 PMVResidual(EnergyPlusData &state,
-                       Real64 const Tset,
-                       Array1D<Real64> const &Par // par(1) = PMV set point
-    );
-
-    void AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &state,
-                                                        int const TempControlledZoneID,
-                                                        int const ActualZoneNum // controlled zone actual zone number
-    );
 
     void OverrideAirSetPointsforEMSCntrl(EnergyPlusData &state);
 

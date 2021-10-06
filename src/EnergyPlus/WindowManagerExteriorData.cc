@@ -62,7 +62,6 @@ namespace EnergyPlus {
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
 using namespace WindowComplexManager;
-
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;

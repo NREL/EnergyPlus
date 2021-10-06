@@ -70,10 +70,6 @@ namespace WaterManager {
 
     void UpdatePrecipitation(EnergyPlusData &state);
 
-    void UpdateIrrigation(EnergyPlusData &state);
-
-    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
-
     void SetupTankSupplyComponent(EnergyPlusData &state,
                                   std::string_view CompName,
                                   std::string_view CompType,
@@ -82,14 +78,6 @@ namespace WaterManager {
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
-    void InternalSetupTankSupplyComponent(EnergyPlusData &state,
-                                          std::string_view CompName,
-                                          std::string_view CompType,
-                                          std::string_view TankName,
-                                          bool &ErrorsFound,
-                                          int &TankIndex,
-                                          int &WaterSupplyIndex);
-
     void SetupTankDemandComponent(EnergyPlusData &state,
                                   std::string_view CompName,
                                   std::string_view const CompType,
@@ -97,18 +85,6 @@ namespace WaterManager {
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterDemandIndex);
-
-    void InternalSetupTankDemandComponent(EnergyPlusData &state,
-                                          std::string_view CompName,
-                                          std::string_view const CompType,
-                                          std::string_view TankName,
-                                          bool &ErrorsFound,
-                                          int &TankIndex,
-                                          int &WaterDemandIndex);
-
-    void CalcRainCollector(EnergyPlusData &state, int const RainColNum); // Index of rain collector
-
-    void CalcGroundwaterWell(EnergyPlusData &state, int const WellNum); // Index of well
 
     void UpdateWaterManager(EnergyPlusData &state);
 
