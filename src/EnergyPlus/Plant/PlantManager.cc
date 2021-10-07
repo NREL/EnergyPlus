@@ -595,22 +595,18 @@ void GetPlantLoopData(EnergyPlusData &state)
         if (NumAlphas >= PressSimAlphaIndex) {
             MatchedPressureString = false;
 
-            // Check all types
-            if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::PressSimType::NoPressure)))) {
-                this_loop.PressureSimType = DataPlant::PressSimType::NoPressure;
+            this_loop.PressureSimType = static_cast<DataPlant::PressSimType>(getEnumerationValue(PressureSimTypeNamesUC, Alpha(PressSimAlphaIndex)));
+            switch (this_loop.PressureSimType) {
+                // Check all types
+            case DataPlant::PressSimType::NoPressure:
+            case DataPlant::PressSimType::FlowCorrection:
+            case DataPlant::PressSimType::PumpPowerCorrection:
+            case DataPlant::PressSimType::FlowSimulation: {
                 MatchedPressureString = true;
-            } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex),
-                                                   format("{}", cPressureSimType(DataPlant::PressSimType::PumpPowerCorrection)))) {
-                this_loop.PressureSimType = DataPlant::PressSimType::PumpPowerCorrection;
-                MatchedPressureString = true;
-            } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex),
-                                                   format("{}", cPressureSimType(DataPlant::PressSimType::FlowSimulation)))) {
-                this_loop.PressureSimType = DataPlant::PressSimType::FlowSimulation;
-                MatchedPressureString = true;
-            } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex),
-                                                   format("{}", cPressureSimType(DataPlant::PressSimType::FlowCorrection)))) {
-                this_loop.PressureSimType = DataPlant::PressSimType::FlowCorrection;
-                MatchedPressureString = true;
+                break;
+            }
+            default:
+                break;
             }
 
             // If we found a match, check to make sure it is one of the valid
@@ -626,9 +622,11 @@ void GetPlantLoopData(EnergyPlusData &state)
                     ShowContinueError(
                         state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
                     ShowContinueError(state, "Currently only options are: ");
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::PressSimType::NoPressure)));
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::PressSimType::PumpPowerCorrection)));
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::PressSimType::FlowCorrection)));
+                    ShowContinueError(state, "  - " + format("{}", PressureSimTypeNamesUC[static_cast<int>(DataPlant::PressSimType::NoPressure)]));
+                    ShowContinueError(state,
+                                      "  - " + format("{}", PressureSimTypeNamesUC[static_cast<int>(DataPlant::PressSimType::PumpPowerCorrection)]));
+                    ShowContinueError(state,
+                                      "  - " + format("{}", PressureSimTypeNamesUC[static_cast<int>(DataPlant::PressSimType::FlowCorrection)]));
                     ErrorsFound = true;
                 }
             }

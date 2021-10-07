@@ -294,6 +294,14 @@ enum class PressSimType
     PumpPowerCorrection, // Only updating the pump power
     FlowCorrection,      // Update pump flow rate based on pump curve
     FlowSimulation,      // Full pressure network simulation
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(PressSimType::Num)> PressureSimTypeNamesUC{
+    "NONE",
+    "PUMPPOWERCORRECTION",
+    "LOOPFLOWCORRECTION",
+    "PRESSURESIMULATION",
 };
 
 enum class CtrlType

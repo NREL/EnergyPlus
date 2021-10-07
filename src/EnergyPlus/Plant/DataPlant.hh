@@ -89,23 +89,6 @@ namespace DataPlant {
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
-    constexpr std::string_view cPressureSimType(DataPlant::PressSimType const &d)
-    {
-        switch (d) {
-        case DataPlant::PressSimType::NoPressure:
-            return "NONE";
-        case DataPlant::PressSimType::PumpPowerCorrection:
-            return "PUMPPOWERCORRECTION";
-        case DataPlant::PressSimType::FlowCorrection:
-            return "LOOPFLOWCORRECTION";
-        case DataPlant::PressSimType::FlowSimulation:
-            return "PRESSURESIMULATION";
-        default:
-            assert(false);
-            return "";
-        }
-    }
-
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 
     constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNamesCC{
