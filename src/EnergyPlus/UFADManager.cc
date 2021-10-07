@@ -1057,39 +1057,40 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
     Real64 ZoneMult;                 // total zone multiplier
     int ZoneNodeNum;                 // node number of the HVAC zone node
-    Array1D_int IntGainTypesOccupied(30,
-                                     {IntGainTypeOf_People,
-                                      IntGainTypeOf_WaterHeaterMixed,
-                                      IntGainTypeOf_WaterHeaterStratified,
-                                      IntGainTypeOf_ThermalStorageChilledWaterMixed,
-                                      IntGainTypeOf_ThermalStorageChilledWaterStratified,
-                                      IntGainTypeOf_ElectricEquipment,
-                                      IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                      IntGainTypeOf_GasEquipment,
-                                      IntGainTypeOf_HotWaterEquipment,
-                                      IntGainTypeOf_SteamEquipment,
-                                      IntGainTypeOf_OtherEquipment,
-                                      IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                      IntGainTypeOf_GeneratorFuelCell,
-                                      IntGainTypeOf_WaterUseEquipment,
-                                      IntGainTypeOf_GeneratorMicroCHP,
-                                      IntGainTypeOf_ElectricLoadCenterTransformer,
-                                      IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                      IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                      IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                      IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
-                                      IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                      IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                      IntGainTypeOf_PipeIndoor,
-                                      IntGainTypeOf_RefrigerationCase,
-                                      IntGainTypeOf_RefrigerationCompressorRack,
-                                      IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
-                                      IntGainTypeOf_RefrigerationSystemSuctionPipe,
-                                      IntGainTypeOf_RefrigerationSecondaryReceiver,
-                                      IntGainTypeOf_RefrigerationSecondaryPipe,
-                                      IntGainTypeOf_RefrigerationWalkIn});
+    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+        DataHeatBalance::IntGainType::People,
+        DataHeatBalance::IntGainType::WaterHeaterMixed,
+        DataHeatBalance::IntGainType::WaterHeaterStratified,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+        DataHeatBalance::IntGainType::ElectricEquipment,
+        DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+        DataHeatBalance::IntGainType::GasEquipment,
+        DataHeatBalance::IntGainType::HotWaterEquipment,
+        DataHeatBalance::IntGainType::SteamEquipment,
+        DataHeatBalance::IntGainType::OtherEquipment,
+        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+        DataHeatBalance::IntGainType::GeneratorFuelCell,
+        DataHeatBalance::IntGainType::WaterUseEquipment,
+        DataHeatBalance::IntGainType::GeneratorMicroCHP,
+        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+        DataHeatBalance::IntGainType::PipeIndoor,
+        DataHeatBalance::IntGainType::RefrigerationCase,
+        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+        DataHeatBalance::IntGainType::RefrigerationWalkIn};
 
-    Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
+    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                   DataHeatBalance::IntGainType::Lights};
     Real64 RetAirGains;
 
     // Exact solution or Euler method
@@ -1128,12 +1129,12 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     PowerPerPlume = state.dataRoomAirMod->ZoneUCSDUI(UINum).PowerPerPlume;
     // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
     // baseboards (nonthermostatic), water heater skin loss
-    SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, ConvGainsOccSubzone);
+    ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         ConvGainsOccSubzone += RetAirGains;
     }
 
@@ -1142,10 +1143,10 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
 
     // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
-    SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone);
+    ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         ConvGainsUpSubzone += RetAirGains;
     }
     ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
@@ -1567,39 +1568,40 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     int ZoneNodeNum;                 // node number of the HVAC zone node
     Real64 TempDepCoef(0.0);         // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
     Real64 TempIndCoef(0.0);         // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-    static const Array1D_int IntGainTypesOccupied(30,
-                                                  {IntGainTypeOf_People,
-                                                   IntGainTypeOf_WaterHeaterMixed,
-                                                   IntGainTypeOf_WaterHeaterStratified,
-                                                   IntGainTypeOf_ThermalStorageChilledWaterMixed,
-                                                   IntGainTypeOf_ThermalStorageChilledWaterStratified,
-                                                   IntGainTypeOf_ElectricEquipment,
-                                                   IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                                   IntGainTypeOf_GasEquipment,
-                                                   IntGainTypeOf_HotWaterEquipment,
-                                                   IntGainTypeOf_SteamEquipment,
-                                                   IntGainTypeOf_OtherEquipment,
-                                                   IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                                   IntGainTypeOf_GeneratorFuelCell,
-                                                   IntGainTypeOf_WaterUseEquipment,
-                                                   IntGainTypeOf_GeneratorMicroCHP,
-                                                   IntGainTypeOf_ElectricLoadCenterTransformer,
-                                                   IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                                   IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                                   IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                                   IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                                   IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
-                                                   IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                                   IntGainTypeOf_PipeIndoor,
-                                                   IntGainTypeOf_RefrigerationCase,
-                                                   IntGainTypeOf_RefrigerationCompressorRack,
-                                                   IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
-                                                   IntGainTypeOf_RefrigerationSystemSuctionPipe,
-                                                   IntGainTypeOf_RefrigerationSecondaryReceiver,
-                                                   IntGainTypeOf_RefrigerationSecondaryPipe,
-                                                   IntGainTypeOf_RefrigerationWalkIn});
+    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+        DataHeatBalance::IntGainType::People,
+        DataHeatBalance::IntGainType::WaterHeaterMixed,
+        DataHeatBalance::IntGainType::WaterHeaterStratified,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+        DataHeatBalance::IntGainType::ElectricEquipment,
+        DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+        DataHeatBalance::IntGainType::GasEquipment,
+        DataHeatBalance::IntGainType::HotWaterEquipment,
+        DataHeatBalance::IntGainType::SteamEquipment,
+        DataHeatBalance::IntGainType::OtherEquipment,
+        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+        DataHeatBalance::IntGainType::GeneratorFuelCell,
+        DataHeatBalance::IntGainType::WaterUseEquipment,
+        DataHeatBalance::IntGainType::GeneratorMicroCHP,
+        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+        DataHeatBalance::IntGainType::PipeIndoor,
+        DataHeatBalance::IntGainType::RefrigerationCase,
+        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+        DataHeatBalance::IntGainType::RefrigerationWalkIn};
 
-    static const Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
+    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                   DataHeatBalance::IntGainType::Lights};
     Real64 RetAirGains;
 
     // Exact solution or Euler method
@@ -1642,12 +1644,12 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     PowerPerPlume = state.dataRoomAirMod->ZoneUCSDUE(UINum).PowerPerPlume;
     // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
     // baseboards (nonthermostatic), water heater skin loss
-    SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, ConvGainsOccSubzone);
+    ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         ConvGainsOccSubzone += RetAirGains;
     }
 
@@ -1655,10 +1657,10 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     ConvGainsOccSubzone += state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
     // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
-    SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone);
+    ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         ConvGainsUpSubzone += RetAirGains;
     }
     ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);

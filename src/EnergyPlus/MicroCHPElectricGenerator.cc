@@ -671,7 +671,7 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                               this->ZoneID,
                               "Generator:MicroCHP",
                               this->Name,
-                              DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
+                              DataHeatBalance::IntGainType::GeneratorMicroCHP,
                               &this->A42Model.SkinLossConvect,
                               nullptr,
                               &this->A42Model.SkinLossRadiat);
@@ -1551,7 +1551,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
                         .LoopSide(this->CWLoopSideNum)
                         .Branch(this->CWBranchNum)
                         .Comp(this->CWCompNum)
-                        .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
+                        .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                 }
             }
 
