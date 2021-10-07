@@ -83,11 +83,9 @@ struct OpSchemePtrData
 struct EquipListCompData
 {
     // Members
-    std::string Name;   // The name of each item in the list
-    std::string TypeOf; // The name of each item in the list
-    int TypeOf_Num;
-    std::string CtrlType;                  // CoolingOp, HeatingOp, DualOp
-    DataPlant::CtrlType CtrlTypeNum;       // CoolingOp, HeatingOp, DualOp
+    std::string Name;                      // The name of each item in the list
+    std::string TypeOf;                    // The name of each item in the list
+    DataPlant::CtrlType CtrlType;          // CoolingOp, HeatingOp, DualOp
     int LoopNumPtr;                        // pointer to the comp location in the data structure
     int LoopSideNumPtr;                    // pointer to the comp location in the data structure
     int BranchNumPtr;                      // pointer to the comp location in the data structure
@@ -102,8 +100,8 @@ struct EquipListCompData
 
     // Default Constructor
     EquipListCompData()
-        : TypeOf_Num(0), CtrlTypeNum(DataPlant::CtrlType::Unassigned), LoopNumPtr(0), LoopSideNumPtr(0), BranchNumPtr(0), CompNumPtr(0),
-          SetPointFlowRate(0.0), DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
+        : CtrlType(DataPlant::CtrlType::Unassigned), LoopNumPtr(0), LoopSideNumPtr(0), BranchNumPtr(0), CompNumPtr(0), SetPointFlowRate(0.0),
+          DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
     {
     }
 };
