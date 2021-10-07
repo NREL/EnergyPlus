@@ -2129,7 +2129,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                     ShowContinueError(state, "Component name = " + this_component.Name);
                                     errFlag2 = true;
                                 }
-                                DataPlant::OpScheme SchemeType;
+                                DataPlant::OpScheme SchemeType{};
                                 if (Index == 1) {
                                     SchemeType = this_plant_loop.OpScheme(OpSchemePtr).Type;
                                 } else {
