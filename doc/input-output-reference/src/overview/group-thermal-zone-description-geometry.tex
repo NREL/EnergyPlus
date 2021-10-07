@@ -19,7 +19,7 @@ Space geometry is specified by attaching surfaces to a space using the ``Space N
 
 \paragraph{Field: Name}\label{space-object-name}
 
-The name of the Space object. Must be unique across Zone and Space names.
+The name of the Space object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Zone Name}\label{space-zone-name}
 
@@ -49,9 +49,9 @@ Space lists are not exclusive. A Space can be referenced by more than one SpaceL
 
 \subsubsection{Inputs}\label{inputs-1-045space}
 
-\paragraph{Field: Space List Name}\label{field-space-list-name-000}
+\paragraph{Field: Name}\label{field-space-list-name-000}
 
-The name of the SpaceList object. Must be unique across SpaceLists and Spaces.
+The name of the SpaceList object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Space \textless{}\#\textgreater{} Name}\label{field-space-name}
 
@@ -82,7 +82,7 @@ Default space names may not be referenced in the input except for \hyperref[outp
 
 \paragraph{Field: Name}\label{zone-object-name}
 
-The name of the Zone object. Must be unique across Zone and Space names.
+The name of the Zone object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Direction of Relative North}\label{field-direction-of-relative-north}
 
@@ -455,9 +455,9 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 \subsubsection{Inputs}\label{inputs-1-045}
 
-\paragraph{Field: Zone List Name}\label{field-zone-list-name-000}
+\paragraph{Field: Name}\label{field-zone-list-name-000}
 
-The name of the ZoneList object. Must be unique across ZoneLists.
+The name of the ZoneList object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Zone \textless{}\#\textgreater{} Name}\label{field-zone-1---zone-20-name}
 
@@ -751,7 +751,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-012}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-012}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}
 
@@ -803,7 +807,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-1-009}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-1-009}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-1}
 
@@ -855,7 +863,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-2-007}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-2-007}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-2}
 
@@ -905,7 +917,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-3-006}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-3-006}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object}
 
@@ -963,8 +979,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-4-006}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
 
+\paragraph{Field: Space Name}\label{field-space-name-4-006}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-4}
 
 The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
@@ -1013,8 +1032,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-5-005}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
 
+\paragraph{Field: Space Name}\label{field-space-name-5-005}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-5}
 
 The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
@@ -1063,7 +1085,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-6-004}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-6-004}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-1}
 
@@ -1121,7 +1147,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-7-004}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-7-004}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-7}
 
@@ -1171,7 +1201,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-8-003}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-8-003}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-8}
 
@@ -1221,7 +1255,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-9-001}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-9-001}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-2}
 
@@ -1752,7 +1790,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-10-000}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-10-000}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition}
 
@@ -1865,7 +1907,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-11-000}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-11-000}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition-1}
 
@@ -1974,7 +2020,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-12-000}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-12-000}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition-2}
 
@@ -2143,7 +2193,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-13}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-13}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space name <Zone Name> or <Zone Name>-Remainder. See hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition-3}
 
