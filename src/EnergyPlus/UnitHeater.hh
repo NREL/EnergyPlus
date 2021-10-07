@@ -75,7 +75,11 @@ namespace UnitHeater {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(HCoilType::Num)> HCoilTypeNamesUC{
-        "COIL:HEATING:WATER", "COIL:HEATING:STEAM", "COIL:HEATING:ELECTRIC", "COIL:HEATING:FUEL"};
+        "COIL:HEATING:ELECTRIC",
+        "COIL:HEATING:FUEL",
+        "COIL:HEATING:WATER",
+        "COIL:HEATING:STEAM",
+    };
 
     struct UnitHeaterData
     {
