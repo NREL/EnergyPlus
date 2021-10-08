@@ -68,7 +68,7 @@ namespace WaterToAirHeatPump {
         // Members
         std::string Name;                                 // Name of the Water to Air Heat pump
         std::string WatertoAirHPType;                     // Type of WatertoAirHP ie. Heating or Cooling
-        DataPlant::PlantEquipmentType WAHPPlantTypeOfNum; // type of component in plant
+        DataPlant::PlantEquipmentType WAHPType; // type of component in plant
         std::string Refrigerant;                          // Refrigerant name
         bool SimFlag;
         Real64 InletAirMassFlowRate;    // Inlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
@@ -141,7 +141,7 @@ namespace WaterToAirHeatPump {
 
         // Default Constructor
         WatertoAirHPEquipConditions()
-            : WAHPPlantTypeOfNum(DataPlant::PlantEquipmentType::Invalid), SimFlag(false), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
+            : WAHPType(DataPlant::PlantEquipmentType::Invalid), SimFlag(false), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
               InletAirDBTemp(0.0), InletAirHumRat(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0),
               InletWaterTemp(0.0), OutletWaterTemp(0.0), InletWaterMassFlowRate(0.0), OutletWaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0),
               DesignWaterVolFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0), Power(0.0), Energy(0.0), QSensible(0.0), QLatent(0.0),
