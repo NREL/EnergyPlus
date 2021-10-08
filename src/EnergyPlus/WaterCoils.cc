@@ -6376,7 +6376,7 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
 
 void CheckActuatorNode(EnergyPlusData &state,
                        int const ActuatorNodeNum,                // input actuator node number
-                       DataPlant::PlantEquipmentType &iNodeType, // Cooling or Heating or 0
+                       DataPlant::PlantEquipmentType &WaterCoilType, // Cooling or Heating or 0
                        bool &NodeNotFound                        // true if matching water inlet node not found
 )
 {
@@ -6402,12 +6402,12 @@ void CheckActuatorNode(EnergyPlusData &state,
     }
 
     WhichCoil = 0;
-    iNodeType = DataPlant::PlantEquipmentType::Invalid;
+    WaterCoilType = DataPlant::PlantEquipmentType::Invalid;
     NodeNotFound = true;
     for (CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum == ActuatorNodeNum) {
             WhichCoil = CoilNum;
-            iNodeType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
+            WaterCoilType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
             NodeNotFound = false;
         }
     }

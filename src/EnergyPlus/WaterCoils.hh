@@ -477,7 +477,7 @@ namespace WaterCoils {
 
     void CheckActuatorNode(EnergyPlusData &state,
                            int const ActuatorNodeNum,                // input actuator node number
-                           DataPlant::PlantEquipmentType &iNodeType, // Cooling or Heating or 0
+                           DataPlant::PlantEquipmentType &WaterCoilType, // Cooling or Heating or 0
                            bool &NodeNotFound                        // true if matching water inlet node not found
     );
 
