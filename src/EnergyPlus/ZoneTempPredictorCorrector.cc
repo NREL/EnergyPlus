@@ -3918,7 +3918,7 @@ void PredictSystemLoads(EnergyPlusData &state,
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
-            SumAllInternalConvectionGainsExceptPeople(state, ZoneNum, SumIntGainExceptPeople);
+            SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
         TempDepCoef = SumHA + SumMCp;
@@ -5262,7 +5262,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
-            SumAllInternalConvectionGainsExceptPeople(state, ZoneNum, SumIntGainExceptPeople);
+            SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
         //    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
@@ -6601,13 +6601,13 @@ void CalcZoneSums(EnergyPlusData &state,
     auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
 
     // Sum all convective internal gains: SumIntGain
-    SumAllInternalConvectionGains(state, ZoneNum, SumIntGain);
+    SumIntGain = SumAllInternalConvectionGains(state, ZoneNum);
     SumIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumAllReturnAirConvectionGains(state, ZoneNum, RetAirGain, 0);
+        RetAirGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
         SumIntGain += RetAirGain;
     }
 
@@ -6746,7 +6746,6 @@ void CalcZoneSums(EnergyPlusData &state,
                 if (Zone(ZoneNum).NoHeatToReturnAir) {
                     SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                     state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
-                    state.dataSurface->SurfWinHeatTransfer(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                     if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
                         state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
                         state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
@@ -6757,7 +6756,7 @@ void CalcZoneSums(EnergyPlusData &state,
                             state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                     state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
-                        state.dataSurface->SurfWinHeatTransfer(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
             }
 
@@ -6913,12 +6912,12 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
 
     // Sum all convective internal gains: SumIntGain
-    SumAllInternalConvectionGains(state, ZoneNum, SumIntGains);
+    SumIntGains = SumAllInternalConvectionGains(state, ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumAllReturnAirConvectionGains(state, ZoneNum, SumRetAirGains, 0);
+        SumRetAirGains = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
         SumIntGains += SumRetAirGains;
     }
 

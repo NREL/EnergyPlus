@@ -354,6 +354,11 @@ In addition to the correlation choices described below, it is also possible to o
 
 These options can also use schedules to control values over time. Specific details are given in the Input Output Reference document.
 
+For exterior simple-glazing windows modeled with the WindowMaterial:SimpleGlazingSystem
+object, \emph{h\(_{c,ext}\)} is scaled with an adjustment ratio. This enables the modeling
+of simple windows with highly conductive frames (large input U values). The calculation
+of the adjustment ratio is detailed in Section~\ref{application-issues}.
+
 \subsubsection{Simple Combined}\label{simple-combined}
 
 The simple algorithm uses surface roughness and local surface windspeed to calculate the exterior heat transfer coefficient (key:SimpleCombined).~ The basic equation used is:
@@ -639,6 +644,8 @@ The adaptive convection algorithm implemented in EnergyPlus for the outside face
 4 & Vertical Wall Leeward & Any & Leeward & TARPLeeward MoWiTTLeeward DOE2Leeward EmmelVertical NusseltJurges McAdams Mitchell & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline
 \bottomrule
 \end{longtable}}
+
+One slight difference in the Adaptive Convection Algorithm is the calculation of the perimeter used in the various components of the model.  In the TARP Algorithm, the perimeter is calculated by making an assumption that the surface is rectangular in shape.  However, when the Adaptive Convection Algorithm is utilized, a slightly more sophisticated perimeter calculation that is better able to handle non-rectangular surfaces is employed.  This slight difference in the perimeter calculation can result in differences between the TARP Algorithm and the Adaptive Convection Algorithm even when the options for the surface classifications noted above match the TARP Algorithm details.
 
 \paragraph{Outside Face Surface Classification}\label{outside-face-surface-classification}
 

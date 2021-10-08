@@ -5039,28 +5039,28 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                       this->AmbientTempZone,
                                       "WaterHeater:Mixed",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_WaterHeaterMixed,
+                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "WaterHeater:Stratified",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_WaterHeaterStratified,
+                                      DataHeatBalance::IntGainType::WaterHeaterStratified,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "ThermalStorage:ChilledWater:Mixed",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "ThermalStorage:ChilledWater:Stratified",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
                                       &this->AmbientZoneGain);
             }
         }
@@ -11311,6 +11311,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
     }
 
+    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+
     // if stratified, might set height.
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11442,6 +11444,8 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
             }
         }
     }
+
+    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
 
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11968,6 +11972,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
+
+            if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
         }
     }
 }
@@ -12600,6 +12606,23 @@ void WaterThermalTankData::oneTimeInit(EnergyPlusData &state)
     if (this->myOneTimeInitFlag) {
         this->setupOutputVars(state);
         this->myOneTimeInitFlag = false;
+    }
+}
+
+void WaterThermalTankData::setBackupElementCapacity(EnergyPlusData &state)
+{
+    // Fix for #9001: The BackupElementCapacity was not being reset from the autosize value (-99999) which resulted in
+    // negative electric consumption.  Using a test for any negative numbers here instead of just -99999 for safety.
+    // Only reset the backup element capacity if a problem has been occured.
+    if (this->HeatPumpNum > 0) {
+        if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) return;
+        if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity < 0.0) {
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity = this->MaxCapacity;
+        }
+    } else if (this->DesuperheaterNum > 0) {
+        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).BackupElementCapacity < 0.0) {
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).BackupElementCapacity = this->MaxCapacity;
+        }
     }
 }
 

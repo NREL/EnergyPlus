@@ -7381,7 +7381,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                                 curUnits = "ton";
                                 curConversionFactor *= 3600.0;
                             }
-                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
+                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
                             columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
@@ -12519,12 +12519,12 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
     // Using/Aliasing
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
+        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                  "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                 "but no Daylight Method is defined in Zone:" +
+                                 "but no Daylighting Controls are defined in Zone:" +
                                      state.dataHeatBal->Zone(ZoneNum).Name);
             }
         }
@@ -13835,7 +13835,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
             // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, state.dataOutRptTab->ZoneNumGCLS) +=
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(state.dataOutRptTab->iSurfGCLS) +
-                state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(state.dataOutRptTab->iSurfGCLS) +
+                state.dataSurface->SurfWinConvHeatFlowNatural(state.dataOutRptTab->iSurfGCLS) +
                 state.dataSurface->SurfWinGainConvShadeToZoneRep(state.dataOutRptTab->iSurfGCLS) +
                 state.dataSurface->SurfWinGainFrameDividerToZoneRep(state.dataOutRptTab->iSurfGCLS);
             // for now assume zero instant solar - may change related
@@ -13845,7 +13845,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         }
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
-            InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, state.dataOutRptTab->IntGainTypesTubularGCLS, tubularGain);
+            tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
         }
     }

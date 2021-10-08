@@ -398,8 +398,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly));
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AddInfiltrationFlow);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, MixingSourceZonesOnly);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Add));
+    EXPECT_TRUE(
+        compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
@@ -460,8 +461,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AdjustInfiltrationFlow);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, AllZones);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Adjust));
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::AllZones));
 
     // setup mixing and infiltration objects
     state->dataGlobal->NumOfZones = 2;
@@ -606,8 +607,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, 0);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::No));
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::Unassigned));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest)
@@ -1588,7 +1589,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
-    Real64 refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
+    Real64 refPtIllum = state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
@@ -1603,7 +1604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win2ConstNum);
     transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
-    refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
+    refPtIllum = state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
 }
 
