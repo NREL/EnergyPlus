@@ -835,32 +835,28 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
     struct ClassType
     {
-        std::string thisType;
-        int thisTypeNum;
+        DataPlant::PlantEquipmentType thisType;
         std::string nodesType;
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
         std::function<Real64(Real64, Real64)> calcQsource;
         std::function<Real64(Real64, Real64)> calcSourceOutletTemp;
 
-        ClassType(std::string _thisType,
-                  int _thisTypeNum,
+        ClassType(DataPlant::PlantEquipmentType _thisType,
                   std::string _nodesType,
                   std::function<Real64(Real64, Real64)> _tLoadOutFunc,
                   std::function<Real64(Real64, Real64)> _qSrcFunc,
                   std::function<Real64(Real64, Real64)> _tSrcOutFunc)
-            : thisType(std::move(_thisType)), thisTypeNum(_thisTypeNum), nodesType(std::move(_nodesType)),
-              calcLoadOutletTemp(std::move(_tLoadOutFunc)), calcQsource(std::move(_qSrcFunc)), calcSourceOutletTemp(std::move(_tSrcOutFunc))
+            : thisType(_thisType), nodesType(std::move(_nodesType)), calcLoadOutletTemp(std::move(_tLoadOutFunc)), calcQsource(std::move(_qSrcFunc)),
+              calcSourceOutletTemp(std::move(_tSrcOutFunc))
         {
         }
     };
-    std::vector<ClassType> classesToInput = {ClassType{"HeatPump:PlantLoop:EIR:Cooling",
-                                                       static_cast<int>(DataPlant::PlantEquipmentType::HeatPumpEIRCooling),
+    std::vector<ClassType> classesToInput = {ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRCooling,
                                                        "Chilled Water Nodes",
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
-                                             ClassType{"HeatPump:PlantLoop:EIR:Heating",
-                                                       static_cast<int>(DataPlant::PlantEquipmentType::HeatPumpEIRHeating),
+                                             ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRHeating,
                                                        "Hot Water Nodes",
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
@@ -869,7 +865,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     bool errorsFound = false;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     for (auto &classToInput : classesToInput) {
-        cCurrentModuleObject = classToInput.thisType;
+        cCurrentModuleObject = DataPlant::PlantEquipTypeNamesCC[static_cast<int>(classToInput.thisType)];
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -888,7 +884,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 EIRPlantLoopHeatPump thisPLHP;
-                thisPLHP.EIRHPType = static_cast<DataPlant::PlantEquipmentType>(classToInput.thisTypeNum);
+                thisPLHP.EIRHPType = classToInput.thisType;
                 thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_inlet_node_name").get<std::string>());
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name").get<std::string>());
