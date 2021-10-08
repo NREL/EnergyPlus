@@ -120,15 +120,15 @@ namespace PlantUtilities {
     );
 
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                             int LoopNum,                             // component's loop index
-                                             int LoopSide,                            // component's loop side number
-                                             DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
-                                             int InletNodeNum,                        // Component's inlet node pointer
-                                             int OutletNodeNum,                       // Component's outlet node pointer
-                                             Real64 ModelCondenserHeatRate,           // model's heat rejection rate at condenser (W)
-                                             Real64 ModelInletTemp,                   // model's inlet temperature (C)
-                                             Real64 ModelOutletTemp,                  // model's outlet temperature (C)
-                                             Real64 ModelMassFlowRate,                // model's condenser water mass flow rate (kg/s)
+                                             int LoopNum,                        // component's loop index
+                                             int LoopSide,                       // component's loop side number
+                                             DataPlant::PlantEquipmentType Type, // Component's type index
+                                             int InletNodeNum,                   // Component's inlet node pointer
+                                             int OutletNodeNum,                  // Component's outlet node pointer
+                                             Real64 ModelCondenserHeatRate,      // model's heat rejection rate at condenser (W)
+                                             Real64 ModelInletTemp,              // model's inlet temperature (C)
+                                             Real64 ModelOutletTemp,             // model's outlet temperature (C)
+                                             Real64 ModelMassFlowRate,           // model's condenser water mass flow rate (kg/s)
                                              bool FirstHVACIteration);
 
     void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
