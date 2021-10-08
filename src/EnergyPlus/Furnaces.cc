@@ -6645,6 +6645,17 @@ namespace Furnaces {
         if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
             SimDXCoil(state, BlankString, On, true, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
+            int HXCC_Index = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
+            int childCCType_Num = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilType_Num;
+            if (childCCType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                int childCCIndex = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilIndex;
+                // int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
+                if (childCCIndex < 0) {
+                    ShowContinueError(state, "Occurs in sizing HeatExchangerAssistedCoolingCoil.");
+                }
+                auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+                newCoil.size(state);
+            }
             SimHXAssistedCoolingCoil(
                 state, BlankString, true, On, 0.0, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, 1, false, 1.0, false);
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple) {
