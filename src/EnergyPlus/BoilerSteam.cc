@@ -429,15 +429,18 @@ namespace BoilerSteam {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
             int BoilerOutletNode = this->BoilerOutletNodeNum;
-            {
-                auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                    state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                    state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
-                }
+            switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+
+            case (DataPlant::LoopDemandCalcScheme::SingleSetPoint):
+                state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint =
+                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
+                break;
+            case (DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand):
+                state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo =
+                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
+                break;
+            default:
+                break;
             }
         }
     }
