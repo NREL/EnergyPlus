@@ -83,7 +83,7 @@ enum class GeneratorType
     Num
 };
 
-constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypes{"Generator:InternalCombustionEngine",
+constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypeNames{"Generator:InternalCombustionEngine",
                                                                                             "Generator:CombustionTurbine",
                                                                                             "Generator:Photovoltaic",
                                                                                             "Generator:FuelCell",
@@ -92,7 +92,7 @@ constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> Gen
                                                                                             "Generator:WindTurbine",
                                                                                             "Generator:PVWatts"};
 
-constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypesUC{"GENERATOR:INTERNALCOMBUSTIONENGINE",
+constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypeNamesUC{"GENERATOR:INTERNALCOMBUSTIONENGINE",
                                                                                               "GENERATOR:COMBUSTIONTURBINE",
                                                                                               "GENERATOR:PHOTOVOLTAIC",
                                                                                               "GENERATOR:FUELCELL",
