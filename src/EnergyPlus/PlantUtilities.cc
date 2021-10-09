@@ -1757,7 +1757,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             errFlag = true;
         } else {
             ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", CompType, CompName));
-            ShowContinueError(state, format("Valid CompTypes are in the range [1 - {}].", static_cast<int>(DataPlant::PlantEquipmentType::Num)));
+            ShowContinueError(state, format("Valid CompTypes are in the range [0 - {}].", static_cast<int>(DataPlant::PlantEquipmentType::Num)));
             ShowFatalError(state, "Previous error causes program termination");
         }
     }
