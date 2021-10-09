@@ -295,7 +295,7 @@ namespace SteamCoils {
 
             state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
             state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state.dataSteamCoils->SteamCoil_AirHeating;
-            state.dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+            state.dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = NumArray(1);
             state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = NumArray(2);
             state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn = NumArray(3);
@@ -521,7 +521,7 @@ namespace SteamCoils {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
-                                    state.dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).CoilType,
                                     state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
                                     state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
                                     state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,

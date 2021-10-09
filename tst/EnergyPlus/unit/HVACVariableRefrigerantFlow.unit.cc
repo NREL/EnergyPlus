@@ -8448,7 +8448,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+    state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state->dataSteamCoils->ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;
     state->dataSteamCoils->CheckEquipName.dimension(state->dataSteamCoils->NumSteamCoils, true);
