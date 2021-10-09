@@ -805,11 +805,11 @@ namespace UnitVentilator {
                         auto const SELECT_CASE_var(cHeatingCoilType);
                         if (SELECT_CASE_var == "COIL:HEATING:WATER") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_WaterCoilType;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum =
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType =
                                 DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                         } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_SteamCoilType;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
                         } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_ElectricCoilType;
                         } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
@@ -920,11 +920,11 @@ namespace UnitVentilator {
                         auto const SELECT_CASE_var(cCoolingCoilType);
                         if (SELECT_CASE_var == "COIL:COOLING:WATER") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = state.dataUnitVentilators->Cooling_CoilWaterCooling;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterCooling;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                             state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName = Alphas(18);
                         } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = state.dataUnitVentilators->Cooling_CoilDetailedCooling;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum =
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType =
                                 DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                             state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName = Alphas(18);
                         } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
@@ -936,10 +936,10 @@ namespace UnitVentilator {
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName);
                             if (UtilityRoutines::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType, "Coil:Cooling:Water")) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterCooling;
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                             } else if (UtilityRoutines::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType,
                                                                    "Coil:Cooling:Water:DetailedGeometry")) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum =
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType =
                                     DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                             } else {
                                 ShowSevereError(state,
@@ -1493,12 +1493,12 @@ namespace UnitVentilator {
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
-                (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
+            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                (state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
@@ -1522,13 +1522,13 @@ namespace UnitVentilator {
                         .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum)
                         .NodeNumOut;
             }
-            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
-                (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum ==
+            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
+                (state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType ==
                  DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopNum,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopSide,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWBranchNum,
