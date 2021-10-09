@@ -229,10 +229,10 @@ namespace WaterThermalTanks {
         // Members
         std::string Name;                                   // Name of heat pump water heater
         std::string Type;                                   // Type of water heater (HEAT PUMP:WATER HEATER)
-        DataPlant::PlantEquipmentType HPWHType;              // integer parameter for heat pump water heater
+        DataPlant::PlantEquipmentType HPWHType;             // integer parameter for heat pump water heater
         std::string TankName;                               // Name of tank associated with heat pump water heater
         std::string TankType;                               // Type of water heater (MIXED or STRATIFIED) used with heat pump
-        DataPlant::PlantEquipmentType HPWHTankType;          // Parameter for tank type (MIXED or STRATIFIED)
+        DataPlant::PlantEquipmentType HPWHTankType;         // Parameter for tank type (MIXED or STRATIFIED)
         bool StandAlone;                                    // Flag for operation with no plant connections (no use nodes)
         int AvailSchedPtr;                                  // Index to Availability Schedule curve index
         int SetPointTempSchedule;                           // Index to Setpoint Temperature Schedule curve
@@ -406,17 +406,17 @@ namespace WaterThermalTanks {
     struct WaterThermalTankData : PlantComponent
     {
         // Members
-        std::string Name;                      // Name of water heater
-        std::string Type;                      // Type of water heater (MIXED or STRATIFIED)
+        std::string Name;                                   // Name of water heater
+        std::string Type;                                   // Type of water heater (MIXED or STRATIFIED)
         DataPlant::PlantEquipmentType WaterThermalTankType; // integer parameter for water heater(if part of an HPWH,then=HPWH)
-        bool IsChilledWaterTank;               // logical flag, true if for chilled water, false if for hot water
-        std::string EndUseSubcategoryName;     // User-defined end-use subcategory name
-        bool Init;                             // Flag for initialization:  TRUE means do the init
-        bool StandAlone;                       // Flag for operation with no plant connections (no source or use)
-        Real64 Volume;                         // Tank volume (m3)
-        bool VolumeWasAutoSized;               // true if tank volume was autosize on input
-        Real64 Mass;                           // Total mass of fluid in the tank (kg)
-        Real64 TimeElapsed;                    // Fraction of the current hour that has elapsed (h)
+        bool IsChilledWaterTank;                            // logical flag, true if for chilled water, false if for hot water
+        std::string EndUseSubcategoryName;                  // User-defined end-use subcategory name
+        bool Init;                                          // Flag for initialization:  TRUE means do the init
+        bool StandAlone;                                    // Flag for operation with no plant connections (no source or use)
+        Real64 Volume;                                      // Tank volume (m3)
+        bool VolumeWasAutoSized;                            // true if tank volume was autosize on input
+        Real64 Mass;                                        // Total mass of fluid in the tank (kg)
+        Real64 TimeElapsed;                                 // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
         AmbientTempEnum AmbientTempIndicator;                         // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
         int AmbientTempSchedule;                                      // Schedule index pointer
