@@ -91,7 +91,7 @@ namespace DataPlant {
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 
-    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNamesCC{
+    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
         "Boiler:HotWater",
         "Boiler:Steam",
         "Chiller:Absorption",
@@ -189,7 +189,7 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating"};
 
-    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNames{
+    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
         "BOILER:STEAM",
         "CHILLER:ABSORPTION",

@@ -1067,14 +1067,14 @@ namespace FaultsManager {
 
                     // Check the faulty tower type
                     if (!UtilityRoutines::SameString(
-                            DataPlant::PlantEquipTypeNamesCC[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
                             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType)) {
                         ShowWarningError(state,
                                          cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                              cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) +
                                              ". Tower type in the fault model is updated. ");
                         state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType =
-                            DataPlant::PlantEquipTypeNamesCC[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
                     }
 
                     // Check the tower model
@@ -1183,13 +1183,13 @@ namespace FaultsManager {
 
                     // Check the faulty tower type
                     if (!UtilityRoutines::SameString(
-                            DataPlant::PlantEquipTypeNamesCC[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
                             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType)) {
                         ShowWarningError(state,
                                          cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                              cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) + ". Tower type is updated. ");
                         state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType =
-                            DataPlant::PlantEquipTypeNamesCC[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
                     }
                 }
             }

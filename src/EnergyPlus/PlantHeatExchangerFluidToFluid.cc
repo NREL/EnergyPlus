@@ -2282,7 +2282,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
-                                   DataPlant::PlantEquipTypeNamesCC[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
                                    this->Name));
             ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
@@ -2306,7 +2306,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
-                                   DataPlant::PlantEquipTypeNamesCC[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
                                    this->Name));
             ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
@@ -2317,7 +2317,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
-                                   DataPlant::PlantEquipTypeNamesCC[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
                                    this->Name));
             ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;

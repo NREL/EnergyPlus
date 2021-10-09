@@ -1985,7 +1985,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip(this_equip_list.Comp(EquipNum));
                         Type = static_cast<DataPlant::PlantEquipmentType>(
-                            getEnumerationValue(PlantEquipTypeNames, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
+                            getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 this_equip.Name,
@@ -2023,7 +2023,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                                   "\" includes equipment that is not valid on a Condenser Loop");
                             ShowContinueError(state,
                                               format("Component {} not allowed as supply equipment on this type of loop.",
-                                                     PlantEquipTypeNamesCC[static_cast<int>(Type)]));
+                                                     PlantEquipTypeNames[static_cast<int>(Type)]));
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -2036,7 +2036,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                                   "\" includes equipment that is not valid on a Plant Loop");
                             ShowContinueError(state,
                                               format("Component {} not allowed as supply equipment on this type of loop.",
-                                                     PlantEquipTypeNamesCC[static_cast<int>(Type)]));
+                                                     PlantEquipTypeNames[static_cast<int>(Type)]));
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -3494,7 +3494,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                 }
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     ActuatorName = format("Plant Component {}",
-                                          PlantEquipTypeNamesCC[static_cast<int>(
+                                          PlantEquipTypeNames[static_cast<int>(
                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Type)]);
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";

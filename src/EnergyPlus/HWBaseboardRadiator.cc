@@ -1885,7 +1885,7 @@ namespace HWBaseboardRadiator {
         // check input, provide comp index, call utility routines
 
         // Using/Aliasing
-        using DataPlant::PlantEquipTypeNamesCC;
+        using DataPlant::PlantEquipTypeNames;
 
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1927,7 +1927,7 @@ namespace HWBaseboardRadiator {
                                           "for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          PlantEquipTypeNamesCC[BaseboardTypeNum]));
+                                          PlantEquipTypeNames[BaseboardTypeNum]));
                 }
             }
         }

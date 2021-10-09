@@ -1682,7 +1682,7 @@ namespace SteamBaseboardRadiator {
         // Based on UpdateBaseboardPlantConnection from Brent Griffith, Sept 2010
 
         // Using/Aliasing
-        using DataPlant::PlantEquipTypeNamesCC;
+        using DataPlant::PlantEquipTypeNames;
 
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1723,7 +1723,7 @@ namespace SteamBaseboardRadiator {
                                           "Name for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          PlantEquipTypeNamesCC[static_cast<int>(BaseboardType)]));
+                                          PlantEquipTypeNames[static_cast<int>(BaseboardType)]));
                 }
             }
         }

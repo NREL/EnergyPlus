@@ -1734,13 +1734,13 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
                                 format("Plant Component {} called \"{}\" was not found on any plant loops.",
-                                       DataPlant::PlantEquipTypeNamesCC[static_cast<int>(CompType)],
+                                       DataPlant::PlantEquipTypeNames[static_cast<int>(CompType)],
                                        std::string{CompName}));
-                AuditBranches(state, true, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(CompType)], CompName);
+                AuditBranches(state, true, DataPlant::PlantEquipTypeNames[static_cast<int>(CompType)], CompName);
             } else {
                 ShowSevereError(state,
                                 format("Plant Component {} called \"{}\" was not found on plant loop=\"{}\".",
-                                       DataPlant::PlantEquipTypeNamesCC[static_cast<int>(CompType)],
+                                       DataPlant::PlantEquipTypeNames[static_cast<int>(CompType)],
                                        std::string{CompName},
                                        state.dataPlnt->PlantLoop(SingleLoopSearch).Name));
             }
