@@ -641,7 +641,8 @@ namespace UserDefinedComponents {
 
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                static_cast<DataPlant::HowMet>(getEnumerationValue(DataPlant::HowMetTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 2))));
+                                static_cast<DataPlant::HowMet>(
+                                    getEnumerationValue(DataPlant::HowMetTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 2))));
                             if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed ==
                                 DataPlant::HowMet::ByNominalCapLowOutLimit) {
                                 // actuator for low out limit
@@ -667,8 +668,8 @@ namespace UserDefinedComponents {
 
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                static_cast<DataPlant::LoopFlowStatus>(
-                                    getEnumerationValue(DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 3))));
+                                static_cast<DataPlant::LoopFlowStatus>(getEnumerationValue(
+                                    DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 3))));
                         }
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection

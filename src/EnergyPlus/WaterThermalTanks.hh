@@ -406,17 +406,17 @@ namespace WaterThermalTanks {
     struct WaterThermalTankData : PlantComponent
     {
         // Members
-        std::string Name;                      // Name of water heater
-        std::string Type;                      // Type of water heater (MIXED or STRATIFIED)
-        DataPlant::PlantEquipmentType TypeNum; // integer parameter for water heater(if part of an HPWH,then=HPWH)
-        bool IsChilledWaterTank;               // logical flag, true if for chilled water, false if for hot water
-        std::string EndUseSubcategoryName;     // User-defined end-use subcategory name
-        bool Init;                             // Flag for initialization:  TRUE means do the init
-        bool StandAlone;                       // Flag for operation with no plant connections (no source or use)
-        Real64 Volume;                         // Tank volume (m3)
-        bool VolumeWasAutoSized;               // true if tank volume was autosize on input
-        Real64 Mass;                           // Total mass of fluid in the tank (kg)
-        Real64 TimeElapsed;                    // Fraction of the current hour that has elapsed (h)
+        std::string Name;                                   // Name of water heater
+        std::string Type;                                   // Type of water heater (MIXED or STRATIFIED)
+        DataPlant::PlantEquipmentType WaterThermalTankType; // integer parameter for water heater(if part of an HPWH,then=HPWH)
+        bool IsChilledWaterTank;                            // logical flag, true if for chilled water, false if for hot water
+        std::string EndUseSubcategoryName;                  // User-defined end-use subcategory name
+        bool Init;                                          // Flag for initialization:  TRUE means do the init
+        bool StandAlone;                                    // Flag for operation with no plant connections (no source or use)
+        Real64 Volume;                                      // Tank volume (m3)
+        bool VolumeWasAutoSized;                            // true if tank volume was autosize on input
+        Real64 Mass;                                        // Total mass of fluid in the tank (kg)
+        Real64 TimeElapsed;                                 // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
         AmbientTempEnum AmbientTempIndicator;                         // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
         int AmbientTempSchedule;                                      // Schedule index pointer
@@ -609,7 +609,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterThermalTankData()
-            : TypeNum(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
+            : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
               VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(AmbientTempEnum::OutsideAir), AmbientTempSchedule(0),
               AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
               OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(ControlTypeEnum::Cycle),
