@@ -462,10 +462,10 @@ namespace UnitHeater {
                     static_cast<HCoilType>(getEnumerationValue(HCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(7))));
                 switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
                 case HCoilType::WaterHeatingCoil:
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                     break;
                 case HCoilType::SteamCoil:
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
                     break;
                 case HCoilType::Electric:
                 case HCoilType::Gas:
@@ -798,12 +798,12 @@ namespace UnitHeater {
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
-                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
+            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum,
+                                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
