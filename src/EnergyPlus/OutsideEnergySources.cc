@@ -163,20 +163,20 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
 
         std::string reportVarPrefix;
         std::string nodeNames;
-        DataPlant::PlantEquipmentType typeOf;
+        DataPlant::PlantEquipmentType EnergyType;
         int thisIndex;
         if (EnergySourceNum <= NumDistrictUnitsHeat) {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating";
             reportVarPrefix = "District Heating ";
             nodeNames = "Hot Water Nodes";
-            typeOf = DataPlant::PlantEquipmentType::PurchHotWater;
+            EnergyType = DataPlant::PlantEquipmentType::PurchHotWater;
             heatIndex++;
             thisIndex = heatIndex;
         } else {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
             reportVarPrefix = "District Cooling ";
             nodeNames = "Chilled Water Nodes";
-            typeOf = DataPlant::PlantEquipmentType::PurchChilledWater;
+            EnergyType = DataPlant::PlantEquipmentType::PurchChilledWater;
             coolIndex++;
             thisIndex = coolIndex;
         }
@@ -235,7 +235,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
         }
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyTransfer = 0.0;
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyRate = 0.0;
-        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyType = typeOf;
+        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyType = EnergyType;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum =
                 ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
