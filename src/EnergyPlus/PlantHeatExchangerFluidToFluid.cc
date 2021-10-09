@@ -2390,7 +2390,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             if (this->OtherCompSupplySideLoop.inletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->ComponentUserName,
-                                                        this->ComponentTypeOfNum,
+                                                        this->ComponentType,
                                                         this->OtherCompSupplySideLoop.loopNum,
                                                         this->OtherCompSupplySideLoop.loopSideNum,
                                                         this->OtherCompSupplySideLoop.branchNum,
@@ -2405,7 +2405,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             if (this->OtherCompDemandSideLoop.inletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->ComponentUserName,
-                                                        this->ComponentTypeOfNum,
+                                                        this->ComponentType,
                                                         this->OtherCompDemandSideLoop.loopNum,
                                                         this->OtherCompDemandSideLoop.loopSideNum,
                                                         this->OtherCompDemandSideLoop.branchNum,
