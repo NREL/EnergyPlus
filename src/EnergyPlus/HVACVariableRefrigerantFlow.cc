@@ -207,7 +207,7 @@ void SimulateVRF(EnergyPlusData &state,
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).Name,
-                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFPlantTypeOfNum,
+                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFType,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopSideNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceBranchNum,
@@ -2274,7 +2274,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
             if (UtilityRoutines::SameString(cAlphaArgs(34), "WaterCooled")) {
                 state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
-                state.dataHVACVarRefFlow->VRF(VRFNum).VRFPlantTypeOfNum = PlantEquipmentType::HeatPumpVRF;
+                state.dataHVACVarRefFlow->VRF(VRFNum).VRFType = PlantEquipmentType::HeatPumpVRF;
                 if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatingPerformanceOATType == DataHVACGlobals::WetBulbIndicator) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + state.dataHVACVarRefFlow->VRF(VRFNum).Name);
                     ShowContinueError(state, cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
