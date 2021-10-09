@@ -134,7 +134,7 @@ namespace PlantUtilities {
     void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
                                          int LoopNum,                             // component's loop index
                                          int LoopSide,                            // component's loop side number
-                                         DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
+                                         DataPlant::PlantEquipmentType Type, // Component's type index
                                          int InletNodeNum,                        // Component's inlet node pointer
                                          int OutletNodeNum,                       // Component's outlet node pointer
                                          Real64 ModelRecoveryHeatRate,            // model's heat rejection rate at recovery (W)
@@ -146,7 +146,7 @@ namespace PlantUtilities {
     void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
                                                      int LoopNum,                                // component's loop index
                                                      int LoopSide,                               // component's loop side number
-                                                     DataPlant::PlantEquipmentType TypeOfNum,    // Component's type index
+                                                     DataPlant::PlantEquipmentType Type,    // Component's type index
                                                      int InletNodeNum,                           // Component's inlet node pointer
                                                      int OutletNodeNum,                          // Component's outlet node pointer
                                                      DataLoopNode::NodeFluidType HeatSourceType, // Type of fluid in Generator loop
@@ -159,7 +159,7 @@ namespace PlantUtilities {
                                        int Loop1LoopSideNum,
                                        int Loop2Num,
                                        int Loop2LoopSideNum,
-                                       DataPlant::PlantEquipmentType PlantComponentTypeOfNum,
+                                       DataPlant::PlantEquipmentType ComponentType,
                                        bool Loop1DemandsOnLoop2);
 
     void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int OldIndex, int NewIndex);

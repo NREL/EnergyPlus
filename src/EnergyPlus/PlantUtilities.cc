@@ -1066,7 +1066,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
 void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
                                      int const LoopNum,                                        // component's loop index
                                      int const LoopSide,                                       // component's loop side number
-                                     [[maybe_unused]] DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
+                                     [[maybe_unused]] DataPlant::PlantEquipmentType Type, // Component's type index
                                      int const InletNodeNum,                                   // Component's inlet node pointer
                                      int const OutletNodeNum,                                  // Component's outlet node pointer
                                      Real64 const ModelRecoveryHeatRate,                       // model's heat rejection rate at recovery (W)
@@ -1152,7 +1152,7 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
 void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
                                                  int const LoopNum,                                                 // component's loop index
                                                  int const LoopSide,                                                // component's loop side number
-                                                 [[maybe_unused]] DataPlant::PlantEquipmentType const TypeOfNum,    // Component's type index
+                                                 [[maybe_unused]] DataPlant::PlantEquipmentType const Type,    // Component's type index
                                                  int const InletNodeNum,                                            // Component's inlet node pointer
                                                  [[maybe_unused]] int const OutletNodeNum,                          // Component's outlet node pointer
                                                  [[maybe_unused]] DataLoopNode::NodeFluidType const HeatSourceType, // Type of fluid in Generator loop
@@ -1217,7 +1217,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
                                    int const Loop1LoopSideNum,
                                    int const Loop2Num,
                                    int const Loop2LoopSideNum,
-                                   DataPlant::PlantEquipmentType PlantComponentTypeOfNum,
+                                   DataPlant::PlantEquipmentType ComponentType,
                                    bool const Loop1DemandsOnLoop2)
 {
 
@@ -1252,7 +1252,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     }
     connected_1(TotalConnected).LoopNum = Loop2Num;
     connected_1(TotalConnected).LoopSideNum = Loop2LoopSideNum;
-    connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(PlantComponentTypeOfNum);
+    connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_1(TotalConnected).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
     auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2Num).LoopSide(Loop2LoopSideNum));
@@ -1266,7 +1266,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     }
     connected_2(TotalConnected).LoopNum = Loop1Num;
     connected_2(TotalConnected).LoopSideNum = Loop1LoopSideNum;
-    connected_2(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(PlantComponentTypeOfNum);
+    connected_2(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_2(TotalConnected).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
 }
 
