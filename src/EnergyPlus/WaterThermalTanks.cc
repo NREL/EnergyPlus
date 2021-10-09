@@ -301,11 +301,11 @@ void WaterThermalTankData::simulate(
     this->initialize(state, FirstHVACIteration);
     //       Plant connected water heaters may have a desuperheater heating coil attached
     if (this->DesuperheaterNum == 0) {
-        if ((this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) ||
-            (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankMixed)) {
+        if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) ||
+            (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed)) {
             this->CalcWaterThermalTankMixed(state);
-        } else if ((this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
-                   (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+        } else if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
+                   (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
             this->CalcWaterThermalTankStratified(state);
         }
     } else if (this->DesuperheaterNum > 0) {
@@ -640,7 +640,7 @@ void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
                 TankTemp = 20.0;
             }
             {
-                auto const SELECT_CASE_var(Tank.WaterThermalTankType);
+                auto const SELECT_CASE_var(Tank.TypeNum);
                 if (SELECT_CASE_var == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
                     QLossToZone = max(Tank.OnCycLossCoeff * Tank.OnCycLossFracToZone, Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone) *
                                   (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
@@ -2339,7 +2339,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         Tank.Name = state.dataIPShortCut->cAlphaArgs(1);
         Tank.Type = state.dataIPShortCut->cCurrentModuleObject;
-        Tank.WaterThermalTankType = DataPlant::PlantEquipmentType::WtrHeaterMixed;
+        Tank.TypeNum = DataPlant::PlantEquipmentType::WtrHeaterMixed;
         Tank.FluidIndex = Tank.waterIndex;
 
         // default to always on
@@ -2799,7 +2799,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         Tank.Name = state.dataIPShortCut->cAlphaArgs(1);
         Tank.Type = state.dataIPShortCut->cCurrentModuleObject;
-        Tank.WaterThermalTankType = DataPlant::PlantEquipmentType::WtrHeaterStratified;
+        Tank.TypeNum = DataPlant::PlantEquipmentType::WtrHeaterStratified;
         Tank.FluidIndex = Tank.waterIndex;
 
         // default to always on
@@ -3410,7 +3410,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 
         Tank.Name = state.dataIPShortCut->cAlphaArgs(1);
         Tank.Type = state.dataIPShortCut->cCurrentModuleObject;
-        Tank.WaterThermalTankType = DataPlant::PlantEquipmentType::ChilledWaterTankMixed;
+        Tank.TypeNum = DataPlant::PlantEquipmentType::ChilledWaterTankMixed;
         Tank.FluidIndex = Tank.waterIndex;
         Tank.IsChilledWaterTank = true;
         Tank.EndUseSubcategoryName = "Chilled Water Storage";
@@ -3701,7 +3701,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
 
         Tank.Name = state.dataIPShortCut->cAlphaArgs(1);
         Tank.Type = state.dataIPShortCut->cCurrentModuleObject;
-        Tank.WaterThermalTankType = DataPlant::PlantEquipmentType::ChilledWaterTankStratified;
+        Tank.TypeNum = DataPlant::PlantEquipmentType::ChilledWaterTankStratified;
         Tank.FluidIndex = Tank.waterIndex;
         Tank.IsChilledWaterTank = true;
         Tank.EndUseSubcategoryName = "Chilled Water Storage";
@@ -4167,7 +4167,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         continue;
                     Tank.DesuperheaterNum = DesuperheaterNum;
                     DesuperHtr.WaterHeaterTankNum = WtrHtrNum;
-                    DesuperHtr.TankTypeNum = Tank.WaterThermalTankType;
+                    DesuperHtr.TankTypeNum = Tank.TypeNum;
                     DesuperHtr.BackupElementCapacity = Tank.MaxCapacity;
                     if (Tank.UseInletNode == 0 && Tank.UseOutletNode == 0) DesuperHtr.StandAlone = true;
 
@@ -4238,11 +4238,11 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     HPWH.WHOffCycParaFracToTank = Tank.OffCycParaFracToTank;
                     HPWH.WHPLFCurve = Tank.PLFCurve;
 
-                    if (((Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
+                    if (((Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
                          (HPWH.TypeNum == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped)) ||
-                        (Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified)) {
+                        (Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified)) {
                         HPWH.TankType = Tank.Type;
-                        HPWH.TankTypeNum = Tank.WaterThermalTankType;
+                        HPWH.TankTypeNum = Tank.TypeNum;
                     } else {
                         ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
                         ShowContinueError(state, "Invalid water heater tank type = " + Tank.Type);
@@ -4267,8 +4267,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         state, HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWH.OutletNodeName1, HPWH.InletNodeName1, "HPWH To Tank");
 
                     // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
-                    if ((Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
-                        (Tank.ControlType == ControlTypeEnum::Modulate)) {
+                    if ((Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) && (Tank.ControlType == ControlTypeEnum::Modulate)) {
                         ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
                         ShowContinueError(state, "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
                         ErrorsFound = true;
@@ -4463,7 +4462,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         } // ALLOCATED
                     }     // InletAirConfiguration
 
-                    if (Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+                    if (Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
 
                         // Nodal heat distribution fraction for stratified tank wrapped condensers
                         if (HPWH.TypeNum == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
@@ -4868,8 +4867,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
 void WaterThermalTankData::setupOutputVars(EnergyPlusData &state)
 {
-    if ((this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) ||
-        (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+    if ((this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) ||
+        (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
         this->setupChilledWaterTankOutputVars(state);
     } else {
         // moving setupWaterHeaterOutputVars to here causes big table diffs...
@@ -4992,7 +4991,7 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name);
 
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
             SetupOutputVariable(state,
@@ -5015,7 +5014,7 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
         }
     }
 
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
             static constexpr std::string_view Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
@@ -5036,45 +5035,46 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
 {
     // set up internal gains if tank is in a thermal zone
     if (this->AmbientTempZone > 0) {
-        switch (this->WaterThermalTankType) {
+        switch (this->TypeNum) {
         case (DataPlant::PlantEquipmentType::WtrHeaterMixed): {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "WaterHeater:Mixed",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                  &this->AmbientZoneGain);
-            break;
-        }
-        case (DataPlant::PlantEquipmentType::WtrHeaterStratified): {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "WaterHeater:Stratified",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::WaterHeaterStratified,
-                                  &this->AmbientZoneGain);
-            break;
-        }
-        case (DataPlant::PlantEquipmentType::ChilledWaterTankMixed): {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "ThermalStorage:ChilledWater:Mixed",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-                                  &this->AmbientZoneGain);
-            break;
-        }
-        case (DataPlant::PlantEquipmentType::ChilledWaterTankStratified): {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "ThermalStorage:ChilledWater:Stratified",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-                                  &this->AmbientZoneGain);
-            break;
-        }
-        default:
-            break;
+                SetupZoneInternalGain(state,
+                                      this->AmbientTempZone,
+                                      "WaterHeater:Mixed",
+                                      this->Name,
+                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
+                                      &this->AmbientZoneGain);
+                break;
+            }
+            case (DataPlant::PlantEquipmentType::WtrHeaterStratified): {
+                SetupZoneInternalGain(state,
+                                      this->AmbientTempZone,
+                                      "WaterHeater:Stratified",
+                                      this->Name,
+                                      DataHeatBalance::IntGainType::WaterHeaterStratified,
+                                      &this->AmbientZoneGain);
+                break;
+            }
+            case (DataPlant::PlantEquipmentType::ChilledWaterTankMixed): {
+                SetupZoneInternalGain(state,
+                                      this->AmbientTempZone,
+                                      "ThermalStorage:ChilledWater:Mixed",
+                                      this->Name,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+                                      &this->AmbientZoneGain);
+                break;
+            }
+            case (DataPlant::PlantEquipmentType::ChilledWaterTankStratified): {
+                SetupZoneInternalGain(state,
+                                      this->AmbientTempZone,
+                                      "ThermalStorage:ChilledWater:Stratified",
+                                      this->Name,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+                                      &this->AmbientZoneGain);
+                break;
+            }
+            default:
+                break;
+
         }
     }
 }
@@ -5577,7 +5577,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
 
     // Setup report variables for WaterHeater:Stratified
     // CurrentModuleObject='WaterHeater:Stratified'
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
 
         SetupOutputVariable(state,
                             "Water Heater Heater 1 Heating Rate",
@@ -5660,7 +5660,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
         }
     }
 
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
             static constexpr std::string_view Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
@@ -5950,7 +5950,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    this->WaterThermalTankType,
+                                                    this->TypeNum,
                                                     this->UseSide.loopNum,
                                                     this->UseSide.loopSideNum,
                                                     this->UseSide.branchNum,
@@ -5990,7 +5990,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    this->WaterThermalTankType,
+                                                    this->TypeNum,
                                                     this->SrcSide.loopNum,
                                                     this->SrcSide.loopSideNum,
                                                     this->SrcSide.branchNum,
@@ -6002,13 +6002,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                                                     this->SourceInletNode,
                                                     _);
             if (this->UseInletNode > 0) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                              this->UseSide.loopNum,
-                                                              this->UseSide.loopSideNum,
-                                                              this->SrcSide.loopNum,
-                                                              this->SrcSide.loopSideNum,
-                                                              this->WaterThermalTankType,
-                                                              true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->UseSide.loopNum, this->UseSide.loopSideNum, this->SrcSide.loopNum, this->SrcSide.loopSideNum, this->TypeNum, true);
             }
             if (errFlag) {
                 ShowFatalError(state, "InitWaterThermalTank: Program terminated due to previous condition(s).");
@@ -6087,8 +6082,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
             // if stratified tank model, ensure that nominal change over rate is greater than one minute, avoid numerical problems.
 
-            if ((this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
-                (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+            if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
+                (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
                 Real64 MaxSideVolFlow = max(this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
                 if (MaxSideVolFlow > 0.0) { // protect div by zero
@@ -6438,7 +6433,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         }
 
         Real64 sensedTemp;
-        if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
+        if (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
             int tmpNodeNum = this->HeaterNode1;
             sensedTemp = this->Node(tmpNodeNum).SavedTemp;
         } else {
@@ -9010,10 +9005,10 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     if (AvailSchedule == 0.0 || (HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp ||
         state.dataHVACGlobal->HPWHInletDBTemp < HeatPump.MinAirTempForHPOperation ||
         state.dataHVACGlobal->HPWHInletDBTemp > HeatPump.MaxAirTempForHPOperation || HPSetPointTemp >= this->TankTempLimit ||
-        (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed &&
+        (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed &&
          this->SavedMode == state.dataWaterThermalTanks->heatMode) ||
-        (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime &&
-         this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified && (this->SavedHeaterOn1 || this->SavedHeaterOn2))) {
+        (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified &&
+         (this->SavedHeaterOn1 || this->SavedHeaterOn2))) {
         //   revert to float mode any time HPWH compressor is OFF
         HeatPump.Mode = state.dataWaterThermalTanks->floatMode;
         if (InletAirMixerNode > 0) {
@@ -9289,14 +9284,14 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 state.dataWaterThermalTanks->hpPartLoadRatio = 1.0;
             }
         } else { // or use side nodes may meet set point without need for heat pump compressor operation
-                 // check to see if HP needs to operate
-            if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
-                state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
-                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-            } else if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
-                state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
-                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
-            }
+            // check to see if HP needs to operate
+                if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+                    state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
+                    state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
+                } else if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+                    state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
+                    state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
+                }
             // Check tank temperature by setting source inlet mass flow rate to zero.
             state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
@@ -9695,13 +9690,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     this->SourceInletTemp = state.dataLoopNodes->Node(HPWaterInletNode).Temp + CondenserDeltaT;
                     //           this CALL does not update node temps, must use WaterThermalTank variables
                     // select tank type
-                    if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
-                        this->CalcWaterThermalTankMixed(state);
-                        NewTankTemp = this->TankTemp;
-                    } else if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
-                        this->CalcWaterThermalTankStratified(state);
-                        NewTankTemp = this->FindStratifiedTankSensedTemp(state);
-                    }
+                        if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+                            this->CalcWaterThermalTankMixed(state);
+                            NewTankTemp = this->TankTemp;
+                        } else if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+                            this->CalcWaterThermalTankStratified(state);
+                            NewTankTemp = this->FindStratifiedTankSensedTemp(state);
+                        }
 
                     if (NewTankTemp > HPSetPointTemp) {
                         SpeedNum = i;
@@ -10212,9 +10207,9 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
 void WaterThermalTankData::CalcWaterThermalTank(EnergyPlusData &state)
 {
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
         this->CalcWaterThermalTankMixed(state);
-    } else if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+    } else if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
         this->CalcWaterThermalTankStratified(state);
     } else {
         assert(false);
@@ -10223,10 +10218,10 @@ void WaterThermalTankData::CalcWaterThermalTank(EnergyPlusData &state)
 
 Real64 WaterThermalTankData::GetHPWHSensedTankTemp(EnergyPlusData &state)
 {
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
         return this->TankTemp;
     } else {
-        assert(this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified);
+        assert(this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified);
         return this->FindStratifiedTankSensedTemp(state);
     }
 }
@@ -10487,12 +10482,12 @@ Real64 WaterThermalTankData::PLRResidualHPWH(EnergyPlusData &state, Real64 const
     bool const isVariableSpeed = (HeatPump.NumofSpeed > 0);
     this->Mode = int(Par(2));
     // Apply the PLR
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+    if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
         // For a mixed tank, the PLR is applied to the source mass flow rate.
         this->SourceMassFlowRate = Par(5) * HPPartLoadRatio;
         this->CalcWaterThermalTankMixed(state);
     } else {
-        assert(this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified);
+        assert(this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified);
         // For a stratified tank, the PLR is applied to the Coil.TotalHeatingEnergyRate
         // whether that's a VarSpeedCoil or DXCoils::DXCoil.
         // Here we create a pointer to the TotalHeatingEnergyRate for the appropriate coil type.
@@ -10576,13 +10571,13 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
             NeedsHeatOrCool = true;
         } else if ((OutletTemp <= DeadBandTemp) && (OutletTemp > SetPointTemp_loc)) {
             // inside the deadband, use saved mode from water thermal tank calcs (modes only for mixed)
-            if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) {
+            if (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) {
                 if (this->SavedMode == state.dataWaterThermalTanks->coolMode) {
                     NeedsHeatOrCool = true;
                 } else if (this->SavedMode == state.dataWaterThermalTanks->floatMode) {
                     NeedsHeatOrCool = false;
                 }
-            } else if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
+            } else if (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
                 NeedsHeatOrCool = true;
             }
 
@@ -11327,7 +11322,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
 
     // if stratified, might set height.
-    if ((this->VolumeWasAutoSized) && (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) &&
+    if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
         if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
             this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobalConstants::Pi, 0.3333333333333333);
@@ -11460,7 +11455,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
 
     if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
 
-    if ((this->VolumeWasAutoSized) && (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) &&
+    if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
         if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
             this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobalConstants::Pi, 0.3333333333333333);
@@ -12121,7 +12116,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
             if (this->HeatPumpNum == 0) {
 
                 {
-                    auto const SELECT_CASE_var(this->WaterThermalTankType);
+                    auto const SELECT_CASE_var(this->TypeNum);
 
                     if (SELECT_CASE_var == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
                         this->CalcWaterThermalTankMixed(state);
@@ -12434,7 +12429,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                 this->PLFCurve = state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilPLFFPLR;
 
                 {
-                    auto const SELECT_CASE_var(this->WaterThermalTankType);
+                    auto const SELECT_CASE_var(this->TypeNum);
 
                     if (SELECT_CASE_var == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
                         if (this->Efficiency > 0.0) this->CalcWaterThermalTankMixed(state);
@@ -12521,7 +12516,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
     // Write test results
     if (this->HeatPumpNum == 0) {
         Real64 MaxCapacity_loc;
-        if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+        if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
             if (this->ControlType == PriorityEnum::MasterSlave) {
                 MaxCapacity_loc = max(this->MaxCapacity, this->MaxCapacity2);
             } else { // PrioritySimultaneous
