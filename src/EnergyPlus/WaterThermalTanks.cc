@@ -9277,16 +9277,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
         } else { // or use side nodes may meet set point without need for heat pump compressor operation
             // check to see if HP needs to operate
-            {
-                auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-                if (SELECT_CASE_var1 == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+                if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
                     state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
                     state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+                } else if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
                     state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
                     state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
                 }
-            }
             // Check tank temperature by setting source inlet mass flow rate to zero.
             state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
@@ -9685,16 +9682,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     this->SourceInletTemp = state.dataLoopNodes->Node(HPWaterInletNode).Temp + CondenserDeltaT;
                     //           this CALL does not update node temps, must use WaterThermalTank variables
                     // select tank type
-                    {
-                        auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-                        if (SELECT_CASE_var1 == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+                        if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
                             this->CalcWaterThermalTankMixed(state);
                             NewTankTemp = this->TankTemp;
-                        } else if (SELECT_CASE_var1 == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+                        } else if (HeatPump.TankTypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
                             this->CalcWaterThermalTankStratified(state);
                             NewTankTemp = this->FindStratifiedTankSensedTemp(state);
                         }
-                    }
 
                     if (NewTankTemp > HPSetPointTemp) {
                         SpeedNum = i;
