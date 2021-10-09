@@ -66,10 +66,10 @@ namespace WaterToAirHeatPump {
     struct WatertoAirHPEquipConditions
     {
         // Members
-        std::string Name;                                 // Name of the Water to Air Heat pump
-        std::string WatertoAirHPType;                     // Type of WatertoAirHP ie. Heating or Cooling
+        std::string Name;                       // Name of the Water to Air Heat pump
+        std::string WatertoAirHPType;           // Type of WatertoAirHP ie. Heating or Cooling
         DataPlant::PlantEquipmentType WAHPType; // type of component in plant
-        std::string Refrigerant;                          // Refrigerant name
+        std::string Refrigerant;                // Refrigerant name
         bool SimFlag;
         Real64 InletAirMassFlowRate;    // Inlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
         Real64 OutletAirMassFlowRate;   // Outlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]

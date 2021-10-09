@@ -1656,11 +1656,11 @@ namespace SteamBaseboardRadiator {
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
                                              DataPlant::PlantEquipmentType BaseboardType, // type index
-                                             std::string const &BaseboardName,               // component name
-                                             [[maybe_unused]] int const EquipFlowCtrl,       // Flow control mode for the equipment
-                                             [[maybe_unused]] int const LoopNum,             // Plant loop index for where called from
-                                             [[maybe_unused]] int const LoopSide,            // Plant loop side index for where called from
-                                             int &CompIndex,                                 // Chiller number pointer
+                                             std::string const &BaseboardName,            // component name
+                                             [[maybe_unused]] int const EquipFlowCtrl,    // Flow control mode for the equipment
+                                             [[maybe_unused]] int const LoopNum,          // Plant loop index for where called from
+                                             [[maybe_unused]] int const LoopSide,         // Plant loop side index for where called from
+                                             int &CompIndex,                              // Chiller number pointer
                                              [[maybe_unused]] bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )

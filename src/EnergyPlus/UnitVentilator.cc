@@ -805,8 +805,7 @@ namespace UnitVentilator {
                         auto const SELECT_CASE_var(cHeatingCoilType);
                         if (SELECT_CASE_var == "COIL:HEATING:WATER") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_WaterCoilType;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType =
-                                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                         } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_SteamCoilType;
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
@@ -1523,8 +1522,7 @@ namespace UnitVentilator {
                         .NodeNumOut;
             }
             if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
-                (state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType ==
-                 DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
+                (state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName,
