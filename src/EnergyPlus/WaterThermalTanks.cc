@@ -5072,6 +5072,9 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                       &this->AmbientZoneGain);
                 break;
             }
+            default:
+                break;
+
         }
     }
 }

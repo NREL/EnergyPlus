@@ -575,7 +575,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         {
             state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(getEnumerationValue(
-                DataHeatBalance::AirBalanceTypeNamesUC, cAlphaArgs(3))); // Air balance method type character input-->convert to enum
+                DataHeatBalance::AirBalanceTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
             if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Unassigned) {
                 state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
