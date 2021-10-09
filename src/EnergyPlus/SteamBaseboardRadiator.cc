@@ -1655,7 +1655,7 @@ namespace SteamBaseboardRadiator {
     }
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             DataPlant::PlantEquipmentType BaseboardTypeNum, // type index
+                                             DataPlant::PlantEquipmentType BaseboardType, // type index
                                              std::string const &BaseboardName,               // component name
                                              [[maybe_unused]] int const EquipFlowCtrl,       // Flow control mode for the equipment
                                              [[maybe_unused]] int const LoopNum,             // Plant loop index for where called from
@@ -1717,13 +1717,13 @@ namespace SteamBaseboardRadiator {
                                           BaseboardName,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
                 }
-                if (BaseboardTypeNum != DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) {
+                if (BaseboardType != DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) {
                     ShowFatalError(state,
                                    format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard "
                                           "Name for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          PlantEquipTypeNamesCC[static_cast<int>(BaseboardTypeNum)]));
+                                          PlantEquipTypeNamesCC[static_cast<int>(BaseboardType)]));
                 }
             }
         }

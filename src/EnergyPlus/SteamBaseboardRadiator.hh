@@ -194,7 +194,7 @@ namespace SteamBaseboardRadiator {
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             DataPlant::PlantEquipmentType BaseboardTypeNum, // type index
+                                             DataPlant::PlantEquipmentType BaseboardType, // type index
                                              std::string const &BaseboardName,               // component name
                                              int const EquipFlowCtrl,                        // Flow control mode for the equipment
                                              int const LoopNum,                              // Plant loop index for where called from
