@@ -229,10 +229,10 @@ namespace WaterThermalTanks {
         // Members
         std::string Name;                                   // Name of heat pump water heater
         std::string Type;                                   // Type of water heater (HEAT PUMP:WATER HEATER)
-        DataPlant::PlantEquipmentType TypeNum;              // integer parameter for heat pump water heater
+        DataPlant::PlantEquipmentType HPWHType;              // integer parameter for heat pump water heater
         std::string TankName;                               // Name of tank associated with heat pump water heater
         std::string TankType;                               // Type of water heater (MIXED or STRATIFIED) used with heat pump
-        DataPlant::PlantEquipmentType TankTypeNum;          // Parameter for tank type (MIXED or STRATIFIED)
+        DataPlant::PlantEquipmentType HPWHTankType;          // Parameter for tank type (MIXED or STRATIFIED)
         bool StandAlone;                                    // Flag for operation with no plant connections (no use nodes)
         int AvailSchedPtr;                                  // Index to Availability Schedule curve index
         int SetPointTempSchedule;                           // Index to Setpoint Temperature Schedule curve
@@ -360,7 +360,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         HeatPumpWaterHeaterData()
-            : TypeNum(DataPlant::PlantEquipmentType::Invalid), TankTypeNum(DataPlant::PlantEquipmentType::Invalid), StandAlone(false),
+            : HPWHType(DataPlant::PlantEquipmentType::Invalid), HPWHTankType(DataPlant::PlantEquipmentType::Invalid), StandAlone(false),
               AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), Capacity(0.0), BackupElementCapacity(0.0),
               BackupElementEfficiency(0.0), WHOnCycParaLoad(0.0), WHOffCycParaLoad(0.0), WHOnCycParaFracToTank(0.0), WHOffCycParaFracToTank(0.0),
               WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
@@ -408,7 +408,7 @@ namespace WaterThermalTanks {
         // Members
         std::string Name;                      // Name of water heater
         std::string Type;                      // Type of water heater (MIXED or STRATIFIED)
-        DataPlant::PlantEquipmentType TypeNum; // integer parameter for water heater(if part of an HPWH,then=HPWH)
+        DataPlant::PlantEquipmentType WaterThermalTankType; // integer parameter for water heater(if part of an HPWH,then=HPWH)
         bool IsChilledWaterTank;               // logical flag, true if for chilled water, false if for hot water
         std::string EndUseSubcategoryName;     // User-defined end-use subcategory name
         bool Init;                             // Flag for initialization:  TRUE means do the init
@@ -609,7 +609,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterThermalTankData()
-            : TypeNum(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
+            : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
               VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(AmbientTempEnum::OutsideAir), AmbientTempSchedule(0),
               AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
               OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(ControlTypeEnum::Cycle),

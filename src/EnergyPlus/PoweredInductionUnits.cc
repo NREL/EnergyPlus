@@ -1624,7 +1624,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                              state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow);
             }
         } else {
-            if (UtilityRoutines::SameString(HCoilNamesUC[static_cast<int>(state.dataPowerInductionUnits->PIU(PIUNum).HCoilType)],
+            if (UtilityRoutines::SameString(HCoilNames[static_cast<int>(state.dataPowerInductionUnits->PIU(PIUNum).HCoilType)],
                                             "Coil:Heating:Steam")) {
 
                 CoilSteamInletNode =
