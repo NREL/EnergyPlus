@@ -528,8 +528,8 @@ Add component type for 'CoilSystem:Cooling:Water' in Primary Air Loop
 ### DataPlant.cc ###
     Add "CoilSystem:Cooling:Water" system cooling coil to the 1D String lists:
 
-	PlantEquipTypeNames
-	PlantEquipTypeNamesCC
+	SimPlantEquipTypes
+	ccSimPlantEquipTypes
 	ValidLoopEquipTypes
 
 	Change NumSimPlantEquipTypes(96) to NumSimPlantEquipTypes(97);
@@ -551,15 +551,15 @@ Add component type for 'CoilSystem:Cooling:Water' in Primary Air Loop
 
 					} else if (UtilityRoutines::SameString(this_comp_type,
 					    "Coil:Heating:Steam")) {
-						this_comp.Type = TypeOf_CoilSteamAirHeating;
-						this_comp.CurOpSchemeType = Demand;
+						this_comp.TypeOf_Num = TypeOf_CoilSteamAirHeating;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
 
                     **New demand side condenser equipment "CoilSystem:Cooling:Water"**
 
 					} else if (UtilityRoutines::SameString(this_comp_type,
 					    "CoilSystem:Cooling:Water")) {
-						this_comp.Type = TypeOf_CoilSystemCoolingWater;
-						this_comp.CurOpSchemeType = Demand;
+						this_comp.TypeOf_Num = TypeOf_CoilSystemCoolingWater;
+						this_comp.CurOpSchemeType = DemandOpSchemeType;
 					...
 
 

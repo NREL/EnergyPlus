@@ -391,7 +391,7 @@ The following functions of SingleDuct module may be moved as member function as 
     void SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
     void SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
     void SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
-    void CalcVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNode, int const Type, Real64 const HWFlow, 
+    void CalcVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNode, int const HCoilType, Real64 const HWFlow, 
                    Real64 const HCoilReq, int const FanType, Real64 const AirFlow, int const FanOn, Real64 &LoadMet);
     Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, Array1<Real64> const &Par);
     Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow, Array1<Real64> const &Par);
