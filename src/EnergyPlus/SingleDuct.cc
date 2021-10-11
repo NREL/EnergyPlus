@@ -4798,7 +4798,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
     }
 
-    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad<QCoolFanOnMin - SmallLoad &&this->sd_airterminalInlet.AirMassFlowRateMaxAvail> 0.0 &&
+    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
         !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         // check that it can meet the load
         FanOp = 1;

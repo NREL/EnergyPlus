@@ -425,19 +425,21 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if BITF_TEST_NONE (BITF(LayerType(i)),
+        if
+            BITF_TEST_NONE(BITF(LayerType(i)),
                            BITF(TARCOGLayerType::SPECULAR) | BITF(TARCOGLayerType::WOVSHADE) | BITF(TARCOGLayerType::VENETBLIND_HORIZ) |
                                BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
                                BITF(TARCOGLayerType::VENETBLIND_VERT))
 
-        {
-            ArgCheck = 22;
-            ErrorMessage = format("Incorrect layer type for layer #{:3}"
-                                  ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "
-                                  "shade) or 5 (bsdf).",
-                                  i);
-            return ArgCheck;
-        }
+            {
+                ArgCheck = 22;
+                ErrorMessage =
+                    format("Incorrect layer type for layer #{:3}"
+                           ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "
+                           "shade) or 5 (bsdf).",
+                           i);
+                return ArgCheck;
+            }
 
         // bi...TEMPORARY! Don't allow CSW and CSM method for outdoor and indoor SD layers
         if ((IsShadingLayer(LayerType(1))) && ((ThermalMod == TARCOGThermalModel::SCW) || (ThermalMod == TARCOGThermalModel::CSM))) {
