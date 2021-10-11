@@ -211,6 +211,12 @@ namespace VentilatedSlab {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
+        // make sure data is gotten for surface lists
+        if (!state.dataSurfLists->SurfaceListInputsFilled) {
+            GetSurfaceListsInputs(state);
+            state.dataSurfLists->SurfaceListInputsFilled = true;
+        }
+
         state.dataVentilatedSlab->NumOfVentSlabs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // Allocate the local derived type and do one-time initializations for all parts of it
 

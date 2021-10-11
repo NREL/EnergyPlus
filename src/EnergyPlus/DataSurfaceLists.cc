@@ -364,29 +364,4 @@ int GetNumberOfSurfaceLists(EnergyPlusData &state)
     return NumberOfSurfaceLists;
 }
 
-int GetNumberOfSurfListVentSlab(EnergyPlusData &state)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   September 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Acts as a target for outside routines to make sure data is gotten before using.
-
-    // Return value
-    int NumberOfSurfListVentSlab;
-
-    if (!state.dataSurfLists->SurfaceListInputsFilled) {
-        GetSurfaceListsInputs(state);
-        state.dataSurfLists->SurfaceListInputsFilled = true;
-    }
-
-    NumberOfSurfListVentSlab = state.dataSurfLists->NumOfSurfListVentSlab;
-
-    return NumberOfSurfListVentSlab;
-}
-
 } // namespace EnergyPlus::DataSurfaceLists
