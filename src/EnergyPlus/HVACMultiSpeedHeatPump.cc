@@ -766,18 +766,18 @@ namespace HVACMultiSpeedHeatPump {
         //  This routine will get the input required by the multispeed heat pump model
 
         // Using/Aliasing
+        using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataSizing::AutoSize;
+        using DXCoils::GetDXCoilIndex;
         using Fans::GetFanIndex;
         using Fans::GetFanInletNode;
         using Fans::GetFanOutletNode;
         using Fans::GetFanType;
         using Fans::GetFanVolFlow;
         using FluidProperties::FindGlycol;
-        using BranchNodeConnections::SetUpCompSets;
-        using DXCoils::GetDXCoilIndex;
         using NodeInputManager::GetOnlySingleNode;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
