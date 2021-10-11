@@ -1231,7 +1231,6 @@ namespace UnitVentilator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
@@ -3002,11 +3001,10 @@ namespace UnitVentilator {
 
         // METHODOLOGY EMPLOYED:
         // Simply calls the different components in order.  Only slight wrinkles
-        // here are that the unit ventilator has it's own outside air mixed and
+        // here are that the unit ventilator has its own outside air mixed and
         // that a cooling coil must be present in order to call a cooling coil
         // simulation.  Other than that, the subroutine is very straightforward.
 
-        using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitVentilator_Num;
@@ -3559,7 +3557,6 @@ namespace UnitVentilator {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitVentilator_Num;

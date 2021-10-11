@@ -7273,7 +7273,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataErrorTracking;
-        using DataLoopNode::ObjectIsParent;
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;

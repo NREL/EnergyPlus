@@ -1563,7 +1563,6 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitHeater_Num;
@@ -1859,7 +1858,6 @@ namespace UnitHeater {
         // Simply calls the different components in order.
 
         // Using/Aliasing
-        using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitHeater_Num;

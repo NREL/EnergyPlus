@@ -776,7 +776,6 @@ namespace HVACMultiSpeedHeatPump {
         using Fans::GetFanType;
         using Fans::GetFanVolFlow;
         using FluidProperties::FindGlycol;
-
         using BranchNodeConnections::SetUpCompSets;
         using DXCoils::GetDXCoilIndex;
         using NodeInputManager::GetOnlySingleNode;

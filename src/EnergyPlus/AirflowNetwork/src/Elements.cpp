@@ -3467,7 +3467,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
