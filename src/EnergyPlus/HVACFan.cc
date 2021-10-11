@@ -237,6 +237,7 @@ namespace HVACFan {
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
+        state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::SystemAirFlowSizing)) = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity; // wrong, but maybe no diffs
         sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
         designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 

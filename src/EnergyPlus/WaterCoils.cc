@@ -2366,6 +2366,10 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             bool errorsFound = false;
             CoolingAirFlowSizer sizingCoolingAirFlow;
             CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
+            if (state.dataSize->CurZoneEqNum > 0) {
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingAirFlowSizing)) =
+                    DataSizing::ZoneHVACSizingType::CoolingDesignCapacity; // wrong but might make no diffs
+            }
             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             Real64 autoSizedValue = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate =

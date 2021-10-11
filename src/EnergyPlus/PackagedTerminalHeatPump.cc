@@ -5545,6 +5545,10 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             HeatingAirFlowSizer sizingHeatingAirFlow;
             sizingHeatingAirFlow.overrideSizingString(SizingString);
             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            if (state.dataSize->CurZoneEqNum > 0) {
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
+                    DataSizing::ZoneHVACSizingType::HeatingDesignCapacity; // wrong but might make no diffs
+            }
             sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirFlow = false;
