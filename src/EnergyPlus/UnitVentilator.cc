@@ -1861,11 +1861,11 @@ namespace UnitVentilator {
         DataSizing::ZoneHVACSizingType CapSizingMethod =
             DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
                                                   // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-        Real64 CoolingAirVolFlowScalable; // cooling airvolume for rate determined using scalable sizing method
-        Real64 HeatingAirVolFlowScalable; // heating airvolume for rate determined using scalable sizing method
-        bool DoWaterCoilSizing = false;   // if TRUE do water coil sizing calculation
-        Real64 WaterCoilSizDeltaT;        // water coil deltaT for design water flow rate autosizing
-        int CoilNum;                      // index of water coil object
+        Real64 CoolingAirVolFlowScalable;         // cooling airvolume for rate determined using scalable sizing method
+        Real64 HeatingAirVolFlowScalable;         // heating airvolume for rate determined using scalable sizing method
+        bool DoWaterCoilSizing = false;           // if TRUE do water coil sizing calculation
+        Real64 WaterCoilSizDeltaT;                // water coil deltaT for design water flow rate autosizing
+        int CoilNum;                              // index of water coil object
 
         PltSizHeatNum = 0;
         ErrorsFound = false;

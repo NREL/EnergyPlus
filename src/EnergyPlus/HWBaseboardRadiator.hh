@@ -123,7 +123,7 @@ namespace HWBaseboardRadiator {
         DataSizing::ZoneHVACSizingType HeatingCapMethod =
             DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity,
                                                   // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 ScaledHeatingCapacity;             // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
         // Default Constructor
         HWBaseboardParams()
@@ -145,7 +145,7 @@ namespace HWBaseboardRadiator {
         DataSizing::ZoneHVACSizingType HeatingCapMethod =
             DataSizing::ZoneHVACSizingType::None; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity,
                                                   // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 ScaledHeatingCapacity = 0.0;       // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         Real64 Offset = 0.0;
         Real64 FracRadiant = 0.0;
         Real64 FracDistribPerson = 0.0;

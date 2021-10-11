@@ -5187,7 +5187,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     DataSizing::ZoneHVACSizingType CapSizingMethod =
         DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
                                               // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-    Real64 minNoLoadFlow(0); // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
+    Real64 minNoLoadFlow(0);                  // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
 
     auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 

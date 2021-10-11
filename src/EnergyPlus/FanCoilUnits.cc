@@ -1449,10 +1449,10 @@ namespace FanCoilUnits {
         DataSizing::ZoneHVACSizingType CapSizingMethod =
             DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
                                                   // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-        bool SizingDesRunThisZone;      // test for zone sizing
-        bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
-        Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
-        int CoilNum;                    // index of water coil object
+        bool SizingDesRunThisZone;                // test for zone sizing
+        bool DoWaterCoilSizing = false;           // if TRUE do water coil sizing calculation
+        Real64 WaterCoilSizDeltaT;                // water coil deltaT for design water flow rate autosizing
+        int CoilNum;                              // index of water coil object
 
         PltSizCoolNum = 0;
         PltSizHeatNum = 0;

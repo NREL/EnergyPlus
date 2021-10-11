@@ -978,7 +978,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     DataSizing::ZoneHVACSizingType CapSizingMethod =
         DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
                                               // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-    int PltSizCoolNum(0); // index of plant sizing object for 1st cooling loop
+    int PltSizCoolNum(0);                     // index of plant sizing object for 1st cooling loop
     Real64 rho;
     Real64 Cp;
     Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reporting

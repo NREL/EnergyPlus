@@ -2748,8 +2748,8 @@ namespace LowTempRadiantSystem {
         int SizingMethod;                    // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
         bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
         DataSizing::ZoneHVACSizingType CapSizingMethod =
-            DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
-                                                  // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+            DataSizing::ZoneHVACSizingType::None;    // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
+                                                     // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
         Real64 DesCoilLoad;                          // design autosized or user specified capacity
         OperatingMode OpMode(OperatingMode::ClgHtg); // System operating mode
         int HeatNode;                                // Hot water inlet node to determine system operating mode

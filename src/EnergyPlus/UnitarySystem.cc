@@ -1718,7 +1718,8 @@ namespace UnitarySystems {
             // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
             if (this->UnitType == "AirLoopHVAC:UnitarySystem") state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
             bool errorsFound = false;
-            state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingAirFlowSizing)) = DataSizing::ZoneHVACSizingType::CoolingDesignCapacity;  // wrong, but need it to behave like develop
+            state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingAirFlowSizing)) =
+                DataSizing::ZoneHVACSizingType::CoolingDesignCapacity; // wrong, but need it to behave like develop
             if ((CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::SupplyAirFlowRate) ||
                 (CoolingSAFlowMethod == DataSizing::ZoneHVACSizingType::None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;

@@ -7922,7 +7922,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     bool errorsFound = false;
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     if (state.dataSize->CurZoneEqNum > 0) {
-                        state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
+                        state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum)
+                            .SizingMethod(static_cast<int>(AutoSizingType::HeatingAirFlowSizing)) =
                             DataSizing::ZoneHVACSizingType::CoolingDesignCapacity; // wrong but might make no diffs
                     }
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
@@ -7934,7 +7935,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     CoolingAirFlowSizer sizingCoolingAirFlow;
                     sizingCoolingAirFlow.overrideSizingString(SizingString);
                     if (state.dataSize->CurZoneEqNum > 0) {
-                        state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(static_cast<int>(AutoSizingType::CoolingAirFlowSizing)) =
+                        state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum)
+                            .SizingMethod(static_cast<int>(AutoSizingType::CoolingAirFlowSizing)) =
                             DataSizing::ZoneHVACSizingType::CoolingDesignCapacity; // wrong but might make no diffs
                     }
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);

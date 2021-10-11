@@ -1488,8 +1488,8 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     DataSizing::ZoneHVACSizingType CapSizingMethod =
         DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
                                               // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-    Real64 CoolingAirVolFlowDes(0.0); // cooling supply air flow rate
-    Real64 HeatingAirVolFlowDes(0.0); // heating supply air flow rate
+    Real64 CoolingAirVolFlowDes(0.0);         // cooling supply air flow rate
+    Real64 HeatingAirVolFlowDes(0.0);         // heating supply air flow rate
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
     auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);

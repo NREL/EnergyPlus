@@ -1037,9 +1037,9 @@ namespace UnitHeater {
         DataSizing::ZoneHVACSizingType CapSizingMethod =
             DataSizing::ZoneHVACSizingType::None; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea,
                                                   // FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-        bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
-        Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
-        int CoilNum;                    // index of water coil object
+        bool DoWaterCoilSizing = false;           // if TRUE do water coil sizing calculation
+        Real64 WaterCoilSizDeltaT;                // water coil deltaT for design water flow rate autosizing
+        int CoilNum;                              // index of water coil object
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
         auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);

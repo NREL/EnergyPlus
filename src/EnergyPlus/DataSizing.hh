@@ -537,8 +537,8 @@ namespace DataSizing {
         bool SystemCapacity;          // TRUE if AirloopHVAC system heating capacity is calculated
         bool DesignSizeFromParent;    // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
         int HVACSizingIndex;          // index to DesignSpecification:ZoneHVAC:Sizing
-        Array1D<ZoneHVACSizingType> SizingMethod; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea,
-                                                  // FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
+        Array1D<ZoneHVACSizingType> SizingMethod;    // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea,
+                                                     // FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
         Array1D<ZoneHVACSizingType> CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea,
                                                      // FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
 
@@ -588,12 +588,12 @@ namespace DataSizing {
         DataSizing::ZoneHVACSizingType HeatingCapMethod =
             DataSizing::ZoneHVACSizingType::None; // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity,
                                                   // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-        Real64 MaxCoolAirVolFlow = 0.0;       // - maximum cooling supply air flow rate, m3/s
-        Real64 MaxHeatAirVolFlow = 0.0;       // - maximum heating supply air flow rate, m3/s
-        Real64 MaxNoCoolHeatAirVolFlow = 0.0; // - maximum supply air flow rate when no cooling or heating, m3/s
-        Real64 ScaledCoolingCapacity = 0.0;   // - scaled maximum cooling capacity of zone HVAC equipment, W
-        Real64 ScaledHeatingCapacity = 0.0;   // - scaled maximum heating capacity of zone HVAC equipment, W
-        bool RequestAutoSize = false;         // - true if autosizing is requested
+        Real64 MaxCoolAirVolFlow = 0.0;           // - maximum cooling supply air flow rate, m3/s
+        Real64 MaxHeatAirVolFlow = 0.0;           // - maximum heating supply air flow rate, m3/s
+        Real64 MaxNoCoolHeatAirVolFlow = 0.0;     // - maximum supply air flow rate when no cooling or heating, m3/s
+        Real64 ScaledCoolingCapacity = 0.0;       // - scaled maximum cooling capacity of zone HVAC equipment, W
+        Real64 ScaledHeatingCapacity = 0.0;       // - scaled maximum heating capacity of zone HVAC equipment, W
+        bool RequestAutoSize = false;             // - true if autosizing is requested
     };
 
     // Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit
@@ -800,8 +800,8 @@ namespace DataSizing {
             DataSizing::ZoneHVACSizingType::None; // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity,
                                                   // CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
         DataSizing::ZoneHVACSizingType HeatingCapMethod =
-            DataSizing::ZoneHVACSizingType::None; // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity,
-                                                  // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+            DataSizing::ZoneHVACSizingType::None;  // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity,
+                                                   // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledCoolingCapacity;              // - scaled maximum cooling capacity of cooling coil in an air loop
         Real64 ScaledHeatingCapacity;              // - scaled maximum heating capacity of cooling coil in an air loop
         Real64 FloorAreaOnAirLoopCooled;           // total floor of cooled zones served by an airloop
