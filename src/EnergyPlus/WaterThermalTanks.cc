@@ -4621,17 +4621,17 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     // store the sizing data in "sizing" nested derived type for the correct water heater
 
                     if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "PeakDraw")) {
-                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizeEnum::PeakDraw;
+                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizingMode::PeakDraw;
                     } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ResidentialHUD-FHAMinimum")) {
-                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizeEnum::ResidentialMin;
+                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizingMode::ResidentialMin;
                     } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "PerPerson")) {
-                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizeEnum::PerPerson;
+                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizingMode::PerPerson;
                     } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "PerFloorArea")) {
-                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizeEnum::PerFloorArea;
+                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizingMode::PerFloorArea;
                     } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "PerUnit")) {
-                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizeEnum::PerUnit;
+                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizingMode::PerUnit;
                     } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "PerSolarCollectorArea")) {
-                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizeEnum::PerSolarColArea;
+                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = SizingMode::PerSolarColArea;
                     } else {
                         // wrong design mode entered, throw error
                         ShowSevereError(state,
@@ -4668,11 +4668,11 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     switch (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode) {
 
-                    case SizeEnum::NotSet: {
+                    case SizingMode::Unassigned: {
                         // do nothing, error thrown if design mode not found
                         break;
                     }
-                    case SizeEnum::PeakDraw: { // need to have entered a reasonable value for TankDrawTime
+                    case SizingMode::PeakDraw: { // need to have entered a reasonable value for TankDrawTime
                         if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankDrawTime <= 0.0) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -4708,7 +4708,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         break;
                     }
-                    case SizeEnum::ResidentialMin: {
+                    case SizingMode::ResidentialMin: {
                         // it would have to have at least on bedroom and any more than 10 is crazy for this mode
                         if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NumberOfBedrooms < 1) {
                             ShowSevereError(state,
@@ -4724,7 +4724,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         break;
                     }
-                    case SizeEnum::PerPerson: {
+                    case SizingMode::PerPerson: {
 
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerPerson <= 0.0)) {
@@ -4744,7 +4744,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         break;
                     }
-                    case SizeEnum::PerFloorArea: {
+                    case SizingMode::PerFloorArea: {
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerArea <= 0.0)) {
                             ShowSevereError(state,
@@ -4762,7 +4762,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         break;
                     }
-                    case SizeEnum::PerUnit: {
+                    case SizingMode::PerUnit: {
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerUnit <= 0.0)) {
                             ShowSevereError(state,
@@ -4793,7 +4793,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case SizeEnum::PerSolarColArea: {
+                    case SizingMode::PerSolarColArea: {
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerCollectorArea <= 0.0)) {
                             ShowSevereError(state,
@@ -4817,21 +4817,21 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
             for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WaterThermalTankNum) {
 
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
-                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizeEnum::NotSet)) {
+                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Unassigned)) {
                     ShowWarningError(state,
                                      "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
                                          "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                     ErrorsFound = true;
                 }
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
-                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizeEnum::NotSet)) {
+                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Unassigned)) {
                     ShowWarningError(state,
                                      "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
                                          "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                     ErrorsFound = true;
                 }
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).HeightWasAutoSized) &&
-                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizeEnum::NotSet)) {
+                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Unassigned)) {
                     ShowWarningError(state,
                                      "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
                                          "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
@@ -11067,12 +11067,12 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
 
     switch (this->Sizing.DesignMode) {
 
-    case SizeEnum::NotSet:
-    case SizeEnum::PeakDraw: {
+    case SizingMode::Unassigned:
+    case SizingMode::PeakDraw: {
 
         break;
     }
-    case SizeEnum::ResidentialMin: {
+    case SizingMode::ResidentialMin: {
 
         // assume can propagate rules for gas to other fuels.
         bool FuelTypeIsLikeGas = false;
@@ -11225,7 +11225,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
         break;
     }
-    case SizeEnum::PerPerson: {
+    case SizingMode::PerPerson: {
         // how to get number of people?
 
         Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
@@ -11274,7 +11274,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
         break;
     }
-    case SizeEnum::PerFloorArea: {
+    case SizingMode::PerFloorArea: {
 
         Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
         if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
@@ -11319,7 +11319,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
         break;
     }
-    case SizeEnum::PerUnit: {
+    case SizingMode::PerUnit: {
 
         if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerUnit * this->Sizing.NumberOfUnits;
 
@@ -11365,7 +11365,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
         break;
     }
-    case SizeEnum::PerSolarColArea: {
+    case SizingMode::PerSolarColArea: {
         break;
     }
     default:
@@ -11423,7 +11423,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     Real64 tmpTankVolume = this->Volume;
     Real64 tmpMaxCapacity = this->MaxCapacity;
 
-    if (this->Sizing.DesignMode == SizeEnum::PeakDraw) {
+    if (this->Sizing.DesignMode == SizingMode::PeakDraw) {
         if (this->VolumeWasAutoSized)
             tmpTankVolume = this->Sizing.TankDrawTime * this->UseDesignVolFlowRate * DataGlobalConstants::SecInHour; // hours | m3/s | (3600 s/1 hour)
         if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -11472,7 +11472,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
                 BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
             }
         }
-    } else if (this->Sizing.DesignMode == SizeEnum::PerSolarColArea) {
+    } else if (this->Sizing.DesignMode == SizingMode::PerSolarColArea) {
 
         this->Sizing.TotalSolarCollectorArea = 0.0;
         for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
@@ -11772,7 +11772,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
         switch (this->Sizing.DesignMode) {
 
-        case SizeEnum::PeakDraw: {
+        case SizingMode::PeakDraw: {
             // get draw rate from maximum in schedule
             Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, this->waterIndex, RoutineName);
             Real64 DrawDesignVolFlowRate = ScheduleManager::GetScheduleMaxValue(state, this->FlowRateSchedule) * this->MassFlowRateMax / rho;
@@ -11801,7 +11801,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
             break;
         }
-        case SizeEnum::ResidentialMin: {
+        case SizingMode::ResidentialMin: {
             // assume can propagate rules for gas to other fuels.
             bool FuelTypeIsLikeGas = false;
             if (UtilityRoutines::SameString(this->FuelType, "NaturalGas")) {
@@ -11943,7 +11943,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
             break;
         }
-        case SizeEnum::PerPerson: {
+        case SizingMode::PerPerson: {
             // how to get number of people?
 
             Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
@@ -11968,7 +11968,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
             break;
         }
-        case SizeEnum::PerFloorArea: {
+        case SizingMode::PerFloorArea: {
 
             Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
             if (this->VolumeWasAutoSized) {
@@ -11991,7 +11991,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             }
             break;
         }
-        case SizeEnum::PerUnit: {
+        case SizingMode::PerUnit: {
 
             if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerUnit * this->Sizing.NumberOfUnits;
 
@@ -12012,7 +12012,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             }
             break;
         }
-        case SizeEnum::PerSolarColArea: {
+        case SizingMode::PerSolarColArea: {
             this->Sizing.TotalSolarCollectorArea = 0.0;
             for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
                 this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;

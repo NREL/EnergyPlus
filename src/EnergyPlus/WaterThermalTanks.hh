@@ -131,15 +131,16 @@ namespace WaterThermalTanks {
         Source // Indicates Source side of water heater
     };
 
-    enum struct SizeEnum
+    enum class SizingMode
     {
-        NotSet,
+        Unassigned = -1,
         PeakDraw,
         ResidentialMin,
         PerPerson,
         PerFloorArea,
         PerUnit,
-        PerSolarColArea
+        PerSolarColArea,
+        Num
     };
 
     enum struct SourceSideEnum
@@ -192,7 +193,7 @@ namespace WaterThermalTanks {
     {
         // Members
         // input data
-        SizeEnum DesignMode;                      // what sizing method to use
+        SizingMode DesignMode;                      // what sizing method to use
         Real64 TankDrawTime;                      // in hours, time storage can meet peak demand
         Real64 RecoveryTime;                      // time for tank to recover
         Real64 NominalVolForSizingDemandSideFlow; // nominal tank size to use in sizing demand side connections
@@ -215,7 +216,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterHeaterSizingData()
-            : DesignMode(SizeEnum::NotSet), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
+            : DesignMode(SizingMode::Unassigned), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
               NumberOfBathrooms(0.0), TankCapacityPerPerson(0.0), RecoveryCapacityPerPerson(0.0), TankCapacityPerArea(0.0),
               RecoveryCapacityPerArea(0.0), NumberOfUnits(0.0), TankCapacityPerUnit(0.0), RecoveryCapacityPerUnit(0.0),
               TankCapacityPerCollectorArea(0.0), HeightAspectRatio(0.0), PeakDemand(0.0), PeakNumberOfPeople(0.0), TotalFloorArea(0.0),
