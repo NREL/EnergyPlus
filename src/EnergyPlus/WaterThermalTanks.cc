@@ -3043,7 +3043,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-            }
+           break;
+        }
             case WTTAmbientTemp::OutsideAir: {
                 Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(13),
