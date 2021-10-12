@@ -157,6 +157,12 @@ namespace WaterThermalTanks {
         Num
     };
 
+
+    constexpr std::array<std::string_view, static_cast<int>(InletPositionMode::Num)> InletPositionModeNamesUC{
+        "FIXED",
+        "SEEKING"
+    };
+
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
     enum class ReclaimHeatObjectType
     {

@@ -3302,15 +3302,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate inlet mode
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(20));
-            if (SELECT_CASE_var == "FIXED") {
-                Tank.InletMode = InletPositionMode::Fixed;
-
-            } else if (SELECT_CASE_var == "SEEKING") {
-                Tank.InletMode = InletPositionMode::Seeking;
-            }
-        }
+        Tank.InletMode = static_cast<InletPositionMode>(getEnumerationValue(InletPositionModeNamesUC, state.dataIPShortCut->cAlphaArgs(20)));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(32);
         int specifiedNodes = 0;
