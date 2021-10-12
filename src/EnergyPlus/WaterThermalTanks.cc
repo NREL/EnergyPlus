@@ -2819,32 +2819,34 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.HeightWasAutoSized = true;
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-            if (SELECT_CASE_var == "VERTICALCYLINDER") {
-                Tank.Shape = TankShape::VertCylinder;
-
-            } else if (SELECT_CASE_var == "HORIZONTALCYLINDER") {
-                Tank.Shape = TankShape::HorizCylinder;
-
-            } else if (SELECT_CASE_var == "OTHER") {
-                Tank.Shape = TankShape::Other;
-                if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
-                    Tank.Perimeter = state.dataIPShortCut->rNumericArgs(3);
-                } else {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER");
-                    ErrorsFound = true;
-                }
-
+        Tank.Shape = static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+        switch (Tank.Shape) {
+        case TankShape::VertCylinder: {
+            break;
+        }
+        case TankShape::HorizCylinder: {
+            break;
+        }
+        case TankShape::Other: {
+            if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
+                Tank.Perimeter = state.dataIPShortCut->rNumericArgs(3);
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Tank Shape entered=" + state.dataIPShortCut->cAlphaArgs(3));
-                Tank.Shape = TankShape::VertCylinder;
+                                    ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER");
                 ErrorsFound = true;
             }
+
+            break;
+        }
+        default: {
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Tank Shape entered=" + state.dataIPShortCut->cAlphaArgs(3));
+            Tank.Shape = TankShape::VertCylinder;
+            ErrorsFound = true;
+            break;
+        }
         }
 
         if (state.dataIPShortCut->rNumericArgs(4) > 0.0) {

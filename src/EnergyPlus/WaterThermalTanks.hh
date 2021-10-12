@@ -117,6 +117,12 @@ namespace WaterThermalTanks {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(TankShape::Num)> TankShapeNamesUC{
+        "VERTICALCYLINDER",
+        "HORIZONTALCYLINDER",
+        "OTHER",
+    };
+
     enum class HeaterControlMode
     {
         Unassigned = -1,
