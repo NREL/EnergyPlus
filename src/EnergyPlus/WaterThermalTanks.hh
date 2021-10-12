@@ -86,8 +86,8 @@ namespace WaterThermalTanks {
         "ZONEANDOUTDOORAIR"
     };
 
-    constexpr int TankAmbientTempNames = static_cast<int>(WTTAmbientTemp::Num)-1; // Since AmbientTemp::ZoneAndOA is not appilcable to Tank
-    constexpr std::array<std::string_view, TankAmbientTempNames> TankAmbientTempNamesUC{
+    constexpr int TankAmbientTempNamesNum = static_cast<int>(WTTAmbientTemp::Num)-1; // Since AmbientTemp::ZoneAndOA is not appilcable to Tank
+    constexpr std::array<std::string_view, TankAmbientTempNamesNum> TankAmbientTempNamesUC{
         "SCHEDULE",
         "ZONE",
         "OUTDOORS",
