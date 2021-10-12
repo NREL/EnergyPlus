@@ -69,12 +69,14 @@ struct EnergyPlusData;
 
 namespace WaterThermalTanks {
 
-    enum struct AmbientTempEnum
+    enum class AmbientTemp
     {
+        Unassigned = -1,
         Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
         TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
         OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
-        ZoneAndOA   // applicable to HPWH only, inlet air is mixture of OA and zone air
+        ZoneAndOA,   // applicable to HPWH only, inlet air is mixture of OA and zone air
+        Num
     };
 
     enum class CrankcaseHeaterControlTemp
@@ -303,7 +305,7 @@ namespace WaterThermalTanks {
         int InletAirMixerNode;                              // Inlet air mixer node number of HP water heater
         int OutletAirSplitterNode;                          // Outlet air splitter node number of HP water heater
         Real64 SourceMassFlowRate;                          // Maximum mass flow rate on the source side (kg/s)
-        AmbientTempEnum InletAirConfiguration;              // Identifies source of HPWH inlet air
+        AmbientTemp InletAirConfiguration;              // Identifies source of HPWH inlet air
         int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
         int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
         int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
@@ -312,7 +314,7 @@ namespace WaterThermalTanks {
         int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
         Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
         Real64 OnCycParaLoad;                               // Rate for on-cycle parasitic load (W)
-        AmbientTempEnum ParasiticTempIndicator;             // Indicator for HPWH parasitic heat rejection location
+        AmbientTemp ParasiticTempIndicator;             // Indicator for HPWH parasitic heat rejection location
         Real64 OffCycParaFuelRate;                          // Electric consumption rate for off-cycle parasitic load (W)
         Real64 OnCycParaFuelRate;                           // Electric consumption rate for on-cycle parasitic load (W)
         Real64 OffCycParaFuelEnergy;                        // Electric energy consumption for off-cycle parasitic load (J)
@@ -380,9 +382,9 @@ namespace WaterThermalTanks {
               FanNum(0), FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0),
               SaveMode(0), SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
               MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0),
-              InletAirConfiguration(AmbientTempEnum::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0),
+              InletAirConfiguration(AmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0),
               CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0), OffCycParaLoad(0.0),
-              OnCycParaLoad(0.0), ParasiticTempIndicator(AmbientTempEnum::OutsideAir), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
+              OnCycParaLoad(0.0), ParasiticTempIndicator(AmbientTemp::OutsideAir), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
               OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
               HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
               IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true),
@@ -428,7 +430,7 @@ namespace WaterThermalTanks {
         Real64 Mass;                       // Total mass of fluid in the tank (kg)
         Real64 TimeElapsed;                // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
-        AmbientTempEnum AmbientTempIndicator;                         // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
+        AmbientTemp AmbientTempIndicator;                         // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
         int AmbientTempSchedule;                                      // Schedule index pointer
         int AmbientTempZone;                                          // Number of ambient zone around tank
         int AmbientTempOutsideAirNode;                                // Number of outside air node
@@ -621,7 +623,7 @@ namespace WaterThermalTanks {
         // Default Constructor
         WaterThermalTankData()
             : TypeNum(0), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
-              TimeElapsed(0.0), AmbientTempIndicator(AmbientTempEnum::OutsideAir), AmbientTempSchedule(0), AmbientTempZone(0),
+              TimeElapsed(0.0), AmbientTempIndicator(AmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientTempZone(0),
               AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0), OffCycLossFracToZone(0.0),
               OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(HeaterControlMode::Cycle),
               StratifiedControlMode(PriorityControlMode::Unassigned), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),

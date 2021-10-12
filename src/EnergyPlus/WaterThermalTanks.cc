@@ -488,7 +488,7 @@ void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int const WaterHeaterN
         auto &HPWaterHtr = state.dataWaterThermalTanks->HPWaterHeater(Tank.HeatPumpNum);
 
         if (HPWaterHtr.StandAlone &&
-            (HPWaterHtr.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWaterHtr.InletAirConfiguration == AmbientTempEnum::Schedule)) {
+            (HPWaterHtr.InletAirConfiguration == AmbientTemp::OutsideAir || HPWaterHtr.InletAirConfiguration == AmbientTemp::Schedule)) {
             bool LocalRunFlag = true;
             PlantLocation A(0, 0, 0, 0);
             HPWaterHtr.simulate(state, A, FirstHVACIteration, MyLoad, LocalRunFlag);
@@ -1351,7 +1351,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             auto const SELECT_CASE_var(hpwhAlpha[6 + nAlphaOffset]);
 
             if (SELECT_CASE_var == "SCHEDULE") {
-                HPWH.InletAirConfiguration = AmbientTempEnum::Schedule;
+                HPWH.InletAirConfiguration = AmbientTemp::Schedule;
 
                 // Inlet Air Temperature Schedule
                 if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
@@ -1390,7 +1390,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "ZONEAIRONLY") {
-                HPWH.InletAirConfiguration = AmbientTempEnum::TempZone;
+                HPWH.InletAirConfiguration = AmbientTemp::TempZone;
 
                 // Inlet Air Zone
                 if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
@@ -1407,10 +1407,10 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "OUTDOORAIRONLY") {
-                HPWH.InletAirConfiguration = AmbientTempEnum::OutsideAir;
+                HPWH.InletAirConfiguration = AmbientTemp::OutsideAir;
 
             } else if (SELECT_CASE_var == "ZONEANDOUTDOORAIR") {
-                HPWH.InletAirConfiguration = AmbientTempEnum::ZoneAndOA;
+                HPWH.InletAirConfiguration = AmbientTemp::ZoneAndOA;
 
                 // Inlet Air Zone
                 if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
@@ -1612,7 +1612,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "ZONE") {
                 HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Zone;
-                if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
+                if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
                                         "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
@@ -1777,15 +1777,15 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Parasitic Heat Rejection Location
         if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Zone")) {
-            HPWH.ParasiticTempIndicator = AmbientTempEnum::TempZone;
-            if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
+            HPWH.ParasiticTempIndicator = AmbientTemp::TempZone;
+            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
                 ShowContinueError(state, hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir");
                 ShowContinueError(state, " when parasitic heat rejection location equals Zone.");
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Outdoors")) {
-            HPWH.ParasiticTempIndicator = AmbientTempEnum::OutsideAir;
+            HPWH.ParasiticTempIndicator = AmbientTemp::OutsideAir;
         } else {
             ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
             ShowContinueError(state, " parasitic heat rejection location must be either Zone or Outdoors.");
@@ -1796,7 +1796,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
         if (!hpwhAlphaBlank[26 + nAlphaOffset]) {
             // For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
-            if (HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+            if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                 HPWH.InletAirMixerNode = NodeInputManager::GetOnlySingleNode(state,
                                                                              hpwhAlpha[26 + nAlphaOffset],
                                                                              ErrorsFound,
@@ -1812,7 +1812,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                   "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as "
                                   "Zone and OutdoorAir. Node name disregarded and simulation continues.");
             }
-        } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+        } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
             ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
             ShowContinueError(state, "Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
             ErrorsFound = true;
@@ -1821,7 +1821,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Outlet Air Splitter Node
         if (!hpwhAlphaBlank[27 + nAlphaOffset]) {
             //  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
-            if (HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+            if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                 HPWH.OutletAirSplitterNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                  hpwhAlpha[27 + nAlphaOffset],
                                                                                  ErrorsFound,
@@ -1837,7 +1837,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                   "Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as "
                                   "ZoneAndOutdoorAir. Node name disregarded and simulation continues.");
             }
-        } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+        } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
             ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
             ShowContinueError(state, "Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
             ErrorsFound = true;
@@ -1898,7 +1898,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         } else {
             // when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as DataLoopNode::ObjectIsParent
-            if (HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
+            if (HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
                 // for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
                 // to avoid node connection errors
                 HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -1922,7 +1922,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                  DataLoopNode::ObjectIsParent);
 
             } else { // HPWH is connected to a zone with no mixer/splitter nodes
-                if (HPWH.InletAirConfiguration == AmbientTempEnum::TempZone) {
+                if (HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
                     HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                     hpwhAlpha[7 + nAlphaOffset],
                                                                                     ErrorsFound,
@@ -1975,7 +1975,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             }
         }
         // check that required node names are present
-        if (HPWH.InletAirConfiguration == AmbientTempEnum::Schedule || HPWH.InletAirConfiguration == AmbientTempEnum::TempZone) {
+        if (HPWH.InletAirConfiguration == AmbientTemp::Schedule || HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
             if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                 ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
@@ -1983,7 +1983,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                   hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] + " must be specified.");
                 ErrorsFound = true;
             }
-        } else if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir) {
+        } else if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
             if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                 ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
@@ -1991,7 +1991,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                   hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] + " must be specified.");
                 ErrorsFound = true;
             }
-        } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+        } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
             if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                 ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
@@ -2009,7 +2009,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
         // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-        if ((HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) &&
+        if ((HPWH.InletAirConfiguration == AmbientTemp::TempZone || HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) &&
             HPWH.AmbientTempZone > 0) {
             if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
                 DataZoneEquipment::GetZoneEquipmentData(state);
@@ -2058,7 +2058,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
-        if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+        if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
             HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[28 + nAlphaOffset]);
             if (HPWH.InletAirMixerSchPtr == 0) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
@@ -2084,7 +2084,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (HPWH.OutletAirSplitterNode != 0) {
                 HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
             } else {
-                if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir) {
+                if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                     HPWH.FanOutletNode = HPWH.ExhaustAirNode;
                 } else {
                     HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
@@ -2141,7 +2141,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (HPWH.InletAirMixerNode != 0) {
             HPWHFanInletNodeNum = HPWH.InletAirMixerNode;
         } else {
-            if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir) {
+            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                 HPWHFanInletNodeNum = HPWH.OutsideAirNode;
             } else {
                 HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
@@ -2189,7 +2189,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (HPWH.OutletAirSplitterNode != 0) {
                 HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
             } else {
-                if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir) {
+                if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                     HPWHCoilOutletNodeNum = HPWH.ExhaustAirNode;
                 } else {
                     HPWHCoilOutletNodeNum = HPWH.HeatPumpAirOutletNode;
@@ -2529,7 +2529,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(8));
             if (SELECT_CASE_var == "SCHEDULE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
+                Tank.AmbientTempIndicator = AmbientTemp::Schedule;
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
                 if (Tank.AmbientTempSchedule == 0) {
                     ShowSevereError(state,
@@ -2539,7 +2539,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "ZONE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
+                Tank.AmbientTempIndicator = AmbientTemp::TempZone;
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
                     ShowSevereError(state,
@@ -2549,7 +2549,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "OUTDOORS") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
+                Tank.AmbientTempIndicator = AmbientTemp::OutsideAir;
                 Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(11),
                                                                                      ErrorsFound,
@@ -3042,7 +3042,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
             if (SELECT_CASE_var == "SCHEDULE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
+                Tank.AmbientTempIndicator = AmbientTemp::Schedule;
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
                 if (Tank.AmbientTempSchedule == 0) {
                     ShowSevereError(state,
@@ -3052,7 +3052,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "ZONE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
+                Tank.AmbientTempIndicator = AmbientTemp::TempZone;
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
                     ShowSevereError(state,
@@ -3062,7 +3062,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "OUTDOORS") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
+                Tank.AmbientTempIndicator = AmbientTemp::OutsideAir;
                 Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(13),
                                                                                      ErrorsFound,
@@ -3477,7 +3477,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
             if (SELECT_CASE_var == "SCHEDULE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
+                Tank.AmbientTempIndicator = AmbientTemp::Schedule;
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (Tank.AmbientTempSchedule == 0) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
@@ -3488,7 +3488,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "ZONE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
+                Tank.AmbientTempIndicator = AmbientTemp::TempZone;
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
@@ -3499,7 +3499,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "OUTDOORS") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
+                Tank.AmbientTempIndicator = AmbientTemp::OutsideAir;
                 Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(6),
                                                                                      ErrorsFound,
@@ -3798,7 +3798,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
             if (SELECT_CASE_var == "SCHEDULE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
+                Tank.AmbientTempIndicator = AmbientTemp::Schedule;
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (Tank.AmbientTempSchedule == 0) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
@@ -3809,7 +3809,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "ZONE") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
+                Tank.AmbientTempIndicator = AmbientTemp::TempZone;
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
@@ -3821,7 +3821,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                 Tank.OffCycLossFracToZone = 1.0;
 
             } else if (SELECT_CASE_var == "OUTDOORS") {
-                Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
+                Tank.AmbientTempIndicator = AmbientTemp::OutsideAir;
                 Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(7),
                                                                                      ErrorsFound,
@@ -4394,7 +4394,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     }
 
                     // Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-                    if (HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
+                    if (HPWH.InletAirConfiguration == AmbientTemp::TempZone || HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataZoneEquip->ZoneEquipList)) {
                             bool FoundTankInList = false;
                             bool TankNotLowestPriority = false;
@@ -6347,18 +6347,18 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         }
 
         switch (this->AmbientTempIndicator) {
-        case AmbientTempEnum::Schedule: {
+        case AmbientTemp::Schedule: {
             SchIndex = this->AmbientTempSchedule;
             this->AmbientTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
 
             break;
         }
-        case AmbientTempEnum::TempZone: {
+        case AmbientTemp::TempZone: {
             this->AmbientTemp = state.dataHeatBalFanSys->MAT(this->AmbientTempZone);
 
             break;
         }
-        case AmbientTempEnum::OutsideAir: {
+        case AmbientTemp::OutsideAir: {
             this->AmbientTemp = state.dataLoopNodes->Node(this->AmbientTempOutsideAirNode).Temp;
             break;
         }
@@ -6564,13 +6564,13 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         Real64 HPInletHumRat = 0.0;
         Real64 HPInletRelHum;
         switch (state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirConfiguration) {
-        case AmbientTempEnum::TempZone: {
+        case AmbientTemp::TempZone: {
             state.dataWaterThermalTanks->mixerInletAirSchedule = 0.0;
             HPInletDryBulbTemp = state.dataLoopNodes->Node(HPAirInletNode).Temp;
             HPInletHumRat = state.dataLoopNodes->Node(HPAirInletNode).HumRat;
             break;
         }
-        case AmbientTempEnum::ZoneAndOA: {
+        case AmbientTemp::ZoneAndOA: {
             if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirMixerSchPtr > 0) {
                 //         schedule values are checked for boundary of 0 and 1 in GetWaterThermalTankInputFlag
                 state.dataWaterThermalTanks->mixerInletAirSchedule =
@@ -6584,14 +6584,14 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                             (1.0 - state.dataWaterThermalTanks->mixerInletAirSchedule) * state.dataLoopNodes->Node(HPAirInletNode).HumRat;
             break;
         }
-        case AmbientTempEnum::OutsideAir: {
+        case AmbientTemp::OutsideAir: {
             state.dataWaterThermalTanks->mixerInletAirSchedule = 1.0;
             HPInletDryBulbTemp = state.dataLoopNodes->Node(OutdoorAirNode).Temp;
             HPInletHumRat = state.dataLoopNodes->Node(OutdoorAirNode).HumRat;
 
             break;
         }
-        case AmbientTempEnum::Schedule: {
+        case AmbientTemp::Schedule: {
             HPInletDryBulbTemp =
                 ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempSchedule);
             HPInletRelHum = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientRHSchedule);
@@ -10214,8 +10214,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     switch (HeatPump.InletAirConfiguration) {
 
     //   no sensible capacity to zone for outdoor and scheduled HPWH
-    case AmbientTempEnum::OutsideAir:
-    case AmbientTempEnum::Schedule: {
+    case AmbientTemp::OutsideAir:
+    case AmbientTemp::Schedule: {
         HeatPump.HPWaterHeaterSensibleCapacity = 0.0;
         HeatPump.HPWaterHeaterLatentCapacity = 0.0;
 
@@ -10227,7 +10227,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(HPAirInletNode).HumRat);
 
         //     add parasitics to zone heat balance if parasitic heat load is to zone otherwise neglect parasitics
-        if (HeatPump.ParasiticTempIndicator == AmbientTempEnum::TempZone) {
+        if (HeatPump.ParasiticTempIndicator == AmbientTemp::TempZone) {
             HeatPump.HPWaterHeaterSensibleCapacity =
                 (state.dataLoopNodes->Node(HPAirOutletNode).MassFlowRate * CpAir *
                  (state.dataLoopNodes->Node(HPAirOutletNode).Temp - state.dataLoopNodes->Node(HPAirInletNode).Temp)) +
@@ -12698,7 +12698,7 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
         HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HeatPumpWaterHeaterIndex);
 
         // "Zone and outdoor air" configuration is expected break the conservation of mass
-        if (HPWH.InletAirConfiguration != AmbientTempEnum::ZoneAndOA) {
+        if (HPWH.InletAirConfiguration != AmbientTemp::ZoneAndOA) {
 
             // Air outlet node
             if (NodeNumber == HPWH.HeatPumpAirOutletNode) {
