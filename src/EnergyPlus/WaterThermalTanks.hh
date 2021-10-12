@@ -102,6 +102,12 @@ namespace WaterThermalTanks {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(CrankcaseHeaterControlTemp::Num)> CrankcaseHeaterControlTempNamesUC{
+        "SCHEDULE",
+        "ZONE",
+        "OUTDOORS",
+    };
+
     enum class TankShape
     {
         Unassigned = -1,

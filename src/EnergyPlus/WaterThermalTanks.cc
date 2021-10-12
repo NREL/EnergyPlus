@@ -1577,10 +1577,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Compressor Location
-        {
-            auto const SELECT_CASE_var(hpwhAlpha[20 + nAlphaOffset]);
-            if (SELECT_CASE_var == "SCHEDULE") {
-                HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Schedule;
+        HPWH.CrankcaseTempIndicator = static_cast<CrankcaseHeaterControlTemp>(getEnumerationValue(CrankcaseHeaterControlTempNamesUC, hpwhAlpha[20 + nAlphaOffset]));
+        switch (HPWH.CrankcaseTempIndicator) {
+        case CrankcaseHeaterControlTemp::Schedule: {
                 if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                     // Compressor Ambient Temperature Schedule
                     HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
@@ -1595,8 +1594,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-            } else if (SELECT_CASE_var == "ZONE") {
-                HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Zone;
+            break;
+        }
+            case CrankcaseHeaterControlTemp::Zone: {
                 if (HPWH.InletAirConfiguration == WTTAmbientTemp::OutsideAir || HPWH.InletAirConfiguration == WTTAmbientTemp::Schedule) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
@@ -1611,15 +1611,19 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                         state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
                             " was provided but will not be used based on compressor location input=\"" + hpwhAlpha[20 + nAlphaOffset] + "\".");
                 }
-            } else if (SELECT_CASE_var == "OUTDOORS") {
-                HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Exterior;
+            break;
+            }
+            case CrankcaseHeaterControlTemp::Exterior: {
                 if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " +
                                          hpwhAlphaFieldNames[21 + nAlphaOffset] + " was provided but will not be used based on " +
                                          hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[20 + nAlphaOffset] + "\".");
                 }
+            break;
             }
+            default:
+                break;
         }
 
         // Fan Name
