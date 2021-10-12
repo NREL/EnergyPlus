@@ -6424,7 +6424,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         Real64 mdotUse = this->PlantMassFlowRatesFunc(state,
                                                       this->UseInletNode,
                                                       FirstHVACIteration,
-                                                      SideEnum::Use,
+                                                      WaterHeaterSide::Use,
                                                       this->UseSide.loopSideNum,
                                                       this->UseSideSeries,
                                                       this->UseBranchControlType,
@@ -6463,7 +6463,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         Real64 mdotSource = this->PlantMassFlowRatesFunc(state,
                                                          this->SourceInletNode,
                                                          FirstHVACIteration,
-                                                         SideEnum::Source,
+                                                         WaterHeaterSide::Source,
                                                          this->SrcSide.loopSideNum,
                                                          this->SourceSideSeries,
                                                          this->SourceBranchControlType,
@@ -10627,7 +10627,7 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
 Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
                                                     int const InNodeNum,
                                                     bool const FirstHVACIteration,
-                                                    SideEnum const WaterThermalTankSide,
+                                                    WaterHeaterSide const WaterThermalTankSide,
                                                     int const PlantLoopSide,
                                                     [[maybe_unused]] bool const PlumbedInSeries,
                                                     DataBranchAirLoopPlant::ControlTypeEnum const BranchControlType,
@@ -10664,13 +10664,13 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         // If FlowLock is True (1),  the new resolved plant loop mdot is used
         if (this->UseCurrentFlowLock == DataPlant::iFlowLock::Unlocked) {
             CurrentMode = PassingFlowThru;
-            if ((this->UseSideLoadRequested > 0.0) && (WaterThermalTankSide == SideEnum::Use)) {
+            if ((this->UseSideLoadRequested > 0.0) && (WaterThermalTankSide == WaterHeaterSide::Use)) {
                 CurrentMode = MaybeRequestingFlow;
             }
         } else {
             CurrentMode = PassingFlowThru;
         }
-        if (WaterThermalTankSide == SideEnum::Source) {
+        if (WaterThermalTankSide == WaterHeaterSide::Source) {
             CurrentMode = MaybeRequestingFlow;
         }
     } else if (PlantLoopSide == DataPlant::DemandSide) {
@@ -10693,11 +10693,11 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
 
     // evaluate Availability schedule,
     bool ScheduledAvail = true;
-    if (WaterThermalTankSide == SideEnum::Use) {
+    if (WaterThermalTankSide == WaterHeaterSide::Use) {
         if (ScheduleManager::GetCurrentScheduleValue(state, this->UseSideAvailSchedNum) == 0.0) {
             ScheduledAvail = false;
         }
-    } else if (WaterThermalTankSide == SideEnum::Source) {
+    } else if (WaterThermalTankSide == WaterHeaterSide::Source) {
         if (ScheduleManager::GetCurrentScheduleValue(state, this->SourceSideAvailSchedNum) == 0.0) {
             ScheduledAvail = false;
         }
@@ -10722,9 +10722,9 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         if (!ScheduledAvail) {
             MassFlowRequest = 0.0;
         } else {
-            if (WaterThermalTankSide == SideEnum::Use) {
+            if (WaterThermalTankSide == WaterHeaterSide::Use) {
                 MassFlowRequest = this->PlantUseMassFlowRateMax;
-            } else if (WaterThermalTankSide == SideEnum::Source) {
+            } else if (WaterThermalTankSide == WaterHeaterSide::Source) {
                 MassFlowRequest = this->PlantSourceMassFlowRateMax;
             } else {
                 assert(false);
@@ -10735,9 +10735,9 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         bool NeedsHeatOrCool = this->SourceHeatNeed(state, OutletTemp, DeadBandTemp, SetPointTemp_loc);
 
         if (MassFlowRequest > 0.0) {
-            if (WaterThermalTankSide == SideEnum::Use) {
+            if (WaterThermalTankSide == WaterHeaterSide::Use) {
                 FlowResult = MassFlowRequest;
-            } else if (WaterThermalTankSide == SideEnum::Source) {
+            } else if (WaterThermalTankSide == WaterHeaterSide::Source) {
                 if (NeedsHeatOrCool) {
                     FlowResult = MassFlowRequest;
                 } else {
@@ -10767,7 +10767,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         if (!ScheduledAvail) {
             MassFlowRequest = 0.0;
         } else {
-            if (WaterThermalTankSide == SideEnum::Use) {
+            if (WaterThermalTankSide == WaterHeaterSide::Use) {
                 if ((this->IsChilledWaterTank) && (this->UseSideLoadRequested > 0.0)) {
                     MassFlowRequest = this->PlantUseMassFlowRateMax;
                 } else if ((this->IsChilledWaterTank) && (this->UseSideLoadRequested == 0.0)) {
@@ -10776,12 +10776,12 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
                     MassFlowRequest = this->PlantUseMassFlowRateMax;
                 }
 
-            } else if (WaterThermalTankSide == SideEnum::Source) {
+            } else if (WaterThermalTankSide == WaterHeaterSide::Source) {
                 MassFlowRequest = this->PlantSourceMassFlowRateMax;
             }
         }
 
-        if (WaterThermalTankSide == SideEnum::Source) { // temperature dependent controls for indirect heating/cooling
+        if (WaterThermalTankSide == WaterHeaterSide::Source) { // temperature dependent controls for indirect heating/cooling
             bool NeedsHeatOrCool = this->SourceHeatNeed(state, OutletTemp, DeadBandTemp, SetPointTemp_loc);
             if (MassFlowRequest > 0.0) {
                 if (NeedsHeatOrCool) {

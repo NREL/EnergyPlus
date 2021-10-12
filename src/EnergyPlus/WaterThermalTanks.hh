@@ -125,10 +125,12 @@ namespace WaterThermalTanks {
         AirWaterHeatPumpEQ              // reclaim heating source is Water to air heat pump cooling coil
     };
 
-    enum struct SideEnum
+    enum class WaterHeaterSide
     {
+        Unassigned = -1,
         Use,   // Indicates Use side of water heater
-        Source // Indicates Source side of water heater
+        Source, // Indicates Source side of water heater
+        Num
     };
 
     enum class SizingMode
@@ -704,7 +706,7 @@ namespace WaterThermalTanks {
         Real64 PlantMassFlowRatesFunc(EnergyPlusData &state,
                                       int InNodeNum,
                                       bool FirstHVACIteration,
-                                      SideEnum WaterThermalTankSide,
+                                      WaterHeaterSide WaterThermalTankSide,
                                       int PlantLoopSide,
                                       bool PlumbedInSeries, // !unused1208
                                       DataBranchAirLoopPlant::ControlTypeEnum BranchControlType,

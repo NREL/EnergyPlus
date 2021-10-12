@@ -5327,7 +5327,7 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
     result = Tank.PlantMassFlowRatesFunc(*state,
                                          inNodeNum,
                                          false,
-                                         EnergyPlus::WaterThermalTanks::SideEnum::Use,
+                                         EnergyPlus::WaterThermalTanks::WaterHeaterSide::Use,
                                          plantLoopSide,
                                          false,
                                          DataBranchAirLoopPlant::ControlTypeEnum::Bypass,
