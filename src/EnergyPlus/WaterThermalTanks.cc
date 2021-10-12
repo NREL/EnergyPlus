@@ -6988,17 +6988,14 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                         // Heater is required at less than the minimum capacity
                         // If cycling, Qmincap = Qmaxcap.  Once the setpoint is reached, heater will almost always be shut off here
 
-                        {
-                            auto const SELECT_CASE_var1(this->ControlType);
-
-                            if (SELECT_CASE_var1 == HeaterControlMode::Cycle) {
+                            if (this->ControlType == HeaterControlMode::Cycle) {
                                 // Control will cycle on and off based on DeadBandTemp
                                 Qheater = 0.0;
                                 Qunmet = 0.0;
                                 Mode_loc = state.dataWaterThermalTanks->floatMode;
                                 continue;
 
-                            } else if (SELECT_CASE_var1 == HeaterControlMode::Modulate) {
+                            } else if (this->ControlType == HeaterControlMode::Modulate) {
                                 // Control will cycle on and off based on DeadBandTemp until Qneeded > Qmincap again
                                 Qheater = 0.0;
                                 Qunmet = Qneeded;
@@ -7013,7 +7010,6 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                                 // Heater must not come back on until Qneeded >= Qmincap
                                 // Mode = modfloatMode
                             }
-                        }
 
                     } else if (Qneeded <= Qmaxcap) {
                         // Heater can exactly meet the needed heat rate (usually by modulating) and heats for all of the remaining time
