@@ -131,6 +131,11 @@ namespace WaterThermalTanks {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(HeaterControlMode::Num)> HeaterControlModeNamesUC{
+        "CYCLE",
+        "MODULATE"
+    };
+
     enum class PriorityControlMode // For Stratified Water Heaters, this controls how the two heating elements work together
     {
         Unassigned = -1,

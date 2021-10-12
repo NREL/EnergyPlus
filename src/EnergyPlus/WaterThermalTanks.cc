@@ -2398,26 +2398,29 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         // Validate Heater Control Type
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-            if (SELECT_CASE_var == "CYCLE") {
-                Tank.ControlType = HeaterControlMode::Cycle;
+        Tank.ControlType = static_cast<HeaterControlMode>(getEnumerationValue(HeaterControlModeNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+        switch (Tank.ControlType) {
+        case (HeaterControlMode::Cycle): {
                 Tank.MinCapacity = Tank.MaxCapacity;
-
-            } else if (SELECT_CASE_var == "MODULATE") {
-                Tank.ControlType = HeaterControlMode::Modulate;
+                break;
+        }
+        case (HeaterControlMode::Modulate): {
 
                 // CASE ('MODULATE WITH OVERHEAT')  ! Not yet implemented
 
                 // CASE ('MODULATE WITH UNDERHEAT')  ! Not yet implemented
 
-            } else {
+            break;
+        }
+        default:{
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Control Type entered=" + state.dataIPShortCut->cAlphaArgs(3));
                 ErrorsFound = true;
-            }
+            break;
         }
+        }
+
         Tank.VolFlowRateMin = state.dataIPShortCut->rNumericArgs(6);
         Tank.VolFlowRateMin = max(0.0, Tank.VolFlowRateMin);
         Tank.IgnitionDelay = state.dataIPShortCut->rNumericArgs(7); // Not yet implemented
