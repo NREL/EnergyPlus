@@ -2860,21 +2860,13 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate Heater Priority Control
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
-            if (SELECT_CASE_var == "MASTERSLAVE") {
-                Tank.StratifiedControlMode = PriorityControlMode::MasterSlave;
-
-            } else if (SELECT_CASE_var == "SIMULTANEOUS") {
-                Tank.StratifiedControlMode = PriorityControlMode::Simultaneous;
-
-            } else {
+        Tank.StratifiedControlMode = static_cast<PriorityControlMode>(getEnumerationValue(PriorityControlModeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        if (Tank.StratifiedControlMode == PriorityControlMode::Unassigned) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Heater Priority Control entered=" + state.dataIPShortCut->cAlphaArgs(4));
                 ErrorsFound = true;
             }
-        }
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {

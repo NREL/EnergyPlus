@@ -144,6 +144,11 @@ namespace WaterThermalTanks {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(PriorityControlMode::Num)> PriorityControlModeNamesUC{
+        "MASTERSLAVE",
+        "SIMULTANEOUS"
+    };
+
     enum class InletPositionMode
     {
         Unassigned = -1,
