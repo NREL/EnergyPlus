@@ -1351,66 +1351,65 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         switch (HPWH.InletAirConfiguration) {
         case (WTTAmbientTemp::Schedule): {
 
-
-                // Inlet Air Temperature Schedule
-                if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
-                    HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[11 + nAlphaOffset]);
-                    if (HPWH.AmbientTempSchedule == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
+            // Inlet Air Temperature Schedule
+            if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
+                HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[11 + nAlphaOffset]);
+                if (HPWH.AmbientTempSchedule == 0) {
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(state, hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
                     ErrorsFound = true;
                 }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError(state, "required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
+                ErrorsFound = true;
+            }
 
-                // Inlet Air Humidity Schedule
-                if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
-                    HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[12 + nAlphaOffset]);
-                    if (HPWH.AmbientRHSchedule == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
-                        ErrorsFound = true;
-                    } else {
-                        if (!ScheduleManager::CheckScheduleValueMinMax(state, HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
-                            ShowContinueError(state,
-                                              hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
-                                                  "\", schedule values must be (>=0., <=1.)");
-                            ErrorsFound = true;
-                        }
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
+            // Inlet Air Humidity Schedule
+            if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
+                HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[12 + nAlphaOffset]);
+                if (HPWH.AmbientRHSchedule == 0) {
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(state, hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
                     ErrorsFound = true;
+                } else {
+                    if (!ScheduleManager::CheckScheduleValueMinMax(state, HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
+                        ShowContinueError(state,
+                                          hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
+                                              "\", schedule values must be (>=0., <=1.)");
+                        ErrorsFound = true;
+                    }
                 }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError(state, "required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
+                ErrorsFound = true;
+            }
 
             break;
         }
-            case (WTTAmbientTemp::ZoneAndOA):
-            case (WTTAmbientTemp::TempZone):{
+        case (WTTAmbientTemp::ZoneAndOA):
+        case (WTTAmbientTemp::TempZone): {
 
-                // Inlet Air Zone
-                if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
-                    HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
-                    if (HPWH.AmbientTempZone == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+            // Inlet Air Zone
+            if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
+                HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
+                if (HPWH.AmbientTempZone == 0) {
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
                     ErrorsFound = true;
                 }
-            break;
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+                ErrorsFound = true;
             }
-            default:
-            case (WTTAmbientTemp::OutsideAir):
-                break;
+            break;
+        }
+        default:
+        case (WTTAmbientTemp::OutsideAir):
+            break;
         }
 
         // Read air inlet nodes after mixer/splitter nodes have been read in (state.dataIPShortCut->cAlphaArgs 7-10),
@@ -1577,53 +1576,54 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Compressor Location
-        HPWH.CrankcaseTempIndicator = static_cast<CrankcaseHeaterControlTemp>(getEnumerationValue(CrankcaseHeaterControlTempNamesUC, hpwhAlpha[20 + nAlphaOffset]));
+        HPWH.CrankcaseTempIndicator =
+            static_cast<CrankcaseHeaterControlTemp>(getEnumerationValue(CrankcaseHeaterControlTempNamesUC, hpwhAlpha[20 + nAlphaOffset]));
         switch (HPWH.CrankcaseTempIndicator) {
         case CrankcaseHeaterControlTemp::Schedule: {
-                if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
-                    // Compressor Ambient Temperature Schedule
-                    HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
-                    if (HPWH.CrankcaseTempSchedule == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
+            if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
+                // Compressor Ambient Temperature Schedule
+                HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
+                if (HPWH.CrankcaseTempSchedule == 0) {
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(state, hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
                     ErrorsFound = true;
                 }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError(state, "required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
+                ErrorsFound = true;
+            }
 
             break;
         }
-            case CrankcaseHeaterControlTemp::Zone: {
-                if (HPWH.InletAirConfiguration == WTTAmbientTemp::OutsideAir || HPWH.InletAirConfiguration == WTTAmbientTemp::Schedule) {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                        "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
-                    ShowContinueError(state, " Outdoor Air when compressor location equals ZONE.");
-                    ErrorsFound = true;
-                }
+        case CrankcaseHeaterControlTemp::Zone: {
+            if (HPWH.InletAirConfiguration == WTTAmbientTemp::OutsideAir || HPWH.InletAirConfiguration == WTTAmbientTemp::Schedule) {
+                ShowSevereError(state,
+                                state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
+                                    "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
+                ShowContinueError(state, " Outdoor Air when compressor location equals ZONE.");
+                ErrorsFound = true;
+            }
 
-                if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
-                    ShowWarningError(
-                        state,
-                        state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
-                            " was provided but will not be used based on compressor location input=\"" + hpwhAlpha[20 + nAlphaOffset] + "\".");
-                }
-            break;
+            if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
+                ShowWarningError(state,
+                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
+                                     " was provided but will not be used based on compressor location input=\"" + hpwhAlpha[20 + nAlphaOffset] +
+                                     "\".");
             }
-            case CrankcaseHeaterControlTemp::Exterior: {
-                if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " +
-                                         hpwhAlphaFieldNames[21 + nAlphaOffset] + " was provided but will not be used based on " +
-                                         hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[20 + nAlphaOffset] + "\".");
-                }
             break;
+        }
+        case CrankcaseHeaterControlTemp::Exterior: {
+            if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
+                ShowWarningError(state,
+                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
+                                     " was provided but will not be used based on " + hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" +
+                                     hpwhAlpha[20 + nAlphaOffset] + "\".");
             }
-            default:
-                break;
+            break;
+        }
+        default:
+            break;
         }
 
         // Fan Name
@@ -2401,22 +2401,22 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.ControlType = static_cast<HeaterControlMode>(getEnumerationValue(HeaterControlModeNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
         switch (Tank.ControlType) {
         case (HeaterControlMode::Cycle): {
-                Tank.MinCapacity = Tank.MaxCapacity;
-                break;
+            Tank.MinCapacity = Tank.MaxCapacity;
+            break;
         }
         case (HeaterControlMode::Modulate): {
 
-                // CASE ('MODULATE WITH OVERHEAT')  ! Not yet implemented
+            // CASE ('MODULATE WITH OVERHEAT')  ! Not yet implemented
 
-                // CASE ('MODULATE WITH UNDERHEAT')  ! Not yet implemented
+            // CASE ('MODULATE WITH UNDERHEAT')  ! Not yet implemented
 
             break;
         }
-        default:{
-                ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Control Type entered=" + state.dataIPShortCut->cAlphaArgs(3));
-                ErrorsFound = true;
+        default: {
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Control Type entered=" + state.dataIPShortCut->cAlphaArgs(3));
+            ErrorsFound = true;
             break;
         }
         }
@@ -2521,59 +2521,59 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(getEnumerationValue(TankAmbientTempNamesUC, state.dataIPShortCut->cAlphaArgs(8)));
         switch (Tank.AmbientTempIndicator) {
         case WTTAmbientTemp::Schedule: {
-                Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
-                if (Tank.AmbientTempSchedule == 0) {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Ambient Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(9));
-                    ErrorsFound = true;
-                }
+            Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
+            if (Tank.AmbientTempSchedule == 0) {
+                ShowSevereError(state,
+                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ":  Ambient Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(9));
+                ErrorsFound = true;
+            }
 
             break;
         }
         case WTTAmbientTemp::TempZone: {
-                Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Zone);
-                if (Tank.AmbientTempZone == 0) {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Ambient Temperature Zone not found = " + state.dataIPShortCut->cAlphaArgs(10));
-                    ErrorsFound = true;
-                }
+            Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Zone);
+            if (Tank.AmbientTempZone == 0) {
+                ShowSevereError(state,
+                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ":  Ambient Temperature Zone not found = " + state.dataIPShortCut->cAlphaArgs(10));
+                ErrorsFound = true;
+            }
 
             break;
         }
         case WTTAmbientTemp::OutsideAir: {
-                Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                                     state.dataIPShortCut->cAlphaArgs(11),
-                                                                                     ErrorsFound,
-                                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                     NodeInputManager::compFluidStream::Primary,
-                                                                                     DataLoopNode::ObjectIsNotParent);
-                if (!state.dataIPShortCut->cAlphaArgs(11).empty()) {
-                    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                        ShowSevereError(state,
-                                        state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                        ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(11));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+            Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                 state.dataIPShortCut->cAlphaArgs(11),
+                                                                                 ErrorsFound,
+                                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                                 state.dataIPShortCut->cAlphaArgs(1),
+                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                 DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+            if (!state.dataIPShortCut->cAlphaArgs(11).empty()) {
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                        ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
+                    ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(11));
                     ErrorsFound = true;
                 }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                ErrorsFound = true;
+            }
 
             break;
         }
         default: {
-                ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(8));
-                ShowContinueError(state, " Valid entries are SCHEDULE, ZONE, and OUTDOORS.");
-                ErrorsFound = true;
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(8));
+            ShowContinueError(state, " Valid entries are SCHEDULE, ZONE, and OUTDOORS.");
+            ErrorsFound = true;
             break;
         }
         }
@@ -2818,7 +2818,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.Shape = static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
-        case TankShape::VertCylinder:{
+        case TankShape::VertCylinder: {
             break;
         }
         case TankShape::Other: {
@@ -2851,13 +2851,14 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate Heater Priority Control
-        Tank.StratifiedControlMode = static_cast<PriorityControlMode>(getEnumerationValue(PriorityControlModeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        Tank.StratifiedControlMode =
+            static_cast<PriorityControlMode>(getEnumerationValue(PriorityControlModeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
         if (Tank.StratifiedControlMode == PriorityControlMode::Unassigned) {
-                ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Heater Priority Control entered=" + state.dataIPShortCut->cAlphaArgs(4));
-                ErrorsFound = true;
-            }
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Heater Priority Control entered=" + state.dataIPShortCut->cAlphaArgs(4));
+            ErrorsFound = true;
+        }
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -3024,61 +3025,61 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         switch (Tank.AmbientTempIndicator) {
 
         case (WTTAmbientTemp::Schedule): {
-                Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
-                if (Tank.AmbientTempSchedule == 0) {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Ambient Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(11));
-                    ErrorsFound = true;
-                }
+            Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
+            if (Tank.AmbientTempSchedule == 0) {
+                ShowSevereError(state,
+                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ":  Ambient Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(11));
+                ErrorsFound = true;
+            }
 
             break;
         }
         case WTTAmbientTemp::TempZone: {
-                Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataHeatBal->Zone);
-                if (Tank.AmbientTempZone == 0) {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Ambient Temperature Zone not found = " + state.dataIPShortCut->cAlphaArgs(12));
-                    ErrorsFound = true;
-                }
-
-           break;
-        }
-            case WTTAmbientTemp::OutsideAir: {
-                Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                                     state.dataIPShortCut->cAlphaArgs(13),
-                                                                                     ErrorsFound,
-                                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
-                                                                                     DataLoopNode::ObjectIsNotParent);
-                if (!state.dataIPShortCut->cAlphaArgs(13).empty()) {
-                    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                        ShowSevereError(state,
-                                        state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                        ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(13));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
-                    ErrorsFound = true;
-                }
-
-            break;
-            }
-            default: {
+            Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataHeatBal->Zone);
+            if (Tank.AmbientTempZone == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
+                                    ":  Ambient Temperature Zone not found = " + state.dataIPShortCut->cAlphaArgs(12));
                 ErrorsFound = true;
-            break;
             }
+
+            break;
+        }
+        case WTTAmbientTemp::OutsideAir: {
+            Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                 state.dataIPShortCut->cAlphaArgs(13),
+                                                                                 ErrorsFound,
+                                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                                 state.dataIPShortCut->cAlphaArgs(1),
+                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+            if (!state.dataIPShortCut->cAlphaArgs(13).empty()) {
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                        ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
+                    ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(13));
+                    ErrorsFound = true;
+                }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                ErrorsFound = true;
+            }
+
+            break;
+        }
+        default: {
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(10));
+            ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
+            ErrorsFound = true;
+            break;
+        }
         }
 
         Tank.SkinLossCoeff = state.dataIPShortCut->rNumericArgs(18);
@@ -3338,7 +3339,6 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
         }
 
-
         if (!state.dataIPShortCut->lAlphaFieldBlanks(22)) {
             Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(22));
             if (Tank.SourceSideAltSetpointSchedNum == 0) {
@@ -3450,61 +3450,59 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
-                Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-                if (Tank.AmbientTempSchedule == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule was not found.");
-                    ErrorsFound = true;
-                }
+            Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            if (Tank.AmbientTempSchedule == 0) {
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Schedule was not found.");
+                ErrorsFound = true;
+            }
 
             break;
         }
         case WTTAmbientTemp::TempZone: {
-                Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
-                if (Tank.AmbientTempZone == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Zone was not found.");
-                    ErrorsFound = true;
-                }
+            Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
+            if (Tank.AmbientTempZone == 0) {
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Zone was not found.");
+                ErrorsFound = true;
+            }
 
             break;
         }
         case WTTAmbientTemp::OutsideAir: {
-                Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                                     state.dataIPShortCut->cAlphaArgs(6),
-                                                                                     ErrorsFound,
-                                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                     NodeInputManager::compFluidStream::Primary,
-                                                                                     DataLoopNode::ObjectIsNotParent);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                        ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+            Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                 state.dataIPShortCut->cAlphaArgs(6),
+                                                                                 ErrorsFound,
+                                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                                 state.dataIPShortCut->cAlphaArgs(1),
+                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                 DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                     ErrorsFound = true;
                 }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                ErrorsFound = true;
+            }
 
             break;
         }
         default: {
-                ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(3));
-                ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
-                ErrorsFound = true;
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(3));
+            ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
+            ErrorsFound = true;
             break;
         }
         }
@@ -3704,7 +3702,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.Shape = static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
-        case TankShape::VertCylinder:{
+        case TankShape::VertCylinder: {
             break;
         }
         case TankShape::Other: {
@@ -3775,62 +3773,60 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
-                Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
-                if (Tank.AmbientTempSchedule == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule was not found.");
-                    ErrorsFound = true;
-                }
+            Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
+            if (Tank.AmbientTempSchedule == 0) {
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Schedule was not found.");
+                ErrorsFound = true;
+            }
 
             break;
         }
         case WTTAmbientTemp::TempZone: {
-                Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
-                if (Tank.AmbientTempZone == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Zone was not found.");
-                    ErrorsFound = true;
-                }
-                Tank.OffCycLossFracToZone = 1.0;
+            Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
+            if (Tank.AmbientTempZone == 0) {
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "Zone was not found.");
+                ErrorsFound = true;
+            }
+            Tank.OffCycLossFracToZone = 1.0;
 
             break;
         }
         case WTTAmbientTemp::OutsideAir: {
-                Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                                     state.dataIPShortCut->cAlphaArgs(7),
-                                                                                     ErrorsFound,
-                                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
-                                                                                     DataLoopNode::ObjectIsNotParent);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                        ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+            Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                 state.dataIPShortCut->cAlphaArgs(7),
+                                                                                 ErrorsFound,
+                                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                                 state.dataIPShortCut->cAlphaArgs(1),
+                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                     ErrorsFound = true;
                 }
+            } else {
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                ErrorsFound = true;
+            }
 
             break;
         }
         default: {
-                ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(4));
-                ShowContinueError(state, "  Valid entries are Schedule, Zone, and Outdoors.");
-                ErrorsFound = true;
+            ShowSevereError(state,
+                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(4));
+            ShowContinueError(state, "  Valid entries are Schedule, Zone, and Outdoors.");
+            ErrorsFound = true;
             break;
         }
         }
@@ -6988,28 +6984,28 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                         // Heater is required at less than the minimum capacity
                         // If cycling, Qmincap = Qmaxcap.  Once the setpoint is reached, heater will almost always be shut off here
 
-                            if (this->ControlType == HeaterControlMode::Cycle) {
-                                // Control will cycle on and off based on DeadBandTemp
-                                Qheater = 0.0;
-                                Qunmet = 0.0;
-                                Mode_loc = state.dataWaterThermalTanks->floatMode;
-                                continue;
+                        if (this->ControlType == HeaterControlMode::Cycle) {
+                            // Control will cycle on and off based on DeadBandTemp
+                            Qheater = 0.0;
+                            Qunmet = 0.0;
+                            Mode_loc = state.dataWaterThermalTanks->floatMode;
+                            continue;
 
-                            } else if (this->ControlType == HeaterControlMode::Modulate) {
-                                // Control will cycle on and off based on DeadBandTemp until Qneeded > Qmincap again
-                                Qheater = 0.0;
-                                Qunmet = Qneeded;
-                                Mode_loc = state.dataWaterThermalTanks->floatMode;
-                                continue;
+                        } else if (this->ControlType == HeaterControlMode::Modulate) {
+                            // Control will cycle on and off based on DeadBandTemp until Qneeded > Qmincap again
+                            Qheater = 0.0;
+                            Qunmet = Qneeded;
+                            Mode_loc = state.dataWaterThermalTanks->floatMode;
+                            continue;
 
-                                // CASE (ControlTypeModulateWithOverheat)  ! Not yet implemented
-                                // Calculate time to reach steady-state temp; check for venting at MaxTemp limit
-                                // Qheater = Qmincap
+                            // CASE (ControlTypeModulateWithOverheat)  ! Not yet implemented
+                            // Calculate time to reach steady-state temp; check for venting at MaxTemp limit
+                            // Qheater = Qmincap
 
-                                // CASE (ControlTypeModulateWithUnderheat)  ! Not yet implemented
-                                // Heater must not come back on until Qneeded >= Qmincap
-                                // Mode = modfloatMode
-                            }
+                            // CASE (ControlTypeModulateWithUnderheat)  ! Not yet implemented
+                            // Heater must not come back on until Qneeded >= Qmincap
+                            // Mode = modfloatMode
+                        }
 
                     } else if (Qneeded <= Qmaxcap) {
                         // Heater can exactly meet the needed heat rate (usually by modulating) and heats for all of the remaining time
@@ -9243,13 +9239,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             state.dataWaterThermalTanks->hpPartLoadRatio = 0.0;
             // check to see if HP needs to operate
             // set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
-                if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
-                    state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
-                    state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-                } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-                    state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
-                    state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
-                }
+            if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
+                state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
+                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
+            } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+                state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
+                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
+            }
             state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
 
@@ -9285,14 +9281,14 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 state.dataWaterThermalTanks->hpPartLoadRatio = 1.0;
             }
         } else { // or use side nodes may meet set point without need for heat pump compressor operation
-            // check to see if HP needs to operate
-                if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
-                    state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
-                    state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-                } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-                    state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
-                    state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
-                }
+                 // check to see if HP needs to operate
+            if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
+                state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
+                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
+            } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+                state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
+                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
+            }
             // Check tank temperature by setting source inlet mass flow rate to zero.
             state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
@@ -9336,13 +9332,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         // HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
 
         // set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
-            if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
-                state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
-                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-            } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-                state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
-                state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
-            }
+        if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
+            state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
+            state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
+        } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+            state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
+            state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
+        }
         state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
         state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
 
@@ -9688,13 +9684,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     this->SourceInletTemp = state.dataLoopNodes->Node(HPWaterInletNode).Temp + CondenserDeltaT;
                     //           this CALL does not update node temps, must use WaterThermalTank variables
                     // select tank type
-                        if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
-                            this->CalcWaterThermalTankMixed(state);
-                            NewTankTemp = this->TankTemp;
-                        } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-                            this->CalcWaterThermalTankStratified(state);
-                            NewTankTemp = this->FindStratifiedTankSensedTemp(state);
-                        }
+                    if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
+                        this->CalcWaterThermalTankMixed(state);
+                        NewTankTemp = this->TankTemp;
+                    } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+                        this->CalcWaterThermalTankStratified(state);
+                        NewTankTemp = this->FindStratifiedTankSensedTemp(state);
+                    }
 
                     if (NewTankTemp > HPSetPointTemp) {
                         SpeedNum = i;
@@ -9824,13 +9820,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 this->SourceInletTemp = state.dataLoopNodes->Node(HPWaterInletNode).Temp + CondenserDeltaT;
                 //           this CALL does not update node temps, must use WaterThermalTank variables
                 // select tank type
-                    if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
-                        this->CalcWaterThermalTankMixed(state);
-                        NewTankTemp = this->TankTemp;
-                    } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-                        this->CalcWaterThermalTankStratified(state);
-                        NewTankTemp = this->FindStratifiedTankSensedTemp(state);
-                    }
+                if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
+                    this->CalcWaterThermalTankMixed(state);
+                    NewTankTemp = this->TankTemp;
+                } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+                    this->CalcWaterThermalTankStratified(state);
+                    NewTankTemp = this->FindStratifiedTankSensedTemp(state);
+                }
                 // update inlet temp
                 state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
                 if (std::abs(state.dataLoopNodes->Node(HPWaterInletNode).Temp - HPWHCondInletNodeLast) < DataHVACGlobals::SmallTempDiff) break;
@@ -10398,13 +10394,13 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
     //           this CALL does not update node temps, must use WaterThermalTank variables
     // select tank type
     Real64 NewTankTemp = 0.0;
-        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
-            this->CalcWaterThermalTankMixed(state);
-            NewTankTemp = this->TankTemp;
-        } else if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-            this->CalcWaterThermalTankStratified(state);
-            NewTankTemp = this->FindStratifiedTankSensedTemp(state);
-        }
+    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
+        this->CalcWaterThermalTankMixed(state);
+        NewTankTemp = this->TankTemp;
+    } else if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+        this->CalcWaterThermalTankStratified(state);
+        NewTankTemp = this->FindStratifiedTankSensedTemp(state);
+    }
 
     return Par(7) - NewTankTemp;
 }

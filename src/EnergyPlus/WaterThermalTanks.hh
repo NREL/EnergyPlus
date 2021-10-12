@@ -75,18 +75,14 @@ namespace WaterThermalTanks {
         Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
         TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
         OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
-        ZoneAndOA,   // applicable to HPWH only, inlet air is mixture of OA and zone air
+        ZoneAndOA,  // applicable to HPWH only, inlet air is mixture of OA and zone air
         Num
     };
 
     constexpr std::array<std::string_view, static_cast<int>(WTTAmbientTemp::Num)> HPWHAmbientTempNamesUC{
-        "SCHEDULE",
-        "ZONEAIRONLY",
-        "OUTDOORAIRONLY",
-        "ZONEANDOUTDOORAIR"
-    };
+        "SCHEDULE", "ZONEAIRONLY", "OUTDOORAIRONLY", "ZONEANDOUTDOORAIR"};
 
-    constexpr int TankAmbientTempNamesNum = static_cast<int>(WTTAmbientTemp::Num)-1; // Since AmbientTemp::ZoneAndOA is not appilcable to Tank
+    constexpr int TankAmbientTempNamesNum = static_cast<int>(WTTAmbientTemp::Num) - 1; // Since AmbientTemp::ZoneAndOA is not appilcable to Tank
     constexpr std::array<std::string_view, TankAmbientTempNamesNum> TankAmbientTempNamesUC{
         "SCHEDULE",
         "ZONE",
@@ -98,7 +94,7 @@ namespace WaterThermalTanks {
         Unassigned = -1,
         Schedule, // temperature controlling compressor crankcase heater is scheduled
         Zone,     // temperature controlling compressor crankcase heater is zone air
-        Exterior,  // temperature controlling compressor crankcase heater is outdoor air
+        Exterior, // temperature controlling compressor crankcase heater is outdoor air
         Num
     };
 
@@ -113,7 +109,7 @@ namespace WaterThermalTanks {
         Unassigned = -1,
         VertCylinder,  // tank shape is a vertical cylinder
         HorizCylinder, // tank shape is a horizontal cylinder
-        Other,          // tank shape has an arbitrary perimeter shape
+        Other,         // tank shape has an arbitrary perimeter shape
         Num
     };
 
@@ -131,10 +127,7 @@ namespace WaterThermalTanks {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(HeaterControlMode::Num)> HeaterControlModeNamesUC{
-        "CYCLE",
-        "MODULATE"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(HeaterControlMode::Num)> HeaterControlModeNamesUC{"CYCLE", "MODULATE"};
 
     enum class PriorityControlMode // For Stratified Water Heaters, this controls how the two heating elements work together
     {
@@ -144,10 +137,7 @@ namespace WaterThermalTanks {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(PriorityControlMode::Num)> PriorityControlModeNamesUC{
-        "MASTERSLAVE",
-        "SIMULTANEOUS"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(PriorityControlMode::Num)> PriorityControlModeNamesUC{"MASTERSLAVE", "SIMULTANEOUS"};
 
     enum class InletPositionMode
     {
@@ -157,10 +147,7 @@ namespace WaterThermalTanks {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(InletPositionMode::Num)> InletPositionModeNamesUC{
-        "FIXED",
-        "SEEKING"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(InletPositionMode::Num)> InletPositionModeNamesUC{"FIXED", "SEEKING"};
 
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
     enum class ReclaimHeatObjectType
@@ -206,10 +193,7 @@ namespace WaterThermalTanks {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(SourceSideControl::Num)> SourceSideControlNamesUC{
-        "STORAGETANK",
-        "INDIRECTHEATPRIMARYSETPOINT",
-        "INDIRECTHEATALTERNATESETPOINT"
-    };
+        "STORAGETANK", "INDIRECTHEATPRIMARYSETPOINT", "INDIRECTHEATALTERNATESETPOINT"};
 
     struct StratifiedNodeData
     {
@@ -354,16 +338,16 @@ namespace WaterThermalTanks {
         int InletAirMixerNode;                              // Inlet air mixer node number of HP water heater
         int OutletAirSplitterNode;                          // Outlet air splitter node number of HP water heater
         Real64 SourceMassFlowRate;                          // Maximum mass flow rate on the source side (kg/s)
-        WTTAmbientTemp InletAirConfiguration;              // Identifies source of HPWH inlet air
+        WTTAmbientTemp InletAirConfiguration;               // Identifies source of HPWH inlet air
         int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
         int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
         int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
-        CrankcaseHeaterControlTemp CrankcaseTempIndicator;               // Indicator for HPWH compressor/crankcase heater location
+        CrankcaseHeaterControlTemp CrankcaseTempIndicator;  // Indicator for HPWH compressor/crankcase heater location
         int CrankcaseTempSchedule;                          // Schedule index pointer where crankcase heater is located
         int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
         Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
         Real64 OnCycParaLoad;                               // Rate for on-cycle parasitic load (W)
-        WTTAmbientTemp ParasiticTempIndicator;             // Indicator for HPWH parasitic heat rejection location
+        WTTAmbientTemp ParasiticTempIndicator;              // Indicator for HPWH parasitic heat rejection location
         Real64 OffCycParaFuelRate;                          // Electric consumption rate for off-cycle parasitic load (W)
         Real64 OnCycParaFuelRate;                           // Electric consumption rate for on-cycle parasitic load (W)
         Real64 OffCycParaFuelEnergy;                        // Electric energy consumption for off-cycle parasitic load (J)
@@ -479,7 +463,7 @@ namespace WaterThermalTanks {
         Real64 Mass;                       // Total mass of fluid in the tank (kg)
         Real64 TimeElapsed;                // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
-        WTTAmbientTemp AmbientTempIndicator;                         // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
+        WTTAmbientTemp AmbientTempIndicator;                          // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
         int AmbientTempSchedule;                                      // Schedule index pointer
         int AmbientTempZone;                                          // Number of ambient zone around tank
         int AmbientTempOutsideAirNode;                                // Number of outside air node
@@ -544,21 +528,21 @@ namespace WaterThermalTanks {
         int SourceSideAvailSchedNum; // source side availability schedule.
         PlantLocation SrcSide;
         SourceSideControl SourceSideControlMode; // flag for how source side flow is controlled
-        int SourceSideAltSetpointSchedNum;    // schedule of alternate temperature setpoint values
-        Real64 SizingRecoveryTime;            // sizing parameter for autosizing indirect water heaters (hr)
-        Real64 MassFlowRateMax;               // Maximum flow rate for scheduled DHW (kg/s)
-        Real64 VolFlowRateMin;                // Minimum flow rate for heater ignition (kg/s)
-        Real64 MassFlowRateMin;               // Minimum mass flow rate for heater ignition (kg/s)
-        int FlowRateSchedule;                 // Schedule index pointer
-        int UseInletTempSchedule;             // Cold water supply temperature schedule index pointer
-        Real64 TankTemp;                      // Temperature of tank fluid (average, if stratified) (C)
-        Real64 SavedTankTemp;                 // Tank temp that is carried from time step to time step (C)
-        Real64 TankTempAvg;                   // Average tank temperature over the time step (C)
+        int SourceSideAltSetpointSchedNum;       // schedule of alternate temperature setpoint values
+        Real64 SizingRecoveryTime;               // sizing parameter for autosizing indirect water heaters (hr)
+        Real64 MassFlowRateMax;                  // Maximum flow rate for scheduled DHW (kg/s)
+        Real64 VolFlowRateMin;                   // Minimum flow rate for heater ignition (kg/s)
+        Real64 MassFlowRateMin;                  // Minimum mass flow rate for heater ignition (kg/s)
+        int FlowRateSchedule;                    // Schedule index pointer
+        int UseInletTempSchedule;                // Cold water supply temperature schedule index pointer
+        Real64 TankTemp;                         // Temperature of tank fluid (average, if stratified) (C)
+        Real64 SavedTankTemp;                    // Tank temp that is carried from time step to time step (C)
+        Real64 TankTempAvg;                      // Average tank temperature over the time step (C)
         // Stratified variables (in addition to the above)
         Real64 Height;           // Height of tank (m)
         bool HeightWasAutoSized; // true if the height of tank was autosize on input
         Real64 Perimeter;        // Perimeter of tank (m), only used for OTHER shape
-        TankShape Shape;     // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
+        TankShape Shape;         // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
         Real64 HeaterHeight1;
         int HeaterNode1;
         bool HeaterOn1;
