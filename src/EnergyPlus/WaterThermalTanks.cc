@@ -2829,13 +2829,13 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
             if (SELECT_CASE_var == "VERTICALCYLINDER") {
-                Tank.Shape = TankShapeEnum::VertCylinder;
+                Tank.Shape = TankShape::VertCylinder;
 
             } else if (SELECT_CASE_var == "HORIZONTALCYLINDER") {
-                Tank.Shape = TankShapeEnum::HorizCylinder;
+                Tank.Shape = TankShape::HorizCylinder;
 
             } else if (SELECT_CASE_var == "OTHER") {
-                Tank.Shape = TankShapeEnum::Other;
+                Tank.Shape = TankShape::Other;
                 if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
                     Tank.Perimeter = state.dataIPShortCut->rNumericArgs(3);
                 } else {
@@ -2849,7 +2849,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Tank Shape entered=" + state.dataIPShortCut->cAlphaArgs(3));
-                Tank.Shape = TankShapeEnum::VertCylinder;
+                Tank.Shape = TankShape::VertCylinder;
                 ErrorsFound = true;
             }
         }
@@ -2908,7 +2908,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // adjust tank height used in these calculations for testing heater height
         Real64 tankHeightForTesting;
-        if (Tank.Shape == TankShapeEnum::HorizCylinder) {
+        if (Tank.Shape == TankShape::HorizCylinder) {
             tankHeightForTesting = 2.0 * sqrt((Tank.Volume / Tank.Height) / DataGlobalConstants::Pi);
         } else {
             tankHeightForTesting = Tank.Height;
@@ -3727,13 +3727,13 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
             if (SELECT_CASE_var == "VERTICALCYLINDER") {
-                Tank.Shape = TankShapeEnum::VertCylinder;
+                Tank.Shape = TankShape::VertCylinder;
 
             } else if (SELECT_CASE_var == "HORIZONTALCYLINDER") {
-                Tank.Shape = TankShapeEnum::HorizCylinder;
+                Tank.Shape = TankShape::HorizCylinder;
 
             } else if (SELECT_CASE_var == "OTHER") {
-                Tank.Shape = TankShapeEnum::Other;
+                Tank.Shape = TankShape::Other;
                 if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
                     Tank.Perimeter = state.dataIPShortCut->rNumericArgs(3);
                 } else {
@@ -3747,7 +3747,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Tank Shape entered=" + state.dataIPShortCut->cAlphaArgs(2));
-                Tank.Shape = TankShapeEnum::VertCylinder;
+                Tank.Shape = TankShape::VertCylinder;
                 ErrorsFound = true;
             }
         }
@@ -4472,7 +4472,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         // Nodal heat distribution fraction for stratified tank wrapped condensers
                         if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-                            if (Tank.Shape == TankShapeEnum::HorizCylinder) {
+                            if (Tank.Shape == TankShape::HorizCylinder) {
                                 ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ":");
                                 ShowContinueError(state, "A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
                                 ShowContinueError(
@@ -4529,10 +4529,10 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         // Get the vertical tank height depending on the type of tank
                         Real64 TankHeight;
-                        if (Tank.Shape == TankShapeEnum::VertCylinder || Tank.Shape == TankShapeEnum::Other) {
+                        if (Tank.Shape == TankShape::VertCylinder || Tank.Shape == TankShape::Other) {
                             TankHeight = Tank.Height;
                         } else {
-                            assert(Tank.Shape == TankShapeEnum::HorizCylinder);
+                            assert(Tank.Shape == TankShape::HorizCylinder);
                             // For horizontal cylinders, the tank "height" is actually the length.
                             // We need to calculate the height.
                             Real64 EndArea = Tank.Volume / Tank.Height;
@@ -5761,14 +5761,14 @@ void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
     // Mixing rate set to 50% of the max value for dt = 1.0
     this->InversionMixingRate = NodeMass * 0.5 * 1.0;
 
-    if ((this->Shape == TankShapeEnum::VertCylinder) || (this->Shape == TankShapeEnum::Other)) {
+    if ((this->Shape == TankShape::VertCylinder) || (this->Shape == TankShape::Other)) {
         TankHeight = this->Height;
         Real64 EndArea = this->Volume / TankHeight;
         Real64 NodeHeight = TankHeight / NumNodes;
         Real64 CondCoeff = (FluidCond + this->AdditionalCond) * EndArea / NodeHeight;
 
         Real64 Perimeter_loc;
-        if (this->Shape == TankShapeEnum::VertCylinder) {
+        if (this->Shape == TankShape::VertCylinder) {
             Real64 Radius = std::sqrt(EndArea / DataGlobalConstants::Pi);
             Perimeter_loc = 2.0 * DataGlobalConstants::Pi * Radius;
         } else { // TankShapeOther

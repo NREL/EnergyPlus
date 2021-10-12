@@ -84,11 +84,13 @@ namespace WaterThermalTanks {
         Exterior  // temperature controlling compressor crankcase heater is outdoor air
     };
 
-    enum struct TankShapeEnum
+    enum class TankShape
     {
+        Unassigned = -1,
         VertCylinder,  // tank shape is a vertical cylinder
         HorizCylinder, // tank shape is a horizontal cylinder
-        Other          // tank shape has an arbitrary perimeter shape
+        Other,          // tank shape has an arbitrary perimeter shape
+        Num
     };
 
     enum class HeaterControlMode
@@ -503,7 +505,7 @@ namespace WaterThermalTanks {
         Real64 Height;           // Height of tank (m)
         bool HeightWasAutoSized; // true if the height of tank was autosize on input
         Real64 Perimeter;        // Perimeter of tank (m), only used for OTHER shape
-        TankShapeEnum Shape;     // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
+        TankShape Shape;     // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
         Real64 HeaterHeight1;
         int HeaterNode1;
         bool HeaterOn1;
@@ -633,7 +635,7 @@ namespace WaterThermalTanks {
               SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint), SourceSideAltSetpointSchedNum(0),
               SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0), FlowRateSchedule(0), UseInletTempSchedule(0),
               TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0), HeightWasAutoSized(false), Perimeter(0.0),
-              Shape(TankShapeEnum::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false), HeaterHeight2(0.0),
+              Shape(TankShape::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false), HeaterHeight2(0.0),
               HeaterNode2(0), HeaterOn2(false), SavedHeaterOn2(false), AdditionalCond(0.0), SetPointTemp2(0.0), SetPointTempSchedule2(0),
               DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0), SkinLossCoeff(0.0), SkinLossFracToZone(0.0),
               OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0), UseOutletHeight(0.0), UseOutletHeightWasAutoSized(false),
