@@ -2736,11 +2736,11 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(18));
                 if (SELECT_CASE_var == "STORAGETANK") {
-                    Tank.SourceSideControlMode = SourceSideEnum::StorageTank;
+                    Tank.SourceSideControlMode = SourceSideControl::StorageTank;
                 } else if (SELECT_CASE_var == "INDIRECTHEATPRIMARYSETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideEnum::IndirectHeatPrimarySetpoint;
+                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
                 } else if (SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideEnum::IndirectHeatAltSetpoint;
+                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatAltSetpoint;
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2749,7 +2749,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 }
             }
         } else {
-            Tank.SourceSideControlMode = SourceSideEnum::IndirectHeatPrimarySetpoint;
+            Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(19)) {
@@ -3351,11 +3351,11 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(21));
                 if (SELECT_CASE_var == "STORAGETANK") {
-                    Tank.SourceSideControlMode = SourceSideEnum::StorageTank;
+                    Tank.SourceSideControlMode = SourceSideControl::StorageTank;
                 } else if (SELECT_CASE_var == "INDIRECTHEATPRIMARYSETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideEnum::IndirectHeatPrimarySetpoint;
+                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
                 } else if (SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideEnum::IndirectHeatAltSetpoint;
+                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatAltSetpoint;
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -3364,7 +3364,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 }
             }
         } else {
-            Tank.SourceSideControlMode = SourceSideEnum::IndirectHeatPrimarySetpoint;
+            Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(22)) {
@@ -10567,7 +10567,7 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
     bool NeedsHeatOrCool = false;
 
     if (!this->IsChilledWaterTank) {
-        if (this->SourceSideControlMode == SourceSideEnum::IndirectHeatPrimarySetpoint) {
+        if (this->SourceSideControlMode == SourceSideControl::IndirectHeatPrimarySetpoint) {
             if (OutletTemp < DeadBandTemp) {
                 NeedsHeatOrCool = true;
             } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp_loc)) {
@@ -10581,7 +10581,7 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
             } else if (OutletTemp >= SetPointTemp_loc) {
                 NeedsHeatOrCool = false;
             }
-        } else if (this->SourceSideControlMode == SourceSideEnum::IndirectHeatAltSetpoint) {
+        } else if (this->SourceSideControlMode == SourceSideControl::IndirectHeatAltSetpoint) {
             // get alternate setpoint
             Real64 const AltSetpointTemp = ScheduleManager::GetCurrentScheduleValue(state, this->SourceSideAltSetpointSchedNum);
             Real64 const AltDeadBandTemp = AltSetpointTemp - this->DeadBandDeltaTemp;
@@ -10598,7 +10598,7 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
             } else if (OutletTemp >= AltSetpointTemp) {
                 NeedsHeatOrCool = false;
             }
-        } else if (this->SourceSideControlMode == SourceSideEnum::StorageTank) {
+        } else if (this->SourceSideControlMode == SourceSideControl::StorageTank) {
             if (OutletTemp < this->TankTempLimit) {
                 NeedsHeatOrCool = true;
             } else {

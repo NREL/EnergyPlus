@@ -155,11 +155,13 @@ namespace WaterThermalTanks {
         Num
     };
 
-    enum struct SourceSideEnum
+    enum class SourceSideControl
     {
+        Unassigned = -1,
         StorageTank,
         IndirectHeatPrimarySetpoint,
-        IndirectHeatAltSetpoint
+        IndirectHeatAltSetpoint,
+        Num
     };
 
     struct StratifiedNodeData
@@ -494,7 +496,7 @@ namespace WaterThermalTanks {
         bool SourceSideSeries;
         int SourceSideAvailSchedNum; // source side availability schedule.
         PlantLocation SrcSide;
-        SourceSideEnum SourceSideControlMode; // flag for how source side flow is controlled
+        SourceSideControl SourceSideControlMode; // flag for how source side flow is controlled
         int SourceSideAltSetpointSchedNum;    // schedule of alternate temperature setpoint values
         Real64 SizingRecoveryTime;            // sizing parameter for autosizing indirect water heaters (hr)
         Real64 MassFlowRateMax;               // Maximum flow rate for scheduled DHW (kg/s)
@@ -636,7 +638,7 @@ namespace WaterThermalTanks {
               SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0),
               SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
               SourceBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), SourceSidePlantSizNum(0), SourceSideSeries(true),
-              SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint), SourceSideAltSetpointSchedNum(0),
+              SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideControl::IndirectHeatAltSetpoint), SourceSideAltSetpointSchedNum(0),
               SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0), FlowRateSchedule(0), UseInletTempSchedule(0),
               TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0), HeightWasAutoSized(false), Perimeter(0.0),
               Shape(TankShape::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false), HeaterHeight2(0.0),
