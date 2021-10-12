@@ -86,6 +86,13 @@ namespace WaterThermalTanks {
         "ZONEANDOUTDOORAIR"
     };
 
+    constexpr int TankAmbientTempNames = static_cast<int>(AmbientTemp::Num)-1; // Since AmbientTemp::ZoneAndOA is not appilcable to Tank
+    constexpr std::array<std::string_view, TankAmbientTempNames> TankAmbientTempNamesUC{
+        "SCHEDULE",
+        "ZONE",
+        "OUTDOORS",
+    };
+
     enum class CrankcaseHeaterControlTemp
     {
         Unassigned = -1,
