@@ -2729,20 +2729,13 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(18));
-                if (SELECT_CASE_var == "STORAGETANK") {
-                    Tank.SourceSideControlMode = SourceSideControl::StorageTank;
-                } else if (SELECT_CASE_var == "INDIRECTHEATPRIMARYSETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
-                } else if (SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatAltSetpoint;
-                } else {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(18));
-                    ErrorsFound = true;
-                }
+            Tank.SourceSideControlMode =
+                static_cast<SourceSideControl>(getEnumerationValue(SourceSideControlNamesUC, state.dataIPShortCut->cAlphaArgs(18)));
+            if (Tank.SourceSideControlMode == SourceSideControl::Unassigned) {
+                ShowSevereError(state,
+                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(18));
+                ErrorsFound = true;
             }
         } else {
             Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
@@ -3334,24 +3327,18 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.SetupStratifiedNodes(state);
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(21));
-                if (SELECT_CASE_var == "STORAGETANK") {
-                    Tank.SourceSideControlMode = SourceSideControl::StorageTank;
-                } else if (SELECT_CASE_var == "INDIRECTHEATPRIMARYSETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
-                } else if (SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT") {
-                    Tank.SourceSideControlMode = SourceSideControl::IndirectHeatAltSetpoint;
-                } else {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(21));
-                    ErrorsFound = true;
-                }
+            Tank.SourceSideControlMode =
+                static_cast<SourceSideControl>(getEnumerationValue(SourceSideControlNamesUC, state.dataIPShortCut->cAlphaArgs(21)));
+            if (Tank.SourceSideControlMode == SourceSideControl::Unassigned) {
+                ShowSevereError(state,
+                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(21));
+                ErrorsFound = true;
             }
         } else {
             Tank.SourceSideControlMode = SourceSideControl::IndirectHeatPrimarySetpoint;
         }
+
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(22)) {
             Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(22));

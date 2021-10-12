@@ -157,7 +157,6 @@ namespace WaterThermalTanks {
         Num
     };
 
-
     constexpr std::array<std::string_view, static_cast<int>(InletPositionMode::Num)> InletPositionModeNamesUC{
         "FIXED",
         "SEEKING"
@@ -204,6 +203,12 @@ namespace WaterThermalTanks {
         IndirectHeatPrimarySetpoint,
         IndirectHeatAltSetpoint,
         Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(SourceSideControl::Num)> SourceSideControlNamesUC{
+        "STORAGETANK",
+        "INDIRECTHEATPRIMARYSETPOINT",
+        "INDIRECTHEATALTERNATESETPOINT"
     };
 
     struct StratifiedNodeData
