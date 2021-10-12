@@ -9286,16 +9286,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
         } else { // or use side nodes may meet set point without need for heat pump compressor operation
             // check to see if HP needs to operate
-            {
-                auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-                if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
+                if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
                     state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
                     state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
+                } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
                     state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
                     state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
                 }
-            }
             // Check tank temperature by setting source inlet mass flow rate to zero.
             state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
@@ -9339,16 +9336,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         // HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
 
         // set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
-        {
-            auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-            if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
+            if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
                 state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
                 state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-            } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
+            } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
                 state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
                 state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
             }
-        }
         state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
         state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
 
@@ -9694,16 +9688,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     this->SourceInletTemp = state.dataLoopNodes->Node(HPWaterInletNode).Temp + CondenserDeltaT;
                     //           this CALL does not update node temps, must use WaterThermalTank variables
                     // select tank type
-                    {
-                        auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-                        if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
+                        if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
                             this->CalcWaterThermalTankMixed(state);
                             NewTankTemp = this->TankTemp;
-                        } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
+                        } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
                             this->CalcWaterThermalTankStratified(state);
                             NewTankTemp = this->FindStratifiedTankSensedTemp(state);
                         }
-                    }
 
                     if (NewTankTemp > HPSetPointTemp) {
                         SpeedNum = i;
@@ -9833,16 +9824,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 this->SourceInletTemp = state.dataLoopNodes->Node(HPWaterInletNode).Temp + CondenserDeltaT;
                 //           this CALL does not update node temps, must use WaterThermalTank variables
                 // select tank type
-                {
-                    auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-                    if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
+                    if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
                         this->CalcWaterThermalTankMixed(state);
                         NewTankTemp = this->TankTemp;
-                    } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
+                    } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
                         this->CalcWaterThermalTankStratified(state);
                         NewTankTemp = this->FindStratifiedTankSensedTemp(state);
                     }
-                }
                 // update inlet temp
                 state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
                 if (std::abs(state.dataLoopNodes->Node(HPWaterInletNode).Temp - HPWHCondInletNodeLast) < DataHVACGlobals::SmallTempDiff) break;
@@ -10410,16 +10398,13 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
     //           this CALL does not update node temps, must use WaterThermalTank variables
     // select tank type
     Real64 NewTankTemp = 0.0;
-    {
-        auto const SELECT_CASE_var1(state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum);
-        if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
+        if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
             this->CalcWaterThermalTankMixed(state);
             NewTankTemp = this->TankTemp;
-        } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
+        } else if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
             this->CalcWaterThermalTankStratified(state);
             NewTankTemp = this->FindStratifiedTankSensedTemp(state);
         }
-    }
 
     return Par(7) - NewTankTemp;
 }
