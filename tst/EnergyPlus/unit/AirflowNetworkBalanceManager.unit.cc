@@ -21029,7 +21029,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
     state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
-    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTemp::TempZone;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::WTTAmbientTemp::TempZone;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
@@ -21158,7 +21158,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
     state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
-    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTemp::TempZone;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::WTTAmbientTemp::TempZone;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
@@ -21280,7 +21280,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
     state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
     state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
-    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTemp::ZoneAndOA;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::WTTAmbientTemp::ZoneAndOA;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;

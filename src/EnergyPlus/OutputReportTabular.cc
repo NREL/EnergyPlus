@@ -4444,7 +4444,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Water heater and thermal storage
     auto &WaterThermalTank(state.dataWaterThermalTanks->WaterThermalTank);
     for (int iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
-        if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTemp::OutsideAir) {
+        if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::WTTAmbientTemp::OutsideAir) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
         }
     }
