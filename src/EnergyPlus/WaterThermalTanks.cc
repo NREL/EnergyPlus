@@ -3028,10 +3028,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = state.dataIPShortCut->rNumericArgs(16);
         Tank.OnCycParaHeight = state.dataIPShortCut->rNumericArgs(17);
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
-            if (SELECT_CASE_var == "SCHEDULE") {
-                Tank.AmbientTempIndicator = WTTAmbientTemp::Schedule;
+        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(getEnumerationValue(TankAmbientTempNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+        switch (Tank.AmbientTempIndicator) {
+
+        case (WTTAmbientTemp::Schedule): {
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
                 if (Tank.AmbientTempSchedule == 0) {
                     ShowSevereError(state,
@@ -3040,8 +3040,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-            } else if (SELECT_CASE_var == "ZONE") {
-                Tank.AmbientTempIndicator = WTTAmbientTemp::TempZone;
+            break;
+        }
+        case WTTAmbientTemp::TempZone: {
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
                     ShowSevereError(state,
@@ -3050,8 +3051,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-            } else if (SELECT_CASE_var == "OUTDOORS") {
-                Tank.AmbientTempIndicator = WTTAmbientTemp::OutsideAir;
+            }
+            case WTTAmbientTemp::OutsideAir: {
                 Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(13),
                                                                                      ErrorsFound,
@@ -3075,12 +3076,15 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-            } else {
+            break;
+            }
+            default: {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(10));
                 ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
                 ErrorsFound = true;
+            break;
             }
         }
 
