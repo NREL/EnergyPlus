@@ -1347,11 +1347,10 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Inlet Air Configuration
-        {
-            auto const SELECT_CASE_var(hpwhAlpha[6 + nAlphaOffset]);
+        HPWH.InletAirConfiguration = static_cast<AmbientTemp>(getEnumerationValue(HPWHAmbientTempNamesUC, hpwhAlpha[6 + nAlphaOffset]));
+        switch (HPWH.InletAirConfiguration) {
+        case (AmbientTemp::Schedule): {
 
-            if (SELECT_CASE_var == "SCHEDULE") {
-                HPWH.InletAirConfiguration = AmbientTemp::Schedule;
 
                 // Inlet Air Temperature Schedule
                 if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
@@ -1389,8 +1388,10 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-            } else if (SELECT_CASE_var == "ZONEAIRONLY") {
-                HPWH.InletAirConfiguration = AmbientTemp::TempZone;
+            break;
+        }
+            case (AmbientTemp::ZoneAndOA):
+            case (AmbientTemp::TempZone):{
 
                 // Inlet Air Zone
                 if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
@@ -1405,27 +1406,11 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
                     ErrorsFound = true;
                 }
-
-            } else if (SELECT_CASE_var == "OUTDOORAIRONLY") {
-                HPWH.InletAirConfiguration = AmbientTemp::OutsideAir;
-
-            } else if (SELECT_CASE_var == "ZONEANDOUTDOORAIR") {
-                HPWH.InletAirConfiguration = AmbientTemp::ZoneAndOA;
-
-                // Inlet Air Zone
-                if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
-                    HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
-                    if (HPWH.AmbientTempZone == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
-                    ErrorsFound = true;
-                }
+            break;
             }
+            default:
+            case (AmbientTemp::OutsideAir):
+                break;
         }
 
         // Read air inlet nodes after mixer/splitter nodes have been read in (state.dataIPShortCut->cAlphaArgs 7-10),

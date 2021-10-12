@@ -79,6 +79,13 @@ namespace WaterThermalTanks {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(AmbientTemp::Num)> HPWHAmbientTempNamesUC{
+        "SCHEDULE",
+        "ZONEAIRONLY",
+        "OUTDOORAIRONLY",
+        "ZONEANDOUTDOORAIR"
+    };
+
     enum class CrankcaseHeaterControlTemp
     {
         Unassigned = -1,
