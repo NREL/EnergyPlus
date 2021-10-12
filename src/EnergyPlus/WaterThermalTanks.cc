@@ -2412,11 +2412,11 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
             if (SELECT_CASE_var == "CYCLE") {
-                Tank.ControlType = ControlTypeEnum::Cycle;
+                Tank.ControlType = HeaterControlMode::Cycle;
                 Tank.MinCapacity = Tank.MaxCapacity;
 
             } else if (SELECT_CASE_var == "MODULATE") {
-                Tank.ControlType = ControlTypeEnum::Modulate;
+                Tank.ControlType = HeaterControlMode::Modulate;
 
                 // CASE ('MODULATE WITH OVERHEAT')  ! Not yet implemented
 
@@ -2865,10 +2865,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
             if (SELECT_CASE_var == "MASTERSLAVE") {
-                Tank.ControlType = PriorityEnum::MasterSlave;
+                Tank.StratifiedControlMode = PriorityControlMode::MasterSlave;
 
             } else if (SELECT_CASE_var == "SIMULTANEOUS") {
-                Tank.ControlType = PriorityEnum::Simultaneous;
+                Tank.StratifiedControlMode = PriorityControlMode::Simultaneous;
 
             } else {
                 ShowSevereError(state,
@@ -3460,7 +3460,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         }
 
         Tank.MinCapacity = 0.0;
-        Tank.ControlType = ControlTypeEnum::Cycle;
+        Tank.ControlType = HeaterControlMode::Cycle;
 
         Tank.MassFlowRateMin = 0.0;
         Tank.IgnitionDelay = 0.0;
@@ -4273,7 +4273,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         state, HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWH.OutletNodeName1, HPWH.InletNodeName1, "HPWH To Tank");
 
                     // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
-                    if ((Tank.TypeNum == DataPlant::TypeOf_WtrHeaterMixed) && (Tank.ControlType == ControlTypeEnum::Modulate)) {
+                    if ((Tank.TypeNum == DataPlant::TypeOf_WtrHeaterMixed) && (Tank.ControlType == HeaterControlMode::Modulate)) {
                         ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
                         ShowContinueError(state, "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
                         ErrorsFound = true;
@@ -5892,7 +5892,7 @@ void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
             //      .AND. (Tank%MaxCapacity2 > 0.0d0)) THEN
             this->HeaterNode2 = NodeNum;
 
-            if ((NodeNum == this->HeaterNode1) && (this->ControlType == PriorityEnum::Simultaneous)) {
+            if ((NodeNum == this->HeaterNode1) && (this->StratifiedControlMode == PriorityControlMode::Simultaneous)) {
                 this->Node(NodeNum).MaxCapacity += this->MaxCapacity2;
             } else {
                 this->Node(NodeNum).MaxCapacity = this->MaxCapacity2;
@@ -6090,7 +6090,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
 
-            if (this->ControlType == ControlTypeEnum::Cycle) {
+            if (this->ControlType == HeaterControlMode::Cycle) {
                 this->MinCapacity = this->MaxCapacity;
             }
 
@@ -7018,14 +7018,14 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                         {
                             auto const SELECT_CASE_var1(this->ControlType);
 
-                            if (SELECT_CASE_var1 == ControlTypeEnum::Cycle) {
+                            if (SELECT_CASE_var1 == HeaterControlMode::Cycle) {
                                 // Control will cycle on and off based on DeadBandTemp
                                 Qheater = 0.0;
                                 Qunmet = 0.0;
                                 Mode_loc = state.dataWaterThermalTanks->floatMode;
                                 continue;
 
-                            } else if (SELECT_CASE_var1 == ControlTypeEnum::Modulate) {
+                            } else if (SELECT_CASE_var1 == HeaterControlMode::Modulate) {
                                 // Control will cycle on and off based on DeadBandTemp until Qneeded > Qmincap again
                                 Qheater = 0.0;
                                 Qunmet = Qneeded;
@@ -7340,7 +7340,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
     Real64 RTF = Runtime / SecInTimeStep;
     PLR = PLRsum / SecInTimeStep;
 
-    if (this->ControlType == ControlTypeEnum::Cycle) {
+    if (this->ControlType == HeaterControlMode::Cycle) {
         // Recalculate Part Load Factor and fuel energy based on Runtime Fraction, instead of Part Load Ratio
         Real64 PLF = this->PartLoadFactor(state, RTF);
         Efuel = Eheater / (PLF * this->Efficiency);
@@ -7848,7 +7848,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
 
             // Control the second heater element (slave)
             if (this->MaxCapacity2 > 0.0) {
-                if ((this->ControlType == PriorityEnum::MasterSlave) && this->HeaterOn1) {
+                if ((this->StratifiedControlMode == PriorityControlMode::MasterSlave) && this->HeaterOn1) {
                     this->HeaterOn2 = false;
 
                 } else {
@@ -8611,7 +8611,8 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             AverageWasteHeat = state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailCapacity -
                                state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeatTotal;
             DesupHtr.DXSysPLR = 1.0;
-        } else if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXCooling || DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXMultiSpeed ||
+        } else if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXCooling ||
+                   DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXMultiSpeed ||
                    DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXMultiMode) {
             AverageWasteHeat = state.dataHeatBal->HeatReclaimDXCoil(SourceID).AvailCapacity -
                                state.dataHeatBal->HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
@@ -8947,7 +8948,8 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
             for (auto &num : state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeat)
                 state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal += num;
-        } else if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXCooling || DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXMultiSpeed ||
+        } else if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXCooling ||
+                   DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXMultiSpeed ||
                    DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::DXMultiMode) {
             state.dataHeatBal->HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = DesupHtr.HeaterRate;
             state.dataHeatBal->HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
@@ -12555,7 +12557,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
     if (this->HeatPumpNum == 0) {
         Real64 MaxCapacity_loc;
         if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-            if (this->ControlType == PriorityEnum::MasterSlave) {
+            if (this->StratifiedControlMode == PriorityControlMode::MasterSlave) {
                 MaxCapacity_loc = max(this->MaxCapacity, this->MaxCapacity2);
             } else { // PrioritySimultaneous
                 MaxCapacity_loc = this->MaxCapacity + this->MaxCapacity2;
