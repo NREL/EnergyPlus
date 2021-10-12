@@ -107,10 +107,12 @@ namespace WaterThermalTanks {
         Simultaneous     // water heater only, simultaneous control of heater elements
     };
 
-    enum struct InletModeEnum
+    enum class InletPositionMode
     {
+        Unassigned = -1,
         Fixed,  // water heater only, inlet water always enters at the user-specified height
-        Seeking // water heater only, inlet water seeks out the node with the closest temperature
+        Seeking, // water heater only, inlet water seeks out the node with the closest temperature
+        Num
     };
 
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
@@ -530,7 +532,7 @@ namespace WaterThermalTanks {
         int UseOutletStratNode;             // Use-side outlet node number
         int SourceInletStratNode;           // Source-side inlet node number
         int SourceOutletStratNode;          // Source-side outlet node number
-        InletModeEnum InletMode;            // Inlet position mode:  1 = FIXED; 2 = SEEKING
+        InletPositionMode InletMode;            // Inlet position mode:  1 = FIXED; 2 = SEEKING
         Real64 InversionMixingRate;
         Array1D<Real64> AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
         int Nodes;                           // Number of nodes
@@ -635,7 +637,7 @@ namespace WaterThermalTanks {
               DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0), SkinLossCoeff(0.0), SkinLossFracToZone(0.0),
               OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0), UseOutletHeight(0.0), UseOutletHeightWasAutoSized(false),
               SourceInletHeight(0.0), SourceInletHeightWasAutoSized(false), SourceOutletHeight(0.0), UseInletStratNode(0), UseOutletStratNode(0),
-              SourceInletStratNode(0), SourceOutletStratNode(0), InletMode(InletModeEnum::Fixed), InversionMixingRate(0.0), Nodes(0),
+              SourceInletStratNode(0), SourceOutletStratNode(0), InletMode(InletPositionMode::Fixed), InversionMixingRate(0.0), Nodes(0),
               VolFlowRate(0.0), VolumeConsumed(0.0), UnmetRate(0.0), LossRate(0.0), FlueLossRate(0.0), UseRate(0.0), TotalDemandRate(0.0),
               SourceRate(0.0), HeaterRate(0.0), HeaterRate1(0.0), HeaterRate2(0.0), FuelRate(0.0), FuelRate1(0.0), FuelRate2(0.0), VentRate(0.0),
               OffCycParaFuelRate(0.0), OffCycParaRateToTank(0.0), OnCycParaFuelRate(0.0), OnCycParaRateToTank(0.0), NetHeatTransferRate(0.0),
@@ -665,7 +667,7 @@ namespace WaterThermalTanks {
 
         Real64 PartLoadFactor(EnergyPlusData &state, Real64 PartLoadRatio_loc);
 
-        void CalcNodeMassFlows(InletModeEnum inletMode);
+        void CalcNodeMassFlows(InletPositionMode inletMode);
 
         void SetupStratifiedNodes(EnergyPlusData &state);
 

@@ -3311,10 +3311,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(20));
             if (SELECT_CASE_var == "FIXED") {
-                Tank.InletMode = InletModeEnum::Fixed;
+                Tank.InletMode = InletPositionMode::Fixed;
 
             } else if (SELECT_CASE_var == "SEEKING") {
-                Tank.InletMode = InletModeEnum::Seeking;
+                Tank.InletMode = InletPositionMode::Seeking;
             }
         }
 
@@ -4026,10 +4026,10 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(14));
             if (SELECT_CASE_var == "FIXED") {
-                Tank.InletMode = InletModeEnum::Fixed;
+                Tank.InletMode = InletPositionMode::Fixed;
 
             } else if (SELECT_CASE_var == "SEEKING") {
-                Tank.InletMode = InletModeEnum::Seeking;
+                Tank.InletMode = InletPositionMode::Seeking;
             }
         }
 
@@ -7787,7 +7787,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     Real64 Qheater1;                      // Heating rate of burner or electric heating element 1 (W)
     Real64 Qheater2;                      // Heating rate of burner or electric heating element 2 (W)
 
-    if (this->InletMode == InletModeEnum::Fixed) CalcNodeMassFlows(InletModeEnum::Fixed);
+    if (this->InletMode == InletPositionMode::Fixed) CalcNodeMassFlows(InletPositionMode::Fixed);
 
     // Time remaining in the current DataGlobals::TimeStep (s)
     Real64 TimeRemaining = SecInTimeStep;
@@ -7815,7 +7815,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
         bool PrevHeaterOn1 = this->HeaterOn1;
         bool PrevHeaterOn2 = this->HeaterOn2;
 
-        if (this->InletMode == InletModeEnum::Seeking) CalcNodeMassFlows(InletModeEnum::Seeking);
+        if (this->InletMode == InletPositionMode::Seeking) CalcNodeMassFlows(InletPositionMode::Seeking);
 
         // Heater control logic
         if (this->IsChilledWaterTank) {
@@ -8323,7 +8323,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     if (this->AmbientTempZone > 0) this->AmbientZoneGain = -this->LossRate * this->SkinLossFracToZone - this->VentRate;
 }
 
-void WaterThermalTankData::CalcNodeMassFlows(InletModeEnum inletMode)
+void WaterThermalTankData::CalcNodeMassFlows(InletPositionMode inletMode)
 {
 
     // SUBROUTINE INFORMATION:
@@ -8359,7 +8359,7 @@ void WaterThermalTankData::CalcNodeMassFlows(InletModeEnum inletMode)
         e.MassFlowToLower = 0.0;
     }
 
-    if (inletMode == InletModeEnum::Seeking) {
+    if (inletMode == InletPositionMode::Seeking) {
         // 'Seek' the node with the temperature closest to the inlet temperature
         // Start at the user-specified inlet node and search to the user-specified outlet node
         int Step;
