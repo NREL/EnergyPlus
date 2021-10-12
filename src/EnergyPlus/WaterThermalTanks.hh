@@ -114,15 +114,17 @@ namespace WaterThermalTanks {
     };
 
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
-    enum struct CoilObjEnum
+    enum class ReclaimHeatObjectType
     {
+        Unassigned = -1,
         CompressorRackRefrigeratedCase, // reclaim heating source is refrigerated case compressor rack
         DXCooling,                      // reclaim heating source is DX cooling coil
         DXMultiSpeed,                   // reclaim heating source is DX multispeed coil
         DXMultiMode,                    // reclaim heating source is DX multimode coil
         CondenserRefrigeration,         // reclaim heating source is detailed refrigeration system condenser
         DXVariableCooling,              // reclaim heating source is Variable Speed DX cooling coil
-        AirWaterHeatPumpEQ              // reclaim heating source is Water to air heat pump cooling coil
+        AirWaterHeatPumpEQ,              // reclaim heating source is Water to air heat pump cooling coil
+        Num
     };
 
     enum class WaterHeaterSide
@@ -851,7 +853,7 @@ namespace WaterThermalTanks {
         Real64 BackupElementCapacity;     // Tank backup element capacity (W)
         Real64 DXSysPLR;                  // runtime fraction of desuperheater heating coil
         int ReclaimHeatingSourceIndexNum; // Index to reclaim heating source (condenser) of a specific type
-        CoilObjEnum ReclaimHeatingSource; // The source for the Desuperheater Heating Coil
+        ReclaimHeatObjectType ReclaimHeatingSource; // The source for the Desuperheater Heating Coil
         int SetPointError;                // Used when temp SP in tank and desuperheater are reversed
         int SetPointErrIndex1;            // Index to recurring error for tank/desuperheater set point temp
         int IterLimitErrIndex1;           // Index for recurring iteration limit warning messages
@@ -878,7 +880,7 @@ namespace WaterThermalTanks {
               PumpFracToWater(0.0), OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0), SetPointTemp(0.0), WaterHeaterTankNum(0),
               DesuperheaterPLR(0.0), OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0), OnCycParaFuelRate(0.0),
               OffCycParaFuelEnergy(0.0), OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
-              ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(CoilObjEnum::DXCooling), SetPointError(0), SetPointErrIndex1(0),
+              ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(ReclaimHeatObjectType::DXCooling), SetPointError(0), SetPointErrIndex1(0),
               IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0),
               IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ValidSourceType(false)
         {
