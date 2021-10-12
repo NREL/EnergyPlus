@@ -1595,7 +1595,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(hpwhAlpha[20 + nAlphaOffset]);
             if (SELECT_CASE_var == "SCHEDULE") {
-                HPWH.CrankcaseTempIndicator = CrankTempEnum::Schedule;
+                HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Schedule;
                 if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                     // Compressor Ambient Temperature Schedule
                     HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
@@ -1611,7 +1611,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
 
             } else if (SELECT_CASE_var == "ZONE") {
-                HPWH.CrankcaseTempIndicator = CrankTempEnum::Zone;
+                HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Zone;
                 if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
@@ -1627,7 +1627,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                             " was provided but will not be used based on compressor location input=\"" + hpwhAlpha[20 + nAlphaOffset] + "\".");
                 }
             } else if (SELECT_CASE_var == "OUTDOORS") {
-                HPWH.CrankcaseTempIndicator = CrankTempEnum::Exterior;
+                HPWH.CrankcaseTempIndicator = CrankcaseHeaterControlTemp::Exterior;
                 if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " +
@@ -6534,16 +6534,16 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         int OutletAirSplitterNode = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OutletAirSplitterNode;
 
         switch (state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempIndicator) {
-        case CrankTempEnum::Zone: {
+        case CrankcaseHeaterControlTemp::Zone: {
             state.dataHVACGlobal->HPWHCrankcaseDBTemp =
                 state.dataHeatBalFanSys->MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
             break;
         }
-        case CrankTempEnum::Exterior: {
+        case CrankcaseHeaterControlTemp::Exterior: {
             state.dataHVACGlobal->HPWHCrankcaseDBTemp = state.dataEnvrn->OutDryBulbTemp;
             break;
         }
-        case CrankTempEnum::Schedule: {
+        case CrankcaseHeaterControlTemp::Schedule: {
             state.dataHVACGlobal->HPWHCrankcaseDBTemp =
                 ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempSchedule);
             break;

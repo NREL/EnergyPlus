@@ -77,11 +77,13 @@ namespace WaterThermalTanks {
         ZoneAndOA   // applicable to HPWH only, inlet air is mixture of OA and zone air
     };
 
-    enum struct CrankTempEnum
+    enum class CrankcaseHeaterControlTemp
     {
+        Unassigned = -1,
         Schedule, // temperature controlling compressor crankcase heater is scheduled
         Zone,     // temperature controlling compressor crankcase heater is zone air
-        Exterior  // temperature controlling compressor crankcase heater is outdoor air
+        Exterior,  // temperature controlling compressor crankcase heater is outdoor air
+        Num
     };
 
     enum class TankShape
@@ -305,7 +307,7 @@ namespace WaterThermalTanks {
         int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
         int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
         int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
-        CrankTempEnum CrankcaseTempIndicator;               // Indicator for HPWH compressor/crankcase heater location
+        CrankcaseHeaterControlTemp CrankcaseTempIndicator;               // Indicator for HPWH compressor/crankcase heater location
         int CrankcaseTempSchedule;                          // Schedule index pointer where crankcase heater is located
         int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
         Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
@@ -379,7 +381,7 @@ namespace WaterThermalTanks {
               SaveMode(0), SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
               MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0),
               InletAirConfiguration(AmbientTempEnum::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0),
-              CrankcaseTempIndicator(CrankTempEnum::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0), OffCycParaLoad(0.0),
+              CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0), OffCycParaLoad(0.0),
               OnCycParaLoad(0.0), ParasiticTempIndicator(AmbientTempEnum::OutsideAir), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
               OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
               HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
