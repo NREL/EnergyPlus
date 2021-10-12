@@ -9243,16 +9243,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             state.dataWaterThermalTanks->hpPartLoadRatio = 0.0;
             // check to see if HP needs to operate
             // set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
-            {
-                auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-                if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
+                if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
                     state.dataLoopNodes->Node(HPWaterInletNode).Temp = savedTankTemp;
                     state.dataLoopNodes->Node(HPWaterOutletNode).Temp = savedTankTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
+                } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
                     state.dataLoopNodes->Node(HPWaterInletNode).Temp = this->SourceOutletTemp;
                     state.dataLoopNodes->Node(HPWaterOutletNode).Temp = this->SourceInletTemp;
                 }
-            }
             state.dataLoopNodes->Node(HPWaterInletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(HPWaterOutletNode).MassFlowRate = 0.0;
 
