@@ -209,13 +209,12 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-        if
-            BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
+        if (BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
                            BITF(DataHeatBalance::MaterialGroup::GlassEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
                                BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
                                BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
-                               BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer))
-        continue;
+                               BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer)))
+            continue;
 
         if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
             // Gap or Gas Layer
