@@ -461,7 +461,7 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists = true;
             }
             state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
-                state, DataZoneEquipment::UnitVentilator_Num, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                state, DataZoneEquipment::ZoneEquip::UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr == 0) {
                 ShowSevereError(
                     state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
@@ -1450,7 +1450,6 @@ namespace UnitVentilator {
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::UnitVentilator_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1489,12 +1488,13 @@ namespace UnitVentilator {
 
         if (allocated(ZoneComp)) {
             if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
                     state.dataUnitVentilators->UnitVent(UnitVentNum).AvailManagerListName;
-                ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
                 state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
             }
-            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus = ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
+            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -2916,7 +2916,6 @@ namespace UnitVentilator {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitVentilator_Num;
         using General::SolveRoot;
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
@@ -3703,7 +3702,6 @@ namespace UnitVentilator {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitVentilator_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::SetComponentFlowRate;

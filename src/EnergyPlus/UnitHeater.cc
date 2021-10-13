@@ -751,7 +751,6 @@ namespace UnitHeater {
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::UnitHeater_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -789,12 +788,13 @@ namespace UnitHeater {
 
         if (allocated(ZoneComp)) {
             if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
-                ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
                 state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
             }
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus = ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1497,7 +1497,6 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitHeater_Num;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -1796,7 +1795,6 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitHeater_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;

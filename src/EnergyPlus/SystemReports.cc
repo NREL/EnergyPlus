@@ -4539,7 +4539,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                                                .EquipType_Num(thisZoneEquipNum));
                 // case statement to cover all possible zone forced air units that could have outside air
 
-                if (SELECT_CASE_var == WindowAC_Num) { // Window Air Conditioner
+                if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::WindowAC) { // Window Air Conditioner
                     OutAirNode =
                         GetWindowACOutAirNode(state,
                                               state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4569,7 +4569,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == VRFTerminalUnit_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::VRFTerminalUnit) {
                     OutAirNode =
                         GetVRFTUOutAirNode(state,
                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4598,8 +4598,9 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if ((SELECT_CASE_var == PkgTermHPAirToAir_Num) || (SELECT_CASE_var == PkgTermACAirToAir_Num) ||
-                           (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) {
+                } else if ((SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) ||
+                           (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) ||
+                           (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir)) {
                     OutAirNode =
                         GetPTUnitOutAirNode(state,
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4637,7 +4638,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == FanCoil4Pipe_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::FanCoil4Pipe) {
                     OutAirNode =
                         GetFanCoilOutAirNode(state,
                                              state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4667,7 +4668,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == UnitVentilator_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::UnitVentilator) {
                     OutAirNode = GetUnitVentilatorOutAirNode(
                         state,
                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4697,7 +4698,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == PurchasedAir_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PurchasedAir) {
                     ZFAUOutAirFlow += GetPurchasedAirOutAirMassFlow(
                         state,
                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4729,7 +4730,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == ERVStandAlone_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ERVStandAlone) {
                     OutAirNode = GetStandAloneERVOutAirNode(
                         state,
                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4756,10 +4757,10 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == ZoneUnitarySys_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ZoneUnitarySys) {
                     // add accounting for OA when unitary system is used as zone equipment
 
-                } else if (SELECT_CASE_var == OutdoorAirUnit_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::OutdoorAirUnit) {
                     OutAirNode = OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(
                         state,
                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4785,7 +4786,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler) {
                     OutAirNode = GetHybridUnitaryACOutAirNode(
                         state,
                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
@@ -4813,17 +4814,27 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                         ZFAUZoneVentLoad += 0.0;
                     }
 
-                } else if (SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
+                } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::UnitHeater ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::VentilatedSlab ||
                            //    ZoneHVAC:EvaporativeCoolerUnit ?????
-                           SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num || SELECT_CASE_var == AirDistUnit_Num ||
-                           SELECT_CASE_var == BBWaterConvective_Num || SELECT_CASE_var == BBElectricConvective_Num ||
-                           SELECT_CASE_var == HiTempRadiant_Num ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::AirDistUnit ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBWaterConvective ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBElectricConvective ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::HiTempRadiant ||
                            //    not sure how HeatExchanger:* could be used as zone equipment ?????
-                           SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::LoTempRadiant ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ZoneExhaustFan ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::HeatXchngr ||
                            // HPWaterHeater can be used as zone equipment
-                           SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num ||
-                           SELECT_CASE_var == BBSteam_Num || SELECT_CASE_var == BBElectric_Num || SELECT_CASE_var == RefrigerationAirChillerSet_Num ||
-                           SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num || SELECT_CASE_var == CoolingPanel_Num) {
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::HPWaterHeater ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBWater ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ZoneDXDehumidifier ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBSteam ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBElectric ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::RefrigerationAirChillerSet ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::UserDefinedZoneHVACForcedAir ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::CoolingPanel) {
                     // do nothing, OA not included
 
                 } else {

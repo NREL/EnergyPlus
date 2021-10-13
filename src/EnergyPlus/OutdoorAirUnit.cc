@@ -1160,7 +1160,6 @@ namespace OutdoorAirUnit {
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::OutdoorAirUnit_Num;
         using FluidProperties::GetDensityGlycol;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::InitComponentNodes;
@@ -1207,11 +1206,12 @@ namespace OutdoorAirUnit {
 
         if (allocated(ZoneComp)) {
             if (MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName = OutAirUnit(OAUnitNum).AvailManagerListName;
-                ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
+                    OutAirUnit(OAUnitNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
                 MyZoneEqFlag(OAUnitNum) = false;
             }
-            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
+            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
         }
 
         if (MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {

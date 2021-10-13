@@ -803,7 +803,6 @@ namespace WindowAC {
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::WindowAC_Num;
 
         int InNode;          // inlet node number in window AC loop
         int OutNode;         // outlet node number in window AC loop
@@ -829,11 +828,12 @@ namespace WindowAC {
 
         if (allocated(ZoneComp)) {
             if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(WindowAC_Num).ZoneCompAvailMgrs(WindACNum).AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
-                ZoneComp(WindowAC_Num).ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
                 state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
             }
-            state.dataWindowAC->WindAC(WindACNum).AvailStatus = ZoneComp(WindowAC_Num).ZoneCompAvailMgrs(WindACNum).AvailStatus;
+            state.dataWindowAC->WindAC(WindACNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailStatus;
         }
 
         // need to check all Window AC units to see if they are on Zone Equipment List or issue warning

@@ -1583,41 +1583,41 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     ++SupAirPathNodeNum;
                     state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
                     if (CompNum == 1) {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = PathInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = CompInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
                     }
                     for (SplitterOutNum = 1; SplitterOutNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes;
                          ++SplitterOutNum) {
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = 0;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Unassigned;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
                     state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
                     if (CompNum == 1) {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = PathInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = CompInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
                     }
                     for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = 0;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Unassigned;
                     }
                 }
             }
 
             // find the nodes that connect a splitter and a plenum
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == 0) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Unassigned) {
                     for (SupNodeIndex2 = SupNodeIndex + 1; SupNodeIndex2 <= NumAllSupAirPathNodes; ++SupNodeIndex2) {
                         if ((state.dataSimAirServingZones->SupNode(SupNodeIndex) == state.dataSimAirServingZones->SupNode(SupNodeIndex2)) &&
-                            (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == CompInlet)) {
-                            state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = Intermediate;
+                            (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == DataZoneEquipment::AirNodeType::CompInlet)) {
+                            state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Intermediate;
                             break;
                         }
                     }
@@ -1626,10 +1626,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             //  the rest of the nodes are outlet nodes and count the duplicated intermediate nodes
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == 0) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Unassigned) {
                     ++NumSupAirPathOutNodes;
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = Outlet;
-                } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Intermediate) {
+                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Outlet;
+                } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate) {
                     ++NumSupAirPathIntNodes;
                 }
             }
@@ -1645,16 +1645,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             // transfer data from the local SupNode array to the SupplyAirPath data structure
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == PathInlet ||
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Intermediate ||
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Outlet) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::PathInlet ||
+                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate ||
+                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
                     ++SupAirPathNodeNum;
                     // map the local node numbers to the HVAC (global) node numbers
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).Node(SupAirPathNodeNum) = state.dataSimAirServingZones->SupNode(SupNodeIndex);
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType(SupAirPathNodeNum) =
                         state.dataSimAirServingZones->SupNodeType(SupNodeIndex);
                 }
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Outlet) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
                     ++SupAirPathOutNodeNum;
                     // map the outlet node number to the HVAC (global) node number
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) =
@@ -2402,8 +2402,8 @@ void ConnectReturnNodes(EnergyPlusData &state)
                 }
                 // Loop over components in return path and each component's inlet nodes
                 for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
-                    int compType = thisRetPath.ComponentType_Num(compNum);
-                    if (compType == ZoneMixer_Type) {
+                    DataZoneEquipment::CompType compType = thisRetPath.ComponentType_Num(compNum);
+                    if (compType == DataZoneEquipment::CompType::ZoneMixer) {
                         auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisMixer.InletNode(inNode)) {
@@ -2412,7 +2412,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
                                 break; // leave component inlet node loop
                             }
                         }
-                    } else if (compType == ZoneReturnPlenum_Type) {
+                    } else if (compType == DataZoneEquipment::CompType::ZoneReturnPlenum) {
                         auto const &thisPlenum(state.dataZonePlenum->ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisPlenum.InletNode(inNode)) {

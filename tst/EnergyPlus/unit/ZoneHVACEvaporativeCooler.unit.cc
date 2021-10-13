@@ -136,7 +136,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).EquipType(1) = "ZoneHVAC:EvaporativeCoolerUnit";
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit;
     }
 
     virtual void TearDown()

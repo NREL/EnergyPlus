@@ -1521,19 +1521,19 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= state.dataZoneEquip->SupplyAirPath(BCount).NumNodes; ++Count2) {
-                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
+                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::PathInlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Inlet Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Intermediate) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Through Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Outlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Outlet Node,{},{},{}\n",
                           Count2,

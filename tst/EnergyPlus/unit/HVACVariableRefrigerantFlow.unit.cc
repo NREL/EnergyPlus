@@ -270,7 +270,7 @@ protected:
         thisZoneEqList.EquipName(1) = "NO NAME";
         thisZoneEqList.CoolingPriority(1) = 1;
         thisZoneEqList.HeatingPriority(1) = 1;
-        thisZoneEqList.EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+        thisZoneEqList.EquipType_Num(1) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
 
         auto &finalZoneSizing(state->dataSize->FinalZoneSizing(zoneNum));
         finalZoneSizing.DesCoolVolFlow = 1.5;

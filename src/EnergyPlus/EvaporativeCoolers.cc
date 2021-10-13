@@ -4131,7 +4131,6 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
     using DataSizing::AutoSize;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
     using Fans::GetFanVolFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4143,11 +4142,12 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     if (allocated(ZoneComp)) {
         if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
-            ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailManagerListName = ZoneEvapUnit(UnitNum).AvailManagerListName;
-            ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName = ZoneEvapUnit(UnitNum).AvailManagerListName;
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
             ZoneEvapUnit(UnitNum).MyZoneEq = false;
         }
-        ZoneEvapUnit(UnitNum).FanAvailStatus = ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+        ZoneEvapUnit(UnitNum).FanAvailStatus =
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
     }
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {

@@ -153,7 +153,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
         state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = NumNodes;
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(NumNodes);
         state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);

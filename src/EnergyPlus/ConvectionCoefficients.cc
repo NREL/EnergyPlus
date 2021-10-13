@@ -5825,8 +5825,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                  ++EquipNum) {
 
                 switch (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum)) {
-                case AirDistUnit_Num:
-                case PurchasedAir_Num:
+                case DataZoneEquipment::ZoneEquip::AirDistUnit:
+                case DataZoneEquipment::ZoneEquip::PurchasedAir:
                     if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .EquipData(EquipNum)
                                         .OutletNodeNums)))
@@ -5859,15 +5859,15 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         }
                     }
                     break;
-                case WindowAC_Num:
-                case PkgTermHPAirToAir_Num:
-                case PkgTermACAirToAir_Num:
-                case ZoneDXDehumidifier_Num:
-                case PkgTermHPWaterToAir_Num:
-                case FanCoil4Pipe_Num:
-                case UnitVentilator_Num:
-                case UnitHeater_Num:
-                case OutdoorAirUnit_Num:
+                case DataZoneEquipment::ZoneEquip::WindowAC:
+                case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir:
+                case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir:
+                case DataZoneEquipment::ZoneEquip::ZoneDXDehumidifier:
+                case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir:
+                case DataZoneEquipment::ZoneEquip::FanCoil4Pipe:
+                case DataZoneEquipment::ZoneEquip::UnitVentilator:
+                case DataZoneEquipment::ZoneEquip::UnitHeater:
+                case DataZoneEquipment::ZoneEquip::OutdoorAirUnit:
                     if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .EquipData(EquipNum)
                                         .OutletNodeNums)))
@@ -5899,11 +5899,11 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         }
                     }
                     break;
-                case CoolingPanel_Num:
-                case BBSteam_Num:
-                case BBWaterConvective_Num:
-                case BBElectricConvective_Num:
-                case BBWater_Num:
+                case DataZoneEquipment::ZoneEquip::CoolingPanel:
+                case DataZoneEquipment::ZoneEquip::BBSteam:
+                case DataZoneEquipment::ZoneEquip::BBWaterConvective:
+                case DataZoneEquipment::ZoneEquip::BBElectricConvective:
+                case DataZoneEquipment::ZoneEquip::BBWater:
                     if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                         EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                         FlowRegimeStack[EquipOnCount] = ConvectionConstants::InConvFlowRegime::B;
@@ -5915,8 +5915,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 .CoolingPriority(EquipNum);
                     }
                     break;
-                case BBElectric_Num:
-                case HiTempRadiant_Num:
+                case DataZoneEquipment::ZoneEquip::BBElectric:
+                case DataZoneEquipment::ZoneEquip::HiTempRadiant:
                     if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                         EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                         FlowRegimeStack[EquipOnCount] = ConvectionConstants::InConvFlowRegime::B;
@@ -5928,8 +5928,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 .CoolingPriority(EquipNum);
                     }
                     break;
-                case VentilatedSlab_Num:
-                case LoTempRadiant_Num:
+                case DataZoneEquipment::ZoneEquip::VentilatedSlab:
+                case DataZoneEquipment::ZoneEquip::LoTempRadiant:
                     if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
                         for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                             if (!state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop)) continue;

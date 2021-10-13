@@ -1474,7 +1474,6 @@ namespace VentilatedSlab {
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::VentilatedSlab_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1541,12 +1540,13 @@ namespace VentilatedSlab {
 
         if (allocated(ZoneComp)) {
             if (state.dataVentilatedSlab->MyZoneEqFlag(Item)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(VentilatedSlab_Num).ZoneCompAvailMgrs(Item).AvailManagerListName =
+                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).AvailManagerListName =
                     state.dataVentilatedSlab->VentSlab(Item).AvailManagerListName;
-                ZoneComp(VentilatedSlab_Num).ZoneCompAvailMgrs(Item).ZoneNum = VentSlabZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).ZoneNum = VentSlabZoneNum;
                 state.dataVentilatedSlab->MyZoneEqFlag(Item) = false;
             }
-            state.dataVentilatedSlab->VentSlab(Item).AvailStatus = ZoneComp(VentilatedSlab_Num).ZoneCompAvailMgrs(Item).AvailStatus;
+            state.dataVentilatedSlab->VentSlab(Item).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).AvailStatus;
         }
 
         if (state.dataVentilatedSlab->MyPlantScanFlag(Item) && allocated(state.dataPlnt->PlantLoop)) {
