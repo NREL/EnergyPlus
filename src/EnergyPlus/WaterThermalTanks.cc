@@ -2398,7 +2398,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         // Validate Heater Control Type
-        Tank.ControlType = static_cast<HeaterControlMode>(getEnumerationValue(HeaterControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+        Tank.ControlType = static_cast<HeaterControlMode>(
+            getEnumerationValue(HeaterControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.ControlType) {
         case (HeaterControlMode::Cycle): {
             Tank.MinCapacity = Tank.MaxCapacity;
@@ -3021,7 +3022,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = state.dataIPShortCut->rNumericArgs(16);
         Tank.OnCycParaHeight = state.dataIPShortCut->rNumericArgs(17);
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
+            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
         switch (Tank.AmbientTempIndicator) {
 
         case (WTTAmbientTemp::Schedule): {
@@ -10596,47 +10598,44 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
     // collect routines for setting flow rates for Water heaters
     // with plant connections.
 
-    int const PassingFlowThru(1);
-    int const MaybeRequestingFlow(2);
-    int const ThrottlingFlow(3);
 
     // determine current mode.  there are three possible
     //  1.  passing thru what was given to inlet node
     //  2.  potentially making a flow request
     //  3.  throttling flow in response to Plant's restrictions (MassFlowRateMaxAvail)
-    // init default mode to passing thru
-    int CurrentMode = PassingFlowThru; // default
+    // init default mode changed to Unassigned
+    FlowMode CurrentMode = FlowMode::Unassigned; // default
 
     if (PlantLoopSide == DataPlant::DemandSupply_No) {
-        CurrentMode = PassingFlowThru;
+        CurrentMode = FlowMode::PassingFlowThru;
     } else if (PlantLoopSide == DataPlant::SupplySide) {
         // If FlowLock is False (0), the tank sets the plant loop mdot
         // If FlowLock is True (1),  the new resolved plant loop mdot is used
         if (this->UseCurrentFlowLock == DataPlant::iFlowLock::Unlocked) {
-            CurrentMode = PassingFlowThru;
+            CurrentMode = FlowMode::PassingFlowThru;
             if ((this->UseSideLoadRequested > 0.0) && (WaterThermalTankSide == WaterHeaterSide::Use)) {
-                CurrentMode = MaybeRequestingFlow;
+                CurrentMode = FlowMode::MaybeRequestingFlow;
             }
         } else {
-            CurrentMode = PassingFlowThru;
+            CurrentMode = FlowMode::PassingFlowThru;
         }
         if (WaterThermalTankSide == WaterHeaterSide::Source) {
-            CurrentMode = MaybeRequestingFlow;
+            CurrentMode = FlowMode::MaybeRequestingFlow;
         }
     } else if (PlantLoopSide == DataPlant::DemandSide) {
 
         //  2.  Might be Requesting Flow.
         if (FirstHVACIteration) {
             if (BranchControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
-                CurrentMode = PassingFlowThru;
+                CurrentMode = FlowMode::PassingFlowThru;
             } else {
-                CurrentMode = MaybeRequestingFlow;
+                CurrentMode = FlowMode::MaybeRequestingFlow;
             }
         } else {
             if (BranchControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
-                CurrentMode = PassingFlowThru;
+                CurrentMode = FlowMode::PassingFlowThru;
             } else {
-                CurrentMode = ThrottlingFlow;
+                CurrentMode = FlowMode::ThrottlingFlow;
             }
         }
     }
@@ -10657,7 +10656,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
     Real64 FlowResult = 0.0;
     switch (CurrentMode) {
 
-    case PassingFlowThru: {
+    case FlowMode::PassingFlowThru: {
         if (!ScheduledAvail) {
             FlowResult = 0.0;
         } else {
@@ -10666,7 +10665,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
 
         break;
     }
-    case ThrottlingFlow: {
+    case FlowMode::ThrottlingFlow: {
         // first determine what mass flow would be if it is to requested
         Real64 MassFlowRequest = 0.0;
         if (!ScheduledAvail) {
@@ -10710,7 +10709,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
 
         break;
     }
-    case MaybeRequestingFlow: {
+    case FlowMode::MaybeRequestingFlow: {
 
         // first determine what mass flow would be if it is to requested
         Real64 MassFlowRequest = 0.0;

@@ -195,6 +195,15 @@ namespace WaterThermalTanks {
     constexpr std::array<std::string_view, static_cast<int>(SourceSideControl::Num)> SourceSideControlNamesUC{
         "STORAGETANK", "INDIRECTHEATPRIMARYSETPOINT", "INDIRECTHEATALTERNATESETPOINT"};
 
+    enum class FlowMode
+    {
+        Unassigned = -1,
+        PassingFlowThru,
+        MaybeRequestingFlow,
+        ThrottlingFlow,
+        Num
+    };
+
     struct StratifiedNodeData
     {
         // Members
