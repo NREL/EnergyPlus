@@ -2664,33 +2664,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcWindSurfaceTheta)
 
 TEST_F(ConvectionCoefficientsFixture, TestEmmelVertical)
 {
-    std::string const idf_objects = delimited_string({
-        "GlobalGeometryRules,",
-        "UpperLeftCorner,           !- Starting Vertex Position",
-        "CounterClockWise,          !- Vertex Entry Direction",
-        "World;                     !- Coordinate System",
-
-        "BuildingSurface:Detailed,",
-        "Zn001:Wall001,             !- Name",
-        "Wall,                      !- Surface Type",
-        "R13WALL,                   !- Construction Name",
-        "ZONE ONE,                  !- Zone Name",
-        ",                          !- Space Name",
-        "Outdoors,                  !- Outside Boundary Condition",
-        ",                          !- Outside Boundary Condition Object",
-        "SunExposed,                !- Sun Exposure",
-        "WindExposed,               !- Wind Exposure",
-        "0.5000000,                 !- View Factor to Ground",
-        "4,                         !- Number of Vertices",
-        "0,0,4.572000,              !- X,Y,Z ==> Vertex 1 {m}",
-        "0,0,0,                     !- X,Y,Z ==> Vertex 2 {m}",
-        "15.24000,0,0,              !- X,Y,Z ==> Vertex 3 {m}",
-        "15.24000,0,4.572000;       !- X,Y,Z ==> Vertex 4 {m}",
-    });
-
-    ASSERT_TRUE(process_idf(idf_objects));
-
-    // convection coefficient at 0 deg theta
+    // wind speeds
     constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
     // expected values
@@ -2698,7 +2672,7 @@ TEST_F(ConvectionCoefficientsFixture, TestEmmelVertical)
         5.150, 9.029, 12.539, 15.829, 18.965, 21.984, 24.907, 27.753, 30.531, 33.251, 35.919, 38.542, 41.124, 43.668, 46.178};
 
     constexpr std::array<Real64, 15> actualHcFortyFiveDegTheta = {
-        3.340, 5.978, 8.404, 10.702, 12.908, 15.045, 17.124, 19.157, 21.149, 23.107, 25.033, 26.931, 28.804, 30.654, 32.483522992019196};
+        3.340, 5.978, 8.404, 10.702, 12.908, 15.045, 17.124, 19.157, 21.149, 23.107, 25.033, 26.931, 28.804, 30.654, 32.483};
 
     constexpr std::array<Real64, 15> actualHcNinetyDegTheta = {
         4.780, 7.819, 10.427, 12.790, 14.986, 17.057, 19.030, 20.922, 22.747, 24.514, 26.231, 27.902, 29.534, 31.129, 32.692};
@@ -2735,6 +2709,57 @@ TEST_F(ConvectionCoefficientsFixture, TestEmmelVertical)
         // test at 180 deg theta
         actualHc = actualHcOneEightyDegTheta[idx];
         expectedHc = ConvectionCoefficients::CalcEmmelVertical(*state, windSpeed, 180, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+    }
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestEmmelRoof)
+{
+    // wind speeds
+    constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    // expected values
+    constexpr std::array<Real64, 15> actualHcZeroDegTheta = {
+        5.110, 8.775, 12.039, 15.067, 17.932, 20.672, 23.313, 25.872, 28.362, 30.791, 33.167, 35.496, 37.783, 40.031, 42.245};
+
+    constexpr std::array<Real64, 15> actualHcFortyFiveDegTheta = {
+        4.600, 7.954, 10.957, 13.753, 16.404, 18.945, 21.399, 23.779, 26.098, 28.363, 30.581, 32.758, 34.896, 37.000, 39.072};
+
+    constexpr std::array<Real64, 15> actualHcNinetyDegTheta = {
+        3.670, 6.615, 9.337, 11.924, 14.414, 16.830, 19.187, 21.493, 23.756, 25.982, 28.174, 30.337, 32.473, 34.584, 36.673};
+
+    constexpr std::array<Real64, 15> actualHcOneThirtyFiveDegTheta = {
+        4.600, 7.954, 10.957, 13.753, 16.404, 18.945, 21.399, 23.779, 26.098, 28.363, 30.581, 32.758, 34.896, 37.000, 39.072};
+
+    constexpr std::array<Real64, 15> actualHcOneEightyDegTheta = {
+        5.110, 8.775, 12.039, 15.067, 17.932, 20.672, 23.313, 25.872, 28.362, 30.791, 33.167, 35.496, 37.783, 40.031, 42.245};
+
+    for (int idx = 0; idx < 15; idx++) {
+        Real64 windSpeed = windSpeedAt10m[idx];
+
+        // test at 0 deg theta
+        Real64 actualHc = actualHcZeroDegTheta[idx];
+        Real64 expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 0, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 45 deg theta
+        actualHc = actualHcFortyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 45, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 90 deg theta
+        actualHc = actualHcNinetyDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 90, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 135 deg theta
+        actualHc = actualHcOneThirtyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 135, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 180 deg theta
+        actualHc = actualHcOneEightyDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 180, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
     }
 }

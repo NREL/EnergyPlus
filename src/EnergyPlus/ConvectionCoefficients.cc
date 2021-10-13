@@ -8760,6 +8760,9 @@ Real64 CalcMitchell(EnergyPlusData &state, Real64 const WindAtZ, Real64 const Le
 
 Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth)
 {
+    // Computes the angle theta between the wind direction and the surface azimuth
+    // Should always be a value between 0-180 deg
+
     Real64 theta = std::abs(WindDir - SurfAzimuth);
     if (theta > 180) {
         return abs(theta - 360);
