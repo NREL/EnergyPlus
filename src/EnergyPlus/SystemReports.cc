@@ -4417,7 +4417,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
     using WindowAC::GetWindowACZoneInletAirNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallLoad(0.1); // (W)
+    Real64 constexpr SmallLoad(0.1); // (W)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CtrlZoneNum;             // ZONE counter
@@ -5154,7 +5154,7 @@ void MatchPlantSys(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const EnergyTrans(1);
+    int constexpr EnergyTrans(1);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

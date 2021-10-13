@@ -209,12 +209,13 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-        if BITF_TEST_NONE (BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
+        if
+            BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
                            BITF(DataHeatBalance::MaterialGroup::GlassEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
                                BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
                                BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
                                BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer))
-            continue;
+        continue;
 
         if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
             // Gap or Gas Layer
@@ -386,9 +387,9 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
     //                  ! wind speed (the value used in Window 5)
     // BeamSolarInc = 0.0
 
-    Real64 const Height(1.0); // window height, m
-    Real64 const TOUT(-18.0); // outdoor air temperature, C
-    Real64 const TIN(21.0);   // indoor air temperature, C
+    Real64 constexpr Height(1.0); // window height, m
+    Real64 constexpr TOUT(-18.0); // outdoor air temperature, C
+    Real64 constexpr TIN(21.0);   // indoor air temperature, C
     static constexpr std::string_view RoutineName("CalcEQLWindowUvalue: ");
 
     Real64 U;    // U-factor, W/m2-K
@@ -669,7 +670,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataHeatBalFanSys;
 
-    Real64 const TOL(0.0001); // convergence tolerance
+    Real64 constexpr TOL(0.0001); // convergence tolerance
 
     int NL; // Number of layers
     Real64 TIN(0);
@@ -945,7 +946,7 @@ HEMINT(EnergyPlusData &state,
 
     constexpr Real64 KMAX(8); // max steps
     int const NPANMAX(std::pow(2, KMAX));
-    Real64 const TOL(0.0005); // convergence tolerance
+    Real64 constexpr TOL(0.0005); // convergence tolerance
     static constexpr std::string_view RoutineName("HEMINT");
 
     Array2D<Real64> T(KMAX, KMAX);
@@ -1982,7 +1983,7 @@ void PD_BEAM_CASE_I(Real64 const S,                        // pleat spacing (> 0
     //   _PARL = surface parallel to window (pleat top/bot)
     //   _PERP = surface perpendicular to window (pleat side)
 
-    int const N(12);
+    int constexpr N(12);
 
     Real64 TAUBF_BT_PERP;
     Real64 AB; // lengths of surfaces and diagonal strings
@@ -2407,7 +2408,7 @@ void PD_BEAM_CASE_II(Real64 const S,                        // pleat spacing (> 
     //   _PARL = surface parallel to window (pleat top/bot)
     //   _PERP = surface perpendicular to window (pleat side)
 
-    int const N(10);
+    int constexpr N(10);
 
     Real64 TAUBF_BT_PERP;
     Real64 AB; // lengths of surfaces and diagonal strings
@@ -2740,7 +2741,7 @@ void PD_BEAM_CASE_III(Real64 const S,       // pleat spacing (> 0)
     //   _PERP = surface perpendicular to window (pleat side)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const N(10);
+    int constexpr N(10);
 
     Real64 TAUBF_BT_PERP;
     Real64 AB; // lengths for surfaces and diagonal strings
@@ -3071,7 +3072,7 @@ void PD_BEAM_CASE_IV(Real64 const S,                        // pleat spacing (> 
     //   _PARL = surface parallel to window (pleat top/bot)
     //   _PERP = surface perpendicular to window (pleat side)
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const N(6);
+    int constexpr N(6);
 
     Real64 TAUBF_BT_PERP;
     Real64 AK; // length of diagonal strings
@@ -3254,7 +3255,7 @@ void PD_BEAM_CASE_V(Real64 const S,       // pleat spacing (> 0)
     //   _PARL = surface parallel to window (pleat top/bot)
     //   _PERP = surface perpendicular to window (pleat side)
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const N(7);
+    int constexpr N(7);
 
     Real64 TAUBF_BT_PERP;
     Real64 AK; // lengths of surfaces and diagonal strings
@@ -3482,7 +3483,7 @@ void PD_BEAM_CASE_VI(Real64 const S,                        // pleat spacing (> 
     //   _PARL = surface parallel to window (pleat top/bot)
     //   _PERP = surface perpendicular to window (pleat side)
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const N(6);
+    int constexpr N(6);
 
     Real64 AK; // length of diagonal strings
     Real64 CG;
@@ -4098,7 +4099,7 @@ void VB_SOL6(EnergyPlusData &state,
     //   ltyVBVER: + = front-side slat tip is counter-
     //                 clockwise from normal (viewed from above)
     //    Note: all solar slat properties - incident-to-diffuse
-    int const N(4);
+    int constexpr N(4);
 
     Real64 AB; // lengths of slat segments and diagonal strings
     Real64 AE;
@@ -4843,8 +4844,8 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     //   0=outside, 1=betw layer 1-2, ..., NL=inside
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Height(1.0); // Window height (m) for standard ratings calculation
-    int const MaxIter(100);   // maximum number of iterations allowed
+    Real64 constexpr Height(1.0); // Window height (m) for standard ratings calculation
+    int constexpr MaxIter(100);   // maximum number of iterations allowed
 
     Real64 ALPHA;
     Real64 HCOCFout;
@@ -6359,7 +6360,7 @@ bool CFSUFactor(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
     // for conditions specified (no incident solar)
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const TOL(0.01); // 0.0001d0
+    Real64 constexpr TOL(0.01); // 0.0001d0
 
     int NL;
     Real64 TOABS;

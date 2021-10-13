@@ -408,7 +408,7 @@ int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const SizeAdder(25);
+    int constexpr SizeAdder(25);
     auto &ort(state.dataOutRptTab);
 
     if (!allocated(ort->MonthlyInput)) {
@@ -453,7 +453,7 @@ void AddMonthlyFieldSetInput(
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const sizeIncrement(50);
+    int constexpr sizeIncrement(50);
     auto &ort(state.dataOutRptTab);
 
     // INTERFACE BLOCK SPECIFICATIONS:
@@ -1029,7 +1029,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     int firstReport;
     int repIndex;
     int found;
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
     Array1D_string objNames;
     Array1D_int objVarIDs;
@@ -16767,7 +16767,7 @@ void ResetBinGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all timebins gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     auto &ort(state.dataOutRptTab);
 
     // clear the binning arrays to zeros
@@ -16967,7 +16967,7 @@ void ResetRemainingPredefinedEntries(EnergyPlusData &state)
     // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
     // simulations so that only last year is reported in tabular reports
 
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     int iLight;
     int iZone;
     auto &Zone(state.dataHeatBal->Zone);

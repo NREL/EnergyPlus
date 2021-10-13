@@ -94,9 +94,9 @@ namespace MundtSimMgr {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    Real64 const CpAir(1005.0);   // Specific heat of air
-    Real64 const MinSlope(0.001); // Bound on result from Mundt model
-    Real64 const MaxSlope(5.0);   // Bound on result from Mundt Model
+    Real64 constexpr CpAir(1005.0);   // Specific heat of air
+    Real64 constexpr MinSlope(0.001); // Bound on result from Mundt model
+    Real64 constexpr MaxSlope(5.0);   // Bound on result from Mundt Model
 
     // MODULE VARIABLE DECLARATIONS:
 

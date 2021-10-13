@@ -336,6 +336,8 @@ struct PhotovoltaicsData : BaseGlobalStruct
     std::string const cPVSimplePerfObjectName = "PhotovoltaicPerformance:Simple";
     std::string const cPVEquiv1DiodePerfObjectName = "PhotovoltaicPerformance:EquivalentOne-Diode";
     std::string const cPVSandiaPerfObjectName = "PhotovoltaicPerformance:Sandia";
+
+    // TODO: remove 'const' from state
     Real64 const MinIrradiance = 0.3; // [W/m2] Assume no operation if Ic is below this number (W/m2)
     int NumPVs = 0;                   // count of number of PV generators
     int Num1DiodePVModuleTypes = 0;   // count for Equivalent one-diode model

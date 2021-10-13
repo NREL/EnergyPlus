@@ -763,7 +763,7 @@ void PassPressureAcrossSplitter(EnergyPlusData &state, int const LoopNum, int co
     //  when possible expansion occurs during further development
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const InletBranchNum(1);
+    int constexpr InletBranchNum(1);
 
     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(InletBranchNum).NodeNumOut).Press =
         SplitterInletPressure;
@@ -842,9 +842,9 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
 
     // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("ResolvedLoopMassFlowRate: ");
-    int const MaxIters(100);
-    Real64 const PressureConvergeCriteria(0.1); // Pa
-    Real64 const ZeroTolerance(0.0001);
+    int constexpr MaxIters(100);
+    Real64 constexpr PressureConvergeCriteria(0.1); // Pa
+    Real64 constexpr ZeroTolerance(0.0001);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 PumpPressureRise;

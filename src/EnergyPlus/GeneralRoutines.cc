@@ -167,12 +167,12 @@ void ControlCompOutput(EnergyPlusData &state,
     // Iteration maximum for reheat control
     static int const MaxIter(25);
     static Real64 const iter_fac(1.0 / std::pow(2, MaxIter - 3));
-    int const iReverseAction(1);
-    int const iNormalAction(2);
+    int constexpr iReverseAction(1);
+    int constexpr iNormalAction(2);
 
     // Note - order in routine must match order below
     //  Plus -- order in ListOfComponents array must be in sorted order.
-    int const NumComponents(11);
+    int constexpr NumComponents(11);
     static Array1D_string const ListOfComponents(NumComponents,
                                                  {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
                                                   "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
@@ -887,10 +887,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using Psychrometrics::PsyWFnTdbTwbPb;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const g(9.807);          // gravitational constant (m/s**2)
-    Real64 const nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 const k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
+    Real64 constexpr g(9.807);          // gravitational constant (m/s**2)
+    Real64 constexpr nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 constexpr k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 constexpr Sigma(5.6697e-08); // Stefan-Boltzmann constant
     static constexpr std::string_view RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
@@ -1133,7 +1133,7 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Pr(0.71); // Prandtl number for air
+    Real64 constexpr Pr(0.71); // Prandtl number for air
 
     // INTERFACE BLOCK SPECIFICATIONS
 

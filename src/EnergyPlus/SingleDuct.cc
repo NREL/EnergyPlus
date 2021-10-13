@@ -4766,7 +4766,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     using SteamCoils::GetCoilCapacity;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const BigLoad(1.0e+20);
+    Real64 constexpr BigLoad(1.0e+20);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow = 0; // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets

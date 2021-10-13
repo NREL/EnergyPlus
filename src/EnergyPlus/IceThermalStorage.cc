@@ -316,14 +316,14 @@ namespace IceThermalStorage {
         // REFERENCES:
         // Ice Storage Component Model Proposal (Revised).doc by Rick Strand (Dec 2005/Jan 2006)
 
-        int const MaxIterNum(100);                      // Maximum number of internal iterations for ice storage solution
-        Real64 const SmallestLoad(0.1);                 // Smallest load to actually run the ice storage unit [Watts]
-        Real64 const TankDischargeToler(0.001);         // Below this fraction, there is nothing left to discharge
-        Real64 const TankChargeToler(0.999);            // Above this fraction, we don't have anything left to charge
-        Real64 const TemperatureToler(0.1);             // Temperature difference between iterations that indicates convergence [C]
-        Real64 const SIEquiv100GPMinMassFlowRate(6.31); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
-                                                        // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
-                                                        // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
+        int constexpr MaxIterNum(100);                      // Maximum number of internal iterations for ice storage solution
+        Real64 constexpr SmallestLoad(0.1);                 // Smallest load to actually run the ice storage unit [Watts]
+        Real64 constexpr TankDischargeToler(0.001);         // Below this fraction, there is nothing left to discharge
+        Real64 constexpr TankChargeToler(0.999);            // Above this fraction, we don't have anything left to charge
+        Real64 constexpr TemperatureToler(0.1);             // Temperature difference between iterations that indicates convergence [C]
+        Real64 constexpr SIEquiv100GPMinMassFlowRate(6.31); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
+                                                            // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
+                                                            // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
         static constexpr std::string_view RoutineName("DetailedIceStorageData::SimDetailedIceStorage");
 
         int NodeNumIn = this->PlantInNodeNum;                      // Plant loop inlet node number for component
@@ -1897,7 +1897,7 @@ namespace IceThermalStorage {
         // LMTD = (Tin-Tout)/ln((Tin-Tfr)/(Tout-Tfr))
 
         Real64 CalcDetIceStorLMTDstar;
-        Real64 const Tnom(10.0); // Nominal temperature difference across the ice storage unit [C]
+        Real64 constexpr Tnom(10.0); // Nominal temperature difference across the ice storage unit [C]
 
         // First set the temperature differences and avoid problems with the LOG
         // term by setting some reasonable minimums
@@ -2079,7 +2079,7 @@ namespace IceThermalStorage {
         // Just take what has already been calculated or calculate the appropriate
         // output value based on simulation data.
 
-        Real64 const LowLoadLimit(0.1); // Load below which device can be assumed off [W]
+        Real64 constexpr LowLoadLimit(0.1); // Load below which device can be assumed off [W]
 
         if (this->CompLoad < LowLoadLimit) { // No load condition
 

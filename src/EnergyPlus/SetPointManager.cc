@@ -5706,7 +5706,7 @@ void DefineScheduledTESSetPointManager::calculate(EnergyPlusData &state)
     // Locals
     Real64 CurSchValOnPeak;
     Real64 CurSchValCharge;
-    Real64 const OnVal(0.5);
+    Real64 constexpr OnVal(0.5);
 
     CurSchValOnPeak = GetCurrentScheduleValue(state, this->SchedPtr);
     CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
@@ -7078,7 +7078,7 @@ void DefMultiZoneMinHumSetPointManager::calculate(EnergyPlusData &state)
     using DataHVACGlobals::SmallMassFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
+    Real64 constexpr SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -7144,7 +7144,7 @@ void DefMultiZoneMaxHumSetPointManager::calculate(EnergyPlusData &state)
     using DataHVACGlobals::SmallMassFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
+    Real64 constexpr SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int AirLoopNum;              // the index of the air loop served by this setpoint manager

@@ -1210,7 +1210,7 @@ namespace HVACSingleDuctInduc {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const SolveMaxIter(50);
+        int constexpr SolveMaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QZnReq;           // heating or cooling needed by zone [Watts]

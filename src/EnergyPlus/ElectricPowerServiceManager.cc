@@ -2861,10 +2861,10 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
         // This code is lifted from ssc cmod_pvwatts5.cpp:powerout() method.
         // It was easier to do this calculation here because we have a many to one relationship between inverter
         // and generator whereas theirs is one to one.
-        Real64 const etaref = 0.9637;
-        Real64 const A = -0.0162;
-        Real64 const B = -0.0059;
-        Real64 const C = 0.9858;
+        Real64 constexpr etaref = 0.9637;
+        Real64 constexpr A = -0.0162;
+        Real64 constexpr B = -0.0059;
+        Real64 constexpr C = 0.9858;
         Real64 const pdc0 = ratedPower_ / pvWattsInverterEfficiency_;
         Real64 const plr = dCPowerIn_ / pdc0;
         Real64 ac = 0;
@@ -3762,8 +3762,8 @@ ElectricStorage::ElectricStorage( // main constructor
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound)
 {
-    Real64 const minChargeEfficiency = 0.001;
-    Real64 const minDischargeEfficiency = 0.001;
+    Real64 constexpr minChargeEfficiency = 0.001;
+    Real64 constexpr minDischargeEfficiency = 0.001;
 
     // Fix for Defect #8867.  Do not allow either efficiency to be zero as it will lead to a divide by zero (NaN).
     if (UtilityRoutines::SameString(whichType, "CHARGING")) {
@@ -4931,7 +4931,7 @@ Real64 ElectricTransformer::getLossRateForInputPower(EnergyPlusData &state, Real
 
 void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const surplusPowerOutFromLoadCenters)
 {
-    Real64 const ambTempRef = 20.0; // reference ambient temperature (C)
+    Real64 constexpr ambTempRef = 20.0; // reference ambient temperature (C)
     if (myOneTimeFlag_) {
         // calculate rated no load losses and rated load losses if the performance input method is based on
         // nominal efficiency. This calculation is done only once

@@ -308,28 +308,28 @@ void GetRefrigerationInput(EnergyPlusData &state)
     static constexpr std::string_view TrackMessageAlt("GetInput in RefrigeratedCase");
     static constexpr std::string_view RoutineNameNoColon("GetRefrigerationInput");
 
-    int const AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
+    int constexpr AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
     //     input in both watts and flow rate
-    int const NumWIAlphaFieldsBeforeZoneInput(9);   // Used to cycle through zones on input for walk in coolers
-    int const NumWIAlphaFieldsPerZone(4);           // Used to cycle through zones on input for walk in coolers
-    int const NumWINumberFieldsBeforeZoneInput(12); // Used to cycle through zones on input for walk in coolers
-    int const NumWINumberFieldsPerZone(8);          // Used to cycle through zones on input for walk in coolers
-    Real64 const CondARI460DelT(16.7);              // Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
-    Real64 const CondARI460Tcond(51.7);             // Rated sat cond temp for air-cooled cond, ARI 460
-    Real64 const CondARI490DelT(15.0);              // Rated sat cond temp - wet bulb air T for evap-cooled Cond w R22, ARI490
-    Real64 const CondARI490Tcond(40.6);             // Rated sat cond temp for evap-cooled cond with R22, ARI 490
-    Real64 const DelEvapTDefault(5.0);              // default difference between case T and evap T (C)
-    Real64 const HoursPerDay(24.0);
-    Real64 const SecondsPerHour(3600.0);
-    Real64 const DefaultCascadeCondApproach(3.0); // Cascade condenser approach temperature difference (deltaC)
-    Real64 const DefaultCircRate(2.5);            // Phase change liquid overfeed circulating rate (ASHRAE definition)
-    Real64 const DefaultWISurfaceUValue(0.3154);  // equiv R18 in Archaic American units (W/m2-delta T)
-    Real64 const DefaultWIUValueGlassDr(1.136);   // equiv R5 in Archaic American units (W/m2-delta T)
-    Real64 const DefaultWIUValueStockDr(0.3785);  // equiv R15 in Archaic American units (W/m2-delta T)
-    Real64 const DefaultWIHeightGlassDr(1.5);     // glass door height in walk-in cooler (m)
-    Real64 const DefaultWIHeightStockDr(3.0);     // stock door height in walk-in cooler (m)
-    Real64 const PumpImpellerEfficiency(0.78);    // same as used in pump auto-sizing, dimensionless
-    Real64 const PumpMotorEfficiency(0.85);       // suggested as average value in ITT/Gould pump references,
+    int constexpr NumWIAlphaFieldsBeforeZoneInput(9);   // Used to cycle through zones on input for walk in coolers
+    int constexpr NumWIAlphaFieldsPerZone(4);           // Used to cycle through zones on input for walk in coolers
+    int constexpr NumWINumberFieldsBeforeZoneInput(12); // Used to cycle through zones on input for walk in coolers
+    int constexpr NumWINumberFieldsPerZone(8);          // Used to cycle through zones on input for walk in coolers
+    Real64 constexpr CondARI460DelT(16.7);              // Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
+    Real64 constexpr CondARI460Tcond(51.7);             // Rated sat cond temp for air-cooled cond, ARI 460
+    Real64 constexpr CondARI490DelT(15.0);              // Rated sat cond temp - wet bulb air T for evap-cooled Cond w R22, ARI490
+    Real64 constexpr CondARI490Tcond(40.6);             // Rated sat cond temp for evap-cooled cond with R22, ARI 490
+    Real64 constexpr DelEvapTDefault(5.0);              // default difference between case T and evap T (C)
+    Real64 constexpr HoursPerDay(24.0);
+    Real64 constexpr SecondsPerHour(3600.0);
+    Real64 constexpr DefaultCascadeCondApproach(3.0); // Cascade condenser approach temperature difference (deltaC)
+    Real64 constexpr DefaultCircRate(2.5);            // Phase change liquid overfeed circulating rate (ASHRAE definition)
+    Real64 constexpr DefaultWISurfaceUValue(0.3154);  // equiv R18 in Archaic American units (W/m2-delta T)
+    Real64 constexpr DefaultWIUValueGlassDr(1.136);   // equiv R5 in Archaic American units (W/m2-delta T)
+    Real64 constexpr DefaultWIUValueStockDr(0.3785);  // equiv R15 in Archaic American units (W/m2-delta T)
+    Real64 constexpr DefaultWIHeightGlassDr(1.5);     // glass door height in walk-in cooler (m)
+    Real64 constexpr DefaultWIHeightStockDr(3.0);     // stock door height in walk-in cooler (m)
+    Real64 constexpr PumpImpellerEfficiency(0.78);    // same as used in pump auto-sizing, dimensionless
+    Real64 constexpr PumpMotorEfficiency(0.85);       // suggested as average value in ITT/Gould pump references,
 
     Array1D_string Alphas;             // Alpha items for object
     Array1D_string cAlphaFieldNames;   // Alpha field names (from input processor)

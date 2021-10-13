@@ -2423,8 +2423,8 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const StartQuality(1.0);
-    Real64 const StartHumRat(0.0);
+    Real64 constexpr StartQuality(1.0);
+    Real64 constexpr StartHumRat(0.0);
     static constexpr std::string_view RoutineNameAlt("InitializeLoops");
     static constexpr std::string_view RoutineName("PlantManager:InitializeLoop");
 

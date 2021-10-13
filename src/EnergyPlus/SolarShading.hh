@@ -338,6 +338,7 @@ namespace SolarShading {
 struct SolarShadingData : BaseGlobalStruct
 {
 
+    // TODO: remove 'const' from state
     Real64 const SmallIncrement = 1.0e-10; // Small increment added for shading/sunlit area calculations.
     Real64 const HCMULT = 100000.0;        // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
                                     // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters

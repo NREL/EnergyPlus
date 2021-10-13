@@ -611,7 +611,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     }
 
     // CALCULATE THE SIMULATION TIME
-    Real64 const hoursInDay = 24.0;
+    Real64 constexpr hoursInDay = 24.0;
     CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 +
                      (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 

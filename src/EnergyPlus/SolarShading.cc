@@ -2491,7 +2491,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     Real64 CircumSolarFac;         // Ratio of cosine of incidence angle to cosine of zenith angle
     Real64 KappaZ3;                // Intermediate variable
     Real64 ViewFactorSkyGeom;      // Geometrical sky view factor
-    Real64 const cosine_tolerance(0.0001);
+    Real64 constexpr cosine_tolerance(0.0001);
 
 #ifdef EP_Count_Calls
     ++state.dataTimingsData->NumAnisoSky_Calls;
@@ -6137,7 +6137,7 @@ void CalcInteriorSolarOverlaps(EnergyPlusData &state,
     //  some of these will receive beam radiation from HTSS this hour)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const WindowShadedOnlyByReveal(2); // for use with RevealStatus
+    int constexpr WindowShadedOnlyByReveal(2); // for use with RevealStatus
 
     typedef Array2D<Int64>::size_type size_type;
     int JBKS;        // Counter of back surfaces with non-zero overlap with HTSS
@@ -9000,9 +9000,9 @@ void SHDRVL(EnergyPlusData &state,
 
     int NVS; // Number of verticies
 
-    int const None(0);                       // for use with RevealStatus
-    int const EntireWindowShadedByReveal(1); // for use with RevealStatus
-    int const WindowShadedOnlyByReveal(2);   // for use with RevealStatus
+    int constexpr None(0);                       // for use with RevealStatus
+    int constexpr EntireWindowShadedByReveal(1); // for use with RevealStatus
+    int constexpr WindowShadedOnlyByReveal(2);   // for use with RevealStatus
 
     Real64 A; // Area
     Real64 R; // Depth of the reveal (m)

@@ -113,7 +113,7 @@ namespace ScheduleManager {
                                   "CustomDay1",
                                   "CustomDay2"});
 
-    int const NumScheduleTypeLimitUnitTypes(14);
+    int constexpr NumScheduleTypeLimitUnitTypes(14);
     Array1D_string ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
                                               {"Dimensionless",
                                                "Temperature",

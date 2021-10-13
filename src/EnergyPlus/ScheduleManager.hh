@@ -73,7 +73,7 @@ namespace ScheduleManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    int const MaxDayTypes(12);
+    int constexpr MaxDayTypes(12);
 
     enum class SchedType : int
     {

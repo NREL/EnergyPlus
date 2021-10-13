@@ -1737,7 +1737,7 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const CelsiustoKelvin(DataGlobalConstants::KelvinConv); // Conversion from Celsius to Kelvin
-    Real64 const Tref(283.15);                                     // Reference Temperature for performance curves,10C [K]
+    Real64 constexpr Tref(283.15);                                 // Reference Temperature for performance curves,10C [K]
     static constexpr std::string_view RoutineName("CalcWatertoWaterHPCooling");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1909,7 +1909,7 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const CelsiustoKelvin(DataGlobalConstants::KelvinConv); // Conversion from Celsius to Kelvin
-    Real64 const Tref(283.15);                                     // Reference Temperature for performance curves,10C [K]
+    Real64 constexpr Tref(283.15);                                 // Reference Temperature for performance curves,10C [K]
     static constexpr std::string_view RoutineName("CalcWatertoWaterHPHeating");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

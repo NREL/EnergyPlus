@@ -342,15 +342,15 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     ScheduleManager::UpdateScheduleValues(*state);
 
     // a few constants for convenience
-    int const evapOutletNodeNum = 1;
-    int const condInletNodeNum = 2;
-    int const chwLoopIndex = 1;
-    int const condLoopIndex = 2;
-    int const demandSide = 1;
-    int const supplySide = 2;
-    int const chillerBranchChW = 1;
-    int const chillerBranchCW = 1;
-    int const chillerCompIndex = 1;
+    int constexpr evapOutletNodeNum = 1;
+    int constexpr condInletNodeNum = 2;
+    int constexpr chwLoopIndex = 1;
+    int constexpr condLoopIndex = 2;
+    int constexpr demandSide = 1;
+    int constexpr supplySide = 2;
+    int constexpr chillerBranchChW = 1;
+    int constexpr chillerBranchCW = 1;
+    int constexpr chillerCompIndex = 1;
 
     // Set up ChW loop manually, way too much input to do that here in idf, all I care about is the
     state->dataPlnt->TotNumLoops = 2;
@@ -360,7 +360,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp.allocate(1);
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
-    Real64 const designCondenserEnteringTemp = 20;
+    Real64 constexpr designCondenserEnteringTemp = 20;
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn =
         designCondenserEnteringTemp;
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
@@ -531,8 +531,8 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
 
     // indexes in Schedule
-    int const OnSched = 1;
-    int const OffSched = 2;
+    int constexpr OnSched = 1;
+    int constexpr OffSched = 2;
     std::string const idf_contents(delimited_string({
         "Schedule:Constant,MyScheduleOn,,1;",
         "Schedule:Constant,MyScheduleOff,,0;",

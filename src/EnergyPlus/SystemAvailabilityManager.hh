@@ -491,7 +491,7 @@ namespace SystemAvailabilityManager {
 
 struct SystemAvailabilityManagerData : BaseGlobalStruct
 {
-
+    // TODO: remove 'const' from state
     int const MaxDayTypes = 12;
     int const StayOff = 0;
     int const CycleOnAny = 1;

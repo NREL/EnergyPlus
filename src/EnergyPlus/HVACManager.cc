@@ -1876,7 +1876,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxAir(5); // Iteration Max for Air Simulation Iterations
+    int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IterAir; // counts iterations to enforce maximum iteration limit

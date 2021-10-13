@@ -1288,8 +1288,8 @@ namespace EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on SizeTower by Don Shirey, Sept/Oct 2002; Richard Raustad, Feb 2005
 
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
         std::string const CalledFrom("SizeEvapFluidCooler");
 
         int SolFla;                      // Flag of solver
@@ -2080,10 +2080,10 @@ namespace EvaporativeFluidCoolers {
         // Dec. 2008. BG. added RunFlag logic per original methodology
 
         static constexpr std::string_view RoutineName("CalcSingleSpeedEvapFluidCooler");
-        int const MaxIteration(100); // Maximum fluid bypass iteration calculations
+        int constexpr MaxIteration(100); // Maximum fluid bypass iteration calculations
         std::string const MaxItChar("100");
-        Real64 const BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
-        Real64 const OWTLowerLimit(0.0);            // The limit of evaporative fluid cooler exit fluid temperature used
+        Real64 constexpr BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
+        Real64 constexpr OWTLowerLimit(0.0);            // The limit of evaporative fluid cooler exit fluid temperature used
         // in the fluid bypass calculation to avoid fluid freezing. For water,
         // it is 0 degreeC and for glycols, it can be much lower. The fluid type
         // is stored at the loop. Current choices are Water and Steam,
@@ -2364,9 +2364,9 @@ namespace EvaporativeFluidCoolers {
         // Merkel, F. 1925.  Verduftungskuhlung. VDI Forschungsarbeiten, Nr 275, Berlin.
         // ASHRAE     1999.  HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculations.
 
-        int const IterMax(50);                  // Maximum number of iterations allowed
-        Real64 const WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations
-        Real64 const DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
+        int constexpr IterMax(50);                  // Maximum number of iterations allowed
+        Real64 constexpr WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations
+        Real64 constexpr DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         static constexpr std::string_view RoutineName("SimSimpleEvapFluidCooler");
 
         this->WaterInletNode = this->WaterInletNodeNum;
@@ -2618,7 +2618,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
-        Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
+        Real64 constexpr TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         std::string CharErrOut;
         std::string CharLowOutletTemp;
 

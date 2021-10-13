@@ -80,10 +80,10 @@ using namespace OutputReportPredefined;
 TEST_F(EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
 {
     Real64 DeltaT = 0.0;
-    Real64 const SourceInletTemp = 62.0;
-    Real64 const Cp = 4178.; // water, J/(kg * K)
-    Real64 const SetPointTemp = 60.0;
-    Real64 const SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
+    Real64 constexpr SourceInletTemp = 62.0;
+    Real64 constexpr Cp = 4178.; // water, J/(kg * K)
+    Real64 constexpr SetPointTemp = 60.0;
+    Real64 constexpr SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
     Real64 SourceMassFlowRate = SourceMassFlowRateOrig;
     Real64 Qheatpump = 0.0;
     Real64 Qsource = 0.0;
@@ -1935,7 +1935,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 20.0 / 60.0;
     TimeStepSys = state->dataGlobal->TimeStepZone;
-    const int TankNum = 1;
+    constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     for (auto &node : Tank.Node) {
         node.Temp = 60.0;
@@ -2127,7 +2127,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
-    const int TankNum = 1;
+    constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     Tank.SourceInletNode = 1;
     Tank.SourceOutletNode = 2;

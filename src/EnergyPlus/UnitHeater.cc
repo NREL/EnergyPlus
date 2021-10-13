@@ -1502,7 +1502,7 @@ namespace UnitHeater {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(100); // maximum number of iterations
+        int constexpr MaxIter(100); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlNode;        // the hot water inlet node

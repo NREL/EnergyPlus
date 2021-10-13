@@ -2273,7 +2273,7 @@ namespace HVACUnitaryBypassVAV {
         // Simulates the unit components sequentially in the air flow direction.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500); // Maximum number of iterations
+        int constexpr MaxIte(500); // Maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinHumRat;       // Minimum humidity ratio for sensible capacity calculation (kg/kg)
@@ -4173,8 +4173,8 @@ namespace HVACUnitaryBypassVAV {
         // is calculated iteratively.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-        int const SolveMaxIter(50);
+        Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+        int constexpr SolveMaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 mdot;            // heating coil steam or hot water mass flow rate

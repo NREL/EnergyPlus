@@ -688,8 +688,8 @@ namespace ThermalComfort {
         using Psychrometrics::PsyPsatFnTemp;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(150);             // Limit of iteration
-        Real64 const StopIterCrit(0.00015); // Stop criteria for iteration
+        int constexpr MaxIter(150);             // Limit of iteration
+        Real64 constexpr StopIterCrit(0.00015); // Stop criteria for iteration
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 P1;  // Intermediate variables to calculate clothed body ratio and clothing temperature
@@ -1438,7 +1438,7 @@ namespace ThermalComfort {
         // Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const CloEmiss(0.8); // Clothing Emissivity
+        Real64 constexpr CloEmiss(0.8); // Clothing Emissivity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BodyWt;            // Weight of body, kg
@@ -1925,7 +1925,7 @@ namespace ThermalComfort {
         using namespace DataHeatBalance;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const AngleFacLimit(0.01); // To set the limit of sum of angle factors
+        Real64 constexpr AngleFacLimit(0.01); // To set the limit of sum of angle factors
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllAngleFacSummed; // Sum of angle factors in each zone
@@ -2241,8 +2241,8 @@ namespace ThermalComfort {
         Real64 SurfaceTemp;
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const AreaEff(1.8);                    // Effective area of a "standard" person in meters squared
-        Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
+        Real64 constexpr AreaEff(1.8);                    // Effective area of a "standard" person in meters squared
+        Real64 constexpr StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneRadTemp;
@@ -2988,7 +2988,7 @@ namespace ThermalComfort {
         int j;
         bool weathersimulation;
         Real64 inavgdrybulb;
-        int const numHeaderRowsInEpw = 8;
+        int constexpr numHeaderRowsInEpw = 8;
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;

@@ -2909,8 +2909,8 @@ namespace SurfaceGeometry {
     {
         bool sameSurfNormal(false); // True if surface has the same surface normal within tolerance
         bool baseSurfHoriz(false);  // True if base surface is near horizontal
-        Real64 const warningTolerance(30.0);
-        Real64 const errorTolerance(90.0);
+        Real64 constexpr warningTolerance(30.0);
+        Real64 constexpr errorTolerance(90.0);
 
         surfaceError = false;
 
@@ -9447,7 +9447,7 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        int const NumValidShadingTypes(9);
+        int constexpr NumValidShadingTypes(9);
         static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
                                                        {
                                                            "SHADEOFF",          // 1
@@ -9461,7 +9461,7 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int const NumValidWindowShadingControlTypes(21);
+        int constexpr NumValidWindowShadingControlTypes(21);
         static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
                                                                     {"ALWAYSON",
                                                                      "ALWAYSOFF",
@@ -15440,7 +15440,7 @@ namespace SurfaceGeometry {
                 (revMatLay.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
-                Real64 const SmallDiff = 0.0001;
+                Real64 constexpr SmallDiff = 0.0001;
                 if ((thisMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass) &&
                     (revMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed

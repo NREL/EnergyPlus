@@ -257,6 +257,7 @@ struct ThermalComfortsData : BaseGlobalStruct
     int AnkleDraftActMetWarningInd = 0;       // Counter for ankle draft invalid activity level warnings.
 
     // MODULE PARAMETER DEFINITIONS
+    // TODO: remove 'const' from state
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
     Real64 const ActLevelConv = 58.2;                        // Converter for activity level (1Met = 58.2 W/m2)
     Real64 const BodySurfArea = 1.8;                         // Dubois body surface area of the human body (m2)

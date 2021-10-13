@@ -264,14 +264,14 @@ namespace SteamCoils {
                           int const CoilNum,                           // index of hot steam heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
                           Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
+                          Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this coil is used
     );
 
 } // namespace SteamCoils
 
 struct SteamCoilsData : BaseGlobalStruct
 {
-
+    // TODO: remove 'const' from state
     int const SteamCoil_AirHeating = 2;
     int const TemperatureSetPointControl = 1;
     int const ZoneLoadControl = 3;
