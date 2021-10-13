@@ -8772,7 +8772,7 @@ Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth)
 }
 
 Real64 CalcBlockenWindward(Real64 const WindAt10m,
-                           Real64 const WindDir,    // Wind direction measured clockwise from geographhic North
+                           Real64 const WindDir,    // Wind direction measured clockwise from geographic North
                            Real64 const SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
 )
 {
@@ -8800,16 +8800,15 @@ Real64 CalcBlockenWindward(Real64 const WindAt10m,
 
     Real64 Theta; // angle between wind and surface azimuth
 
-    Theta = WindDir - SurfAzimuth - 90.0; // TODO double check theta
-    if (Theta > 180.0) Theta -= 360.0;
+    Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth);
 
     if (Theta <= 11.25) {
         Hf = 4.6 * std::pow(WindAt10m, 0.89);
-    } else if ((11.25 < Theta) && (Theta <= 33.75)) {
+    } else if (Theta <= 33.75) {
         Hf = 5.0 * std::pow(WindAt10m, 0.8);
-    } else if ((33.75 < Theta) && (Theta <= 56.25)) {
+    } else if (Theta <= 56.25) {
         Hf = 4.6 * std::pow(WindAt10m, 0.84);
-    } else if ((56.25 < Theta) && (Theta <= 100.0)) {
+    } else if (Theta <= 90.0) {
         Hf = 4.5 * std::pow(WindAt10m, 0.81);
     } else {
         // should not be used for leeward... check why come here?
@@ -8820,7 +8819,7 @@ Real64 CalcBlockenWindward(Real64 const WindAt10m,
 
 Real64 CalcEmmelVertical(EnergyPlusData &state,
                          Real64 const WindAt10m,
-                         Real64 const WindDir,     // Wind direction measured clockwise from geographhic North
+                         Real64 const WindDir,     // Wind direction measured clockwise from geographic North
                          Real64 const SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                          int const SurfNum)
 {
@@ -8878,7 +8877,7 @@ Real64 CalcEmmelVertical(EnergyPlusData &state,
 
 Real64 CalcEmmelRoof(EnergyPlusData &state,
                      Real64 const WindAt10m,
-                     Real64 const WindDir,                // Wind direction measured clockwise from geographhic North
+                     Real64 const WindDir,                // Wind direction measured clockwise from geographic North
                      Real64 const LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                      int const SurfNum)
 {
@@ -8998,7 +8997,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
                      Real64 const SurfTemp,
                      Real64 const AirTemp,
                      Real64 const WindAtZ,
-                     [[maybe_unused]] Real64 const WindDirect, // Wind direction measured clockwise from geographhic North
+                     [[maybe_unused]] Real64 const WindDirect, // Wind direction measured clockwise from geographic North
                      Real64 const RoofArea,
                      Real64 const RoofPerimeter)
 {
