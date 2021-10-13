@@ -96,7 +96,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 //       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
-// This module contain the routines dealing with convection coefficients.
+// This module contains the routines dealing with convection coefficients.
 // This module collects correlations/calculations for both the interior and exterior
 // Manages a portion of the input and calculations for Hc values for use in surface heat balances.
 
