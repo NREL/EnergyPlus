@@ -7013,12 +7013,12 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
         break;
     case ConvectionConstants::RefWind::ParallelComp:
         // WindSpeed , WindDir, surface Azimuth
-        Theta = state.dataEnvrn->WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+        Theta = CalcWindSurfaceTheta(state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
         ThetaRad = Theta * DataGlobalConstants::DegToRadians;
         break;
     case ConvectionConstants::RefWind::ParallelCompAtZ:
         // Surface WindSpeed , Surface WindDir, surface Azimuth
-        Theta = state.dataSurface->SurfOutWindDir(SurfNum) - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+        Theta = CalcWindSurfaceTheta(state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
         ThetaRad = Theta * DataGlobalConstants::DegToRadians;
         windVel = std::cos(ThetaRad) * state.dataSurface->SurfOutWindSpeed(SurfNum);
         break;
