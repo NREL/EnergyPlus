@@ -2763,3 +2763,46 @@ TEST_F(ConvectionCoefficientsFixture, TestEmmelRoof)
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
     }
 }
+
+TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
+{
+    // wind speeds
+    constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    // expected values
+    constexpr std::array<Real64, 15> actualHcZeroDegTheta = {
+        4.600, 8.525, 12.229, 15.798, 19.268, 22.663, 25.995, 29.276, 32.511, 35.707, 38.868, 41.998, 45.099, 48.174, 51.225};
+
+    constexpr std::array<Real64, 15> actualHcTwentyTwoDegTheta = {
+        5.000, 8.706, 12.041, 15.157, 18.119, 20.965, 23.716, 26.390, 28.998, 31.548, 34.047, 36.502, 38.916, 41.293, 43.636};
+
+    constexpr std::array<Real64, 15> actualHcFortyFiveTheta = {
+        4.600, 8.234, 11.575, 14.740, 17.778, 20.721, 23.585, 26.385, 29.129, 31.824, 34.477, 37.091, 39.671, 42.219, 44.738};
+
+    constexpr std::array<Real64, 15> actualHcSixtySevenDegTheta = {
+        4.500, 7.889, 10.957, 13.832, 16.572, 19.209, 21.764, 24.250, 26.678, 29.054, 31.386, 33.678, 35.934, 38.157, 40.350};
+
+    for (int idx = 0; idx < 15; idx++) {
+        Real64 windSpeed = windSpeedAt10m[idx];
+
+        // test at 0 deg theta
+        Real64 actualHc = actualHcZeroDegTheta[idx];
+        Real64 expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 0, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 22.5 deg theta
+        actualHc = actualHcTwentyTwoDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 22.5, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 45 deg theta
+        actualHc = actualHcFortyFiveTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 45, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 67.5 deg theta
+        actualHc = actualHcSixtySevenDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 67.5, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+    }
+}
