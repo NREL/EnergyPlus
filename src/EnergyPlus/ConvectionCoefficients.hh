@@ -836,6 +836,8 @@ namespace ConvectionCoefficients {
                                Real64 SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
     );
 
+    Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth);
+
     Real64 CalcEmmelVertical(EnergyPlusData &state,
                              Real64 WindAt10m,
                              Real64 WindDir,     // Wind direction measured clockwise from geographic North

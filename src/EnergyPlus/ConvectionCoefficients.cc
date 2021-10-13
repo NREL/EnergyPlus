@@ -8758,6 +8758,16 @@ Real64 CalcMitchell(EnergyPlusData &state, Real64 const WindAtZ, Real64 const Le
     }
 }
 
+Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth)
+{
+    Real64 theta = std::abs(WindDir - SurfAzimuth);
+    if (theta > 180) {
+        return abs(theta - 360);
+    } else {
+        return theta;
+    }
+}
+
 Real64 CalcBlockenWindward(Real64 const WindAt10m,
                            Real64 const WindDir,    // Wind direction measured clockwise from geographhic North
                            Real64 const SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
