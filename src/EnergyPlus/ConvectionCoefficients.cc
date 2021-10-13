@@ -8838,25 +8838,24 @@ Real64 CalcEmmelVertical(EnergyPlusData &state,
     // REFERENCES:
     // Emmel, M.G., M.O. Abadie, N. Mendes. 2007. New external convective
     //   heat transfer coefficient correlations for isolated low-rise buildings.
-    //    Energy and Buildings 39 (2007) 335- 342
+    //   Energy and Buildings 39 (2007) 335- 342
 
     // Return value
     Real64 Hf;
 
     Real64 Theta; // angle between wind and surface azimuth
 
-    Theta = WindDir - SurfAzimuth - 90.0; // TODO double check theta
-    if (Theta > 180.0) Theta -= 360.0;
+    Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth);
 
     if (Theta <= 22.5) {
         Hf = 5.15 * std::pow(WindAt10m, 0.81);
-    } else if ((22.5 < Theta) && (Theta <= 67.5)) {
+    } else if (Theta <= 67.5) {
         Hf = 3.34 * std::pow(WindAt10m, 0.84);
-    } else if ((67.5 < Theta) && (Theta <= 112.5)) {
+    } else if (Theta <= 112.5) {
         Hf = 4.78 * std::pow(WindAt10m, 0.71);
-    } else if ((112.5 < Theta) && (Theta <= 157.5)) {
+    } else if (Theta <= 157.5) {
         Hf = 4.05 * std::pow(WindAt10m, 0.77);
-    } else if ((157.5 < Theta) && (Theta <= 180.0)) {
+    } else if (Theta <= 180.0) {
         Hf = 3.54 * std::pow(WindAt10m, 0.76);
 
     } else {
