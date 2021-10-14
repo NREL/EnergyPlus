@@ -2430,7 +2430,6 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.FuelType) {
-        case Fuel::DistrictCooling:
         case Fuel::Unassigned: {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2487,15 +2486,6 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaFuelType =
             static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
         switch (Tank.OffCycParaFuelType) {
-        case Fuel::DistrictCooling: {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(6));
-            // Set to Electric to avoid errors when setting up output variables
-            Tank.OffCycParaFuelType = Fuel::Electricity;
-            ErrorsFound = true;
-            break;
-        }
         case Fuel::Unassigned:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
                 Tank.OffCycParaFuelType = Tank.FuelType;
@@ -2520,15 +2510,6 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaFuelType =
             static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
         switch (Tank.OnCycParaFuelType) {
-        case Fuel::DistrictCooling: {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
-            // Set to Electric to avoid errors when setting up output variables
-            Tank.OnCycParaFuelType = Fuel::Electricity;
-            ErrorsFound = true;
-            break;
-        }
         case Fuel::Unassigned:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
                 Tank.OnCycParaFuelType = Tank.FuelType;
@@ -2976,7 +2957,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             getEnumerationValue(FuelTypeNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
-        if ((Tank.FuelType == Fuel::DistrictCooling) || (Tank.FuelType == Fuel::Unassigned)) {
+        if (Tank.FuelType == Fuel::Unassigned) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                 ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
@@ -3001,7 +2982,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             getEnumerationValue(FuelTypeNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
-        if ((Tank.OffCycParaFuelType == Fuel::DistrictCooling) || (Tank.OffCycParaFuelType == Fuel::Unassigned)) {
+        if (Tank.OffCycParaFuelType == Fuel::Unassigned) {
             if (state.dataIPShortCut->cAlphaArgs(8).empty()) {
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else {
@@ -3024,7 +3005,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             FuelTypeNamesUC,
             UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                 9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
-        if ((Tank.OnCycParaFuelType == Fuel::DistrictCooling) || (Tank.OnCycParaFuelType == Fuel::Unassigned)) {
+        if (Tank.OnCycParaFuelType == Fuel::Unassigned) {
             if (state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else {
