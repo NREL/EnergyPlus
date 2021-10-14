@@ -7018,7 +7018,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
         break;
     case ConvectionConstants::RefWind::ParallelCompAtZ:
         // Surface WindSpeed , Surface WindDir, surface Azimuth
-        Theta = CalcWindSurfaceTheta(state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
+        Theta = CalcWindSurfaceTheta(state.dataSurface->SurfOutWindDir(SurfNum), Surface(SurfNum).Azimuth);
         ThetaRad = Theta * DataGlobalConstants::DegToRadians;
         windVel = std::cos(ThetaRad) * state.dataSurface->SurfOutWindSpeed(SurfNum);
         break;
@@ -8763,7 +8763,9 @@ Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth)
     // Computes the angle theta between the wind direction and the surface azimuth
     // Should always be a value between 0-180 deg
 
-    Real64 theta = std::abs(WindDir - SurfAzimuth);
+    Real64 windDir = std::fmod(WindDir, 360);
+    Real64 surfAzi = std::fmod(SurfAzimuth, 360);
+    Real64 theta = std::abs(windDir - surfAzi);
     if (theta > 180) {
         return abs(theta - 360);
     } else {
@@ -8795,26 +8797,19 @@ Real64 CalcBlockenWindward(Real64 const WindAt10m,
     //   Heat Transfer Coefficients at the Facade of a Low-Rise Building.
     //   Building and Environment 44 (2009) 2396 - 2412.
 
-    // Return value
-    Real64 Hf;
-
-    Real64 Theta; // angle between wind and surface azimuth
-
-    Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth);
+    Real64 Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth); // angle between wind and surface azimuth
 
     if (Theta <= 11.25) {
-        Hf = 4.6 * std::pow(WindAt10m, 0.89);
+        return 4.6 * std::pow(WindAt10m, 0.89);
     } else if (Theta <= 33.75) {
-        Hf = 5.0 * std::pow(WindAt10m, 0.8);
+        return 5.0 * std::pow(WindAt10m, 0.8);
     } else if (Theta <= 56.25) {
-        Hf = 4.6 * std::pow(WindAt10m, 0.84);
-    } else if (Theta <= 90.0) {
-        Hf = 4.5 * std::pow(WindAt10m, 0.81);
+        return 4.6 * std::pow(WindAt10m, 0.84);
+    } else if (Theta <= 100.0) {
+        return 4.5 * std::pow(WindAt10m, 0.81);
     } else {
-        // should not be used for leeward... check why come here?
-        Hf = 3.54 * std::pow(WindAt10m, 0.76); // emmel model for robustness?
+        assert(false);
     }
-    return Hf;
 }
 
 Real64 CalcEmmelVertical(EnergyPlusData &state,
@@ -8842,37 +8837,33 @@ Real64 CalcEmmelVertical(EnergyPlusData &state,
     //   heat transfer coefficient correlations for isolated low-rise buildings.
     //   Energy and Buildings 39 (2007) 335- 342
 
-    // Return value
-    Real64 Hf;
+    if ((WindDir > 360) || (SurfAzimuth > 360)) {
+        if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
+            ShowSevereMessage(state, "CalcEmmelVertical: Convection model angle calculations suspect (developer issue)");
+            ShowContinueError(state, format("Value for WindDir = {:.5R}", WindDir));
+            ShowContinueError(state, format("Value for SurfAzimuth = {:.5R}", SurfAzimuth));
+            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
+            ShowContinueError(state, "Modulo applied to angles to bound between 0-360 deg.");
+        }
+        ShowRecurringSevereErrorAtEnd(
+            state, "CalcEmmelVertical: Convection model angles suspect.", state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
+    }
 
-    Real64 Theta; // angle between wind and surface azimuth
-
-    Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth);
+    Real64 Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth); // angle between wind and surface azimuth
 
     if (Theta <= 22.5) {
-        Hf = 5.15 * std::pow(WindAt10m, 0.81);
+        return 5.15 * std::pow(WindAt10m, 0.81);
     } else if (Theta <= 67.5) {
-        Hf = 3.34 * std::pow(WindAt10m, 0.84);
+        return 3.34 * std::pow(WindAt10m, 0.84);
     } else if (Theta <= 112.5) {
-        Hf = 4.78 * std::pow(WindAt10m, 0.71);
+        return 4.78 * std::pow(WindAt10m, 0.71);
     } else if (Theta <= 157.5) {
-        Hf = 4.05 * std::pow(WindAt10m, 0.77);
+        return 4.05 * std::pow(WindAt10m, 0.77);
     } else if (Theta <= 180.0) {
-        Hf = 3.54 * std::pow(WindAt10m, 0.76);
-
+        return 3.54 * std::pow(WindAt10m, 0.76);
     } else {
-        if (state.dataConvectionCoefficient->CalcEmmelVerticalErrorIDX == 0) {
-            ShowSevereMessage(state, "CalcEmmelVertical: Convection model wind angle calculation suspect (developer issue)");
-            ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
-            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
-            ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
-        }
-        ShowRecurringSevereErrorAtEnd(state,
-                                      "CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
-                                      state.dataConvectionCoefficient->CalcEmmelVerticalErrorIDX);
-        Hf = 3.54 * std::pow(WindAt10m, 0.76);
+        assert(false);
     }
-    return Hf;
 }
 
 Real64 CalcEmmelRoof(EnergyPlusData &state,
@@ -8900,38 +8891,33 @@ Real64 CalcEmmelRoof(EnergyPlusData &state,
     //   heat transfer coefficient correlations for isolated low-rise buildings.
     //    Energy and Buildings 39 (2007) 335- 342
 
-    // Return value
-    Real64 Hf;
+    if ((WindDir > 360) || (LongAxisOutwardAzimuth > 360)) {
+        if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
+            ShowSevereMessage(state, "CalcEmmelRoof: Convection model angle calculations suspect (developer issue)");
+            ShowContinueError(state, format("Value for WindDir = {:.5R}", WindDir));
+            ShowContinueError(state, format("Value for LongAxisOutwardAzimuth = {:.5R}", LongAxisOutwardAzimuth));
+            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
+            ShowContinueError(state, "Modulo applied to angles to bound between 0-360 deg.");
+        }
+        ShowRecurringSevereErrorAtEnd(
+            state, "CalcEmmelRoof: Convection model angles suspect.", state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
+    }
 
-    Real64 Theta; // angle between wind and surface azimuth
-
-    Theta = CalcWindSurfaceTheta(WindDir, LongAxisOutwardAzimuth);
+    Real64 Theta = CalcWindSurfaceTheta(WindDir, LongAxisOutwardAzimuth); // angle between wind and surface azimuth
 
     if (Theta <= 22.5) {
-        Hf = 5.11 * std::pow(WindAt10m, 0.78);
+        return 5.11 * std::pow(WindAt10m, 0.78);
     } else if (Theta <= 67.5) {
-        Hf = 4.60 * std::pow(WindAt10m, 0.79);
+        return 4.60 * std::pow(WindAt10m, 0.79);
     } else if (Theta <= 112.5) {
-        Hf = 3.67 * std::pow(WindAt10m, 0.85);
+        return 3.67 * std::pow(WindAt10m, 0.85);
     } else if (Theta <= 157.5) {
-        Hf = 4.60 * std::pow(WindAt10m, 0.79);
+        return 4.60 * std::pow(WindAt10m, 0.79);
     } else if (Theta <= 180.0) {
-        Hf = 5.11 * std::pow(WindAt10m, 0.78);
-
+        return 5.11 * std::pow(WindAt10m, 0.78);
     } else {
-        if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
-            ShowSevereMessage(state, "CalcEmmelRoof: Convection model wind angle calculation suspect (developer issue)");
-            ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
-            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
-            ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
-        }
-        ShowRecurringSevereErrorAtEnd(state,
-                                      "CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
-                                      state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
-
-        Hf = 3.67 * std::pow(WindAt10m, 0.85);
+        assert(false);
     }
-    return Hf;
 }
 
 Real64 CalcClearRoof(EnergyPlusData &state,
