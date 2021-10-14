@@ -1347,7 +1347,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Inlet Air Configuration
-        HPWH.InletAirConfiguration = static_cast<WTTAmbientTemp>(getEnumerationValue(HPWHAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[6 + nAlphaOffset])));
+        HPWH.InletAirConfiguration =
+            static_cast<WTTAmbientTemp>(getEnumerationValue(HPWHAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[6 + nAlphaOffset])));
         switch (HPWH.InletAirConfiguration) {
         case (WTTAmbientTemp::Schedule): {
 
@@ -1576,8 +1577,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Compressor Location
-        HPWH.CrankcaseTempIndicator =
-            static_cast<CrankcaseHeaterControlTemp>(getEnumerationValue(CrankcaseHeaterControlTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[20 + nAlphaOffset])));
+        HPWH.CrankcaseTempIndicator = static_cast<CrankcaseHeaterControlTemp>(
+            getEnumerationValue(CrankcaseHeaterControlTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[20 + nAlphaOffset])));
         switch (HPWH.CrankcaseTempIndicator) {
         case CrankcaseHeaterControlTemp::Schedule: {
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
@@ -2427,7 +2428,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.IgnitionDelay = state.dataIPShortCut->rNumericArgs(7); // Not yet implemented
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC,UtilityRoutines::MakeUPPERCase( state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.FuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.FuelType) {
         case Fuel::DistrictCooling:
         case Fuel::Unassigned: {
@@ -2483,7 +2484,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+        Tank.OffCycParaFuelType =
+            static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
         switch (Tank.OffCycParaFuelType) {
         case Fuel::DistrictCooling: {
             ShowSevereError(state,
@@ -2515,7 +2517,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(11);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
+        Tank.OnCycParaFuelType =
+            static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
         switch (Tank.OnCycParaFuelType) {
         case Fuel::DistrictCooling: {
             ShowSevereError(state,
@@ -2544,7 +2547,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         Tank.OnCycParaFracToTank = state.dataIPShortCut->rNumericArgs(12);
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
+            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
         switch (Tank.AmbientTempIndicator) {
         case WTTAmbientTemp::Schedule: {
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
@@ -2755,8 +2759,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-            Tank.SourceSideControlMode =
-                static_cast<SourceSideControl>(getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(18))));
+            Tank.SourceSideControlMode = static_cast<SourceSideControl>(
+                getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(18))));
             if (Tank.SourceSideControlMode == SourceSideControl::Unassigned) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2841,7 +2845,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.HeightWasAutoSized = true;
         }
 
-        Tank.Shape = static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+        Tank.Shape =
+            static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
         case TankShape::VertCylinder: {
@@ -2877,8 +2882,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate Heater Priority Control
-        Tank.StratifiedControlMode =
-            static_cast<PriorityControlMode>(getEnumerationValue(PriorityControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.StratifiedControlMode = static_cast<PriorityControlMode>(
+            getEnumerationValue(PriorityControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         if (Tank.StratifiedControlMode == PriorityControlMode::Unassigned) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2967,7 +2972,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
+        Tank.FuelType = static_cast<Fuel>(
+            getEnumerationValue(FuelTypeNamesUC,
+                                UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
+                                    7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if ((Tank.FuelType == Fuel::DistrictCooling) || (Tank.FuelType == Fuel::Unassigned)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2989,7 +2997,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(12);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
+        Tank.OffCycParaFuelType = static_cast<Fuel>(
+            getEnumerationValue(FuelTypeNamesUC,
+                                UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
+                                    8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if ((Tank.OffCycParaFuelType == Fuel::DistrictCooling) || (Tank.OffCycParaFuelType == Fuel::Unassigned)) {
             if (state.dataIPShortCut->cAlphaArgs(8).empty()) {
                 Tank.OffCycParaFuelType = Tank.FuelType;
@@ -3009,10 +3020,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(15);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Fuel>(
-            getEnumerationValue(FuelTypeNamesUC,
-                                UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
-                                    9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
+        Tank.OnCycParaFuelType = static_cast<Fuel>(getEnumerationValue(
+            FuelTypeNamesUC,
+            UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
+                9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
         if ((Tank.OnCycParaFuelType == Fuel::DistrictCooling) || (Tank.OnCycParaFuelType == Fuel::Unassigned)) {
             if (state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 Tank.OnCycParaFuelType = Tank.FuelType;
@@ -3304,7 +3315,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate inlet mode
-        Tank.InletMode = static_cast<InletPositionMode>(getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(20))));
+        Tank.InletMode = static_cast<InletPositionMode>(
+            getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(20))));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(32);
         int specifiedNodes = 0;
@@ -3336,8 +3348,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.SetupStratifiedNodes(state);
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
-            Tank.SourceSideControlMode =
-                static_cast<SourceSideControl>(getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(21))));
+            Tank.SourceSideControlMode = static_cast<SourceSideControl>(
+                getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(21))));
             if (Tank.SourceSideControlMode == SourceSideControl::Unassigned) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -3455,7 +3467,8 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         Tank.OnCycParaFuelType = Fuel::Electricity;
         Tank.OnCycParaFracToTank = 0.0;
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
+            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -3708,7 +3721,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
             Tank.HeightWasAutoSized = true;
         }
 
-        Tank.Shape = static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+        Tank.Shape =
+            static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
         case TankShape::VertCylinder: {
@@ -3778,7 +3792,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = 0.0;
         Tank.OnCycParaHeight = 0.0;
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
+            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -4009,7 +4024,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate inlet mode
-        Tank.InletMode = static_cast<InletPositionMode>(getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(14))));
+        Tank.InletMode = static_cast<InletPositionMode>(
+            getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(14))));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(18);
         Tank.AdditionalCond = state.dataIPShortCut->rNumericArgs(19);
@@ -10605,7 +10621,6 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
     // collect routines for setting flow rates for Water heaters
     // with plant connections.
 
-
     // determine current mode.  there are three possible
     //  1.  passing thru what was given to inlet node
     //  2.  potentially making a flow request
@@ -11032,23 +11047,23 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
 
         // assume can propagate rules for gas to other fuels.
         bool FuelTypeIsLikeGas = false;
-         switch (this->FuelType) {
-         case Fuel::NaturalGas:
-         case Fuel::Diesel:
-         case Fuel::Gasoline:
-         case Fuel::Coal:
-         case Fuel::FuelOilNo1:
-         case Fuel::FuelOilNo2:
-         case Fuel::Propane:
-         case Fuel::Steam:
-         case Fuel::OtherFuel1:
-         case Fuel::OtherFuel2:
-         case Fuel::DistrictHeating:
-             FuelTypeIsLikeGas = true;
-             break;
-         default:// FuelTypeIsLikeGas stays false
-             break;
-         }
+        switch (this->FuelType) {
+        case Fuel::NaturalGas:
+        case Fuel::Diesel:
+        case Fuel::Gasoline:
+        case Fuel::Coal:
+        case Fuel::FuelOilNo1:
+        case Fuel::FuelOilNo2:
+        case Fuel::Propane:
+        case Fuel::Steam:
+        case Fuel::OtherFuel1:
+        case Fuel::OtherFuel2:
+        case Fuel::DistrictHeating:
+            FuelTypeIsLikeGas = true;
+            break;
+        default: // FuelTypeIsLikeGas stays false
+            break;
+        }
 
         if (this->Sizing.NumberOfBedrooms == 1) {
             if (this->FuelType == Fuel::Electricity) {
@@ -11768,7 +11783,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             case Fuel::DistrictHeating:
                 FuelTypeIsLikeGas = true;
                 break;
-            default:// FuelTypeIsLikeGas stays false
+            default: // FuelTypeIsLikeGas stays false
                 break;
             }
 

@@ -204,7 +204,8 @@ namespace WaterThermalTanks {
         Num
     };
 
-    enum class Fuel {
+    enum class Fuel
+    {
         Unassigned = -1,
         Electricity,
         NaturalGas,
@@ -222,22 +223,19 @@ namespace WaterThermalTanks {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNamesUC{
-        "ELECTRICITY",
-        "NATURALGAS",
-        "DIESEL",
-        "GASOLINE",
-        "COAL",
-        "FUELOILNO1",
-        "FUELOILNO2",
-        "PROPANE",
-        "STEAM",
-        "OTHERFUEL1",
-        "OTHERFUEL2",
-        "DISTRICTHEATING",
-        "DISTRICTCOOLING"
-    };
-
+    constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNamesUC{"ELECTRICITY",
+                                                                                        "NATURALGAS",
+                                                                                        "DIESEL",
+                                                                                        "GASOLINE",
+                                                                                        "COAL",
+                                                                                        "FUELOILNO1",
+                                                                                        "FUELOILNO2",
+                                                                                        "PROPANE",
+                                                                                        "STEAM",
+                                                                                        "OTHERFUEL1",
+                                                                                        "OTHERFUEL2",
+                                                                                        "DISTRICTHEATING",
+                                                                                        "DISTRICTCOOLING"};
 
     struct StratifiedNodeData
     {
@@ -522,7 +520,7 @@ namespace WaterThermalTanks {
         int SavedMode;                                                // Mode indicator saved from previous time step
         HeaterControlMode ControlType;                                // Indicator for Heater Control type
         PriorityControlMode StratifiedControlMode;                    // Indicator for Stratified Water Heaters Priority Control Type
-        Fuel FuelType;                                         // Fuel type
+        Fuel FuelType;                                                // Fuel type
         Real64 MaxCapacity;                                           // Maximum capacity of auxiliary heater 1 (W)
         bool MaxCapacityWasAutoSized;                                 // true if heater 1 capacity was autosized on input
         Real64 MinCapacity;                                           // Minimum capacity of auxiliary heater 1 (W)
@@ -534,10 +532,10 @@ namespace WaterThermalTanks {
         Real64 TankTempLimit;                                         // Maximum tank temperature limit before venting (C)
         Real64 IgnitionDelay;                                         // Time delay before heater is allowed to turn on (s)
         Real64 OffCycParaLoad;                                        // Rate for off-cycle parasitic load (W)
-        Fuel OffCycParaFuelType;                               // Fuel type for off-cycle parasitic load
+        Fuel OffCycParaFuelType;                                      // Fuel type for off-cycle parasitic load
         Real64 OffCycParaFracToTank;                                  // Fraction of off-cycle parasitic energy ending up in tank (W)
         Real64 OnCycParaLoad;                                         // Rate for on-cycle parasitic load (W)
-        Fuel OnCycParaFuelType;                                // Fuel type for on-cycle parasitic load
+        Fuel OnCycParaFuelType;                                       // Fuel type for on-cycle parasitic load
         Real64 OnCycParaFracToTank;                                   // Fraction of on-cycle parasitic energy ending up in tank (W)
         DataPlant::iFlowLock UseCurrentFlowLock;                      // current flow lock setting on use side
         int UseInletNode;                                             // Inlet node on the use side; colder water returning to a hottank
