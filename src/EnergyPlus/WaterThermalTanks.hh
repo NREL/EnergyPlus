@@ -223,17 +223,17 @@ namespace WaterThermalTanks {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNames{"Electricity",
-                                                                                        "NaturalGas",
-                                                                                        "Diesel",
-                                                                                        "Gasoline",
-                                                                                        "Coal",
-                                                                                        "FuelOilNo1",
-                                                                                        "FuelOilNo2",
-                                                                                        "Propane",
-                                                                                        "Steam",
-                                                                                        "OtherFuel1",
-                                                                                        "OtherFuel2",
-                                                                                        "DistrictHeating"};
+                                                                                      "NaturalGas",
+                                                                                      "Diesel",
+                                                                                      "Gasoline",
+                                                                                      "Coal",
+                                                                                      "FuelOilNo1",
+                                                                                      "FuelOilNo2",
+                                                                                      "Propane",
+                                                                                      "Steam",
+                                                                                      "OtherFuel1",
+                                                                                      "OtherFuel2",
+                                                                                      "DistrictHeating"};
 
     constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNamesUC{"ELECTRICITY",
                                                                                         "NATURALGAS",

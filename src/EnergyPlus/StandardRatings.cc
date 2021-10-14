@@ -175,24 +175,22 @@ namespace StandardRatings {
     Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp(
         18, {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
-    int constexpr NumberOfRegions {6};
-    int constexpr NumberOfBins {18};
-    std::array<std::array< Real64, NumberOfBins>, NumberOfRegions> AllRegionFracBinHoursAtOutdoorBinTemp {
-        {
-    // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
+    int constexpr NumberOfRegions{6};
+    int constexpr NumberOfBins{18};
+    std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> AllRegionFracBinHoursAtOutdoorBinTemp{{
+        // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
         {{0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-    // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
+        // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
         {{0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-    // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
+        // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
         {{0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0}},
-    // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
+        // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
         {{0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0}},
-    // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
+        // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
         {{0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001}},
-    // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
+        // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
         {{0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-        }
-    };
+    }};
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     int const NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
@@ -649,7 +647,9 @@ namespace StandardRatings {
         // Formats
 
         if (StandardRatingsMyOneTimeFlag) {
-            print(state.files.eio, "{}\n", "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
+            print(state.files.eio,
+                  "{}\n",
+                  "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
             StandardRatingsMyOneTimeFlag = false;
         }
 
@@ -1431,7 +1431,7 @@ namespace StandardRatings {
         if (RegionNum == 5) {
             DesignHeatingRequirementMin = NetHeatingCapRated;
         } else {
-            DesignHeatingRequirementMin = NetHeatingCapRated * 1.8 * (18.33 - OutdoorDesignTemperature[RegionNum-1]) / 60.0;
+            DesignHeatingRequirementMin = NetHeatingCapRated * 1.8 * (18.33 - OutdoorDesignTemperature[RegionNum - 1]) / 60.0;
         }
 
         for (StandardDHRNum = 1; StandardDHRNum <= TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
@@ -1455,10 +1455,10 @@ namespace StandardRatings {
 
         for (BinNum = 0; BinNum < TotalNumOfTemperatureBins(RegionNum); ++BinNum) {
 
-            FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[RegionNum-1][BinNum];
+            FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
 
-            BuildingLoad =
-                (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum-1]) * CorrectionFactor * DesignHeatingRequirement;
+            BuildingLoad = (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum - 1]) * CorrectionFactor *
+                           DesignHeatingRequirement;
 
             if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.22)) {
                 NetHeatingCapReduced =
@@ -2245,7 +2245,7 @@ namespace StandardRatings {
             DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp;
             DesignHeatingRequirementMax = 2.20 * NetHeatingCapRatedHighTemp;
         } else {
-            DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp * (18.33 - OutdoorDesignTemperature[RegionNum-1]) / (60.0 / 1.80);
+            DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp * (18.33 - OutdoorDesignTemperature[RegionNum - 1]) / (60.0 / 1.80);
             DesignHeatingRequirementMax = 2.20 * DesignHeatingRequirementMin;
         }
         // Set the Design Heating Requirement to nearest standard value (From Table 18, AHRI/ANSI Std 210/240)
@@ -2273,13 +2273,13 @@ namespace StandardRatings {
         for (BinNum = 0; BinNum < TotalNumOfTemperatureBins(RegionNum); ++BinNum) { // NumOfOATempBins
 
             if ((RegionNum > 0) && (RegionNum <= 6))
-                FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[RegionNum-1][BinNum];
+                FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
             else
                 FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[3][BinNum];
 
             // Calculate the building heating load
-            BuildingHeatingLoad =
-                (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum-1]) * CorrectionFactor * DesignHeatingRequirement;
+            BuildingHeatingLoad = (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum - 1]) * CorrectionFactor *
+                                  DesignHeatingRequirement;
 
             if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.20)) {
                 HeatingCapacityMax = TotHeatCapTestH3(nsp) + ((TotHeatCapTestH1(nsp) - TotHeatCapTestH3(nsp)) *
@@ -2487,9 +2487,11 @@ namespace StandardRatings {
 
         case CoilDX_CoolingSingleSpeed: {
             if (MyCoolOneTimeFlag) {
-                print(state.files.eio, "{}", "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                                             "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
-                                             "{Btu/W-h}\n");
+                print(state.files.eio,
+                      "{}",
+                      "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                      "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
+                      "{Btu/W-h}\n");
                 MyCoolOneTimeFlag = false;
             }
 
