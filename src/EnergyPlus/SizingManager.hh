@@ -96,10 +96,8 @@ namespace SizingManager {
                                     int &NumAlphas,
                                     Array1D<Real64> const &rNumericArgs,
                                     int &NumNumbers,
-                                    Array1D_bool const &lNumericFieldBlanks, // Unused
                                     Array1D_bool const &lAlphaFieldBlanks,
                                     Array1D_string const &cAlphaFieldNames,
-                                    Array1D_string const &cNumericFieldNames, // Unused
                                     bool &ErrorsFound                         // If errors found in input
     );
 

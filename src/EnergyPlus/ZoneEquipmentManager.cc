@@ -812,6 +812,23 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
     }
 
+    // Now that zone and space input has been processed, fill in space indexes in OARequirements
+    for (int oaIndex = 1; oaIndex <= state.dataSize->NumOARequirements; ++oaIndex) {
+        auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
+        if (thisOAReq.numDSOA > 0) {
+            for (auto thisSpaceName : thisOAReq.dsoaSpaceNames) {
+                int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                if (thisSpaceNum > 0) {
+                    thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
+                } else {
+                    ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                    ShowContinueError(state, "Space=" + thisSpaceName + " not found.");
+                    ErrorsFound = true;
+                }
+            }
+        }
+    }
+
     for (ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
         if (ZoneIndex == 0) {
