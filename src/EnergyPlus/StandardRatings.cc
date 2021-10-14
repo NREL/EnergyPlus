@@ -120,7 +120,6 @@ namespace StandardRatings {
     Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
     Real64 constexpr AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
     // and hence AirMassFlowRatio is 1.0
-    Real64 constexpr ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
     Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
     // specifies a nominal/default fan electric power consumption per rated air
     // volume flow rate to account for indoor fan electric power consumption

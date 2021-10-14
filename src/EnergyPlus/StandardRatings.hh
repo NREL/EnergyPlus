@@ -63,30 +63,10 @@ struct EnergyPlusData;
 
 namespace StandardRatings {
 
-    // Data
-    extern Real64 const IndoorCoilInletAirWetBulbTempRated;   // 19.44C (67F)  Tests A2, B2, B1, and F1
-    extern Real64 const OutdoorCoilInletAirDryBulbTempRated;  // 35.00C (95F)  Tests A2, B2, B1, and F1
-    extern Real64 const OutdoorCoilInletAirDryBulbTempTestA2; // 35.00C (95F)  Test A2 (high speed)
-    extern Real64 const OutdoorCoilInletAirDryBulbTempTestB2; // 27.78C (82F)  Test B2 (high speed)
-    extern Real64 const OutdoorCoilInletAirDryBulbTempTestB1; // 27.78C (82F)  Test B1 (Low speed)
-    extern Real64 const OutdoorCoilInletAirDryBulbTempTestF1; // 19.44C (67F)  Test B1 (Low speed)
-
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    extern Real64 const CoolingCoilInletAirWetBulbTempRated; // 19.44C (67F)  Tests A and B
-    extern Real64 const OutdoorUnitInletAirDryBulbTemp;      // 27.78C (82F)  Test B (for SEER)
-    extern Real64 const OutdoorUnitInletAirDryBulbTempRated; // 35.00C (95F)  Test A (rated capacity)
-    extern Real64 const AirMassFlowRatioRated;               // AHRI test is at the design flow rate
-    // and hence AirMassFlowRatio is 1.0
-    extern Real64 const ConvFromSIToIP;                    // Conversion from SI to IP [3.412 Btu/hr-W]
-    extern Real64 const DefaultFanPowerPerEvapAirFlowRate; // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
-    // specifies a nominal/default fan electric power consumption per rated air
-    // volume flow rate to account for indoor fan electric power consumption
-    // when the standard tests are conducted on units that do not have an
-    // indoor air circulting fan. Used if user doesn't enter a specific value.
-    extern Real64 const PLRforSEER;                     // Part-load ratio for SEER calculation (single speed DX cooling coils)
     extern Array1D<Real64> const IEERWeightingFactor;   // EER Weighting factors (IEER)
-    extern Real64 const OADBTempLowReducedCapacityTest; // Outdoor air dry-bulb temp in degrees C (65F)
-    // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
+
+    Real64 constexpr ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
 
     // Defrost strategy (heat pump only)
     enum class DefrostStrat
@@ -147,8 +127,6 @@ namespace StandardRatings {
     // ANSI/ASHRAE Standard 127-2012 -Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
     // indoor dry bulb temperatures for tests A, B, C and D and Classes I, II, III, and IV
     extern Array1D<Real64> const IndoorDBTempClassI2IV;
-    // indoor dew point temperature
-    extern Real64 const IndoorTDPA2D;
     // outdoor dry bulb temperatures for tests A, B, C and D
     extern Array1D<Real64> const OutdoorDBTempAllClassA2D;
 
