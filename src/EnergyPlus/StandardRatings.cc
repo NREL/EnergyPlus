@@ -634,9 +634,7 @@ namespace StandardRatings {
         // Formats
 
         if (StandardRatingsMyOneTimeFlag) {
-            static constexpr std::string_view Format_990(
-                "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
-            print(state.files.eio, "{}\n", Format_990);
+            print(state.files.eio, "{}\n", "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
             StandardRatingsMyOneTimeFlag = false;
         }
 
@@ -2499,11 +2497,9 @@ namespace StandardRatings {
 
         case CoilDX_CoolingSingleSpeed: {
             if (MyCoolOneTimeFlag) {
-                static constexpr std::string_view Format_990(
-                    "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                    "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
-                    "{Btu/W-h}\n");
-                print(state.files.eio, "{}", Format_990);
+                print(state.files.eio, "{}", "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                                             "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
+                                             "{Btu/W-h}\n");
                 MyCoolOneTimeFlag = false;
             }
 
