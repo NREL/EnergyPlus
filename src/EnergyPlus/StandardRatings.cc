@@ -156,10 +156,6 @@ namespace StandardRatings {
     Real64 const CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
     Real64 const CyclicDegradationCoeff(0.25);
-    Array1D<Real64> const OutdoorDesignTemperature(6, {2.78, -2.78, -8.33, -15.0, -23.33, -1.11});
-    // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    Array1D<Real64> const OutdoorBinTemperature(
-        18, {16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56});
     // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
     Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp(
         18, {0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
@@ -178,6 +174,25 @@ namespace StandardRatings {
     // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
     Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp(
         18, {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+
+    int constexpr NumberOfRegions {6};
+    int constexpr NumberOfBins {18};
+    std::array<std::array< Real64, NumberOfBins>, NumberOfRegions> AllRegionFracBinHoursAtOutdoorBinTemp {
+        {
+    // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
+        {{0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
+    // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
+        {{0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
+    // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
+        {{0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0}},
+    // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
+        {{0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0}},
+    // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
+        {{0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001}},
+    // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
+        {{0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
+        }
+    };
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     int const NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
@@ -1416,7 +1431,7 @@ namespace StandardRatings {
         if (RegionNum == 5) {
             DesignHeatingRequirementMin = NetHeatingCapRated;
         } else {
-            DesignHeatingRequirementMin = NetHeatingCapRated * 1.8 * (18.33 - OutdoorDesignTemperature(RegionNum)) / 60.0;
+            DesignHeatingRequirementMin = NetHeatingCapRated * 1.8 * (18.33 - OutdoorDesignTemperature[RegionNum-1]) / 60.0;
         }
 
         for (StandardDHRNum = 1; StandardDHRNum <= TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
@@ -1438,33 +1453,21 @@ namespace StandardRatings {
             DesignHeatingRequirement = DesignHeatingRequirementMin;
         }
 
-        for (BinNum = 1; BinNum <= TotalNumOfTemperatureBins(RegionNum); ++BinNum) {
+        for (BinNum = 0; BinNum < TotalNumOfTemperatureBins(RegionNum); ++BinNum) {
 
-            if (RegionNum == 1) {
-                FractionalBinHours = RegionOneFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 2) {
-                FractionalBinHours = RegionTwoFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 3) {
-                FractionalBinHours = RegionThreeFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 4) {
-                FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 5) {
-                FractionalBinHours = RegionFiveFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 6) {
-                FractionalBinHours = RegionSixFracBinHoursAtOutdoorBinTemp(BinNum);
-            }
+            FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[RegionNum-1][BinNum];
 
             BuildingLoad =
-                (18.33 - OutdoorBinTemperature(BinNum)) / (18.33 - OutdoorDesignTemperature(RegionNum)) * CorrectionFactor * DesignHeatingRequirement;
+                (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum-1]) * CorrectionFactor * DesignHeatingRequirement;
 
-            if ((OutdoorBinTemperature(BinNum) <= -8.33) || (OutdoorBinTemperature(BinNum) >= 7.22)) {
+            if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.22)) {
                 NetHeatingCapReduced =
-                    NetHeatingCapH3Test + (NetHeatingCapRated - NetHeatingCapH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (16.67);
-                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerRated - ElecPowerH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (16.67);
+                    NetHeatingCapH3Test + (NetHeatingCapRated - NetHeatingCapH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (16.67);
+                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerRated - ElecPowerH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (16.67);
             } else {
                 NetHeatingCapReduced =
-                    NetHeatingCapH3Test + (NetHeatingCapH2Test - NetHeatingCapH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (10.0);
-                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerH2Test - ElecPowerH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (10.0);
+                    NetHeatingCapH3Test + (NetHeatingCapH2Test - NetHeatingCapH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (10.0);
+                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerH2Test - ElecPowerH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (10.0);
             }
 
             if (NetHeatingCapReduced != 0.0) {
@@ -1487,9 +1490,9 @@ namespace StandardRatings {
                 LowTempCutOutFactor = 0.0;
             } else {
                 if (!OATempCompressorOnOffBlank) {
-                    if (OutdoorBinTemperature(BinNum) <= OATempCompressorOff) {
+                    if (OutdoorBinTemperature[BinNum] <= OATempCompressorOff) {
                         LowTempCutOutFactor = 0.0;
-                    } else if (OutdoorBinTemperature(BinNum) > OATempCompressorOff && OutdoorBinTemperature(BinNum) <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
                         LowTempCutOutFactor = 0.5;
                     } else {
                         LowTempCutOutFactor = 1.0;
@@ -2242,7 +2245,7 @@ namespace StandardRatings {
             DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp;
             DesignHeatingRequirementMax = 2.20 * NetHeatingCapRatedHighTemp;
         } else {
-            DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp * (18.33 - OutdoorDesignTemperature(RegionNum)) / (60.0 / 1.80);
+            DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp * (18.33 - OutdoorDesignTemperature[RegionNum-1]) / (60.0 / 1.80);
             DesignHeatingRequirementMax = 2.20 * DesignHeatingRequirementMin;
         }
         // Set the Design Heating Requirement to nearest standard value (From Table 18, AHRI/ANSI Std 210/240)
@@ -2267,102 +2270,89 @@ namespace StandardRatings {
         // The minimum temperature below which the compressor is turned off
         OATempCompressorOff = MinOATCompressor;
 
-        for (BinNum = 1; BinNum <= TotalNumOfTemperatureBins(RegionNum); ++BinNum) { // NumOfOATempBins
+        for (BinNum = 0; BinNum < TotalNumOfTemperatureBins(RegionNum); ++BinNum) { // NumOfOATempBins
 
-            {
-                if (RegionNum == 1) {
-                    FractionalBinHours = RegionOneFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (RegionNum == 2) {
-                    FractionalBinHours = RegionTwoFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (RegionNum == 3) {
-                    FractionalBinHours = RegionThreeFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (RegionNum == 4) {
-                    FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (RegionNum == 5) {
-                    FractionalBinHours = RegionFiveFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (RegionNum == 6) {
-                    FractionalBinHours = RegionSixFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else {
-                    FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp(BinNum);
-                }
-            }
+            if ((RegionNum > 0) && (RegionNum <= 6))
+                FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[RegionNum-1][BinNum];
+            else
+                FractionalBinHours = AllRegionFracBinHoursAtOutdoorBinTemp[3][BinNum];
 
             // Calculate the building heating load
             BuildingHeatingLoad =
-                (18.33 - OutdoorBinTemperature(BinNum)) / (18.33 - OutdoorDesignTemperature(RegionNum)) * CorrectionFactor * DesignHeatingRequirement;
+                (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum-1]) * CorrectionFactor * DesignHeatingRequirement;
 
-            if ((OutdoorBinTemperature(BinNum) <= -8.33) || (OutdoorBinTemperature(BinNum) >= 7.20)) {
+            if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.20)) {
                 HeatingCapacityMax = TotHeatCapTestH3(nsp) + ((TotHeatCapTestH1(nsp) - TotHeatCapTestH3(nsp)) *
-                                                              (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                              (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                               (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                 HeatingElecPowerMax =
                     OutdoorUnitPowerTestH3(nsp) + ((OutdoorUnitPowerTestH1(nsp) - OutdoorUnitPowerTestH3(nsp)) *
-                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                    (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
             } else {
                 HeatingCapacityMax = TotHeatCapTestH3(nsp) + ((TotHeatCapTestH2(nsp) - TotHeatCapTestH3(nsp)) *
-                                                              (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                              (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                               (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                 HeatingElecPowerMax =
                     OutdoorUnitPowerTestH3(nsp) + ((OutdoorUnitPowerTestH2(nsp) - OutdoorUnitPowerTestH3(nsp)) *
-                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                    (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
             }
 
             // determine the speed number
             for (spnum = 1; spnum <= nsp - 1; ++spnum) {
                 // Low Speed
-                if (OutdoorBinTemperature(BinNum) < -8.33) {
+                if (OutdoorBinTemperature[BinNum] < -8.33) {
                     HeatingCapacityLS = TotHeatCapTestH3(spnum) + ((TotHeatCapTestH1(spnum) - TotHeatCapTestH3(spnum)) *
-                                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                                    (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerLS =
                         OutdoorUnitPowerTestH3(spnum) + ((OutdoorUnitPowerTestH1(spnum) - OutdoorUnitPowerTestH3(spnum)) *
-                                                         (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                         (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                          (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
 
-                } else if (OutdoorBinTemperature(BinNum) >= 4.44) {
+                } else if (OutdoorBinTemperature[BinNum] >= 4.44) {
                     HeatingCapacityLS = TotHeatCapTestH1(spnum) + ((TotHeatCapTestH0(spnum) - TotHeatCapTestH1(spnum)) *
-                                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempRated) /
+                                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempRated) /
                                                                    (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
                     HeatingElecPowerLS =
                         OutdoorUnitPowerTestH1(spnum) + ((OutdoorUnitPowerTestH0(spnum) - OutdoorUnitPowerTestH1(spnum)) *
-                                                         (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempRated) /
+                                                         (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempRated) /
                                                          (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
                 } else {
                     HeatingCapacityLS = TotHeatCapTestH3(spnum) + ((TotHeatCapTestH2(spnum) - TotHeatCapTestH3(spnum)) *
-                                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                                    (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerLS =
                         OutdoorUnitPowerTestH3(spnum) + ((OutdoorUnitPowerTestH2(spnum) - OutdoorUnitPowerTestH3(spnum)) *
-                                                         (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                         (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                          (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                 }
                 // High Speed
-                if ((OutdoorBinTemperature(BinNum) <= -8.33) || (OutdoorBinTemperature(BinNum) >= 7.20)) {
+                if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.20)) {
                     HeatingCapacityHS =
                         TotHeatCapTestH3(spnum + 1) + ((TotHeatCapTestH1(spnum + 1) - TotHeatCapTestH3(spnum + 1)) *
-                                                       (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                       (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                        (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerHS =
                         OutdoorUnitPowerTestH3(spnum + 1) + ((OutdoorUnitPowerTestH1(spnum + 1) - OutdoorUnitPowerTestH3(spnum + 1)) *
-                                                             (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                             (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                              (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                 } else {
                     HeatingCapacityHS =
                         TotHeatCapTestH3(spnum + 1) + ((TotHeatCapTestH2(spnum + 1) - TotHeatCapTestH3(spnum + 1)) *
-                                                       (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                       (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                        (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerHS =
                         OutdoorUnitPowerTestH3(spnum + 1) + ((OutdoorUnitPowerTestH2(spnum + 1) - OutdoorUnitPowerTestH3(spnum + 1)) *
-                                                             (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                             (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                              (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                 }
                 LowTempCutOutFactor = 0.0;
                 if (!OATempCompressorOnOffBlank) {
-                    if (OutdoorBinTemperature(BinNum) <= OATempCompressorOff) {
+                    if (OutdoorBinTemperature[BinNum] <= OATempCompressorOff) {
                         LowTempCutOutFactor = 0.0;
-                    } else if (OutdoorBinTemperature(BinNum) > OATempCompressorOff && OutdoorBinTemperature(BinNum) <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
                         LowTempCutOutFactor = 0.5;
                     } else {
                         LowTempCutOutFactor = 1.0;
@@ -2395,12 +2385,12 @@ namespace StandardRatings {
                 } else if (BuildingHeatingLoad >= HeatingCapacityMax) {
                     NetTotHeatCapBinned = BuildingHeatingLoad;
                     if (!OATempCompressorOnOffBlank && HeatingElecPowerMax > 0.0) {
-                        if ((OutdoorBinTemperature(BinNum) <= OATempCompressorOff) || (HeatingCapacityMax / HeatingElecPowerMax < 1.0)) {
+                        if ((OutdoorBinTemperature[BinNum] <= OATempCompressorOff) || (HeatingCapacityMax / HeatingElecPowerMax < 1.0)) {
                             LowTempCutOutFactor = 0.0;
-                        } else if ((OutdoorBinTemperature(BinNum) > OATempCompressorOff && OutdoorBinTemperature(BinNum) <= OATempCompressorOn) &&
+                        } else if ((OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) &&
                                    (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
                             LowTempCutOutFactor = 0.5;
-                        } else if ((OutdoorBinTemperature(BinNum) > OATempCompressorOn) && (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
+                        } else if ((OutdoorBinTemperature[BinNum] > OATempCompressorOn) && (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
                             LowTempCutOutFactor = 1.0;
                         }
                     } else {

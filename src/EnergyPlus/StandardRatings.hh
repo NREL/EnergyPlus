@@ -112,9 +112,9 @@ namespace StandardRatings {
     extern Real64 const CorrectionFactor; // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
     extern Real64 const CyclicDegradationCoeff;
-    extern Array1D<Real64> const OutdoorDesignTemperature;
+    constexpr std::array<Real64,6> OutdoorDesignTemperature {2.78, -2.78, -8.33, -15.0, -23.33, -1.11};
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    extern Array1D<Real64> const OutdoorBinTemperature;
+    constexpr std::array<Real64,18> OutdoorBinTemperature {16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56};
     // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
     extern Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp;
     // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
