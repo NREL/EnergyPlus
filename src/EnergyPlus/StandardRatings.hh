@@ -84,7 +84,6 @@ namespace StandardRatings {
     // when the standard tests are conducted on units that do not have an
     // indoor air circulting fan. Used if user doesn't enter a specific value.
     extern Real64 const PLRforSEER;                     // Part-load ratio for SEER calculation (single speed DX cooling coils)
-    extern Array1D<Real64> const ReducedPLR;            // Reduced Capacity part-load conditions
     extern Array1D<Real64> const IEERWeightingFactor;   // EER Weighting factors (IEER)
     extern Real64 const OADBTempLowReducedCapacityTest; // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444

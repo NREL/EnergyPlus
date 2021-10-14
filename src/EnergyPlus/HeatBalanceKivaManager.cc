@@ -235,10 +235,10 @@ void KivaInstanceMap::setInitialBoundaryConditions(
     bcs->deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobalConstants::KelvinConv;
 
     // Estimate indoor temperature
-    static const Real64 defaultFlagTemp = -999; // default sets this below -999 at -9999 so uses value if entered
-    constexpr Real64 standardTemp = 22;         // degC
-    Real64 assumedFloatingTemp = standardTemp;  // degC (somewhat arbitrary assumption--not knowing anything else
-                                                // about the building at this point)
+    constexpr Real64 defaultFlagTemp = -999;   // default sets this below -999 at -9999 so uses value if entered
+    constexpr Real64 standardTemp = 22;        // degC
+    Real64 assumedFloatingTemp = standardTemp; // degC (somewhat arbitrary assumption--not knowing anything else
+                                               // about the building at this point)
 
     Real64 Tin;
     if (zoneAssumedTemperature > defaultFlagTemp) {

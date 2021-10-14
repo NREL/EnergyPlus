@@ -7919,7 +7919,7 @@ namespace WeatherManager {
 
         Real64 const Ratio = 0.4 + 0.01 * (Tavg - 44.0);
         Real64 const Lag = 35.0 - 1.0 * (Tavg - 44.0);
-        Real64 const Offset = 6.0;
+        Real64 constexpr Offset = 6.0;
         int const latitude_sign = (state.dataEnvrn->Latitude >= 0) ? 1 : -1;
 
         // calculated water main temp (F)

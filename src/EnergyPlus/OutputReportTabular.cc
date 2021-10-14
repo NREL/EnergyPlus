@@ -7760,12 +7760,12 @@ void WriteBEPSTable(EnergyPlusData &state)
     //   that will split up very long header lines for the fixed width
     //   table is the header rows.
 
-    int const colElectricity(1);
-    int const colGas(2);
-    int const colPurchCool(11);
-    int const colPurchHeat(12);
+    int constexpr colElectricity(1);
+    int constexpr colGas(2);
+    int constexpr colPurchCool(11);
+    int constexpr colPurchHeat(12);
 
-    Real64 const SmallValue(1.e-14);
+    Real64 constexpr SmallValue(1.e-14);
     auto &ort(state.dataOutRptTab);
 
     // all arrays are in the format: (row, column)
@@ -11020,16 +11020,16 @@ void WriteVeriSumTable(EnergyPlusData &state)
     using ScheduleManager::ScheduleAverageHoursPerWeek;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const wwrcTotal(1);
-    int const wwrcNorth(2);
-    int const wwrcEast(3);
-    int const wwrcSouth(4);
-    int const wwrcWest(5);
-    int const wwrrWall(1);
-    int const wwrrAbvGndWall(2);
-    int const wwrrWindow(3);
-    int const wwrrWWR(4);
-    int const wwrrAbvGndWWR(5);
+    int constexpr wwrcTotal(1);
+    int constexpr wwrcNorth(2);
+    int constexpr wwrcEast(3);
+    int constexpr wwrcSouth(4);
+    int constexpr wwrcWest(5);
+    int constexpr wwrrWall(1);
+    int constexpr wwrrAbvGndWall(2);
+    int constexpr wwrrWindow(3);
+    int constexpr wwrrWWR(4);
+    int constexpr wwrrAbvGndWWR(5);
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -17874,10 +17874,10 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
 
     std::string unitSIOnly;
     int modeInString;
-    int const misBrac(1);
-    int const misParen(2);
-    int const misBrce(3);
-    int const misNoHint(4);
+    int constexpr misBrac(1);
+    int constexpr misParen(2);
+    int constexpr misBrce(3);
+    int constexpr misNoHint(4);
     std::string const stringInUpper(UtilityRoutines::MakeUPPERCase(stringInWithSI));
     auto &ort(state.dataOutRptTab);
 

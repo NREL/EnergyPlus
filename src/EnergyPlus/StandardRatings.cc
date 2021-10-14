@@ -125,7 +125,7 @@ namespace StandardRatings {
     // specifies a nominal/default fan electric power consumption per rated air
     // volume flow rate to account for indoor fan electric power consumption
     // when the standard tests are conducted on units that do not have an
-    // indoor air circulting fan. Used if user doesn't enter a specific value.
+    // indoor air circulating fan. Used if user doesn't enter a specific value.
     Real64 constexpr PLRforSEER(0.5);                             // Part-load ratio for SEER calculation (single speed DX cooling coils)
     Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
     Array1D<Real64> const IEERWeightingFactor(4, {0.020, 0.617, 0.238, 0.125}); // EER Weighting factors (IEER)

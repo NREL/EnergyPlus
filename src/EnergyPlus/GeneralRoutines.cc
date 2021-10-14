@@ -165,7 +165,7 @@ void ControlCompOutput(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Iteration maximum for reheat control
-    static int const MaxIter(25);
+    static int constexpr MaxIter(25);
     static Real64 const iter_fac(1.0 / std::pow(2, MaxIter - 3));
     int constexpr iReverseAction(1);
     int constexpr iNormalAction(2);
@@ -619,7 +619,7 @@ bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const Mi
     bool BBConvergeCheck;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Real64 const BBIterLimit(0.00001);
+    static Real64 constexpr BBIterLimit(0.00001);
 
     if (SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum) {
         // For all zone equipment except radiant/convective baseboard (steam and water) units:

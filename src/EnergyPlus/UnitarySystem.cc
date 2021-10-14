@@ -1502,8 +1502,8 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const RunOnSensible(1); // identifier for temperature (sensible load) control
-        int const RunOnLatent(2);   // identifier for humidity (latent load) control
+        int constexpr RunOnSensible(1); // identifier for temperature (sensible load) control
+        int constexpr RunOnLatent(2);   // identifier for humidity (latent load) control
         static constexpr std::string_view routineName("FrostControlSetPointLimit");
 
         Real64 AirMassFlow = state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate;
@@ -8305,7 +8305,7 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(100); // maximum number of iterations
+        int constexpr MaxIter(100); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::vector<Real64> Par(17);      // parameters passed to RegulaFalsi function
@@ -11645,8 +11645,8 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);   // Maximum number of iterations for solver
-        Real64 const Acc(1.e-3); // Accuracy of solver result
+        int constexpr MaxIte(500);   // Maximum number of iterations for solver
+        Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // std::string CompName;    // Name of Unitary System object
@@ -11763,9 +11763,9 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);         // Maximum number of iterations for solver
-        Real64 const Acc(1.e-3);       // Accuracy of solver result
-        Real64 const HumRatAcc(1.e-6); // Accuracy of solver result
+        int constexpr MaxIte(500);         // Maximum number of iterations for solver
+        Real64 constexpr Acc(1.e-3);       // Accuracy of solver result
+        Real64 constexpr HumRatAcc(1.e-6); // Accuracy of solver result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReqOutput; // Sensible capacity (outlet - inlet) required to meet load or setpoint temperature
@@ -13472,8 +13472,8 @@ namespace UnitarySystems {
         bool const SuppHeatingCoilFlag(false);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);    // Maximum number of iterations for solver
-        Real64 const Acc(1.0e-3); // Accuracy of solver result
+        int constexpr MaxIte(500);    // Maximum number of iterations for solver
+        Real64 constexpr Acc(1.0e-3); // Accuracy of solver result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput; // Sensible capacity (outlet - inlet) when the compressor is on
@@ -14222,9 +14222,9 @@ namespace UnitarySystems {
         const bool SuppHeatingCoilFlag(true);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);    // Maximum number of iterations for solver
-        Real64 const Acc(1.0e-3); // Accuracy of solver result
-        int const SolveMaxIter(50);
+        int constexpr MaxIte(500);    // Maximum number of iterations for solver
+        Real64 constexpr Acc(1.0e-3); // Accuracy of solver result
+        int constexpr SolveMaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput = 0.0;      // Sensible capacity (outlet - inlet) when the compressor is on

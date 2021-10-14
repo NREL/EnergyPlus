@@ -6696,7 +6696,7 @@ namespace AirflowNetworkBalanceManager {
         using General::SolveRoot;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const CycFanCycComp(1); // fan cycles with compressor operation
+        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -6713,8 +6713,8 @@ namespace AirflowNetworkBalanceManager {
         Real64 LocalHumRat;
         Real64 LocalDryBulb;
         Array1D<Real64> Par; // Pressure setpoint
-        Real64 const ErrorToler(0.00001);
-        int const MaxIte(20);
+        Real64 constexpr ErrorToler(0.00001);
+        int constexpr MaxIte(20);
         int SolFla;
         Real64 MinExhaustMassFlowrate;
         Real64 MaxExhaustMassFlowrate;
@@ -7806,7 +7806,7 @@ namespace AirflowNetworkBalanceManager {
 
                 Pamb = state.dataEnvrn->OutBaroPress;
 
-                Real64 const tolerance = 0.001;
+                Real64 constexpr tolerance = 0.001;
                 Real64 UThermal(10); // Initialize. This will get updated.
                 Real64 UThermal_iter = 0;
                 Real64 Tsurr = Tamb;
@@ -12476,9 +12476,9 @@ namespace AirflowNetworkBalanceManager {
         auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const HybridVentCtrl_Close(2);                                           // Open windows or doors
-        int const IndividualCtrlType(0);                                             // Individual window or door control
-        int const GlobalCtrlType(1);                                                 // Global window or door control
+        int constexpr HybridVentCtrl_Close(2);                                       // Open windows or doors
+        int constexpr IndividualCtrlType(0);                                         // Individual window or door control
+        int constexpr GlobalCtrlType(1);                                             // Global window or door control
         static constexpr std::string_view RoutineName("HybridVentilationControl: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

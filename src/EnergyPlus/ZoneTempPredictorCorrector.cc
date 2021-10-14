@@ -2742,10 +2742,10 @@ void CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64>
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine calculate the zone operative temperature setpoint using adaptive comfort model.
+    // This subroutine calculates the zone operative temperature setpoint using adaptive comfort model.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const summerDesignDayTypeIndex(9);
+    int constexpr summerDesignDayTypeIndex(9);
     Real64 GrossApproxAvgDryBulbDesignDay(0.0);
 
     auto &AdapComfortDailySetPointSchedule = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule;
@@ -7453,7 +7453,7 @@ void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int const Tem
         }
     } else {
         int const envrnDayNum(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
-        int const summerDesignDayTypeIndex(9);
+        int constexpr summerDesignDayTypeIndex(9);
         // Adjust summer design day set point
         if (state.dataWeatherManager->DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
             ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
@@ -7873,8 +7873,8 @@ void GetComfortSetPoints(EnergyPlusData &state,
     // 0 = Solution; 1 = Set to Min; 2 Set to Max
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Acc(0.001); // accuracy control for SolveRoot
-    int const MaxIter(500);  // iteration control for SolveRoot
+    Real64 constexpr Acc(0.001); // accuracy control for SolveRoot
+    int constexpr MaxIter(500);  // iteration control for SolveRoot
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 Tmin;            // Minimum drybulb setpoint temperature
@@ -8159,7 +8159,7 @@ void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &state)
     int numDays;
     std::string monthAssumed;
     std::string monthAssumed2;
-    const int wednesday = 4;
+    constexpr int wednesday = 4;
 
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
@@ -8412,7 +8412,7 @@ temperatureAndCountInSch(EnergyPlusData &state, int const &scheduleIndex, bool c
     int hourSelect = hourOfDay + state.dataWeatherManager->DSTIndex(jdateSelect);
 
     // get the value at the selected time
-    int const firstTimeStep = 1;
+    int constexpr firstTimeStep = 1;
     int weekSchIndexSelect = state.dataScheduleMgr->Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
     int daySchIndexSelect = state.dataScheduleMgr->WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
     Real64 valueAtSelectTime = state.dataScheduleMgr->DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);

@@ -2967,7 +2967,7 @@ namespace ThermalComfort {
         using OutputReportTabular::StrToReal;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 const alpha(0.8);
+        static Real64 constexpr alpha(0.8);
         static Array1D<Real64> const alpha_pow({pow_6(alpha), pow_5(alpha), pow_4(alpha), pow_3(alpha), pow_2(alpha), alpha, 1.0}); // alpha^(7-i)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
