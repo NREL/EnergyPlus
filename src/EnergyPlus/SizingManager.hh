@@ -98,7 +98,7 @@ namespace SizingManager {
                                     int &NumNumbers,
                                     Array1D_bool const &lAlphaFieldBlanks,
                                     Array1D_string const &cAlphaFieldNames,
-                                    bool &ErrorsFound                         // If errors found in input
+                                    bool &ErrorsFound // If errors found in input
     );
 
     void GetZoneAirDistribution(EnergyPlusData &state);

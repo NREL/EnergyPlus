@@ -2197,6 +2197,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetSpaceData)
     // state->dataInputProcessing->inputProcessor->epJSON["Space"]["Space 1a"] = {{"zone_name", "Zone 1"}};
 
     // Using R_json raw string parsing to get the arrays processed correctly
+    // Reference https://github.com/nlohmann/json#json-as-first-class-data-type
     state->dataInputProcessing->inputProcessor->epJSON = R"(
     {
         "Zone": {
