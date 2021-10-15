@@ -173,6 +173,32 @@ function(ADD_SIMULATION_TEST)
 
 endfunction()
 
+function(ADD_REVERSE_DD_TEST)
+  # Note that for now BUILD_FORTRAN must be ON as I always add the -r flag
+  # Named arguments
+  # IDF_FILE <filename> IDF input file
+  #
+  # Optional Arguments
+  # EXPECT_FATAL Expect simulation to fail
+  set(options EXPECT_FATAL)
+  set(oneValueArgs IDF_FILE)
+  cmake_parse_arguments(ADD_RDD_TEST "${options}" "${oneValueArgs}" ${ARGN})
+  if(ADD_SIM_TEST_EXPECT_FATAL)
+    return()  # don't add tests for fatal tests
+  endif()
+  get_filename_component(IDF_NAME "${ADD_RDD_TEST_IDF_FILE}" NAME_WE)
+  set(TEST_FILE_FOLDER "testfiles")
+  set(ENERGYPLUS_FLAGS "-D -r")
+  add_test(
+          NAME "reverseDD.${IDF_NAME}"
+          COMMAND
+          ${CMAKE_COMMAND} -DSOURCE_DIR=${PROJECT_SOURCE_DIR} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
+          -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE} -DENERGYPLUS_FLAGS=${ENERGYPLUS_FLAGS} -DBUILD_FORTRAN=${BUILD_FORTRAN} -DTEST_FILE_FOLDER=${TEST_FILE_FOLDER} -P
+          ${PROJECT_SOURCE_DIR}/cmake/RunReverseDD.cmake)
+  set_tests_properties("reverseDD.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
+  set_tests_properties("reverseDD.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+endfunction()
+
 function(fixup_executable EXECUTABLE_PATH)
   include(GetPrerequisites)
   get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
