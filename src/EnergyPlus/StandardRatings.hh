@@ -68,6 +68,15 @@ namespace StandardRatings {
 
     Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
 
+    Real64 constexpr HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)
+    // Test H1 or rated (low and High Speed) Std. AHRI 210/240
+
+    Real64 constexpr HeatingOutdoorCoilInletAirDBTempH2Test(1.67); // Outdoor air dry-bulb temp in degrees C (35F)
+    // Test H2 (low and High Speed) Std. AHRI 210/240
+
+    Real64 constexpr HeatingOutdoorCoilInletAirDBTempH3Test(-8.33); // Outdoor air dry-bulb temp in degrees C (17F)
+    // Test H3 (low and High Speed) Std. AHRI 210/240
+
     // Defrost strategy (heat pump only)
     enum class DefrostStrat
     {
@@ -88,9 +97,6 @@ namespace StandardRatings {
     // bins for a region
     extern Array1D<Real64> const StandardDesignHeatingRequirement;
     // Standardized DHRs from ANSI/AHRI 210/240
-    extern Real64 const CorrectionFactor; // A correction factor which tends to improve the agreement
-    // between calculated and measured building loads, dimensionless.
-    extern Real64 const CyclicDegradationCoeff;
     extern Array1D<Real64> const OutdoorDesignTemperature;
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
     extern Array1D<Real64> const OutdoorBinTemperature;
@@ -111,18 +117,6 @@ namespace StandardRatings {
     extern Array1D<Real64> const OutdoorBinTemperatureSEER;
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
     extern Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp;
-
-    extern Real64 const HeatingIndoorCoilInletAirDBTempRated; // Heating coil entering air dry-bulb temperature in
-    // degrees C (70F) Test H1, H2 and H3
-    // (low and High Speed) Std. AHRI 210/240
-    extern Real64 const HeatingOutdoorCoilInletAirDBTempH0Test; // Outdoor air dry-bulb temp in degrees C (47F)
-    // Test H0 (low and High Speed) Std. AHRI 210/240
-    extern Real64 const HeatingOutdoorCoilInletAirDBTempRated; // Outdoor air dry-bulb temp in degrees C (47F)
-    // Test H1 or rated (low and High Speed) Std. AHRI 210/240
-    extern Real64 const HeatingOutdoorCoilInletAirDBTempH2Test; // Outdoor air dry-bulb temp in degrees C (35F)
-    // Test H2 (low and High Speed) Std. AHRI 210/240
-    extern Real64 const HeatingOutdoorCoilInletAirDBTempH3Test; // Outdoor air dry-bulb temp in degrees C (17F)
-    // Test H3 (low and High Speed) Std. AHRI 210/240
 
     // ANSI/ASHRAE Standard 127-2012 -Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
     // indoor dry bulb temperatures for tests A, B, C and D and Classes I, II, III, and IV

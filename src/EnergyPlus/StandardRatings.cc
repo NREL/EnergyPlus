@@ -189,12 +189,6 @@ namespace StandardRatings {
     // (low and High Speed) Std. AHRI 210/240
     Real64 constexpr HeatingOutdoorCoilInletAirDBTempH0Test(16.67); // Outdoor air dry-bulb temp in degrees C (47F)
     // Test H0 (low and High Speed) Std. AHRI 210/240
-    Real64 constexpr HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)
-    // Test H1 or rated (low and High Speed) Std. AHRI 210/240
-    Real64 constexpr HeatingOutdoorCoilInletAirDBTempH2Test(1.67); // Outdoor air dry-bulb temp in degrees C (35F)
-    // Test H2 (low and High Speed) Std. AHRI 210/240
-    Real64 constexpr HeatingOutdoorCoilInletAirDBTempH3Test(-8.33); // Outdoor air dry-bulb temp in degrees C (17F)
-    // Test H3 (low and High Speed) Std. AHRI 210/240
 
     // ANSI/ASHRAE Standard 127-2012 -- Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
     //  Class 1 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F )
