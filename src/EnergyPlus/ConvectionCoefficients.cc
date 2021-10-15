@@ -5599,22 +5599,21 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         break;
     case ConvectionConstants::HcExt_BlockenWindward:
-        Hf = CalcBlockenWindward(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
+        Hf = CalcBlockenWindward(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth, SurfNum);
         // Not compatible with Kiva (doesn't use weather station windspeed)
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             ShowFatalError(state, "Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
         }
         break;
     case ConvectionConstants::HcExt_EmmelVertical:
-        Hf = CalcEmmelVertical(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth, SurfNum);
+        Hf = CalcEmmelVertical(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
         // Not compatible with Kiva (doesn't use weather station windspeed)
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             ShowFatalError(state, "Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
         }
         break;
     case ConvectionConstants::HcExt_EmmelRoof:
-        Hf = CalcEmmelRoof(
-            state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
+        Hf = CalcEmmelRoof(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth);
         // Not compatible with Kiva (doesn't use weather station windspeed)
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             ShowFatalError(state, "Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
@@ -8773,10 +8772,11 @@ Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth)
     }
 }
 
-Real64 CalcBlockenWindward(Real64 const WindAt10m,
-                           Real64 const WindDir,    // Wind direction measured clockwise from geographic North
-                           Real64 const SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
-)
+Real64 CalcBlockenWindward(EnergyPlusData &state,
+                           Real64 const WindAt10m,
+                           Real64 const WindDir,     // Wind direction measured clockwise from geographic North
+                           Real64 const SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
+                           int const SurfNum)
 {
 
     // FUNCTION INFORMATION:
@@ -8808,15 +8808,22 @@ Real64 CalcBlockenWindward(Real64 const WindAt10m,
     } else if (Theta <= 100.0) {
         return 4.5 * std::pow(WindAt10m, 0.81);
     } else {
-        assert(false);
+        if (state.dataConvectionCoefficient->CalcBlockenWindwardErrorIDX == 0) {
+            ShowSevereMessage(state, "CalcBlockenWindward: Convection model wind angle calculation suspect (developer issue)");
+            ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
+            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
+            ShowContinueError(state, "Convection model uses EmmelVertical correlation and the simulation continues");
+        }
+        ShowRecurringSevereErrorAtEnd(state,
+                                      "CalcBlockenWindward: Convection model wind angle calculation suspect.",
+                                      state.dataConvectionCoefficient->CalcBlockenWindwardErrorIDX);
+        return CalcEmmelVertical(WindAt10m, WindDir, SurfAzimuth);
     }
 }
 
-Real64 CalcEmmelVertical(EnergyPlusData &state,
-                         Real64 const WindAt10m,
+Real64 CalcEmmelVertical(Real64 const WindAt10m,
                          Real64 const WindDir,     // Wind direction measured clockwise from geographic North
-                         Real64 const SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
-                         int const SurfNum)
+                         Real64 const SurfAzimuth) // or Facing, Direction the surface outward normal faces (degrees)
 {
 
     // FUNCTION INFORMATION:
@@ -8837,18 +8844,6 @@ Real64 CalcEmmelVertical(EnergyPlusData &state,
     //   heat transfer coefficient correlations for isolated low-rise buildings.
     //   Energy and Buildings 39 (2007) 335- 342
 
-    if ((WindDir > 360) || (SurfAzimuth > 360)) {
-        if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
-            ShowSevereMessage(state, "CalcEmmelVertical: Convection model angle calculations suspect (developer issue)");
-            ShowContinueError(state, format("Value for WindDir = {:.5R}", WindDir));
-            ShowContinueError(state, format("Value for SurfAzimuth = {:.5R}", SurfAzimuth));
-            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
-            ShowContinueError(state, "Modulo applied to angles to bound between 0-360 deg.");
-        }
-        ShowRecurringSevereErrorAtEnd(
-            state, "CalcEmmelVertical: Convection model angles suspect.", state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
-    }
-
     Real64 Theta = CalcWindSurfaceTheta(WindDir, SurfAzimuth); // angle between wind and surface azimuth
 
     if (Theta <= 22.5) {
@@ -8859,18 +8854,14 @@ Real64 CalcEmmelVertical(EnergyPlusData &state,
         return 4.78 * std::pow(WindAt10m, 0.71);
     } else if (Theta <= 157.5) {
         return 4.05 * std::pow(WindAt10m, 0.77);
-    } else if (Theta <= 180.0) {
-        return 3.54 * std::pow(WindAt10m, 0.76);
     } else {
-        assert(false);
+        return 3.54 * std::pow(WindAt10m, 0.76);
     }
 }
 
-Real64 CalcEmmelRoof(EnergyPlusData &state,
-                     Real64 const WindAt10m,
+Real64 CalcEmmelRoof(Real64 const WindAt10m,
                      Real64 const WindDir,                // Wind direction measured clockwise from geographic North
-                     Real64 const LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
-                     int const SurfNum)
+                     Real64 const LongAxisOutwardAzimuth) // or Facing, Direction the surface outward normal faces (degrees)
 {
 
     // FUNCTION INFORMATION:
@@ -8891,18 +8882,6 @@ Real64 CalcEmmelRoof(EnergyPlusData &state,
     //   heat transfer coefficient correlations for isolated low-rise buildings.
     //    Energy and Buildings 39 (2007) 335- 342
 
-    if ((WindDir > 360) || (LongAxisOutwardAzimuth > 360)) {
-        if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
-            ShowSevereMessage(state, "CalcEmmelRoof: Convection model angle calculations suspect (developer issue)");
-            ShowContinueError(state, format("Value for WindDir = {:.5R}", WindDir));
-            ShowContinueError(state, format("Value for LongAxisOutwardAzimuth = {:.5R}", LongAxisOutwardAzimuth));
-            ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
-            ShowContinueError(state, "Modulo applied to angles to bound between 0-360 deg.");
-        }
-        ShowRecurringSevereErrorAtEnd(
-            state, "CalcEmmelRoof: Convection model angles suspect.", state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
-    }
-
     Real64 Theta = CalcWindSurfaceTheta(WindDir, LongAxisOutwardAzimuth); // angle between wind and surface azimuth
 
     if (Theta <= 22.5) {
@@ -8913,10 +8892,8 @@ Real64 CalcEmmelRoof(EnergyPlusData &state,
         return 3.67 * std::pow(WindAt10m, 0.85);
     } else if (Theta <= 157.5) {
         return 4.60 * std::pow(WindAt10m, 0.79);
-    } else if (Theta <= 180.0) {
-        return 5.11 * std::pow(WindAt10m, 0.78);
     } else {
-        assert(false);
+        return 5.11 * std::pow(WindAt10m, 0.78);
     }
 }
 

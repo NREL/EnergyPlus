@@ -2688,27 +2688,27 @@ TEST_F(ConvectionCoefficientsFixture, TestEmmelVertical)
 
         // test at 0 deg theta
         Real64 actualHc = actualHcZeroDegTheta[idx];
-        Real64 expectedHc = ConvectionCoefficients::CalcEmmelVertical(*state, windSpeed, 0, 0, 1);
+        Real64 expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 0, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 45 deg theta
         actualHc = actualHcFortyFiveDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelVertical(*state, windSpeed, 45, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 45, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 90 deg theta
         actualHc = actualHcNinetyDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelVertical(*state, windSpeed, 90, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 90, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 135 deg theta
         actualHc = actualHcOneThirtyFiveDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelVertical(*state, windSpeed, 135, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 135, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 180 deg theta
         actualHc = actualHcOneEightyDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelVertical(*state, windSpeed, 180, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 180, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
     }
 }
@@ -2739,33 +2739,56 @@ TEST_F(ConvectionCoefficientsFixture, TestEmmelRoof)
 
         // test at 0 deg theta
         Real64 actualHc = actualHcZeroDegTheta[idx];
-        Real64 expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 0, 0, 1);
+        Real64 expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 0, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 45 deg theta
         actualHc = actualHcFortyFiveDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 45, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 45, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 90 deg theta
         actualHc = actualHcNinetyDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 90, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 90, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 135 deg theta
         actualHc = actualHcOneThirtyFiveDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 135, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 135, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 180 deg theta
         actualHc = actualHcOneEightyDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcEmmelRoof(*state, windSpeed, 180, 0, 1);
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 180, 0);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
     }
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
 {
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+
     // wind speeds
     constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
@@ -2782,27 +2805,36 @@ TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
     constexpr std::array<Real64, 15> actualHcSixtySevenDegTheta = {
         4.500, 7.889, 10.957, 13.832, 16.572, 19.209, 21.764, 24.250, 26.678, 29.054, 31.386, 33.678, 35.934, 38.157, 40.350};
 
+    constexpr std::array<Real64, 15> emmelVertActualHcOneThirtyFiveDegTheta = {
+        4.050, 6.906, 9.437, 11.777, 13.985, 16.093, 18.121, 20.083, 21.990, 23.848, 25.664, 27.443, 29.187, 30.901, 32.587};
+
     for (int idx = 0; idx < 15; idx++) {
         Real64 windSpeed = windSpeedAt10m[idx];
 
         // test at 0 deg theta
         Real64 actualHc = actualHcZeroDegTheta[idx];
-        Real64 expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 0, 0);
+        Real64 expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 0, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 22.5 deg theta
         actualHc = actualHcTwentyTwoDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 22.5, 0);
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 22.5, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 45 deg theta
         actualHc = actualHcFortyFiveTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 45, 0);
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 45, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
 
         // test at 67.5 deg theta
         actualHc = actualHcSixtySevenDegTheta[idx];
-        expectedHc = ConvectionCoefficients::CalcBlockenWindward(windSpeed, 67.5, 0);
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 67.5, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 120 deg. should throw warnings and pick up the EmmelVertical correlation
+        actualHc = emmelVertActualHcOneThirtyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 135, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+        ASSERT_EQ(state->dataConvectionCoefficient->CalcBlockenWindwardErrorIDX, 1);
     }
 }
