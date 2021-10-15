@@ -7110,35 +7110,51 @@ namespace SurfaceGeometry {
         }
 
         if (NumIntMassSurfaces > 0) {
+            int spaceNum = 0;
             for (int Loop = 1; Loop <= TotIntMass; ++Loop) {
+                int numberOfZonesOrSpaces = 1;
+                if (state.dataSurface->IntMassObjects(Loop).ZoneListActive) {
+                    numberOfZonesOrSpaces = state.dataSurface->IntMassObjects(Loop).NumOfZones;
+                } else if (state.dataSurface->IntMassObjects(Loop).spaceListActive) {
+                    numberOfZonesOrSpaces = state.dataSurface->IntMassObjects(Loop).numOfSpaces;
+                }
 
-                for (int Item1 = 1; Item1 <= state.dataSurface->IntMassObjects(Loop).NumOfZones; ++Item1) {
+                for (int Item1 = 1; Item1 <= numberOfZonesOrSpaces; ++Item1) {
 
                     ++SurfNum;
 
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction = state.dataSurface->IntMassObjects(Loop).Construction;
-                    if (!state.dataSurface->IntMassObjects(Loop).ZoneListActive) {
+                    if (!state.dataSurface->IntMassObjects(Loop).ZoneListActive && !state.dataSurface->IntMassObjects(Loop).spaceListActive) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr;
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = state.dataSurface->IntMassObjects(Loop).spaceOrSpaceListPtr;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataSurface->IntMassObjects(Loop).Name;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::IntMass;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListName;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = true;
                     } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            cCurrentModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataSurface->IntMassObjects(Loop).Name,
-                            state.dataSurfaceGeometry->SurfaceTmp,
-                            SurfNum - 1,
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                            errFlag);
+                        if (state.dataSurface->IntMassObjects(Loop).ZoneListActive) {
+                            CheckCreatedZoneItemName(
+                                state,
+                                RoutineName,
+                                cCurrentModuleObject,
+                                state.dataHeatBal
+                                    ->Zone(state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1))
+                                    .Name,
+                                state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                state.dataSurface->IntMassObjects(Loop).Name,
+                                state.dataSurfaceGeometry->SurfaceTmp,
+                                SurfNum - 1,
+                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                errFlag);
 
-                        ZoneNum = state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1);
+                            ZoneNum = state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1);
+                        } else if (state.dataSurface->IntMassObjects(Loop).spaceListActive) {
+                            spaceNum = state.dataHeatBal->spaceList(state.dataSurface->IntMassObjects(Loop).spaceOrSpaceListPtr).spaces(Item1);
+                            ZoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                            const std::string spaceName = state.dataHeatBal->space(spaceNum).Name;
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = spaceName + ' ' + state.dataSurface->IntMassObjects(Loop).Name;
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = spaceNum;
+                        }
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = ZoneNum;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::IntMass;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
