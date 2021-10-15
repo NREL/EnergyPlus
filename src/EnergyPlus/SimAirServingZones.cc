@@ -3719,7 +3719,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
             int ControlledZoneNum = 0;
             int constexpr OAUnitNumLocal = 0;
             Real64 constexpr OAUCoilOutTempLocal = 0.0;
-            bool const ZoneEquipment = false;
+            bool constexpr ZoneEquipment = false;
             Real64 sysOut = 0.0;
             Real64 latOut = 0.0;
             HVACVariableRefrigerantFlow::SimulateVRF(state,

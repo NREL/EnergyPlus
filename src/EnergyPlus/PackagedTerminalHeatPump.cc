@@ -6283,8 +6283,8 @@ void CalcPTUnit(EnergyPlusData &state,
     int ATMixOutNode(0); // outlet node of ATM Mixer
 
     // Tuned Named constants to avoid heap allocation when passed to Optional args
-    bool const True(true);
-    bool const False(false);
+    bool constexpr True(true);
+    bool constexpr False(false);
     int constexpr iZero(0);
     int constexpr iOne(1);
     Real64 constexpr dZero(0.0);

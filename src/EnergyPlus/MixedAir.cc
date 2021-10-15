@@ -758,7 +758,7 @@ void SimOAComponent(EnergyPlusData &state,
             bool CoolingActive = false;
             int constexpr OAUnitNum = 0;
             Real64 constexpr OAUCoilOutTemp = 0.0;
-            bool const ZoneEquipment = false;
+            bool constexpr ZoneEquipment = false;
             Real64 sysOut = 0.0;
             Real64 latOut = 0.0;
             HVACVariableRefrigerantFlow::SimulateVRF(state,

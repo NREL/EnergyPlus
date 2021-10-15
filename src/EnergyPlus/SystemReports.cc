@@ -4516,8 +4516,8 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
         ZoneVolume = state.dataHeatBal->Zone(ActualZoneNum).Volume * state.dataHeatBal->Zone(ActualZoneNum).Multiplier *
                      state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier; // CR 7170
 
-        bool const UseOccSchFlag = true;
-        bool const UseMinOASchFlag = true;
+        bool constexpr UseOccSchFlag = true;
+        bool constexpr UseMinOASchFlag = true;
         state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataSizing::calcDesignSpecificationOutdoorAir(
             state, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
         if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {

@@ -13469,7 +13469,7 @@ namespace UnitarySystems {
         //  Calculate operating PLR and adjust speed when using multispeed coils.
 
         // Locals
-        bool const SuppHeatingCoilFlag(false);
+        bool constexpr SuppHeatingCoilFlag(false);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500);    // Maximum number of iterations for solver
@@ -14219,7 +14219,7 @@ namespace UnitarySystems {
         //  Data is moved from the System data structure to the System outlet nodes.
 
         // Locals
-        const bool SuppHeatingCoilFlag(true);
+        constexpr bool SuppHeatingCoilFlag(true);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500);    // Maximum number of iterations for solver

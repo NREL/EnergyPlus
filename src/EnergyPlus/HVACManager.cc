@@ -640,8 +640,8 @@ void SimHVAC(EnergyPlusData &state)
     using ZoneEquipmentManager::ManageZoneEquipment;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    bool const SimWithPlantFlowUnlocked(false);
-    bool const SimWithPlantFlowLocked(true);
+    bool constexpr SimWithPlantFlowUnlocked(false);
+    bool constexpr SimWithPlantFlowLocked(true);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration

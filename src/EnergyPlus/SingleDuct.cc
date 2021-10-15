@@ -4334,7 +4334,7 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
     // FUNCTION PARAMETER DEFINITIONS:
     // na

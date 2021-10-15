@@ -3241,7 +3241,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     bool CoolingActive = false;
                     int constexpr OAUnitNum = 0;
                     Real64 constexpr OAUCoilOutTemp = 0.0;
-                    bool const ZoneEquipment = true;
+                    bool constexpr ZoneEquipment = true;
                     SimulateVRF(state,
                                 state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                 FirstHVACIteration,
