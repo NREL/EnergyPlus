@@ -645,7 +645,11 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (spaceNum > 0) {
         floorArea = state.dataHeatBal->space(spaceNum).floorArea;
         // TODO MJW: For now just proportion space volume by floor area
-        volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+        if (thisZone.FloorArea > 0.0) {
+            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+        } else {
+            volume = 0.0;
+        }
         nomTotOccupants = state.dataHeatBal->space(spaceNum).totOccupants;
         curNumOccupants = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
         maxOccupants = state.dataHeatBal->space(spaceNum).maxOccupants;
