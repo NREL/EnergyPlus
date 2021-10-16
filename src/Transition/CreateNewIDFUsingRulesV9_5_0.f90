@@ -709,8 +709,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(9)=InArgs(11)
                 IF (CurArgs > 14) THEN
                     OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
+                    CurArgs = CurArgs - 5
+                ELSE
+                    CurArgs = 9
                 ENDIF
-                CurArgs = CurArgs - 5
 
                 CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Water:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
