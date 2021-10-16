@@ -6,13 +6,14 @@
 # BUILD_FORTRAN
 # TEST_FILE_FOLDER
 # ENERGYPLUS_FLAGS
+# PYTHON_EXECUTABLE
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
 get_filename_component(EXE_PATH "${ENERGYPLUS_EXE}" PATH)
 
 # Create path variables
-set(OUTPUT_DIR_NAME "testfilesReverseDD")
+set(OUTPUT_DIR_NAME "testfiles_ReverseDD")
 set(IDF_PATH "${SOURCE_DIR}/${TEST_FILE_FOLDER}/${IDF_FILE}")
 set(PRODUCT_PATH "${BINARY_DIR}/Products/")
 set(EXE_PATH "${EXE_PATH}/")
@@ -21,16 +22,18 @@ set(EPW_PATH "${SOURCE_DIR}/weather/${EPW_FILE}")
 # Copy IDD to Executable directory if it is not already there
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PRODUCT_PATH}/Energy+.idd" "${EXE_PATH}")
 
-# list zipping is available as of 3.17, which is our minimum version, :+1:
-list(APPEND MODE Regular Reversed)
-list(APPEND VAR "" Y)
+# Delete the root test directory which will delete any previous Regular/Reversed subdirectories
+execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}")
 
-foreach(M V in ZIP_LISTS MODE VAR)
+# list zipping is available as of 3.17, which is our minimum version, :+1:
+set(MODE Regular Reversed)
+set(VAR "" Y)
+
+foreach(M V IN ZIP_LISTS MODE VAR)
 
   set(OUTPUT_DIR_PATH "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}/${M}/")
 
-  # Clean up old test directory
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${OUTPUT_DIR_PATH}")
+  # Create a new directory for output
   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${OUTPUT_DIR_PATH}")
 
   # Read the file contents to check for special cases
@@ -161,16 +164,23 @@ foreach(M V in ZIP_LISTS MODE VAR)
     set(ECHO_CMD "echo")
   endif()
 
+  # set the reverse design day environment variable for EnergyPlus
+  set(ENV{REVERSEDD} "${V}")
   execute_process(
     COMMAND ${ECHO_CMD}
-    COMMAND"${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
+    COMMAND "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
     WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
     RESULT_VARIABLE RESULT)
 
 endforeach()
-#
-#if(RESULT EQUAL 0)
-#  message("Test Passed")
-#else()
-#  message("Test Failed")
-#endif()
+
+execute_process(
+        COMMAND ${ECHO_CMD}
+        COMMAND "${PYTHON_EXECUTABLE}" "${SOURCE_DIR}/cmake/ReverseDDPostProcess.py" "${SOURCE_DIR}/${TEST_FILE_FOLDER}/${IDF_FILE}" "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}"
+        WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
+        RESULT_VARIABLE RESULT)
+if(RESULT EQUAL 0)
+  message("Test Passed")
+else()
+  message("Test Failed")
+endif()
