@@ -2412,6 +2412,10 @@ void GetOARequirements(EnergyPlusData &state)
                             ErrorsFound = true;
                         }
                     }
+                } else {
+                    ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name + " is empty.");
+                    ShowContinueError(state, "At least one pair of Space Name and Space Design Specification Outdoor Air Object Name is required.");
+                    ErrorsFound = true;
                 }
             }
 
