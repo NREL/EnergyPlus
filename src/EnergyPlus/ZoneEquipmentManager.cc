@@ -1324,6 +1324,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     }
 
     // Populate DesignSpecification:OutdoorAir:SpaceList spaces
+    bool dsoaError = false;
     for (int oaIndex = 1; oaIndex <= state.dataSize->NumOARequirements; ++oaIndex) {
         auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
         // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
@@ -1336,13 +1337,15 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
                     ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                    dsoaError = true;
                     ErrorsFound = true;
                 }
                 // Check for duplicate spaces
                 for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
                     if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
                         ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                        ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in list.");
+                        ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in the list.");
+                        dsoaError = true;
                         ErrorsFound = true;
                     }
                 }
@@ -1361,7 +1364,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         Real64 ZoneMinOccupancy = 0.;
         ZoneIndex = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
         int DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
-        if (DSOAPtr > 0) {
+        if ((DSOAPtr > 0) && !dsoaError) {
             auto &thisOAReq = state.dataSize->OARequirements(DSOAPtr);
             // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
             if (thisOAReq.numDSOA > 0) {
@@ -1425,7 +1428,11 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex =
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use
-        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
+        if (!dsoaError) {
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
+        } else {
+            OAVolumeFlowRate = 0.0;
+        }
 
         // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
         state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA = OAVolumeFlowRate;
