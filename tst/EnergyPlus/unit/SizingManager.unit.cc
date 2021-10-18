@@ -103,18 +103,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -134,18 +123,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -165,18 +143,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -196,18 +163,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -227,18 +183,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -258,18 +203,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
