@@ -7039,7 +7039,9 @@ namespace SurfaceGeometry {
             if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
                 ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->ZoneList);
             if (Item1 > 0) {
-                ++NumIntMassSurfaces;
+                if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    ++NumIntMassSurfaces;
+                }
                 state.dataSurface->IntMassObjects(Item).NumOfZones = 1;
                 state.dataSurface->IntMassObjects(Item).ZoneListActive = false;
                 state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr = Item1;
@@ -7243,9 +7245,24 @@ namespace SurfaceGeometry {
             if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
                 ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->ZoneList);
             if (Item1 > 0) {
-                ++NumIntMassSurf;
+                if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    ++NumIntMassSurf;
+                }
             } else if (ZLItem > 0) {
                 NumIntMassSurf += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
+            }
+
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                int Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->space);
+                int SLItem = 0;
+                if (Item1 == 0 && int(state.dataHeatBal->spaceList.size()) > 0)
+                    SLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->spaceList);
+                if (Item1 > 0) {
+                    ++NumIntMassSurf;
+                } else if (SLItem > 0) {
+                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
+                    NumIntMassSurf += numOfSpaces;
+                }
             }
         }
         NumIntMassSurf = max(NumIntMassSurf, TotIntMass);
@@ -14949,6 +14966,7 @@ namespace SurfaceGeometry {
                 if (spaceEnclosureNum == 0) {
                     spaceHasOnlyFloors = true;
                     for (int const surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                        if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::IntMass) continue;
                         if (state.dataSurface->Surface(surfNum).Class != SurfaceClass::Floor) {
                             spaceHasOnlyFloors = false;
                             break;
