@@ -7070,6 +7070,16 @@ namespace SurfaceGeometry {
                     state.dataSurface->IntMassObjects(Item).numOfSpaces = 1;
                     state.dataSurface->IntMassObjects(Item).spaceListActive = false;
                     state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
+                    if (!state.dataSurface->IntMassObjects(Item).ZoneListActive) {
+                        if (state.dataHeatBal->space(Item1).zoneNum != state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
+                                                "\" is not part of Zone =\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                            ErrorsFound = true;
+                            errFlag = true;
+                        }
+                    }
                 } else if (SLItem > 0) {
                     int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
                     NumIntMassSurfaces += numOfSpaces;
@@ -7079,7 +7089,7 @@ namespace SurfaceGeometry {
                 } else {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                     ++SurfNum;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                     ErrorsFound = true;
