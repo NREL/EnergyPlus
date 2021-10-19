@@ -176,7 +176,7 @@ endforeach()
 
 execute_process(
         COMMAND ${ECHO_CMD}
-        COMMAND "${PYTHON_EXECUTABLE}" "${SOURCE_DIR}/cmake/ReverseDDPostProcess.py" "${SOURCE_DIR}/${TEST_FILE_FOLDER}/${IDF_FILE}" "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}"
+        COMMAND "${PYTHON_EXECUTABLE}" "${SOURCE_DIR}/cmake/ReverseDDPostProcess.py" "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}"
         WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
         RESULT_VARIABLE RESULT)
 if(RESULT EQUAL 0)
