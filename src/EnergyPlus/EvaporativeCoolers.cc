@@ -4140,15 +4140,13 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
-    if (allocated(ZoneComp)) {
-        if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName = ZoneEvapUnit(UnitNum).AvailManagerListName;
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
-            ZoneEvapUnit(UnitNum).MyZoneEq = false;
-        }
-        ZoneEvapUnit(UnitNum).FanAvailStatus =
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+    if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
+        ZoneComp[DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit].ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+            ZoneEvapUnit(UnitNum).AvailManagerListName;
+        ZoneComp[DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit].ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+        ZoneEvapUnit(UnitNum).MyZoneEq = false;
     }
+    ZoneEvapUnit(UnitNum).FanAvailStatus = ZoneComp[DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit].ZoneCompAvailMgrs(UnitNum).AvailStatus;
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataEvapCoolers->ZoneEquipmentListChecked = true;

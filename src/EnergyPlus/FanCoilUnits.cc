@@ -1163,15 +1163,13 @@ namespace FanCoilUnits {
             state.dataFanCoilUnits->InitFanCoilUnitsOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
-                    FanCoil(FanCoilNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ZoneNum;
-                state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
-            }
-            FanCoil(FanCoilNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
+        if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
+            ZoneComp[DataZoneEquipment::ZoneEquip::FanCoil4Pipe].ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
+                FanCoil(FanCoilNum).AvailManagerListName;
+            ZoneComp[DataZoneEquipment::ZoneEquip::FanCoil4Pipe].ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ZoneNum;
+            state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
         }
+        FanCoil(FanCoilNum).AvailStatus = ZoneComp[DataZoneEquipment::ZoneEquip::FanCoil4Pipe].ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
 
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;

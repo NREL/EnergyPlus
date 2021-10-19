@@ -1486,16 +1486,14 @@ namespace UnitVentilator {
             state.dataUnitVentilators->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
-                state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
-            }
-            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus =
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
+        if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
+            ZoneComp[DataZoneEquipment::ZoneEquip::UnitVentilator].ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
+                state.dataUnitVentilators->UnitVent(UnitVentNum).AvailManagerListName;
+            ZoneComp[DataZoneEquipment::ZoneEquip::UnitVentilator].ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
+            state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
         }
+        state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus =
+            ZoneComp[DataZoneEquipment::ZoneEquip::UnitVentilator].ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||

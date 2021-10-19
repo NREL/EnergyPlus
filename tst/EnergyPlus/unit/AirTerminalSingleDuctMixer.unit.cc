@@ -8213,8 +8213,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     int const CompNum = 1;
     // current time is within the run time period, starting time is less than stopping time
     state->dataGlobal->SimTimeSteps = 0;
-    state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
-    state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
+    state->dataHVACGlobal->ZoneComp[1].ZoneCompAvailMgrs(1).StartTime = 0.0;
+    state->dataHVACGlobal->ZoneComp[1].ZoneCompAvailMgrs(1).StopTime = 4.0;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
     // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);

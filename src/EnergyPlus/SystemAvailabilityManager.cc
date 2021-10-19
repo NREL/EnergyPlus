@@ -226,52 +226,47 @@ namespace SystemAvailabilityManager {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents;
              ++ZoneEquipType) { // loop over the zone equipment types which allow system avail managers
-            if (allocated(ZoneComp)) {
-                if (ZoneComp(ZoneEquipType).TotalNumComp > 0) {
-                    for (CompNum = 1; CompNum <= ZoneComp(ZoneEquipType).TotalNumComp; ++CompNum) {
-                        if (allocated(ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
-                            if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers > 0) {
-                                // Save the previous status for differential thermostat
-                                PreviousStatus = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus;
-                                // initialize the availability to "take no action"
-                                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
-                                for (ZoneCompAvailMgrNum = 1;
-                                     ZoneCompAvailMgrNum <= ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers;
-                                     ++ZoneCompAvailMgrNum) {
-                                    // loop over the avail managers in ZoneHVAC:* components
-                                    SimSysAvailManager(state,
-                                                       ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerType(ZoneCompAvailMgrNum),
-                                                       ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerName(ZoneCompAvailMgrNum),
-                                                       ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerNum(ZoneCompAvailMgrNum),
-                                                       DummyArgument,
-                                                       PreviousStatus,
-                                                       AvailStatus,
-                                                       ZoneEquipType,
-                                                       CompNum);
-                                    if (AvailStatus == ForceOff) {
-                                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = ForceOff;
-                                        break; // Fans forced off takes precedence
-                                    } else if ((AvailStatus == CycleOn) &&
-                                               (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus == NoAction)) {
-                                        // cycle on is next precedence
-                                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = CycleOn;
-                                    }
-                                } // end of availability manager loop
-                            }
-                        } else {
-                            ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
+            if (ZoneComp[ZoneEquipType].TotalNumComp > 0) {
+                for (CompNum = 1; CompNum <= ZoneComp[ZoneEquipType].TotalNumComp; ++CompNum) {
+                    if (allocated(ZoneComp[ZoneEquipType].ZoneCompAvailMgrs)) {
+                        if (ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).NumAvailManagers > 0) {
+                            // Save the previous status for differential thermostat
+                            PreviousStatus = ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus;
+                            // initialize the availability to "take no action"
+                            ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
+                            for (ZoneCompAvailMgrNum = 1; ZoneCompAvailMgrNum <= ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).NumAvailManagers;
+                                 ++ZoneCompAvailMgrNum) {
+                                // loop over the avail managers in ZoneHVAC:* components
+                                SimSysAvailManager(state,
+                                                   ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerType(ZoneCompAvailMgrNum),
+                                                   ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerName(ZoneCompAvailMgrNum),
+                                                   ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerNum(ZoneCompAvailMgrNum),
+                                                   DummyArgument,
+                                                   PreviousStatus,
+                                                   AvailStatus,
+                                                   ZoneEquipType,
+                                                   CompNum);
+                                if (AvailStatus == ForceOff) {
+                                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus = ForceOff;
+                                    break; // Fans forced off takes precedence
+                                } else if ((AvailStatus == CycleOn) && (ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus == NoAction)) {
+                                    // cycle on is next precedence
+                                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus = CycleOn;
+                                }
+                            } // end of availability manager loop
                         }
-                        if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).ZoneNum > 0) {
-                            if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
-                                for (HybridVentNum = 1; HybridVentNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++HybridVentNum) {
-                                    if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum)
-                                             .HybridVentMgrConnectedToAirLoop) {
-                                        if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).ActualZoneNum ==
-                                            ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).ZoneNum) {
-                                            if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).VentilationCtrl ==
-                                                state.dataSystemAvailabilityManager->HybridVentCtrl_Open) {
-                                                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = ForceOff;
-                                            }
+                    } else {
+                        ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
+                    }
+                    if (ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).ZoneNum > 0) {
+                        if (state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
+                            for (HybridVentNum = 1; HybridVentNum <= state.dataHVACGlobal->NumHybridVentSysAvailMgrs; ++HybridVentNum) {
+                                if (!state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).HybridVentMgrConnectedToAirLoop) {
+                                    if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).ActualZoneNum ==
+                                        ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).ZoneNum) {
+                                        if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).VentilationCtrl ==
+                                            state.dataSystemAvailabilityManager->HybridVentCtrl_Open) {
+                                            ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus = ForceOff;
                                         }
                                     }
                                 }
@@ -280,6 +275,7 @@ namespace SystemAvailabilityManager {
                     }
                 }
             }
+
         } // end of zone equip types
     }
 
@@ -303,8 +299,8 @@ namespace SystemAvailabilityManager {
         using NodeInputManager::GetOnlySingleNode;
         using NodeInputManager::MarkNode;
         using namespace DataLoopNode;
-        using DataZoneEquipment::cValidSysAvailManagerCompTypes;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
+        using DataZoneEquipment::ValidSysAvailManagerCompTypeNamesCC;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSysAvailManagerInputs: "); // include trailing blank
@@ -384,16 +380,13 @@ namespace SystemAvailabilityManager {
         rNumericArgs.dimension(maxNumbers, 0.0);
         lNumericFieldBlanks.dimension(maxNumbers, false);
 
-        if (!allocated(state.dataHVACGlobal->ZoneComp)) {
-            state.dataHVACGlobal->ZoneComp.allocate(NumValidSysAvailZoneComponents);
-        }
-
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-            if (!allocated(state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
-                TotalNumComp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cValidSysAvailManagerCompTypes(ZoneEquipType));
-                state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp = TotalNumComp;
+            if (!allocated(state.dataHVACGlobal->ZoneComp[ZoneEquipType].ZoneCompAvailMgrs)) {
+                TotalNumComp =
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ValidSysAvailManagerCompTypeNamesCC(ZoneEquipType));
+                state.dataHVACGlobal->ZoneComp[ZoneEquipType].TotalNumComp = TotalNumComp;
                 if (TotalNumComp > 0) {
-                    state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs.allocate(TotalNumComp);
+                    state.dataHVACGlobal->ZoneComp[ZoneEquipType].ZoneCompAvailMgrs.allocate(TotalNumComp);
                 }
             }
         }
@@ -1625,32 +1618,32 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->GetAvailListsInput = false;
         }
 
-        if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).Input) { // when both air loop and zone eq avail managers are present, zone
+        if (ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).Input) { // when both air loop and zone eq avail managers are present, zone
                                                                         // avail mngrs list name has not been read in first time through here
                                                                         // (see end of if block)
-            AvailabilityListName = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerListName;
+            AvailabilityListName = ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerListName;
             Found = 0;
             if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0)
                 Found = UtilityRoutines::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->SysAvailMgrListData);
             if (Found != 0) {
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers =
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).NumAvailManagers =
                     state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).NumItems;
-                CompNumAvailManagers = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers;
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = 0;
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = 0;
-                if (!allocated(ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerName)) {
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerName.allocate(CompNumAvailManagers);
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerType.allocate(CompNumAvailManagers);
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerNum.allocate(CompNumAvailManagers);
+                CompNumAvailManagers = ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).NumAvailManagers;
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailStatus = NoAction;
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StartTime = 0;
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StopTime = 0;
+                if (!allocated(ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerName)) {
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerName.allocate(CompNumAvailManagers);
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerType.allocate(CompNumAvailManagers);
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerNum.allocate(CompNumAvailManagers);
                 }
-                for (Num = 1; Num <= ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers; ++Num) {
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerName(Num) =
+                for (Num = 1; Num <= ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).NumAvailManagers; ++Num) {
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerName(Num) =
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num);
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerNum(Num) = 0;
-                    ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerType(Num) =
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerNum(Num) = 0;
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerType(Num) =
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num);
-                    if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerType(Num) == 0) {
+                    if (ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).AvailManagerType(Num) == 0) {
                         ShowSevereError(state,
                                         "GetZoneEqAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" +
                                             state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).cAvailManagerType(Num) + "\".");
@@ -1661,7 +1654,7 @@ namespace SystemAvailabilityManager {
                     }
                     if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num) ==
                             state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo &&
-                        Num != ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers) {
+                        Num != ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).NumAvailManagers) {
                         ShowWarningError(state,
                                          "GetZoneEqAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" +
                                              state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
@@ -1673,9 +1666,9 @@ namespace SystemAvailabilityManager {
                     }
                 } // End of Num Loop
             }
-            if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).Count > 0 || Found > 0)
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).Input = false;
-            ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).Count += 1;
+            if (ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).Count > 0 || Found > 0)
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).Input = false;
+            ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).Count += 1;
         }
     }
 
@@ -1813,11 +1806,9 @@ namespace SystemAvailabilityManager {
         }
         //  HybridVentSysAvailMgrData%AvailStatus= NoAction
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
-            if (allocated(state.dataHVACGlobal->ZoneComp)) {
-                if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp > 0)
-                    for (auto &e : state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
-                        e.AvailStatus = NoAction;
-            }
+            if (state.dataHVACGlobal->ZoneComp[ZoneEquipType].TotalNumComp > 0)
+                for (auto &e : state.dataHVACGlobal->ZoneComp[ZoneEquipType].ZoneCompAvailMgrs)
+                    e.AvailStatus = NoAction;
         }
     }
 
@@ -2097,12 +2088,12 @@ namespace SystemAvailabilityManager {
         if (present(ZoneEquipType)) {
             if (state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
+                ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
             }
 
-            StartTime = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime;
-            StopTime = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime;
+            StartTime = ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StartTime;
+            StopTime = ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StopTime;
             if (state.dataSystemAvailabilityManager->CalcNCycSysAvailMgr_OneTimeFlag) {
                 ZoneCompNCControlType.dimension(state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs, true);
                 state.dataSystemAvailabilityManager->CalcNCycSysAvailMgr_OneTimeFlag = false;
@@ -2220,11 +2211,11 @@ namespace SystemAvailabilityManager {
 
                 if (AvailStatus == CycleOn) {                                                           // reset the start and stop times
                     if (CyclingRunTimeControlType == state.dataSystemAvailabilityManager->Thermostat) { // Cycling Run Time is ignored
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
+                        ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
+                        ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime =
+                        ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
+                        ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(CompNum).StopTime =
                             state.dataGlobal->SimTimeSteps + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
                     }
                 }
@@ -4814,11 +4805,9 @@ namespace SystemAvailabilityManager {
                 e.AvailStatus = NoAction;
 
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
-            if (allocated(ZoneComp)) {
-                if (ZoneComp(ZoneEquipType).TotalNumComp > 0)
-                    for (auto &e : ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
-                        e.AvailStatus = NoAction;
-            }
+            if (ZoneComp[ZoneEquipType].TotalNumComp > 0)
+                for (auto &e : ZoneComp[ZoneEquipType].ZoneCompAvailMgrs)
+                    e.AvailStatus = NoAction;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
@@ -5084,8 +5073,8 @@ namespace SystemAvailabilityManager {
                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl =
                                 state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                             for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-                                for (ZoneCompNum = 1; ZoneCompNum <= state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp; ++ZoneCompNum) {
-                                    if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
+                                for (ZoneCompNum = 1; ZoneCompNum <= state.dataHVACGlobal->ZoneComp[ZoneEquipType].TotalNumComp; ++ZoneCompNum) {
+                                    if (state.dataHVACGlobal->ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl =
                                             state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                                         break;

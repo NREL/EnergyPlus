@@ -4106,17 +4106,15 @@ void InitPTUnit(EnergyPlusData &state,
         state.dataPTHP->ZoneEquipmentListNotChecked = true;
     }
 
-    if (allocated(state.dataHVACGlobal->ZoneComp)) {
-        PTObjectIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
-        if (MyZoneEqFlag(PTUnitNum)) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).AvailManagerListName =
-                state.dataPTHP->PTUnit(PTUnitNum).AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).ZoneNum = ZoneNum;
-            MyZoneEqFlag(PTUnitNum) = false;
-        }
-        state.dataPTHP->PTUnit(PTUnitNum).AvailStatus =
-            state.dataHVACGlobal->ZoneComp(state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType).ZoneCompAvailMgrs(PTObjectIndex).AvailStatus;
+    PTObjectIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
+    if (MyZoneEqFlag(PTUnitNum)) { // initialize the name of each availability manager list and zone number
+        state.dataHVACGlobal->ZoneComp[state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType].ZoneCompAvailMgrs(PTObjectIndex).AvailManagerListName =
+            state.dataPTHP->PTUnit(PTUnitNum).AvailManagerListName;
+        state.dataHVACGlobal->ZoneComp[state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType].ZoneCompAvailMgrs(PTObjectIndex).ZoneNum = ZoneNum;
+        MyZoneEqFlag(PTUnitNum) = false;
     }
+    state.dataPTHP->PTUnit(PTUnitNum).AvailStatus =
+        state.dataHVACGlobal->ZoneComp[state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType].ZoneCompAvailMgrs(PTObjectIndex).AvailStatus;
 
     if (MyPlantScanFlag(PTUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
         if ((state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) ||

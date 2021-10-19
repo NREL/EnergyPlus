@@ -786,16 +786,14 @@ namespace UnitHeater {
             state.dataUnitHeaters->InitUnitHeaterOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
-                state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
-            }
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus =
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
+        if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
+            ZoneComp[DataZoneEquipment::ZoneEquip::UnitHeater].ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
+            ZoneComp[DataZoneEquipment::ZoneEquip::UnitHeater].ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
+            state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
         }
+        state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus =
+            ZoneComp[DataZoneEquipment::ZoneEquip::UnitHeater].ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||

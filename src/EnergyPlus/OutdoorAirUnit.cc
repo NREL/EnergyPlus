@@ -1204,15 +1204,13 @@ namespace OutdoorAirUnit {
             state.dataOutdoorAirUnit->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            if (MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
-                    OutAirUnit(OAUnitNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
-                MyZoneEqFlag(OAUnitNum) = false;
-            }
-            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
+        if (MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
+            ZoneComp[DataZoneEquipment::ZoneEquip::OutdoorAirUnit].ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
+                OutAirUnit(OAUnitNum).AvailManagerListName;
+            ZoneComp[DataZoneEquipment::ZoneEquip::OutdoorAirUnit].ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
+            MyZoneEqFlag(OAUnitNum) = false;
         }
+        OutAirUnit(OAUnitNum).AvailStatus = ZoneComp[DataZoneEquipment::ZoneEquip::OutdoorAirUnit].ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
 
         if (MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
             for (compLoop = 1; compLoop <= OutAirUnit(OAUnitNum).NumComponents; ++compLoop) {

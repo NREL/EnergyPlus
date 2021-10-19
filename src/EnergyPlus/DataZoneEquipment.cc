@@ -78,7 +78,7 @@ namespace EnergyPlus::DataZoneEquipment {
 // PURPOSE OF THIS MODULE:
 // This module contains variable declarations for zone equipment configuration data
 
-Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponents,
+Array1D_string const ValidSysAvailManagerCompTypeNamesCC(NumValidSysAvailZoneComponents,
                                                     {"ZoneHVAC:FourPipeFanCoil",
                                                      "ZoneHVAC:PackagedTerminalHeatPump",
                                                      "ZoneHVAC:PackagedTerminalAirConditioner",

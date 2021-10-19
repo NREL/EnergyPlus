@@ -274,18 +274,17 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
 
         state.dataZoneEquip->ZoneEquipAvail = NoAction;
 
-        if (allocated(ZoneComp)) {
-            for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-                if (allocated(ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
-                    TotalNumComp = ZoneComp(ZoneEquipType).TotalNumComp;
-                    for (ZoneCompNum = 1; ZoneCompNum <= TotalNumComp; ++ZoneCompNum) {
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus = NoAction;
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).StartTime = 0;
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).StopTime = 0;
-                    }
+        for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
+            if (allocated(ZoneComp[ZoneEquipType].ZoneCompAvailMgrs)) {
+                TotalNumComp = ZoneComp[ZoneEquipType].TotalNumComp;
+                for (ZoneCompNum = 1; ZoneCompNum <= TotalNumComp; ++ZoneCompNum) {
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(ZoneCompNum).AvailStatus = NoAction;
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(ZoneCompNum).StartTime = 0;
+                    ZoneComp[ZoneEquipType].ZoneCompAvailMgrs(ZoneCompNum).StopTime = 0;
                 }
             }
         }
+
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
 
@@ -3184,10 +3183,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
                 GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
 
-                if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
+                if (ZoneComp[ZoneEquipTypeNum].ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
                     state.dataHVACGlobal->ZoneCompTurnFansOn = true;
                     state.dataHVACGlobal->ZoneCompTurnFansOff = false;
-                } else if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == ForceOff) {
+                } else if (ZoneComp[ZoneEquipTypeNum].ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == ForceOff) {
                     state.dataHVACGlobal->ZoneCompTurnFansOn = false;
                     state.dataHVACGlobal->ZoneCompTurnFansOff = true;
                 } else {
@@ -3421,7 +3420,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                              // via SumLatentHTRadSys... so setting LatOutputProvided = 0.0
 
                 } else if (SELECT_CASE_var == ZoneEquip::LoTempRadiant) { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow',
-                                                                              // 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
+                                                                          // 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
                     // 'ZoneHVAC:LowTemperatureRadiant:Electric'
                     SimLowTempRadiantSystem(state,
                                             state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
@@ -3469,7 +3468,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                      state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr));
 
                 } else if (SELECT_CASE_var == ZoneEquip::HPWaterHeater) { // 'WaterHeater:HeatPump:PumpedCondenser'
-                                                                   //                        auto HPWH =
+                                                                          //                        auto HPWH =
                     //                        WaterThermalTanks::HeatPumpWaterHeaterData::factory(PrioritySimOrder(EquipTypeNum).EquipName);
                     //                        PlantLocation A(0, 0, 0, 0);
                     //                        Real64 curLoad = 0.0;

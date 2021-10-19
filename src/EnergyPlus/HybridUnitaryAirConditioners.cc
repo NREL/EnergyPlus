@@ -223,16 +223,14 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = 0;
 
     // set the availability status based on the availability manager list name
-    if (allocated(ZoneComp)) {
-        if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
-                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
-            MyZoneEqFlag(UnitNum) = false;
-        }
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus =
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+    if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
+        ZoneComp[DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler].ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+            state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
+        ZoneComp[DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler].ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+        MyZoneEqFlag(UnitNum) = false;
     }
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus =
+        ZoneComp[DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler].ZoneCompAvailMgrs(UnitNum).AvailStatus;
 
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
     if (!state.dataHybridUnitaryAC->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {

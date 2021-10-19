@@ -1279,16 +1279,14 @@ void InitStandAloneERV(EnergyPlusData &state,
         state.dataHVACStandAloneERV->MyOneTimeFlag = false;
     }
 
-    if (allocated(state.dataHVACGlobal->ZoneComp)) {
-        if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
-                state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
-            state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum) = false;
-        }
-        state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
+    if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
+        state.dataHVACGlobal->ZoneComp[DataZoneEquipment::ZoneEquip::ERVStandAlone].ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
+        state.dataHVACGlobal->ZoneComp[DataZoneEquipment::ZoneEquip::ERVStandAlone].ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
+        state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum) = false;
     }
+    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus =
+        state.dataHVACGlobal->ZoneComp[DataZoneEquipment::ZoneEquip::ERVStandAlone].ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
 
     // need to check all units to see if they are on Zone Equipment List or issue warning
     if (!state.dataHVACStandAloneERV->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
