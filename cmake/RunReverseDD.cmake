@@ -29,6 +29,8 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${BINARY_DIR}/${
 set(MODE Regular Reversed)
 set(VAR "" Y)
 
+message("Running reverse design day test for file ${IDF_NAME}")
+
 foreach(M V IN ZIP_LISTS MODE VAR)
 
   set(OUTPUT_DIR_PATH "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}/${M}/")
@@ -182,11 +184,16 @@ foreach(M V IN ZIP_LISTS MODE VAR)
   endif()
 endforeach()
 
+message("Reverse design day simulations completed, now running comparison script")
+
 execute_process(
         COMMAND ${ECHO_CMD}
         COMMAND "${PYTHON_EXECUTABLE}" "${SOURCE_DIR}/cmake/ReverseDDPostProcess.py" "${BINARY_DIR}/${OUTPUT_DIR_NAME}/${IDF_NAME}"
         WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
         RESULT_VARIABLE RESULT_RDD)
+
+message("Reverse design day comparison complete")
+
 if(RESULT_RDD EQUAL 0)
   message("Test Passed")
 else()

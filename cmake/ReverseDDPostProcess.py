@@ -61,6 +61,7 @@ from math import log10, floor
 
 """Processes a diff between DD and ReverseDD runs, returning 0 for match and 1 for differences or error"""
 
+
 def process_command_arguments() -> str:
     """Verify the number of command line arguments is correct then return the relevant ones"""
     if len(sys.argv) != 2:
