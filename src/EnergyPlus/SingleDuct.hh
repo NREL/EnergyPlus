@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -196,12 +197,12 @@ namespace SingleDuct {
         std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units
         int SecInNode;                // zone or zone unit air node number
         // warning variables
-        int IterationLimit;                  // Used for RegulaFalsi error -1
-        int IterationFailed;                 // Used for RegulaFalsi error -2
-        int OAPerPersonMode;                 // mode for how per person rates are determined, DCV or design.
-        bool EMSOverrideAirFlow;             // if true, EMS is calling to override flow rate
-        Real64 EMSMassFlowRateValue;         // value EMS is directing to use for flow rate [kg/s]
-        int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
+        int IterationLimit;                                       // Used for RegulaFalsi error -1
+        int IterationFailed;                                      // Used for RegulaFalsi error -2
+        DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
+        bool EMSOverrideAirFlow;                                  // if true, EMS is calling to override flow rate
+        Real64 EMSMassFlowRateValue;                              // value EMS is directing to use for flow rate [kg/s]
+        int ZoneTurndownMinAirFracSchPtr;                         // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
         bool MyEnvrnFlag;
@@ -229,10 +230,11 @@ namespace SingleDuct {
               ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
-              HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0), OAPerPersonMode(0), EMSOverrideAirFlow(false),
-              EMSMassFlowRateValue(0.0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false),
-              MyEnvrnFlag(true), MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0),
-              MassFlow3(0.0), MassFlowDiff(0.0)
+              HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
+              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassigned), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
+              ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true),
+              MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0), MassFlow3(0.0),
+              MassFlowDiff(0.0)
         {
         }
 
@@ -316,7 +318,7 @@ namespace SingleDuct {
         int OARequirementsPtr;          // - Index to DesignSpecification:OutdoorAir object
         int AirLoopNum;                 // System sizing adjustments
         Real64 DesignPrimaryAirVolRate; // System sizing adjustments, filled from design OA spec using sizing mode flags.
-        int OAPerPersonMode;            // mode for how per person rates are determined, DCV or design.
+        DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
         bool printWarning;              // flag to print warnings only once
         // Default Constructor
         AirTerminalMixerData()
@@ -325,7 +327,7 @@ namespace SingleDuct {
               DOASEnthalpy(0.0), DOASPressure(0.0), DOASMassFlowRate(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), MixedAirEnthalpy(0.0),
               MixedAirPressure(0.0), MixedAirMassFlowRate(0.0), MassFlowRateMaxAvail(0.0), ADUNum(0), TermUnitSizingIndex(0), OneTimeInitFlag(true),
               OneTimeInitFlag2(true), ZoneEqNum(0), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0),
-              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(0), printWarning(true)
+              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassigned), printWarning(true)
         {
         }
 

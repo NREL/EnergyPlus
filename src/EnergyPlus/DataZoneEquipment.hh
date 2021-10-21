@@ -134,13 +134,29 @@ namespace DataZoneEquipment {
     };
 
     constexpr int NumValidSysAvailZoneComponents(14);
-    extern Array1D_string const ValidSysAvailManagerCompTypeNamesCC;
+    constexpr std::array<std::string_view, NumValidSysAvailZoneComponents> ValidSysAvailManagerCompTypeNamesCC = {
+        "ZoneHVAC:FourPipeFanCoil",
+        "ZoneHVAC:PackagedTerminalHeatPump",
+        "ZoneHVAC:PackagedTerminalAirConditioner",
+        "ZoneHVAC:WaterToAirHeatPump",
+        "ZoneHVAC:WindowAirConditioner",
+        "ZoneHVAC:UnitHeater",
+        "ZoneHVAC:UnitVentilator",
+        "ZoneHVAC:EnergyRecoveryVentilator",
+        "ZoneHVAC:VentilatedSlab",
+        "ZoneHVAC:OutdoorAirUnit",
+        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
+        "ZoneHVAC:IdealLoadsAirSystem",
+        "ZoneHVAC:EvaporativeCoolerUnit",
+        "ZoneHVAC:HybridUnitaryHVAC"};
 
     // Per Person Ventilation Rate Mode
-    constexpr int PerPersonDCVByCurrentLevel(1);
-    constexpr int PerPersonByDesignLevel(2);
-
-
+    enum class PerPersonVentRateMode
+    {
+        Unassigned = -1,
+        DCVByCurrentLevel,
+        ByDesignLevel
+    };
 
     enum class LoadDist
     {
