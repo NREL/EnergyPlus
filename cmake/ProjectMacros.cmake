@@ -171,6 +171,19 @@ function(ADD_SIMULATION_TEST)
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
+  if(ENABLE_REVERSE_DD_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL))
+    set(TEST_FILE_FOLDER "testfiles")
+    set(ENERGYPLUS_FLAGS "-D -r")
+    add_test(
+            NAME "reverseDD.${IDF_NAME}"
+            COMMAND
+            ${CMAKE_COMMAND} -DSOURCE_DIR=${PROJECT_SOURCE_DIR} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DPYTHON_EXECUTABLE=${Python_EXECUTABLE} -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
+            -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE} -DENERGYPLUS_FLAGS=${ENERGYPLUS_FLAGS} -DBUILD_FORTRAN=${BUILD_FORTRAN} -DTEST_FILE_FOLDER=${TEST_FILE_FOLDER} -P
+            ${PROJECT_SOURCE_DIR}/cmake/RunReverseDD.cmake)
+    set_tests_properties("reverseDD.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success;Test Passed")
+    set_tests_properties("reverseDD.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  endif()
+
 endfunction()
 
 function(fixup_executable EXECUTABLE_PATH)
