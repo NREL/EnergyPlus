@@ -163,6 +163,7 @@ endif()
 
 if(BUILD_TESTING)
   option(ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF)
+  option(ENABLE_REVERSE_DD_TESTING "Enable Reverse Design Day Tests" OFF)
   option(BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF)
   if(ENABLE_REGRESSION_TESTING)
     if(CMAKE_CL_64)
