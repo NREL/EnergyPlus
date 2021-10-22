@@ -2297,15 +2297,14 @@ namespace UnitarySystems {
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
             // mine data from heat exchanger assisted cooling coil
             // Get DX heat exchanger assisted cooling coil index
-            int childCCType_Num_temp = state.dataHVACAssistedCC->HXAssistedCoil(this->m_CoolingCoilIndex).CoolingCoilType_Num;
-            if (childCCType_Num_temp == DataHVACGlobals::CoilDX_Cooling) {
-                int childCCIndex_temp = state.dataHVACAssistedCC->HXAssistedCoil(this->m_CoolingCoilIndex).CoolingCoilIndex;
-                // int childCCIndex_temp = CoilCoolingDX::factory(state, ChildCoolingCoilName);
-                if (childCCIndex_temp < 0) {
+            int childCCType_Num = state.dataHVACAssistedCC->HXAssistedCoil(this->m_CoolingCoilIndex).CoolingCoilType_Num;
+            if (childCCType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                int childCCIndex = state.dataHVACAssistedCC->HXAssistedCoil(this->m_CoolingCoilIndex).CoolingCoilIndex;
+                if (childCCIndex < 0) {
                     ShowContinueError(state, "Occurs in sizing HeatExchangerAssistedCoolingCoil.");
                 }
-                auto &newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
-                newCoil_temp.size(state);
+                auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+                newCoil.size(state);
             }
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
 
@@ -4768,25 +4767,25 @@ namespace UnitarySystems {
                     if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
 
                         errFlag = false;
-                        int childCCIndex_temp = CoilCoolingDX::factory(state, ChildCoolingCoilName);
-                        if (childCCIndex_temp < 0) {
+                        int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
+                        if (childCCIndex < 0) {
                             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errFlag = true;
                             errorsFound = true;
                         }
 
-                        auto &newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
-                        this->m_CoolingCoilAvailSchPtr = newCoil_temp.availScheduleIndex;
+                        auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+                        this->m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
 
-                        // thisSys.m_DesignCoolingCapacity = newCoil_temp.performance.normalMode.ratedGrossTotalCap;
+                        // thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
                         // Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
-                        this->m_MaxCoolAirVolFlow = newCoil_temp.performance.normalMode.ratedEvapAirFlowRate;
+                        this->m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
                         // if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                         if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
 
                         // Get Outdoor condenser node from heat exchanger assisted DX coil object
                         errFlag = false;
-                        this->m_CondenserNodeNum = newCoil_temp.condInletNodeIndex;
+                        this->m_CondenserNodeNum = newCoil.condInletNodeIndex;
 
                     } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) {
 
