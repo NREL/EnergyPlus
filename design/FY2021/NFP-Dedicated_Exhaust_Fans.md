@@ -4,6 +4,8 @@ Dedicated Exhaust System for Flexible Exhausts Configurations
 **J. Yuan & M.J. Witte, GARD Analytics**
 
  - Original Date: July 30, 2021
+ - Revised: August 2, 2021, revise and start design
+ - Revised: Oct ??, 2021, 
 
 ## Justification for New Feature ##
 
@@ -13,11 +15,14 @@ This new feature intends to provide a convenient way for multiple exhausts in di
 
 Currently modeling this type of configuration in EnergyPlus requires workarounds (to be described in the overview section) and it quite cumbersome to implement for large projects. According to the original requester, the workaround method could also complain about missing “exhaust fans” in the energy report  the  during compliance reviews (e.g. CA Title-24, pp. 257, 2019 version). This calls for an easier way to model a such re-routed exhaust streams, which would also allow more accurate part loads calculation and reporting on the exhaust fans. The proposed work is thus about implementing such a new feature that will allow more flexible exhaust streams routing to meet the modeling needs described above. 
 
+Another application for such exhaust systems is health care. ANSI/ASHRAE/ASHE Standard 170-2013 Ventilation of Health Care Facilities specifies that certain types of spaces have a requirement that "All Room Air Exhausted Directly to Outdoors," e.g. ER waiting rooms, laboratories, laundry, etc. This adds the requirement for exhaust flow to track supply flow which is not currently possible at the zone level.
+
 ## E-mail and Conference Call Conclusions ##
 
 ### E-mail Communications ###
 
 - A few email exchanges with the original requester prior to and during the development of the NFP to clarify the development needs;
+- Comment in [pull request #9925](https://github.com/NREL/EnergyPlus/pull/8925#issuecomment-891994628) regarding application for health care spaces with requirement that "All Room Air Exhausted Directly to Outdoors."
 
 ### Conference Call Communications ###
 
@@ -35,11 +40,11 @@ The second potential candidate for modeling such an exhaust system is the AirLoo
 
 A third potential candidate is using the general Connector:Mixer object to develop the airloop topography. The Connector:Mixer will taken several "branches" and connect them to a common outlet branch. This means that the Connector:Mixer actually works on the branch level and explicitly branches need to be defined for each incoming and outgoing connections, which will be cumbersome to use when trying to connect many zones on larger projects. The configuration is also subject to the restrictions that the airloop system that multiple routed exhaust system is difficult to be correctly recognized by EnergyPlus.
 
-Currently, the original requester for the feature (S. Rao at Affiliated Engineers Inc) uses a workaround that uses EMS sensors to gather the different zone exhaust information and "virtually" mixed them together via some pieces of EMS program code, and then feed the gather flow information to a "dummy" actuatable system to accomplish the goal of modeling such a configuration. 
+Currently, the original requester for the feature uses a workaround that uses EMS sensors to gather the different zone exhaust information and "virtually" mixed them together via some pieces of EMS program code, and then feed the gather flow information to a "dummy" actuatable system to accomplish the goal of modeling such a configuration. 
 
 Based on the existing modules' capabilities and limitations, we proposed to add two new IDF objects to model such a  re-routed and recombined exhaust system configuration, and to allow quick setup and scaling up of such a configure for larger simulation projects.
 
-## Approach ##
+## Approach A ##
 
 The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described: 
 ```
@@ -67,6 +72,41 @@ AirLoopHVAC:ExhaustMixer,
     Zone1 Exhaust Fan Outlet Node,  !- Inlet 2 Node Name
     ,                               !- Inlet 2 Design Flow Rate {m3/s}
     ;                               !- Inlet 2 Flow Fraction Schedule Name
+```
+
+## Approach B ##
+
+The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described: 
+```
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust,            !- Name
+    Exhaust Avail List,         !- Availability Manager List Name
+    Fan:SystemModel,            !- Component 1 Object Type
+    Central Exhaust Fan,        !- Component 1 Name
+    AirLoopHVAC:Mixer,          !- Component 2 Object Type
+    Exhaust Mixer 1,            !- Component 2 Name
+    AirLoopHVAC:Mixer,          !- Component 3 Object Type
+    Exhaust Mixer 2;            !- Component 3 Name
+```
+
+The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume could not be used with the current object.
+
+The ZoneHVAC:ExhaustSystem is also to be added as a new object: 
+```
+ZoneHVAC:ExhaustSystem,
+    Zone2 Exhaust System,           !-Name
+    HVACOperationSchd,              !- Availability Schedule Name
+    Zone2 Exhaust Node,             !- Inlet Node Name
+    Central Exhaust Fan Inlet Node, !- Outlet Node Name
+    0.1,                            !- Design Flow Rate {m3/s}
+    Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
+    Zone2 Exhaust Fan,              !- Fan Name
+    Scheduled,                      !- Fan Control Type (Scheduled, Passive, FollowSupply, ????)
+    Zone2 Exhaust Fan Flow Sched,   !- Flow Fraction Schedule Name
+    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+    ,                               !- System Availability Manager Name
+    ,                               !- Minimum Zone Temperature Limit Schedule Name
+    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
 In the example IDF block above, the Inlet 2 Design Flow Rate (m3/s) might not be needed as it is an existing zone exhaust fan. The set up intends to allow some flexibility in the configurations in that one or more of the connect branch to the mixer can be without a branch fan. Further, the exhaust mixer will allow more than 2 inlet branches to be connected to the mixer.
