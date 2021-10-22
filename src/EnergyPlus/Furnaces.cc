@@ -2196,15 +2196,15 @@ namespace Furnaces {
                     if (UtilityRoutines::SameString(ChildCoolingCoilType,
                                                         "COIL:COOLING:DX")) {
 
-                        int childCCIndex_temp = CoilCoolingDX::factory(state, ChildCoolingCoilName);
-                        if (childCCIndex_temp < 0) {
+                        int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
+                        if (childCCIndex < 0) {
                             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + Alphas(1));
                             errFlag = true;
                             ErrorsFound = true;
                         }
-                        auto &newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
+                        auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
 
-                        state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = newCoil_temp.condInletNodeIndex;
+                        state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = newCoil.condInletNodeIndex;
 
                     }
                     // else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
@@ -6649,7 +6649,6 @@ namespace Furnaces {
             int childCCType_Num = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilType_Num;
             if (childCCType_Num == DataHVACGlobals::CoilDX_Cooling) {
                 int childCCIndex = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilIndex;
-                // int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
                 if (childCCIndex < 0) {
                     ShowContinueError(state, "Occurs in sizing HeatExchangerAssistedCoolingCoil.");
                 }
@@ -12668,15 +12667,8 @@ namespace Furnaces {
             // state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
             //    DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
                         
-            // bool IsNotOK = false;
             std::string ChildCoolingCoilType = state.dataHVACAssistedCC->HXAssistedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolingCoilType;
             std::string ChildCoolingCoilName = state.dataHVACAssistedCC->HXAssistedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolingCoilName;
-            // std::string ChildCoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, IsNotOK);
-            // std::string ChildCoolingCoilType = HVACHXAssistedCoolingCoil::GetHXDXCoilType(state, CoolingCoilType, CoolingCoilName, IsNotOK);
-            // if (IsNotOK) {
-            //    ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + FurnaceName);
-            //    ErrorsFound = true;
-            // }
 
             if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
                 int childCCIndex_DX = CoilCoolingDX::factory(state, ChildCoolingCoilName);
