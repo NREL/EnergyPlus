@@ -214,7 +214,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 this->autoSizedValue = _originalValue;
             } else {
-                this->dataFracOfAutosizedHeatingCapacity = 1.0;
                 if (this->curOASysNum > 0) {
                     if (this->oaSysEqSizing(this->curOASysNum).AirFlow) {
                         DesVolFlow = this->oaSysEqSizing(this->curOASysNum).AirVolFlow;
