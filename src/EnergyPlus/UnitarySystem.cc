@@ -12551,7 +12551,7 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag,
                                                                                         _,
                                                                                         this->m_DehumidificationMode,
-                                                                                        0.0);// this->CoilSHR);
+                                                                                        0.0); // this->CoilSHR);
                                     TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
                                 TempMinPLR = TempMaxPLR;

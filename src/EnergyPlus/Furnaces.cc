@@ -2193,8 +2193,7 @@ namespace Furnaces {
                     }
 
                     // if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    if (UtilityRoutines::SameString(ChildCoolingCoilType,
-                                                        "COIL:COOLING:DX")) {
+                    if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
 
                         int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
                         if (childCCIndex < 0) {
@@ -12666,9 +12665,11 @@ namespace Furnaces {
             // 2021-10: Comment out the original line
             // state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
             //    DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
-                        
-            std::string ChildCoolingCoilType = state.dataHVACAssistedCC->HXAssistedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolingCoilType;
-            std::string ChildCoolingCoilName = state.dataHVACAssistedCC->HXAssistedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolingCoilName;
+
+            std::string ChildCoolingCoilType =
+                state.dataHVACAssistedCC->HXAssistedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolingCoilType;
+            std::string ChildCoolingCoilName =
+                state.dataHVACAssistedCC->HXAssistedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolingCoilName;
 
             if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
                 int childCCIndex_DX = CoilCoolingDX::factory(state, ChildCoolingCoilName);

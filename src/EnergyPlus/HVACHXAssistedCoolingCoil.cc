@@ -1119,12 +1119,12 @@ namespace HVACHXAssistedCoolingCoil {
                 bool singleMode = (mSingleMode == 1);
 
                 Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
-                                             .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
+                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
 
                 Real64 CoilPLR = 1.0;
                 int mControlType = 2;
                 if (mControlType == 2) {
-                        if (mCoolingSpeedNum > 1) {
+                    if (mCoolingSpeedNum > 1) {
                         CoilPLR = 1.0 * double(CompOp);
                     } else {
                         CoilPLR = PartLoadRatio * double(CompOp);
@@ -1132,7 +1132,7 @@ namespace HVACHXAssistedCoolingCoil {
                 } else {
                     //
                 }
-                
+
                 int OperationMode = DataHVACGlobals::coilNormalMode;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
                     OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
@@ -1159,12 +1159,12 @@ namespace HVACHXAssistedCoolingCoil {
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     state,
                     OperationMode, // partially implemented for HXAssistedCoil
-                    CoilPLR, // PartLoadRatio,
+                    CoilPLR,       // PartLoadRatio,
                     mCoolingSpeedNum,
                     mCoolingSpeedRatio,
                     FanOpMode,
                     singleMode); //,
-                    // LoadSHR);
+                                 // LoadSHR);
 
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 SimDXCoil(state,
