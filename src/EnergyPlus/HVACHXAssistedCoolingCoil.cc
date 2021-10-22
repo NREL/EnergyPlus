@@ -1115,51 +1115,27 @@ namespace HVACHXAssistedCoolingCoil {
 
                 int coolingCoilIndex = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex;
 
-                // This is the unitary calc way: 
-                
-                // bool const singleMode = (this->m_SingleMode == 1);
                 int mSingleMode = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes();
                 bool singleMode = (mSingleMode == 1);
-                //if (mSingleMode > 1) {
-                //    singleMode = false;
-                //}
 
                 Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
 
                 Real64 CoilPLR = 1.0;
-                int mControlType = 2; // ControlType::Setpoint
-                // if (this->m_ControlType == ControlType::Setpoint) {
+                int mControlType = 2;
                 if (mControlType == 2) {
-                        if (mCoolingSpeedNum > 1) { // if (this->m_CoolingSpeedNum > 1) {
-                        // CoilPLR = 1.0 * double(CompOn);
+                        if (mCoolingSpeedNum > 1) {
                         CoilPLR = 1.0 * double(CompOp);
                     } else {
-                        // CoilPLR = PartLoadRatio * double(CompOn);
                         CoilPLR = PartLoadRatio * double(CompOp);
                     }
                 } else {
-                    //if (state.dataUnitarySystems->CoolingLoad) {
-                    //    if (this->m_CoolingSpeedNum > 1) {
-                    //        if (!singleMode) {
-                    //            CoilPLR = 1.0 * double(CompOn);
-                    //            this->m_CoolingSpeedRatio = PartLoadRatio * double(CompOn);
-                    //        } else {
-                    //            CoilPLR = PartLoadRatio * double(CompOn);
-                    //        }
-                    //    } else {
-                    //        CoilPLR = PartLoadRatio * double(CompOn);
-                    //    }
-                    //} else {
-                    //    CoilPLR = 0.0;
-                    //}
+                    //
                 }
                 
                 int OperationMode = DataHVACGlobals::coilNormalMode;
-                // if (state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
                     OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
-                // } else if (this->m_DehumidificationMode == 1) {
                 } else if (DehumidificationMode == 1) {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
@@ -1167,31 +1143,18 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
                 Real64 mCoolCompPartLoadRatio = double(CompOp);
 
-                // if (this->m_CoolingSpeedNum > 1) {
                 if (mCoolingSpeedNum > 1) {
-                    //    if (this->m_SingleMode == 0) {
                     if (mSingleMode == 0) {
-                        //        this->m_CoolCompPartLoadRatio = double(CompOn);
                         mCoolCompPartLoadRatio = double(CompOp);
                     } else {
-                        //        this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
                         mCoolCompPartLoadRatio = PartLoadRatio * double(CompOp);
-                        //        // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
-                        //        this->m_CoolingSpeedRatio = 1.0;
                         mCoolingSpeedRatio = 1.0;
                     }
                     CoilPLR = 1.0;
                 } else {
-                    //    this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
-                    // CoolCompPartLoadRatio = CoolingCycRatio * double(CompOn);
-                    //    // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
-                    //    this->m_CoolingSpeedRatio = 0.0;
                     mCoolingSpeedRatio = 1.0;
                     CoilPLR = PartLoadRatio * double(CompOp);
                 }
-
-                // state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                //    state, OperationMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode, this->CoilSHR);
 
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     state,
@@ -1202,25 +1165,6 @@ namespace HVACHXAssistedCoolingCoil {
                     FanOpMode,
                     singleMode); //,
                     // LoadSHR);
-
-                //// Or consider the unitary simMultiCoil way: 
-                //Real64 SpeedRatio = 0.0;
-                //Real64 CycRatio = 0.0;
-
-                //if (CoilType == DataHVACGlobals::Cooling) {
-                //    if (this->m_CoolingSpeedNum <= 1.0) {
-                //        SpeedRatio = 0.0;
-                //        CycRatio = PartLoadFrac;
-                //    } else {
-                //        if (this->m_SingleMode == 0) {
-                //            SpeedRatio = PartLoadFrac;
-                //            CycRatio = 0.0;
-                //        } else {
-                //            SpeedRatio = 1.0;
-                //            CycRatio = PartLoadFrac;
-                //        }
-                //    }
-                //}
 
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 SimDXCoil(state,

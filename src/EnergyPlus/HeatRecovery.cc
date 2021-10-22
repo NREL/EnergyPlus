@@ -1796,7 +1796,6 @@ namespace HeatRecovery {
                         state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
                     } else if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         // Use the new coil option:
-                        // At least temporarily set it similar to variable speed? how to support VS dx coil here?
                         state.dataHeatRecovery->FullLoadOutAirTemp = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirDryBulbTemp;
                         state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirHumRat;
                     } else {
