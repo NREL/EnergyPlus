@@ -74,6 +74,8 @@ AirLoopHVAC:ExhaustMixer,
     ;                               !- Inlet 2 Flow Fraction Schedule Name
 ```
 
+In the example IDF block above, the Inlet 2 Design Flow Rate (m3/s) might not be needed as it is an existing zone exhaust fan. The set up intends to allow some flexibility in the configurations in that one or more of the connect branch to the mixer can be without a branch fan. Further, the exhaust mixer will allow more than 2 inlet branches to be connected to the mixer.
+
 ## Approach B ##
 
 The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described: 
@@ -89,7 +91,7 @@ AirLoopHVAC:ExhaustSystem,
     Exhaust Mixer 2;            !- Component 3 Name
 ```
 
-The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume could not be used with the current object.
+The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume would not be allowed.
 
 The ZoneHVAC:ExhaustSystem is also to be added as a new object: 
 ```
@@ -97,7 +99,7 @@ ZoneHVAC:ExhaustSystem,
     Zone2 Exhaust System,           !-Name
     HVACOperationSchd,              !- Availability Schedule Name
     Zone2 Exhaust Node,             !- Inlet Node Name
-    Central Exhaust Fan Inlet Node, !- Outlet Node Name
+    Exhaust Mixer 1 Inlet Node 2,   !- Outlet Node Name
     0.1,                            !- Design Flow Rate {m3/s}
     Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
     Zone2 Exhaust Fan,              !- Fan Name
@@ -109,7 +111,48 @@ ZoneHVAC:ExhaustSystem,
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
-In the example IDF block above, the Inlet 2 Design Flow Rate (m3/s) might not be needed as it is an existing zone exhaust fan. The set up intends to allow some flexibility in the configurations in that one or more of the connect branch to the mixer can be without a branch fan. Further, the exhaust mixer will allow more than 2 inlet branches to be connected to the mixer.
+## Approach C ##
+
+The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described.
+AirLoopHVAC:Exhaust System would reference the following components:
+
+* ZoneHVAC:ExhaustSystem - required for every zone that connects to the exhaust system. This can have its own fan or be passive.
+* AirLoopHVAC:Mixer - if there is more than one zone, then a mixer is required.
+* Fan:SystemModel (or Fan:ComponentModel) - a fan is required if any of the ZoneHVAC:ExhaustSystem objects do not have a fan.
+
+```
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust,            !- Name
+    Exhaust Avail List,         !- Availability Manager List Name
+    ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
+    Zone1 Exhaust System,       !- Component 1 Name
+    ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
+    Zone2 Exhaust System,       !- Component 2 Name
+    AirLoopHVAC:Mixer,          !- Component 3 Object Type
+    Exhaust Mixer;              !- Component 3 Name
+    Fan:SystemModel,            !- Component 4 Object Type
+    Central Exhaust Fan,        !- Component 4 Name
+```
+
+The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume would not be allowed.
+
+The ZoneHVAC:ExhaustSystem is also to be added as a new object: 
+```
+ZoneHVAC:ExhaustSystem,
+    Zone2 Exhaust System,           !-Name
+    HVACOperationSchd,              !- Availability Schedule Name
+    Zone2 Exhaust Node,             !- Inlet Node Name
+    Exhaust Mixer Inlet Node 2,     !- Outlet Node Name
+    0.1,                            !- Design Flow Rate {m3/s}
+    Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
+    Zone2 Exhaust Fan,              !- Fan Name
+    Scheduled,                      !- Fan Control Type (Scheduled, Passive, FollowSupply, ????)
+    Zone2 Exhaust Fan Flow Sched,   !- Flow Fraction Schedule Name
+    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+    ,                               !- System Availability Manager Name
+    ,                               !- Minimum Zone Temperature Limit Schedule Name
+    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
+```
 
 ### IDD changes ###
 
