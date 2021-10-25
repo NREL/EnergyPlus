@@ -2361,12 +2361,12 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                 auto const SELECT_CASE_var(
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed);
 
-                if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCap) {
+                if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCap) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
-                        DataPlant::HowMet_ByNominalCapFreeCoolCntrl;
-                } else if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCapLowOutLimit) {
+                        DataPlant::HowMet::ByNominalCapFreeCoolCntrl;
+                } else if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCapLowOutLimit) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
-                        DataPlant::HowMet_ByNominalCapLowOutLimitFreeCoolCntrl;
+                        DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl;
                 }
             }
 

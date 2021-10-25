@@ -13845,7 +13845,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         }
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
-            InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, state.dataOutRptTab->IntGainTypesTubularGCLS, tubularGain);
+            tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
         }
     }
