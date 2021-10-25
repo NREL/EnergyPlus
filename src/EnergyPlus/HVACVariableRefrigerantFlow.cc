@@ -9152,14 +9152,14 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
             // Report to eio other information not related to autosizing
             if (MyOneTimeEIOFlag) {
-                static constexpr fmt::string_view Format_990(
+                static constexpr std::string_view Format_990(
                     "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
                     "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                     "Correction Factor\n");
                 print(state.files.eio, Format_990);
                 MyOneTimeEIOFlag = false;
             }
-            static constexpr fmt::string_view Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
+            static constexpr std::string_view Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
             print(state.files.eio,
                   Format_991,
                   cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum),
@@ -15562,6 +15562,9 @@ void VRFCondenserEquipment::VRFOU_PipeLossH(
     }
 }
 void VRFCondenserEquipment::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
+void VRFCondenserEquipment::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
 {
 }
 

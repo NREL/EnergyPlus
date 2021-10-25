@@ -232,7 +232,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
-    EXPECT_EQ(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling);
+    EXPECT_TRUE(compare_enums(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling));
     EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
         *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     Real64 FullSensibleOutput = 0.0;
@@ -357,7 +357,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
-    EXPECT_EQ(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling);
+    EXPECT_TRUE(compare_enums(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling));
     EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
         *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     Real64 FullSensibleOutput = 0.0;
@@ -496,7 +496,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
-    EXPECT_EQ(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling);
+    EXPECT_TRUE(compare_enums(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling));
     EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
         *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     Real64 FullSensibleOutput = 0.0;

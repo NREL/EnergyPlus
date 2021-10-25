@@ -1347,6 +1347,80 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.708728, 0.001);
+    EXPECT_EQ(thisSys->m_CoolingSpeedRatio, 0);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 1);
+
+    state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
+    thisSys->m_EMSOverrideCoilSpeedNumOn = true;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 0.708728;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+    // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
+    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.708728, 0.001);
+    EXPECT_EQ(thisSys->m_CoolingSpeedRatio, 0); // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 1);   // ceiling of override value
+
+    // check that cooling coil air outlet node is at set point, same cycling ratio and speed level with non-ems value
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
+    // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
+    EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+    Real64 CoolingCoilAirOutletTempAtSpeedOne = state->dataLoopNodes->Node(2).Temp;
+
+    state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.2;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+    EXPECT_EQ(thisSys->m_SpeedNum, 2);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.2, 0.001); // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
+
+    // check that cooling coil air outlet node temperature is lower than the set point
+    EXPECT_LT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint);
+    // check that cooling coil air outlet node temperature at speed 1.2 is lower than that at speed 0.71
+    EXPECT_LT(state->dataLoopNodes->Node(2).Temp, CoolingCoilAirOutletTempAtSpeedOne);
+    // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
+    EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+
+    state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 2.2;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+    EXPECT_EQ(thisSys->m_SpeedNum, 2);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 1.0, 0.001); // RESET TO MAX SPEED ALLOWED
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
@@ -9562,22 +9636,22 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     thisSys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
     DXCoils::SizeDXCoil(*state, 1);
 
-    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
+    EXPECT_EQ(1, state->dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
-    ASSERT_NEAR(thisSys->m_DesignHeatingCapacity, 1303.091, 0.001);
-    ASSERT_EQ(thisSys->m_DesignCoolingCapacity, 0.0);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 325.773, 0.001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 651.545, 0.001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(3), 977.318, 0.001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(4), 1303.091, 0.001);
-    ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.0131, 0.0001);
-    ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.0262, 0.0001);
-    ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.0393, 0.0001);
-    ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.0524, 0.0001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1), 0.0131, 0.0001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2), 0.0262, 0.0001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3), 0.0393, 0.0001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(4), 0.0524, 0.0001);
+    EXPECT_NEAR(thisSys->m_DesignHeatingCapacity, 1303.097, 0.001);
+    EXPECT_EQ(thisSys->m_DesignCoolingCapacity, 0.0);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 325.774, 0.001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 651.549, 0.001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(3), 977.323, 0.001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(4), 1303.097, 0.001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.0131, 0.0001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.0262, 0.0001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.0393, 0.0001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.0524, 0.0001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1), 0.0131, 0.0001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2), 0.0262, 0.0001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3), 0.0393, 0.0001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(4), 0.0524, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
@@ -12703,16 +12777,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
     // check each input fields of unitary system
-    EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name);                              // checks object name
-    EXPECT_EQ(UnitarySys::ControlType::Load, thisSys->m_ControlType);              // checks control type
-    EXPECT_EQ(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num); // checks Dehumidification Control type type
+    EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name);                                               // checks object name
+    EXPECT_TRUE(compare_enums(UnitarySys::ControlType::Load, thisSys->m_ControlType));              // checks control type
+    EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num)); // checks Dehumidification Control type type
     EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                              // checks availability schedule name
     EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                                     // checks air inlet node name
     EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                                    // checks air outlet node name
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                    // checks fan object type "FAN:ONOFF"
     EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                                // checks fan object name
-    EXPECT_EQ(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace);                                             // checks fan placement, "DrawThrough"
+    EXPECT_TRUE(compare_enums(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace));                            // checks fan placement, "DrawThrough"
     EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr);                                    // checks Supply Air Fan Operating Mode Schedule Name
     EXPECT_EQ("COIL:HEATING:WATER", thisSys->m_HeatingCoilTypeName);               // checks heating coil object type
     EXPECT_EQ("WATER HEATING COIL", thisSys->m_HeatingCoilName);                   // checks heating coil object type
@@ -14950,7 +15024,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
 
     // Like I said above in the IDF snippet section, control type has to be SingleZoneVAV or autosizing of
     // 'Minimum Supply Air Temperature' (DesignMinOutletTemp) isn't allowed
-    EXPECT_EQ(thisSys->m_ControlType, EnergyPlus::UnitarySystems::UnitarySys::ControlType::CCMASHRAE);
+    EXPECT_TRUE(compare_enums(thisSys->m_ControlType, EnergyPlus::UnitarySystems::UnitarySys::ControlType::CCMASHRAE));
     EXPECT_EQ(thisSys->DesignMinOutletTemp, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
@@ -17309,8 +17383,8 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17394,8 +17468,8 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWaterDetailed);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17495,8 +17569,8 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17687,8 +17761,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17937,8 +18011,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -18210,8 +18284,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);

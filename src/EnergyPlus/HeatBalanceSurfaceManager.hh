@@ -125,6 +125,10 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
+    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
+    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
@@ -139,6 +143,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void ReportSurfaceHeatBalance(EnergyPlusData &state);
+
+    void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state);
 
     void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
@@ -157,7 +163,9 @@ namespace HeatBalanceSurfaceManager {
     void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                     Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetQdotConvOutRepPerArea(EnergyPlusData &state, int SurfNum);
+    Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int SurfNum);
+
+    Real64 GetQdotConvOutPerArea(EnergyPlusData &state, const int SurfNum);
 
     void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone

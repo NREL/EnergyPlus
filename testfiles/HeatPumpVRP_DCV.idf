@@ -1324,7 +1324,7 @@
     DCVObject,               !- Name
     VentSchedule,            !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     West Zone,               !- Zone or ZoneList 1 Name
     CM DSOA West Zone,       !- Design Specification Outdoor Air Object Name 1

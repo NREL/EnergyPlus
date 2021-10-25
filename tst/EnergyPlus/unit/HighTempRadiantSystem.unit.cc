@@ -61,7 +61,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HighTempRadiantSystem;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;

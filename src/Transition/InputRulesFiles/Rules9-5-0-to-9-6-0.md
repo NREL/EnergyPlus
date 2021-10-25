@@ -3,6 +3,14 @@ Input Changes version 9.5.0 to 9.6.0
 
 This file documents the structural changes on the input of EnergyPlus that could affect interfaces, etc.
 
+# Object Change: VentilationRateProcedure to Standard62.1VentilationRateProcedure in Sizing:System and Controller:MechanicalVentilation
+
+Summary: The implementation of the ASHRAE Standard 62.1 Simplified Procedure introduced a new `System Outdoor Air Method` for `Sizing:System`. To be consistent with the existing Standard 62.1 Summary report, it was decided to use the `Standard62.1` prefix for both the `VentilationRateProcedure` and `SimplifiedProcedure`.
+
+If Field 27 in `Sizing:System` is `VentilationRateProcedure`, it is replaced by `Standard62.1VentilationRateProcedure`. If Field 4 in `Controller:MechanicalVentilation` is `VentilationRateProcedure`, it is replace by `Standard62.1VentilationRateProcedure`.
+
+See [8891](https://github.com/NREL/EnergyPlus/pull/8891)
+
 # Object Change: AirflowNetwork:MultiZone:ReferenceCrackConditions 
 
 Summary: The field for *Reference Temperature* was changed to a required-field without a default value. In previous versions, the field for *Reference Temperature* was not a required-field and has a default value of 20.0C. The transition rule sets a value of 20.0C for this field if it was left blank in previous versions.
@@ -85,7 +93,7 @@ and Floor:Interzone:**
 
 **For ZoneProperty:UserViewFactors:BySurfaceName:**
 
-* Field name "zone_or_zonelist_name" was changed to "space_or_spacelist_name".
+* Field name "zone_or_zonelist_name" was changed to "zone_or_zonelist_or_space_or_spacelist_name".
 * The contents of this field do not need to change, because pre-v9.6 input files have no Spaces, so
 default spaces will be created with the same names as the zone names. 
 
@@ -139,7 +147,7 @@ and Floor:Interzone:**
 **For ZoneProperty:UserViewFactors:BySurfaceName:**
 
 * No transition required. 
-* Field name "Zone or ZoneList Name" changed to "Space or SpaceList Name".
+* Field name "Zone or ZoneList Name" changed to "Zone or ZoneList or Space or SpaceList Name".
 * The contents of this field do no need to change, because pre-v9.6 input files have no Spaces, so
 default spaces will be created with the same names as the zone names. 
 

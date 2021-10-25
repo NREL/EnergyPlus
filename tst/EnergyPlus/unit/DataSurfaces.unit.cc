@@ -72,7 +72,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SurfaceGeometry;
-using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 
 TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
@@ -359,4 +358,61 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
     }
+}
+
+TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
+{
+    int numSurfs = state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(numSurfs);
+    state->dataSurface->SurfTAirRef.dimension(numSurfs, 0);
+    state->dataSurface->SurfIntConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->SurfExtConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->SurfWinStormWinConstr.dimension(numSurfs, 0);
+    state->dataSurface->SurfMaterialMovInsulExt.dimension(numSurfs, 0);
+    state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs, 0);
+    state->dataSurface->SurfSchedMovInsulExt.dimension(numSurfs, 0);
+    state->dataSurface->SurfSchedMovInsulInt.dimension(numSurfs, 0);
+    state->dataSurface->SurfExternalShadingSchInd.dimension(numSurfs, 0);
+    state->dataSurface->SurfSurroundingSurfacesNum.dimension(numSurfs, 0);
+    state->dataSurface->SurfLinkedOutAirNode.dimension(numSurfs, 0);
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 1);
+    EXPECT_EQ(state->dataSurface->Surface(1).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(2).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(3).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(4).RepresentativeCalcSurfNum, 1);
+
+    state->dataSurface->RepresentativeSurfaceMap.clear();
+
+    state->dataSurface->Surface(1).Area = 20.0;
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(3).Azimuth = 180.04;
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 2);
+    EXPECT_EQ(state->dataSurface->Surface(1).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(2).RepresentativeCalcSurfNum, 2);
+    EXPECT_EQ(state->dataSurface->Surface(3).RepresentativeCalcSurfNum, 2);
+    EXPECT_EQ(state->dataSurface->Surface(4).RepresentativeCalcSurfNum, 1);
+
+    state->dataSurface->RepresentativeSurfaceMap.clear();
+
+    state->dataSurface->Surface(3).Azimuth = 180.05;
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 3);
+    EXPECT_EQ(state->dataSurface->Surface(1).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(2).RepresentativeCalcSurfNum, 2);
+    EXPECT_EQ(state->dataSurface->Surface(3).RepresentativeCalcSurfNum, 3);
+    EXPECT_EQ(state->dataSurface->Surface(4).RepresentativeCalcSurfNum, 1);
 }

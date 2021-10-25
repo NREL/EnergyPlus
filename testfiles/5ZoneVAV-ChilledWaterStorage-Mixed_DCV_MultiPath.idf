@@ -3693,7 +3693,7 @@
     ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
     ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
@@ -3806,7 +3806,7 @@
     VAV WITH REHEAT_OAMechanical Ventilation,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList 1 Name
     CM DSOA ZN_1_FLR_1_SEC_1,!- Design Specification Outdoor Air Object Name 1

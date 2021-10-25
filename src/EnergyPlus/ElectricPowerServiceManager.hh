@@ -803,6 +803,8 @@ private:                      // data
 
 void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
 
+Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
+
 struct ElectPwrSvcMgrData : BaseGlobalStruct
 {
 

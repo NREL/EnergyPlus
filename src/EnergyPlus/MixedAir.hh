@@ -126,6 +126,7 @@ namespace MixedAir {
     };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
+    // can't change these to enum class since these are used in SetupOutputVariable()
     constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
     constexpr int limitFactorLimits = 1;      // Limits and scheduled limits
     constexpr int limitFactorEconomizer = 2;  // Economizer operation
@@ -297,7 +298,7 @@ namespace MixedAir {
         Real64 TotPeopleOAFlow;                 // Total outdoor air flow rate for all PEOPLE objects in zones (m3/s)
         Real64 TotZoneOAFlow;                   // Total outdoor air flow rate for all zones (m3/s)
         Real64 TotZoneOAACH;                    // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
-        int SystemOAMethod;                     // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP
+        int SystemOAMethod;                     // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP, SOAM_VRPL
         Real64 ZoneMaxOAFraction;               // Zone maximum outdoor air fraction
         Array1D<Real64> ZoneOAAreaRate;         // Mechanical ventilation rate (m3/s/m2) for each zone
         Array1D<Real64> ZoneOAPeopleRate;       // Mechanical ventilation rate (m3/s/person) for each zone
@@ -328,8 +329,9 @@ namespace MixedAir {
         Real64 Fa = 1.0;                        // temporary variable used in multi-path VRP calc
         Real64 Fb = 1.0;
         Real64 Fc = 1.0;
-        Real64 Xs = 1.0;  // uncorrected system outdoor air fraction
-        Real64 Evz = 1.0; // zone ventilation efficiency
+        Real64 Xs = 1.0;       // uncorrected system outdoor air fraction
+        Real64 Evz = 1.0;      // zone ventilation efficiency
+        Real64 SysDesOA = 0.0; // System design OA
 
         // Default Constructor
         VentilationMechanicalProps()

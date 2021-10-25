@@ -1209,7 +1209,7 @@ namespace FuelCellElectricGenerator {
                                   this->FCPM.ZoneID,
                                   "Generator:FuelCell",
                                   this->Name,
-                                  DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
+                                  DataHeatBalance::IntGainType::GeneratorFuelCell,
                                   &this->Report.SkinLossConvect,
                                   nullptr,
                                   &this->Report.SkinLossRadiat);
@@ -3393,8 +3393,6 @@ namespace FuelCellElectricGenerator {
 
         static constexpr std::string_view RoutineName("InitFuelCellGenerators");
 
-        this->oneTimeInit(state);
-
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
 
@@ -3727,7 +3725,7 @@ namespace FuelCellElectricGenerator {
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
     }
-    void FCDataStruct::oneTimeInit(EnergyPlusData &state)
+    void FCDataStruct::oneTimeInit_new(EnergyPlusData &state)
     {
 
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
@@ -3754,6 +3752,10 @@ namespace FuelCellElectricGenerator {
             }
             this->MyPlantScanFlag_Init = false;
         }
+    }
+
+    void FCDataStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace FuelCellElectricGenerator

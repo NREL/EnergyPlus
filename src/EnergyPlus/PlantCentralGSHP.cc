@@ -1431,7 +1431,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
                 ShowContinueError(state, "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                ShowContinueError(state, format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ",")));
+                ShowContinueError(state, fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ",")));
 
                 CHErrorsFound = true;
             }
@@ -1492,7 +1492,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
                 ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                const auto curve_output = format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
+                const auto curve_output = fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
                 ShowContinueError(state, curve_output);
 
                 CHErrorsFound = true;
@@ -1610,13 +1610,13 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             } else if (LoopNum == this->HWLoopNum) {
                 state.dataPlnt->PlantLoop(this->HWLoopNum)
                     .LoopSide(this->HWLoopSideNum)
                     .Branch(this->HWBranchNum)
                     .Comp(this->HWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             // check if setpoint on outlet node - chilled water loop
@@ -3557,6 +3557,10 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
         this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QCond * SecInTimeStep;
     }
 }
+void WrapperSpecs::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
+
 void WrapperSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }

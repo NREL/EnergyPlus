@@ -48,19 +48,458 @@
 #ifndef IOFiles_hh_INCLUDED
 #define IOFiles_hh_INCLUDED
 
-#include <EnergyPlus/FileSystem.hh>
+// C++ Headers
+#include <array>
 #include <cassert>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <ostream>
 #include <vector>
+
+// EnergyPlus Headers
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
+
+// Third Party Headers
+#include <fmt/compile.h>
+#include <fmt/format.h>
+#include <fmt/os.h>
+#include <fmt/ostream.h>
+#include <fmt/printf.h>
+#include <fmt/ranges.h>
+#include <nlohmann/json.hpp>
+
+namespace {
+struct DoubleWrapper
+{
+    // this cannot be marked explicit
+    // we need the implicit conversion for it to work
+    DoubleWrapper(double val) : value(val){};
+    operator double() const
+    {
+        return value;
+    };
+    DoubleWrapper &operator=(const double &other)
+    {
+        value = other;
+        return *this;
+    }
+
+private:
+    double value;
+};
+} // namespace
+
+namespace fmt {
+template <> struct formatter<DoubleWrapper>
+{
+private:
+    fmt::detail::dynamic_format_specs<char> specs_;
+    const char *format_str_;
+    fmt::memory_buffer buffer = fmt::memory_buffer();
+
+    struct null_handler : detail::error_handler
+    {
+        void on_align(align_t)
+        {
+        }
+        void on_sign(sign_t)
+        {
+        }
+        void on_hash()
+        {
+        }
+    };
+
+    static constexpr bool should_be_fixed_output(const double value)
+    {
+        return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
+    }
+
+    static constexpr bool fixed_will_fit(const double value, const int places)
+    {
+        if (value < 1.0 && value > -1.0) {
+            return true;
+        } else {
+            return static_cast<int>(std::log10(std::abs(value))) < places;
+        }
+    }
+
+    static std::string &zero_pad_exponent(std::string &str)
+    {
+        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+        if (str.size() > 3) {
+            if (!std::isdigit(str[str.size() - 3])) {
+                // wants a 0 inserted
+                str.insert(str.size() - 2, "0");
+            }
+        }
+        return str;
+    }
+
+    std::string_view spec_builder()
+    {
+        buffer.clear();
+        buffer.push_back('{');
+        buffer.push_back(':');
+        //    [[fill]align][sign]["#"]["0"][width]["." precision]["L"][type]
+
+        //    [[fill]align]
+        switch (specs_.align) {
+        case align_t::left:
+            if (specs_.fill.size()) buffer.append(specs_.fill);
+            buffer.push_back('<');
+            break;
+        case align_t::right:
+            if (specs_.fill.size()) buffer.append(specs_.fill);
+            buffer.push_back('>');
+            break;
+        case align_t::center:
+            if (specs_.fill.size()) buffer.append(specs_.fill);
+            buffer.push_back('^');
+            break;
+        case align_t::none:
+        case align_t::numeric:
+            break;
+        default:
+            throw fmt::format_error("Bad alignment");
+        }
+
+        //    [sign]
+        switch (specs_.sign) {
+        case sign_t::plus:
+            buffer.push_back('+');
+            break;
+        case sign_t::minus:
+            buffer.push_back('-');
+            break;
+        case sign_t::space:
+            buffer.push_back(' ');
+            break;
+        case sign_t::none:
+            break;
+        default:
+            throw fmt::format_error("Bad sign");
+        }
+
+        //    [alt]
+        if (specs_.alt) {
+            buffer.push_back('#');
+        }
+
+        //    [width]
+        if (specs_.width >= 0) {
+            if (specs_.fill[0] == '0') {
+                buffer.push_back('0');
+            }
+            auto fmt_int = fmt::format_int(specs_.width);
+            buffer.append(fmt_int.data(), fmt_int.data() + fmt_int.size());
+        }
+
+        //    [precision]
+        if (specs_.precision >= 0) {
+            buffer.push_back('.');
+
+            auto fmt_int = fmt::format_int(specs_.precision);
+            buffer.append(fmt_int.data(), fmt_int.data() + fmt_int.size());
+        }
+
+        //    [locale]
+        if (specs_.localized) {
+            buffer.push_back('L');
+        }
+
+        //    [type]
+        buffer.push_back(specs_.type);
+
+        buffer.push_back('}');
+
+        return {buffer.data(), buffer.size()};
+    }
+
+    template <typename Context> void handle_specs(Context &ctx)
+    {
+        detail::handle_dynamic_spec<detail::width_checker>(specs_.width, specs_.width_ref, ctx);
+        detail::handle_dynamic_spec<detail::precision_checker>(specs_.precision, specs_.precision_ref, ctx);
+    }
+
+public:
+    template <typename ParseContext> constexpr auto parse(ParseContext &ctx)
+    {
+        auto begin = ctx.begin(), end = ctx.end();
+        format_str_ = begin;
+        if (begin == end) return begin;
+        using handler_type = fmt::detail::dynamic_specs_handler<ParseContext>;
+        auto it = fmt::detail::parse_format_specs(begin, end, handler_type(specs_, ctx));
+        return it;
+    }
+
+    template <typename FormatContext> auto format(const DoubleWrapper &doubleWrapper, FormatContext &ctx)
+    {
+        const auto next_float = [](const double value) {
+            if (std::signbit(value)) {
+                if (value == -0.0) {
+                    return value;
+                } else {
+                    return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                }
+            } else {
+                if (value == 0.0) {
+                    return value;
+                } else {
+                    return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                }
+            }
+        };
+
+        double val = doubleWrapper;
+
+        handle_specs(ctx);
+        detail::specs_checker<null_handler> checker(null_handler(), detail::mapped_type_constant<double, FormatContext>::value);
+        checker.on_align(specs_.align);
+        if (specs_.sign != sign::none) checker.on_sign(specs_.sign);
+        if (specs_.alt) checker.on_hash();
+        if (specs_.precision >= 0) checker.end_precision();
+
+        // matches Fortran's 'E' format
+        if (specs_.type == 'Z') {
+            // The Fortran 'G' format insists on a leading 0, even though
+            // that actually means losing data
+            specs_.type = 'E';
+
+            // 0 pad the end
+            specs_.alt = true;
+
+            bool initialPrecisionWas1 = false;
+            if (specs_.precision > 1) {
+                // reduce the precision to get rounding behavior
+                --specs_.precision;
+            } else {
+                // We need AT LEAST one in precision so we capture a '.' below
+                initialPrecisionWas1 = true;
+                specs_.precision = 1;
+                ++specs_.width;
+            }
+
+            // multiply by 10 to get the exponent we want
+            auto str = fmt::format(spec_builder(), val * 10);
+            //      auto str = write_to_string(value * 10);
+
+            // we need "space" to insert our leading 0
+            if (str.front() != ' ') {
+                str.insert(str.begin(), ' ');
+            }
+
+            auto begin = std::find(std::begin(str), std::end(str), '.');
+            if (initialPrecisionWas1) {
+                // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
+                // and this is why we manually increased the specs_.width by one above
+                str.erase(std::next(begin));
+            }
+            // if (begin != std::end(str)) {
+            // ' -1.2345E15'
+            //     ^
+            std::swap(*begin, *std::prev(begin));
+            // ' -.12345E15'
+            //     ^
+            std::advance(begin, -2);
+            // ' -.12345E15'
+            //   ^
+            if (*begin != ' ') {
+                // found a sign
+                std::swap(*begin, *std::prev(begin));
+                // '- .12345E15'
+                //   ^
+            }
+            // '-0.12345E15'
+            //   ^
+            *begin = '0';
+            return fmt::format_to(ctx.out(), "{}", str);
+        } else if (specs_.type == 'S') {
+            // matches Fortran's 'G', but stripped of whitespace
+            specs_.type = 'N';
+            // Need to rerun with double wrapper since 'N' is one of our custom ones
+            auto str = fmt::format(spec_builder(), doubleWrapper);
+
+            auto strip_whitespace = [](std::string_view const s) -> std::string {
+                if (s.empty()) {
+                    return std::string{};
+                }
+                auto const first = s.find_first_not_of(' ');
+                auto const last = s.find_last_not_of(' ');
+                if ((first == std::string::npos) || (last == std::string::npos)) {
+                    return std::string{};
+                } else {
+                    return std::string{s.substr(first, last - first + 1)};
+                }
+            };
+
+            return fmt::format_to(ctx.out(), "{}", strip_whitespace(str));
+        } else if (specs_.type == 'N') {
+            // matches Fortran's 'G' format
+
+            if (specs_.width == 0 && specs_.precision == -1) {
+                // Need to rerun with double wrapper since 'N' is one of our custom ones
+                return fmt::format_to(ctx.out(), "{:20N}", doubleWrapper);
+            } else if (should_be_fixed_output(val) && fixed_will_fit(val, specs_.width - 5)) {
+                specs_.type = 'F';
+
+                // account for alignment with E formatted
+                specs_.width -= 4;
+                if (val == 0.0) {
+                    --specs_.precision;
+                } else if (val < 1.0 && val > -1.0) {
+                    // No adjustment necessary
+                } else if (specs_.precision == -1) {
+                    const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(val)));
+                    specs_.precision = specs_.width - (order_of_magnitude + 2);
+                } else {
+                    const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(val)));
+                    specs_.precision -= (order_of_magnitude + 1);
+                }
+
+                // if precision adjustment would result in negative, make it 0 to get rounding
+                // and adjust spacing
+                if (specs_.precision <= 0) {
+                    specs_.width -= 1;
+                    specs_.precision = 0;
+                }
+
+                auto str = fmt::format(spec_builder(), val);
+
+                // When precision hit 0, add . to match Fortran formatting
+                if (specs_.precision == 0) {
+                    // write the last 4 chars
+                    return fmt::format_to(ctx.out(), "{}.    ", str);
+                } else {
+                    // write the last 4 chars
+                    return fmt::format_to(ctx.out(), "{}    ", str);
+                }
+            } else {
+                // The Fortran 'G' format insists on a leading 0, even though
+                // that actually means losing data
+                specs_.type = 'Z';
+                // Need to rerun with double wrapper since 'Z' is one of our custom ones
+                return fmt::format_to(ctx.out(), spec_builder(), doubleWrapper);
+            }
+        } else if (specs_.type == 'R') { // matches RoundSigDigits() behavior
+            // push the value up a tad to get the same rounding behavior as Objexx
+            const auto fixed_output = should_be_fixed_output(val);
+
+            if (fixed_output) {
+                specs_.type = 'F';
+
+                if (val > 100000.0) {
+                    const auto digits10 = static_cast<int>(std::log10(val));
+                    // we cannot represent this val to the required precision, truncate the floating
+                    // point portion
+                    if (digits10 + specs_.precision >= std::numeric_limits<decltype(val)>::max_digits10) {
+                        specs_.precision = 0;
+                        spec_builder();
+                        // add '.' to match old RoundSigDigits
+                        buffer.push_back('.');
+                        std::string_view fmt_buffer(buffer.data(), buffer.size());
+                        return fmt::format_to(ctx.out(), fmt_buffer, val);
+                    } else {
+                        return fmt::format_to(ctx.out(), spec_builder(), val);
+                    }
+                } else {
+                    if (val == 0.0 || val == -0.0) {
+                        return fmt::format_to(ctx.out(), spec_builder(), 0.0);
+                    } else {
+                        // nudge up to next rounded val
+                        return fmt::format_to(ctx.out(), spec_builder(), next_float(next_float(next_float(val))));
+                    }
+                }
+            } else {
+                specs_.type = 'E';
+                auto str = fmt::format(spec_builder(), next_float(val));
+                return fmt::format_to(ctx.out(), "{}", zero_pad_exponent(str));
+            }
+        } else if (specs_.type == 'T') { // matches TrimSigDigits behavior
+            const auto fixed_output = should_be_fixed_output(val);
+
+            if (fixed_output) {
+                const auto magnitude = std::pow(10, specs_.precision);
+                const auto adjusted = (val * magnitude) + 0.0001;
+                const auto truncated = std::trunc(adjusted) / magnitude;
+                specs_.type = 'F';
+                return fmt::format_to(ctx.out(), spec_builder(), truncated);
+            } else {
+                specs_.type = 'E';
+                specs_.precision += 2;
+
+                // write the `E` formatted float to a std::string
+                auto str = fmt::format(spec_builder(), val);
+                str = zero_pad_exponent(str);
+
+                // Erase last 2 numbers to truncate the value
+                const auto E_itr = std::find(begin(str), end(str), 'E');
+                if (E_itr != str.end()) {
+                    str.erase(std::prev(E_itr, 2), E_itr);
+                }
+
+                return fmt::format_to(ctx.out(), "{}", str);
+            }
+        }
+        return fmt::format_to(ctx.out(), spec_builder(), val);
+    }
+};
+} // namespace fmt
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+
+enum class FormatSyntax
+{
+    Fortran,
+    FMT,
+    Printf
+};
+
+inline constexpr bool is_fortran_syntax(const std::string_view format_str)
+{
+    bool within_fmt_str = false;
+    for (auto const c : format_str) {
+        switch (c) {
+        case '{':
+            within_fmt_str = true;
+            break;
+        case '}':
+            within_fmt_str = false;
+            break;
+        case 'R':
+        case 'S':
+        case 'N':
+        case 'Z':
+        case 'T':
+            if (within_fmt_str) {
+                return true;
+            } else {
+                break;
+            }
+        default:
+            break;
+        }
+    }
+    return false;
+}
+
+class InputOutputFile;
+template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
+void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
+
+inline constexpr FormatSyntax check_syntax(const std::string_view format_str)
+{
+    if (is_fortran_syntax(format_str)) {
+        return FormatSyntax::Fortran;
+    } else {
+        return FormatSyntax::FMT;
+    }
+}
 
 class InputFile
 {
@@ -128,9 +567,14 @@ public:
         }
     }
 
+    std::string readFile();
+
+    nlohmann::json readJSON();
+
     explicit InputFile(fs::path FilePath);
 
 private:
+    std::uintmax_t file_size{};
     std::unique_ptr<std::istream> is;
     friend class IOFiles;
 };
@@ -160,9 +604,7 @@ public:
 private:
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
-    template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
-    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim);
-    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile);
+    template <FormatSyntax, typename... Args> friend void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
     friend class IOFiles;
 };
 
@@ -186,36 +628,8 @@ template <typename FileType> struct IOFilePath
 using InputOutputFilePath = IOFilePath<InputOutputFile>;
 using InputFilePath = IOFilePath<InputFile>;
 
-struct JsonOutputStreams
+struct JsonOutputFilePaths
 {
-    std::unique_ptr<std::ostream> json_stream; // Internal stream used for json output
-    std::unique_ptr<std::ostream> json_TSstream_Zone;
-    std::unique_ptr<std::ostream> json_TSstream_HVAC;
-    std::unique_ptr<std::ostream> json_TSstream;
-    std::unique_ptr<std::ostream> json_HRstream;
-    std::unique_ptr<std::ostream> json_MNstream;
-    std::unique_ptr<std::ostream> json_DYstream;
-    std::unique_ptr<std::ostream> json_SMstream;
-    std::unique_ptr<std::ostream> json_YRstream;
-    std::unique_ptr<std::ostream> cbor_stream; // Internal stream used for cbor output
-    std::unique_ptr<std::ostream> cbor_TSstream_Zone;
-    std::unique_ptr<std::ostream> cbor_TSstream_HVAC;
-    std::unique_ptr<std::ostream> cbor_TSstream;
-    std::unique_ptr<std::ostream> cbor_HRstream;
-    std::unique_ptr<std::ostream> cbor_MNstream;
-    std::unique_ptr<std::ostream> cbor_DYstream;
-    std::unique_ptr<std::ostream> cbor_SMstream;
-    std::unique_ptr<std::ostream> cbor_YRstream;
-    std::unique_ptr<std::ostream> msgpack_stream; // Internal stream used for messagepack output
-    std::unique_ptr<std::ostream> msgpack_TSstream_Zone;
-    std::unique_ptr<std::ostream> msgpack_TSstream_HVAC;
-    std::unique_ptr<std::ostream> msgpack_TSstream;
-    std::unique_ptr<std::ostream> msgpack_HRstream;
-    std::unique_ptr<std::ostream> msgpack_MNstream;
-    std::unique_ptr<std::ostream> msgpack_DYstream;
-    std::unique_ptr<std::ostream> msgpack_SMstream;
-    std::unique_ptr<std::ostream> msgpack_YRstream;
-
     fs::path outputJsonFilePath;
     fs::path outputTSHvacJsonFilePath;
     fs::path outputTSZoneJsonFilePath;
@@ -353,7 +767,7 @@ public:
     fs::path outputErrFilePath{"eplusout.err"};
     std::unique_ptr<std::ostream> err_stream;
 
-    JsonOutputStreams json; // Internal streams used for json outputs
+    JsonOutputFilePaths json; // Internal streams used for json outputs
 
     void flushAll(); // For RunningEnergyPlusViaAPI only
 };
@@ -382,8 +796,28 @@ public:
     }
 };
 
-void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
-std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
+template <typename... Args> void vprint(std::ostream &os, std::string_view format_str, const Args &... args)
+{
+    //    assert(os.good());
+    auto buffer = fmt::memory_buffer();
+    try {
+        fmt::format_to(std::back_inserter(buffer), format_str, args...);
+    } catch (const fmt::format_error &) {
+        throw EnergyPlus::FatalError(fmt::format("Error with format, '{}', passed {} args", format_str, sizeof...(Args)));
+    }
+    os.write(buffer.data(), buffer.size());
+}
+
+template <typename... Args> std::string vprint(std::string_view format_str, const Args &... args)
+{
+    auto buffer = fmt::memory_buffer();
+    try {
+        fmt::format_to(std::back_inserter(buffer), format_str, args...);
+    } catch (const fmt::format_error &) {
+        throw EnergyPlus::FatalError(fmt::format("Error with format, '{}', passed {} args", format_str, sizeof...(Args)));
+    }
+    return fmt::to_string(buffer);
+}
 
 // Uses lib {fmt} (which has been accepted for C++20)
 // Formatting syntax guide is here: https://fmt.dev/latest/syntax.html
@@ -406,12 +840,32 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // Defines a custom formatting type 'T' that that truncates the value
 // to match the behavior of TrimSigDigits utility function
 //
-template <typename... Args> void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
+
+namespace {
+    template <typename... Args> void print_fortran_syntax(std::ostream &os, std::string_view format_str, const Args &... args)
+    {
+        EnergyPlus::vprint<std::conditional_t<std::is_same_v<double, Args>, DoubleWrapper, Args>...>(os, format_str, args...);
+    }
+
+    template <typename... Args> std::string format_fortran_syntax(std::string_view format_str, const Args &... args)
+    {
+        return EnergyPlus::vprint<std::conditional_t<std::is_same_v<double, Args>, DoubleWrapper, Args>...>(format_str, args...);
+    }
+} // namespace
+
+template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
+void print(std::ostream &os, std::string_view format_str, Args &&... args)
 {
-    EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+    if constexpr (formatSyntax == FormatSyntax::Fortran) {
+        print_fortran_syntax(os, format_str, args...);
+    } else if constexpr (formatSyntax == FormatSyntax::FMT) {
+        fmt::print(os, format_str, std::forward<Args>(args)...);
+    } else {
+        static_assert(!(formatSyntax == FormatSyntax::Fortran || formatSyntax == FormatSyntax::FMT), "Invalid FormatSyntax selection");
+    }
 }
 
-template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+template <FormatSyntax formatSyntax, typename... Args> void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args)
 {
     auto *outputStream = [&]() -> std::ostream * {
         if (outputFile.os) {
@@ -425,47 +879,24 @@ template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_
             }
         }
     }();
-
-    EnergyPlus::vprint(*outputStream, format_str, fmt::make_format_args(args...), sizeof...(Args));
+    if constexpr (formatSyntax == FormatSyntax::Fortran) {
+        print_fortran_syntax(*outputStream, format_str, args...);
+    } else if constexpr (formatSyntax == FormatSyntax::FMT) {
+        fmt::print(*outputStream, format_str, std::forward<Args>(args)...);
+    } else {
+        static_assert(!(formatSyntax == FormatSyntax::Fortran || formatSyntax == FormatSyntax::FMT), "Invalid FormatSyntax selection");
+    }
 }
 
-template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim)
+template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args> std::string format(std::string_view format_str, Args &&... args)
 {
-    auto *outputStream = [&]() -> std::ostream * {
-        if (outputFile.os) {
-            return outputFile.os.get();
-        } else {
-            if (outputFile.defaultToStdOut) {
-                return &std::cout;
-            } else {
-                assert(outputFile.os);
-                return nullptr;
-            }
-        }
-    }();
-    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream, delim));
-}
-
-template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile)
-{
-    auto *outputStream = [&]() -> std::ostream * {
-        if (outputFile.os) {
-            return outputFile.os.get();
-        } else {
-            if (outputFile.defaultToStdOut) {
-                return &std::cout;
-            } else {
-                assert(outputFile.os);
-                return nullptr;
-            }
-        }
-    }();
-    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream));
-}
-
-template <typename... Args> std::string format(::fmt::string_view format_str, const Args &... args)
-{
-    return EnergyPlus::vprint(format_str, ::fmt::make_format_args(args...), sizeof...(Args));
+    if constexpr (formatSyntax == FormatSyntax::Fortran) {
+        return format_fortran_syntax(format_str, args...);
+    } else if constexpr (formatSyntax == FormatSyntax::FMT) {
+        return fmt::format(format_str, std::forward<Args>(args)...);
+    } else if constexpr (formatSyntax == FormatSyntax::Printf) {
+        return fmt::sprintf(format_str, std::forward<Args>(args)...);
+    }
 }
 
 } // namespace EnergyPlus

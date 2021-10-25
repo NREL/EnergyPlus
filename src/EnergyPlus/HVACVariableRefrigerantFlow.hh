@@ -589,6 +589,8 @@ namespace HVACVariableRefrigerantFlow {
         ) const;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct TerminalUnitListData

@@ -64,7 +64,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, RecurringWarningTest)
 {

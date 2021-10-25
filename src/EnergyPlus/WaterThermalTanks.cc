@@ -4087,19 +4087,19 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
 
         if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
-            static constexpr fmt::string_view Format_720(
+            static constexpr std::string_view Format_720(
                 "! <Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery Efficiency, "
                 "Standard Rated Energy Factor\n");
-            static constexpr fmt::string_view Format_721(
+            static constexpr std::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
                 "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
-            static constexpr fmt::string_view Format_722(
+            static constexpr std::string_view Format_722(
                 "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
                 "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
-            static constexpr fmt::string_view Format_725(
+            static constexpr std::string_view Format_725(
                 "! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
                 "Source Side Design Flow Rate {{m3/s}}\n");
-            static constexpr fmt::string_view Format_726(
+            static constexpr std::string_view Format_726(
                 "! <Chilled Water Tank Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},UA {{W/K}},Number Of "
                 "Inlets,Number Of Outlets\n");
 
@@ -5013,7 +5013,7 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
     if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-            static constexpr fmt::string_view Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
+            static constexpr std::string_view Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
             print(state.files.eio,
                   Format_724,
@@ -5039,28 +5039,28 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                       this->AmbientTempZone,
                                       "WaterHeater:Mixed",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_WaterHeaterMixed,
+                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "WaterHeater:Stratified",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_WaterHeaterStratified,
+                                      DataHeatBalance::IntGainType::WaterHeaterStratified,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "ThermalStorage:ChilledWater:Mixed",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
                                       &this->AmbientZoneGain);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
                 SetupZoneInternalGain(state,
                                       this->AmbientTempZone,
                                       "ThermalStorage:ChilledWater:Stratified",
                                       this->Name,
-                                      DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified,
+                                      DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
                                       &this->AmbientZoneGain);
             }
         }
@@ -5651,7 +5651,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-            static constexpr fmt::string_view Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
+            static constexpr std::string_view Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
             print(state.files.eio,
                   Format_723,
                   NodeNum,
@@ -7872,22 +7872,22 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
             }
 
             // Make adjustments to A and B to account for heaters being on or off now
-            if (this->HeaterOn1 and !PrevHeaterOn1) {
+            if (this->HeaterOn1 && !PrevHeaterOn1) {
                 // If heater 1 is on now and wasn't before add the heat rate to the B term
                 B[this->HeaterNode1 - 1] += Qheater1 / (this->Node(this->HeaterNode1).Mass * Cp);
-            } else if (!this->HeaterOn1 and PrevHeaterOn1) {
+            } else if (!this->HeaterOn1 && PrevHeaterOn1) {
                 // If heater 1 is off now and was on before, remove the heat rate from the B term
                 B[this->HeaterNode1 - 1] -= this->MaxCapacity / (this->Node(this->HeaterNode1).Mass * Cp);
             }
-            if (this->HeaterOn2 and !PrevHeaterOn2) {
+            if (this->HeaterOn2 && !PrevHeaterOn2) {
                 // If heater 2 is on now and wasn't before add the heat rate to the B term
                 B[this->HeaterNode2 - 1] += Qheater2 / (this->Node(this->HeaterNode2).Mass * Cp);
-            } else if (!this->HeaterOn2 and PrevHeaterOn2) {
+            } else if (!this->HeaterOn2 && PrevHeaterOn2) {
                 // If heater 1 is off now and was on before, remove the heat rate from the B term
                 B[this->HeaterNode2 - 1] -= this->MaxCapacity / (this->Node(this->HeaterNode2).Mass * Cp);
             }
 
-            if ((this->HeaterOn1 || this->HeaterOn2) and !(PrevHeaterOn1 || PrevHeaterOn2)) {
+            if ((this->HeaterOn1 || this->HeaterOn2) && !(PrevHeaterOn1 || PrevHeaterOn2)) {
                 // Remove off cycle loads
                 // Apply on cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
@@ -7897,7 +7897,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                     B[i] += (-node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * this->AmbientTemp) /
                             NodeCapacitance;
                 }
-            } else if (!(this->HeaterOn1 || this->HeaterOn2) and (PrevHeaterOn1 || PrevHeaterOn2)) {
+            } else if (!(this->HeaterOn1 || this->HeaterOn2) && (PrevHeaterOn1 || PrevHeaterOn2)) {
                 // Remove on cycle loads
                 // Apply off cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
@@ -8040,7 +8040,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                     for (m = j; m < nTankNodes; ++m) {
                         Tmixed += Tfinal[m] * this->Node[m].Mass;
                         MassMixed += this->Node[m].Mass;
-                        if ((m == nTankNodes - 1) or (Tmixed / MassMixed > Tfinal[m + 1])) break;
+                        if ((m == nTankNodes - 1) || (Tmixed / MassMixed > Tfinal[m + 1])) break;
                     }
                     Tmixed /= MassMixed;
 
@@ -10755,6 +10755,8 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         }
     }
 
+    if (FlowResult < DataHVACGlobals::VerySmallMassFlow) FlowResult = 0.0; // Catch underflow problems
+
     return FlowResult;
 }
 
@@ -11309,6 +11311,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
     }
 
+    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+
     // if stratified, might set height.
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11440,6 +11444,8 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
             }
         }
     }
+
+    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
 
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11966,6 +11972,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
+
+            if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
         }
     }
 }
@@ -12510,10 +12518,10 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
             MaxCapacity_loc = this->MaxCapacity;
         }
 
-        static constexpr fmt::string_view Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
+        static constexpr std::string_view Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
         print(state.files.eio, Format_720, this->Type, this->Name, this->Volume, MaxCapacity_loc, RecoveryEfficiency, EnergyFactor);
     } else {
-        static constexpr fmt::string_view Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
+        static constexpr std::string_view Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
         print(state.files.eio,
               Format_721,
               state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type,
@@ -12549,7 +12557,7 @@ void WaterThermalTankData::ReportCWTankInits(EnergyPlusData &state)
         return;
     }
 
-    static constexpr fmt::string_view Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
+    static constexpr std::string_view Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
     print(state.files.eio, Format_728, this->Type, this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
     this->AlreadyReported = true;
@@ -12598,6 +12606,23 @@ void WaterThermalTankData::oneTimeInit(EnergyPlusData &state)
     if (this->myOneTimeInitFlag) {
         this->setupOutputVars(state);
         this->myOneTimeInitFlag = false;
+    }
+}
+
+void WaterThermalTankData::setBackupElementCapacity(EnergyPlusData &state)
+{
+    // Fix for #9001: The BackupElementCapacity was not being reset from the autosize value (-99999) which resulted in
+    // negative electric consumption.  Using a test for any negative numbers here instead of just -99999 for safety.
+    // Only reset the backup element capacity if a problem has been occured.
+    if (this->HeatPumpNum > 0) {
+        if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) return;
+        if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity < 0.0) {
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity = this->MaxCapacity;
+        }
+    } else if (this->DesuperheaterNum > 0) {
+        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).BackupElementCapacity < 0.0) {
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).BackupElementCapacity = this->MaxCapacity;
+        }
     }
 }
 

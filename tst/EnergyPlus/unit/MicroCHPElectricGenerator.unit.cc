@@ -63,7 +63,6 @@
 #include <EnergyPlus/Plant/PlantManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
 {

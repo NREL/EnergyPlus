@@ -72,15 +72,10 @@ enum class OutputTypes
     BSON
 };
 
-template <typename T> void displayMessage(T t)
+template <typename... Args> void displayMessage(std::string_view str_format, Args &&... args)
 {
-    std::cout << t << '\n';
-}
-
-template <typename T, typename... Args> void displayMessage(T t, Args... args) // recursive variadic function
-{
-    std::cout << t;
-    displayMessage(args...);
+    fmt::print(std::cout, str_format, args...);
+    std::cout.write("\n", 1);
 }
 
 bool checkVersionMatch(json const &epJSON)
@@ -88,7 +83,7 @@ bool checkVersionMatch(json const &epJSON)
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
-            std::string v = version["version_identifier"];
+            std::string v = version["version_identifier"].get<std::string>();
             if (v.empty()) {
                 displayMessage("Input errors occurred and version ID was left blank, verify file version");
             } else {
@@ -100,7 +95,7 @@ bool checkVersionMatch(json const &epJSON)
                     Which = static_cast<int>(index(v, EnergyPlus::DataStringGlobals::MatchVersion));
                 }
                 if (Which != 0) {
-                    displayMessage("Version: in IDF=\"" + v + "\" not the same as expected=\"" + EnergyPlus::DataStringGlobals::MatchVersion + "\"");
+                    displayMessage(R"(Version: in IDF="{}" not the same as expected="{}")", v, EnergyPlus::DataStringGlobals::MatchVersion);
                     return false;
                 }
             }
@@ -272,102 +267,73 @@ bool processInput(std::string const &inputFilePath,
                   std::string &outputTypeStr,
                   bool convertHVACTemplate)
 {
-    auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
-    auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
+    auto validation(std::make_unique<Validation>(&schema));
+    auto idf_parser(std::make_unique<IdfParser>());
     json epJSON;
 
-    auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputFilePath));
-    auto const inputDirPath = EnergyPlus::FileSystem::getParentDirectoryPath(inputFilePath);
+    auto const inputPath = fs::path(inputFilePath);
+
+    auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputPath));
+    auto const inputDirPath = EnergyPlus::FileSystem::getParentDirectoryPath(inputPath);
 
     if (outputDirPath.empty()) {
         outputDirPath = inputDirPath;
     }
 
-    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath).string();
-    std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
+    auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputPath);
 
-    bool isEpJSON = true;
-    bool isCBOR = false;
-    bool isMsgPack = false;
-    bool isUBJSON = false;
-    bool isBSON = false;
+    bool isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
+    bool isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
+    bool isMsgPack = (inputFileType == EnergyPlus::FileSystem::FileTypes::MsgPack);
+    bool isUBJSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::UBJSON);
+    bool isBSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::BSON);
 
-    if (inputFileExt == "EPJSON" || inputFileExt == "JSON") {
-        isEpJSON = true;
-        if (outputType == OutputTypes::epJSON) {
-            displayMessage("Same output format as input format requested (epJSON). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "IDF" || inputFileExt == "IMF") {
-        isEpJSON = false;
-        if (outputType == OutputTypes::IDF) {
-            displayMessage("Same output format as input format requested (IDF). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "CBOR") {
-        isEpJSON = true;
-        isCBOR = true;
-        if (outputType == OutputTypes::CBOR) {
-            displayMessage("Same output format as input format requested (CBOR). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "MSGPACK") {
-        isEpJSON = true;
-        isMsgPack = true;
-        if (outputType == OutputTypes::MsgPack) {
-            displayMessage("Same output format as input format requested (MsgPack). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "UBJSON") {
-        isEpJSON = true;
-        isUBJSON = true;
-        if (outputType == OutputTypes::UBJSON) {
-            displayMessage("Same output format as input format requested (UBJSON). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "BSON") {
-        isEpJSON = true;
-        isBSON = true;
-        if (outputType == OutputTypes::BSON) {
-            displayMessage("Same output format as input format requested (BSON). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else {
+    if (!(isEpJSON || EnergyPlus::FileSystem::is_idf_type(inputFileType))) {
         displayMessage("ERROR: Input file must have IDF, IMF, or epJSON extension.");
         return false;
     }
 
-    std::ifstream input_stream(inputFilePath, std::ifstream::in | std::ifstream::binary);
-    if (!input_stream.is_open()) {
-        displayMessage("Input file path " + inputFilePath + " not found");
+    if (outputType == OutputTypes::epJSON &&
+        (inputFileType == EnergyPlus::FileSystem::FileTypes::EpJSON || inputFileType == EnergyPlus::FileSystem::FileTypes::JSON)) {
+        displayMessage("Same output format as input format requested (epJSON). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::IDF &&
+               (inputFileType == EnergyPlus::FileSystem::FileTypes::IDF || inputFileType == EnergyPlus::FileSystem::FileTypes::IMF)) {
+        displayMessage("Same output format as input format requested (IDF). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::CBOR && isCBOR) {
+        displayMessage("Same output format as input format requested (CBOR). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::MsgPack && isMsgPack) {
+        displayMessage("Same output format as input format requested (MsgPack). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::UBJSON && isUBJSON) {
+        displayMessage("Same output format as input format requested (UBJSON). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::BSON && isBSON) {
+        displayMessage("Same output format as input format requested (BSON). Skipping conversion and moving to next file.");
+        return false;
+    }
+
+    if (!EnergyPlus::FileSystem::fileExists(inputPath)) {
+#ifdef _WIN32
+        displayMessage("Input file path {} not found", inputPath.string());
+#else
+        displayMessage("Input file path {} not found", inputPath);
+#endif
+
         return false;
     }
 
     try {
         if (!isEpJSON) {
-            std::string input_file;
-            std::string line;
-            while (std::getline(input_stream, line)) {
-                input_file.append(line + "\n");
-            }
-            if (input_file.empty()) {
-                displayMessage("Failed to read input file: " + inputFilePath);
-                return false;
-            }
+            auto input_file = EnergyPlus::FileSystem::readFile(inputPath);
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
             cleanEPJSON(epJSON);
-        } else if (isCBOR) {
-            epJSON = json::from_cbor(input_stream);
-        } else if (isMsgPack) {
-            epJSON = json::from_msgpack(input_stream);
-        } else if (isUBJSON) {
-            epJSON = json::from_ubjson(input_stream);
-        } else if (isBSON) {
-            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_stream);
+            epJSON = EnergyPlus::FileSystem::readJSON(inputPath);
         }
     } catch (const std::exception &e) {
         displayMessage(e.what());
@@ -395,36 +361,29 @@ bool processInput(std::string const &inputFilePath,
         auto const input_file = idf_parser->encode(epJSON, schema);
         fs::path convertedEpJSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".idf"));
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
-        convertedFS << input_file << std::endl;
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::IDF>(convertedEpJSON, input_file);
         outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
-        auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
         fs::path convertedIDF =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".epJSON"));
-        std::ofstream convertedFS(convertedIDF, std::ofstream::out);
-        convertedFS << input_file << std::endl;
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::EpJSON>(convertedIDF, epJSON);
         outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
         fs::path convertedCBOR =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".cbor"));
-        std::ofstream convertedFS(convertedCBOR, std::ofstream::out | std::ofstream::binary);
-        json::to_cbor(epJSON, convertedFS);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::CBOR>(convertedCBOR, epJSON);
     } else if (outputType == OutputTypes::MsgPack) {
         fs::path convertedMsgPack =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".msgpack"));
-        std::ofstream convertedFS(convertedMsgPack, std::ofstream::out | std::ofstream::binary);
-        json::to_msgpack(epJSON, convertedFS);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::MsgPack>(convertedMsgPack, epJSON);
     } else if (outputType == OutputTypes::UBJSON) {
         fs::path convertedUBJSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".ubjson"));
-        std::ofstream convertedFS(convertedUBJSON, std::ofstream::out | std::ofstream::binary);
-        json::to_ubjson(epJSON, convertedFS);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::UBJSON>(convertedUBJSON, epJSON);
     } else if (outputType == OutputTypes::BSON) {
         fs::path convertedBSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".bson"));
-        std::ofstream convertedFS(convertedBSON, std::ofstream::out | std::ofstream::binary);
-        json::to_bson(epJSON, convertedFS);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::BSON>(convertedBSON, epJSON);
     } else {
         return false;
     }
@@ -435,8 +394,8 @@ std::vector<std::string> parse_input_paths(std::string const &input_paths_file)
 {
     std::ifstream input_paths_stream(input_paths_file);
     if (!input_paths_stream.is_open()) {
-        displayMessage("Could not open file: " + input_paths_file);
-        return std::vector<std::string>();
+        displayMessage("Could not open file: {}", input_paths_file);
+        return {};
     }
     std::vector<std::string> input_paths;
     std::string line;
@@ -537,7 +496,7 @@ int main(int argc, const char *argv[])
     if (opt.isSet("-j")) {
         opt.get("-j")->getInt(number_of_threads);
 #ifndef _OPENMP
-        displayMessage("ConvertInputFormat is not compiled with OpenMP. Only running on 1 thread, not requested ", number_of_threads, " threads.");
+        displayMessage("ConvertInputFormat is not compiled with OpenMP. Only running on 1 thread, not requested {} threads.", number_of_threads);
 #endif
     }
 
@@ -563,25 +522,26 @@ int main(int argc, const char *argv[])
     }
 
     std::string outputTypeStr;
-    OutputTypes outputType = OutputTypes::Default;
+    auto outputType = OutputTypes::Default;
     if (opt.isSet("-f")) {
         opt.get("-f")->getString(outputTypeStr);
         std::transform(outputTypeStr.begin(), outputTypeStr.end(), outputTypeStr.begin(), ::toupper);
-        if (outputTypeStr == "EPJSON" || outputTypeStr == "JSON") {
+        auto const buffer_view = std::string_view(outputTypeStr.data());
+        if (buffer_view.compare(".EPJSON") == 0 || buffer_view.compare(".JSON") == 0) {
             outputType = OutputTypes::epJSON;
             outputTypeStr = "EPJSON";
-        } else if (outputTypeStr == "IDF") {
+        } else if (buffer_view.compare(".IDF") == 0 || buffer_view.compare(".IMF") == 0) {
             outputType = OutputTypes::IDF;
-        } else if (outputTypeStr == "CBOR") {
+        } else if (buffer_view.compare(".CBOR") == 0) {
             outputType = OutputTypes::CBOR;
             displayMessage("CBOR input format is experimental.");
-        } else if (outputTypeStr == "MSGPACK") {
+        } else if (buffer_view.compare(".MSGPACK") == 0) {
             outputType = OutputTypes::MsgPack;
             displayMessage("MsgPack input format is experimental.");
-        } else if (outputTypeStr == "UBJSON") {
+        } else if (buffer_view.compare(".UBJSON") == 0) {
             outputType = OutputTypes::UBJSON;
             displayMessage("UBJSON input format is experimental.");
-        } else if (outputTypeStr == "BSON") {
+        } else if (buffer_view.compare(".BSON") == 0) {
             outputType = OutputTypes::BSON;
             displayMessage("BSON input format is experimental.");
         } else {
@@ -603,7 +563,7 @@ int main(int argc, const char *argv[])
     std::vector<std::string> badOptions;
     if (!opt.gotRequired(badOptions)) {
         for (auto const &badOption : badOptions) {
-            std::cerr << "ERROR: Missing required option " << badOption << ".\n\n";
+            fmt::print(std::cerr, "ERROR: Missing required option {}.\n\n", badOption);
         }
         displayMessage(usage);
         return 1;
@@ -611,7 +571,7 @@ int main(int argc, const char *argv[])
 
     if (!opt.gotExpected(badOptions)) {
         for (auto const &badOption : badOptions) {
-            std::cerr << "ERROR: Got unexpected number of arguments for option " << badOption << ".\n\n";
+            fmt::print(std::cerr, "ERROR: Got unexpected number of arguments for option {}.\n\n", badOption);
         }
         displayMessage(usage);
         return 1;
@@ -620,13 +580,13 @@ int main(int argc, const char *argv[])
     std::vector<std::string> badArgs;
     if (!opt.gotValid(badOptions, badArgs)) {
         for (std::size_t i = 0; i < badOptions.size(); ++i) {
-            std::cerr << "ERROR: Got invalid argument \"" << badArgs[i] << "\" for option " << badOptions[i] << ".\n\n";
+            fmt::print(std::cerr, "ERROR: Got invalid argument \"{}\" for option {}.\n\n", badArgs[i], badOptions[i]);
         }
         return 1;
     }
 
     auto const embeddedEpJSONSchema = EnergyPlus::EmbeddedEpJSONSchema::embeddedEpJSONSchema();
-    auto schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
+    auto schema = json::from_cbor(embeddedEpJSONSchema);
 
     int number_files = static_cast<int>(files.size());
     std::size_t fileCount = 0;
@@ -644,9 +604,9 @@ int main(int argc, const char *argv[])
 #pragma omp atomic
             ++fileCount;
             if (successful) {
-                displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", files[i]);
+                displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, files[i]);
             } else {
-                displayMessage("Input file conversion failed: | ", fileCount, "/", number_files, " | ", files[i]);
+                displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, files[i]);
             }
         }
     }
@@ -655,9 +615,9 @@ int main(int argc, const char *argv[])
         bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
         ++fileCount;
         if (successful) {
-            displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);
+            displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, file);
         } else {
-            displayMessage("Input file conversion failed: | ", fileCount, "/", number_files, " | ", file);
+            displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, file);
         }
     }
 #endif

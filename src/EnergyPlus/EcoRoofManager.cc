@@ -236,7 +236,7 @@ namespace EcoRoofManager {
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
-                                        state.dataHeatBalSurf->TH(1, 1, SurfNum),
+                                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
                                         state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
@@ -491,10 +491,10 @@ namespace EcoRoofManager {
                          (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
                 Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                              F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
-                                       state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
+                                       state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
                                        state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
                                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
-                                       state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum));
+                                       state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
                 Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                              state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
@@ -751,7 +751,7 @@ namespace EcoRoofManager {
         } // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
         // this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-        state.dataHeatBalSurf->TH(1, 1, SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
+        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
         TempExt = state.dataEcoRoofMgr->Tgold;
     }
 

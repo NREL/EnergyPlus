@@ -955,13 +955,13 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
         // check if setpoint on outlet node
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
@@ -1640,11 +1640,8 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                 ShowContinueError(state,
                                   "EIR as a function of PLR curve output at various part-load ratios and condenser water temperatures shown below:");
                 ShowContinueError(state, "PLR           =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-
-                ShowContinueError(state, format("Cond Temp(C) = {:7.2F}", fmt::join(CondTempArray, " ")));
-
-                ShowContinueError(state, format("Curve Output = {:7.2F}", fmt::join(CurveValArray, " ")));
-
+                ShowContinueError(state, fmt::format("Cond Temp(C) = {:7.2F}", fmt::join(CondTempArray, " ")));
+                ShowContinueError(state, fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, " ")));
                 ErrorsFound = true;
             }
         }
