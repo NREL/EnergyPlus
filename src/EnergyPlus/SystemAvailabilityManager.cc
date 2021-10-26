@@ -380,10 +380,10 @@ namespace SystemAvailabilityManager {
         rNumericArgs.dimension(maxNumbers, 0.0);
         lNumericFieldBlanks.dimension(maxNumbers, false);
 
-        for (ZoneEquipType = 0; ZoneEquipType < NumValidSysAvailZoneComponents; ++ZoneEquipType) {
+        for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
             if (!allocated(state.dataHVACGlobal->ZoneComp[ZoneEquipType].ZoneCompAvailMgrs)) {
                 TotalNumComp =
-                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, format(ValidSysAvailManagerCompTypeNamesCC[ZoneEquipType]));
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ValidSysAvailManagerCompTypeNamesCC(ZoneEquipType));
                 state.dataHVACGlobal->ZoneComp[ZoneEquipType].TotalNumComp = TotalNumComp;
                 if (TotalNumComp > 0) {
                     state.dataHVACGlobal->ZoneComp[ZoneEquipType].ZoneCompAvailMgrs.allocate(TotalNumComp);

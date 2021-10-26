@@ -1502,18 +1502,14 @@ void GetSysInput(EnergyPlusData &state)
         }
 
         if (lAlphaBlanks(6)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode =
-                DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
         } else {
             if (Alphas(6) == "CURRENTOCCUPANCY") {
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode =
-                    DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
             } else if (Alphas(6) == "DESIGNOCCUPANCY") {
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode =
-                    DataZoneEquipment::PerPersonVentRateMode::ByDesignLevel;
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
             } else {
-                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode =
-                    DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
+                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state,
                                   "..invalid " + cAlphaFields(6) + "=\"" + Alphas(6) + "\". The default input of CurrentOccupancy is assigned");
@@ -2714,7 +2710,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             if (airLoopNum > 0) {
                 airLoopOAFrac = state.dataAirLoop->AirLoopFlow(airLoopNum).OAFrac;
                 bool UseOccSchFlag = false;
-                if (this->OAPerPersonMode == DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel) UseOccSchFlag = true;
+                if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
                 if (airLoopOAFrac > 0.0) {
                     Real64 vDotOAReq =
                         DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
@@ -6179,14 +6175,14 @@ void GetATMixers(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-            state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
+            state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
         } else {
             if (state.dataIPShortCut->cAlphaArgs(9) == "CURRENTOCCUPANCY") {
-                state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
+                state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
             } else if (state.dataIPShortCut->cAlphaArgs(9) == "DESIGNOCCUPANCY") {
-                state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::ByDesignLevel;
+                state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
             } else {
-                state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
+                state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError(state,
@@ -6456,7 +6452,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
     if (!this->NoOAFlowInputFromUser) {
         Real64 airLoopOAFrac(0.0);
         bool UseOccSchFlag = false;
-        if (this->OAPerPersonMode == DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel) UseOccSchFlag = true;
+        if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
         if (this->AirLoopNum > 0) {
             airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
             if (airLoopOAFrac > 0.0) {

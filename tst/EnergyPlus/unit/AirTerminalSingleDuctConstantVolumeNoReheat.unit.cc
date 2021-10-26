@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     EXPECT_EQ("AVAILSCHEDULE", state->dataSingleDuct->sd_airterminal(1).Schedule);  // AT SD constant volume no reheat availability schedule name
     EXPECT_EQ(0.50, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);    // maximum volume flow Rate
     ASSERT_TRUE(state->dataSingleDuct->sd_airterminal(1).NoOAFlowInputFromUser);    // no OA flow input from user
-    EXPECT_EQ(DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel,
+    EXPECT_EQ(DataZoneEquipment::PerPersonDCVByCurrentLevel,
               state->dataSingleDuct->sd_airterminal(1).OAPerPersonMode); // default value when A6 input field is blank
 }
 

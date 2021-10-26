@@ -78,6 +78,22 @@ namespace EnergyPlus::DataZoneEquipment {
 // PURPOSE OF THIS MODULE:
 // This module contains variable declarations for zone equipment configuration data
 
+Array1D_string const ValidSysAvailManagerCompTypeNamesCC(NumValidSysAvailZoneComponents,
+                                                    {"ZoneHVAC:FourPipeFanCoil",
+                                                     "ZoneHVAC:PackagedTerminalHeatPump",
+                                                     "ZoneHVAC:PackagedTerminalAirConditioner",
+                                                     "ZoneHVAC:WaterToAirHeatPump",
+                                                     "ZoneHVAC:WindowAirConditioner",
+                                                     "ZoneHVAC:UnitHeater",
+                                                     "ZoneHVAC:UnitVentilator",
+                                                     "ZoneHVAC:EnergyRecoveryVentilator",
+                                                     "ZoneHVAC:VentilatedSlab",
+                                                     "ZoneHVAC:OutdoorAirUnit",
+                                                     "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
+                                                     "ZoneHVAC:IdealLoadsAirSystem",
+                                                     "ZoneHVAC:EvaporativeCoolerUnit",
+                                                     "ZoneHVAC:HybridUnitaryHVAC"});
+
 void GetZoneEquipmentData(EnergyPlusData &state)
 {
 
