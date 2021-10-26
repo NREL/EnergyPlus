@@ -5981,14 +5981,16 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         }
     }
 
-    if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
-        state.dataHVACGlobal->ZoneComp[DataZoneEquipment::ZoneEquip::VRFTerminalUnit].ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
-            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
-        state.dataHVACGlobal->ZoneComp[DataZoneEquipment::ZoneEquip::VRFTerminalUnit].ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
-        state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum) = false;
+    if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
+            state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum) = false;
+        }
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
     }
-    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus =
-        state.dataHVACGlobal->ZoneComp[DataZoneEquipment::ZoneEquip::VRFTerminalUnit].ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {

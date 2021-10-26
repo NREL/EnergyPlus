@@ -54,7 +54,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -372,7 +371,7 @@ namespace DataHVACGlobals {
 struct HVACGlobalsData : BaseGlobalStruct
 {
     // Object Data
-    std::array<DataHVACGlobals::ZoneCompTypeData, DataZoneEquipment::ZoneEquip::NUM> ZoneComp;
+    Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
     DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
     Array1D<DataHVACGlobals::ComponentSetPtData> CompSetPtEquip;
 
@@ -465,7 +464,7 @@ struct HVACGlobalsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->ZoneComp = {};
+        this->ZoneComp.deallocate();
         this->CompSetPtEquip.deallocate();
         this->OptStartData = DataHVACGlobals::OptStartDataType();
         // unit test ZoneTempPredictorCorrector_ReportingTest fails without this next line. Next 2 lines are just to be thorough.

@@ -99,7 +99,7 @@ namespace DataZoneEquipment {
     enum ZoneEquip
     {
         Unassigned = -1,
-        FanCoil4Pipe,
+        FanCoil4Pipe = 1,
         PkgTermHPAirToAir,
         PkgTermACAirToAir,
         PkgTermHPWaterToAir,
@@ -129,18 +129,16 @@ namespace DataZoneEquipment {
         RefrigerationAirChillerSet,
         UserDefinedZoneHVACForcedAir,
         CoolingPanel,
-        ZoneUnitarySys,
-        NUM
+        ZoneUnitarySys
     };
 
     constexpr int NumValidSysAvailZoneComponents(14);
-    extern Array1D_string const ValidSysAvailManagerCompTypeNamesCC;
 
     // Per Person Ventilation Rate Mode
     constexpr int PerPersonDCVByCurrentLevel(1);
     constexpr int PerPersonByDesignLevel(2);
 
-
+    extern Array1D_string const cValidSysAvailManagerCompTypes;
 
     enum class LoadDist
     {

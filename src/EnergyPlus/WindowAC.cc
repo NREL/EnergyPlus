@@ -826,13 +826,15 @@ namespace WindowAC {
             state.dataWindowAC->MyOneTimeFlag = false;
         }
 
-        if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
-            ZoneComp[DataZoneEquipment::ZoneEquip::WindowAC].ZoneCompAvailMgrs(WindACNum).AvailManagerListName =
-                state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
-            ZoneComp[DataZoneEquipment::ZoneEquip::WindowAC].ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
-            state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
+        if (allocated(ZoneComp)) {
+            if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
+                state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
+            }
+            state.dataWindowAC->WindAC(WindACNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailStatus;
         }
-        state.dataWindowAC->WindAC(WindACNum).AvailStatus = ZoneComp[DataZoneEquipment::ZoneEquip::WindowAC].ZoneCompAvailMgrs(WindACNum).AvailStatus;
 
         // need to check all Window AC units to see if they are on Zone Equipment List or issue warning
         if (!state.dataWindowAC->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
