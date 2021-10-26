@@ -7334,8 +7334,8 @@ namespace WindowManager {
         // Outside air temperature = 35.0C (95F)
         // Windspeed = 3.35 m/s (7.5 mph)
         // 783 W/m2 (248 Btu/h-ft2) incident beam solar radiation normal to glazing
-        Real64 SHGCWinter; // Center-of-glass solar heat gain coefficient for ASHRAE
-        Real64 SHGCSummer;
+        Real64 SHGCWinter(0.0); // Center-of-glass solar heat gain coefficient for ASHRAE
+        Real64 SHGCSummer(0.0);
         // winter and summer conditions
         Real64 TransSolNorm;        // Window construction solar transmittance at normal incidence
         Real64 TransVisNorm;        // Window construction visible transmittance at normal incidence

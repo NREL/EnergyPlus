@@ -269,15 +269,18 @@ namespace WindowManager {
         auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
 
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
-        // films from ISO 15099 Section 8.2.2 Winter conditions
-        double hExtConvCoeff = 20.0;
-        double hIntConvCoeff = 3.6;
+        double hExtConvCoeff(0.0);
+        double hIntConvCoeff(0.0);
 
         for (bool isSummer : {false, true}) {
             if (isSummer) {
                 // films from ISO 15099 Section 8.2.3 Summer conditions
                 hExtConvCoeff = 8.0;
                 hIntConvCoeff = 2.5;
+            } else {
+                // films from ISO 15099 Section 8.2.2 Winter conditions
+                hExtConvCoeff = 20.0;
+                hIntConvCoeff = 3.6;
             }
             auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, surface.Construction, hIntConvCoeff, isSummer);
 
@@ -319,7 +322,7 @@ namespace WindowManager {
                 } else {
                     uvalue = window.uValue();
                 }
-            } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
+            } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::DualHorizontal) {
                 auto window =
                     Tarcog::ISO15099::DualVisionHorizontal(windowWidth, windowHeight, tVis, tSol, insulGlassUnit, tVis, tSol, insulGlassUnit);
                 window.setFrameLeft(frameData);
@@ -337,7 +340,7 @@ namespace WindowManager {
                 } else {
                     uvalue = window.uValue();
                 }
-            } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
+            } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::DualVertical) {
                 auto window = Tarcog::ISO15099::DualVisionVertical(windowWidth, windowHeight, tVis, tSol, insulGlassUnit, tVis, tSol, insulGlassUnit);
                 window.setFrameTop(frameData);
                 window.setFrameBottom(frameData);
