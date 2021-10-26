@@ -133,12 +133,15 @@ namespace DataZoneEquipment {
     };
 
     constexpr int NumValidSysAvailZoneComponents(14);
+    extern Array1D_string const cValidSysAvailManagerCompTypes;
 
     // Per Person Ventilation Rate Mode
-    constexpr int PerPersonDCVByCurrentLevel(1);
-    constexpr int PerPersonByDesignLevel(2);
-
-    extern Array1D_string const cValidSysAvailManagerCompTypes;
+    enum class PerPersonVentRateMode
+    {
+        Unassgined = -1,
+        DCVByCurrentLevel,
+        ByDesignLevel
+    };
 
     enum class LoadDist
     {
