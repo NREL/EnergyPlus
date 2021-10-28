@@ -83,7 +83,6 @@ namespace OutsideEnergySources {
         int BranchNum = 0;
         int CompNum = 0;
         // flags
-        bool OneTimeInitFlag = true;
         bool BeginEnvrnInitFlag = true;
         bool CheckEquipName = true;
         Real64 MassFlowRate = 0.0;
@@ -112,6 +111,10 @@ namespace OutsideEnergySources {
         void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
 
         void size(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetOutsideEnergySourcesInput(EnergyPlusData &state);

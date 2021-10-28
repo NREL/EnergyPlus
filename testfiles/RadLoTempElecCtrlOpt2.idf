@@ -140,7 +140,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    ,                        !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -343,8 +345,8 @@
     EXTWALL80,               !- Name
     A1 - 1 IN STUCCO,        !- Outside Layer
     C4 - 4 IN COMMON BRICK,  !- Layer 2
-    INS - EXPANDED EXT POLYSTYRENE R12 2 IN, !- Layer 3
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 3
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
   Construction,
     PARTITION06,             !- Name
@@ -356,9 +358,9 @@
     ROOF34,                  !- Name
     E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
-    INS - EXPANDED EXT POLYSTYRENE R12 2 IN, !- Layer 3
-    INS - EXPANDED EXT POLYSTYRENE R12 2 IN, !- Layer 3
-    C12 - 2 IN HW CONCRETE;  !- Layer 4
+    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 3
+    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 4
+    C12 - 2 IN HW CONCRETE;  !- Layer 5
 
   Construction,
     WIN-CON-LIGHT,           !- Name
@@ -422,11 +424,11 @@
   ConstructionProperty:InternalHeatSource,
     Floor Source,            !- Name
     Slab Floor with Radiant, !- Construction Name
-    3,                       !- Source Present After Layer Number
+    3,                       !- Thermal Source Present After Layer Number
     3,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
 
   Construction,
     Slab Floor with Radiant, !- Name
@@ -645,6 +647,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -676,6 +679,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -692,6 +696,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -708,6 +713,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -724,6 +730,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -740,6 +747,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -756,6 +764,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -772,6 +781,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -788,6 +798,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -804,6 +815,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -820,6 +832,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -836,6 +849,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -852,6 +866,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -868,6 +883,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -884,6 +900,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -900,6 +917,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -916,6 +934,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -932,6 +951,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -948,6 +968,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -964,6 +985,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2193,8 +2215,8 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    OutdoorDryBulbTemperature,      !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    OutdoorDryBulbTemperature,  !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2208,7 +2230,7 @@
     269.09776041774302,      !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     SurfaceFaceTemperature,  !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints 2;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2221,8 +2243,8 @@
     ,                        !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     1.9637972000759794,      !- Fraction of Autosized Heating Design Capacity
-    SurfaceInteriorTemperature,    !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    SurfaceInteriorTemperature,  !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Control Type
     0.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints 3;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2346,8 +2368,6 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
-
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

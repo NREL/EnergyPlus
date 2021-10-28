@@ -3,22 +3,24 @@
 
 using namespace FenestrationCommon;
 
-namespace SingleLayerOptics {
+namespace SingleLayerOptics
+{
+    CSpecularCellDescription::CSpecularCellDescription()
+    {}
 
-	CSpecularCellDescription::CSpecularCellDescription() {
+    double CSpecularCellDescription::T_dir_dir(const Side, const CBeamDirection &)
+    {
+        return 0;
+    }
 
-	}
+    double CSpecularCellDescription::R_dir_dir(const Side, const CBeamDirection &)
+    {
+        return 0;
+    }
 
-	double CSpecularCellDescription::T_dir_dir( const Side, const CBeamDirection& ) {
-		return 0;
-	}
+    double CSpecularCellDescription::Rspecular(const Side, const CBeamDirection &)
+    {
+        return 0;
+    }
 
-	double CSpecularCellDescription::R_dir_dir( const Side, const CBeamDirection& ) {
-		return 0;
-	}
-
-	double CSpecularCellDescription::Rspecular( const Side, const CBeamDirection& ) {
-		return 0;
-	}
-
-}
+}   // namespace SingleLayerOptics

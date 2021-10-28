@@ -4,47 +4,47 @@
 #include <memory>
 #include <vector>
 
-namespace FenestrationCommon {
+#include <WCECommon.hpp>
+#include "HeatFlowBalance.hpp"
+#include "IGU.hpp"
 
-	class CLinearSolver;
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        class CNonLinearSolver
+        {
+        public:
+            explicit CNonLinearSolver(CIGU & t_IGU, size_t numberOfIterations = 0u);
 
-}
+            // sets tolerance for solution
+            void setTolerance(double t_Tolerance);
 
-namespace Tarcog {
+            // returns number of iterations for current solution.
+            size_t getNumOfIterations() const;
 
-	class CHeatFlowBalance;
-	class CIGU;
+            void solve();
 
-	class CNonLinearSolver {
-	public:
-		explicit CNonLinearSolver( std::shared_ptr< CIGU > const& t_IGU );
+            double solutionTolerance() const;
+            bool isToleranceAchieved() const;
 
-		// sets tolerance for solution
-		void setTolerance( double const t_Tolerance );
+        private:
+            double calculateTolerance(const std::vector<double> & t_Solution) const;
+            void estimateNewState(const std::vector<double> & t_Solution);
 
-		// returns number of iterations for current solution.
-		size_t getNumOfIterations() const;
+            CIGU & m_IGU;
+            FenestrationCommon::CLinearSolver m_LinearSolver;
+            CHeatFlowBalance m_QBalance;
+            std::vector<double> m_IGUState;
+            double m_Tolerance;
+            size_t m_Iterations;
+            double m_RelaxParam;
+            double m_SolutionTolerance;
+        };
 
-		void solve();
+    }   // namespace ISO15099
 
-		double solutionTolerance() const;
-		bool isToleranceAchieved() const;
-
-	private:
-		double calculateTolerance( std::vector< double > const& t_Solution ) const;
-		void estimateNewState( std::vector< double > const& t_Solution ) const;
-
-		std::shared_ptr< CIGU > m_IGU;
-		std::shared_ptr< FenestrationCommon::CLinearSolver > m_LinearSolver;
-		std::shared_ptr< CHeatFlowBalance > m_QBalance;
-		std::shared_ptr< std::vector< double > > m_IGUState;
-		double m_Tolerance;
-		size_t m_Iterations;
-		double m_RelaxParam;
-		double m_SolutionTolerance;
-	};
-
-}
+}   // namespace Tarcog
 
 
 #endif

@@ -61,7 +61,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HighTempRadiantSystem;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
@@ -113,8 +112,6 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
                           "   **   ~~~   ** Occurs for ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER",
-                          "   ** Severe  ** GetRadiantSystemSurface: Somehow the radiant system enclosure number is zero "
-                          "forZoneHVAC:HighTemperatureRadiant = ZONERADHEATER",
                           "   ** Severe  ** Fraction of radiation distributed to surfaces and people sums up to less than 1 for ZONERADHEATER",
                           "   **   ~~~   ** This would result in some of the radiant energy delivered by the high temp radiant heater being lost.",
                           "   **   ~~~   ** The sum of all radiation fractions to surfaces = 0.80000",

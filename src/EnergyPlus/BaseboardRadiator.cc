@@ -261,7 +261,7 @@ namespace BaseboardRadiator {
         using namespace DataSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
@@ -330,7 +330,7 @@ namespace BaseboardRadiator {
                     baseboard->Baseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     if (baseboard->Baseboard(BaseboardNum).SchedPtr == 0) {
                         ShowSevereError(state,
-                                        RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                             " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                             '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
@@ -460,7 +460,7 @@ namespace BaseboardRadiator {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination.");
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.  Preceding condition(s) cause termination.");
             }
         }
 
@@ -472,8 +472,8 @@ namespace BaseboardRadiator {
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 baseboard->Baseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 baseboard->Baseboard(BaseboardNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
@@ -485,8 +485,8 @@ namespace BaseboardRadiator {
                                 "Baseboard Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 baseboard->Baseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 baseboard->Baseboard(BaseboardNum).EquipID,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -498,56 +498,56 @@ namespace BaseboardRadiator {
                                 "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 baseboard->Baseboard(BaseboardNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 baseboard->Baseboard(BaseboardNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 baseboard->Baseboard(BaseboardNum).AirMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).AirInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).AirOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
         }
     }
@@ -570,7 +570,7 @@ namespace BaseboardRadiator {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("BaseboardRadiator:InitBaseboard");
+        static constexpr std::string_view RoutineName("BaseboardRadiator:InitBaseboard");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
@@ -1076,7 +1076,7 @@ namespace BaseboardRadiator {
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine calculates the heat exchange rate
         // in a pure convective baseboard heater.  The heater is assumed to be crossflow
-        // with both fluids unmixed. The air flow is bouyancy driven and a constant air
+        // with both fluids unmixed. The air flow is buoyancy driven and a constant air
         // flow velocity of 0.5m/s is assumed. The solution is by the effectiveness-NTU
         // method found in Icropera and DeWitt, Fundamentals of Heat and Mass Transfer,
         // Chapter 11.4, p. 523, eq. 11.33

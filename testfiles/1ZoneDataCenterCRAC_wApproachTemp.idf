@@ -229,6 +229,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -245,6 +246,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -261,6 +263,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -277,6 +280,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -293,6 +297,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -309,6 +314,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

@@ -318,5 +318,5 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
     EXPECT_NEAR(firstDay.relativeHumidity, 0.7083, 0.005);
     EXPECT_NEAR(firstDay.windSpeed, 2.8083, 0.001);
     // Sum of (BeamSolarRad + DifSolarRad)/24
-    EXPECT_NEAR(firstDay.horizontalRadiation, 140, 2);
+    EXPECT_NEAR(firstDay.horizontalRadiation, 68, 2);
 }

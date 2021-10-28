@@ -494,56 +494,56 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                 "Demand Manager Meter Demand Power",
                                 OutputProcessor::Unit::W,
                                 DemandManagerList(ListNum).MeterDemand,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 DemandManagerList(ListNum).Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Average Demand Power",
                                 OutputProcessor::Unit::W,
                                 DemandManagerList(ListNum).AverageDemand,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 DemandManagerList(ListNum).Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Peak Demand Power",
                                 OutputProcessor::Unit::W,
                                 DemandManagerList(ListNum).PeakDemand,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 DemandManagerList(ListNum).Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Scheduled Limit Power",
                                 OutputProcessor::Unit::W,
                                 DemandManagerList(ListNum).ScheduledLimit,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 DemandManagerList(ListNum).Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Demand Limit Power",
                                 OutputProcessor::Unit::W,
                                 DemandManagerList(ListNum).DemandLimit,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 DemandManagerList(ListNum).Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Over Limit Power",
                                 OutputProcessor::Unit::W,
                                 DemandManagerList(ListNum).OverLimit,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 DemandManagerList(ListNum).Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Over Limit Time",
                                 OutputProcessor::Unit::hr,
                                 DemandManagerList(ListNum).OverLimitDuration,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 DemandManagerList(ListNum).Name);
 
             if (ErrorsFound) {
@@ -560,24 +560,24 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                             "Demand Manager Exterior Energy Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataDemandManager->DemandManagerExtIterations,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "ManageDemand");
 
         SetupOutputVariable(state,
                             "Demand Manager Heat Balance Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataDemandManager->DemandManagerHBIterations,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "ManageDemand");
 
         SetupOutputVariable(state,
                             "Demand Manager HVAC Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataDemandManager->DemandManagerHVACIterations,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "ManageDemand");
     }
 }

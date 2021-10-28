@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
@@ -88,6 +89,13 @@ void setConsoleOutputState(EnergyPlusState state, int outputStatus)
     } else {
         thisState->dataGlobal->printConsoleOutput = true;
     }
+}
+
+void setEnergyPlusRootDirectory(EnergyPlusState state, const char *path)
+{
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->installRootOverride = true;
+    thisState->dataStrGlobals->exeDirectoryPath = fs::path(path);
 }
 
 void issueWarning(EnergyPlusState state, const char *message)

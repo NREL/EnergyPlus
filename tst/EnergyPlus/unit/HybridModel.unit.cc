@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->MCPTC(1) = 0.0;
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
-    state->dataHeatBal->HConvIn.allocate(1);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(1);
     state->dataHeatBal->SNLoadHeatRate.allocate(1);
     state->dataHeatBal->SNLoadCoolRate.allocate(1);
     state->dataHeatBal->SNLoadHeatEnergy.allocate(1);
@@ -178,7 +178,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->ZoneIntGain.allocate(1);
-    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneHumRat variable initialization
@@ -584,7 +583,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->MCPTC.deallocate();
     state->dataSurface->SurfaceWindow.deallocate();
     state->dataSurface->Surface.deallocate();
-    state->dataHeatBal->HConvIn.deallocate();
+    state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataRoomAirMod->IsZoneCV.deallocate();
@@ -671,7 +670,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->MCPTC(1) = 0.0;
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
-    state->dataHeatBal->HConvIn.allocate(1);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
     state->dataRoomAirMod->IsZoneDV.dimension(1, false);
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
@@ -912,7 +911,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->MCPTC.deallocate();
     state->dataSurface->SurfaceWindow.deallocate();
     state->dataSurface->Surface.deallocate();
-    state->dataHeatBal->HConvIn.deallocate();
+    state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataRoomAirMod->IsZoneCV.deallocate();

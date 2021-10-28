@@ -882,15 +882,20 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Generator Produced AC Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->ElecPowerGenerated,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->EnergyGen,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ElectricityProduced",
@@ -898,24 +903,29 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Generator LHV Basis Electric Efficiency", OutputProcessor::Unit::None, this->ElectricEfficiencyLHV, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Generator LHV Basis Electric Efficiency",
+                        OutputProcessor::Unit::None,
+                        this->ElectricEfficiencyLHV,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     //    Fuel specific report variables
     SetupOutputVariable(state,
                         "Generator " + this->FuelType + " HHV Basis Rate",
                         OutputProcessor::Unit::W,
                         this->FuelEnergyUseRateHHV,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator " + this->FuelType + " HHV Basis Energy",
                         OutputProcessor::Unit::J,
                         this->FuelEnergyHHV,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         this->FuelType,
@@ -923,27 +933,48 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Generator " + this->FuelType + " Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->FuelMdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     //    general fuel use report (to match other generators)
-    SetupOutputVariable(
-        state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRateHHV, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Generator Fuel HHV Basis Rate",
+                        OutputProcessor::Unit::W,
+                        this->FuelEnergyUseRateHHV,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergyHHV, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Generator Fuel HHV Basis Energy",
+                        OutputProcessor::Unit::J,
+                        this->FuelEnergyHHV,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
     //    Heat recovery (to water) report variables
     if (this->HeatRecActive) {
 
-        SetupOutputVariable(
-            state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QHeatRecovered, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->QHeatRecovered,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced Thermal Energy",
                             OutputProcessor::Unit::J,
                             this->ExhaustEnergyRec,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             "ENERGYTRANSFER",
@@ -955,30 +986,50 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             "Generator Thermal Efficiency LHV Basis",
                             OutputProcessor::Unit::None,
                             this->ThermalEfficiencyLHV,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Heat Recovery Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HeatRecInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Heat Recovery Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HeatRecOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Heat Recovery Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Heat Recovery Water Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->HeatRecMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 
     if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
-        SetupOutputVariable(
-            state, "Generator Standby Electricity Rate", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Standby Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->StandbyPowerRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Standby Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->StandbyEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             "Electricity",
@@ -988,11 +1039,21 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     }
 
     if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
-        SetupOutputVariable(
-            state, "Generator Ancillary Electricity Rate", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Ancillary Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->AncillaryPowerRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Ancillary Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            this->AncillaryEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
     }
 
     //   Report combustion air outlet conditions if exhaust air calculations are active
@@ -1001,12 +1062,17 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             "Generator Exhaust Air Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->ExhaustAirMassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustAirTemperature, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Exhaust Air Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustAirTemperature,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 }
 
@@ -1050,61 +1116,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    std::string const RoutineName("InitMTGenerators");
-    bool errFlag;
-
-    if (this->myFlag) {
-        this->setupOutputVars(state);
-        this->myFlag = false;
-    }
-
-    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-        errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::TypeOf_Generator_MicroTurbine,
-                                                this->HRLoopNum,
-                                                this->HRLoopSideNum,
-                                                this->HRBranchNum,
-                                                this->HRCompNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
-        if (errFlag) {
-            ShowFatalError(state, "InitMTGenerators: Program terminated due to previous condition(s).");
-        }
-
-        this->MyPlantScanFlag = false;
-    }
-
-    if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
-
-        // size mass flow rate
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
-                                                       RoutineName);
-
-        this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
-        this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
-
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->HeatRecMaxMassFlowRate,
-                                           this->HeatRecInletNodeNum,
-                                           this->HeatRecOutletNodeNum,
-                                           this->HRLoopNum,
-                                           this->HRLoopSideNum,
-                                           this->HRBranchNum,
-                                           this->HRCompNum);
-
-        this->MySizeAndNodeInitFlag = false;
-
-    } // end one time inits
+    this->oneTimeInit(state); // end one time inits
 
     if (!this->HeatRecActive) return;
 
@@ -1228,7 +1240,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
     Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
     Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
-    std::string const RoutineName("CalcMTGeneratorModel");
+    static constexpr std::string_view RoutineName("CalcMTGeneratorModel");
 
     //   Load local variables from data structure (for code readability)
     // Min allowed operating fraction at full load
@@ -1947,6 +1959,64 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
     }
     this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+}
+void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
+{
+
+    std::string const RoutineName("InitMTGenerators");
+    bool errFlag;
+
+    if (this->myFlag) {
+        this->setupOutputVars(state);
+        this->myFlag = false;
+    }
+
+    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
+        errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_Generator_MicroTurbine,
+                                                this->HRLoopNum,
+                                                this->HRLoopSideNum,
+                                                this->HRBranchNum,
+                                                this->HRCompNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, "InitMTGenerators: Program terminated due to previous condition(s).");
+        }
+
+        this->MyPlantScanFlag = false;
+    }
+
+    if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
+
+        // size mass flow rate
+        Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                       DataGlobalConstants::InitConvTemp,
+                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                       RoutineName);
+
+        this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
+        this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
+
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
+                                           this->HeatRecMaxMassFlowRate,
+                                           this->HeatRecInletNodeNum,
+                                           this->HeatRecOutletNodeNum,
+                                           this->HRLoopNum,
+                                           this->HRLoopSideNum,
+                                           this->HRBranchNum,
+                                           this->HRCompNum);
+
+        this->MySizeAndNodeInitFlag = false;
+    }
 }
 
 } // namespace EnergyPlus::MicroturbineElectricGenerator

@@ -225,7 +225,7 @@ namespace DualDuct {
     // Functions
 
     void SimulateDualDuct(
-        EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
+        EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -237,7 +237,7 @@ namespace DualDuct {
 
     void ReportDualDuctConnections(EnergyPlusData &state);
 
-    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string_view CompName, bool &RecircIsUsed);
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************

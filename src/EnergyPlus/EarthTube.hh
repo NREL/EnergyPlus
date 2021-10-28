@@ -154,9 +154,9 @@ namespace EarthTube {
     void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const &ZoneName,  // name of zone for error reporting
-                                std::string const &FieldName, // name of earth tube in input
-                                bool &ErrorsFound             // Found a problem
+                                std::string const &ZoneName, // name of zone for error reporting
+                                std::string_view FieldName,  // name of earth tube in input
+                                bool &ErrorsFound            // Found a problem
     );
 
     void CalcEarthTube(EnergyPlusData &state);

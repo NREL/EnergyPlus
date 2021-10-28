@@ -229,18 +229,18 @@ file(MAKE_DIRECTORY ${DOCS_OUT})
 
 # the output variables listing
 install(
-  CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${PROJECT_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")"
+  CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${PROJECT_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")"
 )
 install(FILES "${PROJECT_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
 
 # the example file summary
 install(
-  CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
+  CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
   COMPONENT ExampleFiles)
 install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 # the example file objects link
-install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_objects.py\"
+install(CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_objects.py\"
 \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")"
         COMPONENT ExampleFiles)
 install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
@@ -252,7 +252,7 @@ if(BUILD_CHANGELOG)
   # Better to move this condition into the install CODE.
   if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
     install(
-      CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")"
+      CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")"
     )
     install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
   else()
@@ -357,12 +357,14 @@ set(RULES_XLS Rules9-5-0-to-9-6-0.md)
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/readme.html" DESTINATION "./")
+install(FILES "${PROJECT_SOURCE_DIR}/release/Deprecation.html" DESTINATION "./")
 if(LINK_WITH_PYTHON)
   install(FILES "${PROJECT_SOURCE_DIR}/release/PythonLicense.txt" DESTINATION "./")
 endif()
 set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
+install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-5-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-6-0-Energy+.idd")
 
@@ -399,7 +401,6 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/bin/CoeffConv/ReadMe.txt" DESTINATION "PreProcess/CoeffConv/")
   install(FILES "${PROJECT_SOURCE_DIR}/src/Basement/RunBasement.bat" DESTINATION "PreProcess/GrndTempCalc/")
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/RunSlab.bat" DESTINATION "PreProcess/GrndTempCalc/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFEditor/IDFEditor.exe" DESTINATION "PreProcess/IDFEditor/")
   install(FILES "${PROJECT_SOURCE_DIR}/src/ParametricPreprocessor/RunParam.bat" DESTINATION "PreProcess/ParametricPreprocessor/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/ViewFactorCalculation/readme.txt" DESTINATION "PreProcess/ViewFactorCalculation/")
@@ -531,6 +532,7 @@ elseif(UNIX)
       "/usr/local/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
 
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare" DESTINATION "PostProcess/EP-Compare/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/GraphHints.csv" DESTINATION "PostProcess/EP-Compare/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHInterfaces5001.so"
           DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHObjectArray5001.so"

@@ -450,6 +450,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -466,6 +467,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -482,6 +484,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     West Plenum,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -498,6 +501,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Plenum,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -514,6 +518,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -530,6 +535,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Plenum,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -546,6 +552,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -562,6 +569,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -578,6 +586,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     West Plenum,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -594,6 +603,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Plenum,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -610,6 +620,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -626,6 +637,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     West Plenum,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -642,6 +654,7 @@
     Floor,                   !- Surface Type
     Plenum Floor,            !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     PZn001:CeilingW,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -658,6 +671,7 @@
     Floor,                   !- Surface Type
     Plenum Floor,            !- Construction Name
     East Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     PZn001:CeilingE,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -674,6 +688,7 @@
     Roof,                    !- Surface Type
     Plenum Floor,            !- Construction Name
     West Plenum,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001W,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -690,6 +705,7 @@
     Roof,                    !- Surface Type
     Plenum Floor,            !- Construction Name
     East Plenum,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001E,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -706,6 +722,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     West Plenum,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -722,6 +739,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     East Plenum,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -738,6 +756,7 @@
     Roof,                    !- Surface Type
     ROOF19,                  !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -754,6 +773,7 @@
     Roof,                    !- Surface Type
     ROOF19,                  !- Construction Name
     East Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -770,6 +790,7 @@
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Partiton001,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -786,6 +807,7 @@
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
     West Plenum,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     PZn001:Partiton001,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -802,6 +824,7 @@
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
     East Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Partiton001,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -818,6 +841,7 @@
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
     East Plenum,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     PZn001:Partiton001,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -979,8 +1003,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     West Zone OA System,     !- Name
     West Data Center OA Controllers,  !- Controller List Name
-    West Data Center OA Equipment,  !- Outdoor Air Equipment List Name
-    West Data Center Avail List;  !- Availability Manager List Name
+    West Data Center OA Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 
@@ -1666,8 +1689,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     East Zone OA System,     !- Name
     East Data Center OA Controllers,  !- Controller List Name
-    East Data Center OA Equipment,  !- Outdoor Air Equipment List Name
-    East Data Center Avail List;  !- Availability Manager List Name
+    East Data Center OA Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 

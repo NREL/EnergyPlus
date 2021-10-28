@@ -46,11 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // Standard C++ library
-#include <errno.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -68,6 +68,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -116,13 +117,13 @@ namespace FileSystem {
 
     fs::path getAbsolutePath(fs::path const &path)
     {
-        /*
-         * Returns the absolute path for a given relative path.
-         *
-         * If the relative path points to a symlink, the symlink will
-         * be resolved, and this function will return the absolute path
-         * of the link.
-         */
+        //        /*
+        //         * Returns the absolute path for a given relative path.
+        //         *
+        //         * If the relative path points to a symlink, the symlink will
+        //         * be resolved, and this function will return the absolute path
+        //         * of the link.
+        //         */
 
         // Not available in experimental/filesystem
         // return fs::weakly_canonical(fs::absolute(p));
@@ -173,11 +174,11 @@ namespace FileSystem {
 
     fs::path getProgramPath()
     {
-        /*
-         * Returns the relative path to the executable file (including symlinks).
-         *
-         * To resolve symlinks, wrap this call in getAbsolutePath().
-         */
+        // /*
+        // * Returns the relative path to the executable file (including symlinks).
+        // *
+        // * To resolve symlinks, wrap this call in getAbsolutePath().
+        // */
         char executableRelativePath[1024];
 
 #ifdef __APPLE__
@@ -195,7 +196,7 @@ namespace FileSystem {
         GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
 
-        return fs::path(executableRelativePath);
+        return executableRelativePath;
     }
 
     // TODO: remove? seems like fs::path::extension would do fine. It's only used in CommandLineInterface to check the input file type, so we could
@@ -210,25 +211,17 @@ namespace FileSystem {
         return fs::path{pext};
     }
 
-    // TODO: is this any better?
-    InputFileType getInputFileType(fs::path const &filePath)
+    FileTypes getFileType(fs::path const &filePath)
     {
-        std::string pext = fs::path(filePath).extension().string();
-        std::transform(pext.begin(), pext.end(), pext.begin(), ::toupper);
-        if (pext == ".EPJSON" || pext == ".JSON") {
-            return InputFileType::EpJSON;
-        } else if (pext == ".IDF" || pext == ".IMF") {
-            return InputFileType::IDF;
-        } else if (pext == ".CBOR") {
-            return InputFileType::CBOR;
-        } else if (pext == ".MSGPACK") {
-            return InputFileType::MsgPack;
-        } else if (pext == ".UBJSON") {
-            return InputFileType::UBJSON;
-        } else if (pext == ".BSON") {
-            return InputFileType::BSON;
-        }
-        return InputFileType::Unknown;
+#ifdef _WIN32
+        auto const filePathStr = fs::path(filePath).extension().string();
+        auto extension = std::string_view(filePathStr.c_str());
+#else
+        auto extension = std::string_view(fs::path(filePath).extension().c_str());
+#endif
+
+        extension.remove_prefix(extension.find_last_of('.') + 1);
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
@@ -283,7 +276,7 @@ namespace FileSystem {
             return;
         }
 
-        // rename would fail if copying accross devices
+        // rename would fail if copying across devices
         try {
             fs::rename(fs::path(filePath), destination);
         } catch (fs::filesystem_error &) {
@@ -327,6 +320,103 @@ namespace FileSystem {
         // we could return bool?
         fs::create_symlink(filePath, linkPath);
 #endif
+    }
+
+    std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
+    {
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+
+        if (!fileExists(filePath)) {
+            throw FatalError(fmt::format("File does not exists: {}", path));
+        }
+
+        std::string_view fopen_mode;
+        if (mode == std::ios_base::in) {
+            fopen_mode = "r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = "b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = "rb";
+        } else {
+            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        }
+
+        auto close_file = [](FILE *f) { fclose(f); };
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+        if (!holder) {
+            throw FatalError(fmt::format("Could not open file: {}", path));
+        }
+
+        auto f = holder.get();
+        const auto size = fs::file_size(filePath);
+        std::string result;
+        result.resize(size);
+
+        auto bytes_read = fread(result.data(), 1, size, f);
+        auto is_eof = feof(f);
+        auto has_error = ferror(f);
+        if (is_eof != 0) {
+            return result;
+        }
+        if (has_error != 0 || bytes_read != size) {
+            throw FatalError(fmt::format("Error reading file: {}", path));
+        }
+        return result;
+    }
+
+    nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
+    {
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+
+        if (!fileExists(filePath)) {
+            throw FatalError(fmt::format("File does not exists: {}", path));
+        }
+
+        std::string_view fopen_mode;
+        if (mode == std::ios_base::in) {
+            fopen_mode = "r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = "b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = "rb";
+        } else {
+            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        }
+
+        auto close_file = [](FILE *f) { fclose(f); };
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+        if (!holder) {
+            throw FatalError(fmt::format("Could not open file: {}", path));
+        }
+        auto f = holder.get();
+
+        auto const ext = getFileType(filePath);
+        switch (ext) {
+        case FileTypes::EpJSON:
+        case FileTypes::JSON:
+        case FileTypes::GLHE:
+            return nlohmann::json::parse(f, nullptr, true, true);
+        case FileTypes::CBOR:
+            return nlohmann::json::from_cbor(f);
+        case FileTypes::MsgPack:
+            return nlohmann::json::from_msgpack(f);
+        case FileTypes::UBJSON:
+            return nlohmann::json::from_ubjson(f);
+        case FileTypes::BSON:
+            return nlohmann::json::from_bson(f);
+        default:
+            throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+        }
     }
 
 } // namespace FileSystem

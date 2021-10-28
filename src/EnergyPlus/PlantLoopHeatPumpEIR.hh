@@ -132,7 +132,7 @@ namespace EIRPlantLoopHeatPumps {
         int recurringConcurrentOperationWarningIndex = 0;
 
         // logic flags
-        bool oneTimeInit = true;
+        bool oneTimeInitFlag = true;
         bool envrnInit = true;
 
         // a couple worker functions to easily allow merging of cooling and heating operations
@@ -188,6 +188,8 @@ namespace EIRPlantLoopHeatPumps {
         {
             return a - b;
         }
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
 } // namespace EIRPlantLoopHeatPumps

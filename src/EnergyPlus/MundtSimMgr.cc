@@ -274,8 +274,8 @@ namespace MundtSimMgr {
                                                     "Room Air Node Air Temperature",
                                                     OutputProcessor::Unit::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    "HVAC",
-                                                    "Average",
+                                                    OutputProcessor::SOVTimeStepType::HVAC,
+                                                    OutputProcessor::SOVStoreType::Average,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;
@@ -425,7 +425,7 @@ namespace MundtSimMgr {
             state.dataMundtSimMgr->QsysCoolTot = -(SumSysMCpT - ZoneMassFlowRate * CpAir * state.dataHeatBalFanSys->MAT(ZoneNum));
         }
         // determine heat gains
-        SumAllInternalConvectionGains(state, ZoneNum, state.dataMundtSimMgr->ConvIntGain);
+        state.dataMundtSimMgr->ConvIntGain = SumAllInternalConvectionGains(state, ZoneNum);
         state.dataMundtSimMgr->ConvIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                                               state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) +
                                               state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
@@ -433,7 +433,7 @@ namespace MundtSimMgr {
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
+            RetAirConvGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
             state.dataMundtSimMgr->ConvIntGain += RetAirConvGain;
         }
 
@@ -443,9 +443,9 @@ namespace MundtSimMgr {
         // get surface data
         for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
             state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).Temp =
-                state.dataHeatBalSurf->TempSurfIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+                state.dataHeatBalSurf->SurfTempIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
             state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).Hc =
-                state.dataHeatBal->HConvIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+                state.dataHeatBalSurf->SurfHConvInt(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
         }
     }
 

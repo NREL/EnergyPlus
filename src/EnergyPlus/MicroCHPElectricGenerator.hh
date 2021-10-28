@@ -228,6 +228,8 @@ namespace MicroCHPElectricGenerator {
         void UpdateMicroCHPGeneratorRecords(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetMicroCHPGeneratorInput(EnergyPlusData &state);

@@ -77,10 +77,10 @@ using namespace DataBranchNodeConnections;
 
 void RegisterNodeConnection(EnergyPlusData &state,
                             int const NodeNumber,                                // Number for this Node
-                            std::string const &NodeName,                         // Name of this Node
-                            std::string const &ObjectType,                       // Type of object this Node is connected to (e.g. Chiller:Electric)
-                            std::string const &ObjectName,                       // Name of object this Node is connected to (e.g. MyChiller)
-                            std::string const &ConnectionType,                   // Connection Type for this Node (must be valid)
+                            std::string_view const NodeName,                     // Name of this Node
+                            std::string_view const ObjectType,                   // Type of object this Node is connected to (e.g. Chiller:Electric)
+                            std::string_view const ObjectName,                   // Name of object this Node is connected to (e.g. MyChiller)
+                            std::string_view const ConnectionType,               // Connection Type for this Node (must be valid)
                             NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
                             bool const IsParent,                                 // True when node is a parent node
                             bool &errFlag,                                       // Will be True if errors already detected or if errors found here
@@ -110,7 +110,9 @@ void RegisterNodeConnection(EnergyPlusData &state,
     ErrorsFoundHere = false;
     if (!IsValidConnectionType(ConnectionType)) {
         ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
-        ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+        ShowContinueError(state,
+                          "Occurs for Node=" + std::string{NodeName} + ", ObjectType=" + std::string{ObjectType} +
+                              ", ObjectName=" + std::string{ObjectName});
         ErrorsFoundHere = true;
     }
 
@@ -169,7 +171,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
                                                     state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
-                ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
+                ShowContinueError(state, "NodeName=\"" + std::string{NodeName} + "\", entered as type=" + std::string{ConnectionType});
                 ShowContinueError(state, "In Field=" + InputFieldName());
                 ShowContinueError(state,
                                   "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
@@ -250,7 +252,7 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
     }
 }
 
-bool IsValidConnectionType(std::string const &ConnectionType)
+bool IsValidConnectionType(std::string_view ConnectionType)
 {
 
     // FUNCTION INFORMATION:
@@ -1281,12 +1283,12 @@ void GetChildrenData(EnergyPlusData &state,
 }
 
 void SetUpCompSets(EnergyPlusData &state,
-                   std::string const &ParentType,    // Parent Object Type
-                   std::string const &ParentName,    // Parent Object Name
-                   std::string const &CompType,      // Component Type
-                   std::string const &CompName,      // Component Name
-                   std::string const &InletNode,     // Inlet Node Name
-                   std::string const &OutletNode,    // Outlet Node Name
+                   std::string_view ParentType,      // Parent Object Type
+                   std::string_view ParentName,      // Parent Object Name
+                   std::string_view CompType,        // Component Type
+                   std::string_view CompName,        // Component Name
+                   std::string_view InletNode,       // Inlet Node Name
+                   std::string_view OutletNode,      // Outlet Node Name
                    Optional_string_const Description // Description
 )
 {
@@ -1385,7 +1387,7 @@ void SetUpCompSets(EnergyPlusData &state,
                             Found2 = 1;
                     }
                     if (Found2 == 0) {
-                        ShowWarningError(state, "Node used as an inlet more than once: " + InletNode);
+                        ShowWarningError(state, "Node used as an inlet more than once: " + std::string{InletNode});
                         ShowContinueError(state,
                                           "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType +
                                               ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
@@ -1428,7 +1430,7 @@ void SetUpCompSets(EnergyPlusData &state,
                     // This rule is violated by dual duct units, so let it pass
                     if ((Found2 == 0) && (!has_prefixi(state.dataBranchNodeConnections->CompSets(Count).CType, "AirTerminal:DualDuct:")) &&
                         (!has_prefixi(CompTypeUC, "AirTerminal:DualDuct:"))) {
-                        ShowWarningError(state, "Node used as an outlet more than once: " + OutletNode);
+                        ShowWarningError(state, "Node used as an outlet more than once: " + std::string{OutletNode});
                         ShowContinueError(state,
                                           "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType +
                                               ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
@@ -1548,7 +1550,7 @@ void TestInletOutletNodes(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFo
 
 void TestCompSet(EnergyPlusData &state,
                  std::string const &CompType,   // Component Type
-                 std::string const &CompName,   // Component Name
+                 std::string_view CompName,     // Component Name
                  std::string const &InletNode,  // Inlet Node Name
                  std::string const &OutletNode, // Outlet Node Name
                  std::string const &Description // Description of Node Pair (for warning message)

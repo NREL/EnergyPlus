@@ -944,6 +944,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C1-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -960,6 +961,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C2-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -976,6 +978,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -992,6 +995,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C4-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1008,6 +1012,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C5-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1024,6 +1029,7 @@
     Roof,                    !- Surface Type
     ROOF-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1040,6 +1046,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1056,6 +1063,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1072,6 +1080,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1088,6 +1097,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1104,6 +1114,7 @@
     Ceiling,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE1-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C1-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1120,6 +1131,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE1-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1136,6 +1148,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1152,6 +1165,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB21,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1168,6 +1182,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB41,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1184,6 +1199,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB51,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1200,6 +1216,7 @@
     Ceiling,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE2-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C2-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1216,6 +1233,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE2-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1232,6 +1250,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE2-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1248,6 +1267,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB12,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1264,6 +1284,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB32,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1280,6 +1301,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB52,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1296,6 +1318,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1312,6 +1335,7 @@
     Ceiling,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE3-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1328,6 +1352,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE3-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1344,6 +1369,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB23,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1360,6 +1386,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB43,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1376,6 +1403,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB53,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1392,6 +1420,7 @@
     Ceiling,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE4-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C4-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1408,6 +1437,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE4-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1424,6 +1454,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE4-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1440,6 +1471,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB14,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1456,6 +1488,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB34,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1472,6 +1505,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB54,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1488,6 +1522,7 @@
     Ceiling,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE5-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C5-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1504,6 +1539,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE5-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1520,6 +1556,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB15,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1536,6 +1573,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB25,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1552,6 +1590,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB35,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1568,6 +1607,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1 Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB45,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3123,8 +3163,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV OA System,           !- Name
     VAV OA System Controller List,  !- Controller List Name
-    VAV OA System Equipment List,  !- Outdoor Air Equipment List Name
-    VAV OA System Availability Manager List;  !- Availability Manager List Name
+    VAV OA System Equipment List;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

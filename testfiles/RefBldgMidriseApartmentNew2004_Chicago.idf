@@ -998,6 +998,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1014,6 +1015,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1030,6 +1032,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1046,6 +1049,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1062,6 +1066,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Wall 1,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1078,6 +1083,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g WWall S1A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1096,6 +1102,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1112,6 +1119,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1128,6 +1136,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1144,6 +1153,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1160,6 +1170,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g NWall C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1176,6 +1187,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     G WWall N1A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1194,6 +1206,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1210,6 +1223,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1226,6 +1240,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1242,6 +1257,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1258,6 +1274,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g SWall C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1274,6 +1291,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g EIWALL S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1292,6 +1310,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1308,6 +1327,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1324,6 +1344,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1340,6 +1361,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1356,6 +1378,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Wall 6,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1372,6 +1395,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g EIWALL N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1390,6 +1414,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1406,6 +1431,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1422,6 +1448,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1438,6 +1465,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Wall 4,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1454,6 +1482,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g WWall N2A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1470,6 +1499,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g EIWALL NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1488,6 +1518,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1504,6 +1535,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1520,6 +1552,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1536,6 +1569,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Wall 5,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1552,6 +1586,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g WWall NEA,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1568,6 +1603,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g EIWALL N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1586,6 +1622,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1602,6 +1639,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1618,6 +1656,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1634,6 +1673,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Wall 2,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1650,6 +1690,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g WWall S2A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1666,6 +1707,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g EIWALL SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1684,6 +1726,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1700,6 +1743,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1716,6 +1760,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1732,6 +1777,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Wall 3,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1748,6 +1794,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g WWall SEA,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1764,6 +1811,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g EIWALL S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1782,6 +1830,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1798,6 +1847,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1814,6 +1864,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1830,6 +1881,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1846,6 +1898,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m SWall C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1862,6 +1915,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m WWall S1A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1880,6 +1934,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1896,6 +1951,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1912,6 +1968,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1928,6 +1985,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1944,6 +2002,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Wall 4,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1960,6 +2019,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m WWall N1A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1978,6 +2038,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1994,6 +2055,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2010,6 +2072,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2026,6 +2089,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2042,6 +2106,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Wall 3,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2058,6 +2123,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m EIWALL S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2076,6 +2142,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2092,6 +2159,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2108,6 +2176,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2124,6 +2193,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2140,6 +2210,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m NWall C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2156,6 +2227,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m EIWALL N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2174,6 +2246,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2190,6 +2263,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2206,6 +2280,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2222,6 +2297,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Wall 5,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2238,6 +2314,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m WWall N2A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2254,6 +2331,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m EIWALL NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2272,6 +2350,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2288,6 +2367,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2304,6 +2384,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2320,6 +2401,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Wall 6,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2336,6 +2418,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m WWall NEA,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2352,6 +2435,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m EIWALL N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2370,6 +2454,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2386,6 +2471,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2402,6 +2488,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2418,6 +2505,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Wall 1,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2434,6 +2522,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m WWall S2A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2450,6 +2539,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m EIWALL SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2468,6 +2558,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2484,6 +2575,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2500,6 +2592,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2516,6 +2609,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Wall 2,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2532,6 +2626,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m WWall SEA,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2548,6 +2643,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m EIWALL S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2566,6 +2662,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2582,6 +2679,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2598,6 +2696,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2614,6 +2713,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2630,6 +2730,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t SWall C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2646,6 +2747,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t WWall S1A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2664,6 +2766,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2680,6 +2783,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2696,6 +2800,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2712,6 +2817,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2728,6 +2834,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Wall 1,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2744,6 +2851,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t WWall N1A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2762,6 +2870,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2778,6 +2887,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2794,6 +2904,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2810,6 +2921,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2826,6 +2938,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Wall 6,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2842,6 +2955,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t EIWALL S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2860,6 +2974,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2876,6 +2991,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2892,6 +3008,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2908,6 +3025,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2924,6 +3042,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t NWall C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2940,6 +3059,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t EIWALL N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2958,6 +3078,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2974,6 +3095,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2990,6 +3112,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3006,6 +3129,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Wall 2,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3022,6 +3146,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t WWall N2A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3038,6 +3163,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t EIWALL NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3056,6 +3182,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3072,6 +3199,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3088,6 +3216,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3104,6 +3233,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Wall 3,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3120,6 +3250,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t WWall NEA,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3136,6 +3267,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t EIWALL N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3154,6 +3286,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3170,6 +3303,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3186,6 +3320,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3202,6 +3337,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Wall 4,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3218,6 +3354,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t WWall S2A,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3234,6 +3371,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t EIWALL SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3252,6 +3390,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3268,6 +3407,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3284,6 +3424,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3300,6 +3441,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Wall 5,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3316,6 +3458,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t WWall SEA,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3332,6 +3475,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t EIWALL S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3350,6 +3494,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3366,6 +3511,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3382,6 +3528,7 @@
     Roof,                    !- Surface Type
     IEAD Res Roof,           !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3398,6 +3545,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Floor C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3414,6 +3562,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t NIWall SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3430,6 +3579,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t SIWall NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3446,6 +3596,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t SIWall NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3462,6 +3613,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t SIWall N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3478,6 +3630,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t SIWall N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3494,6 +3647,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t NIWall S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3510,6 +3664,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t NIWall S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3526,6 +3681,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t NIWall SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3544,6 +3700,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3560,6 +3717,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceiling C,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3576,6 +3734,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3592,6 +3751,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g NIWall SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3608,6 +3768,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g SIWall NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3624,6 +3785,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3640,6 +3802,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g NIWall SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3656,6 +3819,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g NIWall S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3672,6 +3836,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g NIWall S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3688,6 +3853,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g SIWall N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3704,6 +3870,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g SIWall N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3720,6 +3887,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g SIWall NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3738,6 +3906,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3754,6 +3923,7 @@
     Wall,                    !- Surface Type
     Steel Frame Res Ext Wall,!- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3770,6 +3940,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceiling C,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3786,6 +3957,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Floor C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3802,6 +3974,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m SIWall NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3818,6 +3991,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m NIWall SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3834,6 +4008,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m NIWall S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3850,6 +4025,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m NIWall S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3866,6 +4042,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m NIWall SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3882,6 +4059,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m SIWall NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3898,6 +4076,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m SIWall N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3914,6 +4093,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m SIWall N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6277,163 +6457,190 @@
     Office Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Office,                  !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G Corridor Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     G Corridor,              !- Zone or ZoneList Name
-    155.3169;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    155.3169;                !- Extended Field
 
   InternalMass,
     M Corridor Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     M Corridor,              !- Zone or ZoneList Name
-    155.3169;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    155.3169;                !- Extended Field
 
   InternalMass,
     T Corridor Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     T Corridor,              !- Zone or ZoneList Name
-    155.3169;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    155.3169;                !- Extended Field
 
   InternalMass,
     G SW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G SW Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G NW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G NW Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G NE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G NE Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G N1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G N1 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G N2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G N2 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G S1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G S1 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     G S2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G S2 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M SW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M SW Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M NW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M NW Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M SE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M SE Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M NE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M NE Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M N1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M N1 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M N2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M N2 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M S1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M S1 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     M S2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M S2 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T SW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T SW Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T NW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T NW Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T SE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T SE Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T NE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T NE Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T N1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T N1 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T N2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T N2 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T S1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T S1 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
   InternalMass,
     T S2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T S2 Apartment,          !- Zone or ZoneList Name
-    176.4974;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    176.4974;                !- Extended Field
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -13294,146 +13501,122 @@
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:01_OA,     !- Name
     SPLITSYSTEMAC:01_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:01_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:01_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:02_OA,     !- Name
     SPLITSYSTEMAC:02_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:02_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:02_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:03_OA,     !- Name
     SPLITSYSTEMAC:03_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:03_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:03_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:04_OA,     !- Name
     SPLITSYSTEMAC:04_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:04_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:04_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:05_OA,     !- Name
     SPLITSYSTEMAC:05_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:05_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:05_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:06_OA,     !- Name
     SPLITSYSTEMAC:06_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:06_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:06_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:07_OA,     !- Name
     SPLITSYSTEMAC:07_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:07_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:07_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:08_OA,     !- Name
     SPLITSYSTEMAC:08_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:08_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:08_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:09_OA,     !- Name
     SPLITSYSTEMAC:09_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:09_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:09_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:10_OA,     !- Name
     SPLITSYSTEMAC:10_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:10_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:10_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:11_OA,     !- Name
     SPLITSYSTEMAC:11_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:11_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:11_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:12_OA,     !- Name
     SPLITSYSTEMAC:12_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:12_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:12_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:13_OA,     !- Name
     SPLITSYSTEMAC:13_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:13_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:13_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:14_OA,     !- Name
     SPLITSYSTEMAC:14_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:14_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:14_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:15_OA,     !- Name
     SPLITSYSTEMAC:15_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:15_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:15_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:16_OA,     !- Name
     SPLITSYSTEMAC:16_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:16_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:16_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:17_OA,     !- Name
     SPLITSYSTEMAC:17_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:17_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:17_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:18_OA,     !- Name
     SPLITSYSTEMAC:18_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:18_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:18_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:19_OA,     !- Name
     SPLITSYSTEMAC:19_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:19_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:19_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:20_OA,     !- Name
     SPLITSYSTEMAC:20_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:20_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:20_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:21_OA,     !- Name
     SPLITSYSTEMAC:21_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:21_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:21_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:22_OA,     !- Name
     SPLITSYSTEMAC:22_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:22_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:22_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:23_OA,     !- Name
     SPLITSYSTEMAC:23_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:23_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:23_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:24_OA,     !- Name
     SPLITSYSTEMAC:24_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:24_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:24_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     SPLITSYSTEMAC:01_OANode List;  !- Node or NodeList Name 1

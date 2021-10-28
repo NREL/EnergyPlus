@@ -66,7 +66,7 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void HalfLoopData::solve(EnergyPlusData &state, bool const FirstHVACIteration, bool &ReSimOtherSideNeeded)
     {
@@ -659,8 +659,8 @@ namespace DataPlant {
         // Return value
         Real64 LoadToLoopSetPoint = 0.0; // function result
 
-        static std::string const RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
-        static std::string const RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
 
         //~ General variables
         Real64 SumMdotTimesTemp = 0.0;
@@ -903,21 +903,21 @@ namespace DataPlant {
                     auto &component(branch.Comp(CompCounter));
 
                     int NodeToCheckRequest = component.NodeNumIn;
-                    int FlowPriorityStatus = component.FlowPriority;
+                    LoopFlowStatus FlowPriorityStatus = component.FlowPriority;
 
                     // reference
                     auto &node_with_request(state.dataLoopNodes->Node(NodeToCheckRequest));
 
                     if (!component.isPump()) {
 
-                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus_Unknown) {
+                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus::Unknown) {
                             // do nothing
-                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn) {
+                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn) {
                             ThisBranchFlowRequestNeedAndTurnOn = max(ThisBranchFlowRequestNeedAndTurnOn, node_with_request.MassFlowRateRequest);
                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
-                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus_NeedyIfLoopOn) {
+                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::NeedyIfLoopOn) {
                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, node_with_request.MassFlowRateRequest);
-                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus_TakesWhatGets) {
+                        } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::TakesWhatGets) {
                             // do nothing
                         }
                     } else { // handle pumps differently
@@ -1923,7 +1923,7 @@ namespace DataPlant {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
 
         // Init to zero, so that if we don't find anything, we exit early
         Real64 ComponentMassFlowRate(0.0);

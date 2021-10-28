@@ -107,7 +107,7 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
     {
         if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
             GetPVTcollectorsInput(state);
@@ -121,7 +121,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         // If we didn't find it, fatal
-        ShowFatalError(state, "Solar Thermal Collector Factory: Error getting inputs for object named: " + objectName);
+        ShowFatalError(state, "Solar Thermal Collector Factory: Error getting inputs for object named: " + std::string{objectName});
         // Shut up the compiler
         return nullptr;
     }
@@ -428,16 +428,21 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::setupReportVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
-            state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.ThermPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -450,8 +455,8 @@ namespace PhotovoltaicThermalCollectors {
                                 "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarAir",
@@ -459,23 +464,38 @@ namespace PhotovoltaicThermalCollectors {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
-                state, "Generator PVT Fluid Bypass Status", OutputProcessor::Unit::None, this->Report.BypassStatus, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator PVT Fluid Bypass Status",
+                                OutputProcessor::Unit::None,
+                                this->Report.BypassStatus,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         }
 
-        SetupOutputVariable(
-            state, "Generator PVT Fluid Inlet Temperature", OutputProcessor::Unit::C, this->Report.TinletWorkFluid, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator PVT Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.TinletWorkFluid,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.ToutletWorkFluid,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator PVT Fluid Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.MdotWorkFluid,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 
     void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
@@ -490,36 +510,10 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
-        static std::string const RoutineName("InitPVTcollectors");
+        static constexpr std::string_view RoutineName("InitPVTcollectors");
 
         // Do the one time initializations
-        if (this->MyOneTimeFlag) {
-            this->setupReportVars(state);
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->SetLoopIndexFlag) {
-            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (errFlag) {
-                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
-                }
-                this->SetLoopIndexFlag = false;
-            }
-        }
+        this->oneTimeInit(state);
 
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
@@ -920,7 +914,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Current model is "simple" fixed efficiency and simple night sky balance for cooling
 
-        static std::string const RoutineName("CalcPVTcollectors");
+        static constexpr std::string_view RoutineName("CalcPVTcollectors");
 
         int InletNode(0);
 
@@ -1011,7 +1005,7 @@ namespace PhotovoltaicThermalCollectors {
                 ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                                     this->SurfNum,
                                                                     0.0,
-                                                                    DataHeatBalance::VerySmooth,
+                                                                    DataSurfaces::SurfaceRoughness::VerySmooth,
                                                                     this->Simple.SurfEmissivity,
                                                                     this->Simple.LastCollectorTemp,
                                                                     HcExt,
@@ -1121,6 +1115,37 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
     }
+    void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyOneTimeFlag) {
+            this->setupReportVars(state);
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
+                }
+                this->SetLoopIndexFlag = false;
+            }
+        }
+    }
 
     void GetPVTThermalPowerProduction(EnergyPlusData &state, int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
     {
@@ -1150,7 +1175,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound)
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string_view PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1174,14 +1199,15 @@ namespace PhotovoltaicThermalCollectors {
         if (WhichPVT != 0) {
             NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACInletNodeNum;
         } else {
-            ShowSevereError(state, "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + PVTName + "\"");
+            ShowSevereError(state,
+                            "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
             ErrorsFound = true;
             NodeNum = 0;
         }
 
         return NodeNum;
     }
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound)
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string_view PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1205,7 +1231,8 @@ namespace PhotovoltaicThermalCollectors {
         if (WhichPVT != 0) {
             NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACOutletNodeNum;
         } else {
-            ShowSevereError(state, "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + PVTName + "\"");
+            ShowSevereError(state,
+                            "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
             ErrorsFound = true;
             NodeNum = 0;
         }
@@ -1213,7 +1240,7 @@ namespace PhotovoltaicThermalCollectors {
         return NodeNum;
     }
 
-    int getPVTindexFromName(EnergyPlusData &state, std::string const &objectName)
+    int getPVTindexFromName(EnergyPlusData &state, std::string_view objectName)
     {
         if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
             GetPVTcollectorsInput(state);
@@ -1227,7 +1254,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         // If we didn't find it, fatal
-        ShowFatalError(state, "Solar Thermal Collector GetIndexFromName: Error getting inputs for object named: " + objectName);
+        ShowFatalError(state, "Solar Thermal Collector GetIndexFromName: Error getting inputs for object named: " + std::string{objectName});
         assert(false);
         return 0; // Shutup compiler
     }

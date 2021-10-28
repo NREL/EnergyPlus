@@ -891,7 +891,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_EQ("SEVERITYSCHED", state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedule);
         EXPECT_EQ(severitySchedIndex, state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedPtr);
 
-        EXPECT_EQ(FaultsManager::FouledCoil::UARated, state->dataFaultsMgr->FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_TRUE(compare_enums(FaultsManager::FouledCoil::UARated, state->dataFaultsMgr->FouledCoils(FaultIndex).FoulingInputMethod));
         EXPECT_NEAR(3.32, state->dataFaultsMgr->FouledCoils(FaultIndex).UAFouled, 0.0001);
 
         // Check calculation
@@ -920,7 +920,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_EQ("SEVERITYSCHED", state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedule);
         EXPECT_EQ(severitySchedIndex, state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedPtr);
 
-        EXPECT_EQ(FaultsManager::FouledCoil::FoulingFactor, state->dataFaultsMgr->FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_TRUE(compare_enums(FaultsManager::FouledCoil::FoulingFactor, state->dataFaultsMgr->FouledCoils(FaultIndex).FoulingInputMethod));
         EXPECT_NEAR(0.0005, state->dataFaultsMgr->FouledCoils(FaultIndex).Rfw, 0.0001);
         EXPECT_NEAR(0.0001, state->dataFaultsMgr->FouledCoils(FaultIndex).Rfa, 0.0001);
         EXPECT_NEAR(100.0, state->dataFaultsMgr->FouledCoils(FaultIndex).Aout, 0.01);

@@ -106,6 +106,10 @@ namespace PlantValves {
         void initialize(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetPlantValvesInput(EnergyPlusData &state);

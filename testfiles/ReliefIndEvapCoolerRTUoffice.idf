@@ -625,6 +625,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN1_Fl1_S_Space,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -641,6 +642,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN1_Fl1_S_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_Fl1_E_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -657,6 +659,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN1_Fl1_S_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Fl1_W_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -673,6 +676,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN1_Fl1_S_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_Fl1_Core_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -689,6 +693,7 @@
     floor,                   !- Surface Type
     Ext-Slab,                !- Construction Name
     ZN1_Fl1_S_Space,         !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -705,6 +710,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN1_Fl1_S_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_Fl1_S_Plen:floor,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -721,6 +727,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN2_Fl1_S_Plen,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -737,6 +744,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN2_Fl1_S_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_Fl1_E_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -753,6 +761,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN2_Fl1_S_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_Fl1_W_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -769,6 +778,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN2_Fl1_S_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Fl1_Core_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -785,6 +795,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN2_Fl1_S_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_Fl1_S_Space:Ceiling, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -801,6 +812,7 @@
     ceiling,                 !- Surface Type
     Int-Floor-underside,     !- Construction Name
     ZN2_Fl1_S_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN11_Fl2_S_Space:floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -817,6 +829,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN3_Fl1_E_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_Fl1_S_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -833,6 +846,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN3_Fl1_E_Space,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -849,6 +863,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN3_Fl1_E_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_Fl1_Core_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -865,6 +880,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN3_Fl1_E_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_Fl1_N_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -881,6 +897,7 @@
     floor,                   !- Surface Type
     Ext-Slab,                !- Construction Name
     ZN3_Fl1_E_Space,         !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -897,6 +914,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN3_Fl1_E_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_Fl1_E_Plen:floor,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -913,6 +931,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN4_Fl1_E_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_Fl1_S_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -929,6 +948,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN4_Fl1_E_Plen,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -945,6 +965,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN4_Fl1_E_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Fl1_Core_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -961,6 +982,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN4_Fl1_E_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_Fl1_N_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -977,6 +999,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN4_Fl1_E_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_Fl1_E_Space:Ceiling, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -993,6 +1016,7 @@
     ceiling,                 !- Surface Type
     Int-Floor-Underside,     !- Construction Name
     ZN4_Fl1_E_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN13_Fl2_E_Space:floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1009,6 +1033,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN5_Fl1_W_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_Fl1_S_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1025,6 +1050,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN5_Fl1_W_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_Fl1_Core_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1041,6 +1067,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN5_Fl1_W_Space,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1057,6 +1084,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN5_Fl1_W_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_Fl1_N_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1073,6 +1101,7 @@
     floor,                   !- Surface Type
     EXT-Slab,                !- Construction Name
     ZN5_Fl1_W_Space,         !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1089,6 +1118,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN5_Fl1_W_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_Fl1_W_Plen:floor,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1105,6 +1135,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN6_Fl1_W_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_Fl1_S_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1121,6 +1152,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN6_Fl1_W_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Fl1_Core_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1137,6 +1169,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN6_Fl1_W_Plen,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1153,6 +1186,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN6_Fl1_W_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_Fl1_N_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1169,6 +1203,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN6_Fl1_W_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Fl1_W_Space:Ceiling, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1185,6 +1220,7 @@
     ceiling,                 !- Surface Type
     Int-Floor-Underside,     !- Construction Name
     ZN6_Fl1_W_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN15_Fl2_W_Space:floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1201,6 +1237,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN7_Fl1_N_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_Fl1_Core_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1217,6 +1254,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN7_Fl1_N_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_Fl1_E_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1233,6 +1271,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN7_Fl1_N_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Fl1_W_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1249,6 +1288,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN7_Fl1_N_Space,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1265,6 +1305,7 @@
     floor,                   !- Surface Type
     EXT-Slab,                !- Construction Name
     ZN7_Fl1_N_Space,         !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1281,6 +1322,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN7_Fl1_N_Space,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_Fl1_N_Plen:floor,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1297,6 +1339,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN8_Fl1_N_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Fl1_Core_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1313,6 +1356,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN8_Fl1_N_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_Fl1_E_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1329,6 +1373,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN8_Fl1_N_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_Fl1_W_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1345,6 +1390,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN8_Fl1_N_Plen,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1361,6 +1407,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN8_Fl1_N_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_Fl1_N_Space:Ceiling, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1377,6 +1424,7 @@
     ceiling,                 !- Surface Type
     Int-Floor-Underside,     !- Construction Name
     ZN8_Fl1_N_Plen,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN17_Fl2_N_Space:floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1393,6 +1441,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN9_Fl1_Core_Space,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_Fl1_S_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1409,6 +1458,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN9_Fl1_Core_Space,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_Fl1_E_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1425,6 +1475,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN9_Fl1_Core_Space,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Fl1_W_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1441,6 +1492,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN9_Fl1_Core_Space,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_Fl1_N_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1457,6 +1509,7 @@
     floor,                   !- Surface Type
     EXT-Slab,                !- Construction Name
     ZN9_Fl1_Core_Space,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1473,6 +1526,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN9_Fl1_Core_Space,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Fl1_Core_Plen:floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1489,6 +1543,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN10_Fl1_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_Fl1_S_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1505,6 +1560,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN10_Fl1_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_Fl1_E_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1521,6 +1577,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN10_Fl1_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_Fl1_W_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1537,6 +1594,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN10_Fl1_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_Fl1_N_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1553,6 +1611,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN10_Fl1_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_Fl1_Core_Space:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1569,6 +1628,7 @@
     ceiling,                 !- Surface Type
     Int-Floor-underside,     !- Construction Name
     ZN10_Fl1_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN19_Fl2_Core_Space:floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1585,6 +1645,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN11_Fl2_S_Space,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1601,6 +1662,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN11_Fl2_S_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN13_Fl2_E_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1617,6 +1679,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN11_Fl2_S_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN15_Fl2_W_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1633,6 +1696,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN11_Fl2_S_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN19_Fl2_Core_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1649,6 +1713,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN11_Fl2_S_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_Fl1_S_Plen:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1665,6 +1730,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN11_Fl2_S_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN12_Fl2_S_Plen:floor,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1681,6 +1747,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN12_Fl2_S_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1697,6 +1764,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN12_Fl2_S_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN14_Fl2_E_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1713,6 +1781,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN12_Fl2_S_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN16_Fl2_W_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1729,6 +1798,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN12_Fl2_S_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN20_Fl2_Core_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1745,6 +1815,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN12_Fl2_S_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN11_Fl2_S_Space:Ceiling,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1761,6 +1832,7 @@
     roof,                    !- Surface Type
     Roof,                    !- Construction Name
     ZN12_Fl2_S_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1777,6 +1849,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN13_Fl2_E_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN11_Fl2_S_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1793,6 +1866,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN13_Fl2_E_Space,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1809,6 +1883,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN13_Fl2_E_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN19_Fl2_Core_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1825,6 +1900,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN13_Fl2_E_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN17_Fl2_N_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1841,6 +1917,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN13_Fl2_E_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_Fl1_E_Plen:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1857,6 +1934,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN13_Fl2_E_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN14_Fl2_E_Plen:floor,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1873,6 +1951,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN14_Fl2_E_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN12_Fl2_S_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1889,6 +1968,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN14_Fl2_E_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1905,6 +1985,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN14_Fl2_E_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN20_Fl2_Core_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1921,6 +2002,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN14_Fl2_E_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN18_Fl2_N_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1937,6 +2019,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN14_Fl2_E_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN13_Fl2_E_Space:Ceiling,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1953,6 +2036,7 @@
     roof,                    !- Surface Type
     Roof,                    !- Construction Name
     ZN14_Fl2_E_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1969,6 +2053,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN15_Fl2_W_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN11_Fl2_S_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1985,6 +2070,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN15_Fl2_W_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN19_Fl2_Core_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2001,6 +2087,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN15_Fl2_W_Space,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2017,6 +2104,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN15_Fl2_W_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN17_Fl2_N_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2033,6 +2121,7 @@
     floor,                   !- Surface Type
     Int-Floor-Topside,       !- Construction Name
     ZN15_Fl2_W_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_Fl1_W_Plen:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2049,6 +2138,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN15_Fl2_W_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN16_Fl2_W_Plen:floor,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2065,6 +2155,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN16_Fl2_W_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN12_Fl2_S_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2081,6 +2172,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN16_Fl2_W_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN20_Fl2_Core_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2097,6 +2189,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN16_Fl2_W_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2113,6 +2206,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN16_Fl2_W_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN18_Fl2_N_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2129,6 +2223,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN16_Fl2_W_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN15_Fl2_W_Space:Ceiling,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2145,6 +2240,7 @@
     roof,                    !- Surface Type
     Roof,                    !- Construction Name
     ZN16_Fl2_W_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2161,6 +2257,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN17_Fl2_N_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN19_Fl2_Core_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2177,6 +2274,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN17_Fl2_N_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN13_Fl2_E_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2193,6 +2291,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN17_Fl2_N_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN15_Fl2_W_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2209,6 +2308,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN17_Fl2_N_Space,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2225,6 +2325,7 @@
     floor,                   !- Surface Type
     Int-Floor-Topside,       !- Construction Name
     ZN17_Fl2_N_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_Fl1_N_Plen:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2241,6 +2342,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN17_Fl2_N_Space,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN18_Fl2_N_Plen:floor,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2257,6 +2359,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN18_Fl2_N_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN20_Fl2_Core_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2273,6 +2376,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN18_Fl2_N_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN14_Fl2_E_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2289,6 +2393,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN18_Fl2_N_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN16_Fl2_W_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2305,6 +2410,7 @@
     wall,                    !- Surface Type
     Ext-Wall,                !- Construction Name
     ZN18_Fl2_N_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2321,6 +2427,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN18_Fl2_N_Plen,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN17_Fl2_N_Space:Ceiling,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2337,6 +2444,7 @@
     roof,                    !- Surface Type
     Roof,                    !- Construction Name
     ZN18_Fl2_N_Plen,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2353,6 +2461,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN19_Fl2_Core_Space,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN11_Fl2_S_Space:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2369,6 +2478,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN19_Fl2_Core_Space,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN13_Fl2_E_Space:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2385,6 +2495,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN19_Fl2_Core_Space,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN15_Fl2_W_Space:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2401,6 +2512,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN19_Fl2_Core_Space,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN17_Fl2_N_Space:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2417,6 +2529,7 @@
     floor,                   !- Surface Type
     INT-Floor-topside,       !- Construction Name
     ZN19_Fl2_Core_Space,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Fl1_Core_Plen:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2433,6 +2546,7 @@
     ceiling,                 !- Surface Type
     dropceiling,             !- Construction Name
     ZN19_Fl2_Core_Space,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN20_Fl2_Core_Plen:floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2449,6 +2563,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN20_Fl2_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN12_Fl2_S_Plen:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2465,6 +2580,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN20_Fl2_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN14_Fl2_E_Plen:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2481,6 +2597,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN20_Fl2_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN16_Fl2_W_Plen:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2497,6 +2614,7 @@
     wall,                    !- Surface Type
     Int-Wall,                !- Construction Name
     ZN20_Fl2_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN18_Fl2_N_Plen:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2513,6 +2631,7 @@
     floor,                   !- Surface Type
     dropceiling,             !- Construction Name
     ZN20_Fl2_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN19_Fl2_Core_Space:Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2529,6 +2648,7 @@
     roof,                    !- Surface Type
     Roof,                    !- Construction Name
     ZN20_Fl2_Core_Plen,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3905,8 +4025,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN1,              !- Name
     OA Sys ZN1 Controllers,  !- Controller List Name
-    OA Sys ZN1 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN1 Avail List;   !- Availability Manager List Name
+    OA Sys ZN1 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN1;!- Node or NodeList Name 1
@@ -4255,8 +4374,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN3,              !- Name
     OA Sys ZN3 Controllers,  !- Controller List Name
-    OA Sys ZN3 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN3 Avail List;   !- Availability Manager List Name
+    OA Sys ZN3 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN3;!- Node or NodeList Name 1
@@ -4605,8 +4723,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN5,              !- Name
     OA Sys ZN5 Controllers,  !- Controller List Name
-    OA Sys ZN5 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN5 Avail List;   !- Availability Manager List Name
+    OA Sys ZN5 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN5;!- Node or NodeList Name 1
@@ -4955,8 +5072,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN7,              !- Name
     OA Sys ZN7 Controllers,  !- Controller List Name
-    OA Sys ZN7 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN7 Avail List;   !- Availability Manager List Name
+    OA Sys ZN7 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN7;!- Node or NodeList Name 1
@@ -5305,8 +5421,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN9,              !- Name
     OA Sys ZN9 Controllers,  !- Controller List Name
-    OA Sys ZN9 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN9 Avail List;   !- Availability Manager List Name
+    OA Sys ZN9 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN9;!- Node or NodeList Name 1
@@ -5655,8 +5770,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN11,             !- Name
     OA Sys ZN11 Controllers, !- Controller List Name
-    OA Sys ZN11 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN11 Avail List;  !- Availability Manager List Name
+    OA Sys ZN11 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN11;  !- Node or NodeList Name 1
@@ -6005,8 +6119,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN13,             !- Name
     OA Sys ZN13 Controllers, !- Controller List Name
-    OA Sys ZN13 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN13 Avail List;  !- Availability Manager List Name
+    OA Sys ZN13 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN13;  !- Node or NodeList Name 1
@@ -6355,8 +6468,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN15,             !- Name
     OA Sys ZN15 Controllers, !- Controller List Name
-    OA Sys ZN15 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN15 Avail List;  !- Availability Manager List Name
+    OA Sys ZN15 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN15;  !- Node or NodeList Name 1
@@ -6705,8 +6817,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN17,             !- Name
     OA Sys ZN17 Controllers, !- Controller List Name
-    OA Sys ZN17 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN17 Avail List;  !- Availability Manager List Name
+    OA Sys ZN17 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN17;  !- Node or NodeList Name 1
@@ -7055,8 +7166,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN19,             !- Name
     OA Sys ZN19 Controllers, !- Controller List Name
-    OA Sys ZN19 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN19 Avail List;  !- Availability Manager List Name
+    OA Sys ZN19 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN19;  !- Node or NodeList Name 1

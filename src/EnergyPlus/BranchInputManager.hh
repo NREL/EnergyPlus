@@ -211,7 +211,7 @@ namespace BranchInputManager {
 
     int NumCompsInBranch(EnergyPlusData &state, std::string const &BranchName);
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string const &CompName);
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string_view CompName);
 
     void GetBranchFanTypeName(EnergyPlusData &state,
                               int BranchNum,
@@ -285,7 +285,7 @@ namespace BranchInputManager {
     void GetBranchInput(EnergyPlusData &state);
 
     void GetSingleBranchInput(EnergyPlusData &state,
-                              std::string const &RoutineName,
+                              std::string_view const RoutineName,
                               int BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,

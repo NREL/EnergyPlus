@@ -303,6 +303,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     OSCTest,                 !- Zone Name
+    ,                        !- Space Name
     OtherSideCoefficients,   !- Outside Boundary Condition
     ExampleOSC,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -319,6 +320,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     OSCTest,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     OSCTest:East Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -335,6 +337,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     OSCTest,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     OSCTest:North Wall,      !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -351,6 +354,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     OSCTest,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     OSCTest:West Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -367,6 +371,7 @@
     Ceiling,                 !- Surface Type
     CeilingTile,             !- Construction Name
     OSCTest,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     OSCTest:Ceiling,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -383,6 +388,7 @@
     Floor,                   !- Surface Type
     SlabFloor,               !- Construction Name
     OSCTest,                 !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     OSCTest:Floor,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -398,7 +404,8 @@
     OSCTest:PartitionIntMass,!- Name
     InteriorWall,            !- Construction Name
     OSCTest,                 !- Zone or ZoneList Name
-    92.9;                    !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    92.9;                    !- Extended Field
 
   SurfaceProperty:OtherSideCoefficients,
     ExampleOSC,              !- Name

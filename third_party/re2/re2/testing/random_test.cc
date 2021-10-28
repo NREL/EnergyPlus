@@ -9,12 +9,13 @@
 #include <vector>
 
 #include "util/test.h"
+#include "util/flags.h"
 #include "re2/testing/exhaustive_tester.h"
 
-DEFINE_int32(regexpseed, 404, "Random regexp seed.");
-DEFINE_int32(regexpcount, 100, "How many random regexps to generate.");
-DEFINE_int32(stringseed, 200, "Random string seed.");
-DEFINE_int32(stringcount, 100, "How many random strings to generate.");
+DEFINE_FLAG(int, regexpseed, 404, "Random regexp seed.");
+DEFINE_FLAG(int, regexpcount, 100, "How many random regexps to generate.");
+DEFINE_FLAG(int, stringseed, 200, "Random string seed.");
+DEFINE_FLAG(int, stringcount, 100, "How many random strings to generate.");
 
 namespace re2 {
 
@@ -37,8 +38,10 @@ static void RandomTest(int maxatoms, int maxops,
 
   ExhaustiveTester t(maxatoms, maxops, alphabet, ops,
                      maxstrlen, stralphabet, wrapper, "");
-  t.RandomStrings(FLAGS_stringseed, FLAGS_stringcount);
-  t.GenerateRandom(FLAGS_regexpseed, FLAGS_regexpcount);
+  t.RandomStrings(GetFlag(FLAGS_stringseed),
+                  GetFlag(FLAGS_stringcount));
+  t.GenerateRandom(GetFlag(FLAGS_regexpseed),
+                   GetFlag(FLAGS_regexpcount));
   printf("%d regexps, %d tests, %d failures [%d/%d str]\n",
          t.regexps(), t.tests(), t.failures(), maxstrlen, (int)stralphabet.size());
   EXPECT_EQ(0, t.failures());
@@ -96,4 +99,3 @@ TEST(Random, Complicated) {
 }
 
 }  // namespace re2
-

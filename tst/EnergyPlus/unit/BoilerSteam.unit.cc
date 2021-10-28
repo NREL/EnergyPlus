@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
+    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS")));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
     EXPECT_EQ(thisBoiler.NomEffic, 0.8);
     EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);

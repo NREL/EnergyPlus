@@ -100,15 +100,16 @@ namespace DataHeatBalFanSys {
 
 struct HeatBalFanSysData : BaseGlobalStruct
 {
-    Array1D<Real64> SumConvHTRadSys;         // Sum of convection to zone air from hi temp radiant heaters
-    Array1D<Real64> SumLatentHTRadSys;       // Sum of latent gains from hi temp radiant heaters
-    Array1D<Real64> SumConvPool;             // Sum of convection to zone air from pools
-    Array1D<Real64> SumLatentPool;           // Sum of latent gains from pools
-    Array1D<Real64> QHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
-    Array1D<Real64> QHWBaseboardToPerson;    // Sum of radiant gains to people from hot water baseboard heaters
-    Array1D<Real64> QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
-    Array1D<Real64> QElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
-    Array1D<Real64> QCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
+    Array1D<Real64> SumConvHTRadSys;             // Sum of convection to zone air from hi temp radiant heaters
+    Array1D<Real64> SumLatentHTRadSys;           // Sum of latent gains from hi temp radiant heaters
+    Array1D<Real64> SumConvPool;                 // Sum of convection to zone air from pools
+    Array1D<Real64> SumLatentPool;               // Sum of latent gains from pools
+    Array1D<Real64> ZoneQdotRadHVACToPerson;     // Sum of radiant gains to people from all radiant HVAC sources
+    Array1D<Real64> ZoneQHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
+    Array1D<Real64> ZoneQHWBaseboardToPerson;    // Sum of radiant gains to people from hot water baseboard heaters
+    Array1D<Real64> ZoneQSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
+    Array1D<Real64> ZoneQElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
+    Array1D<Real64> ZoneQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
     // Zone air drybulb conditions variables
     Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
     Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
@@ -198,15 +199,15 @@ struct HeatBalFanSysData : BaseGlobalStruct
     // temperature at source
     Array1D<Real64> CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
     // temperature at the user specified location
-    Array1D<Real64> QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
+    Array1D<Real64> SurfQHTRadSys; // Current radiant heat flux at a surface due to the presence
     // of high temperature radiant heaters
-    Array1D<Real64> QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence
+    Array1D<Real64> SurfQHWBaseboard; // Current radiant heat flux at a surface due to the presence
     // of hot water baseboard heaters
-    Array1D<Real64> QSteamBaseboardSurf; // Current radiant heat flux at a surface due to the presence
+    Array1D<Real64> SurfQSteamBaseboard; // Current radiant heat flux at a surface due to the presence
     // of steam baseboard heaters
-    Array1D<Real64> QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
+    Array1D<Real64> SurfQElecBaseboard; // Current radiant heat flux at a surface due to the presence
     // of electric baseboard heaters
-    Array1D<Real64> QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
+    Array1D<Real64> SurfQCoolingPanel; // Current radiant heat flux at a surface due to the presence
     // of simple cooling panels
     Array1D<Real64> QRadSurfAFNDuct;     // Current radiant heat flux at a surface due to radiation from AFN ducts
     Array1D<Real64> QPoolSurfNumerator;  // Current pool heat flux impact at the surface (numerator of surface heat balance)
@@ -280,10 +281,12 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->SumLatentHTRadSys.deallocate();
         this->SumConvPool.deallocate();
         this->SumLatentPool.deallocate();
-        this->QHTRadSysToPerson.deallocate();
-        this->QHWBaseboardToPerson.deallocate();
-        this->QSteamBaseboardToPerson.deallocate();
-        this->QElecBaseboardToPerson.deallocate();
+        this->ZoneQdotRadHVACToPerson.deallocate();
+        this->ZoneQHTRadSysToPerson.deallocate();
+        this->ZoneQHWBaseboardToPerson.deallocate();
+        this->ZoneQSteamBaseboardToPerson.deallocate();
+        this->ZoneQElecBaseboardToPerson.deallocate();
+        this->ZoneQCoolingPanelToPerson.deallocate();
         this->ZTAV.deallocate();
         this->MAT.deallocate();
         this->TempTstatAir.deallocate();
@@ -350,10 +353,10 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->QPVSysSource.deallocate();
         this->CTFTsrcConstPart.deallocate();
         this->CTFTuserConstPart.deallocate();
-        this->QHTRadSysSurf.deallocate();
-        this->QHWBaseboardSurf.deallocate();
-        this->QSteamBaseboardSurf.deallocate();
-        this->QElecBaseboardSurf.deallocate();
+        this->SurfQHTRadSys.deallocate();
+        this->SurfQHWBaseboard.deallocate();
+        this->SurfQSteamBaseboard.deallocate();
+        this->SurfQElecBaseboard.deallocate();
         this->QPoolSurfNumerator.deallocate();
         this->QRadSurfAFNDuct.deallocate();
         this->PoolHeatTransCoefs.deallocate();

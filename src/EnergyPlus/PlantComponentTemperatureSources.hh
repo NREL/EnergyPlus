@@ -137,6 +137,8 @@ namespace PlantComponentTemperatureSources {
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetWaterSourceInput(EnergyPlusData &state);

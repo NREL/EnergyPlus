@@ -2623,8 +2623,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
-    std::string FreqString;    // temporary
-    std::string VarTypeString; // temporary
+    OutputProcessor::SOVTimeStepType FreqString; // temporary
+    OutputProcessor::SOVStoreType VarTypeString; // temporary
     std::string ResourceTypeString;
     std::string GroupTypeString;
     std::string EndUseTypeString;
@@ -2828,7 +2828,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                             state, cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                     }
                     if (lAlphaFieldBlanks(ErlVarLoop)) {
-                        ShowWarningError(state, RoutineName + cCurrentModuleObject);
+                        ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject);
                         ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
                         ShowContinueError(state, "Blank entry will be skipped, and the simulation continues");
                     } else if (!errFlag) {
@@ -2836,7 +2836,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         // Still need to check for conflicts with program and function names too
 
                         if (VariableNum > 0) {
-                            ShowSevereError(state, RoutineName + cCurrentModuleObject + ", invalid entry.");
+                            ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + ", invalid entry.");
                             ShowContinueError(state, "Invalid " + cAlphaFieldNames(ErlVarLoop) + '=' + cAlphaArgs(ErlVarLoop));
                             ShowContinueError(state, "Name conflicts with an existing global variable name");
                             ErrorsFound = true;
@@ -2874,14 +2874,14 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 // check if variable name is unique and well formed
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (lAlphaFieldBlanks(1)) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject);
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject);
                     ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
                     ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                     ErrorsFound = true;
                 } else if (!errFlag) {
                     VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
                     if (VariableNum > 0) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
                         ShowContinueError(state, "Name conflicts with an existing variable name");
                         ErrorsFound = true;
@@ -2896,11 +2896,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                 if (CurveIndexNum == 0) {
                     if (lAlphaFieldBlanks(2)) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
                         ShowContinueError(state, "Blank " + cAlphaFieldNames(2));
                         ShowContinueError(state, "Blank entry for curve or table name is not allowed");
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "Curve or table was not found.");
                     }
@@ -2934,14 +2934,14 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 // check if variable name is unique and well formed
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (lAlphaFieldBlanks(1)) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject);
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject);
                     ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
                     ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                     ErrorsFound = true;
                 } else if (!errFlag) {
                     VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
                     if (VariableNum > 0) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
                         ShowContinueError(state, "Name conflicts with an existing variable name");
                         ErrorsFound = true;
@@ -2959,11 +2959,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 if (ConstructNum == 0) {
                     if (lAlphaFieldBlanks(2)) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
                         ShowContinueError(state, "Blank " + cAlphaFieldNames(2));
                         ShowContinueError(state, "Blank entry for construction name is not allowed");
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "Construction was not found.");
                     }
@@ -3078,7 +3078,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 VariableNum = FindEMSVariable(state, cAlphaArgs(2), 0);
                 // Still need to check for conflicts with program and function names too
                 if (VariableNum == 0) { // did not find it
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                     ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                     ShowContinueError(state, "Did not find a match with an EMS variable name");
                     ErrorsFound = true;
@@ -3113,7 +3113,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         }
                     }
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                     ShowContinueError(state, format("Invalid {}={:.2T}", cNumericFieldNames(1), rNumericArgs(1)));
                     ShowContinueError(state, "must be greater than zero");
                     ErrorsFound = true;
@@ -3209,14 +3209,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                     if (UnitsA != "" && UnitsB != "") {
                         if (UnitsA != UnitsB) {
-                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
+                            ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
                             ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                             ShowContinueError(state, "..." + cAlphaFieldNames(6) + "=\"" + UnitsB + "\" (will be used)");
                         }
                     } else if (UnitsB == "" && UnitsA != "") {
                         UnitsB = UnitsA;
                         ShowWarningError(state,
-                                         RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                             "\" using deprecated units designation.");
                         ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                     }
                 }
@@ -3235,7 +3236,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                     if (!Found) {
                         StackNum = 0;
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                         ShowContinueError(state, "EMS program or subroutine not found.");
                         ErrorsFound = true;
@@ -3248,11 +3249,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 if (VariableNum == 0) {
                     if (lAlphaFieldBlanks(5)) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "EMS variable not found among global variables.");
                     } else if (StackNum != 0) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "EMS variable not found among local variables in " + cAlphaArgs(5));
                     }
@@ -3270,11 +3271,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     auto const SELECT_CASE_var(cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "AVERAGED") {
-                        VarTypeString = "Average";
+                        VarTypeString = OutputProcessor::SOVStoreType::Average;
                     } else if (SELECT_CASE_var == "SUMMED") {
-                        VarTypeString = "Sum";
+                        VarTypeString = OutputProcessor::SOVStoreType::Summed;
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ShowContinueError(state, "...valid values are Averaged or Summed.");
                         ErrorsFound = true;
@@ -3285,11 +3286,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     auto const SELECT_CASE_var(cAlphaArgs(4));
 
                     if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = "Zone";
+                        FreqString = OutputProcessor::SOVTimeStepType::Zone;
                     } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = "System";
+                        FreqString = OutputProcessor::SOVTimeStepType::System;
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
                         ErrorsFound = true;
@@ -3390,14 +3391,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                     if (UnitsA != "" && UnitsB != "") {
                         if (UnitsA != UnitsB) {
-                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
+                            ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
                             ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                             ShowContinueError(state, "..." + cAlphaFieldNames(9) + "=\"" + UnitsB + "\" (will be used)");
                         }
                     } else if (UnitsB == "" && UnitsA != "") {
                         UnitsB = UnitsA;
                         ShowWarningError(state,
-                                         RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                             "\" using deprecated units designation.");
                         ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                     }
                 }
@@ -3416,7 +3418,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                     if (!Found) {
                         StackNum = 0;
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError(state, "EMS program or subroutine not found.");
                         ErrorsFound = true;
@@ -3428,11 +3430,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 VariableNum = FindEMSVariable(state, cAlphaArgs(2), StackNum);
                 if (VariableNum == 0) {
                     if (lAlphaFieldBlanks(4)) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "EMS variable not found among global variables.");
                     } else if (StackNum != 0) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "EMS variable not found among local variables in " + cAlphaArgs(5));
                     }
@@ -3446,17 +3448,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                VarTypeString = "Sum"; // all metered vars are sum type
+                VarTypeString = OutputProcessor::SOVStoreType::Summed; // all metered vars are sum type
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = "Zone";
+                        FreqString = OutputProcessor::SOVTimeStepType::Zone;
                     } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = "System";
+                        FreqString = OutputProcessor::SOVTimeStepType::System;
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
                         ErrorsFound = true;
@@ -3514,7 +3516,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == "SOLARAIRHEATING") {
                         ResourceTypeString = "SolarAir";
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                         ErrorsFound = true;
                     }
@@ -3533,7 +3535,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == "SYSTEM") {
                         GroupTypeString = "System";
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                         ErrorsFound = true;
                     }
@@ -3586,7 +3588,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == "HEATRECOVERYFORHEATING") {
                         EndUseTypeString = "HeatRecoveryForHeating";
                     } else {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                         ErrorsFound = true;
                     }
@@ -3597,7 +3599,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     (EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" ||
                      EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" ||
                      EndUseTypeString == "HeatRecoveryForHeating")) {
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                     ShowContinueError(state,
                                       "Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5) + " for " + cAlphaFieldNames(7) + "=" + cAlphaArgs(7));
                     ShowContinueError(state, "Field " + cAlphaFieldNames(5) + " is reset from " + cAlphaArgs(5) + " to EnergyTransfer");

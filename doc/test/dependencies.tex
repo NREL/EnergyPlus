@@ -1,32 +1,65 @@
-\documentclass{report}
-
-\usepackage{amssymb,amsmath}
-\usepackage[math]{mathspec}
-\usepackage[margin=0.75in, top=1in]{geometry}
-\usepackage{graphicx,grffile}
-\usepackage[table,svgnames]{xcolor}
-\usepackage{framed}
-\usepackage{longtable,booktabs}
-\usepackage{multirow}
-\usepackage{listings}
-\usepackage{enumitem}
-\usepackage[per-mode=symbol]{siunitx}
+\input{../header}
 
 \title{Test Build with Dependencies}
 \author{Probably CI}
 \date{\today}
 
+\hypersetup{unicode=true,
+            pdftitle={Input Output Reference},
+            pdfauthor={U.S. Department of Energy},
+            colorlinks=true,
+            linkcolor=Maroon,
+            citecolor=Blue,
+            urlcolor=Blue,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+
 \begin{document}
+
+% Reference for making your own Title Page:
+% http://tex.stackexchange.com/questions/10130/use-the-values-of-title-author-and-date-on-a-custom-title-page
+\makeatletter
+\begin{titlepage}
+  \begin{center}
+    {\scshape\LARGE EnergyPlus\texttrademark{} Test Documentation \par}
+    \vspace{1.5cm}
+    {\bfseries\huge \@title \par}
+    \vspace{1.5cm}
+    {\Large\itshape \@author \par}
+    \vspace{2.5cm}
 
     This document is a test to make sure the build system can build the rest of the documentation.
     It should be built with XeTeX, which is the core dependency for building the E+ docs.
 
-    The package listing above should really be kept up to date with the main header.tex, maybe we could split out
-    these dependencies into a standalone file so we can import them from both header.tex and here.
-    One less manual step.
-
     In any case, when a developer attempts to build this on a machine, it will have a nice benefit of installing the missing packages (if the install is set up to do that).
     This is especially nice for CI package builds because miktex is acting weird while trying to build all the documents in multiple threads.
-    I think the package update manager is getting confused occasionally with everything going on.
+    When it tries to install packages or update the fndb, it writes a few lock files, so if you do that in parallel it fails
+    \vfill
+
+
+    % Bottom of the page
+    {\large \today \par}
+    \vspace{1.5cm}
+    {\large Build: 7d8b8c6b02 \par}
+  \end{center}
+  {\small
+  }
+\end{titlepage}
+\makeatother
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+
+\hypertarget{generated-toc}{}
+
+\chapter{A chapter}\label{chapter-1}
+
+A chapter
+
+\section{A section}\label{chapter-1-section-1}
+
+An example section
 
 \end{document}

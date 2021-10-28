@@ -24,6 +24,11 @@ jobs:
       with:
         python-version: 3.7
 
+    - name: Setup QtIFW 4.x
+      uses: jmarrec/setup-qtifw@v1
+      with:
+        qtifw-version: '4.x'
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -36,14 +41,6 @@ jobs:
         echo "Using Apt to install dependencies"
         sudo apt-get update
         sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
-
-    - name: Install IFW
-      shell: bash
-      run: |
-        set -x
-        out_dir=${{ runner.workspace }}/Qt
-        aqt tool linux tools_ifw 4.1 qt.tools.ifw.41 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.1/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/

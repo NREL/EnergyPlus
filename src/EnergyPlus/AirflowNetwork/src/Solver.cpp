@@ -88,10 +88,16 @@ namespace AirflowNetwork {
 
     // Functions
 
-    AirProperties::AirProperties(double const airDensity)
+    AirProperties::AirProperties(double const density)
     {
-        this->density = airDensity;
-        this->sqrtDensity = sqrt(airDensity);
+        this->density = density;
+        this->sqrt_density = sqrt(density);
+    }
+
+    AirProperties::AirProperties()
+        : temperature(20.0), humidity_ratio(0.0), density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
+          sqrt_density(std::sqrt(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0))), viscosity(AIRDYNAMICVISCOSITY(20.0))
+    {
     }
 
     void Solver::allocate(EnergyPlusData &state)
@@ -205,7 +211,7 @@ namespace AirflowNetwork {
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
             properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
+            properties[i].humidity_ratio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
 
@@ -334,7 +340,7 @@ namespace AirflowNetwork {
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
             properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
+            properties[i].humidity_ratio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
     }
@@ -470,15 +476,15 @@ namespace AirflowNetwork {
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
+            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidity_ratio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).ExtNodeNum > 0) {
                 properties[n].density =
                     AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
                 properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
-                properties[n].humidityRatio = state.dataEnvrn->OutHumRat;
+                properties[n].humidity_ratio = state.dataEnvrn->OutHumRat;
             }
-            properties[n].sqrtDensity = std::sqrt(properties[n].density);
+            properties[n].sqrt_density = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
             // if (LIST >= 2) ObjexxFCL::gio::write(outputFile, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
@@ -886,7 +892,7 @@ namespace AirflowNetwork {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
             }
             Real64 multiplier = 1.0;
-            Real64 control = 1.0;
+            Real64 control = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).control;
             // if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum;
 
@@ -1012,18 +1018,16 @@ namespace AirflowNetwork {
 #endif
     }
 
-    int GenericCrack(EnergyPlusData &state,
-                     Real64 &coef,               // Flow coefficient
-                     Real64 const expn,          // Flow exponent
-                     bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                     Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                     const AirProperties &propN, // Node 1 properties
-                     const AirProperties &propM, // Node 2 properties
-                     std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    void generic_crack(Real64 &coefficient,        // Flow coefficient
+                       Real64 const exponent,      // Flow exponent
+                       bool const linear,          // Initialization flag. If true, use linear relationship
+                       Real64 const pdrop,         // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirProperties &propN, // Node 1 properties
+                       const AirProperties &propM, // Node 2 properties
+                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1031,6 +1035,7 @@ namespace AirflowNetwork {
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
         //       RE-ENGINEERED  This subroutine is revised from AFEPLR developed by George Walton, NIST
+        //                      Jason DeGraw
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a power law component
@@ -1041,98 +1046,59 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
+        // FLOW:
+        // Calculate normal density and viscocity at reference conditions
+        constexpr Real64 reference_density = AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0);
+        constexpr Real64 reference_viscosity = 1.71432e-5 + 4.828e-8 * 20.0;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
+        Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
+        Real64 sign{1.0};
+        Real64 upwind_temperature{propN.temperature};
+        Real64 upwind_density{propN.density};
+        Real64 upwind_viscosity{propN.viscosity};
+        Real64 upwind_sqrt_density{propN.sqrt_density};
+        Real64 abs_pdrop = pdrop;
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 RhozNorm;
-        Real64 VisczNorm;
-        Real64 Ctl;
-        Real64 VisAve;
-        Real64 Tave;
-        Real64 RhoCor;
-
-        // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
-        VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
-        VisAve = (propN.viscosity + propM.viscosity) / 2.0;
-        Tave = (propN.temperature + propM.temperature) / 2.0;
-        if (PDROP >= 0.0) {
-            coef /= propN.sqrtDensity;
-        } else {
-            coef /= propM.sqrtDensity;
+        if (pdrop < 0.0) {
+            sign = -1.0;
+            upwind_temperature = propM.temperature;
+            upwind_density = propM.density;
+            upwind_viscosity = propM.viscosity;
+            upwind_sqrt_density = propM.sqrt_density;
+            abs_pdrop = -pdrop;
         }
 
-        if (LFLAG) {
-            // Initialization by linear relation.
-            if (PDROP >= 0.0) {
-                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                DF[0] = coef * propN.density / propN.viscosity * Ctl;
-            } else {
-                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                DF[0] = coef * propM.density / propM.viscosity * Ctl;
-            }
-            F[0] = -DF[0] * PDROP;
+        Real64 coef = coefficient / upwind_sqrt_density;
+
+        // Laminar calculation
+        Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
+        Real64 Ctl{std::pow(reference_density / upwind_density / RhoCor, exponent - 1.0) *
+                   std::pow(reference_viscosity / VisAve, 2.0 * exponent - 1.0)};
+        Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
+        Real64 FL{CDM * pdrop};
+
+        if (linear) {
+            DF[0] = CDM;
+            F[0] = FL;
         } else {
-            // Standard calculation.
-            if (PDROP >= 0.0) {
-                // Flow in positive direction.
-                // Laminar flow.
-                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propN.density / propN.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
-                } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
-                }
+            // Turbulent flow.
+            Real64 abs_FT;
+            if (exponent == 0.5) {
+                abs_FT = coef * upwind_sqrt_density * std::sqrt(abs_pdrop) * Ctl;
             } else {
-                // Flow in negative direction.
-                // Laminar flow.
-                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, 2.0 * expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propM.density / propM.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
-                } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
-                }
+                abs_FT = coef * upwind_sqrt_density * std::pow(abs_pdrop, exponent) * Ctl;
             }
-            // Select laminar or turbulent flow.
-            //            if (LIST >= 4) {
-            //                static ObjexxFCL::gio::Fmt Format_901("(A5,6X,4E16.7)");
-            //                print(std::cout, " generic crack: {:5}      {:16.7E} {16.7E}\n", PDROP, FL, FT);
-            //            }
-            if (std::abs(FL) <= std::abs(FT)) {
+            // Select linear or nonlinear flow.
+            if (std::abs(FL) <= abs_FT) {
                 F[0] = FL;
                 DF[0] = CDM;
             } else {
-                F[0] = FT;
-                DF[0] = FT * expn / PDROP;
+                F[0] = sign * abs_FT;
+                DF[0] = F[0] * exponent / pdrop;
             }
         }
-        return 1;
     }
 
     int GenericDuct(Real64 const Length,        // Duct length
@@ -2065,9 +2031,9 @@ namespace AirflowNetwork {
             auto &solver = state.dataAFNSolver->solver;
 
             TempL1 = solver.properties[From].temperature;
-            Xhl1 = solver.properties[From].humidityRatio;
+            Xhl1 = solver.properties[From].humidity_ratio;
             TzFrom = solver.properties[From].temperature;
-            XhzFrom = solver.properties[From].humidityRatio;
+            XhzFrom = solver.properties[From].humidity_ratio;
             RhoL1 = solver.properties[From].density;
             if (ll == 0 || ll == 3) {
                 PzFrom = solver.PZ(From);
@@ -2085,9 +2051,9 @@ namespace AirflowNetwork {
             }
 
             TempL2 = solver.properties[To].temperature;
-            Xhl2 = solver.properties[To].humidityRatio;
+            Xhl2 = solver.properties[To].humidity_ratio;
             TzTo = solver.properties[To].temperature;
-            XhzTo = solver.properties[To].humidityRatio;
+            XhzTo = solver.properties[To].humidity_ratio;
             RhoL2 = solver.properties[To].density;
 
             if (ll < 3) {

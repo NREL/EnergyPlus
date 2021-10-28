@@ -129,5 +129,13 @@ namespace DataPlant {
         this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
     }
 
+    void CompData::oneTimeInit(EnergyPlusData &state) const
+    {
+        if (this->compPtr->oneTimeInitFlag) {
+            this->compPtr->oneTimeInit_new(state);
+            this->compPtr->oneTimeInitFlag = false;
+        }
+    }
+
 } // namespace DataPlant
 } // namespace EnergyPlus

@@ -604,6 +604,7 @@
     Ceiling,                 !- Surface Type
     Attic Non-res Floor,     !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     attic-floor-dining,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -620,6 +621,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -636,6 +638,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -652,6 +655,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dining_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -668,6 +672,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dining_Wall_North,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -684,6 +689,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -700,6 +706,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -716,6 +723,7 @@
     Ceiling,                 !- Surface Type
     Attic Non-res Floor,     !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     attic-floor-kitchen,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -732,6 +740,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -748,6 +757,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -764,6 +774,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -780,6 +791,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -796,6 +808,7 @@
     Floor,                   !- Surface Type
     Attic Non-res Floor,     !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dining_Ceiling,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -812,6 +825,7 @@
     Floor,                   !- Surface Type
     Attic Non-res Floor,     !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Kitchen_Ceiling,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -828,6 +842,7 @@
     Roof,                    !- Surface Type
     Attic Non-res Roof,      !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -844,6 +859,7 @@
     Roof,                    !- Surface Type
     Attic Non-res Roof,      !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -859,6 +875,7 @@
     Roof,                    !- Surface Type
     Attic Non-res Roof,      !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -874,6 +891,7 @@
     Roof,                    !- Surface Type
     Attic Non-res Roof,      !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1118,13 +1136,15 @@
     Dining Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Dining,                  !- Zone or ZoneList Name
-    743.4961;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    743.4961;                !- Extended Field
 
   InternalMass,
     Kitchen Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
     Kitchen,                 !- Zone or ZoneList Name
-    278.8105;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    278.8105;                !- Extended Field
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -2118,14 +2138,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_1:1_OA,           !- Name
     PSZ-AC_1:1_OA_Controllers,  !- Controller List Name
-    PSZ-AC_1:1_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_1:1 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_1:1_OA_Equipment; !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_2:2_OA,           !- Name
     PSZ-AC_2:2_OA_Controllers,  !- Controller List Name
-    PSZ-AC_2:2_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_2:2 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_2:2_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_1:1_OANode List;  !- Node or NodeList Name 1

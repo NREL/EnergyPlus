@@ -1186,3 +1186,10 @@ Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour,
     }
     return value;
 }
+
+Real64 currentSimTime(EnergyPlusState state)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    Real64 value = (thisState->dataGlobal->DayOfSim - 1) * 24 + currentTime(state);
+    return value;
+}

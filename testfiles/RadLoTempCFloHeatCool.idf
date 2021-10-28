@@ -436,7 +436,7 @@
   ConstructionProperty:InternalHeatSource,
     Floor Source,            !- Name
     Slab Floor with Radiant, !- Construction Name
-    4,                       !- Source Present After Layer Number
+    4,                       !- Thermal Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
@@ -701,6 +701,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -732,6 +733,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -748,6 +750,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -764,6 +767,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -780,6 +784,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -796,6 +801,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -812,6 +818,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -828,6 +835,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -844,6 +852,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -860,6 +869,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -876,6 +886,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -892,6 +903,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -908,6 +920,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -924,6 +937,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -940,6 +954,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -956,6 +971,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -972,6 +988,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -988,6 +1005,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1004,6 +1022,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1020,6 +1039,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1897,120 +1917,120 @@
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name
-    West Zone Radiant Floor Design, !- Design_Object_Name
-    RadiantSysAvailSched, !- Availability_Schedule_Name
-    West Zone, !- Zone_Name
-    Zn001:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
-    400.0, !- Hydronic_Tubing_Length
-    0.0004, !- Rated_Flow_Rate
-    , !- Pump_Flow_Rate_Schedule_Name
-    75000, !- Rated_Pump_Head
-    50, !- Rated_Power_Consumption
-    West Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
-    West Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
-    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name
-    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name
-    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name
-    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name
-    Zone 1 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
-    Zone 1 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
-    RadCoolHighWaterTemp, !- Cooling_High_Water_Temperature_Schedule_Name
-    RadCoolLowWaterTemp, !- Cooling_Low_Water_Temperature_Schedule_Name
-    RadCoolHighControlTemp, !- Cooling_High_Control_Temperature_Schedule_Name
-    RadCoolLowControlTemp, !- Cooling_Low_Control_Temperature_Schedule_Name
-    , !- Number_of_Circuits
-    ; !- Circuit_Length
+    West Zone Radiant Floor Design,  !- Design Object
+    RadiantSysAvailSched,    !- Availability Schedule Name
+    West Zone,               !- Zone Name
+    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
+    400.0,                   !- Hydronic Tubing Length {m}
+    0.0004,                  !- Rated Flow Rate {m3/s}
+    ,                        !- Pump Flow Rate Schedule Name
+    75000,                   !- Rated Pump Head {Pa}
+    50,                      !- Rated Power Consumption {W}
+    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
+    West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+    RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
+    RadHeatLowWaterTemp,     !- Heating Low Water Temperature Schedule Name
+    RadHeatHighControlTemp,  !- Heating High Control Temperature Schedule Name
+    RadHeatLowControlTemp,   !- Heating Low Control Temperature Schedule Name
+    Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
+    Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
+    RadCoolHighWaterTemp,    !- Cooling High Water Temperature Schedule Name
+    RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
+    RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
+    RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
+    ,                        !- Number of Circuits
+    ;                        !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
-    West Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
-    0.87, !- Motor_Efficiency
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
-    SimpleOff, !- Condensation_Control_Type
-    1.0; !- Condensation_Control_Dewpoint_Offset
+    West Zone Radiant Floor Design,  !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
+    MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    SimpleOff,               !- Condensation Control Type
+    1.0;                     !- Condensation Control Dewpoint Offset {C}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     East Zone Radiant Floor, !- Name
-    East Zone Radiant Floor Design, !- Design_Object_Name
-    RadiantSysAvailSched, !- Availability_Schedule_Name
-    East Zone, !- Zone_Name
-    Zn002:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
-    400.0, !- Hydronic_Tubing_Length
-    0.0004, !- Rated_Flow_Rate
-    , !- Pump_Flow_Rate_Schedule_Name
-    75000, !- Rated_Pump_Head
-    50, !- Rated_Power_Consumption
-    East Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
-    East Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
-    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name
-    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name
-    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name
-    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name
-    Zone 2 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
-    Zone 2 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
-    RadCoolHighWaterTemp, !- Cooling_High_Water_Temperature_Schedule_Name
-    RadCoolLowWaterTemp, !- Cooling_Low_Water_Temperature_Schedule_Name
-    RadCoolHighControlTemp, !- Cooling_High_Control_Temperature_Schedule_Name
-    RadCoolLowControlTemp, !- Cooling_Low_Control_Temperature_Schedule_Name
-    , !- Number_of_Circuits
-    ; !- Circuit_Length
+    East Zone Radiant Floor Design,  !- Design Object
+    RadiantSysAvailSched,    !- Availability Schedule Name
+    East Zone,               !- Zone Name
+    Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
+    400.0,                   !- Hydronic Tubing Length {m}
+    0.0004,                  !- Rated Flow Rate {m3/s}
+    ,                        !- Pump Flow Rate Schedule Name
+    75000,                   !- Rated Pump Head {Pa}
+    50,                      !- Rated Power Consumption {W}
+    East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
+    East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+    RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
+    RadHeatLowWaterTemp,     !- Heating Low Water Temperature Schedule Name
+    RadHeatHighControlTemp,  !- Heating High Control Temperature Schedule Name
+    RadHeatLowControlTemp,   !- Heating Low Control Temperature Schedule Name
+    Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
+    Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
+    RadCoolHighWaterTemp,    !- Cooling High Water Temperature Schedule Name
+    RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
+    RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
+    RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
+    ,                        !- Number of Circuits
+    ;                        !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
-    East Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
-    0.87, !- Motor_Efficiency
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
-    VariableOff, !- Condensation_Control_Type
-    0.0; !- Condensation_Control_Dewpoint_Offset
+    East Zone Radiant Floor Design,  !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
+    MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    VariableOff,             !- Condensation Control Type
+    0.0;                     !- Condensation Control Dewpoint Offset {C}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
-    North Zone Radiant Floor, !- Name
-    North Zone Radiant Floor Design, !- Design_Object_Name
-    RadiantSysAvailSched, !- Availability_Schedule_Name
-    North Zone, !- Zone_Name
-    Zn003:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
-    400.0, !- Hydronic_Tubing_Length
-    0.0005, !- Rated_Flow_Rate
-    , !- Pump_Flow_Rate_Schedule_Name
-    75000, !- Rated_Pump_Head
-    50, !- Rated_Power_Consumption
-    North Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
-    North Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
-    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name
-    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name
-    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name
-    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name
-    Zone 3 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
-    Zone 3 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
-    RadCoolHighWaterTemp, !- Cooling_High_Water_Temperature_Schedule_Name
-    RadCoolLowWaterTemp, !- Cooling_Low_Water_Temperature_Schedule_Name
-    RadCoolHighControlTemp, !- Cooling_High_Control_Temperature_Schedule_Name
-    RadCoolLowControlTemp, !- Cooling_Low_Control_Temperature_Schedule_Name
-    , !- Number_of_Circuits
-    ; !- Circuit_Length
+    North Zone Radiant Floor,!- Name
+    North Zone Radiant Floor Design,  !- Design Object
+    RadiantSysAvailSched,    !- Availability Schedule Name
+    North Zone,              !- Zone Name
+    Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
+    400.0,                   !- Hydronic Tubing Length {m}
+    0.0005,                  !- Rated Flow Rate {m3/s}
+    ,                        !- Pump Flow Rate Schedule Name
+    75000,                   !- Rated Pump Head {Pa}
+    50,                      !- Rated Power Consumption {W}
+    North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
+    North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+    RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
+    RadHeatLowWaterTemp,     !- Heating Low Water Temperature Schedule Name
+    RadHeatHighControlTemp,  !- Heating High Control Temperature Schedule Name
+    RadHeatLowControlTemp,   !- Heating Low Control Temperature Schedule Name
+    Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
+    Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
+    RadCoolHighWaterTemp,    !- Cooling High Water Temperature Schedule Name
+    RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
+    RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
+    RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
+    ,                        !- Number of Circuits
+    ;                        !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
-    North Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
-    0.87, !- Motor_Efficiency
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
-    Off, !- Condensation_Control_Type
-    0.0; !- Condensation_Control_Dewpoint_Offset
+    North Zone Radiant Floor Design,  !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
+    MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    Off,                     !- Condensation Control Type
+    0.0;                     !- Condensation Control Dewpoint Offset {C}
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
@@ -2268,3 +2288,4 @@
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,22.00;      !- Field 3
+

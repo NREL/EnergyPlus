@@ -96,7 +96,7 @@ namespace MoistureBalanceEMPDManager {
 
     void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                                  int SurfNum,
-                                 Real64 TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
+                                 Real64 SurfTempIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 TempZone,   // Zone temperature at current time step.
                                  Real64 &TempSat    // Saturated surface temperature.
     );

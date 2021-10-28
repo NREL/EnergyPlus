@@ -131,7 +131,7 @@ namespace HighTempRadiantSystem {
     // Functions
 
     void SimHighTempRadiantSystem(EnergyPlusData &state,
-                                  std::string const &CompName,   // name of the low temperature radiant system
+                                  std::string_view CompName,     // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex)
@@ -169,7 +169,7 @@ namespace HighTempRadiantSystem {
         if (CompIndex == 0) {
             RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
             if (RadSysNum == 0) {
-                ShowFatalError(state, "SimHighTempRadiantSystem: Unit not found=" + CompName);
+                ShowFatalError(state, "SimHighTempRadiantSystem: Unit not found=" + std::string{CompName});
             }
             CompIndex = RadSysNum;
         } else {
@@ -628,15 +628,15 @@ namespace HighTempRadiantSystem {
                                 "Zone Radiant HVAC Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -648,15 +648,15 @@ namespace HighTempRadiantSystem {
                                     "Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).GasPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).GasEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name,
                                     _,
                                     "NaturalGas",
@@ -668,15 +668,15 @@ namespace HighTempRadiantSystem {
                                     "Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).ElecPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).ElecEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name,
                                     _,
                                     "ELECTRICITY",
@@ -1324,16 +1324,16 @@ namespace HighTempRadiantSystem {
         // Initialize arrays
         state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
         state.dataHeatBalFanSys->SumLatentHTRadSys = 0.0;
-        state.dataHeatBalFanSys->QHTRadSysSurf = 0.0;
-        state.dataHeatBalFanSys->QHTRadSysToPerson = 0.0;
+        state.dataHeatBalFanSys->SurfQHTRadSys = 0.0;
+        state.dataHeatBalFanSys->ZoneQHTRadSysToPerson = 0.0;
 
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
 
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
-            state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
-                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
-                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
+            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
+                                                                      state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
+                                                                      state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
 
             state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) +=
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect;
@@ -1348,7 +1348,8 @@ namespace HighTempRadiantSystem {
                         (state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
                          state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribToSurf(RadSurfNum) /
                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->SurfQHTRadSys(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalSurf->AnyRadiantSystems = true;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected");
@@ -1373,14 +1374,14 @@ namespace HighTempRadiantSystem {
         }
 
         // Here an assumption is made regarding radiant heat transfer to people.
-        // While the QHTRadSysToPerson array will be used by the thermal comfort
+        // While the ZoneQHTRadSysToPerson array will be used by the thermal comfort
         // routines, the energy transfer to people would get lost from the perspective
         // of the heat balance.  So, to avoid this net loss of energy which clearly
         // gets added to the zones, we must account for it somehow.  This assumption
         // that all energy radiated to people is converted to convective energy is
         // not very precise, but at least it conserves energy.
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum);
+            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum);
         }
     }
 
@@ -1469,20 +1470,19 @@ namespace HighTempRadiantSystem {
 
                 if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
         }
 
         return SumHATsurf;

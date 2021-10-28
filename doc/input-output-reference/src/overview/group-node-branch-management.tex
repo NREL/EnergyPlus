@@ -4,7 +4,7 @@
 
 \subsection{NodeList}\label{nodelist}
 
-For convenience, the NodeList object can be used to identify all the nodes for a particular use. A node list is not always required. The advantage of listing all the nodes in this manner is that input fields in other objects that ask for a node name can refer to either a single node or a list of nodes using this object. .
+For convenience, the NodeList object can be used to identify all the nodes for a particular use. A node list is not always required. The advantage of listing all the nodes in this manner is that input fields in other objects that ask for a node name can refer to either a single node or a list of nodes using this object.
 
 There are other lines of input syntax that require the use of a NodeList as part of the input. These syntax items include: \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} and the SetpointManager objects. In these two cases, the use of a NodeList statement is mandatory if there is more than one node in this particular ``list''. For example, if the outside air only has a single inlet node, then the name of that node can replace the node list name in the input syntax. As a result of this mandatory specification of node lists for certain types of input, nodes can, obviously, and may be members of more than one list.
 
@@ -318,7 +318,7 @@ This is an optional field used to specify pressure drop information for this par
 
 \paragraph{Field Set (Branch Specifications)}\label{field-set-branch-specifications}
 
-Following the two introductory items, there are groups of 4 repeated items: a type, a name, inlet and outlet node names. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed.
+Following the two introductory items, there are groups of 4 repeated items: a type, a name, inlet and outlet node names. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed by repeating the last four fields.
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type-000}
 
@@ -356,7 +356,7 @@ And a more complex one:
   BRANCH,
       Air Loop Main Branch,    !- Branch Name
       ,                        !- Pressure Drop Curve Name
-      FAN:SIMPLE:ConstVolume,  !- Comp1 Type
+      FAN:ConstantVolume,      !- Comp1 Type
       Supply Fan 1,            !- Comp1 Name
       Air Loop Inlet Node,     !- Comp1 Inlet Node Name
       Cooling Coil Air Inlet Node,  !- Comp1 Outlet Node Name
@@ -442,6 +442,68 @@ ConnectorList LIST, Cooling Supply Side Connectors,
 \subsubsection{Outputs}\label{outputs-3-012}
 
 No output directly related to Connector Lists is currently presented.
+
+\subsection{Plant Loop Connectors}\label{plant-loop-connectors}
+
+The connector list described in the preceding subsection determines how the branches of a particular loop will be hooked together. These connections can be classified either as a separation of a single stream into several outlet streams (splitter) or the merging of several streams into a single outlet stream (mixer). Due to the limitation per branch of a single splitter and a single mixer, the connector list can only have two pieces of equipment as a maximum. The names defined for either/both the splitter or/and the mixer refer then to ``component'' definitions as described in the next two subsections.
+
+The format of both the \textbf{\hyperref[connectorsplitter]{Connector:Splitter}} and \textbf{\hyperref[connectormixer]{Connector:Mixer}} statements is similar. Both begin with an identifying name followed by the branch name of the ``single side'' of the component. In the case of the splitter, this is the inlet since the inlet stream is broken into several outlet streams. In the case of the mixer, this is the outlet since several streams are mixed together to form a single outlet. The remaining list of up to 50 names is simply the branch names of the outlet legs in the case of the splitter and inlet legs in the case of the mixer. No control logic is assume in these components---a determination of how much air to split in which direction using the splitter must be defined by other components.
+
+\subsection{Connector:Splitter}\label{connectorsplitter}
+
+A Connector:Splitter is used to take a single fluid stream or branch and split it into more than one outlet branches.  This input object is used purely to connect the inlet and outlet branches.
+
+\subsubsection{Inputs}\label{inputs-034}
+
+\paragraph{Field: Name}\label{field-name-033}
+
+This alpha field contains the identifying name for the Splitter.
+
+\paragraph{Field: Inlet Branch Name}\label{field-inlet-branch-name}
+
+This alpha field contains the identifying name for the Splitter Inlet Branch.
+
+\paragraph{Field: Outlet Branch \textless{}x\textgreater{} Name}\label{field-outlet-branch-x-name}
+
+This alpha field contains the identifying names for the Splitter Outlet Branches and you enter as many outlet branches as needed.
+
+\subsection{Connector:Mixer}\label{connectormixer}
+
+A Connector:Mixer is used to combine or mix several inlet branches into a single outlet branch.  This input object is used purely to connect the inlet branches with the outlet branch.
+
+\subsubsection{Inputs}\label{inputs-1-031}
+
+\paragraph{Field: Name}\label{field-name-1-030}
+
+This alpha field contains the identifying name for the Mixer.
+
+\paragraph{Field: Outlet Branch Name}\label{field-outlet-branch-name}
+
+This alpha field contains the identifying name for the Mixer Outlet Branch.
+
+\paragraph{Field: Inlet Branch \textless{}x\textgreater{} Name}\label{field-inlet-branch-x-name}
+
+This alpha field contains the identifying names for the Mixer Inlet Branches and you enter as many inlet branch names as needed..
+
+An example of these statements in an IDF is:
+
+\begin{lstlisting}
+
+Connector:Splitter,
+               CW Loop Splitter,
+               CW Pump Branch,
+               Little Chiller Branch,
+               Big Chiller Branch,
+               Purchased Cooling Branch,
+               Supply Bypass Branch;
+  Connector:Mixer,
+               CW Loop Mixer,
+               Cooling Supply Outlet,
+               Little Chiller Branch,
+               Big Chiller Branch,
+               Purchased Cooling Branch,
+               Supply Bypass Branch;
+\end{lstlisting}
 
 \subsection{Pipe:Adiabatic}\label{pipeadiabatic}
 
@@ -963,9 +1025,9 @@ Numeric field specifies the ground cover effects used in the evapotranspiration 
 
 The number of pipe circuit objects which will be defined in the following fields.
 
-\paragraph{Field: Pipe Circuit 1 \{\ldots{} to N; extensible\}}\label{field-pipe-circuit-1-to-n-extensible}
+\paragraph{Field: Pipe Circuit \textless{}\#\textgreater{}}\label{field-pipe-circuit-1-to-n-extensible}
 
-A \hyperref[pipingsystemundergroundpipecircuit]{PipingSystem:Underground:PipeCircuit} to be included in this domain.~ This indicates that the pipe circuit and all of the underlying pipe segments will be included during mesh development and heat transfer calculations within this domain.~ Any number of pipe circuits can be added, assuming all underlying pipe segments do not cause any conflicts for the mesh development engine (overlapping pipes, etc.).
+A \hyperref[pipingsystemundergroundpipecircuit]{PipingSystem:Underground:PipeCircuit} to be included in this domain.~ This indicates that the pipe circuit and all of the underlying pipe segments will be included during mesh development and heat transfer calculations within this domain.~ This object is extensible, so any number of pipe circuits can be added, assuming all underlying pipe segments do not cause any conflicts for the mesh development engine (overlapping pipes, etc.).
 
 \subsection{PipingSystem:Underground:PipeCircuit}\label{pipingsystemundergroundpipecircuit}
 
@@ -1029,9 +1091,9 @@ This alpha field is used as an identifying field for the pipe circuit.
 
 ~The number of pipe segment objects which will be defined in the following fields.
 
-\paragraph{Field: Pipe Segment 1 \{\ldots{} to N; extensible\}}\label{field-pipe-segment-1-to-n-extensible}
+\paragraph{Field: Pipe Segment \textless{}\#\textgreater{}}\label{field-pipe-segment-1-to-n-extensible}
 
-~A \hyperref[pipingsystemundergroundpipesegment]{PipingSystem:Underground:PipeSegment} to be included in this pipe circuit.~ The circuit is set up so that flow passes through the \emph{N} segments in the order they are entered here.
+~A \hyperref[pipingsystemundergroundpipesegment]{PipingSystem:Underground:PipeSegment} to be included in this pipe circuit.~ The circuit is set up so that flow passes through the \emph{N} segments in the order they are entered here. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 \subsection{PipingSystem:Underground:PipeSegment}\label{pipingsystemundergroundpipesegment}
 

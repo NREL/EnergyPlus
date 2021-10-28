@@ -292,7 +292,7 @@ namespace Furnaces {
     // Functions
 
     void SimFurnace(EnergyPlusData &state,
-                    std::string const &FurnaceName,
+                    std::string_view FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
                     int &CompIndex        // Pointer to which furnace

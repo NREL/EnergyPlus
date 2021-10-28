@@ -32,8 +32,6 @@ TEST( StringFunctionsTest, Predicate )
 	EXPECT_TRUE( is_whitespace( string( " " ) ) );
 	EXPECT_TRUE( is_whitespace( string( "\t" ) ) );
 	EXPECT_FALSE( is_whitespace( string( "x" ) ) );
-	EXPECT_TRUE( is_consonant( string( "x" ) ) );
-	EXPECT_FALSE( is_consonant( string( "a" ) ) );
 	EXPECT_TRUE( is_digit( string( "4" ) ) );
 	EXPECT_FALSE( is_digit( string( "P" ) ) );
 	EXPECT_TRUE( is_lower( string( "e" ) ) );
@@ -282,14 +280,6 @@ TEST( StringFunctionsTest, ConversionTo )
 	EXPECT_EQ( 123.75, type_of< double >( string( "123.75" ) ) );
 	EXPECT_EQ( 'X', type_of< char >( string( "X" ) ) );
 
-	EXPECT_EQ( 123, int_of( string( "123" ) ) );
-	EXPECT_EQ( short( 123 ), short_of( string( "123" ) ) );
-	EXPECT_EQ( 123u, uint_of( string( "123" ) ) );
-	EXPECT_EQ( 'X', char_of( string( "X" ) ) );
-
-	EXPECT_EQ( 11l, binary_of( string( "1011" ) ) );
-	EXPECT_EQ( 18l, octal_of( string( "022" ) ) );
-
 	EXPECT_FALSE( type_of< bool >( "0" ) );
 	EXPECT_TRUE( type_of< bool >( "1" ) );
 	EXPECT_FALSE( type_of< bool >( "F" ) );
@@ -306,13 +296,6 @@ TEST( StringFunctionsTest, ConversionTo )
 	EXPECT_EQ( 123.75, type_of< double >( "123.75" ) );
 	EXPECT_EQ( 'X', type_of< char >( "X" ) );
 
-	EXPECT_EQ( 123, int_of( "123" ) );
-	EXPECT_EQ( short( 123 ), short_of( "123" ) );
-	EXPECT_EQ( 123u, uint_of( "123" ) );
-	EXPECT_EQ( 'X', char_of( "X" ) );
-
-	EXPECT_EQ( 11l, binary_of( "1011" ) );
-	EXPECT_EQ( 18l, octal_of( "022" ) );
 }
 
 TEST( StringFunctionsTest, Modifier )
