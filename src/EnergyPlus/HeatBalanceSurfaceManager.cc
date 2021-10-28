@@ -934,6 +934,18 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     curCons = Surface(iSurf).Construction;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
                     zonePt = Surface(iSurf).Zone;
+                    // if the construction report is requested the SummerSHGC is already calculated
+                    if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
+                        SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
+                        TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                    } else {
+                        // must calculate Summer SHGC
+                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
+                            CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                            state.dataConstruction->Construct(curCons).SummerSHGC = SHGCSummer;
+                            state.dataConstruction->Construct(curCons).VisTransNorm = TransVisNorm;
+                        }
+                    }
                     mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                     // include the frame area if present
                     windowArea = Surface(iSurf).GrossArea;
@@ -974,6 +986,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         double uValueRep{0.1};
                         double shgcRep{0.1};
                         double vtRep{0.1};
+
+
                         GetWindowAssemblyNfrcForReport(state, iSurf, windowWidth, windowHeight, vision, uValueRep, shgcRep, vtRep);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueRep, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcRep, 3);
@@ -988,16 +1002,6 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                     nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
-                    // if the construction report is requested the SummerSHGC is already calculated
-                    if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                        SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                        TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
-                    } else {
-                        // must calculate Summer SHGC
-                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                            CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
-                        }
-                    }
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
