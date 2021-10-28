@@ -34,7 +34,7 @@ The concept of UDH is analogous to that of temperature-weighted exceedance hours
 
 UDH is calculated as follows:
 
-![UDH_calc](udh_eq.png)
+![UDH_calc](https://github.com/NREL/EnergyPlus/blob/enhanceResilienceMetrics/design/FY2022/UDH_eq.png)
 
 where T is the indoor air temperature [°C]; t is time [h]; and x<sub>+</sub> = x if x > 0, or 0 otherwise. T<sub>threshold</sub> is the indoor cooling or heating setpoint [°C] in both the grid-on and grid-off scenarios. A similar metric, the Exceedance Degree-Hour, is recently developed by Salimi et al [4]. Instead of thresholding, this metric weights each hour by the distance from the current SET to the comfort zone [4].
 
@@ -182,10 +182,10 @@ N/A
 
 ## References ##
 
-[1]	S. Ayyagari, M. Gartman, and J. Corvidae, “A Framework for Considering Resilience in Building Envelope Design and Construction,” Feb. 2020.
-[2]	USGBC, “Passive Survivability and Back-up Power During Disruptions | U.S. Green Building Council,” Oct. 2018. https://www.usgbc.org/credits/passivesurvivability (accessed Oct. 26, 2021).
-[3]	ASHRAE, “Thermal Environmental Conditions for Human Occupancy,” p. 9, Apr. 2021.
-[4]	S. Salimi, E. Estrella Guillén, and H. Samuelson, “Exceedance Degree-Hours: A new method for assessing long-term thermal conditions,” Indoor Air, vol. 31, no. 6, pp. 2296–2311, 2021, doi: 10.1111/ina.12855.
-[5]	R. Levinson et al., “Key performance indicators for cool envelope materials, windows and shading, natural ventilation, and personal comfort systems,” Nov. 10, 2020.
-[6]	F. Tartarini, S. Schiavon, T. Cheung, and T. Hoyt, “CBE Thermal Comfort Tool: Online tool for thermal comfort calculations and visualizations,” SoftwareX, vol. 12, p. 100563, Jul. 2020, doi: 10.1016/j.softx.2020.100563.
+[1]	S. Ayyagari, M. Gartman, and J. Corvidae, “A Framework for Considering Resilience in Building Envelope Design and Construction,” Feb. 2020.<br>
+[2]	USGBC, “Passive Survivability and Back-up Power During Disruptions | U.S. Green Building Council,” Oct. 2018. https://www.usgbc.org/credits/passivesurvivability (accessed Oct. 26, 2021).<br>
+[3]	ASHRAE, “Thermal Environmental Conditions for Human Occupancy,” p. 9, Apr. 2021.<br>
+[4]	S. Salimi, E. Estrella Guillén, and H. Samuelson, “Exceedance Degree-Hours: A new method for assessing long-term thermal conditions,” Indoor Air, vol. 31, no. 6, pp. 2296–2311, 2021, doi: 10.1111/ina.12855.<br>
+[5]	R. Levinson et al., “Key performance indicators for cool envelope materials, windows and shading, natural ventilation, and personal comfort systems,” Nov. 10, 2020.<br>
+[6]	F. Tartarini, S. Schiavon, T. Cheung, and T. Hoyt, “CBE Thermal Comfort Tool: Online tool for thermal comfort calculations and visualizations,” SoftwareX, vol. 12, p. 100563, Jul. 2020, doi: 10.1016/j.softx.2020.100563.<br>
 
