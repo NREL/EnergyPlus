@@ -2361,7 +2361,7 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
-                // execute
+                // execute. Same for TDDDome and its indices
                 state.dataHeatBal->Zone(ZoneNum).TDDDomeLast = -1;
                 state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = -1;
                 state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;

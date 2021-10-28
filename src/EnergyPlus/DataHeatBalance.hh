@@ -579,13 +579,17 @@ namespace DataHeatBalance {
         int PlenumCondNum;                        // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex;              // this is the index number for TempControlledZone structure for lookup
         // Pointers to Surface Data Structure
-        // AllSurfF                                                                   AllSurfL
-        //              HTSurfF                                                      HTSurfL
-        //               OpaqOrWinMassSurfF                              OpaqOrWinSurfL
-        //               OpaqOrIntMassSurfF      OpaqOrIntMassSurfL
-        //                                        WindowSurfF            WindowSurfL
-        //                                                                DomeF     DomeL
-        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome )]}
+        // |AllSurfF                                                                      |AllSurfL
+        // |            |HTSurfF                                                          |HTSurfL
+        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
+        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
+        // |            |                        ||WindowSurfF           |WindowSurfL     |
+        // |            |                        ||                      ||DomeF          |DomeL
+        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
+        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
+        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
+        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
+        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
         int AllSurfaceFirst;                         // First surface in zone including air boundaries
         int AllSurfaceLast;                          // Last  surface in zone including air boundaries
         int HTSurfaceFirst;                          // First Heat Transfer Surface in Zone
