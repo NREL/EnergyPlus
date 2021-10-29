@@ -101,7 +101,7 @@ For each air loop, the following calculation is performed.
 
 (4)~~Similarly the outlet nodes of the AirLoopHVAC:ZoneSplitter are compared with the heating inlet nodes of all ZoneHVAC:AirDistributionUnits. A match indicates that this zone is served by heating supply air from the air loop.
 
-(5)~~The case where there is no AirLoopHVAC:ZoneSplitter for a AirLoopHVAC:SupplyPath must be handled. In this case the program looks for a match between the zone equipment inlet node and an ZoneHVAC:AirDistributionUnit heating or cooling inlet node. When a match is found that zone is identified as being served with heating or cooling supply air from the air loop.
+(5)~~The case where there is no AirLoopHVAC:ZoneSplitter for an AirLoopHVAC:SupplyPath must be handled. In this case the program looks for a match between the zone equipment inlet node and a ZoneHVAC:AirDistributionUnit heating or cooling inlet node. When a match is found that zone is identified as being served with heating or cooling supply air from the air loop.
 
 (6)~~The list of cooled and heated zones are saved in the air loop data structure AirToZoneNodeInfo.
 

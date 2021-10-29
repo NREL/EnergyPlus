@@ -534,9 +534,11 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
         calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;
+        calcHashKey.ExtCond = 1;
     } else {
         calcHashKey.ExtZone = 0;
         calcHashKey.ExtEnclIndex = 0;
+        calcHashKey.ExtCond = extBoundCond;
     }
 
     calcHashKey.ExtSolar = ExtSolar;
@@ -572,6 +574,8 @@ void SurfaceData::set_representative_surface(EnergyPlusData &state, const int Su
     // Assign the representative surface number based on the first instance of the identical key
     state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum =
         state.dataSurface->RepresentativeSurfaceMap.insert({state.dataSurface->Surface(SurfNum).calcHashKey, SurfNum}).first->second;
+
+    state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum).ConstituentSurfaceNums.push_back(SurfNum);
 }
 
 // Functions

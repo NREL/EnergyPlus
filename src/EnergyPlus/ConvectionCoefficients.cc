@@ -256,6 +256,11 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     continue; // skip surfaces that are not associated with this zone
                 }
             }
+            auto &surface(Surface(SurfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (SurfNum != repSurfNum) continue;
+            }
 
             int algoNum;
             bool standardAlgo;
@@ -319,6 +324,20 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     Real64 hConst = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(hConst);
                 }
+            }
+        }
+    }
+
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int SurfNum = Zone(ZoneNum).WindowSurfaceFirst; SurfNum <= Zone(ZoneNum).WindowSurfaceLast; ++SurfNum) {
+            auto &surface(Surface(SurfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (SurfNum != repSurfNum) continue;
+            }
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
             }
         }
     }
@@ -601,6 +620,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(hConst);
         }
     }
+
+    HExt = HExt * state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
 
     if (TSurf == TSky || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
         HSky = 0.0;
@@ -2964,12 +2985,12 @@ CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness const Roughness, //
     Real64 CalcASHRAESimpExtConvectCoeff;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    static Array1D<Real64> const D({0, 5}, {11.58, 12.49, 10.79, 8.23, 10.22, 8.23});
-    static Array1D<Real64> const E({0, 5}, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
-    static Array1D<Real64> const F({0, 5}, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
+    constexpr static std::array<Real64, 6> D = {11.58, 12.49, 10.79, 8.23, 10.22, 8.23};
+    constexpr static std::array<Real64, 6> E = {5.894, 4.065, 4.192, 4.00, 3.100, 3.33};
+    constexpr static std::array<Real64, 6> F = {0.0, 0.028, 0.0, -0.057, 0.0, -0.036};
 
     CalcASHRAESimpExtConvectCoeff =
-        D(static_cast<int>(Roughness)) + E(static_cast<int>(Roughness)) * SurfWindSpeed + F(static_cast<int>(Roughness)) * pow_2(SurfWindSpeed);
+        D[static_cast<int>(Roughness)] + E[static_cast<int>(Roughness)] * SurfWindSpeed + F[static_cast<int>(Roughness)] * pow_2(SurfWindSpeed);
 
     return CalcASHRAESimpExtConvectCoeff;
 }
@@ -4014,6 +4035,8 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     // EMS override point (Violates Standard 15099?  throw warning? scary.
     if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum))
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
+    else
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
@@ -5204,7 +5227,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         break;
     case ConvectionConstants::HcInt_FohannoPolidoriVerticalWall:
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
+            Real64 QdotConvection = -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum);
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
@@ -5217,7 +5240,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                         (Tsurface - Tzone),
                                                         state.dataSurface->SurfIntConvZoneWallHeight(SurfNum),
                                                         Tsurface,
-                                                        -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
+                                                        -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum),
                                                         SurfNum);
         }
         state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
@@ -5314,7 +5337,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
     auto &Surface(state.dataSurface->Surface);
-    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
+    auto &SurfQdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
     Real64 SurfOutTemp = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
     // first call Hn models
@@ -5365,7 +5388,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                                                  (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                  state.dataSurface->SurfOutConvFaceHeight(SurfNum),
                                                  SurfOutTemp,
-                                                 -QdotConvOutRepPerArea(SurfNum),
+                                                 -SurfQdotConvOutRepPerArea(SurfNum),
                                                  SurfNum);
         break;
     case ConvectionConstants::HcExt_AlamdariHammondStableHorizontal:
@@ -5986,7 +6009,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     // now select which equipment type is dominant compared to all those that are ON
     if (EquipOnCount > 0) {
-        if (state.dataHeatBal->SNLoadPredictedRate(ZoneNum) >= 0.0) { // heating load
+        if (state.dataHeatBal->ZoneSNLoadPredictedRate(ZoneNum) >= 0.0) { // heating load
             PriorityEquipOn = 1;
             for (EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
@@ -5994,7 +6017,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     PriorityEquipOn = EquipOnLoop;
                 }
             }
-        } else if (state.dataHeatBal->SNLoadPredictedRate(ZoneNum) < 0.0) { // cooling load
+        } else if (state.dataHeatBal->ZoneSNLoadPredictedRate(ZoneNum) < 0.0) { // cooling load
             PriorityEquipOn = 1;
             for (EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime

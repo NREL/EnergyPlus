@@ -78,6 +78,41 @@ namespace DisplacementVentMgr {
 
     void CalcUCSDDV(EnergyPlusData &state, int ZoneNum); // Which Zonenum
 
+    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+        DataHeatBalance::IntGainType::People,
+        DataHeatBalance::IntGainType::WaterHeaterMixed,
+        DataHeatBalance::IntGainType::WaterHeaterStratified,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+        DataHeatBalance::IntGainType::ElectricEquipment,
+        DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+        DataHeatBalance::IntGainType::GasEquipment,
+        DataHeatBalance::IntGainType::HotWaterEquipment,
+        DataHeatBalance::IntGainType::SteamEquipment,
+        DataHeatBalance::IntGainType::OtherEquipment,
+        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+        DataHeatBalance::IntGainType::GeneratorFuelCell,
+        DataHeatBalance::IntGainType::WaterUseEquipment,
+        DataHeatBalance::IntGainType::GeneratorMicroCHP,
+        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+        DataHeatBalance::IntGainType::PipeIndoor,
+        DataHeatBalance::IntGainType::RefrigerationCase,
+        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+        DataHeatBalance::IntGainType::RefrigerationWalkIn};
+
+    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                      DataHeatBalance::IntGainType::Lights};
+
 } // namespace DisplacementVentMgr
 
 struct DisplacementVentMgrData : BaseGlobalStruct
@@ -96,39 +131,6 @@ struct DisplacementVentMgrData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
     Real64 TempDepCoef = 0.0; // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
     Real64 TempIndCoef = 0.0; // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-    Array1D_int const IntGainTypesOccupied = Array1D<int>(30,
-                                                          {DataHeatBalance::IntGainTypeOf_People,
-                                                           DataHeatBalance::IntGainTypeOf_WaterHeaterMixed,
-                                                           DataHeatBalance::IntGainTypeOf_WaterHeaterStratified,
-                                                           DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed,
-                                                           DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricEquipment,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                                           DataHeatBalance::IntGainTypeOf_GasEquipment,
-                                                           DataHeatBalance::IntGainTypeOf_HotWaterEquipment,
-                                                           DataHeatBalance::IntGainTypeOf_SteamEquipment,
-                                                           DataHeatBalance::IntGainTypeOf_OtherEquipment,
-                                                           DataHeatBalance::IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                                           DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
-                                                           DataHeatBalance::IntGainTypeOf_WaterUseEquipment,
-                                                           DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                                           DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                                           DataHeatBalance::IntGainTypeOf_PipeIndoor,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationCase,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationCompressorRack,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationSystemSuctionPipe,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationSecondaryReceiver,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationSecondaryPipe,
-                                                           DataHeatBalance::IntGainTypeOf_RefrigerationWalkIn});
-    Array1D_int const IntGainTypesMixedSubzone =
-        Array1D<int>(2, {DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular, DataHeatBalance::IntGainTypeOf_Lights});
 
     void clear_state() override
     {

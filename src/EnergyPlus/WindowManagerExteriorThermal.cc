@@ -197,7 +197,6 @@ namespace WindowManager {
                                                  (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
 
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
 
@@ -239,15 +238,12 @@ namespace WindowManager {
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
             state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
-
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
         }
 
         auto TransDiff = construction.TransDiff;
-        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
             state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
@@ -483,7 +479,7 @@ namespace WindowManager {
 
             auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(t_SurfNum, t_Index) / swRadiation;
             if ((2 * t_Index - 1) == m_TotLay) {
-                absCoeff += state.dataHeatBal->SurfQRadThermInAbs(t_SurfNum) / swRadiation;
+                absCoeff += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(t_SurfNum) / swRadiation;
             }
 
             aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);

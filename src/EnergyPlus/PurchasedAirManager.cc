@@ -2964,9 +2964,6 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // User input defines method used to calculate OA.
 
-    // Using/Aliasing
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-
     // FUNCTION PARAMETER DEFINITIONS:
     bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
@@ -2983,8 +2980,8 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
         } else {
             UseOccSchFlag = false;
         }
-        OAVolumeFlowRate =
-            CalcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+            state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
         OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint

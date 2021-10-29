@@ -2468,7 +2468,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
 
     state->dataPlantHXFluidToFluid->NumberOfPlantFluidHXs = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet_ByNominalCap;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet::ByNominalCap;
     state->dataEnvrn->OutDryBulbTemp = 9.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).TempControlTol = 0.0;
     state->dataLoopNodes->Node(3).TempSetPoint = 11.0;
