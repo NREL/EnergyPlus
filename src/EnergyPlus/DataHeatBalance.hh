@@ -578,7 +578,18 @@ namespace DataHeatBalance {
         int ZoneEqNum;                            // Controlled zone equip config number
         int PlenumCondNum;                        // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex;              // this is the index number for TempControlledZone structure for lookup
-        //            Pointers to Surface Data Structure
+        // Pointers to Surface Data Structure
+        // |AllSurfF                                                                      |AllSurfL
+        // |            |HTSurfF                                                          |HTSurfL
+        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
+        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
+        // |            |                        ||WindowSurfF           |WindowSurfL     |
+        // |            |                        ||                      ||DomeF          |DomeL
+        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
+        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
+        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
+        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
+        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
         int AllSurfaceFirst;                         // First surface in zone including air boundaries
         int AllSurfaceLast;                          // Last  surface in zone including air boundaries
         int HTSurfaceFirst;                          // First Heat Transfer Surface in Zone
@@ -2307,24 +2318,24 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
 
-    Array1D<Real64> SNLoadHeatEnergy;
-    Array1D<Real64> SNLoadCoolEnergy;
-    Array1D<Real64> SNLoadHeatRate;
-    Array1D<Real64> SNLoadCoolRate;
-    Array1D<Real64> SNLoadPredictedRate;
-    Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-    Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    Array1D<Real64> MoisturePredictedRate;
-    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
-    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
-    Array1D<Real64> ListSNLoadHeatEnergy;
-    Array1D<Real64> ListSNLoadCoolEnergy;
-    Array1D<Real64> ListSNLoadHeatRate;
-    Array1D<Real64> ListSNLoadCoolRate;
-    Array1D<Real64> GroupSNLoadHeatEnergy;
-    Array1D<Real64> GroupSNLoadCoolEnergy;
-    Array1D<Real64> GroupSNLoadHeatRate;
-    Array1D<Real64> GroupSNLoadCoolRate;
+    Array1D<Real64> ZoneSNLoadHeatEnergy;
+    Array1D<Real64> ZoneSNLoadCoolEnergy;
+    Array1D<Real64> ZoneSNLoadHeatRate;
+    Array1D<Real64> ZoneSNLoadCoolRate;
+    Array1D<Real64> ZoneSNLoadPredictedRate;
+    Array1D<Real64> ZoneSNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
+    Array1D<Real64> ZoneSNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
+    Array1D<Real64> ZoneMoisturePredictedRate;
+    Array1D<Real64> ZoneMoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    Array1D<Real64> ZoneMoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
+    Array1D<Real64> ZoneListSNLoadHeatEnergy;
+    Array1D<Real64> ZoneListSNLoadCoolEnergy;
+    Array1D<Real64> ZoneListSNLoadHeatRate;
+    Array1D<Real64> ZoneListSNLoadCoolRate;
+    Array1D<Real64> ZoneGroupSNLoadHeatEnergy;
+    Array1D<Real64> ZoneGroupSNLoadCoolEnergy;
+    Array1D<Real64> ZoneGroupSNLoadHeatRate;
+    Array1D<Real64> ZoneGroupSNLoadCoolRate;
 
     Array1D<Real64> ZoneMRT;        // MEAN RADIANT TEMPERATURE (C)
     Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
@@ -2612,24 +2623,24 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NoCfactorConstructionsUsed = true;
         this->NoRegularMaterialsUsed = true;
         this->EnclRadAlwaysReCalc = false;
-        this->SNLoadHeatEnergy.deallocate();
-        this->SNLoadCoolEnergy.deallocate();
-        this->SNLoadHeatRate.deallocate();
-        this->SNLoadCoolRate.deallocate();
-        this->SNLoadPredictedRate.deallocate();
-        this->SNLoadPredictedHSPRate.deallocate();
-        this->SNLoadPredictedCSPRate.deallocate();
-        this->MoisturePredictedRate.deallocate();
-        this->MoisturePredictedHumSPRate.deallocate();
-        this->MoisturePredictedDehumSPRate.deallocate();
-        this->ListSNLoadHeatEnergy.deallocate();
-        this->ListSNLoadCoolEnergy.deallocate();
-        this->ListSNLoadHeatRate.deallocate();
-        this->ListSNLoadCoolRate.deallocate();
-        this->GroupSNLoadHeatEnergy.deallocate();
-        this->GroupSNLoadCoolEnergy.deallocate();
-        this->GroupSNLoadHeatRate.deallocate();
-        this->GroupSNLoadCoolRate.deallocate();
+        this->ZoneSNLoadHeatEnergy.deallocate();
+        this->ZoneSNLoadCoolEnergy.deallocate();
+        this->ZoneSNLoadHeatRate.deallocate();
+        this->ZoneSNLoadCoolRate.deallocate();
+        this->ZoneSNLoadPredictedRate.deallocate();
+        this->ZoneSNLoadPredictedHSPRate.deallocate();
+        this->ZoneSNLoadPredictedCSPRate.deallocate();
+        this->ZoneMoisturePredictedRate.deallocate();
+        this->ZoneMoisturePredictedHumSPRate.deallocate();
+        this->ZoneMoisturePredictedDehumSPRate.deallocate();
+        this->ZoneListSNLoadHeatEnergy.deallocate();
+        this->ZoneListSNLoadCoolEnergy.deallocate();
+        this->ZoneListSNLoadHeatRate.deallocate();
+        this->ZoneListSNLoadCoolRate.deallocate();
+        this->ZoneGroupSNLoadHeatEnergy.deallocate();
+        this->ZoneGroupSNLoadCoolEnergy.deallocate();
+        this->ZoneGroupSNLoadHeatRate.deallocate();
+        this->ZoneGroupSNLoadCoolRate.deallocate();
         this->ZoneMRT.deallocate();
         this->ZoneTransSolar.deallocate();
         this->ZoneWinHeatGain.deallocate();
