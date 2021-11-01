@@ -496,10 +496,10 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
     state->dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
 
-    state->dataHeatBal->SNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataHeatBal->SNLoadPredictedHSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataHeatBal->SNLoadPredictedCSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
 
     state->dataHeatBalFanSys->LoadCorrectionFactor(HeatZoneNum) = 1.0;
     state->dataHeatBalFanSys->LoadCorrectionFactor(CoolZoneNum) = 1.0;
@@ -1299,9 +1299,9 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
-    state->dataHeatBal->SNLoadPredictedRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedHSPRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedCSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
@@ -1434,9 +1434,9 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
-    state->dataHeatBal->SNLoadPredictedRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedHSPRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedCSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);

@@ -2858,7 +2858,7 @@ namespace WindowManager {
 
         state.dataHeatBalSurf->SurfHAirExt(SurfNum) = rad_out_air_per_area / (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
-        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
+        state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
     }
 
     //****************************************************************************
