@@ -304,8 +304,8 @@ namespace SolarCollectors {
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataSolarCollectors->UniqueCollectorNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum =
-                    DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).Type =
+                    DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
@@ -547,7 +547,8 @@ namespace SolarCollectors {
                                                          state.dataIPShortCut->cAlphaFieldNames(1),
                                                          ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).Type =
+                    DataPlant::PlantEquipmentType::SolarCollectorICS; // parameter assigned in DataPlant
 
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
@@ -717,7 +718,7 @@ namespace SolarCollectors {
 
     void CollectorData::setupOutputVars(EnergyPlusData &state)
     {
-        if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+        if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
             // Setup report variables
             SetupOutputVariable(state,
                                 "Solar Collector Incident Angle Modifier",
@@ -771,7 +772,7 @@ namespace SolarCollectors {
                                 "HeatProduced",
                                 _,
                                 "Plant");
-        } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
                                 "Solar Collector Transmittance Absorptance Product",
@@ -887,11 +888,11 @@ namespace SolarCollectors {
         this->initialize(state);
 
         {
-            auto const SELECT_CASE_var(this->TypeNum);
+            auto const SELECT_CASE_var(this->Type);
             // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
                 this->CalcSolarCollector(state);
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
+            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorICS) {
                 this->CalcICSSolarCollector(state);
             } else {
                 assert(false); // LCOV_EXCL_LINE
@@ -1253,15 +1254,17 @@ namespace SolarCollectors {
                 if (qEquation < 0.0) {
                     if (this->ErrIndex == 0) {
                         ShowSevereMessage(state,
-                                          "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                              "\", possible bad input coefficients.");
+                                          format("CalcSolarCollector: {}=\"{}\", possible bad input coefficients.",
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                 this->Name));
                         ShowContinueError(state,
                                           "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
                         ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
                     ShowRecurringSevereErrorAtEnd(state,
-                                                  "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                                      "\", coefficient error continues.",
+                                                  format("CalcSolarCollector: {}=\"{}\", coefficient error continues.",
+                                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                         this->Name),
                                                   this->ErrIndex,
                                                   qEquation,
                                                   qEquation);
@@ -1280,12 +1283,14 @@ namespace SolarCollectors {
             if (Iteration > 100) {
                 if (this->IterErrIndex == 0) {
                     ShowWarningMessage(state,
-                                       "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                           "\":  Solution did not converge.");
+                                       format("CalcSolarCollector: {}=\"{}\":  Solution did not converge.",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                              this->Name));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                                   "\", solution not converge error continues.",
+                                               format("CalcSolarCollector: {}=\"{}\", solution not converge error continues.",
+                                                      DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                      this->Name),
                                                this->IterErrIndex);
                 break;
             } else {
@@ -2199,7 +2204,7 @@ namespace SolarCollectors {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->TypeNum,
+                                                        this->Type,
                                                         this->WLoopNum,
                                                         this->WLoopSideNum,
                                                         this->WLoopBranchNum,

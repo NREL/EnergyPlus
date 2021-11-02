@@ -503,7 +503,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterCooling,
+                                                                DataPlant::PlantEquipmentType::CoilWaterCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -536,7 +536,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterSimpleHeating,
+                                                                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                                                 thisDOAS.HWLoopNum,
                                                                 thisDOAS.HWLoopSide,
                                                                 thisDOAS.HWBranchNum,
@@ -576,7 +576,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
+                                                                DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,

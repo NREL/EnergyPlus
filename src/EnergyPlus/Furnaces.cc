@@ -5207,8 +5207,6 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanSpeedRatioCurveIndex;
 
@@ -5385,7 +5383,7 @@ namespace Furnaces {
                     errFlag = false;
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
-                                            TypeOf_CoilWaterSimpleHeating,
+                                            DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
@@ -5414,7 +5412,7 @@ namespace Furnaces {
                     errFlag = false;
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
-                                            TypeOf_CoilSteamAirHeating,
+                                            DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
@@ -5459,7 +5457,7 @@ namespace Furnaces {
                     errFlag = false;
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
-                                            TypeOf_CoilWaterSimpleHeating,
+                                            DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
@@ -5487,7 +5485,7 @@ namespace Furnaces {
                     errFlag = false;
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
-                                            TypeOf_CoilSteamAirHeating,
+                                            DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,

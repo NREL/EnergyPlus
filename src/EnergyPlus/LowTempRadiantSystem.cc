@@ -80,7 +80,7 @@
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1919,8 +1919,7 @@ namespace LowTempRadiantSystem {
         //       DATE WRITTEN   November 2000
 
         // Using/Aliasing
-        using DataPlant::TypeOf_LowTempRadiant_ConstFlow;
-        using DataPlant::TypeOf_LowTempRadiant_VarFlow;
+
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -2053,7 +2052,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_VarFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopSide,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
@@ -2071,7 +2070,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_VarFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopSide,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,
@@ -2098,7 +2097,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_ConstFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopSide,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWBranchNum,
@@ -2116,7 +2115,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_ConstFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopSide,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWBranchNum,

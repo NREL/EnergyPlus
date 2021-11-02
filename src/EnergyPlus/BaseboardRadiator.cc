@@ -92,7 +92,6 @@ namespace BaseboardRadiator {
 
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    using DataPlant::TypeOf_Baseboard_Conv_Water;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -322,7 +321,7 @@ namespace BaseboardRadiator {
 
                 ++BaseboardNum;
                 baseboard->Baseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // name of this baseboard
-                baseboard->Baseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Conv_Water;
+                baseboard->Baseboard(BaseboardNum).EquipType = DataPlant::PlantEquipmentType::Baseboard_Conv_Water;
                 baseboard->Baseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     baseboard->Baseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;

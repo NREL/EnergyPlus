@@ -218,9 +218,7 @@ namespace HVACSingleDuctInduc {
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
-        using DataPlant::TypeOf_CoilWaterCooling;
-        using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
         using MixerComponent::GetZoneMixerIndex;
         using WaterCoils::GetCoilWaterInletNode;
 
@@ -339,7 +337,7 @@ namespace HVACSingleDuctInduc {
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType = Alphas(6); // type (key) of heating coil
             if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
-                state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+                state.dataHVACSingleDuctInduc->IndUnit(IUNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
             }
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil = Alphas(7); // name of heating coil object
@@ -360,9 +358,9 @@ namespace HVACSingleDuctInduc {
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType = Alphas(8); // type (key) of cooling coil
 
             if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water")) {
-                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
+                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
             } else if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
+                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
             }
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil = Alphas(9); // name of cooling coil object
@@ -513,9 +511,7 @@ namespace HVACSingleDuctInduc {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataPlant::TypeOf_CoilWaterCooling;
-        using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -556,11 +552,11 @@ namespace HVACSingleDuctInduc {
         }
 
         if (state.dataHVACSingleDuctInduc->MyPlantScanFlag(IUNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
+            if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
-                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_PlantTypeNum,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HeatingCoilType,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWLoopNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWLoopSide,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWBranchNum,
@@ -577,12 +573,12 @@ namespace HVACSingleDuctInduc {
                                   "Reference Unit=\"" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name +
                                       "\", type=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType);
             }
-            if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ||
-                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling) {
+            if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling ||
+                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
-                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWLoopNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWLoopSide,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWBranchNum,

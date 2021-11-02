@@ -138,7 +138,7 @@ namespace PlantPipingSystemsManager {
         state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, std::string objectName)
     {
         // Process the input data for circuits if it hasn't been done already
         if (state.dataPlantPipingSysMgr->GetInputFlag) {
@@ -2106,11 +2106,11 @@ namespace PlantPipingSystemsManager {
         // Do any one-time initializations
         if (thisCircuit->NeedToFindOnPlantLoop) {
 
-            int TypeToLookFor;
+            DataPlant::PlantEquipmentType TypeToLookFor;
             if (thisCircuit->IsActuallyPartOfAHorizontalTrench) {
-                TypeToLookFor = DataPlant::TypeOf_GrndHtExchgHorizTrench;
+                TypeToLookFor = DataPlant::PlantEquipmentType::GrndHtExchgHorizTrench;
             } else {
-                TypeToLookFor = DataPlant::TypeOf_PipingSystemPipeCircuit;
+                TypeToLookFor = DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
             }
 
             bool errFlag = false;

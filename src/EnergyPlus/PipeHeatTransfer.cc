@@ -113,13 +113,10 @@ namespace EnergyPlus::PipeHeatTransfer {
 
 // Using/Aliasing
 using namespace GroundTemperatureManager;
-using DataPlant::TypeOf_PipeExterior;
-using DataPlant::TypeOf_PipeInterior;
-using DataPlant::TypeOf_PipeUnderground;
 
 // Functions
 
-PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+PlantComponent *PipeHTData::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     // Process the input data for pipes if it hasn't been done already
     if (state.dataPipeHT->GetPipeInputFlag) {
@@ -128,7 +125,7 @@ PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::
     }
     // Now look for this particular pipe in the list
     for (auto &pipe : state.dataPipeHT->PipeHT) {
-        if (pipe.TypeOf == objectType && pipe.Name == objectName) {
+        if (pipe.Type == objectType && pipe.Name == objectName) {
             return &pipe;
         }
     }
@@ -261,7 +258,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeInterior;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeInterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -416,7 +413,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeExterior;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeExterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -553,7 +550,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeUnderground;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeUnderground;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -913,7 +910,7 @@ void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }
@@ -1572,7 +1569,7 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
     // Only pass pressure if we aren't doing a pressure simulation
     switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
-    case DataPlant::iPressSimType::NoPressure:
+    case DataPlant::PressSimType::NoPressure:
         state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
         break;
     default:
@@ -1879,9 +1876,9 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
 
     // Set environmental variables
     {
-        auto const SELECT_CASE_var(this->TypeOf);
+        auto const SELECT_CASE_var(this->Type);
 
-        if (SELECT_CASE_var == TypeOf_PipeInterior) {
+        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
 
             {
                 auto const SELECT_CASE_var1(this->EnvironmentPtr);
@@ -1895,7 +1892,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
                 }
             }
 
-        } else if (SELECT_CASE_var == TypeOf_PipeExterior) {
+        } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) {
 
             {
                 auto const SELECT_CASE_var1(this->EnvironmentPtr);

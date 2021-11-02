@@ -751,7 +751,7 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompName,  // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                // .TRUE. if this component pair is invalid
                        std::string const &CallString // Context of this pair -- for error message
@@ -781,15 +781,15 @@ void ValidateComponent(EnergyPlusData &state,
 
     IsNotOK = false;
 
-    ItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, CompType, CompName);
+    ItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, std::string{CompType}, CompName);
 
     if (ItemNum < 0) {
-        ShowSevereError(state, "During " + CallString + " Input, Invalid Component Type input=" + CompType);
+        ShowSevereError(state, format("During {} Input, Invalid Component Type input={}", CallString, CompType));
         ShowContinueError(state, "Component name=" + CompName);
         IsNotOK = true;
     } else if (ItemNum == 0) {
         ShowSevereError(state, "During " + CallString + " Input, Invalid Component Name input=" + CompName);
-        ShowContinueError(state, "Component type=" + CompType);
+        ShowContinueError(state, format("Component type={}", CompType));
         IsNotOK = true;
     }
 }

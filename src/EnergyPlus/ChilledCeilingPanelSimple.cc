@@ -121,9 +121,6 @@ void SimCoolingPanel(EnergyPlusData &state,
     // REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
 
-    // Using/Aliasing
-    using DataPlant::TypeOf_CoolingPanel_Simple;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CoolingPanelNum; // Index of unit in baseboard array
     Real64 QZnReq;       // Zone load not yet satisfied
@@ -187,7 +184,7 @@ void SimCoolingPanel(EnergyPlusData &state,
         {
             auto const SELECT_CASE_var(ThisCP.EquipType);
 
-            if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                 ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
             } else {
                 ShowSevereError(state,
@@ -227,7 +224,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
     using DataLoopNode::ObjectIsNotParent;
-    using DataPlant::TypeOf_CoolingPanel_Simple;
     using NodeInputManager::GetOnlySingleNode;
     using ScheduleManager::GetScheduleIndex;
 
@@ -305,8 +301,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         }
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-        ThisCP.EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this simple cooling panel
-        ThisCP.EquipType = TypeOf_CoolingPanel_Simple;        //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+        ThisCP.EquipID = state.dataIPShortCut->cAlphaArgs(1);                  // Name of this simple cooling panel
+        ThisCP.EquipType = DataPlant::PlantEquipmentType::CoolingPanel_Simple; //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 
         // Get schedule
         ThisCP.Schedule = state.dataIPShortCut->cAlphaArgs(2);
