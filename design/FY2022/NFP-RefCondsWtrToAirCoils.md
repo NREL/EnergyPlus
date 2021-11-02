@@ -4,14 +4,14 @@ Reference Temperature Inputs for Water To Air Coils
 **Jeremy Lerond, Wooyoung Jung, and Jian Zhang, PNNL**
 
  - Original Date: 10/21/2021
- - Revision Date: 10/29/2021
+ - Revision Date: 11/01/2021
 
 
 ## Justification for New Feature ##
 
 When auto-sizing the capacity and power of the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects, EnergyPlus determines their total rated capacity by normalizing the total capacity at peak design conditions by the total capacity curve modifier at 85&deg;F Entering Water Temperature (EWT) and at the Entering Air Wet-bulb Temperature (EAWT) at peak design conditions. The total rated capacity is then used to determine the rated power which is in turn used in the simulation to calculate the coil's power by multiplying it by the power curve modifier.
 
-Water-source heat pumps are rated following the test procedures in ISO 13256-1. The rating conditions vary depending on the application of the water-source heat pump. For instance, for cooling operation, groundwater water-to-air heat pumps are rated at 59&deg;F EWT whereas water loop water-to-air heat pumps are rated at 86&deg;F EWT (Se Figure 1). In fact, none of the water-to-air applications currently listed in ASHRAE Standard 90.1 are shown to be rated at 85&deg;F EWT.
+Water-source heat pumps are rated following the test procedures in ISO 13256-1. The rating conditions vary depending on the application of the water-source heat pump. For instance, for cooling operation, groundwater water-to-air heat pumps are rated at 59&deg;F EWT whereas water loop water-to-air heat pumps are rated at 86&deg;F EWT (see Figure 1). In fact, none of the water-to-air applications currently listed in ASHRAE Standard 90.1 are shown to be rated at 85&deg;F EWT.
 
 ![ASHRAE 90.1 WSHP requirements](NFP-RefCondsWtrToAirCoils_901reqs.PNG)
 
@@ -90,13 +90,13 @@ The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&de
 #### Proposed Approach ####
 _Note: The proposed variable names are used below._
 
-- `PeakTotCapTempModFac` is calculated at 29.44&deg;C (85&deg;F) EWT and 15.6&deg;C (60&deg;F) EAWT and is about 0.873
+- `PeakTotCapTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 15.6&deg;C (60&deg;F) EAWT and is about 0.869
 - `RefTotCapTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F) EAWT and is about 0.956 which corresponds to the total capacity modifier at the reference conditions which are the actual rating condition in this example.
 - `RefPowerTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F) EAWT and is about 1.006 which corresponds to the power modifier at the reference conditions which are the actual rating condition in this example.
-- `RefCapCoolTotalDes` = 1000 * 0.956 / 0.873 = 1095 W
-- `RatedPowerCool` = 1095 * 0.956 / (4.2 * 1.006) = 247 W
+- `RefCapCoolTotalDes` = 1000 * 0.956 / 0.869 = 1101 W
+- `RatedPowerCool` = 1101 * 0.956 / (4.2 * 1.006) = 249 W
 
-The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F), at these conditions the `TotCapTempModFac` is 0.956 and `PowerTempModFac` is 1.006. When using these modifiers to calculate the operating capacity and power at these conditions we get a capacity of 1095 * 0.956 = 1047 W and a power of 247 * 1.006 ~= 249 W which correspond to a COP of 1047 / 249 ~= 4.2 which aligns with the user-specified COP of 4.2.
+The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F), at these conditions the `TotCapTempModFac` is 0.956 and `PowerTempModFac` is 1.006. When using these modifiers to calculate the operating capacity and power at these conditions we get a capacity (`CapCoolTotalDesAtRefCdts`) of 1101 * 0.956 = 1052 W and a power (`PowerCoolAtRefCdts`) of 249 * 1.006 ~= 251 W which correspond to a COP of 1052 / 251 ~= 4.2 which aligns with the user-specified COP of 4.2.
 
 ### Additional Proposed Changes ###
 #### Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit ####
