@@ -50,7 +50,7 @@ For reporting, we will present the zone-level and the aggregated building-level 
 
 Resilience metrics are more often evaluated during a certain period when a building is at risk (e.g., during the power outage event or heatwave event), and the period is not necessarily the same as the whole simulation period. We propose to improve current resilience metrics tabular reporting (in the html output) by allowing users to specify the period of calculating and reporting the metrics. 
 
-We propose to add an *Output:Table:SummaryReports:ReportPeriod* that takes an input of a Summary Report name (e.g. *ThermalResilienceSummary*). The reporting period can be defined with a start-date field and an end-date field as supplementary inputs to the *ThermalResilienceSummary* report.
+We propose to add an *Output:Table:ReportPeriod* that takes an input of a Summary Report name (e.g. *ThermalResilienceSummary*). The reporting period can be defined with a start-date field and an end-date field as supplementary inputs to the *ThermalResilienceSummary* report.
 
 ## Approach ##
 
@@ -58,6 +58,7 @@ The following tables will be appended to the existing Thermal Resilience Summary
 
 Report: **Thermal Resilience Summary**
 For: **Entire Facility**
+
 **Hours of Safety for Cold Events**
 
 |	Hours of Safety [h]	| End Time of the Safety Duration | Safe Temperature Exceedance Hours [h] | Safe Temperature Exceedance OccupantHours [h]
@@ -69,6 +70,8 @@ For: **Entire Facility**
 |Max||||
 |Average||||
 |Sum||||
+
+Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 1. Sample report table of hours of safety for cold events.</p>
 
 **Hours of Safety for Hot Events**
@@ -82,6 +85,8 @@ For: **Entire Facility**
 |Max||||
 |Average||||
 |Sum||||
+
+Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 2. Sample report table of hours of safety for hot events.</p>
 
 **Unmet Degree Hours**
@@ -95,6 +100,8 @@ For: **Entire Facility**
 |Max||||
 |Average||||
 |Sum||||
+
+Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 3. Sample report table of unmet degree hours (UDH).</p>
 
 **Discomfort-weighted Exceedance Hours**
@@ -108,9 +115,11 @@ For: **Entire Facility**
 |Max||||
 |Average||||
 |Sum||||
+
+Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 4. Sample report table of discomfort-weighted exceedance hours.</p>
 
-When *ThermalResilienceSummary* is declared in *Output:Table:SummaryReports*, the above three tables will be generated and presented in the tabular reports. In particular, the *Hours of Safety* table will only be presented if an *Output:Table:SummaryReports:ReportPeriod* object is defined for ThermalResilienceSummary report. 
+When *ThermalResilienceSummary* is declared in *Output:Table:SummaryReports*, the above three tables will be generated and presented in the tabular reports. In particular, the *Hours of Safety* table will only be presented if an *Output:Table:ReportPeriod* object is defined for ThermalResilienceSummary report. 
 
 ## Testing/Validation/Data Source(s): ##
 
@@ -132,9 +141,9 @@ Two extra fields will be added to the current People object to define the safe t
           \note this is the indoor safe temperature threshold for heat stress
           \default 30
 
-We will add a new object *Output:Table:SummaryReports:ReportPeriod* to add supplementary information to define the reporting period of certain summary tables.
+We will add a new object *Output:Table:ReportPeriod* to add supplementary information to define the reporting period of certain summary tables.
 
-    Output:Table:SummaryReports:ReportPeriod,
+    Output:Table:ReportPeriod,
         \memo This object allows the user to add a reporting period to a certain tabular report when the reporting period is not the whole simulation period. When defined, the declared summary report is based on aggregations from the start date to the end date defined. 
       A1, \field Report Name,
           \key ThermalResilienceSummary
