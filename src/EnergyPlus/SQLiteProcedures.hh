@@ -220,7 +220,7 @@ public:
                                      std::string const &PeakHrMin     // time stamp of the peak
     );
 
-    void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
+    void addSQLiteComponentSizingRecord(std::string_view AirLoopHVAC, // the type of the component
                                         std::string_view CompName, // the name of the component
                                         std::string_view VarDesc,  // the description of the input variable
                                         Real64 const VarValue      // the value from the sizing calculation

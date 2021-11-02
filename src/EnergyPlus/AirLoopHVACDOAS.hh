@@ -138,7 +138,7 @@ namespace AirLoopHVACDOAS {
         int m_FanIndex;
         int m_FanInletNodeNum;
         int m_FanOutletNodeNum;
-        SimAirServingZones::CompType m_FanTypeNum;
+        SimAirServingZones::AirLoopHVAC m_FanTypeNum;
         int m_HeatCoilNum;
         int m_CoolCoilNum;
         int ConveCount;
@@ -180,7 +180,7 @@ namespace AirLoopHVACDOAS {
             : SumMassFlowRate(0.0), PreheatTemp(-999.0), PrecoolTemp(-999.0), PreheatHumRat(-999.0), PrecoolHumRat(-999.0), SizingMassFlow(0.0),
               SizingCoolOATemp(-999.0), SizingCoolOAHumRat(-999.0), HeatOutTemp(0.0), HeatOutHumRat(0.0), m_AirLoopDOASNum(0), m_OASystemNum(0),
               m_AvailManagerSchedPtr(0), m_AirLoopMixerIndex(-1), m_AirLoopSplitterIndex(-1), NumOfAirLoops(0), m_InletNodeNum(0), m_OutletNodeNum(0),
-              m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(SimAirServingZones::CompType::Unassigned), m_HeatCoilNum(0),
+              m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(SimAirServingZones::AirLoopHVAC::Unassigned), m_HeatCoilNum(0),
               m_CoolCoilNum(0), ConveCount(0), ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false),
               FanBlowTroughFlag(false), m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(0),
               HWBranchNum(0), HWCompNum(0), HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0),

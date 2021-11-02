@@ -68,7 +68,7 @@ namespace OutdoorAirUnit {
     // component types addressed by this module
     extern std::string const cMO_OutdoorAirUnit;
 
-    enum class CompType : int
+    enum class AirLoopHVAC : int
     {
         Unassigned = -1,
         WaterCoil_SimpleCool = 0,
@@ -125,7 +125,7 @@ namespace OutdoorAirUnit {
         // Equipment List Data
         std::string ComponentName;
         std::string ComponentType;
-        CompType ComponentType_Num; // Parameterized Component Types this module can address
+        AirLoopHVAC ComponentType_Num; // Parameterized Component Types this module can address
         int ComponentIndex;         // Which one in list -- updated by routines called from here
         HVACSystemData *compPointer = nullptr;
         int CoilAirInletNode;
@@ -147,7 +147,7 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAEquipList()
-            : ComponentType_Num(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
+            : ComponentType_Num(AirLoopHVAC::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
               CoilWaterOutletNode(0), CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
               MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
@@ -275,7 +275,7 @@ namespace OutdoorAirUnit {
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int EquipNum,
-                                 CompType CompTypeNum, // Component Type -- Integerized for this module
+                                 AirLoopHVAC CompTypeNum, // Component Type -- Integerized for this module
                                  bool FirstHVACIteration,
                                  int &CompIndex,
                                  bool Sim // if TRUE, simulate component

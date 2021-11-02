@@ -1660,7 +1660,7 @@ namespace HeatingCoils {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CompName;       // component name
-        std::string CompType;       // component type
+        std::string AirLoopHVAC;       // component type
         std::string SizingString;   // input field sizing description (e.g., Nominal Capacity)
         bool IsAutoSize;            // Indicator to autosize for reporting
         bool bPRINT = true;         // TRUE if sizing is reported to output (eio)
@@ -1689,7 +1689,7 @@ namespace HeatingCoils {
             TempCap = HeatingCoil(CoilNum).NominalCapacity;
         }
         SizingString = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
-        CompType = "Coil:" + HeatingCoil(CoilNum).HeatingCoilType + ':' + HeatingCoil(CoilNum).HeatingCoilModel;
+        AirLoopHVAC = "Coil:" + HeatingCoil(CoilNum).HeatingCoilType + ':' + HeatingCoil(CoilNum).HeatingCoilModel;
         CompName = HeatingCoil(CoilNum).Name;
         state.dataSize->DataCoilIsSuppHeater = state.dataHeatingCoils->CoilIsSuppHeater; // set global instead of using optional argument
         state.dataSize->DataCoolCoilCap =
@@ -1702,12 +1702,12 @@ namespace HeatingCoils {
                 state.dataSize->DataDesicDehumNum = HeatingCoil(CoilNum).DesiccantDehumNum;
                 HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
                 bool ErrorsFound = false;
-                sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                sizerHeatingDesInletTemp.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
                 state.dataSize->DataDesInletAirTemp = sizerHeatingDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                 HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
                 ErrorsFound = false;
-                sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                sizerHeatingDesOutletTemp.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
                 state.dataSize->DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                 if (state.dataSize->CurOASysNum > 0) {
@@ -1722,7 +1722,7 @@ namespace HeatingCoils {
         bool errorsFound = false;
         HeatingCapacitySizer sizerHeatingCapacity;
         sizerHeatingCapacity.overrideSizingString(SizingString);
-        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+        sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
         TempCap = sizerHeatingCapacity.size(state, TempCap, errorsFound);
         state.dataSize->DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
         state.dataSize->DataDesicRegCoil = false;     // reset global to false so other heating coils are not affected
@@ -1751,12 +1751,12 @@ namespace HeatingCoils {
                     NominalCapacityDes = TempCap * StageNum / NumOfStages;
                     if (ThisStageAutoSize) {
                         HeatingCoil(CoilNum).MSNominalCapacity(StageNum) = NominalCapacityDes;
-                        BaseSizer::reportSizerOutput(state, CompType, CompName, "Design Size " + SizingString, NominalCapacityDes);
+                        BaseSizer::reportSizerOutput(state, AirLoopHVAC, CompName, "Design Size " + SizingString, NominalCapacityDes);
                     } else {
                         if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > 0.0 && NominalCapacityDes > 0.0) {
                             NominalCapacityUser = TempCap * StageNum / NumOfStages; // HeatingCoil( CoilNum ).MSNominalCapacity( StageNum );
                             BaseSizer::reportSizerOutput(state,
-                                                         CompType,
+                                                         AirLoopHVAC,
                                                          CompName,
                                                          "Design Size " + SizingString,
                                                          NominalCapacityDes,
@@ -1766,7 +1766,7 @@ namespace HeatingCoils {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
-                                                "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " +
+                                                "SizeHeatingCoil: Potential issue with equipment sizing for " + AirLoopHVAC + ", " +
                                                     std::string{CompName});
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
@@ -1782,7 +1782,7 @@ namespace HeatingCoils {
                 for (StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
                     if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > 0.0) {
                         BaseSizer::reportSizerOutput(
-                            state, CompType, CompName, "User-Specified " + SizingString, HeatingCoil(CoilNum).MSNominalCapacity(StageNum));
+                            state, AirLoopHVAC, CompName, "User-Specified " + SizingString, HeatingCoil(CoilNum).MSNominalCapacity(StageNum));
                     }
                 }
             }
@@ -3121,7 +3121,7 @@ namespace HeatingCoils {
     }
 
     void CheckHeatingCoilSchedule(EnergyPlusData &state,
-                                  std::string const &CompType, // unused1208
+                                  std::string const &AirLoopHVAC, // unused1208
                                   std::string_view CompName,
                                   Real64 &Value,
                                   int &CompIndex)
@@ -3154,10 +3154,10 @@ namespace HeatingCoils {
             if (CoilNum == 0) {
                 ShowFatalError(state, "CheckHeatingCoilSchedule: Coil not found=\"" + std::string{CompName} + "\".");
             }
-            if (!UtilityRoutines::SameString(CompType, cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num))) {
+            if (!UtilityRoutines::SameString(AirLoopHVAC, cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num))) {
                 ShowSevereError(state, "CheckHeatingCoilSchedule: Coil=\"" + std::string{CompName} + "\"");
                 ShowContinueError(state,
-                                  "...expected type=\"" + CompType + "\", actual type=\"" +
+                                  "...expected type=\"" + AirLoopHVAC + "\", actual type=\"" +
                                       cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
@@ -3179,7 +3179,7 @@ namespace HeatingCoils {
                                        CompName,
                                        state.dataHeatingCoils->HeatingCoil(CoilNum).Name));
                 ShowContinueError(state,
-                                  "...expected type=\"" + CompType + "\", actual type=\"" +
+                                  "...expected type=\"" + AirLoopHVAC + "\", actual type=\"" +
                                       cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }

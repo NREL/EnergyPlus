@@ -162,7 +162,7 @@ namespace ZonePlenum {
 
     void SimAirZonePlenum(EnergyPlusData &state,
                           std::string_view CompName,
-                          DataZoneEquipment::CompType const iCompType,
+                          DataZoneEquipment::AirLoopHVAC const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
                           Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check

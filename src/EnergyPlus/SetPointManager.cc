@@ -4021,7 +4021,7 @@ void InitSetPointManagers(EnergyPlusData &state)
     int InletBranchNum;
     int CompNum;
     int CompNum2;
-    std::string CompType;
+    std::string AirLoopHVAC;
     std::string cSetPointManagerType;
     int FanNodeIn;
     int FanNodeOut;
@@ -4278,16 +4278,16 @@ void InitSetPointManagers(EnergyPlusData &state)
                         for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                                AirLoopHVAC = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
                                 if (MixedAirNode ==
                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn) {
                                     LookForFan = true;
                                 }
                                 if (LookForFan) {
-                                    if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
-                                        UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
-                                        UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
-                                        UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
+                                    if (UtilityRoutines::SameString(AirLoopHVAC, "Fan:ConstantVolume") ||
+                                        UtilityRoutines::SameString(AirLoopHVAC, "Fan:VariableVolume") ||
+                                        UtilityRoutines::SameString(AirLoopHVAC, "Fan:OnOff") ||
+                                        UtilityRoutines::SameString(AirLoopHVAC, "Fan:ComponentModel")) {
                                         FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                                         FanNodeOut =
                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
@@ -4300,11 +4300,11 @@ void InitSetPointManagers(EnergyPlusData &state)
                         for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
-                                    UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
-                                    UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
-                                    UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
+                                AirLoopHVAC = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                                if (UtilityRoutines::SameString(AirLoopHVAC, "Fan:ConstantVolume") ||
+                                    UtilityRoutines::SameString(AirLoopHVAC, "Fan:VariableVolume") ||
+                                    UtilityRoutines::SameString(AirLoopHVAC, "Fan:OnOff") ||
+                                    UtilityRoutines::SameString(AirLoopHVAC, "Fan:ComponentModel")) {
                                     FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                                     FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                 }

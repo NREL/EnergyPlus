@@ -197,7 +197,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
 {
 
     static constexpr std::string_view RoutineName = "sizeOperatingMode";
-    std::string CompType = this->object_name;
+    std::string AirLoopHVAC = this->object_name;
     std::string CompName = this->name;
     bool PrintFlag = true;
     bool errorsFound = false;
@@ -207,7 +207,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     std::string stringOverride = "Rated Evaporator Air Flow Rate [m3/s]";
     if (state.dataGlobal->isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
-    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
     Real64 const ratedInletAirTemp(26.6667);     // 26.6667C or 80F
@@ -221,7 +221,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     this->ratedGrossTotalCap = sizerCoolingCapacity.size(state, TempSize, errorsFound);
 
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
@@ -233,7 +233,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     stringOverride = "Rated Condenser Air Flow Rate [m3/s]";
     if (state.dataGlobal->isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
     sizerCondAirFlow.overrideSizingString(stringOverride);
-    sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizerCondAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
 
     if (this->condenserType != CondenserType::AIRCOOLED) {
@@ -244,7 +244,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
         stringOverride = "Nominal Evaporative Condenser Pump Power [W]";
         sizerCondEvapPumpPower.overrideSizingString(stringOverride);
         TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;
-        sizerCondEvapPumpPower.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+        sizerCondEvapPumpPower.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
         this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(state, TempSize, errorsFound);
     }
 

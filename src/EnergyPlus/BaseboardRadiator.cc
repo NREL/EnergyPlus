@@ -722,7 +722,7 @@ namespace BaseboardRadiator {
         Real64 UADes(0.0);                   // Design UA value for reproting
         Real64 UAUser(0.0);                  // User hard-sized value for reporting
         std::string CompName;                // component name
-        std::string CompType;                // component type
+        std::string AirLoopHVAC;                // component type
         std::string SizingString;            // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;                     // autosized value of coil input field
         int FieldNum = 1;                    // IDD numeric field number where input field description is found
@@ -758,7 +758,7 @@ namespace BaseboardRadiator {
                     }
                 } else {
                     CheckZoneSizing(state, cCMO_BBRadiator_Water, baseboard->Baseboard(BaseboardNum).EquipID);
-                    CompType = cCMO_BBRadiator_Water;
+                    AirLoopHVAC = cCMO_BBRadiator_Water;
                     CompName = baseboard->Baseboard(BaseboardNum).EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
@@ -773,7 +773,7 @@ namespace BaseboardRadiator {
 
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                                CheckZoneSizing(state, CompType, CompName);
+                                CheckZoneSizing(state, AirLoopHVAC, CompName);
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -787,7 +787,7 @@ namespace BaseboardRadiator {
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                            CheckZoneSizing(state, CompType, CompName);
+                            CheckZoneSizing(state, AirLoopHVAC, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -799,7 +799,7 @@ namespace BaseboardRadiator {
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
-                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         DataScalableCapSizingON = false;
                     } else {
@@ -885,7 +885,7 @@ namespace BaseboardRadiator {
                                            RoutineName);
                     state.dataLoopNodes->Node(WaterInletNode).MassFlowRate = rho * baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax;
 
-                    CompType = cCMO_BBRadiator_Water;
+                    AirLoopHVAC = cCMO_BBRadiator_Water;
                     CompName = baseboard->Baseboard(BaseboardNum).EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
@@ -899,7 +899,7 @@ namespace BaseboardRadiator {
                         CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                                CheckZoneSizing(state, CompType, CompName);
+                                CheckZoneSizing(state, AirLoopHVAC, CompName);
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -913,7 +913,7 @@ namespace BaseboardRadiator {
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                            CheckZoneSizing(state, CompType, CompName);
+                            CheckZoneSizing(state, AirLoopHVAC, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -925,7 +925,7 @@ namespace BaseboardRadiator {
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
-                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         DataScalableCapSizingON = false;
                     } else {

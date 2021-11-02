@@ -1025,7 +1025,7 @@ namespace UnitHeater {
         Real64 MaxVolHotSteamFlowDes;  // Autosized maximum hot steam flow for reporting
         Real64 MaxVolHotSteamFlowUser; // Hardsized maximum hot steam flow for reporting
         std::string CompName;          // component name
-        std::string CompType;          // component type
+        std::string AirLoopHVAC;          // component type
         std::string SizingString;      // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;               // autosized value of coil input field
         int FieldNum = 1;              // IDD numeric field number where input field description is found
@@ -1057,7 +1057,7 @@ namespace UnitHeater {
         state.dataSize->DataScalableSizingON = false;
         state.dataSize->DataScalableCapSizingON = false;
         state.dataSize->ZoneHeatingOnlyFan = true;
-        CompType = "ZoneHVAC:UnitHeater";
+        AirLoopHVAC = "ZoneHVAC:UnitHeater";
         CompName = state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name;
         state.dataSize->DataZoneNumber = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ZonePtr;
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -1103,7 +1103,7 @@ namespace UnitHeater {
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
@@ -1115,7 +1115,7 @@ namespace UnitHeater {
                     bool errorsFound = false;
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                     if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                         state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
@@ -1129,7 +1129,7 @@ namespace UnitHeater {
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 }
                 state.dataSize->DataScalableSizingON = false;
@@ -1145,7 +1145,7 @@ namespace UnitHeater {
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             }
         }
@@ -1232,7 +1232,7 @@ namespace UnitHeater {
                                 bool errorsFound = false;
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                 DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 state.dataSize->DataScalableCapSizingON = false;
                             } else {
@@ -1244,7 +1244,7 @@ namespace UnitHeater {
                                 bool errorsFound = false;
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                 DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                             }
 
@@ -1370,7 +1370,7 @@ namespace UnitHeater {
                                 bool errorsFound = false;
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                 DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 state.dataSize->DataScalableCapSizingON = false;
                             } else {

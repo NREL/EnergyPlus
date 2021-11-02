@@ -1636,7 +1636,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
 
 void ScanPlantLoopsForObject(EnergyPlusData &state,
                              std::string_view CompName,
-                             int const CompType,
+                             int const AirLoopHVAC,
                              int &LoopNum,
                              int &LoopSideNum,
                              int &BranchNum,
@@ -1696,7 +1696,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                 auto &this_branch(this_loop_side.Branch(BranchCtr));
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
                     auto &this_component(this_branch.Comp(CompCtr));
-                    if (this_component.TypeOf_Num == CompType) {
+                    if (this_component.TypeOf_Num == AirLoopHVAC) {
                         if (UtilityRoutines::SameString(CompName, this_component.Name)) {
                             FoundCompName = true;
                             if (present(InletNodeNumber)) {
@@ -1733,15 +1733,15 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     if (!FoundComponent) {
-        if (CompType >= 1 && CompType <= DataPlant::NumSimPlantEquipTypes) {
+        if (AirLoopHVAC >= 1 && AirLoopHVAC <= DataPlant::NumSimPlantEquipTypes) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(AirLoopHVAC) + " called \"" + std::string{CompName} +
                                     "\" was not found on any plant loops.");
-                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(AirLoopHVAC), CompName);
             } else {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(AirLoopHVAC) + " called \"" + std::string{CompName} +
                                     "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name + "\".");
             }
             if (present(InletNodeNumber)) {
@@ -1756,7 +1756,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             }
             errFlag = true;
         } else {
-            ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", CompType, CompName));
+            ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", AirLoopHVAC, CompName));
             ShowContinueError(state, format("Valid CompTypes are in the range [1 - {}].", DataPlant::NumSimPlantEquipTypes));
             ShowFatalError(state, "Previous error causes program termination");
         }
@@ -1945,7 +1945,7 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &CompType,           // component description
+                       std::string const &AirLoopHVAC,           // component description
                        std::string_view CompName,             // user name of component
                        int const NodeNumIn,                   // component water inlet node
                        [[maybe_unused]] int const NodeNumOut, // component water outlet node
@@ -2006,13 +2006,13 @@ int MyPlantSizingIndex(EnergyPlusData &state,
             if (PrintErrorFlag) {
                 ShowSevereError(state,
                                 "MyPlantSizingIndex: Could not find " + state.dataPlnt->PlantLoop(MyPltLoopNum).Name + " in Sizing:Plant objects.");
-                ShowContinueError(state, "...reference Component Type=\"" + CompType + "\", Name=\"" + std::string{CompName} + "\".");
+                ShowContinueError(state, "...reference Component Type=\"" + AirLoopHVAC + "\", Name=\"" + std::string{CompName} + "\".");
             }
             ErrorsFound = true;
         }
     } else {
         if (PrintErrorFlag) {
-            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + CompType + " with name " + std::string{CompName} + " on any plant loop");
+            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + AirLoopHVAC + " with name " + std::string{CompName} + " on any plant loop");
         }
         ErrorsFound = true;
     }

@@ -1835,7 +1835,7 @@ namespace HeatRecovery {
         int FieldNum;             // IDD numeric field index where input field description is found
         Real64 TempSize;          // autosized value of coil input field
         std::string CompName;     // component name
-        std::string CompType;     // component type
+        std::string AirLoopHVAC;     // component type
         std::string SizingString; // input field sizing description
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
@@ -1854,7 +1854,7 @@ namespace HeatRecovery {
         }
 
         CompName = state.dataHeatRecovery->ExchCond(ExchNum).Name;
-        CompType = cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
+        AirLoopHVAC = cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
         if (FieldNum > 0) {
             SizingString = state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
         } else {
@@ -1892,7 +1892,7 @@ namespace HeatRecovery {
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.overrideSizingString(SizingString);
         // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-        sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+        sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
         state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
         state.dataSize->DataConstantUsedForSizing = 0.0;
         state.dataSize->DataFractionUsedForSizing = 0.0;
@@ -1900,7 +1900,7 @@ namespace HeatRecovery {
             PrintFlag = true;
             FieldNum = 5;
             CompName = state.dataHeatRecovery->ExchCond(ExchNum).Name;
-            CompType = cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
+            AirLoopHVAC = cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
             SizingString = state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
             if (state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow == AutoSize) {
                 state.dataSize->DataConstantUsedForSizing = state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow;
@@ -1916,7 +1916,7 @@ namespace HeatRecovery {
             SystemAirFlowSizer sizerSystemAirFlow2;
             sizerSystemAirFlow2.overrideSizingString(SizingString);
             // sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow2.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
             state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(state, TempSize, errorsFound);
             state.dataSize->DataConstantUsedForSizing = 0.0;
             state.dataSize->DataFractionUsedForSizing = 0.0;
@@ -1930,14 +1930,14 @@ namespace HeatRecovery {
             FieldNum = 1;
             PrintFlag = true;
             CompName = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).Name;
-            CompType = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).PerfType;
+            AirLoopHVAC = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).PerfType;
             SizingString = state.dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m3/s]";
             TempSize = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             bool errorsFound = false;
             SystemAirFlowSizer sizerSystemAirFlow3;
             sizerSystemAirFlow3.overrideSizingString(SizingString);
             // sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow3.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
             state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow =
                 sizerSystemAirFlow3.size(state, TempSize, errorsFound);
 
@@ -1945,7 +1945,7 @@ namespace HeatRecovery {
             TempSize = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;
             bool ErrorsFound = false;
             DesiccantDehumidifierBFPerfDataFaceVelocitySizer sizerDesDehumBFFaceVel;
-            sizerDesDehumBFFaceVel.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            sizerDesDehumBFFaceVel.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
             state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel =
                 sizerDesDehumBFFaceVel.size(state, TempSize, ErrorsFound);
 

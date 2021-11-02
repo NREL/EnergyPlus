@@ -981,7 +981,7 @@ namespace WindowAC {
         Real64 OutAirVolFlowUser; // Hardsized outdoor ari flow for reporting
         bool IsAutoSize;          // Indicator to autosize
         std::string CompName;     // component name
-        std::string CompType;     // component type
+        std::string AirLoopHVAC;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
         int FieldNum = 2;         // IDD numeric field number where input field description is found
@@ -1007,7 +1007,7 @@ namespace WindowAC {
         state.dataSize->ZoneHeatingOnlyFan = false;
         state.dataSize->ZoneCoolingOnlyFan = true;
         state.dataSize->DataScalableCapSizingON = false;
-        CompType = "ZoneHVAC:WindowAirConditioner";
+        AirLoopHVAC = "ZoneHVAC:WindowAirConditioner";
         CompName = state.dataWindowAC->WindAC(WindACNum).Name;
         state.dataSize->DataZoneNumber = state.dataWindowAC->WindAC(WindACNum).ZonePtr;
         if (state.dataWindowAC->WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -1057,7 +1057,7 @@ namespace WindowAC {
                     if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
@@ -1072,7 +1072,7 @@ namespace WindowAC {
                     bool errorsFound = false;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
-                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
@@ -1083,7 +1083,7 @@ namespace WindowAC {
                     if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 }
                 // DataScalableSizingON = false;
@@ -1122,7 +1122,7 @@ namespace WindowAC {
                 SystemAirFlowSizer sizerSystemAirFlow;
                 sizerSystemAirFlow.overrideSizingString(SizingString);
                 // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                 state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
             }
         }

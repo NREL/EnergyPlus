@@ -124,7 +124,7 @@ protected:
         int maxEquipCount = 1;
         state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
         state->dataZoneEquip->ZoneEquipList(1).EquipType.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex = 1;
@@ -135,7 +135,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = "ZONEREHEATTU";
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEquip::AirDistUnit;
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::AirDistUnit;
         state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = NumNodes;
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(NumNodes);
         state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);

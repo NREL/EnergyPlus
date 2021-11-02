@@ -349,7 +349,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 
     bool PrintFlag = true;
     bool errorsFound = false;
-    std::string CompType = this->object_name;
+    std::string AirLoopHVAC = this->object_name;
     std::string CompName = this->name;
 
     CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -359,13 +359,13 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     // if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
     // stringOverride = preFixString + stringOverride;
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
-    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
 
     std::string SizingString = preFixString + "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     this->rated_total_capacity = sizerCoolingCapacity.size(state, this->rated_total_capacity, errorsFound);
 
     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
@@ -374,7 +374,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     state.dataSize->DataCapacityUsedForSizing = this->rated_total_capacity;
     bool errorFound = false;
     CoolingSHRSizer sizerCoolingSHR;
-    sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizerCoolingSHR.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
         state.dataSize->DataSizingFraction = 0.667;
         this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);

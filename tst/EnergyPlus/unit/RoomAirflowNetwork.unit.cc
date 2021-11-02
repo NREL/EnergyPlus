@@ -269,7 +269,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).numberOfDevices = 1;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device.allocate(state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices);
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompType = DataHeatBalance::IntGainType::People;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).AirLoopHVAC = DataHeatBalance::IntGainType::People;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).ConvectGainRate = 300.0;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).LatentGainRate = 200.0;
 

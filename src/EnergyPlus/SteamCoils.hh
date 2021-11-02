@@ -179,7 +179,7 @@ namespace SteamCoils {
                           bool &ErrorsFound            // set to true if problem
     );
 
-    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
+    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &AirLoopHVAC, std::string_view CompName, Real64 &Value, int &CompIndex);
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
                                    std::string const &CoilType, // must match coil types in this module

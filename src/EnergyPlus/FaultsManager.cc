@@ -2167,14 +2167,14 @@ namespace FaultsManager {
     }
 
     void SetFaultyCoilSATSensor(
-        EnergyPlusData &state, std::string const &CompType, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
+        EnergyPlusData &state, std::string const &AirLoopHVAC, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
     {
 
         FaultyCoilSATFlag = false;
         FaultyCoilSATIndex = 0;
         if (state.dataFaultsMgr->NumFaultyCoilSATSensor == 0) return;
         for (int jFault_CoilSAT = 1; jFault_CoilSAT <= state.dataFaultsMgr->NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
-            if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType, CompType) &&
+            if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType, AirLoopHVAC) &&
                 UtilityRoutines::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName, CompName)) {
                 FaultyCoilSATFlag = true;
                 FaultyCoilSATIndex = jFault_CoilSAT;

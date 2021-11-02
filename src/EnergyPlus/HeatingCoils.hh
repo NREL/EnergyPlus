@@ -261,7 +261,7 @@ namespace HeatingCoils {
     void GetCoilIndex(EnergyPlusData &state, std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound);
 
     void CheckHeatingCoilSchedule(EnergyPlusData &state,
-                                  std::string const &CompType, // unused1208
+                                  std::string const &AirLoopHVAC, // unused1208
                                   std::string_view CompName,
                                   Real64 &Value,
                                   int &CompIndex);

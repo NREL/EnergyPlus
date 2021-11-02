@@ -304,7 +304,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 }
 
 void BaseSizer::reportSizerOutput(EnergyPlusData &state,
-                                  std::string_view CompType,
+                                  std::string_view AirLoopHVAC,
                                   std::string_view CompName,
                                   std::string_view VarDesc,
                                   Real64 const VarValue,
@@ -323,22 +323,22 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
         state.dataEnvrn->oneTimeCompRptHeaderFlag = false;
     }
 
-    print(state.files.eio, Format_991, CompType, CompName, VarDesc, VarValue);
+    print(state.files.eio, Format_991, AirLoopHVAC, CompName, VarDesc, VarValue);
     // add to tabular output reports
-    OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, VarDesc, VarValue);
+    OutputReportPredefined::AddCompSizeTableEntry(state, AirLoopHVAC, CompName, VarDesc, VarValue);
 
     if (present(UsrDesc) && present(UsrValue)) {
-        print(state.files.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
-        OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc(), UsrValue);
+        print(state.files.eio, Format_991, AirLoopHVAC, CompName, UsrDesc(), UsrValue());
+        OutputReportPredefined::AddCompSizeTableEntry(state, AirLoopHVAC, CompName, UsrDesc(), UsrValue);
     } else if (present(UsrDesc) || present(UsrValue)) {
         ShowFatalError(state, "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
     }
 
     // add to SQL output
-    if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
+    if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(AirLoopHVAC, CompName, VarDesc, VarValue);
     if (present(UsrDesc) && present(UsrValue)) {
         if (state.dataSQLiteProcedures->sqlite)
-            state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc(), UsrValue);
+            state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(AirLoopHVAC, CompName, UsrDesc(), UsrValue);
     }
 }
 

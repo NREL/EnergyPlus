@@ -5824,7 +5824,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                  EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes;
                  ++EquipNum) {
 
-                switch (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum)) {
+                switch (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipTypeEnum(EquipNum)) {
                 case DataZoneEquipment::ZoneEquip::AirDistUnit:
                 case DataZoneEquipment::ZoneEquip::PurchasedAir:
                     if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)

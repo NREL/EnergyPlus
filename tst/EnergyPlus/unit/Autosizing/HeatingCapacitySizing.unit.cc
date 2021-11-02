@@ -808,7 +808,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PreheatTemp = 11.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::AirLoopHVAC::Fan_System_Object;
 
     // start with an autosized value
     inputValue = DataSizing::AutoSize;

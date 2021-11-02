@@ -407,9 +407,9 @@ namespace MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOAComponent(EnergyPlusData &state,
-                        std::string const &CompType,                    // the component type
+                        std::string const &AirLoopHVAC,                    // the component type
                         std::string const &CompName,                    // the component Name
-                        SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
+                        SimAirServingZones::AirLoopHVAC const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
                         int &CompIndex,
                         int const AirLoopNum, // air loop index for economizer lockout coordination
@@ -558,7 +558,7 @@ namespace MixedAir {
                               int const InListNum // In-list Number
     );
 
-    SimAirServingZones::CompType GetOACompTypeNum(EnergyPlusData &state,
+    SimAirServingZones::AirLoopHVAC GetOACompTypeNum(EnergyPlusData &state,
                                                   int const OASysNum, // OA Sys Number
                                                   int const InListNum // In-list Number
     );
@@ -599,7 +599,7 @@ struct MixedAirData : BaseGlobalStruct
     EPVector<MixedAir::VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
-    std::string CompType;
+    std::string AirLoopHVAC;
     std::string CompName;
     std::string CtrlName;
     Array1D_bool OAControllerMyOneTimeFlag;

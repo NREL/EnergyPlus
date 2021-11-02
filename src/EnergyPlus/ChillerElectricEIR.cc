@@ -1666,7 +1666,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
             // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                std::string CompType = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_Chiller_ElectricEIR);
+                std::string AirLoopHVAC = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_Chiller_ElectricEIR);
                 state.dataSize->DataConstantUsedForSizing = this->RefCap;
                 state.dataSize->DataFractionUsedForSizing = 0.000114;
                 Real64 TempSize = this->CondVolFlowRate;
@@ -1675,7 +1675,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                 std::string stringOverride = "Reference Condenser Fluid Flow Rate  [m3/s]";
                 if (state.dataGlobal->isEpJSON) stringOverride = "reference_condenser_fluid_flow_rate [m3/s]";
                 sizerCondAirFlow.overrideSizingString(stringOverride);
-                sizerCondAirFlow.initializeWithinEP(state, CompType, this->Name, bPRINT, RoutineName);
+                sizerCondAirFlow.initializeWithinEP(state, AirLoopHVAC, this->Name, bPRINT, RoutineName);
                 this->CondVolFlowRate = sizerCondAirFlow.size(state, TempSize, ErrorsFound);
             }
         }

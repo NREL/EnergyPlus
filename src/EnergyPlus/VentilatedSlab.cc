@@ -1891,7 +1891,7 @@ namespace VentilatedSlab {
         Real64 MaxVolColdWaterFlowDes;  // Autosized maximum cold water flow for reporting
         Real64 MaxVolColdWaterFlowUser; // Hardsized maximum cold water flow for reporting
         std::string CompName;           // component name
-        std::string CompType;           // component type
+        std::string AirLoopHVAC;           // component type
         std::string SizingString;       // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;                // autosized value of coil input field
         int FieldNum = 2;               // IDD numeric field number where input field description is found
@@ -1932,7 +1932,7 @@ namespace VentilatedSlab {
         HeatingAirVolFlowScalable = 0.0;
         state.dataSize->DataScalableSizingON = false;
         state.dataSize->DataScalableCapSizingON = false;
-        CompType = state.dataVentilatedSlab->cMO_VentilatedSlab;
+        AirLoopHVAC = state.dataVentilatedSlab->cMO_VentilatedSlab;
         CompName = state.dataVentilatedSlab->VentSlab(Item).Name;
         state.dataSize->DataZoneNumber = state.dataVentilatedSlab->VentSlab(Item).ZonePtr;
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -1980,7 +1980,7 @@ namespace VentilatedSlab {
                     if (state.dataGlobal->isEpJSON) stringOverride = "maximum_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
@@ -1991,7 +1991,7 @@ namespace VentilatedSlab {
                     state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
-                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataSize->DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                     state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
@@ -2001,7 +2001,7 @@ namespace VentilatedSlab {
                     if (state.dataGlobal->isEpJSON) stringOverride = "maximum_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
                 }
             }
@@ -2033,7 +2033,7 @@ namespace VentilatedSlab {
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
                     SizingMethod = HeatingCapacitySizing;
@@ -2043,7 +2043,7 @@ namespace VentilatedSlab {
                     state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                     state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     SizingMethod = HeatingAirflowSizing;
@@ -2052,7 +2052,7 @@ namespace VentilatedSlab {
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                     HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
                 }
             }
@@ -2069,7 +2069,7 @@ namespace VentilatedSlab {
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
             // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
             state.dataVentilatedSlab->VentSlab(Item).MaxAirVolFlow = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
         }
 
@@ -2263,7 +2263,7 @@ namespace VentilatedSlab {
                                     PrintFlag = false;
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                     state.dataSize->DataScalableCapSizingON = false;
                                 } else {
@@ -2272,7 +2272,7 @@ namespace VentilatedSlab {
                                     TempSize = AutoSize;
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 rho = GetDensityGlycol(state,
@@ -2396,7 +2396,7 @@ namespace VentilatedSlab {
                                     PrintFlag = false;
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                     state.dataSize->DataScalableCapSizingON = false;
                                 } else {
@@ -2405,7 +2405,7 @@ namespace VentilatedSlab {
                                     TempSize = AutoSize;
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 TempSteamIn = 100.00;
@@ -2549,7 +2549,7 @@ namespace VentilatedSlab {
                                 PrintFlag = false;
                                 CoolingCapacitySizer sizerCoolingCapacity;
                                 sizerCoolingCapacity.overrideSizingString(SizingString);
-                                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                 DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                                 state.dataSize->DataScalableCapSizingON = false;
                             } else {
@@ -2559,7 +2559,7 @@ namespace VentilatedSlab {
                                 state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
                                 CoolingCapacitySizer sizerCoolingCapacity;
                                 sizerCoolingCapacity.overrideSizingString(SizingString);
-                                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
                                 DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                             }
                             rho = GetDensityGlycol(state,

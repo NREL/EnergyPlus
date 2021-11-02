@@ -12422,7 +12422,7 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
                 for (EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(j).NumOfEquipTypes; ++EquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(j).EquipType_Num(EquipTypeNum) == DataZoneEquipment::ZoneEquip::ZoneExhaustFan) {
+                    if (state.dataZoneEquip->ZoneEquipList(j).EquipTypeEnum(EquipTypeNum) == DataZoneEquipment::ZoneEquip::ZoneExhaustFan) {
                         found = false;
                         for (k = 1; k <= state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                             for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfExhFan; ++i) {

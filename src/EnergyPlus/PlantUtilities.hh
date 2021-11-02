@@ -188,7 +188,7 @@ namespace PlantUtilities {
 
     void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string_view CompName,
-                                 int CompType,
+                                 int AirLoopHVAC,
                                  int &LoopNum,
                                  int &LoopSideNum,
                                  int &BranchNum,
@@ -215,7 +215,7 @@ namespace PlantUtilities {
     void ShowBranchesOnLoop(EnergyPlusData &state, int LoopNum); // Loop number of loop
 
     int MyPlantSizingIndex(EnergyPlusData &state,
-                           std::string const &CompType,          // component description
+                           std::string const &AirLoopHVAC,          // component description
                            std::string_view CompName,            // user name of component
                            int NodeNumIn,                        // component water inlet node
                            int NodeNumOut,                       // component water outlet node

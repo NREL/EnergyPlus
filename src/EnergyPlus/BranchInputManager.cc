@@ -229,7 +229,7 @@ namespace BranchInputManager {
                        DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of a pressure curve object
                        int &PressCurveIndex,                                      // Index of a pressure curve object
                        int &NumComps,                                             // Number of Components on Branch
-                       Array1D_string &CompType,                                  // Component Type for each item on Branch
+                       Array1D_string &AirLoopHVAC,                                  // Component Type for each item on Branch
                        Array1D_string &CompName,                                  // Component Name for each item on Branch
                        Array1D_string &CompInletNodeNames,                        // Component Inlet Node IDs for each item on Branch
                        Array1D_int &CompInletNodeNums,                            // Component Inlet Node Numbers for each item on Branch
@@ -263,7 +263,7 @@ namespace BranchInputManager {
             state, LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, state.dataBranchInputManager->BComponents, ErrorsFound);
 
         MinCompsAllowed = min(
-            size(CompType), size(CompName), size(CompInletNodeNames), size(CompInletNodeNums), size(CompOutletNodeNames), size(CompOutletNodeNums));
+            size(AirLoopHVAC), size(CompName), size(CompInletNodeNames), size(CompInletNodeNums), size(CompOutletNodeNames), size(CompOutletNodeNums));
         if (MinCompsAllowed < NumComps) {
             ShowSevereError(state, "GetBranchData: Component List arrays not big enough to hold Number of Components");
             ShowContinueError(state, "Input BranchName=" + BranchName + ", in Loop=" + LoopName);
@@ -272,7 +272,7 @@ namespace BranchInputManager {
         }
 
         for (Count = 1; Count <= NumComps; ++Count) {
-            CompType(Count) = state.dataBranchInputManager->BComponents(Count).CType;
+            AirLoopHVAC(Count) = state.dataBranchInputManager->BComponents(Count).CType;
             CompName(Count) = state.dataBranchInputManager->BComponents(Count).Name;
             CompInletNodeNames(Count) = state.dataBranchInputManager->BComponents(Count).InletNodeName;
             CompInletNodeNums(Count) = state.dataBranchInputManager->BComponents(Count).InletNode;
@@ -317,7 +317,7 @@ namespace BranchInputManager {
         return NumCompsInBranch;
     }
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string_view CompName)
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &AirLoopHVAC, std::string_view CompName)
     {
 
         // FUNCTION INFORMATION:
@@ -346,11 +346,11 @@ namespace BranchInputManager {
         NumBranches = size(state.dataBranchInputManager->Branch);
 
         if (NumBranches == 0) {
-            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + std::string{CompName} + "\"");
+            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + AirLoopHVAC + " \"" + std::string{CompName} + "\"");
         } else {
             for (BranchNum = 1; BranchNum <= NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataBranchInputManager->Branch(BranchNum).NumOfComponents; ++CompNum) {
-                    if (UtilityRoutines::SameString(CompType, state.dataBranchInputManager->Branch(BranchNum).Component(CompNum).CType) &&
+                    if (UtilityRoutines::SameString(AirLoopHVAC, state.dataBranchInputManager->Branch(BranchNum).Component(CompNum).CType) &&
                         UtilityRoutines::SameString(CompName, state.dataBranchInputManager->Branch(BranchNum).Component(CompNum).Name)) {
                         GetAirBranchIndex = BranchNum;
                         goto BranchLoop_exit;
@@ -2432,7 +2432,7 @@ namespace BranchInputManager {
 
     void AuditBranches(EnergyPlusData &state,
                        bool const mustprint,           // true if the warning should be printed.
-                       Optional_string_const CompType, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
+                       Optional_string_const AirLoopHVAC, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        Optional_string_const CompName  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     )
     {
@@ -2461,9 +2461,9 @@ namespace BranchInputManager {
         for (BrN = 1; BrN <= state.dataBranchInputManager->NumOfBranches; ++BrN) {
             Found = 0;
             FoundBranchName = "";
-            if (present(CompType) && present(CompName)) {
+            if (present(AirLoopHVAC) && present(CompName)) {
                 for (CpN = 1; CpN <= state.dataBranchInputManager->Branch(BrN).NumOfComponents; ++CpN) {
-                    if (!UtilityRoutines::SameString(CompType(), state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
+                    if (!UtilityRoutines::SameString(AirLoopHVAC(), state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
                         !UtilityRoutines::SameString(CompName(), state.dataBranchInputManager->Branch(BrN).Component(CpN).Name))
                         continue;
                     FoundBranchName = state.dataBranchInputManager->Branch(BrN).Name;
@@ -2483,7 +2483,7 @@ namespace BranchInputManager {
                     ShowContinueError(
                         state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
                     if (!FoundBranchName.empty()) {
-                        ShowContinueError(state, "Branch contains component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\"");
+                        ShowContinueError(state, "Branch contains component, type=\"" + AirLoopHVAC + "\", name=\"" + std::string{CompName} + "\"");
                     }
                 } else {
                     ShowSevereMessage(
@@ -2493,7 +2493,7 @@ namespace BranchInputManager {
             }
         }
         if (mustprint && NeverFound) { // this may be caught during branch input, not sure
-            ShowContinueError(state, "Component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\" was not found on any Branch.");
+            ShowContinueError(state, "Component, type=\"" + AirLoopHVAC + "\", name=\"" + std::string{CompName} + "\" was not found on any Branch.");
             ShowContinueError(state, "Look for mistyped branch or component names/types.");
         }
         if (!mustprint && NumDanglingCount > 0) {

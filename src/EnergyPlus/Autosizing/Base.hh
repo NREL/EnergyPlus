@@ -293,7 +293,7 @@ protected:
 
 public:
     static void reportSizerOutput(EnergyPlusData &state,
-                                  std::string_view CompType,
+                                  std::string_view AirLoopHVAC,
                                   std::string_view CompName,
                                   std::string_view VarDesc,
                                   Real64 VarValue,

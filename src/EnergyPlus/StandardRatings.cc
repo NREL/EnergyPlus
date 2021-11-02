@@ -2440,7 +2440,7 @@ namespace StandardRatings {
     }
 
     void ReportDXCoilRating(EnergyPlusData &state,
-                            std::string const &CompType,    // Type of component
+                            std::string const &AirLoopHVAC,    // Type of component
                             std::string_view CompName,      // Name of component
                             int const CompTypeNum,          // TypeNum of component
                             Real64 const CoolCapVal,        // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
@@ -2515,9 +2515,9 @@ namespace StandardRatings {
 
                 static constexpr std::string_view Format_991(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-                print(state.files.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
+                print(state.files.eio, Format_991, AirLoopHVAC, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, AirLoopHVAC);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
                 // W/W is the same as Btuh/Btuh so that's fine too
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
@@ -2543,9 +2543,9 @@ namespace StandardRatings {
                 }
 
                 static constexpr std::string_view Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
-                print(state.files.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
+                print(state.files.eio, Format_993, AirLoopHVAC, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
 
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilType, CompName, CompType);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilType, CompName, AirLoopHVAC);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
                 // Btu/W-h will convert to itself
@@ -2566,9 +2566,9 @@ namespace StandardRatings {
 
                 static constexpr std::string_view Format_995(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
-                print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
+                print(state.files.eio, Format_995, AirLoopHVAC, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
 
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, AirLoopHVAC);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
@@ -2584,7 +2584,7 @@ namespace StandardRatings {
     }
 
     void ReportDXCoolCoilDataCenterApplication(EnergyPlusData &state,
-                                               std::string const &CompType,           // Type of component
+                                               std::string const &AirLoopHVAC,           // Type of component
                                                std::string_view CompName,             // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
                                                Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
@@ -2658,7 +2658,7 @@ namespace StandardRatings {
                         "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
                     print(state.files.eio,
                           Format_102,
-                          CompType,
+                          AirLoopHVAC,
                           CompName,
                           ClassName,
                           NetCoolingCapRated(Num + 1),
@@ -2669,7 +2669,7 @@ namespace StandardRatings {
                           TotElectricPowerRated(Num + 3),
                           NetCoolingCapRated(Num + 4),
                           TotElectricPowerRated(Num + 4));
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompNameNew, CompType);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompNameNew, AirLoopHVAC);
                     // Note: If you call format("{:.1R}", NetCoolingCapRated(Num + 1)),
                     // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
                     // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur

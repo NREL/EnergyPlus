@@ -283,7 +283,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         if (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex > -1 &&
                             this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].FanBlowTroughFlag &&
                             this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
-                                SimAirServingZones::CompType::Fan_System_Object) {
+                                SimAirServingZones::AirLoopHVAC::Fan_System_Object) {
                             int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
                             Real64 DeltaT = state.dataHVACFan->fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
                             CoilInTemp += DeltaT;

@@ -82,16 +82,18 @@ namespace DataZoneEquipment {
         PathInlet,
         CompInlet,
         Intermediate,
-        Outlet
+        Outlet,
+        NUM
     };
 
-    enum class CompType
+    enum class AirLoopHVAC
     {
         Unassigned = -1,
         ZoneSplitter,
         ZoneSupplyPlenum,
         ZoneMixer,
-        ZoneReturnPlenum
+        ZoneReturnPlenum,
+        NUM
     };
 
     // Start zone equip objects
@@ -129,7 +131,8 @@ namespace DataZoneEquipment {
         RefrigerationAirChillerSet,
         UserDefinedZoneHVACForcedAir,
         CoolingPanel,
-        ZoneUnitarySys
+        ZoneUnitarySys,
+        NUM
     };
 
     constexpr int NumValidSysAvailZoneComponents(14);
@@ -140,7 +143,8 @@ namespace DataZoneEquipment {
     {
         Unassgined = -1,
         DCVByCurrentLevel,
-        ByDesignLevel
+        ByDesignLevel,
+        NUM
     };
 
     enum class LoadDist
@@ -148,7 +152,8 @@ namespace DataZoneEquipment {
         SequentialLoading,
         UniformLoading,
         UniformPLRLoading,
-        SequentialUniformPLRLoading
+        SequentialUniformPLRLoading,
+        NUM
     };
 
     enum class iLightReturnExhaustConfig : int
@@ -374,7 +379,7 @@ namespace DataZoneEquipment {
         int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
         int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
         Array1D_string EquipType;
-        Array1D<DataZoneEquipment::ZoneEquip> EquipType_Num;
+        Array1D<DataZoneEquipment::ZoneEquip> EquipTypeEnum;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
         std::vector<HVACSystemData *> compPointer;
@@ -423,7 +428,7 @@ namespace DataZoneEquipment {
         int NumOfComponents;
         int InletNodeNum;
         Array1D_string ComponentType;
-        Array1D<DataZoneEquipment::CompType> ComponentType_Num;
+        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentType_Num;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
@@ -447,7 +452,7 @@ namespace DataZoneEquipment {
         int NumOfComponents;
         int OutletNodeNum;
         Array1D_string ComponentType;
-        Array1D<DataZoneEquipment::CompType> ComponentType_Num;
+        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentType_Num;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
 
