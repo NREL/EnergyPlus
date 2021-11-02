@@ -498,8 +498,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                     };
                 } else { // Slab (used for exterior grade convection)
                     // Assume very large area for grade (relative to perimeter).
-                    const double area = 9999999.;
-                    const double perim = 1.;
+                    constexpr double area = 9999999.;
+                    constexpr double perim = 1.;
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
                         return CalcSparrowWindward(Roughness, perim, area, windSpeed);
                     };
@@ -3438,15 +3438,15 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
     using Psychrometrics::PsyWFnTdpPb;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const MinFlow(0.01); // Minimum mass flow rate
-    Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
-    Real64 ACH;                 // Air changes per hour
-    int ZoneNode;               // Zone node as defined in system simulation
-    Real64 ZoneVolume;          // Zone node as defined in system simulation
-    Real64 ZoneMassFlowRate;    // Zone node as defined in system simulation
-    Real64 AirDensity;          // zone air density
-    int SurfNum;                // DO loop counter for surfaces
-    Real64 Tilt;                // Surface tilt
+    Real64 constexpr MinFlow(0.01); // Minimum mass flow rate
+    Real64 constexpr MaxACH(100.0); // Maximum ceiling diffuser correlation limit
+    Real64 ACH;                     // Air changes per hour
+    int ZoneNode;                   // Zone node as defined in system simulation
+    Real64 ZoneVolume;              // Zone node as defined in system simulation
+    Real64 ZoneMassFlowRate;        // Zone node as defined in system simulation
+    Real64 AirDensity;              // zone air density
+    int SurfNum;                    // DO loop counter for surfaces
+    Real64 Tilt;                    // Surface tilt
     Real64 ZoneMult;
 
     auto &Zone(state.dataHeatBal->Zone);
@@ -5337,7 +5337,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
     auto &Surface(state.dataSurface->Surface);
-    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
+    auto &SurfQdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
     Real64 SurfOutTemp = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
     // first call Hn models
@@ -5388,7 +5388,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                                                  (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                  state.dataSurface->SurfOutConvFaceHeight(SurfNum),
                                                  SurfOutTemp,
-                                                 -QdotConvOutRepPerArea(SurfNum),
+                                                 -SurfQdotConvOutRepPerArea(SurfNum),
                                                  SurfNum);
         break;
     case ConvectionConstants::HcExt_AlamdariHammondStableHorizontal:
@@ -5443,8 +5443,8 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
 
         if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
             // Assume very large area for grade (relative to perimeter).
-            const double area = 9999999.;
-            const double perim = 1.;
+            constexpr double area = 9999999.;
+            constexpr double perim = 1.;
             HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcSparrowWindward(Roughness, perim, area, windSpeed); };
         } else {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -5472,8 +5472,8 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                                 SurfNum);
         if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
             // Assume very large area for grade (relative to perimeter).
-            const double area = 9999999.;
-            const double perim = 1.;
+            constexpr double area = 9999999.;
+            constexpr double perim = 1.;
             HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcSparrowLeeward(Roughness, perim, area, windSpeed); };
         } else {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -5580,8 +5580,8 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         HfTermFn = [=](double, double, double, double windSpeed) -> double { return windSpeed; };
         if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
             // Assume very large area for grade (relative to perimeter).
-            const double area = 9999999.;
-            const double perim = 1.;
+            constexpr double area = 9999999.;
+            constexpr double perim = 1.;
             HfFn = [=, &state](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
                 return CalcClearRoof(state, Tsurf, Tamb, hfTerm, area, perim, Roughness);
             };
@@ -6008,7 +6008,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     // now select which equipment type is dominant compared to all those that are ON
     if (EquipOnCount > 0) {
-        if (state.dataHeatBal->SNLoadPredictedRate(ZoneNum) >= 0.0) { // heating load
+        if (state.dataHeatBal->ZoneSNLoadPredictedRate(ZoneNum) >= 0.0) { // heating load
             PriorityEquipOn = 1;
             for (EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
@@ -6016,7 +6016,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     PriorityEquipOn = EquipOnLoop;
                 }
             }
-        } else if (state.dataHeatBal->SNLoadPredictedRate(ZoneNum) < 0.0) { // cooling load
+        } else if (state.dataHeatBal->ZoneSNLoadPredictedRate(ZoneNum) < 0.0) { // cooling load
             PriorityEquipOn = 1;
             for (EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
@@ -8099,10 +8099,10 @@ Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperatur
     // at an internal surface. Energy and Buildings 38 (2006) 548 - 553
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const g(9.81);     // gravity constant (m/s**2)
-    Real64 const v(15.89e-6); // kinematic viscosity (m**2/s) for air at 300 K
-    Real64 const k(0.0263);   // thermal conductivity (W/m K) for air at 300 K
-    Real64 const Pr(0.71);    // Prandtl number for air at ?
+    Real64 constexpr g(9.81);     // gravity constant (m/s**2)
+    Real64 constexpr v(15.89e-6); // kinematic viscosity (m**2/s) for air at 300 K
+    Real64 constexpr k(0.0263);   // thermal conductivity (W/m K) for air at 300 K
+    Real64 constexpr Pr(0.71);    // Prandtl number for air at ?
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 RaH(0.0);
@@ -8909,10 +8909,10 @@ Real64 CalcClearRoof(EnergyPlusData &state,
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const g(9.81);     // gravity constant (m/s**2)
-    Real64 const v(15.89e-6); // kinematic viscosity (m**2/s) for air at 300 K
-    Real64 const k(0.0263);   // thermal conductivity (W/m K) for air at 300 K
-    Real64 const Pr(0.71);    // Prandtl number for air at ?
+    Real64 constexpr g(9.81);     // gravity constant (m/s**2)
+    Real64 constexpr v(15.89e-6); // kinematic viscosity (m**2/s) for air at 300 K
+    Real64 constexpr k(0.0263);   // thermal conductivity (W/m K) for air at 300 K
+    Real64 constexpr Pr(0.71);    // Prandtl number for air at ?
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaTemp;

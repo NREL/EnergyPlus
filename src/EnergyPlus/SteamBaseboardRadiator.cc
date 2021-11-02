@@ -285,14 +285,14 @@ namespace SteamBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSteamBaseboardInput:");
-        Real64 const MaxFraction(1.0);       // Maximum limit of fractional values
-        Real64 const MinFraction(0.0);       // Minimum limit of fractional values
-        Real64 const MaxSteamFlowRate(10.0); // Maximum limit of steam volume flow rate in m3/s
-        Real64 const MinSteamFlowRate(0.0);  // Minimum limit of steam volume flow rate in m3/s
+        Real64 constexpr MaxFraction(1.0);       // Maximum limit of fractional values
+        Real64 constexpr MinFraction(0.0);       // Minimum limit of fractional values
+        Real64 constexpr MaxSteamFlowRate(10.0); // Maximum limit of steam volume flow rate in m3/s
+        Real64 constexpr MinSteamFlowRate(0.0);  // Minimum limit of steam volume flow rate in m3/s
         //    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20          ! Maximum number of surfaces that a baseboard heater can radiate to
-        int const MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
+        int constexpr MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
+        int constexpr iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
             1); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
@@ -1510,7 +1510,7 @@ namespace SteamBaseboardRadiator {
 
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
         int BaseboardNum;         // Counter for the baseboard

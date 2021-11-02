@@ -2924,11 +2924,11 @@ namespace UnitVentilator {
         using SteamCoils::CheckSteamCoilSchedule;
         using WaterCoils::CheckWaterCoilSchedule;
 
-        Real64 const LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
+        Real64 constexpr LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
         // (below this value the temperatures are assumed equal)
-        Real64 const LowOAFracDiff(0.01); // Smallest allowed outside air fraction difference for comparison
+        Real64 constexpr LowOAFracDiff(0.01); // Smallest allowed outside air fraction difference for comparison
         // (below this value the fractions are assumed equal)
-        int const MaxIter(50); // maximum number of iterations
+        int constexpr MaxIter(50); // maximum number of iterations
 
         Real64 AirMassFlow;   // air mass flow rate [kg/sec]
         int AirRelNode;       // outside air relief node
@@ -4404,7 +4404,7 @@ namespace UnitVentilator {
         // Check to see what outside air will do, "turn off" cooling coil if OA can handle the load
         int CCoilInAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode;
         int AirInNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
-        Real64 const SmallLoad = -1.0; // Watts
+        Real64 constexpr SmallLoad = -1.0; // Watts
         Real64 CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(AirInNode).HumRat);
         QCoilReq = QZnReq - state.dataLoopNodes->Node(CCoilInAirNode).MassFlowRate * CpAirZn *
                                 (state.dataLoopNodes->Node(CCoilInAirNode).Temp - state.dataLoopNodes->Node(AirInNode).Temp);

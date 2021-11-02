@@ -290,9 +290,10 @@ namespace UnitVentilator {
 struct UnitVentilatorsData : BaseGlobalStruct
 {
 
-    // Currrent Module Unit type
+    // Current Module Unit type
     std::string const cMO_UnitVentilator = "ZoneHVAC:UnitVentilator";
 
+    // TODO: remove 'const' from state
     // Parameters for outside air control types:
     int const Heating_ElectricCoilType = 1;
     int const Heating_GasCoilType = 2;

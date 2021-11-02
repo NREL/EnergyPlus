@@ -592,7 +592,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
+    Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
     static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1002,10 +1002,10 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const 
     using PlantUtilities::SetActuatedBranchFlowRate;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const DemandLedPrimaryInletUpdate(101);
-    int const DemandLedSecondaryInletUpdate(102);
-    int const SupplyLedPrimaryInletUpdate(103);
-    int const SupplyLedSecondaryInletUpdate(104);
+    int constexpr DemandLedPrimaryInletUpdate(101);
+    int constexpr DemandLedSecondaryInletUpdate(102);
+    int constexpr SupplyLedPrimaryInletUpdate(103);
+    int constexpr SupplyLedSecondaryInletUpdate(104);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CurCallingCase;       // local temporary

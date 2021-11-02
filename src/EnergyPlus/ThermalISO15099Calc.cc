@@ -109,7 +109,7 @@ void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Rea
     //   hcout - convective film coeff [w m-2 k-1]
 
     // Locals
-    Real64 const conv(5.6783);
+    Real64 constexpr conv(5.6783);
 
     Real64 vc;
     Real64 acoef;

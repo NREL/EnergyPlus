@@ -338,6 +338,7 @@ namespace SolarShading {
 struct SolarShadingData : BaseGlobalStruct
 {
 
+    // TODO: remove 'const' from state
     Real64 const SmallIncrement = 1.0e-10; // Small increment added for shading/sunlit area calculations.
     Real64 const HCMULT = 100000.0;        // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
                                     // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
@@ -481,8 +482,8 @@ struct SolarShadingData : BaseGlobalStruct
     Array1D<Real64> XVert;
     Array1D<Real64> YVert;
     Array1D<Real64> ZVert;
-    Array1D<Real64> AbsBeamWin;                                                               // Glass layer beam solar absorptance of a window
-    Array1D<Real64> AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
+    Array1D<Real64> SurfWinAbsBeam;                                                               // Glass layer beam solar absorptance of a window
+    Array1D<Real64> SurfWinAbsBeamEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
     Array1D<Real64> SurfWinExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident *
                                                 // ExtBeamAbsByShad
     Array1D<Real64> SurfWinIntBeamAbsByShadFac; // Like SurfWinExtBeamAbsByShadFac, but for interior beam radiation.
@@ -618,8 +619,8 @@ struct SolarShadingData : BaseGlobalStruct
         this->XVert.deallocate();
         this->YVert.deallocate();
         this->ZVert.deallocate();
-        this->AbsBeamWin.deallocate();
-        this->AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->SurfWinAbsBeam.deallocate();
+        this->SurfWinAbsBeamEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
         this->SurfWinExtBeamAbsByShadFac.deallocate();
         this->SurfWinIntBeamAbsByShadFac.deallocate();
         this->SurfWinTransBmSolar.deallocate();

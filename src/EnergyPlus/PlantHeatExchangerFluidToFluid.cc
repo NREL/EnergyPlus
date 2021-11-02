@@ -1813,8 +1813,8 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
     static constexpr std::string_view RoutineName("CalcFluidHeatExchanger");
 
-    int const CmaxMixedCminUnmixed(40);
-    int const CmaxUnMixedCminMixed(41);
+    int constexpr CmaxMixedCminUnmixed(40);
+    int constexpr CmaxUnMixedCminMixed(41);
 
     Real64 SupSideLoopInletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
     Real64 DmdSideLoopInletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
@@ -2039,8 +2039,8 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     // METHODOLOGY EMPLOYED:
     // uses E+'s Regula Falsi numerical method
 
-    int const MaxIte(500);   // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3); // Accuracy of solver result
+    int constexpr MaxIte(500); // Maximum number of iterations for solver
+    Real64 const Acc(1.e-3);   // Accuracy of solver result
 
     int SolFla;             // Flag of solver
     Array1D<Real64> Par(2); // Parameter array passed to solver

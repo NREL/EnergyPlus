@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     Real64 SecMassFlowAtPrimMax = thisSeriesAT.MaxTotAirMassFlow - PriMaxMassFlow;
 
     // Needs an airloop, assume 20% outdoor air
-    Real64 const AirLoopOAFraction = 0.20;
+    Real64 constexpr AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;

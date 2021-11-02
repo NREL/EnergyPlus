@@ -181,7 +181,7 @@ namespace DataHVACGlobals {
     int constexpr CoilVRF_FluidTCtrl_Cooling(33);
     int constexpr CoilVRF_FluidTCtrl_Heating(34);
     int constexpr CoilDX_Cooling(35);
-    //    int const CoilDX_SubcoolReheat(36);
+    //    int constexpr CoilDX_SubcoolReheat(36);
     int constexpr CoilDX_CurveFit_Speed(37);
 
     int constexpr coilNormalMode = 0;        // Normal operation mode

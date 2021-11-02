@@ -386,7 +386,7 @@ namespace HeatBalanceManager {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumConstrObjects(6);
+        int constexpr NumConstrObjects(6);
         Array1D_string const ConstrObjects(NumConstrObjects,
                                            {"Pipe:Indoor",
                                             "Pipe:Outdoor",
@@ -6093,11 +6093,11 @@ namespace HeatBalanceManager {
             if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
                 state.dataHeatBalMgr->MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
+            if (state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
+            if (state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
             }
 
             // Record temperature and load for individual zone
@@ -6107,7 +6107,7 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZone(ZoneNum);
             state.dataHeatBalMgr->TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             state.dataHeatBalMgr->LoadZone(ZoneNum) =
-                max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
+                max(state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
             if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
@@ -6179,7 +6179,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinLoad(100.0); // Minimum laods for convergence check
+        Real64 constexpr MinLoad(100.0); // Minimum loads for convergence check
         // To avoid big percentage difference in low load situations
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -7762,9 +7762,9 @@ namespace HeatBalanceManager {
 
         // ASHRAE Handbook Fundamental 2005
         // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
-        Real64 const Rfilm_in(0.125);
+        Real64 constexpr Rfilm_in(0.125);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
-        Real64 const Rfilm_out(0.03);
+        Real64 constexpr Rfilm_out(0.03);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

@@ -1235,11 +1235,11 @@ namespace Photovoltaics {
 
         using TranspiredCollector::GetUTSCTsColl;
 
-        Real64 const EPS(0.001);
-        Real64 const ERR(0.001);
-        Real64 const MinInsolation(30.0);
-        int const KMAX(100);
-        Real64 const EtaIni(0.10); // initial value of eta
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr ERR(0.001);
+        Real64 constexpr MinInsolation(30.0);
+        int constexpr KMAX(100);
+        Real64 constexpr EtaIni(0.10); // initial value of eta
         Real64 DummyErr;
         Real64 ETA;
         Real64 Tambient;
@@ -1899,7 +1899,7 @@ namespace Photovoltaics {
             Real64 const AM(1.0 / (std::cos(SolZen * DataGlobalConstants::DegToRadians) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         } else {
-            Real64 const AM(36.32); // evaluated above at SolZen = 89.9 issue #5528
+            Real64 constexpr AM(36.32); // evaluated above at SolZen = 89.9 issue #5528
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         }
 

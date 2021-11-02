@@ -1496,7 +1496,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
     // FlowLock = 1  if mass flow rates may not be changed by loop components
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
+    Real64 constexpr AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
     static constexpr std::string_view RoutineName("CalcExhaustAbsorberChillerModel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1945,7 +1945,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
     //                 below Setpoint
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
+    Real64 constexpr AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
     static constexpr std::string_view RoutineName("CalcExhaustAbsorberHeaterModel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

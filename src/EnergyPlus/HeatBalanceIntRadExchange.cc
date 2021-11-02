@@ -142,7 +142,7 @@ namespace HeatBalanceIntRadExchange {
         // Using/Aliasing
         using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
-        Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
+        Real64 constexpr StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
 
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
@@ -1436,7 +1436,7 @@ namespace HeatBalanceIntRadExchange {
         // SUBROUTINE ARGUMENTS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SameAngleLimit(10.0); // If the difference in the azimuth angles are above this value (degrees),
+        Real64 constexpr SameAngleLimit(10.0); // If the difference in the azimuth angles are above this value (degrees),
         // then the surfaces are assumed to be facing different directions.
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1566,8 +1566,8 @@ namespace HeatBalanceIntRadExchange {
         // SUBROUTINE ARGUMENTS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const PrimaryConvergence(0.001);
-        Real64 const DifferenceConvergence(0.00001);
+        Real64 constexpr PrimaryConvergence(0.001);
+        Real64 constexpr DifferenceConvergence(0.00001);
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1848,7 +1848,7 @@ namespace HeatBalanceIntRadExchange {
         //  A(i)*F(i,j)=A(j)*F(j,i); F(i,i)=0.; SUM(F(i,j)=1.0, j=1,N)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MaxEmissLimit(0.99999); // Limit the emissivity internally/avoid a divide by zero error
+        Real64 constexpr MaxEmissLimit(0.99999); // Limit the emissivity internally/avoid a divide by zero error
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2043,8 +2043,8 @@ namespace HeatBalanceIntRadExchange {
             sumAF += A[iS];
         }
 
-        static const int maxIt = 100;
-        static const double tol = 0.0001;
+        constexpr int maxIt = 100;
+        constexpr double tol = 0.0001;
         double fChange, fLast;
         double sumAFNew = sumAF;
         for (unsigned i = 0; i < maxIt; i++) {

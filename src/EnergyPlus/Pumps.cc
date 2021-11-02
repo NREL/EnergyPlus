@@ -240,7 +240,7 @@ void GetPumpInput(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
+    Real64 constexpr StartTemp(100.0); // Standard Temperature across code to calculated Steam density
     static constexpr std::string_view RoutineName("GetPumpInput: ");
     static constexpr std::string_view RoutineNameNoColon("GetPumpInput");
 
@@ -1435,8 +1435,8 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-    Real64 const ZeroPowerTol(0.0000001);
+    Real64 constexpr StartTemp(100.0); // Standard Temperature across code to calculated Steam density
+    Real64 constexpr ZeroPowerTol(0.0000001);
     static constexpr std::string_view RoutineName("PlantPumps::InitializePumps ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2175,7 +2175,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     using FluidProperties::GetSatDensityRefrig;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
+    Real64 constexpr StartTemp(100.0); // Standard Temperature across code to calculated Steam density
     static constexpr std::string_view RoutineName("PlantPumps::InitSimVars ");
     static constexpr std::string_view RoutineNameSizePumps("SizePumps");
 

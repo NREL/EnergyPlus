@@ -2414,24 +2414,24 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         //   conditions. Compressor and OU hex performance are analysed for each mode.
 
         // Inputs_condition
-        Real64 const h_IU_evap_in = 225017; // enthalpy of IU evaporator at inlet [kJ/kg]
-        Real64 const h_comp_out = 432950;   // enthalpy of refrigerant at compressor outlet [kJ/kg]
-        Real64 const Q_c_TU_PL = 4972;      // IU evaporator load, including piping loss [W]
-        Real64 const Q_h_TU_PL = 9954;      // IU condenser load, including piping loss [W]
-        Real64 const Tdischarge = 36.37;    // VRF Compressor discharge refrigerant temperature [C]
-        Real64 Tsuction = 4.86;             // VRF compressor suction refrigerant temperature [C]
-        Real64 Te_update = 5;               // updated evaporating temperature, only updated when Tsuction is updated [C]
-        Real64 h_comp_in = 429529;          // enthalpy of refrigerant at compressor inlet [kJ/kg]
-        Real64 h_IU_PLc_out = 429529;       // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
-        Real64 Pipe_Q_c = 0;                // IU evaporator side piping loss [W]
-        Real64 Q_c_OU;                      // OU evaporator load [W]
-        Real64 Q_h_OU;                      // OU condenser load [W]
-        Real64 m_ref_IU_evap;               // mass flow rate of Refrigerant through IU evaporators [kg/s]
-        Real64 m_ref_OU_evap;               // mass flow rate of Refrigerant through OU evaporator [kg/s]
-        Real64 m_ref_OU_cond;               // mass flow rate of Refrigerant through OU condenser [kg/s]
-        Real64 N_fan_OU;                    // outdoor unit fan power [W]
-        Real64 CompSpdActual;               // Actual compressor running speed [rps]
-        Real64 Ncomp;                       // compressor power [W]
+        Real64 constexpr h_IU_evap_in = 225017; // enthalpy of IU evaporator at inlet [kJ/kg]
+        Real64 constexpr h_comp_out = 432950;   // enthalpy of refrigerant at compressor outlet [kJ/kg]
+        Real64 constexpr Q_c_TU_PL = 4972;      // IU evaporator load, including piping loss [W]
+        Real64 constexpr Q_h_TU_PL = 9954;      // IU condenser load, including piping loss [W]
+        Real64 constexpr Tdischarge = 36.37;    // VRF Compressor discharge refrigerant temperature [C]
+        Real64 Tsuction = 4.86;                 // VRF compressor suction refrigerant temperature [C]
+        Real64 Te_update = 5;                   // updated evaporating temperature, only updated when Tsuction is updated [C]
+        Real64 h_comp_in = 429529;              // enthalpy of refrigerant at compressor inlet [kJ/kg]
+        Real64 h_IU_PLc_out = 429529;           // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
+        Real64 Pipe_Q_c = 0;                    // IU evaporator side piping loss [W]
+        Real64 Q_c_OU;                          // OU evaporator load [W]
+        Real64 Q_h_OU;                          // OU condenser load [W]
+        Real64 m_ref_IU_evap;                   // mass flow rate of Refrigerant through IU evaporators [kg/s]
+        Real64 m_ref_OU_evap;                   // mass flow rate of Refrigerant through OU evaporator [kg/s]
+        Real64 m_ref_OU_cond;                   // mass flow rate of Refrigerant through OU condenser [kg/s]
+        Real64 N_fan_OU;                        // outdoor unit fan power [W]
+        Real64 CompSpdActual;                   // Actual compressor running speed [rps]
+        Real64 Ncomp;                           // compressor power [W]
 
         state->dataEnvrn->OutDryBulbTemp = 10.35;
 
@@ -2473,12 +2473,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         //   the difference between rated conditions and real conditions.
 
         // Inputs_condition
-        Real64 const h_comp_in_real = 429529; // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
-        Real64 const h_evap_in_real = 225016; // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
-        Real64 const P_evap_real = 509784;    // Evaporative pressure at real conditions [Pa]
-        Real64 const T_comp_in_real = 0.65;   // Temperature of the refrigerant at the compressor inlet at real conditions [C]
-        Real64 const T_comp_in_rate = -5.35;  // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
-        Real64 const T_cond_out_rate = 31.38; // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
+        Real64 constexpr h_comp_in_real = 429529; // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
+        Real64 constexpr h_evap_in_real = 225016; // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
+        Real64 constexpr P_evap_real = 509784;    // Evaporative pressure at real conditions [Pa]
+        Real64 constexpr T_comp_in_real = 0.65;   // Temperature of the refrigerant at the compressor inlet at real conditions [C]
+        Real64 constexpr T_comp_in_rate = -5.35;  // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
+        Real64 constexpr T_cond_out_rate = 31.38; // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
         Real64 C_cap_operation;
 
         // Run
@@ -2496,12 +2496,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
      {// a. Evaporator
 
       // Inputs_condition
-      Real64 const Q_req = 6971;        // Required capacity [W]
-    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 CompSpdActual;               // Actual compressor running speed [rps]
+      Real64 constexpr Q_req = 6971;        // Required capacity [W]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;                   // Actual compressor running speed [rps]
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
@@ -2515,12 +2515,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     // b. Condenser
 
     // Inputs_condition
-    Real64 const Q_req = 6953;          // Required capacity [W]
-    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 CompSpdActual;               // Actual compressor running speed [rps]
+    Real64 constexpr Q_req = 6953;          // Required capacity [W]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;                   // Actual compressor running speed [rps]
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
@@ -2537,13 +2537,13 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     //   at given compressor speed and operational conditions.
 
     // Inputs_condition
-    Real64 const CompSpdActual = 1298;  // Actual compressor running speed [rps]
-    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 Q_c_tot;                     // Compressor evaporative capacity [W]
-    Real64 Ncomp;                       // Compressor power [W]
+    Real64 constexpr CompSpdActual = 1298;  // Actual compressor running speed [rps]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 Q_c_tot;                         // Compressor evaporative capacity [W]
+    Real64 Ncomp;                           // Compressor power [W]
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);

@@ -5711,8 +5711,8 @@ void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("GetWaterThermalTankInput");
 
-    const Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
-    const Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
+    constexpr Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
+    constexpr Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
 
     int NumNodes = this->Nodes;
     this->Node.allocate(NumNodes);
@@ -7423,7 +7423,7 @@ Real64 WaterThermalTankData::CalcTimeNeeded(Real64 const Ti, // Initial tank tem
     Real64 CalcTimeNeeded;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Infinity(99999999.9); // A time interval much larger than any single DataGlobals::TimeStep (s)
+    Real64 constexpr Infinity(99999999.9); // A time interval much larger than any single DataGlobals::TimeStep (s)
 
     Real64 t; // Time elapsed from Ti to Tf (s)
 
@@ -7643,9 +7643,9 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     // time step.  Heat transfer rates are averages over the time step.
 
     static constexpr std::string_view RoutineName("CalcWaterThermalTankStratified");
-    const Real64 TemperatureConvergenceCriteria = 0.0001;
+    constexpr Real64 TemperatureConvergenceCriteria = 0.0001;
     const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
-    const Real64 SubTimestepMin = 10.0;        // seconds
+    constexpr Real64 SubTimestepMin = 10.0;    // seconds
     Real64 dt;
 
     // Tank object reference
@@ -8430,7 +8430,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
     // set point temperature, and dead band temperature difference to simulate the desuperheater coil
     // and sets up inputs to the tank model associated with the desuperheater coil
 
-    int const MaxIte(500); // Maximum number of iterations for RegulaFalsi
+    int constexpr MaxIte(500); // Maximum number of iterations for RegulaFalsi
 
     Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
 
@@ -8936,8 +8936,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     // METHODOLOGY EMPLOYED:
     // Simulate the water heater tank, DX coil, and fan to meet the water heating requirements.
 
-    int const MaxIte(500);   // maximum number of iterations
-    Real64 const Acc(0.001); // Accuracy of result from RegulaFalsi
+    int constexpr MaxIte(500);   // maximum number of iterations
+    Real64 constexpr Acc(0.001); // Accuracy of result from RegulaFalsi
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MdotWater;                                                                             // mass flow rate of condenser water, kg/s
@@ -10602,9 +10602,9 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
     // collect routines for setting flow rates for Water heaters
     // with plant connections.
 
-    int const PassingFlowThru(1);
-    int const MaybeRequestingFlow(2);
-    int const ThrottlingFlow(3);
+    int constexpr PassingFlowThru(1);
+    int constexpr MaybeRequestingFlow(2);
+    int constexpr ThrottlingFlow(3);
 
     // determine current mode.  there are three possible
     //  1.  passing thru what was given to inlet node
@@ -11006,8 +11006,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeTankForDemandSide");
-    Real64 const GalTocubicMeters(0.0037854);
-    Real64 const kBtuPerHrToWatts(293.1);
+    Real64 constexpr GalTocubicMeters(0.0037854);
+    Real64 constexpr kBtuPerHrToWatts(293.1);
 
     Real64 Tstart = 14.44;
     Real64 Tfinish = 57.22;
@@ -11703,8 +11703,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
     // same as for plant connected water heaters, only draws are scheduled.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const GalTocubicMeters(0.0037854);
-    Real64 const kBtuPerHrToWatts(293.1);
+    Real64 constexpr GalTocubicMeters(0.0037854);
+    Real64 constexpr kBtuPerHrToWatts(293.1);
     static constexpr std::string_view RoutineName("SizeStandAloneWaterHeater");
 
     Real64 Tstart = 14.44;

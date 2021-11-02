@@ -114,9 +114,9 @@ Real64 CalcDepthFromPeriod(EnergyPlusData &state,
 {
 
     // Assume T, RH, P
-    Real64 const T = 24.0; // C
-    Real64 const RH = 0.45;
-    Real64 const P_amb = 101325; // Pa
+    Real64 constexpr T = 24.0; // C
+    Real64 constexpr RH = 0.45;
+    Real64 constexpr P_amb = 101325; // Pa
 
     // Calculate saturation vapor pressure at assumed temperature
     Real64 const PV_sat = Psychrometrics::PsyPsatFnTemp(state, T, "CalcDepthFromPeriod");
