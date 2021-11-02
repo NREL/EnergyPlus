@@ -2682,7 +2682,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
     CoilBranch.TotalComponents = 1;
     CoilBranch.Comp.allocate(CompNum);
-    CoilBranch.Comp(CompNum).TypeOf_Num = 67;
+    CoilBranch.Comp(CompNum).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -5352,7 +5352,7 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     auto &DSup = state->dataWaterThermalTanks->WaterHeaterDesuperheater(1);
     auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
-    HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
+    HPWH.HPWHType = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped;
 
     // Test 1: Heat Pump Hot Water Heater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
     Tank.HeatPumpNum = 1;
@@ -5403,7 +5403,7 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
 
     // Test 6: Wrapped Heat Pump Water Heater.  Do not do anything.
-    HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
+    HPWH.HPWHType = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped;
     Tank.HeatPumpNum = 1;
     Tank.DesuperheaterNum = 0;
     Tank.MaxCapacity = 200.0;

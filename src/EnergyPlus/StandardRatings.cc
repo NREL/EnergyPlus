@@ -204,7 +204,7 @@ namespace StandardRatings {
 
     void CalcChillerIPLV(EnergyPlusData &state,
                          std::string const &ChillerName,               // Name of Chiller for which IPLV is calculated
-                         int const ChillerType,                        // Type of Chiller - EIR or Reformulated EIR
+                         DataPlant::PlantEquipmentType ChillerType,    // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                          // Reference capacity of chiller [W]
                          Real64 const RefCOP,                          // Reference coefficient of performance [W/W]
                          DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
@@ -246,8 +246,7 @@ namespace StandardRatings {
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
+
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -359,7 +358,7 @@ namespace StandardRatings {
             {
                 auto const SELECT_CASE_var(ChillerType);
 
-                if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                     if (RedCapNum == 1.0) {
                         // Get curve modifier values at rated conditions (load = 100%)
                         ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
@@ -384,7 +383,7 @@ namespace StandardRatings {
                         PartLoadRatio = MinUnloadRat;
                     }
 
-                } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
                     Cp = GetSpecificHeatGlycol(state,
                                                state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
                                                EnteringWaterTempReduced,
@@ -471,10 +470,10 @@ namespace StandardRatings {
             } else {
                 {
                     auto const SELECT_CASE_var(ChillerType);
-                    if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                    if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                         ShowWarningError(state,
                                          "Chiller:Electric:EIR = " + ChillerName + ":  Integrated Part Load Value (IPLV) cannot be calculated.");
-                    } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                    } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:ReformulatedEIR = " + ChillerName +
@@ -604,10 +603,10 @@ namespace StandardRatings {
     }
 
     void ReportChillerIPLV(EnergyPlusData &state,
-                           std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
-                           int const ChillerType,          // Type of Chiller - EIR or Reformulated EIR
-                           Real64 const IPLVValueSI,       // IPLV value in SI units {W/W}
-                           Real64 const IPLVValueIP        // IPLV value in IP units {Btu/W-h}
+                           std::string const &ChillerName,            // Name of Chiller for which IPLV is calculated
+                           DataPlant::PlantEquipmentType ChillerType, // Type of Chiller - EIR or Reformulated EIR
+                           Real64 const IPLVValueSI,                  // IPLV value in SI units {W/W}
+                           Real64 const IPLVValueIP                   // IPLV value in IP units {Btu/W-h}
     )
     {
 
@@ -623,8 +622,6 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using namespace OutputReportPredefined;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &StandardRatingsMyOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyOneTimeFlag;
@@ -641,12 +638,12 @@ namespace StandardRatings {
         {
             static constexpr std::string_view Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
             auto const SELECT_CASE_var(ChillerType);
-            if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:EIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
-            } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:ReformulatedEIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
@@ -660,7 +657,7 @@ namespace StandardRatings {
 
     void CheckCurveLimitsForIPLV(EnergyPlusData &state,
                                  std::string const &ChillerName,               // Name of Chiller
-                                 int const ChillerType,                        // Type of Chiller - EIR or ReformulatedEIR
+                                 DataPlant::PlantEquipmentType ChillerType,    // Type of Chiller - EIR or ReformulatedEIR
                                  DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                                  int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                                  int const EIRFTempCurveIndex                  // Index for the energy input ratio modifier curve
@@ -680,8 +677,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
         // Following parameters are taken from AHRI 551/591,2011 Table 3
         Real64 constexpr HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
@@ -744,12 +739,12 @@ namespace StandardRatings {
                 {
                     auto const SELECT_CASE_var(ChillerType);
 
-                    if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                    if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:EIR = " + ChillerName +
                                              ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
-                    } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                    } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:ReformulatedEIR = " + ChillerName +

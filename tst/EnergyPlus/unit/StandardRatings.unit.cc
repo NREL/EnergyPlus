@@ -254,7 +254,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
 {
 
-    using DataPlant::TypeOf_Chiller_ElectricEIR;
     using StandardRatings::CalcChillerIPLV;
 
     // Setup an air-cooled Chiller:Electric:EIR chiller
@@ -325,7 +324,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     Real64 IPLV;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
-                    TypeOf_Chiller_ElectricEIR,
+                    DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType,
@@ -344,7 +343,6 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
 TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
 {
 
-    using DataPlant::TypeOf_Chiller_ElectricEIR;
     using StandardRatings::CalcChillerIPLV;
 
     // Setup a water-cooled Chiller:Electric:EIR chiller with reference conditions being at non-rated conditions
@@ -418,7 +416,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     Real64 IPLV;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
-                    TypeOf_Chiller_ElectricEIR,
+                    DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType,

@@ -164,7 +164,7 @@ void WrapperSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             this->GLHELoopSideNum,
-                                                            DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                            DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                             this->GLHEInletNodeNum,
                                                             this->GLHEOutletNodeNum,
                                                             this->Report.GLHERate,
@@ -1544,7 +1544,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->CWLoopNum,
                                                 this->CWLoopSideNum,
                                                 this->CWBranchNum,
@@ -1558,7 +1558,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->HWLoopNum,
                                                 this->HWLoopSideNum,
                                                 this->HWBranchNum,
@@ -1572,7 +1572,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->GLHELoopNum,
                                                 this->GLHELoopSideNum,
                                                 this->GLHEBranchNum,
@@ -1589,7 +1589,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                       this->CWLoopSideNum,
                                                       this->GLHELoopNum,
                                                       this->GLHELoopSideNum,
-                                                      DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                      DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
@@ -1597,11 +1597,16 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                       this->HWLoopSideNum,
                                                       this->GLHELoopNum,
                                                       this->GLHELoopSideNum,
-                                                      DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                      DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_CentralGroundSourceHeatPump, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSideNum,
+                                                      this->HWLoopNum,
+                                                      this->HWLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
+                                                      true);
 
         if (this->VariableFlowCH) {
             // Reset flow priority
@@ -2860,7 +2865,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CurCoolingLoad = std::abs(MyLoad);
         this->WrapperCoolingLoad = CurCoolingLoad;
         // Set actual mass flow rate at the nodes when it's locked
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
         }
         if (CHWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
@@ -2874,7 +2879,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CurHeatingLoad = MyLoad;
         this->WrapperHeatingLoad = CurHeatingLoad;
         // Set actual mass flow rate at the nodes when it's locked
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
         }
         if (HWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;

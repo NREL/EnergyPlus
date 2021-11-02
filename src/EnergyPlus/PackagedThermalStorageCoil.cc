@@ -2187,7 +2187,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using DataPlant::TypeOf_PackagedTESCoolingCoil;
+
     using PlantUtilities::ScanPlantLoopsForObject;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2222,7 +2222,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
-                                    TypeOf_PackagedTESCoolingCoil,
+                                    DataPlant::PlantEquipmentType::PackagedTESCoolingCoil,
                                     plloopnum,
                                     lsnum,
                                     brnum,
