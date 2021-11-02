@@ -4142,7 +4142,8 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     if (allocated(ZoneComp)) {
         if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName = ZoneEvapUnit(UnitNum).AvailManagerListName;
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+                ZoneEvapUnit(UnitNum).AvailManagerListName;
             ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
             ZoneEvapUnit(UnitNum).MyZoneEq = false;
         }

@@ -197,12 +197,12 @@ namespace SingleDuct {
         std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units
         int SecInNode;                // zone or zone unit air node number
         // warning variables
-        int IterationLimit;                  // Used for RegulaFalsi error -1
-        int IterationFailed;                 // Used for RegulaFalsi error -2
+        int IterationLimit;                                       // Used for RegulaFalsi error -1
+        int IterationFailed;                                      // Used for RegulaFalsi error -2
         DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
-        bool EMSOverrideAirFlow;             // if true, EMS is calling to override flow rate
-        Real64 EMSMassFlowRateValue;         // value EMS is directing to use for flow rate [kg/s]
-        int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
+        bool EMSOverrideAirFlow;                                  // if true, EMS is calling to override flow rate
+        Real64 EMSMassFlowRateValue;                              // value EMS is directing to use for flow rate [kg/s]
+        int ZoneTurndownMinAirFracSchPtr;                         // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
         bool MyEnvrnFlag;
@@ -231,10 +231,10 @@ namespace SingleDuct {
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
-              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), EMSOverrideAirFlow(false),
-              EMSMassFlowRateValue(0.0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false),
-              MyEnvrnFlag(true), MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0),
-              MassFlow3(0.0), MassFlowDiff(0.0)
+              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
+              ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true),
+              MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0), MassFlow3(0.0),
+              MassFlowDiff(0.0)
         {
         }
 
@@ -314,12 +314,12 @@ namespace SingleDuct {
         int ZoneEqNum;
         int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
         int ZoneNum;
-        bool NoOAFlowInputFromUser;     // avoids OA calculation if no input specified by user
-        int OARequirementsPtr;          // - Index to DesignSpecification:OutdoorAir object
-        int AirLoopNum;                 // System sizing adjustments
-        Real64 DesignPrimaryAirVolRate; // System sizing adjustments, filled from design OA spec using sizing mode flags.
+        bool NoOAFlowInputFromUser;                               // avoids OA calculation if no input specified by user
+        int OARequirementsPtr;                                    // - Index to DesignSpecification:OutdoorAir object
+        int AirLoopNum;                                           // System sizing adjustments
+        Real64 DesignPrimaryAirVolRate;                           // System sizing adjustments, filled from design OA spec using sizing mode flags.
         DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
-        bool printWarning;              // flag to print warnings only once
+        bool printWarning;                                        // flag to print warnings only once
         // Default Constructor
         AirTerminalMixerData()
             : MixerType(0), ZoneHVACUnitType(0), SecInNode(0), PriInNode(0), MixedAirOutNode(0), ZoneInletNode(0), ZoneAirTemp(0.0),

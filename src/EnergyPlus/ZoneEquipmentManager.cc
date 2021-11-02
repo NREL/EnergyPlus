@@ -3421,7 +3421,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                              // via SumLatentHTRadSys... so setting LatOutputProvided = 0.0
 
                 } else if (SELECT_CASE_var == ZoneEquip::LoTempRadiant) { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow',
-                                                                              // 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
+                                                                          // 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
                     // 'ZoneHVAC:LowTemperatureRadiant:Electric'
                     SimLowTempRadiantSystem(state,
                                             state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
@@ -3469,7 +3469,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                      state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr));
 
                 } else if (SELECT_CASE_var == ZoneEquip::HPWaterHeater) { // 'WaterHeater:HeatPump:PumpedCondenser'
-                                                                   //                        auto HPWH =
+                                                                          //                        auto HPWH =
                     //                        WaterThermalTanks::HeatPumpWaterHeaterData::factory(PrioritySimOrder(EquipTypeNum).EquipName);
                     //                        PlantLocation A(0, 0, 0, 0);
                     //                        Real64 curLoad = 0.0;

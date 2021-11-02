@@ -828,7 +828,8 @@ namespace WindowAC {
 
         if (allocated(ZoneComp)) {
             if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailManagerListName =
+                    state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
                 ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
                 state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
             }

@@ -4830,8 +4830,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                            SELECT_CASE_var == DataZoneEquipment::ZoneEquip::HPWaterHeater ||
                            SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBWater ||
                            SELECT_CASE_var == DataZoneEquipment::ZoneEquip::ZoneDXDehumidifier ||
-                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBSteam ||
-                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBElectric ||
+                           SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBSteam || SELECT_CASE_var == DataZoneEquipment::ZoneEquip::BBElectric ||
                            SELECT_CASE_var == DataZoneEquipment::ZoneEquip::RefrigerationAirChillerSet ||
                            SELECT_CASE_var == DataZoneEquipment::ZoneEquip::UserDefinedZoneHVACForcedAir ||
                            SELECT_CASE_var == DataZoneEquipment::ZoneEquip::CoolingPanel) {
