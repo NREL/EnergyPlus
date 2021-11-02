@@ -4181,14 +4181,14 @@ namespace FanCoilUnits {
                 }
             }
             // IF small loads to meet, just shut down unit
-            if (std::abs(QZnReq) < state.dataFanCoilUnits->Small5WLoad) {
+            if (std::abs(QZnReq) < FanCoilUnits::Small5WLoad) {
                 QZnReq = 0.0;
                 CoolingLoad = false;
                 HeatingLoad = false;
             }
         }
 
-        if (UnitOn && QZnReq < (-1.0 * state.dataFanCoilUnits->Small5WLoad) && CoolingLoad) {
+        if (UnitOn && QZnReq < (-1.0 * FanCoilUnits::Small5WLoad) && CoolingLoad) {
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                 mdot = 0.0;
                 SetComponentFlowRate(state,
@@ -4242,7 +4242,7 @@ namespace FanCoilUnits {
             }
             CalcMultiStage4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
 
-        } else if (UnitOn && QZnReq > state.dataFanCoilUnits->Small5WLoad && HeatingLoad) {
+        } else if (UnitOn && QZnReq > FanCoilUnits::Small5WLoad && HeatingLoad) {
 
             mdot = 0.0;
             SetComponentFlowRate(state,
@@ -4430,7 +4430,7 @@ namespace FanCoilUnits {
         AirMassFlowAvg = 0.0;
         AirMassFlowLow = 0.0;
         AirMassFlowHigh = 0.0;
-        AbsError = 2.0 * state.dataFanCoilUnits->Small5WLoad;
+        AbsError = 2.0 * FanCoilUnits::Small5WLoad;
         Error = 1.0;
         Relax = 1.0;
         Iter = 0;
@@ -4440,15 +4440,14 @@ namespace FanCoilUnits {
 
         auto &Node(state.dataLoopNodes->Node);
 
-        if (QZnReq < (-1.0 * state.dataFanCoilUnits->Small5WLoad) && state.dataFanCoilUnits->CoolingLoad) {
+        if (QZnReq < (-1.0 * FanCoilUnits::Small5WLoad) && state.dataFanCoilUnits->CoolingLoad) {
             ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
             if (FanCoil(FanCoilNum).SpeedFanSel == 1) {
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMax);
                 PLR = std::abs(QZnReq / QUnitOutMax);
                 if (PLR > 1.0) PLR = 1.0;
                 // adjust the PLR to meet the cooling load by calling Calc4PipeFanCoil repeatedly
-                while (std::abs(Error) > ControlOffset && std::abs(AbsError) > state.dataFanCoilUnits->Small5WLoad && Iter < MaxIterCycl &&
-                       PLR != 1.0) {
+                while (std::abs(Error) > ControlOffset && std::abs(AbsError) > FanCoilUnits::Small5WLoad && Iter < MaxIterCycl && PLR != 1.0) {
                     Node(InletNode).MassFlowRateMinAvail = Node(InletNode).MassFlowRate;
                     mdot = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                     SetComponentFlowRate(state,
@@ -4554,8 +4553,7 @@ namespace FanCoilUnits {
                     state.dataFanCoilUnits->FanFlowRatio = HighSpeedRatio * SRatio + LowSpeedRatio * (1.0 - SRatio);
                     Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut);
                     // adjust the PLR to meet the cooling load by calling Calc4PipeFanCoil repeatedly
-                    while (std::abs(Error) > ControlOffset && std::abs(AbsError) > state.dataFanCoilUnits->Small5WLoad && Iter < MaxIterCycl &&
-                           SRatio != 1.0) {
+                    while (std::abs(Error) > ControlOffset && std::abs(AbsError) > FanCoilUnits::Small5WLoad && Iter < MaxIterCycl && SRatio != 1.0) {
                         AirMassFlowAvg = AirMassFlowHigh * SRatio + AirMassFlowLow * (1.0 - SRatio);
                         state.dataFanCoilUnits->FanFlowRatio = HighSpeedRatio * SRatio + LowSpeedRatio * (1.0 - SRatio);
                         Node(InletNode).MassFlowRate = AirMassFlowAvg;
@@ -4575,7 +4573,7 @@ namespace FanCoilUnits {
                     }
                 }
             }
-        } else if (QZnReq > state.dataFanCoilUnits->Small5WLoad && state.dataFanCoilUnits->HeatingLoad) {
+        } else if (QZnReq > FanCoilUnits::Small5WLoad && state.dataFanCoilUnits->HeatingLoad) {
             ControlOffset = FanCoil(FanCoilNum).HotControlOffset;
             if (FanCoil(FanCoilNum).SpeedFanSel == 1) {
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMax);
@@ -4583,8 +4581,7 @@ namespace FanCoilUnits {
                 if (PLR > 1.0) PLR = 1.0;
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                     // adjust the PLR to meet the heating load by calling Calc4PipeFanCoil repeatedly
-                    while (std::abs(Error) > ControlOffset && std::abs(AbsError) > state.dataFanCoilUnits->Small5WLoad && Iter < MaxIterCycl &&
-                           PLR != 1.0) {
+                    while (std::abs(Error) > ControlOffset && std::abs(AbsError) > FanCoilUnits::Small5WLoad && Iter < MaxIterCycl && PLR != 1.0) {
                         Node(InletNode).MassFlowRateMinAvail = Node(InletNode).MassFlowRate;
                         mdot = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                         SetComponentFlowRate(state,
@@ -4747,8 +4744,7 @@ namespace FanCoilUnits {
                     Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut);
                     ControlOffset = FanCoil(FanCoilNum).HotControlOffset;
                     // adjust the PLR to meet the heating load calling Calc4PipeFanCoil repeatedly
-                    while (std::abs(Error) > ControlOffset && std::abs(AbsError) > state.dataFanCoilUnits->Small5WLoad && Iter < MaxIterCycl &&
-                           SRatio != 1.0) {
+                    while (std::abs(Error) > ControlOffset && std::abs(AbsError) > FanCoilUnits::Small5WLoad && Iter < MaxIterCycl && SRatio != 1.0) {
                         AirMassFlowAvg = AirMassFlowHigh * SRatio + AirMassFlowLow * (1.0 - SRatio);
                         Node(InletNode).MassFlowRate = AirMassFlowAvg;
                         Node(InletNode).MassFlowRateMax = AirMassFlowAvg;

@@ -128,8 +128,6 @@ public:
     int NumZoneInletNodes = 1;   // number of zone inlet nodes
     int NumZoneExhaustNodes = 1; // number of zone exhaust nodes
     bool ErrorsFound = false;
-    Real64 const CpWater = 4180.0;  // For estimating the expected result
-    Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 protected:
     virtual void SetUp()
@@ -8431,7 +8429,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->NumSteamCoils = 1;
     state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state->dataSteamCoils->SteamCoil_AirHeating;
+    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
     state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -8449,7 +8447,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
-    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state->dataSteamCoils->ZoneLoadControl;
+    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;
     state->dataSteamCoils->CheckEquipName.dimension(state->dataSteamCoils->NumSteamCoils, true);
     state->dataSteamCoils->MySizeFlag.allocate(CoilNum);

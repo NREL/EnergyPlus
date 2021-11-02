@@ -340,43 +340,6 @@ namespace VentilatedSlab {
 struct VentilatedSlabData : BaseGlobalStruct
 {
 
-    std::string const cMO_VentilatedSlab = "ZoneHVAC:VentilatedSlab";
-
-    // TODO: remove 'const' from state
-    // Parameters for outside air control types:
-    int const Heating_ElectricCoilType = 1;
-    int const Heating_GasCoilType = 2;
-    int const Heating_WaterCoilType = 3;
-    int const Heating_SteamCoilType = 4;
-    int const Cooling_CoilWaterCooling = 1;
-    int const Cooling_CoilDetailedCooling = 2;
-    int const Cooling_CoilHXAssisted = 3;
-    int const VariablePercent = 1;
-    int const FixedTemperature = 2;
-    int const FixedOAControl = 3;
-    int const NotOperating = 0; // Parameter for use with OperatingMode variable, set for no heating/cooling
-    int const HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
-    int const CoolingMode = 2;  // Parameter for use with OperatingMode variable, set for cooling
-                                // Ventilated Slab Configurations
-    int const SlabOnly = 1;     // Air circulate through cores of slab only
-    int const SlabAndZone = 2;  // Circulated Air is introduced to zone
-    int const SeriesSlabs = 3;
-    //  Control Types
-    int const MATControl = 1;  // Controls system using mean air temperature
-    int const MRTControl = 2;  // Controls system using mean radiant temperature
-    int const OPTControl = 3;  // Controls system using operative temperature
-    int const ODBControl = 4;  // Controls system using outside air dry-bulb temperature
-    int const OWBControl = 5;  // Controls system using outside air wet-bulb temperature
-    int const SURControl = 6;  // Controls system using surface temperature !Phase2-A
-    int const DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
-
-    // coil operation
-    int const On = 1;  // normal coil operation
-    int const Off = 0; // signal coil shouldn't run
-    int const NoneOption = 0;
-    int const BothOption = 1;
-    int const HeatingOption = 2;
-    int const CoolingOption = 3;
     int OperatingMode = 0; // Used to keep track of whether system is in heating or cooling mode
 
     // MODULE VARIABLE DECLARATIONS:

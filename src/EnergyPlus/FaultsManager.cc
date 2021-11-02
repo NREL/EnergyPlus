@@ -859,7 +859,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != state.dataSteamCoils->TemperatureSetPointControl) {
+                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != SteamCoils::TemperatureSetPointControl) {
                             // The fault model is only applicable to the coils controlled on leaving air temperature
                             ShowWarningError(
                                 state,

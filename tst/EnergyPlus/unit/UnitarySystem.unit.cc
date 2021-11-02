@@ -106,10 +106,8 @@ class ZoneUnitarySysTest : public EnergyPlusFixture
 {
 public:
     int UnitarySysNum = 1;
-    int NumNodes = 1; // number of zone inlet and zone exhaust nodes
+    int NumNodes = 1; // number of zone inlet and zone exhaust nodesgit
     bool ErrorsFound = false;
-    Real64 const CpWater = 4180.0;  // For estimating the expected result
-    Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 protected:
     virtual void SetUp()
@@ -3782,7 +3780,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.m_MSHeatingSpeedRatio.resize(4);
     thisSys.m_MSCoolingSpeedRatio.resize(4);
 
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -4283,7 +4281,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     thisSys.m_CoolMassFlowRate.resize(4);
     thisSys.m_MSHeatingSpeedRatio.resize(4);
     thisSys.m_MSCoolingSpeedRatio.resize(4);
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -4428,7 +4426,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     thisSys.m_CoolMassFlowRate.resize(4);
     thisSys.m_MSHeatingSpeedRatio.resize(4);
     thisSys.m_MSCoolingSpeedRatio.resize(4);
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -12480,7 +12478,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFractionOfAutoSizedCoolingFlowRateValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
-    EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, state->dataUnitarySystems->FractionOfAutoSizedCoolingValue);
+    EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, UnitarySystems::FractionOfAutoSizedCoolingValue);
     EXPECT_EQ(userspecifiedFractionOfAutoSizedCoolingFlowRateValue, 0.9);
 
     bool FirstHVACIteration = true;
@@ -12621,7 +12619,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFlowPerCoolingCapacityValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
-    EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, state->dataUnitarySystems->FlowPerCoolingCapacity);
+    EXPECT_EQ(thisSys->m_NoCoolHeatSAFMethod, UnitarySystems::FlowPerCoolingCapacity);
     EXPECT_EQ(userspecifiedFlowPerCoolingCapacityValue, 0.0000462180155978106);
 
     bool FirstHVACIteration = true;
@@ -13295,9 +13293,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     EXPECT_EQ(thisClgCoil.RatedTotCap(1), DataSizing::AutoSize);
     EXPECT_EQ(thisHtgCoil.NominalCapacity, DataSizing::AutoSize);
 
-    ASSERT_EQ(thisSys->m_CoolingSAFMethod, state->dataUnitarySystems->None);
-    ASSERT_EQ(thisSys->m_HeatingSAFMethod, state->dataUnitarySystems->None);
-    ASSERT_EQ(thisSys->m_NoCoolHeatSAFMethod, state->dataUnitarySystems->None);
+    ASSERT_EQ(thisSys->m_CoolingSAFMethod, UnitarySystems::None);
+    ASSERT_EQ(thisSys->m_HeatingSAFMethod, UnitarySystems::None);
+    ASSERT_EQ(thisSys->m_NoCoolHeatSAFMethod, UnitarySystems::None);
 
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
@@ -16118,7 +16116,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
 
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
-    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = UnitarySystems::CoolingMode;
     state->dataUnitarySystems->CoolingLoad = true;
     thisSys.reportUnitarySystem(*state, 0);
     // cooling coil is off
@@ -16150,7 +16148,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
     // heating coil is on
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.m_HeatingPartLoadFrac = 1.0;
     thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
@@ -16180,7 +16178,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     thisSys.m_AncillaryOffPower = 100.0;
     onElectricEnergy = thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     offElectricEnergy = thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.m_HeatingPartLoadFrac = 0.0;
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = true;
@@ -16214,7 +16212,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
     // heating coil is on
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.m_HeatingPartLoadFrac = 1.0;
     thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
@@ -16235,7 +16233,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     // test with non-discrete speed water coils
     // coil runs the entire time step
     thisSys.m_DiscreteSpeedCoolingCoil = false;
-    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.m_HeatingPartLoadFrac = 0.0;
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = true;
@@ -16269,7 +16267,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
 
     // heating coil is on
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.m_HeatingPartLoadFrac = 1.0;
     thisSys.reportUnitarySystem(*state, 0);
     EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
@@ -17654,7 +17652,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     state->dataLoopNodes->Node.allocate(10);
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);
-    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisSys.m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
 
@@ -17903,7 +17901,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataLoopNodes->Node.allocate(10);
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);
-    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -18166,7 +18164,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     state->dataLoopNodes->Node.allocate(10);
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);
-    thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
+    thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
