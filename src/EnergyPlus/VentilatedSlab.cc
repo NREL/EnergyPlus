@@ -2711,9 +2711,9 @@ namespace VentilatedSlab {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        Real64 const LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
+        Real64 constexpr LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
         // (below this value the temperatures are assumed equal)
-        Real64 const LowOAFracDiff(0.01); // Smallest allowed outside air fraction difference for comparison
+        Real64 constexpr LowOAFracDiff(0.01); // Smallest allowed outside air fraction difference for comparison
         // (below this value the fractions are assumed equal)
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -3806,10 +3806,10 @@ namespace VentilatedSlab {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const CondDeltaTemp(0.001); // How close the surface temperatures can get to the dewpoint temperature
+        Real64 constexpr CondDeltaTemp(0.001); // How close the surface temperatures can get to the dewpoint temperature
         // of a space before the radiant cooling system shuts off the flow.
-        Real64 const ZeroSystemResp(0.1); // Response below which the system response is really zero
-        Real64 const TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
+        Real64 constexpr ZeroSystemResp(0.1); // Response below which the system response is really zero
+        Real64 constexpr TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4794,9 +4794,9 @@ namespace VentilatedSlab {
         // Return value
         Real64 CalcVentSlabHXEffectTerm;
 
-        Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-        int const NumOfPropDivisions(13);
-        Real64 const MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
+        Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+        int constexpr NumOfPropDivisions(13);
+        Real64 constexpr MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
         static Array1D<Real64> const Temps(
             NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
         static Array1D<Real64> const Mu(NumOfPropDivisions,

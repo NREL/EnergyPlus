@@ -640,8 +640,8 @@ void SimHVAC(EnergyPlusData &state)
     using ZoneEquipmentManager::ManageZoneEquipment;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    bool const SimWithPlantFlowUnlocked(false);
-    bool const SimWithPlantFlowLocked(true);
+    bool constexpr SimWithPlantFlowUnlocked(false);
+    bool constexpr SimWithPlantFlowLocked(true);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
@@ -1876,7 +1876,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxAir(5); // Iteration Max for Air Simulation Iterations
+    int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IterAir; // counts iterations to enforce maximum iteration limit

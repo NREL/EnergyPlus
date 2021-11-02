@@ -386,7 +386,7 @@ namespace HeatBalanceManager {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumConstrObjects(6);
+        int constexpr NumConstrObjects(6);
         Array1D_string const ConstrObjects(NumConstrObjects,
                                            {"Pipe:Indoor",
                                             "Pipe:Outdoor",
@@ -6179,7 +6179,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinLoad(100.0); // Minimum laods for convergence check
+        Real64 constexpr MinLoad(100.0); // Minimum loads for convergence check
         // To avoid big percentage difference in low load situations
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -7762,9 +7762,9 @@ namespace HeatBalanceManager {
 
         // ASHRAE Handbook Fundamental 2005
         // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
-        Real64 const Rfilm_in(0.125);
+        Real64 constexpr Rfilm_in(0.125);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
-        Real64 const Rfilm_out(0.03);
+        Real64 constexpr Rfilm_out(0.03);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

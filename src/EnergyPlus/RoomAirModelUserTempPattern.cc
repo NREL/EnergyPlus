@@ -655,7 +655,7 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     Real64 FigureNDheightInZone;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const TolValue(0.0001);
+    Real64 constexpr TolValue(0.0001);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int thisZone;

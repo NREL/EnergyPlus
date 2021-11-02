@@ -103,9 +103,9 @@ namespace PhotovoltaicThermalCollectors {
     //  the first model is a "simple" or "ideal" model useful for sizing, early design, or policy analyses
     //  Simple PV/T model just converts incoming solar to electricity and temperature rise of a working fluid.
 
-    int const SimplePVTmodel(1001);
+    int constexpr SimplePVTmodel(1001);
 
-    Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
+    Real64 constexpr SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
     PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
     {

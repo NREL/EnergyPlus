@@ -1822,14 +1822,14 @@ namespace WaterToAirHeatPump {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const CpWater(4210.0);         // Specific heat of water J/kg_C
-        Real64 const DegreeofSuperheat(80.0); // Initial guess of degree of superheat
-        Real64 const gamma(1.114);            // Expnasion Coefficient
-        Real64 RelaxParam(0.5);               // Relaxation Parameter
-        Real64 const ERR(0.01);               // Error Value
-        int const STOP1(1000);                // Iteration stopper1
-        int const STOP2(1000);                // Iteration stopper2
-        int const STOP3(1000);                // Iteration stopper3
+        Real64 constexpr CpWater(4210.0);         // Specific heat of water J/kg_C
+        Real64 constexpr DegreeofSuperheat(80.0); // Initial guess of degree of superheat
+        Real64 constexpr gamma(1.114);            // Expnasion Coefficient
+        Real64 RelaxParam(0.5);                   // Relaxation Parameter
+        Real64 constexpr ERR(0.01);               // Error Value
+        int constexpr STOP1(1000);                // Iteration stopper1
+        int constexpr STOP2(1000);                // Iteration stopper2
+        int constexpr STOP3(1000);                // Iteration stopper3
 
         static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcWatertoAirHPHeating:SourceSideInletTemp");
         static constexpr std::string_view RoutineNameSourceSideTemp("CalcWatertoAirHPHeating:SourceSideTemp");

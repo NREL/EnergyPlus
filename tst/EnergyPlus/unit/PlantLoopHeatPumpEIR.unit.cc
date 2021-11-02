@@ -483,8 +483,8 @@ TEST_F(EnergyPlusFixture, Initialization)
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // validate that plant sizing went ok
-    Real64 const flowTol = 0.001;
-    Real64 const rho = 999.89; // easy to edit here if the expected density gets adjusted in E+
+    Real64 constexpr flowTol = 0.001;
+    Real64 constexpr rho = 999.89; // easy to edit here if the expected density gets adjusted in E+
     Real64 const expectedLoadSideMassFlow = rho * thisCoolingPLHP->loadSideDesignVolFlowRate;
     Real64 const expectedSourceSideMassFlow = rho * thisCoolingPLHP->sourceSideDesignVolFlowRate;
     EXPECT_NEAR(expectedLoadSideMassFlow, thisCoolingPLHP->loadSideDesignMassFlowRate, flowTol);
@@ -577,8 +577,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-    Real64 const plantSizingLoadVolFlow = 0.01;
-    Real64 const plantSizingLoadDeltaT = 1.0;
+    Real64 constexpr plantSizingLoadVolFlow = 0.01;
+    Real64 constexpr plantSizingLoadDeltaT = 1.0;
 
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.010;
@@ -631,10 +631,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     //   This works out to a multiplier of 2 on the source flow rate.  With the same deltaT on the design of the source
     //   loop, the flow rate must be twice as high.
     // The source side has a slightly different set of thermal properties so the expected flow is scaled by those.
-    Real64 const expectedLoadCp = 4197.93;
-    Real64 const expectedLoadRho = 999.898;
-    Real64 const expectedSourceCp = 4185.0;
-    Real64 const expectedSourceRho = 983.2;
+    Real64 constexpr expectedLoadCp = 4197.93;
+    Real64 constexpr expectedLoadRho = 999.898;
+    Real64 constexpr expectedSourceCp = 4185.0;
+    Real64 constexpr expectedSourceRho = 983.2;
     Real64 const expectedLoadFlow = plantSizingLoadVolFlow;
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     Real64 const baseExpectedSourceFlow = plantSizingLoadVolFlow * 2.0;
@@ -1564,9 +1564,9 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
         firstHVAC = true;
         curLoad = -800;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -1583,9 +1583,9 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
         curLoad = -1200;
         Real64 availableCapacity = 950.0;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -1673,8 +1673,8 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         bool firstHVAC = true;
         Real64 curLoad = -900;
         bool runFlag = true; // plant actually shouldn't do this but the component can be smart enough to handle it
-        Real64 const specifiedLoadSetpoint = 45;
-        Real64 const loadInletTemp = 46;
+        Real64 constexpr specifiedLoadSetpoint = 45;
+        Real64 constexpr loadInletTemp = 46;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
         state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -1689,9 +1689,9 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         bool firstHVAC = true;
         Real64 curLoad = 800;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -1708,9 +1708,9 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         Real64 curLoad = 1200;
         Real64 availableCapacity = 950.0;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -1910,9 +1910,9 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
         firstHVAC = true;
         curLoad = -800;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -1929,9 +1929,9 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
         curLoad = -1200;
         Real64 availableCapacity = 950.0;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -2009,8 +2009,8 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         bool firstHVAC = true;
         Real64 curLoad = -900;
         bool runFlag = true; // plant actually shouldn't do this but the component can be smart enough to handle it
-        Real64 const specifiedLoadSetpoint = 45;
-        Real64 const loadInletTemp = 46;
+        Real64 constexpr specifiedLoadSetpoint = 45;
+        Real64 constexpr loadInletTemp = 46;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
         state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -2025,9 +2025,9 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         bool firstHVAC = true;
         Real64 curLoad = 800;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -2044,9 +2044,9 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         Real64 curLoad = 1200;
         Real64 availableCapacity = 950.0;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -2062,9 +2062,9 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         bool firstHVAC = true;
         Real64 curLoad = 0.0;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
@@ -2341,12 +2341,12 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
 
-    Real64 const plantSizingLoadVolFlow = 0.01;
-    Real64 const plantSizingLoadDeltaT = 1.0;
+    Real64 constexpr plantSizingLoadVolFlow = 0.01;
+    Real64 constexpr plantSizingLoadDeltaT = 1.0;
 
-    Real64 const plantSizingSrcDeltaT = 10.0;
+    Real64 constexpr plantSizingSrcDeltaT = 10.0;
 
-    Real64 const COP = 1;
+    Real64 constexpr COP = 1;
 
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;
@@ -2505,8 +2505,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
 
-    Real64 const plantSizingLoadVolFlow = 0.01;
-    Real64 const plantSizingLoadDeltaT = 1.0;
+    Real64 constexpr plantSizingLoadVolFlow = 0.01;
+    Real64 constexpr plantSizingLoadDeltaT = 1.0;
 
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;

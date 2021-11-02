@@ -185,6 +185,7 @@ namespace TranspiredCollector {
 struct TranspiredCollectorData : BaseGlobalStruct
 {
 
+    // TODO: remove 'const' from state
     int const Layout_Square = 1;
     int const Layout_Triangle = 2;
     int const Correlation_Kutscher1994 = 1;

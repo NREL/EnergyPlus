@@ -588,11 +588,11 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     //       RE-ENGINEERED  Mar2000
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const gamma(1.114); // Expnasion Coefficient
-    Real64 const HeatBalTol(0.0005);
-    Real64 const RelaxParam(0.6);
-    Real64 const SmallNum(1.0e-20);
-    int const IterationLimit(500);
+    Real64 constexpr gamma(1.114); // Expnasion Coefficient
+    Real64 constexpr HeatBalTol(0.0005);
+    Real64 constexpr RelaxParam(0.6);
+    Real64 constexpr SmallNum(1.0e-20);
+    int constexpr IterationLimit(500);
     static constexpr std::string_view RoutineName("CalcGshpModel");
     static constexpr std::string_view RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
     static constexpr std::string_view RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");

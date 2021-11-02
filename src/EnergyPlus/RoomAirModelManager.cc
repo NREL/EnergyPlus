@@ -1957,7 +1957,7 @@ namespace RoomAirModelManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BaseDischargeCoef(0.62);
+        Real64 constexpr BaseDischargeCoef(0.62);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

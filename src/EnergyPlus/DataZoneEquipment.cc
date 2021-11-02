@@ -388,10 +388,10 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
             }
-            const int nAlphasInExtensible = 4;
-            const int nNumsInExtensible = 2;
-            const int nAlphasBeforeExtensible = 2;
-            const int nNumsBeforeExtensible = 0;
+            constexpr int nAlphasInExtensible = 4;
+            constexpr int nNumsInExtensible = 2;
+            constexpr int nAlphasBeforeExtensible = 2;
+            constexpr int nNumsBeforeExtensible = 0;
             maxEquipCount = 0;
             numEquipCount = (NumAlphas - nAlphasBeforeExtensible) / nAlphasInExtensible;
             if (numEquipCount * nAlphasInExtensible != (NumAlphas - nAlphasBeforeExtensible)) ++numEquipCount;

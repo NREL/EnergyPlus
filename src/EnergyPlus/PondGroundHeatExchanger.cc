@@ -530,9 +530,9 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
 
     Real64 CalcTotalFLux; // function return variable
 
-    Real64 const PrandtlAir(0.71); // Prandtl number for air - assumed constant
-    Real64 const SchmidtAir(0.6);  // Schmidt number for air - assumed constant
-    Real64 const PondHeight(0.0);  // for now
+    Real64 constexpr PrandtlAir(0.71); // Prandtl number for air - assumed constant
+    Real64 constexpr SchmidtAir(0.6);  // Schmidt number for air - assumed constant
+    Real64 constexpr PondHeight(0.0);  // for now
 
     static constexpr std::string_view RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
 
@@ -637,9 +637,9 @@ Real64 PondGroundHeatExchangerData::CalcSolarFlux(EnergyPlusData &state) const
 
     Real64 CalcSolarFlux; // Function return variable
 
-    Real64 const WaterRefIndex(1.33); // refractive index of water
-    Real64 const AirRefIndex(1.0003); // refractive index of air
-    Real64 const PondExtCoef(0.3);    // extinction coefficient of water
+    Real64 constexpr WaterRefIndex(1.33); // refractive index of water
+    Real64 constexpr AirRefIndex(1.0003); // refractive index of air
+    Real64 constexpr PondExtCoef(0.3);    // extinction coefficient of water
 
     // check for sun up.
     if (!state.dataEnvrn->SunIsUp) {
@@ -706,8 +706,8 @@ Real64 PondGroundHeatExchangerData::CalcEffectiveness(EnergyPlusData &state,
 
     Real64 CalcEffectiveness; // Function return variable
 
-    Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-    Real64 const GravConst(9.81);      // gravitational constant - should be fixed!
+    Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+    Real64 constexpr GravConst(9.81);      // gravitational constant - should be fixed!
     static constexpr std::string_view CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
 
     // evaluate properties at pipe fluid temperature for given pipe fluid
@@ -867,8 +867,8 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
 }
 void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
 {
-    Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-    Real64 const PondHeight(0.0);     // for now
+    Real64 constexpr DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
+    Real64 constexpr PondHeight(0.0);     // for now
 
     static std::string const RoutineName("InitPondGroundHeatExchanger");
 

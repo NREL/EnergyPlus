@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
     PerformanceCurveData *pCurve;
 
-    int const nCapfT = 1;
+    int constexpr nCapfT = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->CurveType = CurveTypeEnum::Cubic;
     pCurve->NumDims = 1;
@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     Coil.CCapFTemp(1) = nCapfT;
 
-    int const nCapfFF = 2;
+    int constexpr nCapfFF = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->CurveMax = 2;
     Coil.CCapFFlow(1) = nCapfFF;
 
-    int const nEIRfT = 3;
+    int constexpr nEIRfT = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->CurveType = CurveTypeEnum::Cubic;
     pCurve->NumDims = 1;
@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->Var1Max = 25;
     Coil.EIRFTemp(1) = nEIRfT;
 
-    int const nEIRfFF = 4;
+    int constexpr nEIRfFF = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->CurveMax = 2;
     Coil.EIRFFlow(1) = nEIRfFF;
 
-    int const nPLFfPLR = 5;
+    int constexpr nPLFfPLR = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;

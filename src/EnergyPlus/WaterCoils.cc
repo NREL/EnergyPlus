@@ -4444,8 +4444,8 @@ void CoilPartWetPartDry(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    int const itmax(60);
-    Real64 const smalltempdiff(1.0e-9);
+    int constexpr itmax(60);
+    Real64 constexpr smalltempdiff(1.0e-9);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -4688,7 +4688,7 @@ Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
 
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 const SmallNo(1.e-9);
-    int const itmax(12);
+    int constexpr itmax(12);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5320,7 +5320,7 @@ void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IB
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const ErrorTol(1.0e-06);
+    Real64 constexpr ErrorTol(1.0e-06);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5425,7 +5425,7 @@ void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KB
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const GJMAX(1.0e+38);
+    Real64 constexpr GJMAX(1.0e+38);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5818,9 +5818,9 @@ void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Tolerance(1.e-5);         // Relative error tolerance
-    Real64 const PerturbSurfAreaFrac(0.1); // Perturbation applied to Surf Fraction to initialize iteration
-    Real64 const SmallNum(1.e-9);          // Small Number
+    Real64 const Tolerance(1.e-5);             // Relative error tolerance
+    Real64 constexpr PerturbSurfAreaFrac(0.1); // Perturbation applied to Surf Fraction to initialize iteration
+    Real64 const SmallNum(1.e-9);              // Small Number
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -6566,8 +6566,8 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    int const MaxIte(500); // Maximum number of iterations
-    Real64 const Acc(1.0); // Accuracy of result
+    int constexpr MaxIte(500); // Maximum number of iterations
+    Real64 constexpr Acc(1.0); // Accuracy of result
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

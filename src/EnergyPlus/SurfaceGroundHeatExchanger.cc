@@ -125,12 +125,12 @@ namespace SurfaceGroundHeatExchanger {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    Real64 const SmallNum(1.0e-30);         // Very small number to avoid div0 errors
-    Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
-    Real64 const SurfaceHXHeight(0.0);      // Surface Height above ground -- used in height dependent calcs.
+    Real64 constexpr SmallNum(1.0e-30);         // Very small number to avoid div0 errors
+    Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    Real64 constexpr SurfaceHXHeight(0.0);      // Surface Height above ground -- used in height dependent calcs.
 
-    int const SurfCond_Ground(1);
-    int const SurfCond_Exposed(2);
+    int constexpr SurfCond_Ground(1);
+    int constexpr SurfCond_Exposed(2);
 
     PlantComponent *
     SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
@@ -597,11 +597,11 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         using namespace DataEnvironment;
 
-        Real64 const SurfFluxTol(0.001); // tolerance on the surface fluxes
-        Real64 const SrcFluxTol(0.001);  // tolerance on the source flux
-        Real64 const RelaxT(0.1);        // temperature relaxation factor
-        int const Maxiter(100);
-        int const Maxiter1(100);
+        Real64 constexpr SurfFluxTol(0.001); // tolerance on the surface fluxes
+        Real64 constexpr SrcFluxTol(0.001);  // tolerance on the source flux
+        Real64 constexpr RelaxT(0.1);        // temperature relaxation factor
+        int constexpr Maxiter(100);
+        int constexpr Maxiter1(100);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PastFluxTop;    // top surface flux - past value
@@ -1072,8 +1072,8 @@ namespace SurfaceGroundHeatExchanger {
         // Return value
         Real64 CalcHXEffectTerm;
 
-        Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-        int const NumOfPropDivisions(13);  // intervals in property correlation
+        Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+        int constexpr NumOfPropDivisions(13);  // intervals in property correlation
         static Array1D<Real64> const Temps(
             NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
         static Array1D<Real64> const Mu(NumOfPropDivisions,
@@ -1094,7 +1094,7 @@ namespace SurfaceGroundHeatExchanger {
             NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
         static Array1D<Real64> const Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
-        int const WaterIndex(1);
+        int constexpr WaterIndex(1);
         static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1434,8 +1434,8 @@ namespace SurfaceGroundHeatExchanger {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-        Real64 rho;                       // local fluid density
+        Real64 constexpr DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
+        Real64 rho;                           // local fluid density
         bool errFlag;
         static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
 

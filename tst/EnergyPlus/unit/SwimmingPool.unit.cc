@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
 
 TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
 {
-    int const PoolNum = 1;
+    int constexpr PoolNum = 1;
 
     // Tests for InitSwimmingPoolPlantLoopIndex
     state->dataSwimmingPools->NumSwimmingPools = 1;

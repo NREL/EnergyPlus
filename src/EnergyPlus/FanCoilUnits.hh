@@ -448,8 +448,9 @@ struct FanCoilUnitsData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     bool GetFanCoilInputFlag = true; // First time, input is "gotten"
     Real64 FanFlowRatio = 0.0;
-    bool HeatingLoad = false;       // True when zone needs heating
-    bool CoolingLoad = false;       // True when zone needs cooling
+    bool HeatingLoad = false; // True when zone needs heating
+    bool CoolingLoad = false; // True when zone needs cooling
+    // TODO: remove 'const' from state
     Real64 const Small5WLoad = 5.0; // load threshold 5.0 W
     Array1D<FanCoilUnits::FanCoilData> FanCoil;
     Array1D<FanCoilUnits::FanCoilNumericFieldData> FanCoilNumericFields;

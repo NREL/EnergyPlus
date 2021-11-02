@@ -2661,8 +2661,8 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
         static constexpr std::string_view RoutineName("SizeTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3621,8 +3621,8 @@ namespace CondenserLoopTowers {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
         static constexpr std::string_view RoutineName("SizeTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4585,10 +4585,10 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("calculateSingleSpeedTower");
-        int const MaxIteration(100); // Maximum fluid bypass iteration calculations
+        int constexpr MaxIteration(100); // Maximum fluid bypass iteration calculations
         static constexpr std::string_view MaxItChar("100");
-        Real64 const BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
-        Real64 const OWTLowerLimit(0.0);            // The limit of tower exit fluid temperature used in the fluid bypass
+        Real64 constexpr BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
+        Real64 constexpr OWTLowerLimit(0.0);            // The limit of tower exit fluid temperature used in the fluid bypass
         //  calculation to avoid fluid freezing. For water, it is 0 degreeC,
         //  for glycols, it can be much lower. The fluid type is stored at the loop.
         //  Current choices are Water and Steam, needs to expand for glycols
@@ -5119,8 +5119,8 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
         static constexpr std::string_view RoutineName("calculateVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5435,9 +5435,9 @@ namespace CondenserLoopTowers {
         // Find a fan speed that operates the tower to meet MyLoad
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DesignWetBulb(25.56); // tower outdoor air entering wetbulb for design [C]
-        int const MaxIte(500);             // Maximum number of iterations for solver
-        Real64 const Acc(1.e-3);           // Accuracy of solver result
+        Real64 constexpr DesignWetBulb(25.56); // tower outdoor air entering wetbulb for design [C]
+        int constexpr MaxIte(500);             // Maximum number of iterations for solver
+        Real64 const Acc(1.e-3);               // Accuracy of solver result
         static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5793,13 +5793,13 @@ namespace CondenserLoopTowers {
         Real64 MdotCpWater = waterMassFlowRate * CpWater; // Water mass flow rate times the heat capacity [W/K]
 
         int Iter = 0;
-        Real64 OutletAirEnthalpy;               // Enthalpy of exiting moist air [J/kg]
-        Real64 WetBulbError = 1.0;              // Calculated error for exiting wet-bulb temperature between iterations [delta K/K]
-        Real64 DeltaTwb = 1.0;                  // Absolute value of difference between inlet and outlet air wet-bulb temp [C]
-        Real64 OutletAirWetBulbLast;            // temporary Wetbulb temp of exiting moist air [C]
-        int const IterMax(50);                  // Maximum number of iterations allowed
-        Real64 const WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations [delta K/K]
-        Real64 const DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
+        Real64 OutletAirEnthalpy;                   // Enthalpy of exiting moist air [J/kg]
+        Real64 WetBulbError = 1.0;                  // Calculated error for exiting wet-bulb temperature between iterations [delta K/K]
+        Real64 DeltaTwb = 1.0;                      // Absolute value of difference between inlet and outlet air wet-bulb temp [C]
+        Real64 OutletAirWetBulbLast;                // temporary Wetbulb temp of exiting moist air [C]
+        int constexpr IterMax(50);                  // Maximum number of iterations allowed
+        Real64 constexpr WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations [delta K/K]
+        Real64 constexpr DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         while ((WetBulbError > WetBulbTolerance) && (Iter <= IterMax) && (DeltaTwb > DeltaTwbTolerance)) {
             ++Iter;
             //        OutletAirEnthalpy = PsyHFnTdbRhPb(OutletAirWetBulb,1.0,OutBaroPress)
@@ -5878,13 +5878,13 @@ namespace CondenserLoopTowers {
         // Form 160.00-SG2 (0502). 2002.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);    // Maximum number of iterations
-        Real64 const Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla;                                // Flag of solver
-        std::array<Real64, 6> Par;                 // Parameter array for regula falsi solver
-        Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
+        int SolFla;                                    // Flag of solver
+        std::array<Real64, 6> Par;                     // Parameter array for regula falsi solver
+        Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
         Par[0] = this->thisTowerNum;    // Index to cooling tower

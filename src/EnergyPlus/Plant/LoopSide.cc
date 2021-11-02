@@ -212,8 +212,8 @@ namespace DataPlant {
         //  the other values are filled in such as location on the loop where the error occurred and a message error description
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const Parallel(1);
-        int const Outlet(2);
+        int constexpr Parallel(1);
+        int constexpr Outlet(2);
 
         //~ Initialze
         bool EncounteredLRB = false;
@@ -558,9 +558,9 @@ namespace DataPlant {
         //  updated.  The outlet branch "group" is then simulated.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const InletBranchOrOneBranchHalfLoop(1);
-        int const ParallelBranchSet(2);
-        int const OutletBranch(3);
+        int constexpr InletBranchOrOneBranchHalfLoop(1);
+        int constexpr ParallelBranchSet(2);
+        int constexpr OutletBranch(3);
 
         int NumBranchGroups = 1;
         if (this->TotalBranches > 1) {
@@ -1270,7 +1270,7 @@ namespace DataPlant {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
-        int const LoopSideSingleBranch(1); // For readability
+        int constexpr LoopSideSingleBranch(1); // For readability
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumActiveBranches;        // Active branch counter

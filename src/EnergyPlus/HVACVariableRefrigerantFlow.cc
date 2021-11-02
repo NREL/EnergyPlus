@@ -9372,9 +9372,9 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                                                 Real64 &SuppHeatCoilLoad)
 {
 
-    int const MaxIte(500);        // maximum number of iterations
-    Real64 const MinPLF(0.0);     // minimum part load factor allowed
-    Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
+    int constexpr MaxIte(500);        // maximum number of iterations
+    Real64 constexpr MinPLF(0.0);     // minimum part load factor allowed
+    Real64 constexpr ErrorTol(0.001); // tolerance for RegulaFalsi iterations
 
     int VRFCond = this->VRFSysNum;
     Real64 FullOutput = 0.0;   // unit full output when compressor is operating [W]
@@ -12675,9 +12675,9 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     using General::SolveRoot;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    int const MaxIte(500);        // maximum number of iterations
-    Real64 const MinPLF(0.0);     // minimum part load factor allowed
-    Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
+    int constexpr MaxIte(500);        // maximum number of iterations
+    Real64 constexpr MinPLF(0.0);     // minimum part load factor allowed
+    Real64 constexpr ErrorTol(0.001); // tolerance for RegulaFalsi iterations
 
     Real64 FullOutput;      // unit full output when compressor is operating [W]
     Real64 TempOutput;      // unit output when iteration limit exceeded [W]
@@ -13163,21 +13163,21 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
     Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 
-    Array1D<Real64> Par(7);      // Parameters passed to RegulaFalsi
-    int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
-    int const MaxIte(500);       // maximum number of iterations
-    int DXCoilNum;               // index to DX Coil
-    int IndexToTUInTUList;       // index to TU in specific list for the VRF system
-    int SolFla;                  // Flag of RegulaFalsi solver
-    int TUListIndex;             // index to TU list for this VRF system
-    int VRFCond;                 // index to VRF condenser
-    Real64 const ErrorTol(0.01); // tolerance for RegulaFalsi iterations
-    Real64 FanSpdRatio;          // ratio of required and rated air flow rate
-    Real64 FanSpdRatioMin;       // min fan speed ratio
-    Real64 FanSpdRatioMax;       // min fan speed ratio
-    Real64 QCoilReq;             // required coil load (W)
-    Real64 QCoilAct;             // actual coil load (W)
-    Real64 TeTc;                 // evaporating temperature or condensing temperature for VRF indoor unit(C)
+    Array1D<Real64> Par(7);          // Parameters passed to RegulaFalsi
+    int constexpr Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
+    int constexpr MaxIte(500);       // maximum number of iterations
+    int DXCoilNum;                   // index to DX Coil
+    int IndexToTUInTUList;           // index to TU in specific list for the VRF system
+    int SolFla;                      // Flag of RegulaFalsi solver
+    int TUListIndex;                 // index to TU list for this VRF system
+    int VRFCond;                     // index to VRF condenser
+    Real64 constexpr ErrorTol(0.01); // tolerance for RegulaFalsi iterations
+    Real64 FanSpdRatio;              // ratio of required and rated air flow rate
+    Real64 FanSpdRatioMin;           // min fan speed ratio
+    Real64 FanSpdRatioMax;           // min fan speed ratio
+    Real64 QCoilReq;                 // required coil load (W)
+    Real64 QCoilAct;                 // actual coil load (W)
+    Real64 TeTc;                     // evaporating temperature or condensing temperature for VRF indoor unit(C)
 
     VRFCond = this->VRFSysNum;
     TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
@@ -13278,7 +13278,7 @@ Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state,
     //     Par( 6 ) = PartLoadRatio;
     //     Par( 7 ) = OACompOnMassFlow;
 
-    int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
+    int constexpr Mode(1);   // Performance mode for MultiMode DX coil. Always 1 for other coil types
     int CoilIndex;           // index to coil
     int OAMixNode;           // index to the mix node of OA mixer
     int VRFCond;             // index to VRF condenser
@@ -14882,31 +14882,31 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using General::SolveRoot;
 
-    Array1D<Real64> Par(7);     // Parameters passed to RegulaFalsi
-    Real64 const ErrorTol(0.1); // tolerance for RegulaFalsi iterations
-    int const MaxIte(100);      // maximum number of iterations
-    int HRMode(0);              // HR operational mode [W]
-    int HRMode_sub(0);          // HR operational mode (sub) [W]
-    int RefrigerantIndex;       // Index of the refrigerant [-]
-    int SolFla;                 // Flag of RegulaFalsi solver
-    Real64 C_OU_HexRatio;       // capacity ratio between the OU condenser and OU evaporator [-]
-    Real64 m_air_rated;         // OU coil air mass flow rate [kg/s]
-    Real64 m_air_evap;          // OU evaporator air mass flow rate [kg/s]
-    Real64 m_air_cond;          // OU condenser air mass flow rate [kg/s]
-    Real64 m_air_evap_rated;    // Rated OU evaporator air mass flow rate [kg/s]
-    Real64 N_fan_OU_evap(0);    // OU evaporator air mass flow rate [kg/s]
-    Real64 N_fan_OU_cond(0);    // OU condenser air mass flow rate [kg/s]
-    Real64 RhoAir;              // outdoor air density [kg/m3]
-    Real64 Q_c_tot;             // Total evaporator capacity [W]
-    Real64 Q_h_tot;             // Total condenser capacity [W]
-    Real64 Pipe_Q_c_new;        // IU evaporator side piping loss (new), updated because of Te update [W]
-    Real64 rps1_evap;           // compressor speed satisfying IU cooling load
-    Real64 rps2_cond;           // compressor speed satisfying IU heating load
-    Real64 RefPLow;             // Low Pressure Value for Ps (>0.0) [Pa]
-    Real64 RefPHigh;            // High Pressure Value for Ps (max in tables) [Pa]
-    Real64 Tfs;                 // temperature of the air at coil surface [C]
-    Real64 Tolerance(0.05);     // Tolerance for condensing temperature calculation [C}
-    Real64 Tsuction_new;        // VRF compressor suction refrigerant temperature (new) [C]
+    Array1D<Real64> Par(7);         // Parameters passed to RegulaFalsi
+    Real64 constexpr ErrorTol(0.1); // tolerance for RegulaFalsi iterations
+    int constexpr MaxIte(100);      // maximum number of iterations
+    int HRMode(0);                  // HR operational mode [W]
+    int HRMode_sub(0);              // HR operational mode (sub) [W]
+    int RefrigerantIndex;           // Index of the refrigerant [-]
+    int SolFla;                     // Flag of RegulaFalsi solver
+    Real64 C_OU_HexRatio;           // capacity ratio between the OU condenser and OU evaporator [-]
+    Real64 m_air_rated;             // OU coil air mass flow rate [kg/s]
+    Real64 m_air_evap;              // OU evaporator air mass flow rate [kg/s]
+    Real64 m_air_cond;              // OU condenser air mass flow rate [kg/s]
+    Real64 m_air_evap_rated;        // Rated OU evaporator air mass flow rate [kg/s]
+    Real64 N_fan_OU_evap(0);        // OU evaporator air mass flow rate [kg/s]
+    Real64 N_fan_OU_cond(0);        // OU condenser air mass flow rate [kg/s]
+    Real64 RhoAir;                  // outdoor air density [kg/m3]
+    Real64 Q_c_tot;                 // Total evaporator capacity [W]
+    Real64 Q_h_tot;                 // Total condenser capacity [W]
+    Real64 Pipe_Q_c_new;            // IU evaporator side piping loss (new), updated because of Te update [W]
+    Real64 rps1_evap;               // compressor speed satisfying IU cooling load
+    Real64 rps2_cond;               // compressor speed satisfying IU heating load
+    Real64 RefPLow;                 // Low Pressure Value for Ps (>0.0) [Pa]
+    Real64 RefPHigh;                // High Pressure Value for Ps (max in tables) [Pa]
+    Real64 Tfs;                     // temperature of the air at coil surface [C]
+    Real64 Tolerance(0.05);         // Tolerance for condensing temperature calculation [C}
+    Real64 Tsuction_new;            // VRF compressor suction refrigerant temperature (new) [C]
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::string_view RoutineName("VRFHR_OU_Mode");
@@ -15581,8 +15581,8 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
 
     // Locals
     // subroutine parameter definitions:
-    int const MaxIte(500);   // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3); // Accuracy of solver result
+    int constexpr MaxIte(500); // Maximum number of iterations for solver
+    Real64 const Acc(1.e-3);   // Accuracy of solver result
 
     // local variable declaration:
     std::vector<Real64> Par; // Parameter array passed to solver

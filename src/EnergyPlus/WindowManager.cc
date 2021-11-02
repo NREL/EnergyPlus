@@ -5059,8 +5059,8 @@ namespace WindowManager {
         // REFERENCES:
         // See Subr. WindowGasConductance
 
-        Real64 const pres(1.0e5);     // Gap gas pressure (Pa)
-        Real64 const gaslaw(8314.51); // Molar gas constant (J/kMol-K)
+        Real64 constexpr pres(1.0e5);     // Gap gas pressure (Pa)
+        Real64 constexpr gaslaw(8314.51); // Molar gas constant (J/kMol-K)
         Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
 
         int IMix; // Counters of gases in a mixture
@@ -7126,8 +7126,8 @@ namespace WindowManager {
         // Argument array dimensioning
         hgap.dim(5);
 
-        int const MaxIterations(100);  // Maximum allowed number of iterations
-        Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
+        int constexpr MaxIterations(100);  // Maximum allowed number of iterations
+        Real64 constexpr errtemptol(0.02); // Tolerance on errtemp for convergence
         static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
         int i;                  // Counter
@@ -7253,12 +7253,12 @@ namespace WindowManager {
         // This is a shortened form of StartingWindowTemps for use in calculating
         // the nominal center-of-glass U-value.
 
-        Real64 const hrad(5.3);           // Typical radiative conductance (W/m2-K)
-        Real64 const hcinStartValue(3.2); // Starting value for inside air film convective
+        Real64 constexpr hrad(5.3);           // Typical radiative conductance (W/m2-K)
+        Real64 constexpr hcinStartValue(3.2); // Starting value for inside air film convective
         //   conductance (estimated for typical double glazing
         //   using 1.31(dT**0.333), where dT =
         //   room air temp - inside surface temp = 14.2K)
-        Real64 const resgap(0.21); // Typical gap resistance (m2-K/W)
+        Real64 constexpr resgap(0.21); // Typical gap resistance (m2-K/W)
 
         int i;                      // Face counter
         Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of
@@ -8009,8 +8009,8 @@ namespace WindowManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const M(18);
-        int const N(18);
+        int constexpr M(18);
+        int constexpr N(18);
 
         int SurfNum;     // Index to surface number
         int ScreenNum;   // Index to each screen used on exterior of window

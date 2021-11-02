@@ -281,20 +281,20 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHWBaseboardInput:");
-        Real64 const MaxFraction(1.0);
-        Real64 const MinFraction(0.0);
-        Real64 const MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
-        Real64 const MinWaterTempAvg(20.0);         // Minimum limit of average water temperature in degree C
-        Real64 const HighWaterMassFlowRate(10.0);   // Maximum limit of water mass flow rate in kg/s
-        Real64 const LowWaterMassFlowRate(0.00001); // Minimum limit of water mass flow rate in kg/s
-        Real64 const MaxWaterFlowRate(10.0);        // Maximum limit of water volume flow rate in m3/s
-        Real64 const MinWaterFlowRate(0.00001);     // Minimum limit of water volume flow rate in m3/s
-        Real64 const WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
+        Real64 constexpr MaxFraction(1.0);
+        Real64 constexpr MinFraction(0.0);
+        Real64 constexpr MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
+        Real64 constexpr MinWaterTempAvg(20.0);         // Minimum limit of average water temperature in degree C
+        Real64 constexpr HighWaterMassFlowRate(10.0);   // Maximum limit of water mass flow rate in kg/s
+        Real64 constexpr LowWaterMassFlowRate(0.00001); // Minimum limit of water mass flow rate in kg/s
+        Real64 constexpr MaxWaterFlowRate(10.0);        // Maximum limit of water volume flow rate in m3/s
+        Real64 constexpr MinWaterFlowRate(0.00001);     // Minimum limit of water volume flow rate in m3/s
+        Real64 constexpr WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
         //    INTEGER, PARAMETER   :: MaxDistribSurfaces    = 20         ! Maximum number of surfaces that a baseboard heater can radiate to
-        int const MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
+        int constexpr MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
+        int constexpr iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
@@ -867,8 +867,8 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Constant(0.0062); // Constant of linear equation for air mass flow rate
-        Real64 const Coeff(0.0000275); // Correlation coefficient to capacity
+        Real64 constexpr Constant(0.0062); // Constant of linear equation for air mass flow rate
+        Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1077,10 +1077,10 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const AirInletTempStd(18.0); // I=B=R rating document
-        Real64 const CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
-        Real64 const Constant(0.0062);      // Constant of linear equation for air mass flow rate
-        Real64 const Coeff(0.0000275);      // Correlation coefficient to capacity
+        Real64 constexpr AirInletTempStd(18.0); // I=B=R rating document
+        Real64 constexpr CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
+        Real64 constexpr Constant(0.0062);      // Constant of linear equation for air mass flow rate
+        Real64 constexpr Coeff(0.0000275);      // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("SizeHWBaseboard");
         static constexpr std::string_view RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
 
@@ -1417,7 +1417,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
+        Real64 constexpr MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
         static constexpr std::string_view RoutineName("CalcHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1722,7 +1722,7 @@ namespace HWBaseboardRadiator {
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
