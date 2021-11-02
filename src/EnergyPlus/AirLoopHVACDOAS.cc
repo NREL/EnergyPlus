@@ -1056,8 +1056,8 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
 
-        int const summerDesignDayTypeIndex(9);
-        int const winterDesignDayTypeIndex(10);
+        int constexpr summerDesignDayTypeIndex(9);
+        int constexpr winterDesignDayTypeIndex(10);
 
         for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day

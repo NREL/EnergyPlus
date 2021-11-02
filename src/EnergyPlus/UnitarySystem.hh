@@ -936,6 +936,7 @@ struct UnitarySystemsData : BaseGlobalStruct
     bool economizerFlag = false;      // holds air loop economizer status
     bool SuppHeatingCoilFlag = false; // set to TRUE when simulating supplemental heating coil
 
+    // TODO: remove 'const' from state
     // Supply Air Sizing Option
     int const None = 1;
     int const SupplyAirFlowRate = 2;

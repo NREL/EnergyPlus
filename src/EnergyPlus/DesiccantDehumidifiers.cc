@@ -2681,7 +2681,7 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
+        Real64 constexpr MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
         // min vol flow per rated evaporator capacity
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -3348,8 +3348,8 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-        int const SolveMaxIter(50);       // Max iteration for SolveRoot
+        Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+        int constexpr SolveMaxIter(50);       // Max iteration for SolveRoot
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

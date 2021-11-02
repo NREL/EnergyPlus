@@ -2310,7 +2310,7 @@ namespace FanCoilUnits {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIterCycl(100);
+        int constexpr MaxIterCycl(100);
 
         // INTERFACE BLOCK SPECIFICATIONS
 

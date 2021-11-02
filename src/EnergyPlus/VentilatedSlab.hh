@@ -342,6 +342,7 @@ struct VentilatedSlabData : BaseGlobalStruct
 
     std::string const cMO_VentilatedSlab = "ZoneHVAC:VentilatedSlab";
 
+    // TODO: remove 'const' from state
     // Parameters for outside air control types:
     int const Heating_ElectricCoilType = 1;
     int const Heating_GasCoilType = 2;

@@ -260,14 +260,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const VentilTempLimit(100.0);                                        // degrees Celsius
-    Real64 const MixingTempLimit(100.0);                                        // degrees Celsius
-    Real64 const VentilWSLimit(40.0);                                           // m/s
+    Real64 constexpr VentilTempLimit(100.0);                                    // degrees Celsius
+    Real64 constexpr MixingTempLimit(100.0);                                    // degrees Celsius
+    Real64 constexpr VentilWSLimit(40.0);                                       // m/s
     static constexpr std::string_view RoutineName("GetSimpleAirModelInputs: "); // include trailing blank space
     // Refrigeration Door Mixing Protection types, factors used to moderate mixing flow.
-    Real64 const RefDoorNone(0.0);
-    Real64 const RefDoorAirCurtain(0.5);
-    Real64 const RefDoorStripCurtain(0.9);
+    Real64 constexpr RefDoorNone(0.0);
+    Real64 constexpr RefDoorAirCurtain(0.5);
+    Real64 constexpr RefDoorStripCurtain(0.9);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array2D<Real64> SVals1;

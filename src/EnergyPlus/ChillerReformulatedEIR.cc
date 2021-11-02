@@ -1703,8 +1703,8 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
     // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
     //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-    Real64 const Acc(0.0001); // Accuracy control for General::SolveRoot
-    int const MaxIter(500);   // Iteration control for General::SolveRoot
+    Real64 constexpr Acc(0.0001); // Accuracy control for General::SolveRoot
+    int constexpr MaxIter(500);   // Iteration control for General::SolveRoot
 
     if (MyLoad >= 0.0 || !RunFlag) {
         this->calculate(state, MyLoad, RunFlag, state.dataLoopNodes->Node(this->CondInletNodeNum).Temp);

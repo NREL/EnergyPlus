@@ -450,7 +450,7 @@ Real64 RegulateCondenserCompFlowReqOp(
     Real64 FlowVal;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const ZeroLoad(0.0001);
+    Real64 constexpr ZeroLoad(0.0001);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 CompCurLoad;
@@ -668,10 +668,10 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int con
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const OverShootOffset(5.0);
-    Real64 const UnderShootOffset(5.0);
-    Real64 const FatalOverShootOffset(200.0);
-    Real64 const FatalUnderShootOffset(100.0);
+    Real64 constexpr OverShootOffset(5.0);
+    Real64 constexpr UnderShootOffset(5.0);
+    Real64 constexpr FatalOverShootOffset(200.0);
+    Real64 constexpr FatalUnderShootOffset(100.0);
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
 

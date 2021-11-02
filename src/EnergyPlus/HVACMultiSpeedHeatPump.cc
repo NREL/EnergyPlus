@@ -3220,7 +3220,7 @@ namespace HVACMultiSpeedHeatPump {
         using Psychrometrics::PsyCpAirFnW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500); // maximum number of iterations
+        int constexpr MaxIte(500); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;         // unit full output when compressor is operating [W]
@@ -4686,8 +4686,8 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-        int const SolveMaxIter(50);
+        Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+        int constexpr SolveMaxIter(50);
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

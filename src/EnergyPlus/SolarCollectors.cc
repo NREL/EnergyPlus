@@ -919,7 +919,7 @@ namespace SolarCollectors {
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
         static constexpr std::string_view RoutineName("InitSolarCollector");
-        Real64 const BigNumber(9999.9); // Component desired mass flow rate
+        Real64 constexpr BigNumber(9999.9); // Component desired mass flow rate
 
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
@@ -1664,7 +1664,7 @@ namespace SolarCollectors {
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.
         // Wiley-Interscience: New York (1991).
 
-        Real64 const AirRefIndex(1.0003); // refractive index of air
+        Real64 constexpr AirRefIndex(1.0003); // refractive index of air
 
         Array1D<Real64> TransPara(2);    // cover transmittance parallel component
         Array1D<Real64> TransPerp(2);    // cover transmittance perpendicular component
@@ -1947,9 +1947,9 @@ namespace SolarCollectors {
         //   Property data for air at atmospheric pressure were taken from Table A-11, Yunus A Cengel
         //   Heat Transfer: A Practical Approach, McGraw-Hill, Boston, MA, 1998.
 
-        Real64 const gravity(9.806); // gravitational constant [m/s^2]
+        Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
 
-        int const NumOfPropDivisions(11);
+        int constexpr NumOfPropDivisions(11);
         static Array1D<Real64> const Temps(NumOfPropDivisions,
                                            {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}); // Temperature, in C
         static Array1D<Real64> const Mu(
@@ -2046,7 +2046,7 @@ namespace SolarCollectors {
 
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
-        Real64 const gravity(9.806); // gravitational constant [m/s^2]
+        Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
         static constexpr std::string_view CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
         Real64 DeltaT = std::abs(TAbsorber - TWater);

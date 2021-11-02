@@ -3506,8 +3506,8 @@ namespace PlantChillers {
         // 1. BLAST Users Manual
         // 2. CHILLER User Manual
 
-        Real64 const ExhaustCP(1.047);    // Exhaust Gas Specific Heat (J/kg-K)
-        Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
+        Real64 constexpr ExhaustCP(1.047);    // Exhaust Gas Specific Heat (J/kg-K)
+        Real64 constexpr ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
         static constexpr std::string_view RoutineName("CalcEngineDrivenChillerModel");
@@ -5623,7 +5623,7 @@ namespace PlantChillers {
         // 1. BLAST Users Manual
         // 2. CHILLER User Manual
 
-        Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
+        Real64 constexpr ExhaustCP(1.047); // Exhaust Gas Specific Heat
         static constexpr std::string_view RoutineName("CalcGTChillerModel");
         static constexpr std::string_view RoutineNameHeatRecovery("ChillerHeatRecovery");
 

@@ -1048,8 +1048,8 @@ namespace DaylightingDevices {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const N(100000.0); // Number of integration points
-        Real64 const xTol(150.0); // Tolerance factor to skip iterations where dT is approximately 0
+        Real64 constexpr N(100000.0); // Number of integration points
+        Real64 constexpr xTol(150.0); // Tolerance factor to skip iterations where dT is approximately 0
         // Must be >= 1.0, increase this number to decrease the execution time
         Real64 const myLocalTiny(TINY(1.0));
 
@@ -1124,7 +1124,7 @@ namespace DaylightingDevices {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const NPH(1000); // Number of altitude integration points
+        int constexpr NPH(1000); // Number of altitude integration points
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 FluxInc = 0.0;   // Incident solar flux
@@ -1189,7 +1189,7 @@ namespace DaylightingDevices {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const NTH(18); // Number of azimuth integration points
+        int constexpr NTH(18); // Number of azimuth integration points
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 FluxInc = 0.0;   // Incident solar flux

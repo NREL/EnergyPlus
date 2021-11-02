@@ -2965,7 +2965,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // User input defines method used to calculate OA.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people

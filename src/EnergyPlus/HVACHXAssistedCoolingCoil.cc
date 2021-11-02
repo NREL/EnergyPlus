@@ -947,7 +947,7 @@ namespace HVACHXAssistedCoolingCoil {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(50); // Maximum number of iterations
+        int constexpr MaxIter(50); // Maximum number of iterations
 
         Real64 AirMassFlow;        // Inlet air mass flow rate
         Real64 Error;              // Error (exiting coil temp from last iteration minus current coil exiting temp)

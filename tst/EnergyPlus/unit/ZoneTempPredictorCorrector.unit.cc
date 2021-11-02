@@ -856,8 +856,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     int NoneAdapZoneNum(3);
     int DualZoneNum(4);
     int summerDesignDayTypeIndex(9);
-    int const ASH55_CENTRAL(2);
-    int const CEN15251_CENTRAL(5);
+    int constexpr ASH55_CENTRAL(2);
+    int constexpr CEN15251_CENTRAL(5);
 
     state->dataEnvrn->DayOfYear = 1;
     state->dataWeatherManager->Envrn = 1;
@@ -1221,7 +1221,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     Real64 valueAtTime;
     int numDays;
     std::string monthAssumed;
-    const int wednesday = 4;
+    constexpr int wednesday = 4;
 
     state->dataEnvrn->Latitude = 30.; // northern hemisphere
     int sched1Index = GetScheduleIndex(*state, "SCHED1");

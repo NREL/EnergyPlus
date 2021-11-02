@@ -297,8 +297,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     GetPIUs(*state);
 
-    int const PIUNum = 1;
-    int const ADUNum = 1;
+    int constexpr PIUNum = 1;
+    int constexpr ADUNum = 1;
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
     EXPECT_EQ("SPACE1-1 ATU", state->dataDefineEquipment->AirDistUnit(ADUNum).Name);    // ADU name
@@ -1477,8 +1477,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
-    int const PIUNum = 1;
-    int const ADUNum = 1;
+    int constexpr PIUNum = 1;
+    int constexpr ADUNum = 1;
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
     EXPECT_EQ("SERIES PIU ELEC RHT AIR DISTRIBUTION UNIT", state->dataDefineEquipment->AirDistUnit(ADUNum).Name); // ADU name

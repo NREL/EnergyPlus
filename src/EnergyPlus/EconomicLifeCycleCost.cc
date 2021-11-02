@@ -1675,7 +1675,7 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const SizeDepr(41);
+    int constexpr SizeDepr(41);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

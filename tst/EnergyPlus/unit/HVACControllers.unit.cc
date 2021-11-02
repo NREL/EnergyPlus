@@ -697,7 +697,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     state->dataHVACControllers->ControllerProps.allocate(1);
     state->dataHVACControllers->RootFinders.allocate(1);
     bool isConverged = true;
-    int const controlNum = 1;
+    int constexpr controlNum = 1;
     auto &thisController(state->dataHVACControllers->ControllerProps(1));
     thisController.ControlVar = HVACControllers::iCtrl::TemperatureAndHumidityRatio;
     thisController.Offset = 0.0001;

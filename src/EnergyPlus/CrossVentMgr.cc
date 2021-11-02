@@ -367,7 +367,7 @@ namespace CrossVentMgr {
         using namespace Psychrometrics;
         using namespace DataHeatBalFanSys;
 
-        Real64 const MinUin(0.2);
+        Real64 constexpr MinUin(0.2);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Ctd;               // counter

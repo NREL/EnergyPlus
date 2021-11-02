@@ -5228,7 +5228,7 @@ namespace Furnaces {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Small5WLoad(5.0);
+        Real64 constexpr Small5WLoad(5.0);
         auto constexpr RoutineName("InitFurnace");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -7004,8 +7004,8 @@ namespace Furnaces {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(15);    // maximum number of iterations
-        Real64 const MinPLR(0.0); // minimum part load ratio allowed
+        int constexpr MaxIter(15);    // maximum number of iterations
+        Real64 constexpr MinPLR(0.0); // minimum part load ratio allowed
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7302,8 +7302,8 @@ namespace Furnaces {
         using namespace DataZoneEnergyDemands;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(100);   // maximum number of iterations
-        Real64 const MinPLR(0.0); // minimum part load ratio allowed
+        int constexpr MaxIter(100);   // maximum number of iterations
+        Real64 constexpr MinPLR(0.0); // minimum part load ratio allowed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SystemMoistureLoad;   // Total latent load to be removed by furnace/unitary system
@@ -8680,8 +8680,8 @@ namespace Furnaces {
         // Calculate the part-load ratio required to meet the zone sensible load.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(600);   // maximum number of iterations
-        Real64 const MinPLR(0.0); // minimum part load ratio allowed
+        int constexpr MaxIter(600);   // maximum number of iterations
+        Real64 constexpr MinPLR(0.0); // minimum part load ratio allowed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OnOffAirFlowRatio;           // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
@@ -10348,8 +10348,8 @@ namespace Furnaces {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-        int const SolveMaxIter(50);
+        Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+        int constexpr SolveMaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QActual;         // actual heating load
@@ -10944,7 +10944,7 @@ namespace Furnaces {
         using Psychrometrics::PsyCpAirFnW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500); // maximum number of iterations
+        int constexpr MaxIte(500); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;          // unit full output when compressor is operating [W]

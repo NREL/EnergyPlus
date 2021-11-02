@@ -464,8 +464,8 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
     auto &inNode = state->dataLoopNodes->Node(1);
     auto &outNode = state->dataLoopNodes->Node(2);
-    Real64 const roomTemp = 25.0;
-    Real64 const nonZeroFlow = 3.14;
+    Real64 constexpr roomTemp = 25.0;
+    Real64 constexpr nonZeroFlow = 3.14;
 
     // History terms should be allocated to 5 zeros
     EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory.size());

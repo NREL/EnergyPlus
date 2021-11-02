@@ -1264,14 +1264,14 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     }
 
     // set upper limit of time for the short time-step g-function calcs so there is some overlap
-    Real64 const lntts_max_for_short_timestep = -9.0;
+    Real64 constexpr lntts_max_for_short_timestep = -9.0;
     Real64 const t_s = pow_2(this->bhLength) / (9.0 * this->soil.diffusivity);
 
-    Real64 const time_step = 500;
+    Real64 constexpr time_step = 500;
     Real64 const time_max_for_short_timestep = exp(lntts_max_for_short_timestep) * t_s;
     Real64 total_time = 0;
 
-    Real64 const heat_flux = 40.4;
+    Real64 constexpr heat_flux = 40.4;
 
     // time step loop
     while (total_time < time_max_for_short_timestep) {
@@ -2800,7 +2800,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     if (reynoldsNum < lower_limit) {
         nusseltNum = 4.01; // laminar mean(4.36, 3.66)
     } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
-        Real64 const nu_low = 4.01;                   // laminar
+        Real64 constexpr nu_low = 4.01;               // laminar
         Real64 const f = frictionFactor(reynoldsNum); // turbulent
         Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
         Real64 const nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));

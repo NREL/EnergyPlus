@@ -203,8 +203,8 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const NumPipeSections(20);
-    int const NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
+    int constexpr NumPipeSections(20);
+    int constexpr NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
     Real64 const SecondsInHour(DataGlobalConstants::SecInHour);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1336,10 +1336,10 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const NumSections(20);
-    Real64 const ConvCrit(0.05);
-    int const MaxIterations(200);
-    Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    int constexpr NumSections(20);
+    Real64 constexpr ConvCrit(0.05);
+    int constexpr MaxIterations(200);
+    Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IterationIndex(0);    // Index when stepping through equations
@@ -1711,8 +1711,8 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
-    Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-    int const NumOfPropDivisions(13);  // intervals in property correlation
+    Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+    int constexpr NumOfPropDivisions(13);  // intervals in property correlation
     static Array1D<Real64> const Temps(
         NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
     static Array1D<Real64> const Mu(NumOfPropDivisions,
@@ -1834,16 +1834,16 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Pr(0.7);           // Prandl number for air (assume constant)
-    Real64 const CondAir(0.025);    // thermal conductivity of air (assume constant) [W/m.K]
-    Real64 const RoomAirVel(0.381); // room air velocity of 75 ft./min [m/s]
-    Real64 const NaturalConvNusselt(0.36);
+    Real64 constexpr Pr(0.7);           // Prandl number for air (assume constant)
+    Real64 constexpr CondAir(0.025);    // thermal conductivity of air (assume constant) [W/m.K]
+    Real64 constexpr RoomAirVel(0.381); // room air velocity of 75 ft./min [m/s]
+    Real64 constexpr NaturalConvNusselt(0.36);
     // Nusselt for natural convection for horizontal cylinder
     // from: Correlations for Convective Heat Transfer
     //      Dr. Bernhard Spang
     //      Chemical Engineers' Resource Page: http://www.cheresources.com/convection.pdf
-    int const NumOfParamDivisions(5); // intervals in property correlation
-    int const NumOfPropDivisions(12); // intervals in property correlation
+    int constexpr NumOfParamDivisions(5); // intervals in property correlation
+    int constexpr NumOfPropDivisions(12); // intervals in property correlation
 
     static Array1D<Real64> const CCoef(NumOfParamDivisions, {0.989, 0.911, 0.683, 0.193, 0.027});         // correlation coefficient
     static Array1D<Real64> const mExp(NumOfParamDivisions, {0.33, 0.385, 0.466, 0.618, 0.805});           // exponent

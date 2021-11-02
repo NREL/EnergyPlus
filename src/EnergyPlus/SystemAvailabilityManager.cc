@@ -137,11 +137,11 @@ namespace SystemAvailabilityManager {
         int PreviousStatus;
         int ZoneInSysNum;
         int CtrldZoneNum;
-        int HybridVentNum;          // Hybrid ventilation control number
-        int ZoneEquipType;          // Type of ZoneHVAC:* component
-        int CompNum;                // Index of ZoneHVAC:* component
-        int ZoneCompAvailMgrNum;    // Index of availability manager associated with the ZoneHVAC:* component
-        int const DummyArgument(1); // This variable is used when SimSysAvailManager is called for a ZoneHVAC:* component
+        int HybridVentNum;              // Hybrid ventilation control number
+        int ZoneEquipType;              // Type of ZoneHVAC:* component
+        int CompNum;                    // Index of ZoneHVAC:* component
+        int ZoneCompAvailMgrNum;        // Index of availability manager associated with the ZoneHVAC:* component
+        int constexpr DummyArgument(1); // This variable is used when SimSysAvailManager is called for a ZoneHVAC:* component
 
         if (state.dataSystemAvailabilityManager->GetAvailMgrInputFlag) {
             GetSysAvailManagerInputs(state);

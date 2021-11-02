@@ -539,7 +539,7 @@ namespace VariableSpeedCoils {
 
 struct VariableSpeedCoilsData : BaseGlobalStruct
 {
-
+    // TODO: remove 'const' from state
     Real64 const RatedInletAirTemp = 26.6667;       // 26.6667C or 80F
     Real64 const RatedInletWetBulbTemp = 19.4444;   // 19.44 or 67F, cooling mode
     Real64 const RatedInletAirHumRat = 0.0111847;   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb

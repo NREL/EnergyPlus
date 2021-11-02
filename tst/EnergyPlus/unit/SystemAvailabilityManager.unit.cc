@@ -658,8 +658,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     int SysAvailNum = 1;
     int PriAirSysNum = 0;
     int AvailStatus;
-    int const ZoneEquipType = 1;
-    int const CompNum = 1;
+    int constexpr ZoneEquipType = 1;
+    int constexpr CompNum = 1;
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(NumZones);
