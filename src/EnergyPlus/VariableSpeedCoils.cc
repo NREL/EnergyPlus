@@ -92,8 +92,7 @@ namespace VariableSpeedCoils {
     using namespace Psychrometrics;
     using namespace DataSizing;
     using namespace DataHVACGlobals;
-    using DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
-    using DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+
     using DXCoils::AdjustCBF;
     using DXCoils::CalcCBF;
 
@@ -3819,17 +3818,17 @@ namespace VariableSpeedCoils {
              DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) { // fix coil type
             if (state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
                 // switch from coil type numbers in DataHVACGlobals, to coil type numbers in plant.
-                int plantTypeOfNum(0);
+                DataPlant::PlantEquipmentType CoilVSWAHPType(DataPlant::PlantEquipmentType::Invalid);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
-                    plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
+                    CoilVSWAHPType = DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit;
                 } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum ==
                            DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
-                    plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+                    CoilVSWAHPType = DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit;
                 }
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        plantTypeOfNum,
+                                        CoilVSWAHPType,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopSide,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BranchNum,

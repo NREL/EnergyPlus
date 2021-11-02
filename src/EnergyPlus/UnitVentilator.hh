@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -108,7 +109,7 @@ namespace UnitVentilator {
         std::string HCoilName;    // name of heating coil
         std::string HCoilTypeCh;  // type of heating coil character string (same as type on idf file).
         int HCoil_Index;
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HeatingCoilType;
         int HCoil_FluidIndex;
         std::string HCoilSchedName; // availability schedule for the heating coil
         int HCoilSchedPtr;          // index to schedule
@@ -134,7 +135,7 @@ namespace UnitVentilator {
         int CCoil_Index;
         std::string CCoilPlantName; // name of cooling coil for plant
         std::string CCoilPlantType; // type of cooling coil for plant
-        int CCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType CoolingCoilType;
         int CCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
@@ -182,11 +183,12 @@ namespace UnitVentilator {
             : SchedPtr(0), AirInNode(0), AirOutNode(0), FanOutletNode(0), FanType_Num(0), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
               OpMode(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0),
               MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
-              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0), HCoil_PlantTypeNum(0),
-              HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0),
-              MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0),
-              HotCoilOutNodeNum(0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), CCoilPresent(false),
-              CCoil_Index(0), CCoil_PlantTypeNum(0), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
+              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
+              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
+              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
+              HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
+              CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
               ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
               TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),

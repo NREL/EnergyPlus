@@ -111,27 +111,27 @@ namespace SteamCoils {
         Real64 OutletSteamQuality;        // Quality of steam at outlet
         Real64 DegOfSubcooling;
         Real64 LoopSubcoolReturn;
-        int AirInletNodeNum;            // Inlet node number at air side
-        int AirOutletNodeNum;           // Outlet node number at air side
-        int SteamInletNodeNum;          // SteamInletNodeNum
-        int SteamOutletNodeNum;         // SteamOutletNodeNum
-        int TempSetPointNodeNum;        // If applicable : node number that the temp setpoint exists.
-        int TypeOfCoil;                 // Control of Coil , temperature or Zone load
-        int FluidIndex;                 // Fluid index for FluidProperties (Steam)
-        int LoopNum;                    // index for plant loop with steam coil
-        int LoopSide;                   // index for plant loop side for steam coil
-        int BranchNum;                  // index for plant branch for steam coil
-        int CompNum;                    // index for plant component for steam coil
-        int Coil_PlantTypeNum;          // plant level index for coil type
-        Real64 OperatingCapacity;       // capacity of steam coil at operating conditions (W)
-        bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
-        int DesiccantDehumNum;          // index to desiccant dehumidifier object
-        bool FaultyCoilSATFlag;         // True if the coil has SAT sensor fault
-        int FaultyCoilSATIndex;         // Index of the fault object corresponding to the coil
-        Real64 FaultyCoilSATOffset;     // Coil SAT sensor offset
-        bool reportCoilFinalSizes;      // one time report of sizes to coil selection report
-        Real64 DesCoilCapacity;         // store design load
-        Real64 DesAirVolFlow;           // store design air flow
+        int AirInletNodeNum;                    // Inlet node number at air side
+        int AirOutletNodeNum;                   // Outlet node number at air side
+        int SteamInletNodeNum;                  // SteamInletNodeNum
+        int SteamOutletNodeNum;                 // SteamOutletNodeNum
+        int TempSetPointNodeNum;                // If applicable : node number that the temp setpoint exists.
+        int TypeOfCoil;                         // Control of Coil , temperature or Zone load
+        int FluidIndex;                         // Fluid index for FluidProperties (Steam)
+        int LoopNum;                            // index for plant loop with steam coil
+        int LoopSide;                           // index for plant loop side for steam coil
+        int BranchNum;                          // index for plant branch for steam coil
+        int CompNum;                            // index for plant component for steam coil
+        DataPlant::PlantEquipmentType CoilType; // plant level index for coil type
+        Real64 OperatingCapacity;               // capacity of steam coil at operating conditions (W)
+        bool DesiccantRegenerationCoil;         // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+        int DesiccantDehumNum;                  // index to desiccant dehumidifier object
+        bool FaultyCoilSATFlag;                 // True if the coil has SAT sensor fault
+        int FaultyCoilSATIndex;                 // Index of the fault object corresponding to the coil
+        Real64 FaultyCoilSATOffset;             // Coil SAT sensor offset
+        bool reportCoilFinalSizes;              // one time report of sizes to coil selection report
+        Real64 DesCoilCapacity;                 // store design load
+        Real64 DesAirVolFlow;                   // store design air flow
 
         // Default Constructor
         SteamCoilEquipConditions()
@@ -143,9 +143,9 @@ namespace SteamCoils {
               InletSteamMassFlowRate(0.0), OutletSteamMassFlowRate(0.0), MaxSteamVolFlowRate(0.0), MaxSteamMassFlowRate(0.0), InletSteamEnthalpy(0.0),
               OutletWaterEnthalpy(0.0), InletSteamPress(0.0), InletSteamQuality(0.0), OutletSteamQuality(0.0), DegOfSubcooling(0.0),
               LoopSubcoolReturn(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), SteamInletNodeNum(0), SteamOutletNodeNum(0), TempSetPointNodeNum(0),
-              TypeOfCoil(0), FluidIndex(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), Coil_PlantTypeNum(0), OperatingCapacity(0.0),
-              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
-              reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
+              TypeOfCoil(0), FluidIndex(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), CoilType(DataPlant::PlantEquipmentType::Invalid),
+              OperatingCapacity(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
+              FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
         {
         }
     };
@@ -178,7 +178,7 @@ namespace SteamCoils {
     void ReportSteamCoil(EnergyPlusData &state, int const CoilNum);
 
     int GetSteamCoilIndex(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -233,7 +233,7 @@ namespace SteamCoils {
     );
 
     int GetCoilSteamOutletNode(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+                               std::string_view CoilType,   // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );

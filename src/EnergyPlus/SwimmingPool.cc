@@ -823,7 +823,7 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
         if (this->WaterInletNode > 0) {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_SwimmingPool_Indoor,
+                                                    DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
                                                     this->HWLoopNum,
                                                     this->HWLoopSide,
                                                     this->HWBranchNum,

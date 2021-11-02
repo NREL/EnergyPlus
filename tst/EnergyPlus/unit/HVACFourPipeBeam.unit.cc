@@ -1754,7 +1754,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
-    PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
+    PlantUtilities::SetAllFlowLocks(*state, DataPlant::FlowLock::Unlocked);
     // first run with a sensible cooling load of 5000 W and cold supply air
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
@@ -4830,7 +4830,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
-    PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
+    PlantUtilities::SetAllFlowLocks(*state, DataPlant::FlowLock::Unlocked);
     // next run with heating load and neutral supply air
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;

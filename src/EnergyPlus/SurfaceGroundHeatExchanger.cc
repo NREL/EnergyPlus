@@ -132,8 +132,9 @@ namespace SurfaceGroundHeatExchanger {
     int constexpr SurfCond_Ground(1);
     int constexpr SurfCond_Exposed(2);
 
-    PlantComponent *
-    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
+    PlantComponent *SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state,
+                                                            [[maybe_unused]] DataPlant::PlantEquipmentType objectType,
+                                                            std::string const objectName)
     {
         if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
             GetSurfaceGroundHeatExchanger(state);
@@ -1427,7 +1428,7 @@ namespace SurfaceGroundHeatExchanger {
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit_new(EnergyPlusData &state)
     {
-        using DataPlant::TypeOf_GrndHtExchgSurface;
+
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -1441,8 +1442,19 @@ namespace SurfaceGroundHeatExchanger {
 
         // Locate the hx on the plant loops for later usage
         errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->Name, TypeOf_GrndHtExchgSurface, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        ScanPlantLoopsForObject(state,
+                                this->Name,
+                                DataPlant::PlantEquipmentType::GrndHtExchgSurface,
+                                this->LoopNum,
+                                this->LoopSideNum,
+                                this->BranchNum,
+                                this->CompNum,
+                                errFlag,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _);
 
         if (errFlag) {
             ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");

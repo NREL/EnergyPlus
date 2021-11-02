@@ -1156,7 +1156,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     ErrorsFound = false;
     PlantUtilities::ScanPlantLoopsForObject(*state,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_VarFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopSide,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
@@ -1172,7 +1172,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     ErrorsFound = false;
     PlantUtilities::ScanPlantLoopsForObject(*state,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_VarFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopNum,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopSide,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,

@@ -4039,8 +4039,7 @@ void InitPTUnit(EnergyPlusData &state,
     using SteamCoils::SimulateSteamCoilComponents;
     auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
     auto &GetSteamCoilCapacity(SteamCoils::GetCoilCapacity);
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     using Fans::GetFanVolFlow;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -4131,7 +4130,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4168,7 +4167,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4213,7 +4212,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
@@ -4243,7 +4242,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,

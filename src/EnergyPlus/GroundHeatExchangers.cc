@@ -821,19 +821,19 @@ void GLHEBase::simulate(EnergyPlusData &state,
 
 //******************************************************************************
 
-PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string const &objectName)
+PlantComponent *GLHEBase::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataGroundHeatExchanger->GetInput) {
         GetGroundHeatExchangerInput(state);
         state.dataGroundHeatExchanger->GetInput = false;
     }
-    if (objectType == DataPlant::TypeOf_GrndHtExchgSystem) {
+    if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSystem) {
         for (auto &ghx : state.dataGroundHeatExchanger->verticalGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
             }
         }
-    } else if (objectType == DataPlant::TypeOf_GrndHtExchgSlinky) {
+    } else if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSlinky) {
         for (auto &ghx : state.dataGroundHeatExchanger->slinkyGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
@@ -3158,13 +3158,23 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
-    using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state,
+                            this->name,
+                            DataPlant::PlantEquipmentType::GrndHtExchgSystem,
+                            this->loopNum,
+                            this->loopSideNum,
+                            this->branchNum,
+                            this->compNum,
+                            errFlag,
+                            _,
+                            _,
+                            _,
+                            _,
+                            _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
@@ -3244,13 +3254,23 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 
 void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
-    using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state,
+                            this->name,
+                            DataPlant::PlantEquipmentType::GrndHtExchgSlinky,
+                            this->loopNum,
+                            this->loopSideNum,
+                            this->branchNum,
+                            this->compNum,
+                            errFlag,
+                            _,
+                            _,
+                            _,
+                            _,
+                            _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
