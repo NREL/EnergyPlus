@@ -265,13 +265,13 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     EXPECT_EQ(5, state->dataEconLifeCycleCost->numNonrecurringCost);
     EXPECT_EQ("RESIDUALVALUE", state->dataEconLifeCycleCost->NonrecurringCost(5).name);
-    EXPECT_EQ(costCatSalvage, state->dataEconLifeCycleCost->NonrecurringCost(5).category);
+    EXPECT_EQ(CostCategory::Salvage, state->dataEconLifeCycleCost->NonrecurringCost(5).category);
     EXPECT_TRUE(compare_enums(iStartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost(5).startOfCosts));
     EXPECT_EQ(-20000., state->dataEconLifeCycleCost->NonrecurringCost(5).cost);
 
     EXPECT_EQ(1, state->dataEconLifeCycleCost->numRecurringCosts);
     EXPECT_EQ("ANNUALMAINT", state->dataEconLifeCycleCost->RecurringCosts(1).name);
-    EXPECT_EQ(costCatMaintenance, state->dataEconLifeCycleCost->RecurringCosts(1).category);
+    EXPECT_EQ(CostCategory::Maintenance, state->dataEconLifeCycleCost->RecurringCosts(1).category);
     EXPECT_EQ(7000., state->dataEconLifeCycleCost->RecurringCosts(1).cost);
     EXPECT_TRUE(compare_enums(iStartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts(1).startOfCosts));
     EXPECT_EQ(1, state->dataEconLifeCycleCost->RecurringCosts(1).repeatPeriodYears);
@@ -538,7 +538,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     state->dataEconLifeCycleCost->NonrecurringCost.allocate(1);
     state->dataEconLifeCycleCost->NonrecurringCost(1).name = "MiscConstruction";
     state->dataEconLifeCycleCost->NonrecurringCost(1).name = "MiscConstruction";
-    state->dataEconLifeCycleCost->NonrecurringCost(1).category = costCatConstruction;
+    state->dataEconLifeCycleCost->NonrecurringCost(1).category = CostCategory::Construction;
     state->dataEconLifeCycleCost->NonrecurringCost(1).cost = 123456.;
     state->dataEconLifeCycleCost->NonrecurringCost(1).startOfCosts = iStartCosts::ServicePeriod;
     state->dataEconLifeCycleCost->NonrecurringCost(1).totalMonthsFromStart = 10;
@@ -577,15 +577,15 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).yrAmount(4), 1278., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(18).yrAmount(5), 1278., 0.001);
 
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatEnergy).yrAmount(4), 1278., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatEnergy).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::Energy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::Energy).yrAmount(5), 1278., 0.001);
 
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(4), 1278., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::TotEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::TotEnergy).yrAmount(5), 1278., 0.001);
 
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatConstruction).yrAmount(4), 123456, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotCaptl).yrAmount(4), 123456, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::Construction).yrAmount(4), 123456, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::TotCaptl).yrAmount(4), 123456, 0.001);
 
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(4), 1278. + 123456., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(5), 1278., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::TotGrand).yrAmount(4), 1278. + 123456., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow(CostCategory::TotGrand).yrAmount(5), 1278., 0.001);
 }

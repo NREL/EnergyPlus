@@ -97,23 +97,29 @@ namespace EconomicLifeCycleCost {
         Straight40,
         None,
     };
-
-    constexpr int costCatMaintenance(1);
-    constexpr int costCatRepair(2);
-    constexpr int costCatOperation(3);
-    constexpr int costCatReplacement(4);
-    constexpr int costCatMinorOverhaul(5);
-    constexpr int costCatMajorOverhaul(6);
-    constexpr int costCatOtherOperational(7);
-    constexpr int costCatConstruction(8);
-    constexpr int costCatSalvage(9);
-    constexpr int costCatOtherCapital(10);
-    constexpr int costCatWater(11);
-    constexpr int costCatEnergy(12);
-    constexpr int costCatTotEnergy(13);
-    constexpr int costCatTotOper(14);
-    constexpr int costCatTotCaptl(15);
-    constexpr int costCatTotGrand(16);
+    
+    enum CostCategory
+    {
+        Unassigned = -1,
+        StartFromZero,
+        Maintenance,
+        Repair,
+        Operation,
+        Replacement,
+        MinorOverhaul,
+        MajorOverhaul,
+        OtherOperational,
+        Construction,
+        Salvage,
+        OtherCapital,
+        Water,
+        Energy,
+        TotEnergy,
+        TotOper,
+        TotCaptl,
+        TotGrand,
+        Num
+    };
 
     constexpr int countOfCostCat(16); // count of the number of cost categories
 
@@ -188,7 +194,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;            // Name
         std::string lineItem;        // Line Item
-        int category;                // Category
+        CostCategory category;                // Category
         Real64 cost;                 // Cost
         iStartCosts startOfCosts;    // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
@@ -201,7 +207,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(costCatMaintenance), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+            : category(CostCategory::Maintenance), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
               totalMonthsFromStart(0), repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
@@ -212,7 +218,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;         // Name
         std::string lineItem;     // Line Item
-        int category;             // Category
+        CostCategory category;             // Category
         Real64 cost;              // Cost
         iStartCosts startOfCosts; // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
@@ -221,7 +227,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         NonrecurringCostType()
-            : category(costCatConstruction), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+            : category(CostCategory::Construction), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
               totalMonthsFromStart(0)
         {
         }
@@ -263,7 +269,7 @@ namespace EconomicLifeCycleCost {
         std::string name;                           // Name - just for labeling output - use Category for aggregation
         iSourceKind SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
         DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int Category;                               // uses "costCat" constants above
+        CostCategory Category;                               // uses "costCat" constants above
         Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
@@ -274,7 +280,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(iSourceKind::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(0), pvKind(iPrValKind::Unassigned),
+            : SourceKind(iSourceKind::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned), pvKind(iPrValKind::Unassigned),
               presentValue(0.), orginalCost(0.)
         {
         }
