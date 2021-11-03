@@ -4774,7 +4774,7 @@ namespace WeatherManager {
 
                 int endcol = len(Line.data);
                 if (endcol > 0) {
-                    if (int(Line.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
+                    if (int(Line.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                         ShowSevereError(state,
                                         "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.",
                                         OptionalOutputFileRef(state.files.eso));

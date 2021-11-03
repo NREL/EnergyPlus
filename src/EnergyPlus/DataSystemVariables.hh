@@ -64,19 +64,7 @@ struct EnergyPlusData;
 
 namespace DataSystemVariables {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
+    int constexpr iUnicode_end = 0; // endline value when Unicode file
 
     // Shading methods
     enum class ShadingMethod
@@ -103,11 +91,6 @@ namespace DataSystemVariables {
 struct SystemVarsData : BaseGlobalStruct
 {
     bool firstTime = true;
-
-    // TODO: remove 'const' from state
-    int const iASCII_CR = 13;   // endline value when just CR instead of CR/LF
-    int const iUnicode_end = 0; // endline value when Unicode file
-    char const tabchar = '\t';
 
     DataSystemVariables::ShadingMethod shadingMethod = DataSystemVariables::ShadingMethod::PolygonClipping; // defines the shading method used
 

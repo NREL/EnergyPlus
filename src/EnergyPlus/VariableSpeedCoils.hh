@@ -539,39 +539,7 @@ namespace VariableSpeedCoils {
 
 struct VariableSpeedCoilsData : BaseGlobalStruct
 {
-    // TODO: remove 'const' from state
-    Real64 const RatedInletAirTemp = 26.6667;       // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp = 19.4444;   // 19.44 or 67F, cooling mode
-    Real64 const RatedInletAirHumRat = 0.0111847;   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedInletWaterTemp = 29.4444;     // 85 F cooling mode
-    Real64 const RatedAmbAirTemp = 35.0;            // 95 F cooling mode
-    Real64 const RatedInletAirTempHeat = 21.1111;   // 21.11C or 70F, heating mode
-    Real64 const RatedInletWaterTempHeat = 21.1111; // 21.11C or 70F, heating mode
-    Real64 const RatedAmbAirTempHeat = 8.3333;      // 8.33 or 47F, heating mode
-    Real64 const RatedAmbAirWBHeat = 6.1111;        // 8.33 or 43F, heating mode, rated wet bulb temperature
-                                                    // Water Systems
-    int const CondensateDiscarded = 1001;           // default mode where water is "lost"
-    int const CondensateToTank = 1002;              // collect coil condensate from air and store in water storage tank
-
-    int const WaterSupplyFromMains = 101;
-    int const WaterSupplyFromTank = 102;
-
-    // Curve Types
-    int const Linear = 1;
-    int const BiLinear = 2;
-    int const Quadratic = 3;
-    int const BiQuadratic = 4;
-    int const Cubic = 5;
-
-    // Defrost strategy (heat pump only)
-    int const ReverseCycle = 1; // uses reverse cycle defrost strategy
-    int const Resistive = 2;    // uses electric resistance heater for defrost
-                                // Defrost control  (heat pump only)
-    int const Timed = 1;        // defrost cycle is timed
-    int const OnDemand = 2;     // defrost cycle occurs only when required
-
-    int NumVarSpeedCoils = 0; // The Number of Water to Air Heat Pumps found in the Input
-
+    int NumVarSpeedCoils = 0;      // The Number of Water to Air Heat Pumps found in the Input
     bool MyOneTimeFlag = true;     // one time allocation flag
     bool GetCoilsInputFlag = true; // Flag set to make sure you get input once
                                    // LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag

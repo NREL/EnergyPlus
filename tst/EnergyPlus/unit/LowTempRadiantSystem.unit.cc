@@ -94,6 +94,9 @@ using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::General;
 
+Real64 constexpr CpWater = 4180.0;  // For estimating the expected result
+Real64 constexpr RhoWater = 1000.0; // For estimating the expected result
+
 class LowTempRadiantSystemTest : public EnergyPlusFixture
 {
 public:
@@ -102,9 +105,6 @@ public:
     Real64 ExpectedResult1;
     Real64 ExpectedResult2;
     Real64 ExpectedResult3;
-    Real64 const CpWater = 4180.0;  // For estimating the expected result
-    Real64 const RhoWater = 1000.0; // For estimating the expected result
-
     int DesignObjectNum;
 
 protected:

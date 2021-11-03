@@ -472,7 +472,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         // Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
         int endcol = LineResult.data.size();
         if (endcol > 0) {
-            if (int(LineResult.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
+            if (int(LineResult.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                 ShowSevereError(state, "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.");
                 ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError(state, "Program terminates due to previous condition.");

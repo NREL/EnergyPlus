@@ -143,6 +143,20 @@ Real64 constexpr DTheta = 2.0 * DataGlobalConstants::Pi / NTheta; // Azimuth ste
 Real64 constexpr DThetaDPhi = DTheta * DPhi;                      // Product of DTheta and DPhi
 Real64 constexpr PhiMin = 0.5 * DPhi;                             // Minimum altitude
 
+Real64 constexpr HCMULT = 100000.0; // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
+                                    // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
+                                    // to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
+Real64 const sqHCMULT = (HCMULT * HCMULT);    // Square of HCMult used in Homogeneous coordinates
+Real64 const sqHCMULT_fac = (0.5 / sqHCMULT); // ( 0.5 / sqHCMULT ) factor
+
+// Parameters for use with the variable OverlapStatus...
+int constexpr NoOverlap = 1;
+int constexpr FirstSurfWithinSecond = 2;
+int constexpr SecondSurfWithinFirst = 3;
+int constexpr PartialOverlap = 4;
+int constexpr TooManyVertices = 5;
+int constexpr TooManyFigures = 6;
+
 void InitSolarCalculations(EnergyPlusData &state)
 {
 
@@ -2846,7 +2860,7 @@ void CHKSBS(EnergyPlusData &state,
 
     // Print error condition if necessary.
 
-    if (state.dataSolarShading->OverlapStatus != state.dataSolarShading->FirstSurfWithinSecond) {
+    if (state.dataSolarShading->OverlapStatus != FirstSurfWithinSecond) {
         Out = false;
         // C                            COMPUTE COMPONENTS OF VECTOR
         // C                            NORMAL TO BASE SURFACE.
@@ -3456,8 +3470,8 @@ void HTRANS(EnergyPlusData &state,
         // See comment at top of module regarding HCMULT
         auto l(l1);
         for (int N = 1; N <= NumVertices; ++N, ++l) { // [ l ] == ( NS, N )
-            state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XVS(N) * state.dataSolarShading->HCMULT);
-            state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YVS(N) * state.dataSolarShading->HCMULT);
+            state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XVS(N) * HCMULT);
+            state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YVS(N) * HCMULT);
         }
     }
 
@@ -3488,7 +3502,7 @@ void HTRANS(EnergyPlusData &state,
     //  DO N = 1, NumVertices
     //    SUM = SUM + HCX(N,NS)*HCY(N+1,NS) - HCY(N,NS)*HCX(N+1,NS) ! Since HCX and HCY integerized, value of SUM should be ok
     //  END DO
-    state.dataSolarShading->HCAREA(NS) = SUM * state.dataSolarShading->sqHCMULT_fac;
+    state.dataSolarShading->HCAREA(NS) = SUM * sqHCMULT_fac;
     //  HCAREA(NS)=0.5d0*SUM*(kHCMULT)
 }
 
@@ -3535,7 +3549,7 @@ void HTRANS0(EnergyPlusData &state,
         SUM += state.dataSolarShading->HCC[l] = (HCY_m * HCX_l) - (HCX_m * HCY_l);
     }
 
-    state.dataSolarShading->HCAREA(NS) = SUM * state.dataSolarShading->sqHCMULT_fac;
+    state.dataSolarShading->HCAREA(NS) = SUM * sqHCMULT_fac;
 }
 
 void HTRANS1(EnergyPlusData &state,
@@ -3563,8 +3577,8 @@ void HTRANS1(EnergyPlusData &state,
     // only in HTRANS1
     auto l(l1);
     for (int N = 1; N <= NumVertices; ++N, ++l) { // [ l ] == ( NS, N )
-        state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XVS(N) * state.dataSolarShading->HCMULT);
-        state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YVS(N) * state.dataSolarShading->HCMULT);
+        state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XVS(N) * HCMULT);
+        state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YVS(N) * HCMULT);
     }
 
     l = state.dataSolarShading->HCX.index(NS, NumVertices + 1);
@@ -3586,7 +3600,7 @@ void HTRANS1(EnergyPlusData &state,
         SUM += state.dataSolarShading->HCC[l] = (HCY_m * HCX_l) - (HCX_m * HCY_l);
     }
 
-    state.dataSolarShading->HCAREA(NS) = SUM * state.dataSolarShading->sqHCMULT_fac;
+    state.dataSolarShading->HCAREA(NS) = SUM * sqHCMULT_fac;
 }
 
 void INCLOS(EnergyPlusData &state,
@@ -4152,9 +4166,9 @@ void CLIPRECT(EnergyPlusData &state, int const NS2, int const NV1, int &NV3)
 
     // Determine overlap status
     if (NV3 < 3) { // Determine overlap status
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->NoOverlap;
+        state.dataSolarShading->OverlapStatus = NoOverlap;
     } else if (!INTFLAG) {
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->FirstSurfWithinSecond;
+        state.dataSolarShading->OverlapStatus = FirstSurfWithinSecond;
     }
 }
 
@@ -4389,9 +4403,9 @@ void CLIPPOLY(EnergyPlusData &state,
     NV3 = NVOUT;
 
     if (NV3 < 3) { // Determine overlap status
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->NoOverlap;
+        state.dataSolarShading->OverlapStatus = NoOverlap;
     } else if (!INTFLAG) {
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->FirstSurfWithinSecond;
+        state.dataSolarShading->OverlapStatus = FirstSurfWithinSecond;
     }
 }
 
@@ -4432,11 +4446,9 @@ void MULTOL(EnergyPlusData &state,
 
         // Process overlap cases:
 
-        if (state.dataSolarShading->OverlapStatus == state.dataSolarShading->NoOverlap) continue;
+        if (state.dataSolarShading->OverlapStatus == NoOverlap) continue;
 
-        if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-            (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures))
-            break;
+        if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures)) break;
 
         state.dataSolarShading->LOCHCA = NS3; // Increment h.c. arrays pointer.
     }
@@ -4614,7 +4626,7 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
     if (NS3 > state.dataSolarShading->MaxHCS) {
 
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyFigures;
+        state.dataSolarShading->OverlapStatus = TooManyFigures;
 
         if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state,
@@ -4635,7 +4647,7 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         return;
     }
 
-    state.dataSolarShading->OverlapStatus = state.dataSolarShading->PartialOverlap;
+    state.dataSolarShading->OverlapStatus = PartialOverlap;
     NV1 = state.dataSolarShading->HCNV(NS1);
     NV2 = state.dataSolarShading->HCNV(NS2);
     NV3 = 0;
@@ -4645,7 +4657,7 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
         if (NIN1 >= NV1) {
 
-            state.dataSolarShading->OverlapStatus = state.dataSolarShading->FirstSurfWithinSecond;
+            state.dataSolarShading->OverlapStatus = FirstSurfWithinSecond;
 
         } else {
 
@@ -4653,14 +4665,14 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
             if (NIN2 >= NV2) {
 
-                state.dataSolarShading->OverlapStatus = state.dataSolarShading->SecondSurfWithinFirst;
+                state.dataSolarShading->OverlapStatus = SecondSurfWithinFirst;
 
             } else {
 
                 INTCPT(state, NV1, NV2, NV3, NS1, NS2); // Find intercepts of NS1 & NS2.
 
                 if (NV3 < 3) { // Overlap must have 3 or more vertices
-                    state.dataSolarShading->OverlapStatus = state.dataSolarShading->NoOverlap;
+                    state.dataSolarShading->OverlapStatus = NoOverlap;
                     return;
                 }
             }
@@ -4687,8 +4699,8 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         HTRANS0(state, NS3, NV3); // Determine h.c. values of sides.
         // Skip overlaps of negligible area.
 
-        if (std::abs(state.dataSolarShading->HCAREA(NS3)) * state.dataSolarShading->HCMULT < std::abs(state.dataSolarShading->HCAREA(NS1))) {
-            state.dataSolarShading->OverlapStatus = state.dataSolarShading->NoOverlap;
+        if (std::abs(state.dataSolarShading->HCAREA(NS3)) * HCMULT < std::abs(state.dataSolarShading->HCAREA(NS1))) {
+            state.dataSolarShading->OverlapStatus = NoOverlap;
         } else {
             if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0)
                 state.dataSolarShading->HCAREA(NS3) = -state.dataSolarShading->HCAREA(NS3); // Determine sign of area of overlap
@@ -4705,7 +4717,7 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
     } else if (NV3 > state.dataSolarShading->MaxHCV) {
 
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyVertices;
+        state.dataSolarShading->OverlapStatus = TooManyVertices;
 
         if (!state.dataSolarShading->TooManyVerticesMessage && !state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state,
@@ -4725,7 +4737,7 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
     } else if (NS3 > state.dataSolarShading->MaxHCS) {
 
-        state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyFigures;
+        state.dataSolarShading->OverlapStatus = TooManyFigures;
 
         if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state,
@@ -5777,9 +5789,8 @@ void SHDBKS(EnergyPlusData &state,
         state.dataSolarShading->SHDBKSOneTimeFlag = false;
     }
 
-    if ((NBKS <= 0) || (state.dataSolarShading->SurfSunlitArea(HTS) <= 0.0) ||
-        (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-        (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures))
+    if ((NBKS <= 0) || (state.dataSolarShading->SurfSunlitArea(HTS) <= 0.0) || (state.dataSolarShading->OverlapStatus == TooManyVertices) ||
+        (state.dataSolarShading->OverlapStatus == TooManyFigures))
         return;
 
     state.dataSolarShading->FBKSHC = state.dataSolarShading->LOCHCA + 1;
@@ -5839,9 +5850,8 @@ void SHDBKS(EnergyPlusData &state,
         state.dataSolarShading->HCT(NS3) = 1.0;
         DeterminePolygonOverlap(state, NS1, NS2, NS3);
 
-        if (state.dataSolarShading->OverlapStatus == state.dataSolarShading->NoOverlap) continue; // to next back surface
-        if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-            (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures))
+        if (state.dataSolarShading->OverlapStatus == NoOverlap) continue; // to next back surface
+        if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures))
             break; // back surfaces DO loop
 
         // Increment back surface count.
@@ -5898,8 +5908,8 @@ void SHDGSS(EnergyPlusData &state,
     }
 
     state.dataSolarShading->FGSSHC = state.dataSolarShading->LOCHCA + 1;
-    MainOverlapStatus = state.dataSolarShading->NoOverlap; // Set to ensure that the value from the last surface is not saved
-    state.dataSolarShading->OverlapStatus = state.dataSolarShading->NoOverlap;
+    MainOverlapStatus = NoOverlap; // Set to ensure that the value from the last surface is not saved
+    state.dataSolarShading->OverlapStatus = NoOverlap;
 
     if (NGSS <= 0) { // IF NO S.S., receiving surface FULLY SUNLIT.
 
@@ -6040,19 +6050,17 @@ void SHDGSS(EnergyPlusData &state,
             NS2 = NS3;
             DeterminePolygonOverlap(state, NS1, NS2, NS3);
             //  Next statement is special to deal with transmitting shading devices
-            if (state.dataSolarShading->OverlapStatus == state.dataSolarShading->FirstSurfWithinSecond && SchValue > 0.0)
-                state.dataSolarShading->OverlapStatus = state.dataSolarShading->PartialOverlap;
+            if (state.dataSolarShading->OverlapStatus == FirstSurfWithinSecond && SchValue > 0.0)
+                state.dataSolarShading->OverlapStatus = PartialOverlap;
             MainOverlapStatus = state.dataSolarShading->OverlapStatus;
             ExitLoopStatus = MainOverlapStatus;
 
-            if (MainOverlapStatus == state.dataSolarShading->NoOverlap) { // No overlap of general surface shadow and receiving surface
-                                                                          // Continue
-            } else if ((MainOverlapStatus == state.dataSolarShading->FirstSurfWithinSecond) ||
-                       (MainOverlapStatus == state.dataSolarShading->TooManyVertices) ||
-                       (MainOverlapStatus == state.dataSolarShading->TooManyFigures)) {
+            if (MainOverlapStatus == NoOverlap) { // No overlap of general surface shadow and receiving surface
+                                                  // Continue
+            } else if ((MainOverlapStatus == FirstSurfWithinSecond) || (MainOverlapStatus == TooManyVertices) ||
+                       (MainOverlapStatus == TooManyFigures)) {
                 goto ShadowingSurfaces_exit;
-            } else if ((MainOverlapStatus == state.dataSolarShading->SecondSurfWithinFirst) ||
-                       (MainOverlapStatus == state.dataSolarShading->PartialOverlap)) {
+            } else if ((MainOverlapStatus == SecondSurfWithinFirst) || (MainOverlapStatus == PartialOverlap)) {
                 // Determine overlaps with previous shadows.
                 state.dataSolarShading->LOCHCA = NS3;
                 state.dataSolarShading->NGSSHC = state.dataSolarShading->LOCHCA - state.dataSolarShading->FGSSHC + 1;
@@ -6071,12 +6079,11 @@ void SHDGSS(EnergyPlusData &state,
 
         // Compute sunlit area of surface (excluding effects of subsurfs).
 
-        if (ExitLoopStatus == state.dataSolarShading->FirstSurfWithinSecond) { // Surface fully shaded
+        if (ExitLoopStatus == FirstSurfWithinSecond) { // Surface fully shaded
             state.dataSolarShading->SurfSunlitArea(HTS) = 0.0;
             state.dataSolarShading->LOCHCA = state.dataSolarShading->FGSSHC;
 
-        } else if ((ExitLoopStatus == state.dataSolarShading->TooManyVertices) ||
-                   (ExitLoopStatus == state.dataSolarShading->TooManyFigures)) { // Array limits exceeded, estimate
+        } else if ((ExitLoopStatus == TooManyVertices) || (ExitLoopStatus == TooManyFigures)) { // Array limits exceeded, estimate
             state.dataSolarShading->SurfSunlitArea(HTS) = 0.25 * state.dataSolarShading->HCAREA(1);
 
         } else {
@@ -9119,7 +9126,7 @@ void SHDRVL(EnergyPlusData &state,
             // Find overlap
 
             DeterminePolygonOverlap(state, NS1, NS2, state.dataSolarShading->FRVLHC);
-            if (state.dataSolarShading->OverlapStatus == state.dataSolarShading->NoOverlap) {
+            if (state.dataSolarShading->OverlapStatus == NoOverlap) {
                 RevealStatus = EntireWindowShadedByReveal;
                 RevealStatusSet = true;
             }
@@ -9137,8 +9144,7 @@ void SHDRVL(EnergyPlusData &state,
             // Reduce all previous shadows to size of reveal opening.
             state.dataSolarShading->LOCHCA = state.dataSolarShading->FRVLHC;
             MULTOL(state, state.dataSolarShading->LOCHCA, state.dataSolarShading->FSBSHC, state.dataSolarShading->NSBSHC - 1);
-            if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-                (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures)) {
+            if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures)) {
                 RevealStatus = None;
                 RevealStatusSet = true;
             } else {
@@ -9226,8 +9232,7 @@ void SHDSBS(EnergyPlusData &state,
             K = state.dataSurface->Surface(SBSNR).Construction;
 
             if (!state.dataSolarShading->penumbra) {
-                if ((state.dataSolarShading->OverlapStatus != state.dataSolarShading->TooManyVertices) &&
-                    (state.dataSolarShading->OverlapStatus != state.dataSolarShading->TooManyFigures) &&
+                if ((state.dataSolarShading->OverlapStatus != TooManyVertices) && (state.dataSolarShading->OverlapStatus != TooManyFigures) &&
                     (state.dataSolarShading->SurfSunlitArea(HTS) > 0.0)) {
 
                     // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
@@ -9245,14 +9250,12 @@ void SHDSBS(EnergyPlusData &state,
                     // Determine sunlit area of subsurface due to shadows on general receiving surface.
                     if (state.dataSolarShading->NGSSHC > 0) {
                         MULTOL(state, state.dataSolarShading->LOCHCA, state.dataSolarShading->FGSSHC - 1, state.dataSolarShading->NGSSHC);
-                        if ((state.dataSolarShading->OverlapStatus != state.dataSolarShading->TooManyVertices) &&
-                            (state.dataSolarShading->OverlapStatus != state.dataSolarShading->TooManyFigures))
+                        if ((state.dataSolarShading->OverlapStatus != TooManyVertices) && (state.dataSolarShading->OverlapStatus != TooManyFigures))
                             state.dataSolarShading->NSBSHC = state.dataSolarShading->LOCHCA - state.dataSolarShading->FSBSHC + 1;
                     }
                 }
 
-                if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-                    (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures) ||
+                if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures) ||
                     (state.dataSolarShading->SurfSunlitArea(HTS) <= 0.0)) { // General receiving surface totally shaded.
 
                     state.dataSolarShading->SurfSunlitArea(HTSS) = 0.0;
@@ -9276,8 +9279,7 @@ void SHDSBS(EnergyPlusData &state,
 
                     SHDRVL(state, HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
 
-                    if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-                        (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures))
+                    if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures))
                         state.dataSolarShading->SurfSunlitArea(HTSS) = 0.0;
 
                 } else { // Compute area.
@@ -9299,8 +9301,7 @@ void SHDSBS(EnergyPlusData &state,
 
                         SHDRVL(state, HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
 
-                        if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-                            (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures))
+                        if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures))
                             state.dataSolarShading->SurfSunlitArea(HTSS) = 0.0;
 
                     } else { // General receiving surface totally shaded.
@@ -12671,9 +12672,8 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
             state.dataSolarShading->HCT(NS3) = 1.0;
             DeterminePolygonOverlap(state, NS1, NS2, NS3);
 
-            if (state.dataSolarShading->OverlapStatus == state.dataSolarShading->NoOverlap) continue; // to next back surface
-            if ((state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyVertices) ||
-                (state.dataSolarShading->OverlapStatus == state.dataSolarShading->TooManyFigures))
+            if (state.dataSolarShading->OverlapStatus == NoOverlap) continue; // to next back surface
+            if ((state.dataSolarShading->OverlapStatus == TooManyVertices) || (state.dataSolarShading->OverlapStatus == TooManyFigures))
                 break; // back surfaces DO loop
 
             state.dataSolarShading->LOCHCA = NS3;
