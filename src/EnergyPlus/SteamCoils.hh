@@ -64,6 +64,10 @@ struct EnergyPlusData;
 
 namespace SteamCoils {
 
+    int constexpr TemperatureSetPointControl = 1;
+    int constexpr SteamCoil_AirHeating = 2;
+    int constexpr ZoneLoadControl = 3;
+
     struct SteamCoilEquipConditions
     {
         // Members
@@ -271,11 +275,6 @@ namespace SteamCoils {
 
 struct SteamCoilsData : BaseGlobalStruct
 {
-    // TODO: remove 'const' from state
-    int const SteamCoil_AirHeating = 2;
-    int const TemperatureSetPointControl = 1;
-    int const ZoneLoadControl = 3;
-
     int SteamIndex = 0;
     int NumSteamCoils = 0; // The Number of SteamCoils found in the Input
     Array1D_bool MySizeFlag;

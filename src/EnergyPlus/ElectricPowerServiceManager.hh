@@ -374,8 +374,6 @@ private: // data
     Real64 drawnEnergy_;             // [J]
     Real64 decrementedEnergyStored_; // [J] this is the negative of StoredEnergy
     int maxRainflowArrayBounds_;
-    // TODO: remove 'const' from state
-    int const maxRainflowArrayInc_ = 100;
     bool myWarmUpFlag_;
     StorageModelType storageModelMode_;            // type of model parameter, SimpleBucketStorage
     int availSchedPtr_;                            // availability schedule index.

@@ -295,27 +295,6 @@ struct UnitVentilatorsData : BaseGlobalStruct
     // Current Module Unit type
     std::string const cMO_UnitVentilator = "ZoneHVAC:UnitVentilator";
 
-    // TODO: remove 'const' from state
-    // Parameters for outside air control types:
-    int const Heating_ElectricCoilType = 1;
-    int const Heating_GasCoilType = 2;
-    int const Heating_WaterCoilType = 3;
-    int const Heating_SteamCoilType = 4;
-    int const Cooling_CoilWaterCooling = 1;
-    int const Cooling_CoilDetailedCooling = 2;
-    int const Cooling_CoilHXAssisted = 3;
-    // OA operation modes
-    int const VariablePercent = 1;
-    int const FixedTemperature = 2;
-    int const FixedOAControl = 3;
-    // coil operation
-    int const On = 1;  // normal coil operation
-    int const Off = 0; // signal coil shouldn't run
-    int const NoneOption = 0;
-    int const BothOption = 1;
-    int const HeatingOption = 2;
-    int const CoolingOption = 3;
-
     bool HCoilOn = false;        // TRUE if the heating coil  = gas or electric especially) should be running
     int NumOfUnitVents = 0;      // Number of unit ventilators in the input file
     Real64 OAMassFlowRate = 0.0; // Outside air mass flow rate for the unit ventilator

@@ -440,12 +440,6 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D_string const SubSurfCls;
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs;
     Array1D<DataSurfaces::SurfaceClass> const SubSurfIDs;
-
-    // TODO: remove 'const' from state
-    int const UnenteredAdjacentZoneSurface = -998; // allows users to enter one zone surface ("Zone")
-                                                   // referencing another in adjacent zone
-    int const UnreconciledZoneSurface = -999;      // interim value between entering surfaces ("Surface") and reconciling
-
     Array1D<SurfaceGeometry::SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;

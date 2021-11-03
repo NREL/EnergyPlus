@@ -1893,8 +1893,7 @@ void GetPTUnit(EnergyPlusData &state)
                         state, "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 }
-                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) !=
-                    state.dataSteamCoils->ZoneLoadControl) {
+                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) != SteamCoils::ZoneLoadControl) {
                     if (errFlag) {
                         ShowContinueError(state,
                                           "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" +

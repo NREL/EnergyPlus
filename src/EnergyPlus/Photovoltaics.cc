@@ -805,7 +805,7 @@ namespace Photovoltaics {
 
         ThisSurf = state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr;
 
-        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > state.dataPhotovoltaic->MinIrradiance) {
+        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > DataPhotovoltaics::MinIrradiance) {
 
             // get efficiency
             {
@@ -948,7 +948,7 @@ namespace Photovoltaics {
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                     // from DataEnvironment via USE
 
         if (((state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) >
-             state.dataPhotovoltaic->MinIrradiance) &&
+             DataPhotovoltaics::MinIrradiance) &&
             (RunFlag)) {
 
             // first determine PV cell temperatures depending on model
