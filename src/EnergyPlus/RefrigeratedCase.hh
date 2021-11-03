@@ -68,7 +68,7 @@ namespace RefrigeratedCase {
     // Compressor suction pressure control
     enum class iCompSuctionPressureCtrl
     {
-        Unassigned,
+        Unassigned = -1,
         FloatSuctionTemperature,
         ConstantSuctionTemperature,
     };
@@ -76,7 +76,7 @@ namespace RefrigeratedCase {
     // Subcooler type
     enum class iSubcoolerType
     {
-        Unassigned,
+        Unassigned = -1,
         LiquidSuction,
         Mechanical,
     };
@@ -84,7 +84,7 @@ namespace RefrigeratedCase {
     // Walk In Cooler Stock Door Protection types
     enum class WIStockDoor
     {
-        Unassigned,
+        Unassigned = -1,
         None,
         AirCurtain,
         StripCurtain,
@@ -93,7 +93,7 @@ namespace RefrigeratedCase {
     // Walk In Cooler Defrost Control type
     enum class iDefrostCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         Sched,
         TempTerm,
     };
@@ -101,7 +101,7 @@ namespace RefrigeratedCase {
     // Walk In Cooler Defrost type
     enum class WalkinClrDefrostType
     {
-        Unassigned,
+        Unassigned = -1,
         Fluid,
         Elec,
         None,
@@ -111,14 +111,14 @@ namespace RefrigeratedCase {
     // Secondary loop parameters
     enum class iSecFluidType
     {
-        Unassigned,
+        Unassigned = -1,
         AlwaysLiquid,
         PhaseChange,
     };
 
     enum class iSecPumpCtrl
     {
-        Unassigned,
+        Unassigned = -1,
         Constant,
         Variable,
     };
@@ -126,7 +126,7 @@ namespace RefrigeratedCase {
     // Refrigerated display case energy equation form
     enum class iEnergyEqnForm
     {
-        Unassigned,
+        Unassigned = -1,
         None,
         CaseTemperatureMethod,
         RHCubic,
@@ -136,7 +136,7 @@ namespace RefrigeratedCase {
     // Cascade condenser temperature control types
     enum class iCascadeCndsrTempCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         TempSet,
         TempFloat,
     };
@@ -152,7 +152,7 @@ namespace RefrigeratedCase {
     // Air- and evap-cooled condenser fan speed control types
     enum class iFanSpeedCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         VariableSpeed,
         ConstantSpeedLinear,
         TwoSpeed,
@@ -162,7 +162,7 @@ namespace RefrigeratedCase {
     // Refrigerated display case rack heat rejection location
     enum class iLocation
     {
-        Unassigned,
+        Unassigned = -1,
         Outdoors,
         Zone,
     };
@@ -170,7 +170,7 @@ namespace RefrigeratedCase {
     // Refrigerated display case defrost type
     enum class iRefCaseDefrostType
     {
-        Unassigned,
+        Unassigned = -1,
         None,
         OffCycle,
         HotFluid,
@@ -184,7 +184,7 @@ namespace RefrigeratedCase {
     // Anti-sweat heater control type
     enum class iASHtrCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         None,
         Constant,
         Linear,
@@ -195,7 +195,7 @@ namespace RefrigeratedCase {
     // Compressor rating types
     enum class iCompRatingType
     {
-        Unassigned,
+        Unassigned = -1,
         Superheat,
         ReturnGasTemperature,
         Subcooling,
@@ -211,7 +211,7 @@ namespace RefrigeratedCase {
 
     enum class iRatingType
     {
-        Unassigned,
+        Unassigned = -1,
         RatedCapacityTotal,
         EuropeanSC1Std,
         EuropeanSC1Nom,
@@ -228,7 +228,7 @@ namespace RefrigeratedCase {
 
     enum class iSHRCorrectionType
     {
-        Unassigned,
+        Unassigned = -1,
         SHR60,
         QuadraticSHR,
         European,
@@ -237,7 +237,7 @@ namespace RefrigeratedCase {
 
     enum class iVerticalLoc
     {
-        Unassigned,
+        Unassigned = -1,
         Ceiling,
         Middle,
         Floor,
@@ -245,7 +245,7 @@ namespace RefrigeratedCase {
 
     enum class iSourceType
     {
-        Unassigned,
+        Unassigned = -1,
         DetailedSystem,
         SecondarySystem,
     };
@@ -253,7 +253,7 @@ namespace RefrigeratedCase {
     // Warehouse coil Defrost type
     enum class iDefrostType
     {
-        Unassigned,
+        Unassigned = -1,
         Fluid,
         Elec,
         None,

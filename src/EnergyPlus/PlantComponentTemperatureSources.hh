@@ -69,7 +69,7 @@ namespace PlantComponentTemperatureSources {
     // MODULE PARAMETER DEFINITIONS:
     enum class iTempSpecType
     {
-        Unassigned,
+        Unassigned = -1,
         Constant,
         Schedule,
     };

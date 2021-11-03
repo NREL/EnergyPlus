@@ -75,7 +75,7 @@ namespace HVACVariableRefrigerantFlow {
     // Thermostat Priority Control Type
     enum class iThermostatCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         LoadPriority,             // total of zone loads dictate operation in cooling or heating
         ZonePriority,             // # of zones requiring cooling or heating dictate operation in cooling or heating
         ThermostatOffsetPriority, // zone with largest deviation from setpoint dictates operation
@@ -95,7 +95,7 @@ namespace HVACVariableRefrigerantFlow {
     // VRF Algorithm Type
     enum class iAlgorithmType
     {
-        Unassigned,
+        Unassigned = -1,
         SysCurve,   // VRF model based on system curve
         FluidTCtrl, // VRF model based on physics, appreciable for Fluid Temperature Control
     };

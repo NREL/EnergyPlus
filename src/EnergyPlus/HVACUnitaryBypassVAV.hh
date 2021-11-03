@@ -85,7 +85,7 @@ namespace HVACUnitaryBypassVAV {
 
     enum class PriorityCtrlMode // Priority control mode (prioritized thermostat signal)
     {
-        Unassigned,
+        Unassigned = -1,
         CoolingPriority, // Controls CBVAV system based on cooling priority
         HeatingPriority, // Controls CBVAV system based on heating priority
         ZonePriority,    // Controls CBVAV system based on number of zones priority
@@ -94,7 +94,7 @@ namespace HVACUnitaryBypassVAV {
 
     enum class AirFlowCtrlMode // Airflow control for contant fan mode
     {
-        Unassigned,
+        Unassigned = -1,
         UseCompressorOnFlow, // Set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow // Set compressor OFF air flow rate equal to user defined value
     };

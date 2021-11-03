@@ -70,7 +70,7 @@ namespace DualDuct {
     // MODULE PARAMETER DEFINITIONS
     enum class DualDuctDamper
     {
-        Unassigned,
+        Unassigned = -1,
         ConstantVolume,
         VariableVolume,
         OutdoorAir
@@ -78,7 +78,7 @@ namespace DualDuct {
 
     enum class DualDuctOAMode
     {
-        Unassigned,
+        Unassigned = -1,
         ConstantOAMode = 11,
         ScheduleOAMode = 12,
         DynamicOAMode = 13

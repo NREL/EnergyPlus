@@ -65,7 +65,7 @@ namespace CoolTower {
 
     enum class FlowCtrlEnum
     {
-        Unassigned,
+        Unassigned = -1,
         FlowSchedule,
         WindDriven
     };

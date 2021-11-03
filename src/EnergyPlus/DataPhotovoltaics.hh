@@ -64,7 +64,7 @@ namespace DataPhotovoltaics {
 
     enum class PVModel
     {
-        Unassigned,
+        Unassigned = -1,
         Simple,
         TRNSYS,
         Sandia
@@ -72,7 +72,7 @@ namespace DataPhotovoltaics {
 
     enum class CellIntegration
     {
-        Unassigned,               // cell temp method not set
+        Unassigned = -1,          // cell temp method not set
         Decoupled,                // cell temp method based on energy balance
         DecoupledUllebergDynamic, // cell temp method based on energy bal with capacity
         SurfaceOutsideFace,       // cell temp method based on coupling to E+'s heat balance
@@ -83,14 +83,14 @@ namespace DataPhotovoltaics {
 
     enum class Efficiency
     {
-        Unassigned,
+        Unassigned = -1,
         Fixed,    // simple PV, constant efficiency
         Scheduled // simpel PV, scheduled efficiency
     };
 
     enum class SiPVCells
     {
-        Unassigned,
+        Unassigned = -1,
         Crystalline,
         Amorphous
     };

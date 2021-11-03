@@ -61,7 +61,7 @@ namespace DataPlant {
     // "Both" is used as a special flag and is never assigned to the loop's TypeOfLoop member
     enum class LoopType
     {
-        Unassigned,
+        Unassigned = -1,
         Plant,
         Condenser,
         Both

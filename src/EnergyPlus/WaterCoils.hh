@@ -74,7 +74,7 @@ namespace WaterCoils {
 
     enum class iCoilModel
     {
-        Unassigned,
+        Unassigned = -1,
         HeatingSimple,
         CoolingSimple,
         CoolingDetailed,

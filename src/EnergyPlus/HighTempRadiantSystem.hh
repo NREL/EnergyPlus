@@ -70,7 +70,7 @@ namespace HighTempRadiantSystem {
 
     enum class RadHeaterType
     {
-        Unassigned,
+        Unassigned = -1,
         Gas,
         Electric
     };

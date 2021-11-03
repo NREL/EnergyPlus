@@ -123,7 +123,7 @@ namespace OutdoorAirUnit {
 
     enum class Control
     {
-        Unassigned,
+        Unassigned = -1,
         Neutral,
         Unconditioned,
         Temperature
@@ -131,7 +131,7 @@ namespace OutdoorAirUnit {
 
     enum class Operation
     {
-        Unassigned,
+        Unassigned = -1,
         HeatingMode, // normal heating coil operation
         CoolingMode, // normal cooling coil operation
         NeutralMode  // signal coil shouldn't run

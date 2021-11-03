@@ -66,7 +66,7 @@ namespace EarthTube {
     // Parameters for Ventilation
     enum class EarthTubeVentilation
     {
-        Unassigned,
+        Unassigned = -1,
         Natural,
         Intake,
         Exhaust

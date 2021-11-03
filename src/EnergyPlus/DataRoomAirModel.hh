@@ -109,7 +109,7 @@ namespace DataRoomAirModel {
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
     {
-        Unassigned,
+        Unassigned = -1,
         OutdoorDryBulbMode,  // by outdoor air bulb.
         SensibleCoolingMode, // by sensible cooling load
         SensibleHeatingMode, // by sensible heating load
@@ -120,7 +120,7 @@ namespace DataRoomAirModel {
     // user defined temperature pattern types
     enum class UserDefinedPatternType
     {
-        Unassigned,
+        Unassigned = -1,
         ConstGradTempPattern,  // constant gradient in vertical direction
         TwoGradInterpPattern,  // two gradient interpolation
         NonDimenHeightPattern, // non-dimensionalized height
@@ -130,7 +130,7 @@ namespace DataRoomAirModel {
     // parameters to indicate diffuser type
     enum class Diffuser
     {
-        Unassigned,
+        Unassigned = -1,
         Swirl,
         VarArea,
         DisplVent,

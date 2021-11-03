@@ -75,7 +75,7 @@ namespace PackagedTerminalHeatPump {
     // Last mode of operation
     enum class iCompMode
     {
-        Unassigned,
+        Unassigned = -1,
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
     };
@@ -83,7 +83,7 @@ namespace PackagedTerminalHeatPump {
     // Airflow control for constant fan mode
     enum class iAirflowCtrlMode
     {
-        Unassigned,
+        Unassigned = -1,
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
     };
@@ -91,7 +91,7 @@ namespace PackagedTerminalHeatPump {
     // Unit type
     enum class iPTHPType
     {
-        Unassigned,
+        Unassigned = -1,
         PTHPUnit,   // equivalent to PackagedTerminal:HeatPump:AirToAir
         PTACUnit,   // equivalent to PackagedTerminal:AirConditioner
         PTWSHPUnit, // equivalent to WaterToAirHeatPump
@@ -100,7 +100,7 @@ namespace PackagedTerminalHeatPump {
     // control type
     enum class iCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         None,       // no special capacity control
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
     };

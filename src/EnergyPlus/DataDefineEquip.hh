@@ -68,7 +68,7 @@ namespace DataDefineEquip {
     // Equipment Types covered by ZoneAirLoopEquipment:
     enum class iZnAirLoopEquipType
     {
-        Unassigned,
+        Unassigned = -1,
         DualDuctConstVolume,
         DualDuctVAV,
         SingleDuctVAVReheat,

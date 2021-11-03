@@ -67,7 +67,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     enum class iFluidHXType
     {
-        Unassigned,
+        Unassigned = -1,
         CrossFlowBothUnMixed,
         CrossFlowBothMixed,
         CrossFlowSupplyLoopMixedDemandLoopUnMixed,
@@ -79,7 +79,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     enum class iCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         UncontrolledOn,
         OperationSchemeModulated,
         OperationSchemeOnOff,
@@ -96,7 +96,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     enum class iCtrlTemp
     {
-        Unassigned,
+        Unassigned = -1,
         WetBulbTemperature,
         DryBulbTemperature,
         LoopTemperature,

@@ -68,7 +68,7 @@ namespace Furnaces {
 
     enum class ModeOfOperation
     {
-        Unassigned,
+        Unassigned = -1,
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
         NoCoolHeat,  // last operating mode was coil off
@@ -77,7 +77,7 @@ namespace Furnaces {
     // Airflow control for contant fan mode
     enum class AirFlowControlConstFan
     {
-        Unassigned,           // default
+        Unassigned = -1,      // default
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
     };

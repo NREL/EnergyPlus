@@ -67,7 +67,7 @@ namespace ChillerReformulatedEIR {
 
     enum class PLR
     {
-        Unassigned,
+        Unassigned = -1,
         LeavingCondenserWaterTemperature, // Type 1_LeavingCondenserWaterTemperature
         Lift                              // Type 2_Lift
     };

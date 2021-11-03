@@ -69,7 +69,7 @@ namespace DemandManager {
     // MODULE PARAMETER DEFINITIONS:
     enum class ManagerType
     {
-        Unassigned,
+        Unassigned = -1,
         ManagerTypeExtLights,
         ManagerTypeLights,
         ManagerTypeElecEquip,
@@ -79,7 +79,7 @@ namespace DemandManager {
 
     enum class ManagePriorityType
     {
-        Unassigned,
+        Unassigned = -1,
         ManagerPrioritySequential,
         ManagerPriorityOptimal,
         ManagerPriorityAll
@@ -87,7 +87,7 @@ namespace DemandManager {
 
     enum class Limit
     {
-        Unassigned,
+        Unassigned = -1,
         ManagerLimitOff,
         ManagerLimitFixed,
         ManagerLimitVariable,
@@ -96,7 +96,7 @@ namespace DemandManager {
 
     enum class Selection
     {
-        Unassigned,
+        Unassigned = -1,
         ManagerSelectionAll,
         ManagerSelectionMany,
         ManagerSelectionOne

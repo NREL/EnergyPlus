@@ -70,21 +70,21 @@ namespace Pumps {
 
     enum class PumpControlType
     {
-        Unassigned,
+        Unassigned = -1,
         Continuous,   // Pump control type (pump always running)
         Intermittent, // Pump control type (pump runs only when there is a demand)
     };
 
     enum class ControlTypeVFD
     {
-        Unassigned,
+        Unassigned = -1,
         VFDManual,    // VFD control type (Scheduled RPM)
         VFDAutomatic, // VFD control type (Variable RPM according to flow request)
     };
 
     enum class PumpBankControlSeq
     {
-        Unassigned,
+        Unassigned = -1,
         OptimalScheme,    // Control sequencing for pump bank
         SequentialScheme, // Control sequencing for pump bank
         UserDefined,      // Control sequencing for pump bank

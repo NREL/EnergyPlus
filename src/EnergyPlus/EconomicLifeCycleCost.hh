@@ -133,7 +133,7 @@ namespace EconomicLifeCycleCost {
 
     enum class iSourceKind
     {
-        Unassigned,
+        Unassigned = -1,
         Recurring,
         Nonrecurring,
         Resource,
@@ -142,7 +142,7 @@ namespace EconomicLifeCycleCost {
 
     enum class iPrValKind
     {
-        Unassigned,
+        Unassigned = -1,
         Energy,
         NonEnergy,
         NotComputed,

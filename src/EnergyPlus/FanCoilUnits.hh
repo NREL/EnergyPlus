@@ -81,7 +81,7 @@ namespace FanCoilUnits {
 
     enum class CCoil
     {
-        Unassigned,
+        Unassigned = -1,
         Water,
         Detailed,
         HXAssist
@@ -89,14 +89,14 @@ namespace FanCoilUnits {
 
     enum class HCoil
     {
-        Unassigned,
+        Unassigned = -1,
         Water,
         Electric
     };
 
     enum class CCM // capacity control method supported in this module
     {
-        Unassigned,
+        Unassigned = -1,
         ConsFanVarFlow,
         CycFan,
         VarFanVarFlow,

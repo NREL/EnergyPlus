@@ -71,7 +71,7 @@ namespace PackagedThermalStorageCoil {
     // control types
     enum class iModeCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         ScheduledOpModes,   // control over TES modes is via local schedule
         EMSActuatedOpModes, // control over TES modes is via EMS
     };
@@ -88,7 +88,7 @@ namespace PackagedThermalStorageCoil {
     // storage media
     enum class iMedia
     {
-        Unassigned,
+        Unassigned = -1,
         FluidBased,
         IceBased,
     };

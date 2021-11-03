@@ -82,7 +82,7 @@ namespace CurveManager {
 
     enum class CurveTypeEnum
     {
-        Unassigned,
+        Unassigned = -1,
         Linear,
         BiLinear,
         Quadratic,
@@ -108,7 +108,7 @@ namespace CurveManager {
 
     enum class InterpTypeEnum
     {
-        Unassigned,
+        Unassigned = -1,
         EvaluateCurveToLimits,
         BtwxtMethod
     };

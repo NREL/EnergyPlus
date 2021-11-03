@@ -159,7 +159,7 @@ namespace EconomicTariff {
 
     enum class iDemandWindow
     {
-        Unassigned,
+        Unassigned = -1,
         Quarter,
         Half,
         Hour,

@@ -82,7 +82,7 @@ namespace OutputReportTabular {
 
     enum class iAggType
     {
-        Unassigned,
+        Unassigned = -1,
         SumOrAvg,
         Maximum,
         Minimum,
@@ -100,7 +100,7 @@ namespace OutputReportTabular {
 
     enum class iTableStyle
     {
-        Unassigned,
+        Unassigned = -1,
         Comma,
         Tab,
         Fixed,

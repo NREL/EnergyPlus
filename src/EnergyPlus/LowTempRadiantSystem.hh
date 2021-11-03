@@ -71,7 +71,7 @@ namespace LowTempRadiantSystem {
 
     enum class SystemType
     {
-        Unassigned,
+        Unassigned = -1,
         HydronicSystem,     // Variable flow hydronic radiant system
         ConstantFlowSystem, // Constant flow, variable (controlled) temperature radiant system
         ElectricSystem,     // Electric resistance radiant heating system

@@ -62,14 +62,14 @@ namespace DataWater {
 
     enum class TankThermalMode
     {
-        Unassigned,
+        Unassigned = -1,
         ScheduledTankTemp,     // tank water temperature is user input via schedule
         TankZoneThermalCoupled // tank water temperature is modeled using simple UA
     };
 
     enum class RainfallMode
     {
-        Unassigned,
+        Unassigned = -1,
         RainSchedDesign, // mode of Rainfall determination is Scheduled Design
         IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
         IrrSmartSched    // mode of irrigation
@@ -77,14 +77,14 @@ namespace DataWater {
 
     enum class RainLossFactor
     {
-        Unassigned,
+        Unassigned = -1,
         Constant,
         Scheduled
     };
 
     enum class AmbientTempType
     {
-        Unassigned,
+        Unassigned = -1,
         Schedule, // ambient temperature around tank (or HPWH inlet air) is scheduled
         Zone,     // tank is located in a zone or HPWH inlet air is zone air only
         Exterior  // tank is located outdoors or HPWH inlet air is outdoor air only
@@ -92,14 +92,14 @@ namespace DataWater {
 
     enum class GroundWaterTable
     {
-        Unassigned,
+        Unassigned = -1,
         ConstantWaterTable,
         ScheduledWaterTable
     };
 
     enum class ControlSupplyType
     {
-        Unassigned,
+        Unassigned = -1,
         NoControlLevel,
         MainsFloatValve,
         WellFloatValve,
@@ -110,7 +110,7 @@ namespace DataWater {
 
     enum class Overflow
     {
-        Unassigned,
+        Unassigned = -1,
         Discarded,
         ToTank
     };

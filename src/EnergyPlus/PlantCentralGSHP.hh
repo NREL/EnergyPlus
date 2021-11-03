@@ -66,7 +66,7 @@ namespace PlantCentralGSHP {
 
     enum class iCondType
     {
-        Unassigned,
+        Unassigned = -1,
         WaterCooled,
         SmartMixing,
     };

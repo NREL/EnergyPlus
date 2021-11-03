@@ -66,28 +66,28 @@ namespace DesiccantDehumidifiers {
 
     enum class DesicDehumType // Desiccant dehumidifier type
     {
-        Unassigned,
+        Unassigned = -1,
         Solid,
         Generic
     };
 
     enum class DesicDehumCtrlType
     {
-        Unassigned,
+        Unassigned = -1,
         FixedHumratBypass, // FIXED LEAVING HUMRAT SETPOINT:BYPASS
         NodeHumratBypass   // NODE LEAVING HUMRAT SETPOINT:BYPASS
     };
 
     enum class Selection
     {
-        Unassigned,
+        Unassigned = -1,
         No, // Condenser waste heat NOT reclaimed for desiccant regeneration
         Yes // Condenser waste heat reclaimed for desiccant regeneration
     };
 
     enum class PerformanceModel
     {
-        Unassigned,
+        Unassigned = -1,
         Default,
         UserCurves
     };

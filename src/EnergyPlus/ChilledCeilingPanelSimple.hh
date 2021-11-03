@@ -67,7 +67,7 @@ namespace CoolingPanelSimple {
     // Control types:
     enum class Control
     {
-        Unassigned,
+        Unassigned = -1,
         MAT,               // Controls system using mean air temperature
         MRT,               // Controls system using mean radiant temperature
         Operative,         // Controls system using operative temperature

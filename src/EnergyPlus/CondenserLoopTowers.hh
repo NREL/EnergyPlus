@@ -71,7 +71,7 @@ namespace CondenserLoopTowers {
     enum class ModelType
     {
         // Empirical Model Type
-        Unassigned,
+        Unassigned = -1,
         CoolToolsXFModel,
         CoolToolsUserDefined,
         YorkCalcModel,
@@ -92,21 +92,21 @@ namespace CondenserLoopTowers {
 
     enum class PIM
     {
-        Unassigned,
+        Unassigned = -1,
         NominalCapacity,
         UFactor
     };
 
     enum class CapacityCtrlEnum
     {
-        Unassigned,
+        Unassigned = -1,
         FanCycling,
         FluidBypass
     };
 
     enum class CellCtrl
     {
-        Unassigned,
+        Unassigned = -1,
         MinCell,
         MaxCell
     };

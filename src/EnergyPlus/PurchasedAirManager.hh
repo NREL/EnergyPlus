@@ -66,7 +66,7 @@ namespace PurchasedAirManager {
     // Heating and Cooling Limit type parameters
     enum class LimitType
     {
-        Unassigned,
+        Unassigned = -1,
         NoLimit,
         LimitFlowRate,
         LimitCapacity,
@@ -91,7 +91,7 @@ namespace PurchasedAirManager {
     // Dehumidification and Humidification control type parameters
     enum class HumControl
     {
-        Unassigned,
+        Unassigned = -1,
         None,
         ConstantSensibleHeatRatio,
         Humidistat,
@@ -110,7 +110,7 @@ namespace PurchasedAirManager {
     // Outdoor air economizer type parameters
     enum class Econ
     {
-        Unassigned,
+        Unassigned = -1,
         NoEconomizer,
         DifferentialDryBulb,
         DifferentialEnthalpy
@@ -119,7 +119,7 @@ namespace PurchasedAirManager {
     // Heat recovery type parameters
     enum class HeatRecovery
     {
-        Unassigned,
+        Unassigned = -1,
         NoHeatRecovery,
         Sensible,
         Enthalpy

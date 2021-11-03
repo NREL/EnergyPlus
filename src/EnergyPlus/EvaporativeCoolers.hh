@@ -67,21 +67,21 @@ namespace EvaporativeCoolers {
     // MODULE PARAMETER DEFINITIONS
     enum class WaterSupply
     {
-        Unassigned,
+        Unassigned = -1,
         FromMains,
         FromTank
     };
 
     enum class FanPlacement
     {
-        Unassigned,
+        Unassigned = -1,
         BlowThruFan,
         DrawThruFan
     };
 
     enum class ControlType
     {
-        Unassigned,
+        Unassigned = -1,
         ZoneTemperatureDeadBandOnOffCycling,
         ZoneCoolingLoadOnOffCycling,
         ZoneCoolingLoadVariableSpeedFan
@@ -89,7 +89,7 @@ namespace EvaporativeCoolers {
 
     enum class OperatingMode
     {
-        Unassigned,
+        Unassigned = -1,
         None,            // the indirect evaporative cooler Research Special is scheduled off or turned off
         DryModulated,    // the evaporative cooler Research Special is modulated in Dry Mode
         DryFull,         // the evaporative cooler Research Special is run in full capacity in Dry Mode
@@ -100,7 +100,7 @@ namespace EvaporativeCoolers {
 
     enum class EvapCoolerType
     {
-        Unassigned,
+        Unassigned = -1,
         DirectCELDEKPAD,
         IndirectCELDEKPAD,
         IndirectWETCOIL,

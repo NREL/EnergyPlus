@@ -76,7 +76,7 @@ namespace HVACMultiSpeedHeatPump {
     // Mode of operation
     enum class ModeOfOperation
     {
-        Unassigned,
+        Unassigned = -1,
         CoolingMode, // System operating mode is cooling
         HeatingMode, // System operating mode is heating
     };
@@ -84,7 +84,7 @@ namespace HVACMultiSpeedHeatPump {
     // Airflow control for constant fan mode
     enum class AirflowControl
     {
-        Unassigned,
+        Unassigned = -1,
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
     };

@@ -63,14 +63,14 @@ namespace DataGenerators {
     // MODULE PARAMETER DEFINITIONS:
     enum class CurveMode
     {
-        Unassigned,
+        Unassigned = -1,
         Normalized, // mode where efficiency curves are modifier curves
         Direct      // mode where efficiency curves are direct
     };
 
     enum class SkinLoss
     {
-        Unassigned,
+        Unassigned = -1,
         ConstantRate,
         UADT,             // UAdelta T mode for skin losses
         QuadraticFuelNdot // Quadratic function of fuel flow for skin losses
@@ -78,7 +78,7 @@ namespace DataGenerators {
 
     enum class AirSupRateMode
     {
-        Unassigned,
+        Unassigned = -1,
         QuadraticFuncofNdot,  // function of fuel rate mode for air flow
         ConstantStoicsAirRat, // Constant air ratio in stoics with fuel constituents
         QuadraticFuncofPel    // function of electric power mode
@@ -86,7 +86,7 @@ namespace DataGenerators {
 
     enum class RecoverMode
     {
-        Unassigned,
+        Unassigned = -1,
         NoRecoveryOnAirIntake,  // mode for controlling intake air heat recovery
         RecoverBurnInvertBatt,  // mode for controlling intake air heat recovery
         RecoverAuxiliaryBurner, // mode for controlling intake air heat recovery
@@ -97,21 +97,21 @@ namespace DataGenerators {
 
     enum class ConstituentMode
     {
-        Unassigned,
+        Unassigned = -1,
         RegularAir,
         UserDefinedConstituents
     };
 
     enum class FuelTemperatureMode
     {
-        Unassigned,
+        Unassigned = -1,
         FuelInTempFromNode,
         FuelInTempSchedule
     };
 
     enum class WaterTemperatureMode
     {
-        Unassigned,
+        Unassigned = -1,
         WaterInReformMains,
         WaterInReformAirNode,
         WaterInReformWaterNode,
@@ -120,14 +120,14 @@ namespace DataGenerators {
 
     enum class InverterEfficiencyMode
     {
-        Unassigned,
+        Unassigned = -1,
         Constant,
         Quadratic
     };
 
     enum class ExhaustGasHX
     {
-        Unassigned,
+        Unassigned = -1,
         FixedEffectiveness,   // exhaust gas HX modeling mode
         LMTDempiricalUAeff,   // exhaust gas HX modeling mode
         LMTDfundementalUAeff, // exhaust gas HX modeling mode
@@ -136,7 +136,7 @@ namespace DataGenerators {
 
     enum class ElectricalStorage
     {
-        Unassigned,
+        Unassigned = -1,
         SimpleEffConstraints,        // electrical storage modeling mode
         LeadAcidBatterySaupe,        // electrical storage modeling mode
         LeadAcidBatterManwellMcGowan // electrical storage modeling mode
@@ -144,14 +144,14 @@ namespace DataGenerators {
 
     enum class LossDestination
     {
-        Unassigned,
+        Unassigned = -1,
         SurroundingZone,
         AirInletForFC
     };
 
     enum class OperatingMode
     {
-        Unassigned,
+        Unassigned = -1,
         OpModeOff,     // CHP operating mode OFF
         OpModeStandby, // CHP operating mode Stand By
         OpModeWarmUp,  // CHP operating mode Warm Up or start up
@@ -161,7 +161,7 @@ namespace DataGenerators {
 
     enum class FuelMode
     {
-        Unassigned,
+        Unassigned = -1,
         fuelModeGaseousConstituents,
         fuelModeGenericLiquid
     };
@@ -171,7 +171,7 @@ namespace DataGenerators {
 
     enum class ThermodynamicMode
     {
-        Unassigned,
+        Unassigned = -1,
         NISTShomate,
         NASAPolynomial
     };

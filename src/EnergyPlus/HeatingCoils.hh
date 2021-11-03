@@ -69,7 +69,7 @@ namespace HeatingCoils {
 
     enum class HeatObjTypes // reclaim heat object types
     {
-        Unassigned,
+        Unassigned = -1,
         COMPRESSORRACK_REFRIGERATEDCASE,
         COIL_DX_COOLING, // single speed DX
         COIL_DX_MULTISPEED,
