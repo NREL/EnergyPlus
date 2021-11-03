@@ -150,32 +150,38 @@ We will add a new object *Output:Table:ReportPeriod* to add supplementary inform
           \key CO2ResilienceSummary
           \key VisualResilienceSummary
         \key …
-      N1 , \field Begin Month
+      N1 , \field Begin Year
+          \note start year of reporting, if specified
+          \type integer
+      N2 , \field Begin Month
           \required-field
           \minimum 1
           \maximum 12
           \type integer
-      N2 , \field Begin Day of Month
+      N3 , \field Begin Day of Month
           \required-field
           \minimum 1
           \maximum 31
           \type integer
-      N3 , \field Begin Hour of Day
+      N4 , \field Begin Hour of Day
           \required-field
           \minimum 1
           \maximum 24
           \type integer
-      N4 , \field End Month
+      N5 , \field End Year
+          \note start year of reporting, if specified
+          \type integer
+      N6 , \field End Month
           \required-field
           \minimum 1
           \maximum 12
           \type integer
-      N5 , \field End Day of Month
+      N7 , \field End Day of Month
           \required-field
           \minimum 1
           \maximum 31
           \type integer
-      N6 , \field End Hour of Day
+      N8 , \field End Hour of Day
           \required-field
           \minimum 1
           \maximum 24
