@@ -1365,9 +1365,6 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         elcc->CashFlow(jCost).Category = static_cast<CostCategory>(jCost); // make each category the type indicated
         elcc->CashFlow(jCost).SourceKind = iSourceKind::Sum;
     }
-
-
-
     // add the cashflows by category
     for (jCost = countOfCostCat + 1; jCost <= elcc->numCashFlow; ++jCost) {
         curCategory = elcc->CashFlow(jCost).Category;
@@ -1678,7 +1675,7 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const SizeDepr(41);
+    int constexpr SizeDepr(41);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

@@ -101,7 +101,6 @@ namespace EconomicLifeCycleCost {
     enum CostCategory
     {
         Unassigned = -1,
-        StartFromZero,
         Maintenance,
         Repair,
         Operation,
