@@ -301,16 +301,6 @@ namespace DataPlant {
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both};
 
-    extern Array1D<Real64> const ConvergenceHistoryARR;
-
-    // These all are going to be hard coded for now, but when we move to C++20 we will have constexpr methods available to fix this
-    // const Real64 sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
-    // const Real64 square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
-    // const Real64 sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
-    constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
-    constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
-    constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
-
 } // namespace DataPlant
 
 struct DataPlantData : BaseGlobalStruct

@@ -122,6 +122,11 @@ using namespace DataHVACGlobals;
 using namespace DataLoopNode;
 using namespace DataAirLoop;
 
+Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
+constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
+constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
+constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
+
 void ManageHVAC(EnergyPlusData &state)
 {
 
@@ -613,12 +618,8 @@ void SimHVAC(EnergyPlusData &state)
     // this default control algorithm.
 
     // Using/Aliasing
-    using DataPlant::ConvergenceHistoryARR;
     using DataPlant::DemandSide;
     using DataPlant::NumConvergenceHistoryTerms;
-    using DataPlant::square_sum_ConvergenceHistoryARR;
-    using DataPlant::sum_ConvergenceHistoryARR;
-    using DataPlant::sum_square_ConvergenceHistoryARR;
     using DataPlant::SupplySide;
     using EMSManager::ManageEMS;
     using General::CreateSysTimeIntervalString;
@@ -666,9 +667,9 @@ void SimHVAC(EnergyPlusData &state)
     bool MonotonicDecreaseFound;
 
     Array1D<Real64> const ConvergLogStackARR(DataConvergParams::ConvergLogStackDepth, {0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0});
-    Real64 const sum_ConvergLogStackARR(sum(ConvergLogStackARR));
-    Real64 const square_sum_ConvergLogStackARR(pow_2(sum_ConvergLogStackARR));
-    Real64 const sum_square_ConvergLogStackARR(sum(pow(ConvergLogStackARR, 2)));
+    Real64 constexpr sum_ConvergLogStackARR(-45);
+    Real64 constexpr square_sum_ConvergLogStackARR(2025);
+    Real64 constexpr sum_square_ConvergLogStackARR(285);
 
     auto &SimZoneEquipmentFlag = state.dataHVACGlobal->SimZoneEquipmentFlag;
     auto &SimNonZoneEquipmentFlag = state.dataHVACGlobal->SimNonZoneEquipmentFlag;
