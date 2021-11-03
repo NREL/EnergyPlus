@@ -1216,7 +1216,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         }
     }
 
-    elcc->numCashFlow = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed;
+    elcc->numCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed;
     // Cashflow array order:
     //   1 cost categories
     //   2 recurring costs
@@ -1232,7 +1232,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         elcc->CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
     }
     // Put nonrecurring costs into cashflows
-    offset = countOfCostCat + elcc->numRecurringCosts;
+    offset = CostCategory::Num + elcc->numRecurringCosts;
     for (jCost = 1; jCost <= elcc->numNonrecurringCost; ++jCost) {
         elcc->CashFlow(offset + jCost).name = elcc->NonrecurringCost(jCost).name;
         elcc->CashFlow(offset + jCost).SourceKind = iSourceKind::Nonrecurring;
@@ -1253,7 +1253,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         }
     }
     // Put recurring costs into cashflows
-    offset = countOfCostCat;
+    offset = CostCategory::Num;
     for (jCost = 1; jCost <= elcc->numRecurringCosts; ++jCost) {
         elcc->CashFlow(offset + jCost).name = elcc->RecurringCosts(jCost).name;
         elcc->CashFlow(offset + jCost).SourceKind = iSourceKind::Recurring;
@@ -1281,7 +1281,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // Put resource costs into cashflows
     // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
-    cashFlowCounter = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost;
+    cashFlowCounter = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost;
     for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
         if (resourceCostNotZero.at(iResource)) {
             ++cashFlowCounter;
@@ -1361,14 +1361,14 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         }
     }
     // put cashflows into categories
-    for (jCost = 1; jCost <= countOfCostCat; ++jCost) {
+    for (jCost = 1; jCost <= CostCategory::Num; ++jCost) {
         elcc->CashFlow(jCost).Category = static_cast<CostCategory>(jCost); // make each category the type indicated
         elcc->CashFlow(jCost).SourceKind = iSourceKind::Sum;
     }
     // add the cashflows by category
-    for (jCost = countOfCostCat + 1; jCost <= elcc->numCashFlow; ++jCost) {
+    for (jCost = CostCategory::Num + 1; jCost <= elcc->numCashFlow; ++jCost) {
         curCategory = elcc->CashFlow(jCost).Category;
-        if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
+        if ((curCategory <= CostCategory::Num) && (curCategory >= 1)) {
             for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
                 elcc->CashFlow(curCategory).mnAmount(jMonth) += elcc->CashFlow(jCost).mnAmount(jMonth);
             }
@@ -1613,12 +1613,12 @@ void ComputePresentValue(EnergyPlusData &state)
         }
     }
     // sum by category
-    for (int i = 1; i <= countOfCostCat; ++i) {
+    for (int i = 1; i <= CostCategory::Num; ++i) {
         elcc->CashFlow(i).presentValue = 0; // initialize value to zero before summing in next for loop
     }
-    for (iCashFlow = countOfCostCat + 1; iCashFlow <= elcc->numCashFlow; ++iCashFlow) {
+    for (iCashFlow = CostCategory::Num + 1; iCashFlow <= elcc->numCashFlow; ++iCashFlow) {
         curCategory = elcc->CashFlow(iCashFlow).Category;
-        if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
+        if ((curCategory <= CostCategory::Num) && (curCategory >= 1)) {
             elcc->CashFlow(curCategory).presentValue += elcc->CashFlow(iCashFlow).presentValue;
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->CashFlow(curCategory).yrPresVal(jYear) += elcc->CashFlow(iCashFlow).yrPresVal(jYear);
@@ -2204,7 +2204,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             rowHead(iYear + 1) = format("{} {}", MonthNames(elcc->baseDateMonth), elcc->baseDateYear + iYear - 1);
         }
         for (jObj = 1; jObj <= (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
-            curCashFlow = countOfCostCat + jObj;
+            curCashFlow = CostCategory::Num + jObj;
             columnHead(jObj) = elcc->CashFlow(curCashFlow).name;
             {
                 auto const SELECT_CASE_var(elcc->CashFlow(curCashFlow).SourceKind);
@@ -2252,7 +2252,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             rowHead(iYear) = format("{} {}", MonthNames(elcc->baseDateMonth), elcc->baseDateYear + iYear - 1);
         }
         for (jObj = 1; jObj <= elcc->numResourcesUsed; ++jObj) {
-            curCashFlow = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
+            curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj) = elcc->CashFlow(curCashFlow).name;
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 tableBody(jObj, iYear) = RealToStr(elcc->CashFlow(curCashFlow).yrAmount(iYear), 2);
@@ -2287,7 +2287,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             rowHead(iYear) = format("{} {}", MonthNames(elcc->baseDateMonth), elcc->baseDateYear + iYear - 1);
         }
         for (jObj = 1; jObj <= elcc->numResourcesUsed; ++jObj) {
-            curCashFlow = countOfCostCat + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
+            curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj) = elcc->CashFlow(curCashFlow).name;
             auto curResource = elcc->CashFlow(curCashFlow).Resource;
             if (elcc->CashFlow(curCashFlow).Resource != DataGlobalConstants::ResourceType::Water) {
@@ -2467,7 +2467,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(14) = "tOpr";
             columnHead(15) = "tCap";
             columnHead(16) = "Totl";
-            for (jObj = countOfCostCat + 1; jObj <= elcc->numCashFlow; ++jObj) {
+            for (jObj = CostCategory::Num + 1; jObj <= elcc->numCashFlow; ++jObj) {
                 columnHead(jObj) = elcc->CashFlow(jObj).name;
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
@@ -2542,7 +2542,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         totalPV = 0.0;
         rowHead(numRows + 1) = "TOTAL";
         for (jObj = 1; jObj <= (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
-            offset = countOfCostCat;
+            offset = CostCategory::Num;
             rowHead(jObj) = elcc->CashFlow(offset + jObj).name;
             {
                 auto const SELECT_CASE_var(elcc->CashFlow(offset + jObj).Category);

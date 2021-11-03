@@ -120,8 +120,6 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr int countOfCostCat(16); // count of the number of cost categories
-
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
