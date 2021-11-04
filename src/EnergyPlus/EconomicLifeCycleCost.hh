@@ -398,7 +398,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     EPVector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
     EPVector<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
     EPVector<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
-    EPVector<EconomicLifeCycleCost::CashFlowType> CashFlow;
+    std::vector<EconomicLifeCycleCost::CashFlowType> CashFlow;
 
     void clear_state() override
     {
@@ -448,7 +448,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->NonrecurringCost.deallocate();
         this->UsePriceEscalation.deallocate();
         this->UseAdjustment.deallocate();
-        this->CashFlow.deallocate();
+        this->CashFlow.clear();
     }
 };
 
