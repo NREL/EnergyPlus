@@ -832,7 +832,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsS
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
-            columnHead(columnRecount - 1) = fldStIt->m_colHead + curAggString + '[' + curUnits + ']';
+            columnHead(columnRecount - 1) = fldStIt->m_colHead + curAggString + " [" + curUnits + ']';
             columnHead(columnRecount) = fldStIt->m_colHead + " {TIMESTAMP} ";
             minVal = storedMaxVal;
             maxVal = storedMinVal;
@@ -1193,8 +1193,8 @@ void AnnualTable::addTableOfContents(std::ostream &nameOfStream)
 void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const unitsStyle_para)
 {
     std::vector<AnnualFieldSet>::iterator fldStIt;
-    Real64 const veryLarge = 1.0E280;
-    Real64 const verySmall = -1.0E280;
+    Real64 constexpr veryLarge = 1.0E280;
+    Real64 constexpr verySmall = -1.0E280;
     for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
         int curAgg = fldStIt->m_aggregate;
         // for columns with binning aggregation types compute the statistics
@@ -1294,7 +1294,7 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
     Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
     // do the unit conversions
     if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
-        varNameWithUnits = fldStIt->m_variMeter + '[' + unitEnumToString(fldStIt->m_varUnits) + ']';
+        varNameWithUnits = fldStIt->m_variMeter + " [" + unitEnumToString(fldStIt->m_varUnits) + ']';
         OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
         OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     } else { // just do the Joule conversion

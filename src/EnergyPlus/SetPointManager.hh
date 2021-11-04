@@ -799,21 +799,21 @@ namespace SetPointManager {
         Real64 MaxCondEntTemp;          // maximum condenser entering water temp
         int NumCtrlNodes;               // number of nodes whose temperature is being set
         std::string CtrlNodeListName;
-        Array1D_int CtrlNodes;      // nodes where temperature is being set
-        Real64 SetPt;               // the temperature set point [C]
-        int ChillerIndexPlantSide;  // plant side chiller index
-        int ChillerIndexDemandSide; // demand side chiller index
-        int BranchIndexPlantSide;   // plant side branch index
-        int BranchIndexDemandSide;  // demand side branch index
-        int LoopIndexPlantSide;     // plant side loop index
-        int LoopIndexDemandSide;    // deand side loop index
-        int TypeNum;                // chiller type number
+        Array1D_int CtrlNodes;              // nodes where temperature is being set
+        Real64 SetPt;                       // the temperature set point [C]
+        int ChillerIndexPlantSide;          // plant side chiller index
+        int ChillerIndexDemandSide;         // demand side chiller index
+        int BranchIndexPlantSide;           // plant side branch index
+        int BranchIndexDemandSide;          // demand side branch index
+        int LoopIndexPlantSide;             // plant side loop index
+        int LoopIndexDemandSide;            // deand side loop index
+        DataPlant::PlantEquipmentType Type; // chiller type number
 
         // Default Constructor
         DefineCondEntSetPointManager()
             : CondEntTempSchedPtr(0), TowerDsnInletAirWetBulb(0.0), MinTwrWbCurve(0), MinOaWbCurve(0), OptCondEntCurve(0), MinimumLiftTD(0.0),
               MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), ChillerIndexDemandSide(0), BranchIndexPlantSide(0),
-              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), TypeNum(0)
+              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), Type(DataPlant::PlantEquipmentType::Invalid)
         {
         }
 
@@ -841,7 +841,7 @@ namespace SetPointManager {
         Array1D_int ClTowerVarIndex;                           // report variable index
         OutputProcessor::VariableType CndPumpVarType;          // report variable type
         int CndPumpVarIndex;                                   // report variable index
-        int TypeNum;                                           // chiller type number
+        DataPlant::PlantEquipmentType Type;                    // chiller type number
         Array1D_int TowerNum;                                  // cooling tower number
         int CondLoopNum;                                       // condenser loop number
         Array1D_int CondTowerBranchNum;                        // condenser branch number
@@ -857,8 +857,8 @@ namespace SetPointManager {
             : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
               LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
               ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
-              CndPumpVarIndex(0), TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0),
-              ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
+              CndPumpVarIndex(0), Type(DataPlant::PlantEquipmentType::Invalid), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0),
+              ChilledPumpNum(0), ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {
         }
 
@@ -979,12 +979,12 @@ namespace SetPointManager {
         int CtrlNodeNum;
         Real64 NonChargeCHWTemp;
         Real64 ChargeCHWTemp;
-        DataPlant::iCtrlType CompOpType;
+        DataPlant::CtrlType CompOpType;
         Real64 SetPt;
 
         // Default Constructor
         DefineScheduledTESSetPointManager()
-            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::iCtrlType::Unassigned),
+            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::CtrlType::Unassigned),
               SetPt(0.0)
         {
         }
@@ -1028,7 +1028,7 @@ namespace SetPointManager {
                                       int SchedPtrCharge,
                                       Real64 NonChargeCHWTemp,
                                       Real64 ChargeCHWTemp,
-                                      DataPlant::iCtrlType CompOpType,
+                                      DataPlant::CtrlType CompOpType,
                                       int ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);
@@ -1077,9 +1077,9 @@ struct SetPointManagerData : BaseGlobalStruct
 
     int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
     int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-    int InitSetPointManagerTypeNum = 0;
+    DataPlant::PlantEquipmentType ChillerType = DataPlant::PlantEquipmentType::Invalid;
     int InitSetPointManagerNumChiller = 0;
-    int InitSetPointManagerTypeOf_Num = 0;
+    DataPlant::PlantEquipmentType InitType = DataPlant::PlantEquipmentType::Invalid;
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
@@ -1209,9 +1209,9 @@ struct SetPointManagerData : BaseGlobalStruct
 
         GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
         GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-        InitSetPointManagerTypeNum = 0;
+        ChillerType = DataPlant::PlantEquipmentType::Invalid;
         InitSetPointManagerNumChiller = 0;
-        InitSetPointManagerTypeOf_Num = 0;
+        InitType = DataPlant::PlantEquipmentType::Invalid;
 
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"

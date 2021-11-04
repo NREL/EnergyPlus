@@ -1204,7 +1204,7 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
 
     // Using/Aliasing
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
+    Real64 constexpr FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;

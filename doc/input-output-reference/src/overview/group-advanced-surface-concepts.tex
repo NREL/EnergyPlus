@@ -2002,6 +2002,7 @@ Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endhead
 
+-1 & Invalid & N/A & N/A \tabularnewline
 1 & A1 Radiant Heated Floor or Chilled Ceiling & Vertical Wall & Any \tabularnewline
 2 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Stable \tabularnewline
 3 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Unstable \tabularnewline
@@ -2134,7 +2135,7 @@ Report Code & Surface Classification \tabularnewline
 Report Code & Surface Classification \tabularnewline
 \midrule
 \endhead
-
+-1 & Invalid \tabularnewline
 101 & Vertical Wall, Windward \tabularnewline
 102 & Vertical Wall, Leeward \tabularnewline
 103 & Roof, stable heat flow direction \tabularnewline
@@ -2697,13 +2698,14 @@ The second option for specifying view factors requires user input values. These 
 \subsection{ZoneProperty:UserViewFactors:BySurfaceName}\label{zonepropertyuserviewfactorsbysurfacename}
 
 The method of entering user view factors is to enter each surface name and its view factor value to other
-surfaces in a zone or group of zones connected by air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}'').
+surfaces in a radiant/solar enclosure which may consist of one space, one zone or a group of spaces or zones.
 
 \subsubsection{Inputs}\label{inputs-17}
 
-\paragraph{Field: Zone or ZoneList Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
 
-An enclosure for radiant exchange may be a single zone, or a group of zones connected by one or more air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}''). If a ZoneList name is specified, the referenced ``\hyperref[zonelist]{ZoneList}'') must match a group of zones connected with Construction:AirBoundary.
+An enclosure for radiant exchange may be a single space or zone, or a group of spaces or zones connected by one or more air boundaries (see \hyperref[constructionairboundary]{Construction:AirBoundary}).  An enclosure may also be a group of spaces in the same zone with implied air boundaries because the spaces are defined only by floor surfaces (see \hyperref[space]{Space}. 
+If a ZoneList name is specified, the referenced ``\hyperref[zonelist]{ZoneList}'') must match a group of zones connected with Construction:AirBoundary.
 
 Enter the applicable surface pairs with non-zero view factors. Any omitted surface pair is assumed to have a zero view factor.
 

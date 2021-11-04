@@ -68,7 +68,6 @@ using namespace EnergyPlus::ChillerAbsorption;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 {
@@ -1791,7 +1790,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // check chiller inputs
     auto &thisChiller = state->dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
-    EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated);
+    EXPECT_TRUE(compare_enums(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated));
     // define local var
     int EvapInletNode = thisChiller.EvapInletNodeNum;
     int EvapOutletNode = thisChiller.EvapOutletNodeNum;
@@ -1819,11 +1818,11 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // lock the evap flow at test condition specified
     int LoopNum = thisChiller.CWLoopNum;
     int LoopSideNum = thisChiller.CWLoopSideNum;
-    state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::FlowLock::Locked;
     // calc generator flow
     int GenLoopNum = thisChiller.GenLoopNum;
     int GenLoopSideNum = thisChiller.GenLoopSideNum;
-    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::FlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
     thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);

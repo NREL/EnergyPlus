@@ -74,7 +74,6 @@
 #include <EnergyPlus/ZonePlenum.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -303,10 +302,10 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirTemp, 13.0);
     EXPECT_EQ(PurchAir(1).MaxHeatSuppAirHumRat, 0.015);
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirHumRat, 0.009);
-    EXPECT_EQ(PurchAir(1).HeatingLimit, LimitType::NoLimit);
-    EXPECT_EQ(PurchAir(1).CoolingLimit, LimitType::NoLimit);
-    EXPECT_EQ(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
-    EXPECT_EQ(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
+    EXPECT_TRUE(compare_enums(PurchAir(1).HeatingLimit, LimitType::NoLimit));
+    EXPECT_TRUE(compare_enums(PurchAir(1).CoolingLimit, LimitType::NoLimit));
+    EXPECT_TRUE(compare_enums(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio));
+    EXPECT_TRUE(compare_enums(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio));
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)

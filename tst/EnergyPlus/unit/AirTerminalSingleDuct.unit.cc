@@ -635,7 +635,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    int const SysNum(1);
+    int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const OutletNode = state->dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
@@ -647,7 +647,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataSingleDuct->sd_airterminal(SysNum).ReheatComp);
-    EXPECT_EQ(Action::Normal, state->dataSingleDuct->sd_airterminal(SysNum).DamperHeatingAction);
+    EXPECT_TRUE(compare_enums(Action::Normal, state->dataSingleDuct->sd_airterminal(SysNum).DamperHeatingAction));
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // set air inlet node properties
@@ -1781,7 +1781,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.2;
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 1.0;
     // Needs an airloop, assume 20% outdoor air
-    Real64 const AirLoopOAFraction = 0.20;
+    Real64 constexpr AirLoopOAFraction = 0.20;
     thisHeatCoolAT.AirLoopNum = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(thisHeatCoolAT.AirLoopNum).OAFrac = AirLoopOAFraction;

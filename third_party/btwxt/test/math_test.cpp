@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 
 // btwxt
+#include "fixtures.hpp"
 #include <btwxt.h>
 #include <error.h>
 #include <griddeddata.h>

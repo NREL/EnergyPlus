@@ -89,8 +89,8 @@ ZoneTimestepObject::ZoneTimestepObject(
 
       timeStepDuration(timeStepDurat)
 {
-    Real64 const minutesPerHour(60.0);
-    int const hoursPerDay(24);
+    Real64 constexpr minutesPerHour(60.0);
+    int constexpr hoursPerDay(24);
 
     stepEndMinute = timeStepDuration * minutesPerHour + (timeStep - 1) * timeStepDuration * minutesPerHour;
 
@@ -178,7 +178,7 @@ void SizingLog::FillSysStep(ZoneTimestepObject tmpztStepStamp, SystemTimestepObj
     int ztIndex(0);
     int oldNumSubSteps(0);
     int newNumSubSteps(0);
-    Real64 const MinutesPerHour(60.0);
+    Real64 constexpr MinutesPerHour(60.0);
     Real64 ZoneStepStartMinutes(0.0);
 
     ztIndex = GetSysStepZtStepIndex(tmpztStepStamp);
@@ -299,7 +299,7 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData &state, Real64 &rVariable, int stepsInAverage)
 {
     int VectorLength(0);
-    int const HoursPerDay(24);
+    int constexpr HoursPerDay(24);
 
     SizingLog tmpLog(rVariable);
     tmpLog.NumOfEnvironmentsInLogSet = 0;
@@ -398,7 +398,7 @@ void SizingLoggerFramework::UpdateSizingLogValuesZoneStep(EnergyPlusData &state)
 
 void SizingLoggerFramework::UpdateSizingLogValuesSystemStep(EnergyPlusData &state)
 {
-    Real64 const MinutesPerHour(60.0);
+    Real64 constexpr MinutesPerHour(60.0);
     ZoneTimestepObject tmpztStepStamp;
     SystemTimestepObject tmpSysStepStamp;
 

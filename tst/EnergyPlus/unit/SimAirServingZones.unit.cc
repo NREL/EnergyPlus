@@ -71,7 +71,6 @@
 using namespace EnergyPlus;
 using namespace DataAirSystems;
 using namespace DataSizing;
-using namespace ObjexxFCL;
 using namespace SimAirServingZones;
 
 namespace EnergyPlus {

@@ -62,7 +62,6 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
@@ -78,7 +77,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     // issue #4723 (crash) occurred due to unallocated ICS collector data.
     // ! Collector.allocated()
 
-    int const NumOfSurf(1);
+    int constexpr NumOfSurf(1);
     int SurfNum;
     int ZoneNum;
     int ConstrNum;
@@ -134,6 +133,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(NumOfSurf, 1.0);
     state->dataSurface->SurfExtConvCoeffIndex.allocate(NumOfSurf);
     state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
     state->dataSurface->SurfHasSurroundingSurfProperties.allocate(NumOfSurf);
@@ -142,15 +142,15 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
-    Real64 const VentArea(0.1);  // Area available for venting the gap [m2]
-    Real64 const Cv(0.1);        // Orifice coefficient for volume-based discharge, wind-driven [--]
-    Real64 const Cd(0.5);        // Orifice coefficient for discharge,  buoyancy-driven [--]
-    Real64 const HdeltaNPL(3.0); // Height difference from neutral pressure level [m]
-    Real64 const SolAbs(0.75);   // solar absorptivity of baffle [--]
-    Real64 const AbsExt(0.8);    // thermal absorptance/emittance of baffle material [--]
-    Real64 const Tilt(0.283);    // Tilt of gap [Degrees]
-    Real64 const AspRat(0.9);    // aspect ratio of gap  Height/gap [--]
-    Real64 const GapThick(0.05); // Thickness of air space between baffle and underlying heat transfer surface
+    Real64 constexpr VentArea(0.1);  // Area available for venting the gap [m2]
+    Real64 constexpr Cv(0.1);        // Orifice coefficient for volume-based discharge, wind-driven [--]
+    Real64 constexpr Cd(0.5);        // Orifice coefficient for discharge,  buoyancy-driven [--]
+    Real64 constexpr HdeltaNPL(3.0); // Height difference from neutral pressure level [m]
+    Real64 constexpr SolAbs(0.75);   // solar absorptivity of baffle [--]
+    Real64 constexpr AbsExt(0.8);    // thermal absorptance/emittance of baffle material [--]
+    Real64 constexpr Tilt(0.283);    // Tilt of gap [Degrees]
+    Real64 constexpr AspRat(0.9);    // aspect ratio of gap  Height/gap [--]
+    Real64 constexpr GapThick(0.05); // Thickness of air space between baffle and underlying heat transfer surface
     DataSurfaces::SurfaceRoughness Roughness(DataSurfaces::SurfaceRoughness::VeryRough); // Roughness index (1-6), see DataHeatBalance parameters
     Real64 QdotSource(0.0); // Source/sink term, e.g. electricity exported from solar cell [W]
     Real64 TsBaffle(20.0);  // Temperature of baffle (both sides) use lagged value on input [C]

@@ -256,8 +256,8 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     GetInputForLifeCycleCost(*state);
 
-    EXPECT_EQ(iDiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention);
-    EXPECT_EQ(iInflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach);
+    EXPECT_TRUE(compare_enums(iDiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention));
+    EXPECT_TRUE(compare_enums(iInflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach));
     EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
     EXPECT_EQ(1, state->dataEconLifeCycleCost->baseDateMonth);
     EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
@@ -266,14 +266,14 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
     EXPECT_EQ(5, state->dataEconLifeCycleCost->numNonrecurringCost);
     EXPECT_EQ("RESIDUALVALUE", state->dataEconLifeCycleCost->NonrecurringCost(5).name);
     EXPECT_EQ(costCatSalvage, state->dataEconLifeCycleCost->NonrecurringCost(5).category);
-    EXPECT_EQ(iStartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost(5).startOfCosts);
+    EXPECT_TRUE(compare_enums(iStartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost(5).startOfCosts));
     EXPECT_EQ(-20000., state->dataEconLifeCycleCost->NonrecurringCost(5).cost);
 
     EXPECT_EQ(1, state->dataEconLifeCycleCost->numRecurringCosts);
     EXPECT_EQ("ANNUALMAINT", state->dataEconLifeCycleCost->RecurringCosts(1).name);
     EXPECT_EQ(costCatMaintenance, state->dataEconLifeCycleCost->RecurringCosts(1).category);
     EXPECT_EQ(7000., state->dataEconLifeCycleCost->RecurringCosts(1).cost);
-    EXPECT_EQ(iStartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts(1).startOfCosts);
+    EXPECT_TRUE(compare_enums(iStartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts(1).startOfCosts));
     EXPECT_EQ(1, state->dataEconLifeCycleCost->RecurringCosts(1).repeatPeriodYears);
 
     EXPECT_EQ(3, state->dataEconLifeCycleCost->numUsePriceEscalation);
@@ -393,8 +393,8 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     GetInputForLifeCycleCost(*state);
 
-    EXPECT_EQ(iDiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention);
-    EXPECT_EQ(iInflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach);
+    EXPECT_TRUE(compare_enums(iDiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention));
+    EXPECT_TRUE(compare_enums(iInflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach));
     EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
     EXPECT_EQ(1, state->dataEconLifeCycleCost->baseDateMonth);
     EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);

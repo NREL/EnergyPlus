@@ -222,6 +222,8 @@ namespace OutputReportTabular {
         AshStdDes3Line,
     };
 
+    constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesTubularGCLS = {DataHeatBalance::IntGainType::DaylightingDeviceTubular};
+
     // Types
 
     struct OutputTableBinnedType
@@ -607,7 +609,7 @@ namespace OutputReportTabular {
                                             const bool produceTabular,
                                             const bool produceSQLite);
 
-    std::string ResourceWarningMessage(std::string resource);
+    std::string ResourceWarningMessage(std::string const &resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 
@@ -831,13 +833,13 @@ namespace OutputReportTabular {
 
     std::string RealToStr(Real64 const RealIn, int const numDigits);
 
-    Real64 StrToReal(std::string const &stringIn);
+    Real64 StrToReal(std::string_view stringIn);
 
     std::string DateToString(int const codedDate); // word containing encoded month, day, hour, minute
 
     bool isNumber(std::string const &s);
 
-    int digitsAferDecimal(std::string s);
+    int digitsAferDecimal(std::string const &s);
 
     void AddTOCEntry(EnergyPlusData &state, std::string const &nameSection, std::string const &nameReport);
 
@@ -1206,7 +1208,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int TimeStepInDayGCLS = 0;
     int iZoneGCLH = 0;
     int TimeStepInDayGCLH = 0;
-    Array1D_int IntGainTypesTubularGCLS = Array1D_int(1, {DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular});
     Array3D_bool adjFenDone;
     Real64 BigNumRMG = 0.0;
     int foundGsui = 0;
@@ -1510,7 +1511,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->TimeStepInDayGCLS = 0;
         this->iZoneGCLH = 0;
         this->TimeStepInDayGCLH = 0;
-        this->IntGainTypesTubularGCLS = Array1D_int(1, {DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular});
         this->adjFenDone.clear();
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;

@@ -75,7 +75,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
 using namespace EnergyPlus::DataVectorTypes;
 using namespace EnergyPlus::DataShadowingCombinations;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 {
@@ -88,8 +87,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     Real64 AvgEqOfTime(0.0);       // Average value of Equation of Time for period
     Real64 AvgSinSolarDeclin(1.0); // Average value of Sine of Solar Declination for period
     Real64 AvgCosSolarDeclin(0.0); // Average value of Cosine of Solar Declination for period
-    int const NumTimeSteps(6);
-    int const HoursInDay(24);
+    int constexpr NumTimeSteps(6);
+    int constexpr HoursInDay(24);
 
     state->dataGlobal->TimeStep = 1;
     state->dataSurface->TotSurfaces = 3;

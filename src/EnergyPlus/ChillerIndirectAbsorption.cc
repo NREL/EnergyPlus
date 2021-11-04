@@ -141,7 +141,7 @@ void IndirectAbsorberSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             calledFromLocation.loopSideNum,
-                                                            DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                            DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
                                                             this->Report.QCond,
@@ -155,7 +155,7 @@ void IndirectAbsorberSpecs::simulate(
         PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
                                                                     calledFromLocation.loopNum,
                                                                     calledFromLocation.loopSideNum,
-                                                                    DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                                    DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                                     this->GeneratorInletNodeNum,
                                                                     this->GeneratorOutletNodeNum,
                                                                     this->GenHeatSourceType,
@@ -803,7 +803,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                            DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                             this->CWLoopNum,
                                             this->CWLoopSideNum,
                                             this->CWBranchNum,
@@ -817,7 +817,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                            DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                             this->CDLoopNum,
                                             this->CDLoopSideNum,
                                             this->CDBranchNum,
@@ -828,13 +828,18 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             _,
                                             this->CondInletNodeNum,
                                             _);
-    PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
+    PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                  this->CWLoopNum,
+                                                  this->CWLoopSideNum,
+                                                  this->CDLoopNum,
+                                                  this->CDLoopSideNum,
+                                                  DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
+                                                  true);
 
     if (this->GeneratorInletNodeNum > 0) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                 this->GenLoopNum,
                                                 this->GenLoopSideNum,
                                                 this->GenBranchNum,
@@ -845,13 +850,23 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->GeneratorInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSideNum,
+                                                      this->GenLoopNum,
+                                                      this->GenCompNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
+                                                      true);
     }
 
     if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CDLoopNum, this->CDLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, false);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSideNum,
+                                                      this->GenLoopNum,
+                                                      this->GenCompNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
+                                                      false);
     }
     if (errFlag) {
         ShowFatalError(state, "InitIndirectAbsorpChiller: Program terminated due to previous condition(s).");
@@ -860,13 +875,13 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
         // reset flow priority
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-            DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
@@ -1786,7 +1801,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
     // condenser side outlet temperature.
-    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = false;
         this->QEvaporator = std::abs(MyLoad);
 
@@ -1805,10 +1820,10 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
             // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 } else {
@@ -1831,9 +1846,9 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                      this->CWCompNum);
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     }
                 }
@@ -1878,25 +1893,25 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
         } else {
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
-                             .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
+                             .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     }
-                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
-                             .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
+                             .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                     } else {

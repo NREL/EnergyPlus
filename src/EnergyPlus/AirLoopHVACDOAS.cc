@@ -78,6 +78,7 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -157,7 +158,7 @@ namespace AirLoopHVACDOAS {
                 AirLoopMixer thisMixer;
 
                 thisMixer.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                thisMixer.OutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("outlet_node_name")));
+                thisMixer.OutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("outlet_node_name").get<std::string>());
                 thisMixer.m_AirLoopMixer_Num = AirLoopMixerNum - 1;
                 thisMixer.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                               thisMixer.OutletNodeName,
@@ -176,7 +177,7 @@ namespace AirLoopHVACDOAS {
                     int num = 0;
                     for (auto NodeDOASName : NodeArray) {
                         num += 1;
-                        std::string name = UtilityRoutines::MakeUPPERCase(AsString(NodeDOASName.at("inlet_node_name")));
+                        std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("inlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
                         if (NodeNum > 0 && num <= thisMixer.numOfInletNodes) {
                             thisMixer.InletNodeName.push_back(name);
@@ -315,7 +316,7 @@ namespace AirLoopHVACDOAS {
                 AirLoopSplitter thisSplitter;
 
                 thisSplitter.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                thisSplitter.InletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("inlet_node_name")));
+                thisSplitter.InletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("inlet_node_name").get<std::string>());
                 thisSplitter.m_AirLoopSplitter_Num = AirLoopSplitterNum - 1;
 
                 auto NodeNames = fields.find("nodes");
@@ -325,7 +326,7 @@ namespace AirLoopHVACDOAS {
                     int num = 0;
                     for (auto NodeDOASName : NodeArray) {
                         num += 1;
-                        std::string name = UtilityRoutines::MakeUPPERCase(AsString(NodeDOASName.at("outlet_node_name")));
+                        std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("outlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
                         if (NodeNum > 0 && num <= thisSplitter.numOfOutletNodes) {
                             thisSplitter.OutletNodeName.push_back(name);
@@ -372,7 +373,7 @@ namespace AirLoopHVACDOAS {
 
                 thisDOAS.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 // get OA and avail num
-                thisDOAS.OASystemName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("airloophvac_outdoorairsystem_name")));
+                thisDOAS.OASystemName = UtilityRoutines::MakeUPPERCase(fields.at("airloophvac_outdoorairsystem_name").get<std::string>());
                 thisDOAS.m_OASystemNum = UtilityRoutines::FindItemInList(thisDOAS.OASystemName, state.dataAirLoop->OutsideAirSys);
                 if (thisDOAS.m_OASystemNum == 0) {
                     cFieldName = "AirLoopHVAC:OutdoorAirSystem Name";
@@ -502,7 +503,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterCooling,
+                                                                DataPlant::PlantEquipmentType::CoilWaterCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -535,7 +536,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterSimpleHeating,
+                                                                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                                                 thisDOAS.HWLoopNum,
                                                                 thisDOAS.HWLoopSide,
                                                                 thisDOAS.HWBranchNum,
@@ -575,7 +576,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
+                                                                DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -617,6 +618,11 @@ namespace AirLoopHVACDOAS {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
+                        if (state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] == nullptr) {
+                            UnitarySystems::UnitarySys thisSys;
+                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] =
+                                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                        }
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
                                 .compPointer[CompNum]
@@ -637,6 +643,11 @@ namespace AirLoopHVACDOAS {
                             HVACDXHeatPumpSystem::GetHeatingCoilOutletNodeNum(
                                 state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
+                        if (state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] == nullptr) {
+                            UnitarySystems::UnitarySys thisSys;
+                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] =
+                                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                        }
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
                                 .compPointer[CompNum]
@@ -779,7 +790,7 @@ namespace AirLoopHVACDOAS {
                     thisDOAS.m_HeatExchangerFlag = true;
                 }
 
-                thisDOAS.AvailManagerSchedName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
+                thisDOAS.AvailManagerSchedName = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name").get<std::string>());
                 thisDOAS.m_AvailManagerSchedPtr = GetScheduleIndex(state, thisDOAS.AvailManagerSchedName);
                 if (thisDOAS.m_AvailManagerSchedPtr == 0) {
                     cFieldName = "Availability Schedule Name";
@@ -788,7 +799,7 @@ namespace AirLoopHVACDOAS {
                     errorsFound = true;
                 }
 
-                thisDOAS.AirLoopMixerName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("airloophvac_mixer_name"))); //
+                thisDOAS.AirLoopMixerName = UtilityRoutines::MakeUPPERCase(fields.at("airloophvac_mixer_name").get<std::string>()); //
                 thisDOAS.m_AirLoopMixerIndex = getAirLoopMixerIndex(state, thisDOAS.AirLoopMixerName);
                 if (thisDOAS.m_AirLoopMixerIndex < 0) {
                     cFieldName = "AirLoopHVAC:Mixer Name";
@@ -798,7 +809,7 @@ namespace AirLoopHVACDOAS {
                 }
                 AirLoopMixer thisAirLoopMixer;
                 thisDOAS.m_CompPointerAirLoopMixer = thisAirLoopMixer.factory(state, thisDOAS.m_AirLoopMixerIndex, thisDOAS.AirLoopMixerName);
-                thisDOAS.AirLoopSplitterName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("airloophvac_splitter_name"))); //
+                thisDOAS.AirLoopSplitterName = UtilityRoutines::MakeUPPERCase(fields.at("airloophvac_splitter_name").get<std::string>()); //
                 thisDOAS.m_AirLoopSplitterIndex = getAirLoopSplitterIndex(state, thisDOAS.AirLoopSplitterName);
                 if (thisDOAS.m_AirLoopSplitterIndex < 0) {
                     cFieldName = "AirLoopHVAC:Splitter Name";
@@ -811,13 +822,13 @@ namespace AirLoopHVACDOAS {
                     thisAirLoopSplitter.factory(state, thisDOAS.m_AirLoopSplitterIndex, thisDOAS.AirLoopSplitterName);
 
                 // get pretreated desing conditions
-                thisDOAS.PreheatTemp = fields.at("preheat_design_temperature");
-                thisDOAS.PreheatHumRat = fields.at("preheat_design_humidity_ratio");
-                thisDOAS.PrecoolTemp = fields.at("precool_design_temperature");
-                thisDOAS.PrecoolHumRat = fields.at("precool_design_humidity_ratio");
+                thisDOAS.PreheatTemp = fields.at("preheat_design_temperature").get<Real64>();
+                thisDOAS.PreheatHumRat = fields.at("preheat_design_humidity_ratio").get<Real64>();
+                thisDOAS.PrecoolTemp = fields.at("precool_design_temperature").get<Real64>();
+                thisDOAS.PrecoolHumRat = fields.at("precool_design_humidity_ratio").get<Real64>();
 
                 // get info on AirLoops
-                thisDOAS.NumOfAirLoops = fields.at("number_of_airloophvac"); //
+                thisDOAS.NumOfAirLoops = fields.at("number_of_airloophvac").get<int>(); //
                 if (thisDOAS.NumOfAirLoops < 1) {
                     cFieldName = "Number of AirLoopHVAC";
                     ShowSevereError(state,
@@ -831,7 +842,7 @@ namespace AirLoopHVACDOAS {
                     auto AirLoopArray = AirLoopNames.value();
                     int num = 0;
                     for (auto AirLoopHVACName : AirLoopArray) {
-                        std::string name = UtilityRoutines::MakeUPPERCase(AsString(AirLoopHVACName.at("airloophvac_name")));
+                        std::string name = UtilityRoutines::MakeUPPERCase(AirLoopHVACName.at("airloophvac_name").get<std::string>());
                         int LoopNum = UtilityRoutines::FindItemInList(name, state.dataAirSystemsData->PrimaryAirSystems);
                         num += 1;
                         if (LoopNum > 0 && num <= thisDOAS.NumOfAirLoops) {
@@ -1045,8 +1056,8 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
 
-        int const summerDesignDayTypeIndex(9);
-        int const winterDesignDayTypeIndex(10);
+        int constexpr summerDesignDayTypeIndex(9);
+        int constexpr winterDesignDayTypeIndex(10);
 
         for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day

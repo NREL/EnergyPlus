@@ -756,9 +756,9 @@ void SimOAComponent(EnergyPlusData &state,
             int ControlledZoneNum = 0;
             bool HeatingActive = false;
             bool CoolingActive = false;
-            int const OAUnitNum = 0;
-            Real64 const OAUCoilOutTemp = 0.0;
-            bool const ZoneEquipment = false;
+            int constexpr OAUnitNum = 0;
+            Real64 constexpr OAUCoilOutTemp = 0.0;
+            bool constexpr ZoneEquipment = false;
             Real64 sysOut = 0.0;
             Real64 latOut = 0.0;
             HVACVariableRefrigerantFlow::SimulateVRF(state,
@@ -1978,7 +1978,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
         }
 
         // write to .eio file
-        static constexpr fmt::string_view Format_700(
+        static constexpr std::string_view Format_700(
             "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
             "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
             "Name,DSZAD Name");
@@ -4616,8 +4616,8 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     using General::SolveRoot;
     using SetPointManager::GetCoilFreezingCheckFlag;
 
-    int const MaxIte(500);                 // Maximum number of iterations
-    Real64 const Acc(0.0001);              // Accuracy of result
+    int constexpr MaxIte(500);             // Maximum number of iterations
+    Real64 constexpr Acc(0.0001);          // Accuracy of result
     bool AirLoopEconoLockout;              // Economizer lockout flag
     bool AirLoopNightVent;                 // Night Ventilation flag for air loop
     bool EconomizerOperationFlag;          // TRUE if OA economizer is active

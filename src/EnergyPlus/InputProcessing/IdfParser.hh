@@ -65,9 +65,13 @@ public:
 
     IdfParser() = default;
 
-    json decode(std::string const &idf, json const &schema);
+    json decode(std::string_view idf, json const &schema);
 
-    json decode(std::string const &idf, json const &schema, bool &success);
+    json decode(std::string_view idf, json const &schema, bool &success);
+
+    json decode(std::string_view idf, size_t idf_size, json const &schema);
+
+    json decode(std::string_view idf, size_t idf_size, json const &schema, bool &success);
 
     std::string encode(json const &root, json const &schema);
 
@@ -94,43 +98,48 @@ private:
     size_t cur_line_num = 1;
     size_t index_into_cur_line = 0;
     size_t beginning_of_line_index = 0;
-    char s[129];
+    size_t idf_size = 0;
+    char s[129] = {};
     std::unordered_map<std::string, std::string> objectTypeMap;
     std::vector<std::string> errors_;
     std::vector<std::string> warnings_;
 
-    void increment_both_index(size_t &index, size_t &line_index);
+    static void increment_both_index(size_t &index, size_t &line_index);
 
-    void decrement_both_index(size_t &index, size_t &line_index);
+    static void decrement_both_index(size_t &index, size_t &line_index);
 
-    json parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema);
+    json parse_idf(std::string_view idf, size_t &index, bool &success, json const &schema);
 
-    json parse_object(std::string const &idf, size_t &index, bool &success, json const &schema_loc, json const &obj_loc, int idfObjectCount);
+    json parse_object(std::string_view idf, size_t &index, bool &success, json const &schema_loc, json const &obj_loc, int idfObjectCount);
 
-    json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc);
+    json parse_value(std::string_view idf, size_t &index, bool &success, json const &field_loc);
 
-    json parse_number(std::string const &idf, size_t &index, bool &success);
+    // parse_number will return integer, double, or string depending on success of parsing
+    // success will be false, if number cannot be converted to integer or double and string will be returned.
+    json parse_number(std::string_view idf, size_t &index);
 
-    std::string parse_string(std::string const &idf, size_t &index, bool &success);
+    std::string parse_string(std::string_view idf, size_t &index);
 
-    void eat_whitespace(std::string const &idf, size_t &index);
+    void eat_whitespace(std::string_view idf, size_t &index);
 
-    void eat_comment(std::string const &idf, size_t &index);
+    void eat_comment(std::string_view idf, size_t &index);
 
-    Token look_ahead(std::string const &idf, size_t index);
+    Token look_ahead(std::string_view idf, size_t index);
 
-    Token next_token(std::string const &idf, size_t &index);
+    Token next_token(std::string_view idf, size_t &index);
 
-    std::string &rtrim(std::string &s);
+    Token next_limited_token(std::string_view idf, size_t &index);
 
-    inline std::string convertToUpper(std::string s)
+    static std::string rtrim(std::string_view s);
+
+    static inline std::string convertToUpper(std::string str)
     {
-        size_t len = s.size();
+        size_t len = str.size();
         for (size_t i = 0; i < len; ++i) {
-            char c = s[i];
-            s[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only, which is fine
+            char c = str[i];
+            str[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only, which is fine
         }
-        return s;
+        return str;
     }
 };
 

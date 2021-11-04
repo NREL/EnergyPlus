@@ -70,13 +70,14 @@ namespace EnergyPlus {
 class EnergyPlusFixture;
 class ResultsFrameworkFixture;
 struct EnergyPlusData;
+struct JsonOutputFilePaths;
 
 namespace ResultsFramework {
 
     using json = nlohmann::json;
 
     // trim string
-    std::string trim(std::string str);
+    std::string trim(std::string_view const s);
 
     // base result object
     class BaseResultObject
@@ -89,7 +90,7 @@ namespace ResultsFramework {
     {
     public:
         void setProgramVersion(const std::string &programVersion);
-        std::string getProgramVersion();
+        std::string getProgramVersion() const;
         void setSimulationEnvironment(const std::string &simulationEnvironment);
         void setInputModelURI(const std::string &inputModelURI);
         void setStartDateTimeStamp(const std::string &startDateTimeStamp);
@@ -222,7 +223,7 @@ namespace ResultsFramework {
         bool rVariablesScanned() const;
         bool iVariablesScanned() const;
 
-        void newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin);
+        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
         //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 
@@ -231,7 +232,7 @@ namespace ResultsFramework {
         json getVariablesJSON();
         json getJSON() const;
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack);
+        void writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack);
 
     protected:
         bool IDataFrameEnabled = false;
@@ -416,9 +417,9 @@ namespace ResultsFramework {
         bool outputMsgPack = false;
         std::vector<std::string> outputVariables;
 
-        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
+        void writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths);
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams);
+        void writeReport(JsonOutputFilePaths &jsonOutputFilePaths);
 
         void writeCSVOutput(EnergyPlusData &state);
 
@@ -427,88 +428,88 @@ namespace ResultsFramework {
         friend class EnergyPlus::ResultsFrameworkFixture;
 
     protected:
-        inline bool hasRIDetailedZoneTSData()
+        inline bool hasRIDetailedZoneTSData() const
         {
             return RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIDetailedHVACTSData()
+        inline bool hasRIDetailedHVACTSData() const
         {
             return RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRITimestepTSData()
+        inline bool hasRITimestepTSData() const
         {
             return RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIHourlyTSData()
+        inline bool hasRIHourlyTSData() const
         {
             return RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIDailyTSData()
+        inline bool hasRIDailyTSData() const
         {
             return RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIMonthlyTSData()
+        inline bool hasRIMonthlyTSData() const
         {
             return RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIRunPeriodTSData()
+        inline bool hasRIRunPeriodTSData() const
         {
             return RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIYearlyTSData()
+        inline bool hasRIYearlyTSData() const
         {
             return RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasTSMeters()
+        inline bool hasTSMeters() const
         {
             return TSMeters.rDataFrameEnabled();
         };
 
-        inline bool hasHRMeters()
+        inline bool hasHRMeters() const
         {
             return HRMeters.rDataFrameEnabled();
         };
 
-        inline bool hasDYMeters()
+        inline bool hasDYMeters() const
         {
             return DYMeters.rDataFrameEnabled();
         };
 
-        inline bool hasMNMeters()
+        inline bool hasMNMeters() const
         {
             return MNMeters.rDataFrameEnabled();
         };
 
-        inline bool hasSMMeters()
+        inline bool hasSMMeters() const
         {
             return SMMeters.rDataFrameEnabled();
         };
 
-        inline bool hasYRMeters()
+        inline bool hasYRMeters() const
         {
             return YRMeters.rDataFrameEnabled();
         };
 
-        inline bool hasMeterData()
+        inline bool hasMeterData() const
         {
             return hasTSMeters() || hasHRMeters() || hasDYMeters() || hasMNMeters() || hasSMMeters() || hasYRMeters();
         };
 
-        inline bool hasTSData()
+        inline bool hasTSData() const
         {
             return hasRIDetailedZoneTSData() || hasRIDetailedHVACTSData() || hasRITimestepTSData() || hasRIHourlyTSData() || hasRIDailyTSData() ||
                    hasRIMonthlyTSData() || hasRIRunPeriodTSData() || hasRIYearlyTSData();
         };
 
-        inline bool hasOutputData()
+        inline bool hasOutputData() const
         {
             return hasTSData() || hasMeterData();
         };

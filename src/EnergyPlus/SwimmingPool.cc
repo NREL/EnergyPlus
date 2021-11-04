@@ -155,11 +155,11 @@ void GetSwimmingPool(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetSwimmingPool: "); // include trailing blank space
-    Real64 const MinCoverFactor(0.0);                                   // minimum value for cover factors
-    Real64 const MaxCoverFactor(1.0);                                   // maximum value for cover factors
-    Real64 const MinDepth(0.05);                                        // minimum average pool depth (to avoid obvious input errors)
-    Real64 const MaxDepth(10.0);                                        // maximum average pool depth (to avoid obvious input errors)
-    Real64 const MinPowerFactor(0.0);                                   // minimum power factor for miscellaneous equipment
+    Real64 constexpr MinCoverFactor(0.0);                               // minimum value for cover factors
+    Real64 constexpr MaxCoverFactor(1.0);                               // maximum value for cover factors
+    Real64 constexpr MinDepth(0.05);                                    // minimum average pool depth (to avoid obvious input errors)
+    Real64 constexpr MaxDepth(10.0);                                    // maximum average pool depth (to avoid obvious input errors)
+    Real64 constexpr MinPowerFactor(0.0);                               // minimum power factor for miscellaneous equipment
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false);         // Set to true if something goes wrong
@@ -473,8 +473,8 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitSwimmingPool");
-    Real64 const MinActivityFactor = 0.0;  // Minimum value for activity factor
-    Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
+    Real64 constexpr MinActivityFactor = 0.0;  // Minimum value for activity factor
+    Real64 constexpr MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleHeatGainSchedPtr);
@@ -823,7 +823,7 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
         if (this->WaterInletNode > 0) {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_SwimmingPool_Indoor,
+                                                    DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
                                                     this->HWLoopNum,
                                                     this->HWLoopSide,
                                                     this->HWBranchNum,
@@ -881,10 +881,11 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // for the inside surface temperature which is assumed to be the same as the pool
     // water temperature.
     // Standard Heat Balance Equation:
-    //        SurfTempInTmp( SurfNum ) = ( SurfCTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn( SurfNum
+    //        SurfTempInTmp( SurfNum ) = ( SurfCTFConstInPart( SurfNum ) + SurfQRadThermInAbs( SurfNum ) + SurfOpaqQRadSWInAbs( SurfNum ) + HConvIn(
+    //        SurfNum
     //)
-    //* RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) + QHTRadSysSurf(
-    // SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + IterDampConst * SurfTempInsOld(
+    //* RefAirTemp( SurfNum ) + SurfNetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * SurfQsrcHist( 1, SurfNum ) +
+    // SurfQdotRadHVACInPerArea( SurfNum ) + IterDampConst * SurfTempInsOld(
     // SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) + IterDampConst );
     //// Constant part of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection
     // from surface to zone air | Net radiant exchange with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
@@ -926,11 +927,9 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
     // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
     // to the air directly and added to the zone air heat balance
-    Real64 LWsum = (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
-                    state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
-                    state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
-                    state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
-    Real64 LWtotal = this->CurCoverLWRadFac * LWsum;                       // total flux from long-wavelength radiation to surface
+    Real64 LWsum = (state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum) +
+                    state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum)); // summation of all long-wavelenth radiation going to surface
+    Real64 LWtotal = this->CurCoverLWRadFac * LWsum;                           // total flux from long-wavelength radiation to surface
     Real64 SWtotal =
         this->CurCoverSWRadFac * state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
     this->RadConvertToConvect =
@@ -988,7 +987,7 @@ void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,
 )
 {
     static constexpr std::string_view RoutineName("CalcSwimmingPoolEvap");
-    Real64 const CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
+    Real64 constexpr CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
 
     // Evaporation calculation:
     // Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
@@ -1063,7 +1062,7 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
     // radiant systems.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
+    Real64 constexpr CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SwimmingPoolOn = false;
@@ -1176,7 +1175,7 @@ void ReportSwimmingPool(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("ReportSwimmingPool");
-    Real64 const MinDensity = 1.0; // to avoid a divide by zero
+    Real64 constexpr MinDensity = 1.0; // to avoid a divide by zero
 
     for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
 

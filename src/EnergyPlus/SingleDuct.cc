@@ -250,8 +250,7 @@ void GetSysInput(EnergyPlusData &state)
     using Fans::GetFanInletNode;
     using Fans::GetFanOutletNode;
     using namespace DataHeatBalance;
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
 
@@ -391,11 +390,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp.empty()) {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(8) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -797,11 +798,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp.empty()) {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(5) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -1108,11 +1111,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(5) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -2054,11 +2059,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp.empty()) {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(7) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -2483,8 +2490,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     using DataZoneEquipment::CheckZoneEquipmentList;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -2523,7 +2529,8 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     }
 
     if (this->PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
-        if ((this->ReheatComp_PlantType == TypeOf_CoilWaterSimpleHeating) || (this->ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
+        if ((this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+            (this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             // setup plant topology indices for plant fed heating coils
             errFlag = false;
             ScanPlantLoopsForObject(state,
@@ -2713,7 +2720,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
                 if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
                 if (airLoopOAFrac > 0.0) {
                     Real64 vDotOAReq =
-                        DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
+                        DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
                     mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
                     mDotFromOARequirement = min(mDotFromOARequirement, this->AirMassFlowRateMax);
                 } else {
@@ -4328,14 +4335,13 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // REFERENCES:
 
     // Using/Aliasing
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
     // FUNCTION PARAMETER DEFINITIONS:
     // na
@@ -4362,11 +4368,11 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
         if (this->NoOAFlowInputFromUser) return;
         // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
         if (AirLoopOAFrac > 0.0) {
-            OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
-                                                                 this->OARequirementsPtr,
-                                                                 this->ActualZoneNum,
-                                                                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
-                                                                 UseMinOASchFlag);
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                             this->OARequirementsPtr,
+                                                                             this->ActualZoneNum,
+                                                                             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
+                                                                             UseMinOASchFlag);
             OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
             // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -4767,7 +4773,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     using SteamCoils::GetCoilCapacity;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const BigLoad(1.0e+20);
+    Real64 constexpr BigLoad(1.0e+20);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow = 0; // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
@@ -6253,12 +6259,11 @@ void GetATMixers(EnergyPlusData &state)
                                 bool UseOccSchFlag = false;
                                 bool UseMinOASchFlag = false;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                                        state,
-                                        state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
-                                        state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
-                                        UseOccSchFlag,
-                                        UseMinOASchFlag);
+                                    DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                                  state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
+                                                                                  state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
+                                                                                  UseOccSchFlag,
+                                                                                  UseMinOASchFlag);
                             }
                             goto ControlledZoneLoop_exit;
                         }
@@ -6282,12 +6287,11 @@ void GetATMixers(EnergyPlusData &state)
                                     bool UseOccSchFlag = false;
                                     bool UseMinOASchFlag = false;
                                     state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                        DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                                            state,
-                                            state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
-                                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
-                                            UseOccSchFlag,
-                                            UseMinOASchFlag);
+                                        DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                                      state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
+                                                                                      state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
+                                                                                      UseOccSchFlag,
+                                                                                      UseMinOASchFlag);
                                 }
                                 ZoneNodeFoundAgain = true;
                                 break;
@@ -6328,12 +6332,11 @@ void GetATMixers(EnergyPlusData &state)
                                 bool UseOccSchFlag = false;
                                 bool UseMinOASchFlag = false;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                                        state,
-                                        state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
-                                        state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
-                                        UseOccSchFlag,
-                                        UseMinOASchFlag);
+                                    DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                                  state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
+                                                                                  state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
+                                                                                  UseOccSchFlag,
+                                                                                  UseMinOASchFlag);
                             }
                             goto ControlZoneLoop_exit;
                         }
@@ -6376,11 +6379,11 @@ void GetATMixers(EnergyPlusData &state)
                             state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr =
                                 state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex;
                             state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
-                                                                                     state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
-                                                                                     state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
-                                                                                     false,
-                                                                                     false);
+                                DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                              state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
+                                                                              state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
+                                                                              false,
+                                                                              false);
                             state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
                         }
                     }
@@ -6460,7 +6463,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
         if (this->AirLoopNum > 0) {
             airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
             if (airLoopOAFrac > 0.0) {
-                vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
+                vDotOAReq = DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
                 mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
             } else {
                 mDotFromOARequirement = state.dataLoopNodes->Node(this->PriInNode).MassFlowRate;

@@ -94,9 +94,9 @@ namespace MundtSimMgr {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    Real64 const CpAir(1005.0);   // Specific heat of air
-    Real64 const MinSlope(0.001); // Bound on result from Mundt model
-    Real64 const MaxSlope(5.0);   // Bound on result from Mundt Model
+    Real64 constexpr CpAir(1005.0);   // Specific heat of air
+    Real64 constexpr MinSlope(0.001); // Bound on result from Mundt model
+    Real64 constexpr MaxSlope(5.0);   // Bound on result from Mundt Model
 
     // MODULE VARIABLE DECLARATIONS:
 
@@ -425,7 +425,7 @@ namespace MundtSimMgr {
             state.dataMundtSimMgr->QsysCoolTot = -(SumSysMCpT - ZoneMassFlowRate * CpAir * state.dataHeatBalFanSys->MAT(ZoneNum));
         }
         // determine heat gains
-        SumAllInternalConvectionGains(state, ZoneNum, state.dataMundtSimMgr->ConvIntGain);
+        state.dataMundtSimMgr->ConvIntGain = SumAllInternalConvectionGains(state, ZoneNum);
         state.dataMundtSimMgr->ConvIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                                               state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) +
                                               state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
@@ -433,7 +433,7 @@ namespace MundtSimMgr {
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
+            RetAirConvGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
             state.dataMundtSimMgr->ConvIntGain += RetAirConvGain;
         }
 

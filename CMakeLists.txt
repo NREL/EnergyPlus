@@ -163,6 +163,7 @@ endif()
 
 if(BUILD_TESTING)
   option(ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF)
+  option(ENABLE_REVERSE_DD_TESTING "Enable Reverse Design Day Tests" OFF)
   option(BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF)
   if(ENABLE_REGRESSION_TESTING)
     if(CMAKE_CL_64)
@@ -237,6 +238,7 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/re2)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/doj)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/nlohmann)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/fast_float)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/valijson)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/)
 target_include_directories(project_options SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/third_party/SQLite/)
@@ -265,8 +267,8 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.5)
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.5/include)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6/include)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING

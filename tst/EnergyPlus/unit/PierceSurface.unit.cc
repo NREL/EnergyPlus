@@ -61,7 +61,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
-using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 using Vector2D = DataSurfaces::Surface2D::Vector2D;
 
@@ -73,7 +72,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Rectangular)
     floor.Shape = SurfaceShape::Rectangle;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
-    EXPECT_EQ(ShapeCat::Rectangular, floor.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Rectangular, floor.shapeCat));
     EXPECT_EQ(2, floor2d.axis);
     EXPECT_EQ(Vector2D(0, 0), floor2d.vl);
     EXPECT_EQ(Vector2D(1, 1), floor2d.vu);
@@ -145,7 +144,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Triangular)
     floor.Shape = SurfaceShape::Triangle;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
-    EXPECT_EQ(ShapeCat::Triangular, floor.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Triangular, floor.shapeCat));
     EXPECT_EQ(2, floor2d.axis);
     EXPECT_EQ(Vector2D(0, 0), floor2d.vl);
     EXPECT_EQ(Vector2D(1, 1), floor2d.vu);
@@ -198,7 +197,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Triangular)
 
 TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexOctagonal)
 {
-    int const N(8); // Number of vertices and edges
+    int constexpr N(8); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
     Real64 const wedge(TwoPi / N);
     DataSurfaces::SurfaceData floor;
@@ -210,7 +209,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexOctagonal)
     floor.IsConvex = true;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
-    EXPECT_EQ(ShapeCat::Convex, floor.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Convex, floor.shapeCat));
     EXPECT_EQ(2, floor2d.axis);
 
     { // Ray straight down into center of floor
@@ -274,7 +273,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
     floor.IsConvex = true;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
-    EXPECT_EQ(ShapeCat::Convex, floor.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Convex, floor.shapeCat));
     EXPECT_EQ(2, floor2d.axis);
     EXPECT_EQ(Vector2D(-0.25, -0.25), floor2d.vl);
     EXPECT_EQ(Vector2D(1.25, 1.25), floor2d.vu);
@@ -327,7 +326,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
 
 TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexNGon)
 {
-    int const N(32); // Number of vertices and edges
+    int constexpr N(32); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
     Real64 const wedge(TwoPi / N);
     DataSurfaces::SurfaceData floor;
@@ -339,7 +338,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexNGon)
     floor.IsConvex = true;
     floor.set_computed_geometry();
     DataSurfaces::Surface2D const &floor2d(floor.surface2d);
-    EXPECT_EQ(ShapeCat::Convex, floor.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Convex, floor.shapeCat));
     EXPECT_EQ(2, floor2d.axis);
     EXPECT_EQ(Vector2D(-1.0, -1.0), floor2d.vl);
     EXPECT_EQ(Vector2D(1.0, 1.0), floor2d.vu);
@@ -398,7 +397,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexBoomerang)
     boomerang.IsConvex = false;
     boomerang.set_computed_geometry();
     DataSurfaces::Surface2D const &boomerang2d(boomerang.surface2d);
-    EXPECT_EQ(ShapeCat::Nonconvex, boomerang.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Nonconvex, boomerang.shapeCat));
     EXPECT_EQ(2, boomerang2d.axis);
 
     { // Ray straight down into a "wing" of boomerang
@@ -435,7 +434,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexUShape)
     ushape.IsConvex = false;
     ushape.set_computed_geometry();
     DataSurfaces::Surface2D const &ushape2d(ushape.surface2d);
-    EXPECT_EQ(ShapeCat::Nonconvex, ushape.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Nonconvex, ushape.shapeCat));
     EXPECT_EQ(2, ushape2d.axis);
 
     { // Ray straight down into middle of base
@@ -514,7 +513,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexStar4)
     star.IsConvex = false;
     star.set_computed_geometry();
     DataSurfaces::Surface2D const &star2d(star.surface2d);
-    EXPECT_EQ(ShapeCat::Nonconvex, star.shapeCat);
+    EXPECT_TRUE(compare_enums(ShapeCat::Nonconvex, star.shapeCat));
     EXPECT_EQ(2, star2d.axis);
 
     { // Ray straight down into middle of star

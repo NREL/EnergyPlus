@@ -69,7 +69,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -91,7 +90,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(1);
 
     // one-time global initialization
-    int const DesignDayForPeak = 1;
+    int constexpr DesignDayForPeak = 1;
     state->dataSize->SysSizPeakDDNum(1).SensCoolPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = DesignDayForPeak;
@@ -106,8 +105,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
-    int const sysNum = 1;
-    Real64 const CpAir = 4179;
+    int constexpr sysNum = 1;
+    Real64 constexpr CpAir = 4179;
 
     // argument return values
     Real64 designFlowValue;
@@ -196,7 +195,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(1);
 
     // one-time global initialization
-    int const DesignDayForPeak = 0;
+    int constexpr DesignDayForPeak = 0;
     state->dataSize->SysSizPeakDDNum(1).SensCoolPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = DesignDayForPeak;
@@ -208,8 +207,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
-    int const sysNum = 1;
-    Real64 const CpAir = 4179;
+    int constexpr sysNum = 1;
+    Real64 constexpr CpAir = 4179;
 
     // argument return values
     Real64 designFlowValue;
@@ -533,7 +532,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
 TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 {
-    int const ZoneNum = 1;
+    int constexpr ZoneNum = 1;
     std::string CompName;       // component name
     std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
@@ -884,7 +883,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     // EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
     // OutputReportPredefined::reportName(5).show = true;
 
-    int const ZoneNum = 1;
+    int constexpr ZoneNum = 1;
     std::string CompName;       // component name
     std::string CompType;       // component type
     std::string SizingString;   // input field sizing description

@@ -419,12 +419,12 @@ void ProcessDateString(EnergyPlusData &state,
     // the proper month and day for that date string.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FstNum;
-    bool errFlag;
-    int NumTokens;
-    int TokenDay;
-    int TokenMonth;
-    int TokenWeekday;
+    int FstNum{};
+    bool errFlag{};
+    int NumTokens{};
+    int TokenDay{};
+    int TokenMonth{};
+    int TokenWeekday{};
 
     FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
     DateType = WeatherManager::DateType::InvalidDate;
@@ -489,50 +489,46 @@ void DetermineDateTokens(EnergyPlusData &state,
     // is left.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static int const NumSingleChars(3);
-    static Array1D_string const SingleChars(NumSingleChars, {"/", ":", "-"});
-    static int const NumDoubleChars(6);
-    static Array1D_string const DoubleChars(NumDoubleChars,
-                                            {"ST ", "ND ", "RD ", "TH ", "OF ", "IN "}); // Need trailing spaces: Want thse only at end of words
-    static Array1D_string const Months(12, {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"});
-    static Array1D_string const Weekdays(7, {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"});
+    static constexpr int NumSingleChars(3);
+    static constexpr std::array<std::string_view, NumSingleChars> SingleChars{"/", ":", "-"};
+    static constexpr int NumDoubleChars(6);
+    static constexpr std::array<std::string_view, NumDoubleChars> DoubleChars{
+        "ST ", "ND ", "RD ", "TH ", "OF ", "IN "}; // Need trailing spaces: Want thse only at end of words
+    static constexpr std::array<std::string_view, 12> Months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+    static constexpr std::array<std::string_view, 7> Weekdays{"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CurrentString;
-    std::string::size_type Pos;
-    int Loop;
+    std::string CurrentString = String;
+    int Loop{};
     Array1D_string Fields(3);
-    int NumField1;
-    int NumField2;
-    int NumField3;
-    bool errFlag;
-    bool InternalError;
-    bool WkDayInMonth;
+    int NumField1{};
+    int NumField2{};
+    int NumField3{};
+    bool errFlag{};
+    bool InternalError = false;
+    bool WkDayInMonth = false;
 
-    CurrentString = String;
     NumTokens = 0;
     TokenDay = 0;
     TokenMonth = 0;
     TokenWeekday = 0;
     DateType = WeatherManager::DateType::InvalidDate;
-    InternalError = false;
-    WkDayInMonth = false;
     if (present(TokenYear)) TokenYear = 0;
     // Take out separator characters, other extraneous stuff
 
-    for (Loop = 1; Loop <= NumSingleChars; ++Loop) {
-        Pos = index(CurrentString, SingleChars(Loop));
+    for (Loop = 0; Loop < NumSingleChars; ++Loop) {
+        auto Pos = index(CurrentString, SingleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString[Pos] = ' ';
-            Pos = index(CurrentString, SingleChars(Loop));
+            Pos = index(CurrentString, SingleChars[Loop]);
         }
     }
 
-    for (Loop = 1; Loop <= NumDoubleChars; ++Loop) {
-        Pos = index(CurrentString, DoubleChars(Loop));
+    for (Loop = 0; Loop < NumDoubleChars; ++Loop) {
+        auto Pos = index(CurrentString, DoubleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString.replace(Pos, 2, "  ");
-            Pos = index(CurrentString, DoubleChars(Loop));
+            Pos = index(CurrentString, DoubleChars[Loop]);
             WkDayInMonth = true;
         }
     }
@@ -545,7 +541,7 @@ void DetermineDateTokens(EnergyPlusData &state,
         Loop = 0;
         while (Loop < 3) { // Max of 3 fields
             if (CurrentString == BlankString) break;
-            Pos = index(CurrentString, ' ');
+            auto Pos = index(CurrentString, ' ');
             ++Loop;
             if (Pos == std::string::npos) Pos = CurrentString.length();
             Fields(Loop) = CurrentString.substr(0, Pos);
@@ -568,7 +564,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 } else {
                     TokenDay = NumField2;
                 }
-                TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
+                TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months.begin(), Months.end());
                 ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                 if (!InternalError) {
                     DateType = WeatherManager::DateType::MonthDay;
@@ -589,7 +585,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                     }
                 } else { // 2nd field was not numeric.  Must be Month
                     TokenDay = NumField1;
-                    TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
+                    TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
                     ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
                         DateType = WeatherManager::DateType::MonthDay;
@@ -605,13 +601,13 @@ void DetermineDateTokens(EnergyPlusData &state,
                 NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
                 if (!errFlag) { // the expected result
                     TokenDay = NumField1;
-                    TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays, 7);
+                    TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
                     if (TokenWeekday == 0) {
-                        TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                        TokenWeekday = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Weekdays, 7);
+                        TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
+                        TokenWeekday = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Weekdays.begin(), Weekdays.end());
                         if (TokenMonth == 0 || TokenWeekday == 0) InternalError = true;
                     } else {
-                        TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months, 12);
+                        TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
                         if (TokenMonth == 0) InternalError = true;
                     }
                     DateType = WeatherManager::DateType::NthDayInMonth;
@@ -621,13 +617,13 @@ void DetermineDateTokens(EnergyPlusData &state,
                     if (Fields(1) == "LA") {
                         DateType = WeatherManager::DateType::LastDayInMonth;
                         NumTokens = 3;
-                        TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays, 7);
+                        TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
                         if (TokenWeekday == 0) {
-                            TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                            TokenWeekday = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Weekdays, 7);
+                            TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
+                            TokenWeekday = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Weekdays.begin(), Weekdays.end());
                             if (TokenMonth == 0 || TokenWeekday == 0) InternalError = true;
                         } else {
-                            TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months, 12);
+                            TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
                             if (TokenMonth == 0) InternalError = true;
                         }
                     } else { // error....
@@ -843,7 +839,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     // Return value
     std::string OutputString;
 
-    Real64 const FracToMin(60.0);
+    Real64 constexpr FracToMin(60.0);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 ActualTimeS; // Start of current interval (HVAC time step)
@@ -942,8 +938,8 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     // Linear Correction based on the RegulaFalsi routine in EnergyPlus
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const small(1.e-9); // Small Number used to approximate zero
-    Real64 const Perturb(0.1); // Perturbation applied to X to initialize iteration
+    Real64 const small(1.e-9);     // Small Number used to approximate zero
+    Real64 constexpr Perturb(0.1); // Perturbation applied to X to initialize iteration
 
     Real64 DY; // Linear fit result
 
@@ -971,7 +967,9 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
 
         // New guess calculated from LINEAR FIT of most recent two points
         DY = Y0 - Y1;
-        if (std::abs(DY) < small) DY = small;
+        if (std::abs(DY) < small) {
+            DY = small;
+        }
         // new estimation
 
         ResultX = (Y0 * X1 - Y1 * X0) / DY;
@@ -1042,9 +1040,9 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     // as a minimum (capable of representing up to 2,147,483,647).
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const DecMon(100 * 100 * 100);
-    int const DecDay(100 * 100);
-    int const DecHr(100);
+    static constexpr int DecMon(100 * 100 * 100);
+    static constexpr int DecDay(100 * 100);
+    static constexpr int DecHr(100);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TmpItem;
@@ -1082,7 +1080,7 @@ int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStep
     int ActualTimeMin; // calculated Minute for reporting
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const FracToMin(60.0);
+    Real64 constexpr FracToMin(60.0);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 ActualTimeS; // Start of current interval (HVAC time step)
@@ -1258,21 +1256,7 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
 
     // TimeStamp written with formatting
     // "hh:mm:ss.s"
-    // 10 chars + null terminator = 11
-    // This approach should not normally be used due to the fixed width c-style
-    // string but in this case the output string is a fixed size so this is more
-    // clear for formatting and faster. If formatted string changes, make sure to
-    // add more to buffer.
-    char buffer[11];
-    int cx = snprintf(buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds);
-
-    // Make sure output string is only between 0 and 10 characters so string is
-    // not out of bounds of the buffer.
-    assert(cx >= 0 && cx < 11);
-    // Only done to quiet release compiler warning for unused variable.
-    (void)cx;
-
-    return std::string(buffer);
+    return fmt::format("{:02d}:{:02d}:{:04.1f}", Hours, Minutes, Seconds);
 }
 
 std::string CreateTimeIntervalString(Real64 const StartTime, // Start of current interval in seconds
@@ -1320,7 +1304,7 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // - seconds < 60
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const MinToSec(60);
+    int constexpr MinToSec(60);
     int const HourToSec(MinToSec * 60);
 
     // Get number of hours

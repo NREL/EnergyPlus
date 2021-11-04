@@ -139,14 +139,14 @@ namespace CoolTower {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("ZoneCoolTower:Shower");
-        Real64 const MaximumWaterFlowRate(0.016667); // Maximum limit of water flow rate in m3/s (1000 l/min)
-        Real64 const MinimumWaterFlowRate(0.0);      // Minimum limit of water flow rate
-        Real64 const MaxHeight(30.0);                // Maximum effective tower height in m
-        Real64 const MinHeight(1.0);                 // Minimum effective tower height in m
-        Real64 const MaxValue(100.0);                // Maximum limit of outlet area, airflow, and temperature
-        Real64 const MinValue(0.0);                  // Minimum limit of outlet area, airflow, and temperature
-        Real64 const MaxFrac(1.0);                   // Maximum fraction
-        Real64 const MinFrac(0.0);                   // Minimum fraction
+        Real64 constexpr MaximumWaterFlowRate(0.016667); // Maximum limit of water flow rate in m3/s (1000 l/min)
+        Real64 constexpr MinimumWaterFlowRate(0.0);      // Minimum limit of water flow rate
+        Real64 constexpr MaxHeight(30.0);                // Maximum effective tower height in m
+        Real64 constexpr MinHeight(1.0);                 // Minimum effective tower height in m
+        Real64 constexpr MaxValue(100.0);                // Maximum limit of outlet area, airflow, and temperature
+        Real64 constexpr MinValue(0.0);                  // Minimum limit of outlet area, airflow, and temperature
+        Real64 constexpr MaxFrac(1.0);                   // Maximum fraction
+        Real64 constexpr MinFrac(0.0);                   // Minimum fraction
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -614,9 +614,9 @@ namespace CoolTower {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinWindSpeed(0.1);  // Minimum limit of outdoor air wind speed in m/s
-        Real64 const MaxWindSpeed(30.0); // Maximum limit of outdoor air wind speed in m/s
-        Real64 const UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
+        Real64 constexpr MinWindSpeed(0.1);  // Minimum limit of outdoor air wind speed in m/s
+        Real64 constexpr MaxWindSpeed(30.0); // Maximum limit of outdoor air wind speed in m/s
+        Real64 constexpr UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;            // Number of zone being served

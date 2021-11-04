@@ -304,8 +304,8 @@ namespace SolarCollectors {
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataSolarCollectors->UniqueCollectorNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum =
-                    DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).Type =
+                    DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
@@ -547,7 +547,8 @@ namespace SolarCollectors {
                                                          state.dataIPShortCut->cAlphaFieldNames(1),
                                                          ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).Type =
+                    DataPlant::PlantEquipmentType::SolarCollectorICS; // parameter assigned in DataPlant
 
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
@@ -717,7 +718,7 @@ namespace SolarCollectors {
 
     void CollectorData::setupOutputVars(EnergyPlusData &state)
     {
-        if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+        if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
             // Setup report variables
             SetupOutputVariable(state,
                                 "Solar Collector Incident Angle Modifier",
@@ -771,7 +772,7 @@ namespace SolarCollectors {
                                 "HeatProduced",
                                 _,
                                 "Plant");
-        } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
                                 "Solar Collector Transmittance Absorptance Product",
@@ -887,11 +888,11 @@ namespace SolarCollectors {
         this->initialize(state);
 
         {
-            auto const SELECT_CASE_var(this->TypeNum);
+            auto const SELECT_CASE_var(this->Type);
             // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
                 this->CalcSolarCollector(state);
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
+            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorICS) {
                 this->CalcICSSolarCollector(state);
             } else {
                 assert(false); // LCOV_EXCL_LINE
@@ -919,7 +920,7 @@ namespace SolarCollectors {
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
         static constexpr std::string_view RoutineName("InitSolarCollector");
-        Real64 const BigNumber(9999.9); // Component desired mass flow rate
+        Real64 constexpr BigNumber(9999.9); // Component desired mass flow rate
 
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
@@ -1233,9 +1234,9 @@ namespace SolarCollectors {
                 }
 
                 if (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > 0.0) { // Calculate thermal efficiency
-                    // NOTE: Efficiency can be > 1 if Q > QRadSWOutIncident because of favorable delta T, i.e. warm outdoor temperature
+                    // NOTE: Efficiency can be > 1 if Q > SurfQRadSWOutIncident because of favorable delta T, i.e. warm outdoor temperature
                     efficiency =
-                        Q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * area); // Q has units of W; QRadSWOutIncident has units of W/m2
+                        Q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * area); // Q has units of W; SurfQRadSWOutIncident has units of W/m2
                 } else {
                     efficiency = 0.0;
                 }
@@ -1253,15 +1254,17 @@ namespace SolarCollectors {
                 if (qEquation < 0.0) {
                     if (this->ErrIndex == 0) {
                         ShowSevereMessage(state,
-                                          "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                              "\", possible bad input coefficients.");
+                                          format("CalcSolarCollector: {}=\"{}\", possible bad input coefficients.",
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                 this->Name));
                         ShowContinueError(state,
                                           "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
                         ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
                     ShowRecurringSevereErrorAtEnd(state,
-                                                  "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                                      "\", coefficient error continues.",
+                                                  format("CalcSolarCollector: {}=\"{}\", coefficient error continues.",
+                                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                         this->Name),
                                                   this->ErrIndex,
                                                   qEquation,
                                                   qEquation);
@@ -1280,12 +1283,14 @@ namespace SolarCollectors {
             if (Iteration > 100) {
                 if (this->IterErrIndex == 0) {
                     ShowWarningMessage(state,
-                                       "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                           "\":  Solution did not converge.");
+                                       format("CalcSolarCollector: {}=\"{}\":  Solution did not converge.",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                              this->Name));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                                   "\", solution not converge error continues.",
+                                               format("CalcSolarCollector: {}=\"{}\", solution not converge error continues.",
+                                                      DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                      this->Name),
                                                this->IterErrIndex);
                 break;
             } else {
@@ -1664,7 +1669,7 @@ namespace SolarCollectors {
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.
         // Wiley-Interscience: New York (1991).
 
-        Real64 const AirRefIndex(1.0003); // refractive index of air
+        Real64 constexpr AirRefIndex(1.0003); // refractive index of air
 
         Array1D<Real64> TransPara(2);    // cover transmittance parallel component
         Array1D<Real64> TransPerp(2);    // cover transmittance perpendicular component
@@ -1947,9 +1952,9 @@ namespace SolarCollectors {
         //   Property data for air at atmospheric pressure were taken from Table A-11, Yunus A Cengel
         //   Heat Transfer: A Practical Approach, McGraw-Hill, Boston, MA, 1998.
 
-        Real64 const gravity(9.806); // gravitational constant [m/s^2]
+        Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
 
-        int const NumOfPropDivisions(11);
+        int constexpr NumOfPropDivisions(11);
         static Array1D<Real64> const Temps(NumOfPropDivisions,
                                            {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}); // Temperature, in C
         static Array1D<Real64> const Mu(
@@ -2046,7 +2051,7 @@ namespace SolarCollectors {
 
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
-        Real64 const gravity(9.806); // gravitational constant [m/s^2]
+        Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
         static constexpr std::string_view CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
         Real64 DeltaT = std::abs(TAbsorber - TWater);
@@ -2199,7 +2204,7 @@ namespace SolarCollectors {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->TypeNum,
+                                                        this->Type,
                                                         this->WLoopNum,
                                                         this->WLoopSideNum,
                                                         this->WLoopBranchNum,

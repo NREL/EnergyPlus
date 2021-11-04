@@ -80,7 +80,7 @@
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -285,8 +285,8 @@ namespace LowTempRadiantSystem {
         auto constexpr Off("Off");
         auto constexpr SimpleOff("SimpleOff");
         auto constexpr VariableOff("VariableOff");
-        int const iHeatCAPMAlphaNum(5);             // get input index to Low Temperature Radiant system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1); // get input index to Low Temperature Radiant system electric heating capacity
+        int constexpr iHeatCAPMAlphaNum(5);             // get input index to Low Temperature Radiant system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to Low Temperature Radiant system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to Low Temperature Radiant system electric heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
@@ -1919,8 +1919,7 @@ namespace LowTempRadiantSystem {
         //       DATE WRITTEN   November 2000
 
         // Using/Aliasing
-        using DataPlant::TypeOf_LowTempRadiant_ConstFlow;
-        using DataPlant::TypeOf_LowTempRadiant_VarFlow;
+
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -1931,7 +1930,7 @@ namespace LowTempRadiantSystem {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
+        Real64 constexpr ZeroTol(0.0000001); // Smallest non-zero value allowed
         auto constexpr RoutineName("InitLowTempRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2053,7 +2052,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_VarFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopSide,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
@@ -2071,7 +2070,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_VarFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopSide,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,
@@ -2098,7 +2097,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_ConstFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopSide,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWBranchNum,
@@ -2116,7 +2115,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                            TypeOf_LowTempRadiant_ConstFlow,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopSide,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWBranchNum,
@@ -4320,7 +4319,7 @@ namespace LowTempRadiantSystem {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const LowCpFluidValue(100.0); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
+        Real64 constexpr LowCpFluidValue(100.0); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
         auto constexpr RoutineName("CalcLowTempCFloRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4852,8 +4851,8 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
-        Real64 const ZeroSystemResp(0.1); // Response below which the system response is really zero
+        Real64 constexpr TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
+        Real64 constexpr ZeroSystemResp(0.1); // Response below which the system response is really zero
         auto constexpr RoutineName("CalcLowTempCFloRadSysComps");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5701,8 +5700,8 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
 
-        Real64 const upperRangeLimit(500.0);  // high error trigger limit for when model is not working
-        Real64 const lowerRangeLimit(-300.0); // Low error trigger limit for when model is not working
+        Real64 constexpr upperRangeLimit(500.0);  // high error trigger limit for when model is not working
+        Real64 constexpr lowerRangeLimit(-300.0); // Low error trigger limit for when model is not working
 
         if (outletTemp < lowerRangeLimit) {
             state.dataLowTempRadSys->warnTooLow = true;
@@ -5851,9 +5850,9 @@ namespace LowTempRadiantSystem {
         Real64 calculateHXEffectivenessTerm;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-        int const NumOfPropDivisions(13);
-        Real64 const MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
+        Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+        int constexpr NumOfPropDivisions(13);
+        Real64 constexpr MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
         Array1D<Real64> Temps(NumOfPropDivisions,
                               {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
         Array1D<Real64> Mu(NumOfPropDivisions,
@@ -6069,7 +6068,7 @@ namespace LowTempRadiantSystem {
         // one or more of the radiant systems was running.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
+        Real64 constexpr CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surface index

@@ -238,15 +238,16 @@ namespace HighTempRadiantSystem {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
-        Real64 const MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
-        Real64 const MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
-        Real64 const MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
-        Real64 const MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
+        Real64 constexpr MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
+        Real64 constexpr MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
+        Real64 constexpr MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
+        Real64 constexpr MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
+        Real64 constexpr MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
         //  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
-        int const iHeatCAPMAlphaNum(4);                   // get input index to High Temperature Radiant system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1);       // get input index to High Temperature Radiant system heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
+        int constexpr iHeatCAPMAlphaNum(4);             // get input index to High Temperature Radiant system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to High Temperature Radiant system heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
+            2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
 
@@ -1008,7 +1009,7 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         float const TempConvToler(0.1f); // Temperature controller tries to converge to within 0.1C
-        int const MaxIterations(10);     // Maximum number of iterations to achieve temperature control
+        int constexpr MaxIterations(10); // Maximum number of iterations to achieve temperature control
         // (10 interval halvings achieves control to 0.1% of capacity)
         // These two parameters are intended to achieve reasonable control
         // without excessive run times.
@@ -1312,7 +1313,7 @@ namespace HighTempRadiantSystem {
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
@@ -1324,16 +1325,16 @@ namespace HighTempRadiantSystem {
         // Initialize arrays
         state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
         state.dataHeatBalFanSys->SumLatentHTRadSys = 0.0;
-        state.dataHeatBalFanSys->QHTRadSysSurf = 0.0;
-        state.dataHeatBalFanSys->QHTRadSysToPerson = 0.0;
+        state.dataHeatBalFanSys->SurfQHTRadSys = 0.0;
+        state.dataHeatBalFanSys->ZoneQHTRadSysToPerson = 0.0;
 
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
 
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
-            state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
-                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
-                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
+            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
+                                                                      state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
+                                                                      state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
 
             state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) +=
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect;
@@ -1348,7 +1349,8 @@ namespace HighTempRadiantSystem {
                         (state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
                          state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribToSurf(RadSurfNum) /
                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->SurfQHTRadSys(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalSurf->AnyRadiantSystems = true;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected");
@@ -1373,14 +1375,14 @@ namespace HighTempRadiantSystem {
         }
 
         // Here an assumption is made regarding radiant heat transfer to people.
-        // While the QHTRadSysToPerson array will be used by the thermal comfort
+        // While the ZoneQHTRadSysToPerson array will be used by the thermal comfort
         // routines, the energy transfer to people would get lost from the perspective
         // of the heat balance.  So, to avoid this net loss of energy which clearly
         // gets added to the zones, we must account for it somehow.  This assumption
         // that all energy radiated to people is converted to convective energy is
         // not very precise, but at least it conserves energy.
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum);
+            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum);
         }
     }
 

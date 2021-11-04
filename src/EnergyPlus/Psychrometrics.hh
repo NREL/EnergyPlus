@@ -1485,7 +1485,7 @@ namespace Psychrometrics {
     )
     {
 
-        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsatprecision_bits;
+        std::uint64_t Grid_Shift = 64 - 12 - state.dataPsychCache->tsatprecision_bits;
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
         Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
@@ -1680,8 +1680,8 @@ namespace Psychrometrics {
         Real64 const Wmin = min(W1, W2);
         return PsyDeltaHSenFnTdb2Tdb1W(TDB2, TDB1, Wmin);
     }
-    Real64 CSplineint(int const n,     // sample data size
-                      Real64 const x); // given value of x
+    Real64 CSplineint(int const n, // sample data size
+                      Real64 x);   // given value of x
 } // namespace Psychrometrics
 
 struct PsychrometricsData : BaseGlobalStruct

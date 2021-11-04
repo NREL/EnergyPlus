@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::AirflowNetworkBalanceManager;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using namespace CurveManager;
 

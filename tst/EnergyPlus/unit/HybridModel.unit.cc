@@ -76,7 +76,6 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -166,10 +165,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
-    state->dataHeatBal->SNLoadHeatRate.allocate(1);
-    state->dataHeatBal->SNLoadCoolRate.allocate(1);
-    state->dataHeatBal->SNLoadHeatEnergy.allocate(1);
-    state->dataHeatBal->SNLoadCoolEnergy.allocate(1);
+    state->dataHeatBal->ZoneSNLoadHeatRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadCoolRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadHeatEnergy.allocate(1);
+    state->dataHeatBal->ZoneSNLoadCoolEnergy.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
     state->dataRoomAirMod->IsZoneDV.dimension(1, false);
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);

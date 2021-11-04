@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -81,7 +82,6 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 // using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 {
@@ -965,11 +965,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
@@ -988,11 +989,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).ClothingType = 1;
 
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
-    state->dataHeatBalFanSys->QHTRadSysToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QCoolingPanelToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQHTRadSysToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQElecBaseboardToPerson(1) = 0.0;
     Real64 BodySurfaceArea = 1.8258;
     state->dataEnvrn->OutBaroPress = 101325.;
     Real64 WorkEff = 0.0;
@@ -1029,7 +1030,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
         Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
-    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
     // Test 1 - Air velocity = 0.15 m/s.
@@ -1597,6 +1598,38 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -5.5896341565108720, 0.001);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 100.0, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
+{
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+
+    // test the initialisation
+    state->dataEnvrn->DayOfYear = 1;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
+    CalcThermalComfortAdaptiveCEN15251(*state, true, true, 0.0);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -1.3671408, 0.01);
+
+    // skip the first day
+    Array1D<Real64> HourlyDryBulbTemp = {
+        -4.8, -5.4, -5.7, -5.9, -6.1, -6.2, -7.2, -6.7, -6.7, -5.6, -5., -4.4, -5., -3.9, -5., -5., -6.7, -7.8, -9.4, -9.4, -9.4, -9.4, -7.8, -7.2,
+    };
+    state->dataGlobal->BeginDayFlag = true;
+    state->dataGlobal->BeginHourFlag = true;
+    for (int i = 1; i <= 24; i++) {
+        state->dataEnvrn->OutDryBulbTemp = HourlyDryBulbTemp(i);
+        CalcThermalComfortAdaptiveCEN15251(*state, false);
+        if (i == 1) {
+            state->dataGlobal->BeginDayFlag = false;
+        }
+    }
+
+    // test the second day
+    state->dataEnvrn->DayOfYear += 1;
+    state->dataGlobal->BeginDayFlag = true;
+    CalcThermalComfortAdaptiveCEN15251(*state, false);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -2.3912126, 0.01);
+    state->dataGlobal->BeginDayFlag = false;
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_GetAngleFactorListTest)

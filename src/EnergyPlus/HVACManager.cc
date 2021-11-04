@@ -168,8 +168,8 @@ void ManageHVAC(EnergyPlusData &state)
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr fmt::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
-    static constexpr fmt::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+    static constexpr std::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
+    static constexpr std::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PriorTimeStep;       // magnitude of time step for previous history terms
@@ -569,8 +569,8 @@ void ManageHVAC(EnergyPlusData &state)
                       "Enthal     HumRat Fluid Type");
             }
             for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                static constexpr fmt::string_view Format_20{
-                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
+                static constexpr std::string_view Format_20{
+                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                 print(state.files.debug,
                       Format_20,
@@ -640,8 +640,8 @@ void SimHVAC(EnergyPlusData &state)
     using ZoneEquipmentManager::ManageZoneEquipment;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    bool const SimWithPlantFlowUnlocked(false);
-    bool const SimWithPlantFlowLocked(true);
+    bool constexpr SimWithPlantFlowUnlocked(false);
+    bool constexpr SimWithPlantFlowLocked(true);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
@@ -1876,7 +1876,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxAir(5); // Iteration Max for Air Simulation Iterations
+    int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IterAir; // counts iterations to enforce maximum iteration limit
@@ -1887,9 +1887,9 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // This requires that the plant flow resolver carefully set the min/max avail limits on
     //  air side components to ensure they request within bounds.
     if (LockPlantFlows) {
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Locked);
+        SetAllFlowLocks(state, DataPlant::FlowLock::Locked);
     } else {
-        SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
+        SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
     }
     ResetAllPlantInterConnectFlags(state);
 
@@ -2293,33 +2293,35 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
 
     auto &ZoneList(state.dataHeatBal->ZoneList);
     auto &ZoneGroup(state.dataHeatBal->ZoneGroup);
-    auto &ListSNLoadHeatEnergy(state.dataHeatBal->ListSNLoadHeatEnergy);
-    auto &ListSNLoadCoolEnergy(state.dataHeatBal->ListSNLoadCoolEnergy);
-    auto &ListSNLoadHeatRate(state.dataHeatBal->ListSNLoadHeatRate);
-    auto &ListSNLoadCoolRate(state.dataHeatBal->ListSNLoadCoolRate);
+    auto &ZoneListSNLoadHeatEnergy(state.dataHeatBal->ZoneListSNLoadHeatEnergy);
+    auto &ZoneListSNLoadCoolEnergy(state.dataHeatBal->ZoneListSNLoadCoolEnergy);
+    auto &ZoneListSNLoadHeatRate(state.dataHeatBal->ZoneListSNLoadHeatRate);
+    auto &ZoneListSNLoadCoolRate(state.dataHeatBal->ZoneListSNLoadCoolRate);
 
     // Sum ZONE LIST and ZONE GROUP report variables
-    ListSNLoadHeatEnergy = 0.0;
-    ListSNLoadCoolEnergy = 0.0;
-    ListSNLoadHeatRate = 0.0;
-    ListSNLoadCoolRate = 0.0;
+    for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
+        ZoneListSNLoadHeatEnergy(ListNum) = 0.0;
+        ZoneListSNLoadCoolEnergy(ListNum) = 0.0;
+        ZoneListSNLoadHeatRate(ListNum) = 0.0;
+        ZoneListSNLoadCoolRate(ListNum) = 0.0;
+    }
 
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
         for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
             Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
-            ListSNLoadHeatEnergy(ListNum) += state.dataHeatBal->SNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ListSNLoadCoolEnergy(ListNum) += state.dataHeatBal->SNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ListSNLoadHeatRate(ListNum) += state.dataHeatBal->SNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ListSNLoadCoolRate(ListNum) += state.dataHeatBal->SNLoadCoolRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ZoneListSNLoadHeatEnergy(ListNum) += state.dataHeatBal->ZoneSNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ZoneListSNLoadCoolEnergy(ListNum) += state.dataHeatBal->ZoneSNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ZoneListSNLoadHeatRate(ListNum) += state.dataHeatBal->ZoneSNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ZoneListSNLoadCoolRate(ListNum) += state.dataHeatBal->ZoneSNLoadCoolRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
         } // ZoneNum
     }     // ListNum
 
     for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
         Mult = state.dataHeatBal->ZoneGroup(GroupNum).Multiplier;
-        state.dataHeatBal->GroupSNLoadHeatEnergy(GroupNum) = ListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->GroupSNLoadCoolEnergy(GroupNum) = ListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->GroupSNLoadHeatRate(GroupNum) = ListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->GroupSNLoadCoolRate(GroupNum) = ListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(GroupNum) = ZoneListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(GroupNum) = ZoneListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadHeatRate(GroupNum) = ZoneListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadCoolRate(GroupNum) = ZoneListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
     } // GroupNum
 }
 
@@ -2435,7 +2437,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     // Using/Aliasing
     using AirflowNetworkBalanceManager::ReportAirflowNetwork;
-    using DataHeatBalance::AirBalanceQuadrature;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
     using DataHVACGlobals::FanType_ZoneExhaust;
@@ -2680,8 +2681,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
 
         // Report mixing sensible and latent loads
-        MixSenLoad = 0.0; // Initialize arrays to zero before starting to sum
-        MixLatLoad = 0.0;
+        MixSenLoad(ZoneLoop) = 0.0; // Initialize arrays to zero before starting to sum
+        MixLatLoad(ZoneLoop) = 0.0;
         ZnAirRpt(ZoneLoop).MixVolume = 0.0;         // zero reported volume prior to summations below
         ZnAirRpt(ZoneLoop).MixVdotCurDensity = 0.0; // zero reported volume flow rate prior to summations below
         ZnAirRpt(ZoneLoop).MixVdotStdDensity = 0.0; // zero reported volume flow rate prior to summations below
@@ -2896,7 +2897,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         // Reporting combined outdoor air flows
         for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
-            if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature &&
+            if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == DataHeatBalance::AirBalance::Quadrature &&
                 ZoneLoop == state.dataHeatBal->ZoneAirBalance(j).ZonePtr) {
                 if (state.dataHeatBalFanSys->MAT(ZoneLoop) > Zone(ZoneLoop).OutDryBulbTemp) {
                     ZnAirRpt(ZoneLoop).OABalanceHeatLoss = state.dataHeatBalFanSys->MDotCPOA(ZoneLoop) *

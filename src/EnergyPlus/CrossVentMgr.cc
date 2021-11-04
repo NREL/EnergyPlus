@@ -367,7 +367,7 @@ namespace CrossVentMgr {
         using namespace Psychrometrics;
         using namespace DataHeatBalFanSys;
 
-        Real64 const MinUin(0.2);
+        Real64 constexpr MinUin(0.2);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Ctd;               // counter
@@ -913,13 +913,13 @@ namespace CrossVentMgr {
             }
         }
 
-        SumAllInternalConvectionGains(state, ZoneNum, ConvGains);
+        ConvGains = SumAllInternalConvectionGains(state, ZoneNum);
         ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                      state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
+            RetAirConvGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
             ConvGains += RetAirConvGain;
         }
 

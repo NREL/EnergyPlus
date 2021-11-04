@@ -72,7 +72,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SurfaceGeometry;
-using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 
 TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)

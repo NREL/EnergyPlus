@@ -114,9 +114,9 @@ Real64 CalcDepthFromPeriod(EnergyPlusData &state,
 {
 
     // Assume T, RH, P
-    Real64 const T = 24.0; // C
-    Real64 const RH = 0.45;
-    Real64 const P_amb = 101325; // Pa
+    Real64 constexpr T = 24.0; // C
+    Real64 constexpr RH = 0.45;
+    Real64 constexpr P_amb = 101325; // Pa
 
     // Calculate saturation vapor pressure at assumed temperature
     Real64 const PV_sat = Psychrometrics::PsyPsatFnTemp(state, T, "CalcDepthFromPeriod");
@@ -764,7 +764,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
-            static constexpr fmt::string_view Format_700(
+            static constexpr std::string_view Format_700(
                 " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
             print(state.files.eio,
                   Format_700,

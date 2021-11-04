@@ -441,8 +441,7 @@ namespace CostEstimateManager {
                     } else {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                                state.dataDaylightingData->ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
                         } else {
                             ShowSevereError(state,
                                             "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
@@ -889,12 +888,11 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                            sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::TotalDaylRefPoints);
+                            sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::totRefPts);
                     } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                                state.dataDaylightingData->ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
                         }
                     }
 

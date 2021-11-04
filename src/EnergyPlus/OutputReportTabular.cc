@@ -64,6 +64,7 @@
 #include <ObjexxFCL/time.hh>
 
 // Third-party Headers
+#include <fast_float/fast_float.h>
 #include <fmt/format.h>
 
 // EnergyPlus Headers
@@ -407,7 +408,7 @@ int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const SizeAdder(25);
+    int constexpr SizeAdder(25);
     auto &ort(state.dataOutRptTab);
 
     if (!allocated(ort->MonthlyInput)) {
@@ -452,7 +453,7 @@ void AddMonthlyFieldSetInput(
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const sizeIncrement(50);
+    int constexpr sizeIncrement(50);
     auto &ort(state.dataOutRptTab);
 
     // INTERFACE BLOCK SPECIFICATIONS:
@@ -1028,7 +1029,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     int firstReport;
     int repIndex;
     int found;
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
     Array1D_string objNames;
     Array1D_int objVarIDs;
@@ -5275,23 +5276,24 @@ void WriteTabularReports(EnergyPlusData &state)
     }
 
     constexpr static auto variable_fmt{" {}={:12}\n"};
+    constexpr static auto variable_fmt_syntax = check_syntax(variable_fmt);
     state.files.audit.ensure_open(state, "WriteTabularReports", state.files.outputControl.audit);
-    print(state.files.audit, variable_fmt, "MonthlyInputCount", ort->MonthlyInputCount);
-    print(state.files.audit, variable_fmt, "sizeMonthlyInput", ort->sizeMonthlyInput);
-    print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", ort->MonthlyFieldSetInputCount);
-    print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", ort->sizeMonthlyFieldSetInput);
-    print(state.files.audit, variable_fmt, "MonthlyTablesCount", ort->MonthlyTablesCount);
-    print(state.files.audit, variable_fmt, "MonthlyColumnsCount", ort->MonthlyColumnsCount);
-    print(state.files.audit, variable_fmt, "sizeReportName", state.dataOutRptPredefined->sizeReportName);
-    print(state.files.audit, variable_fmt, "numReportName", state.dataOutRptPredefined->numReportName);
-    print(state.files.audit, variable_fmt, "sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
-    print(state.files.audit, variable_fmt, "numSubTable", state.dataOutRptPredefined->numSubTable);
-    print(state.files.audit, variable_fmt, "sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
-    print(state.files.audit, variable_fmt, "numColumnTag", state.dataOutRptPredefined->numColumnTag);
-    print(state.files.audit, variable_fmt, "sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
-    print(state.files.audit, variable_fmt, "numTableEntry", state.dataOutRptPredefined->numTableEntry);
-    print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
-    print(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyInputCount", ort->MonthlyInputCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeMonthlyInput", ort->sizeMonthlyInput);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", ort->MonthlyFieldSetInputCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", ort->sizeMonthlyFieldSetInput);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyTablesCount", ort->MonthlyTablesCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyColumnsCount", ort->MonthlyColumnsCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeReportName", state.dataOutRptPredefined->sizeReportName);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numReportName", state.dataOutRptPredefined->numReportName);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numSubTable", state.dataOutRptPredefined->numSubTable);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numColumnTag", state.dataOutRptPredefined->numColumnTag);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numTableEntry", state.dataOutRptPredefined->numTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
 }
 
 bool produceDualUnitsFlags(const int iUnit_Sys,
@@ -7379,7 +7381,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                                 curUnits = "ton";
                                 curConversionFactor *= 3600.0;
                             }
-                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
+                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
                             columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
@@ -7590,7 +7592,7 @@ void WriteTimeBinTables(EnergyPlusData &state)
             tableBody(1, 1) = "less than";
             tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
             for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                columnHead(nCol + 1) = format("{} [hr]", nCol);
+                columnHead(nCol + 1) = fmt::format("{} [hr]", nCol);
                 // beginning of interval
                 tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
                 // end of interval
@@ -7758,12 +7760,12 @@ void WriteBEPSTable(EnergyPlusData &state)
     //   that will split up very long header lines for the fixed width
     //   table is the header rows.
 
-    int const colElectricity(1);
-    int const colGas(2);
-    int const colPurchCool(11);
-    int const colPurchHeat(12);
+    int constexpr colElectricity(1);
+    int constexpr colGas(2);
+    int constexpr colPurchCool(11);
+    int constexpr colPurchHeat(12);
 
-    Real64 const SmallValue(1.e-14);
+    Real64 constexpr SmallValue(1.e-14);
     auto &ort(state.dataOutRptTab);
 
     // all arrays are in the format: (row, column)
@@ -9589,7 +9591,7 @@ void WriteBEPSTable(EnergyPlusData &state)
     }
 }
 
-std::string ResourceWarningMessage(std::string resource)
+std::string ResourceWarningMessage(std::string const &resource)
 {
     return "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + resource;
 }
@@ -11018,16 +11020,16 @@ void WriteVeriSumTable(EnergyPlusData &state)
     using ScheduleManager::ScheduleAverageHoursPerWeek;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const wwrcTotal(1);
-    int const wwrcNorth(2);
-    int const wwrcEast(3);
-    int const wwrcSouth(4);
-    int const wwrcWest(5);
-    int const wwrrWall(1);
-    int const wwrrAbvGndWall(2);
-    int const wwrrWindow(3);
-    int const wwrrWWR(4);
-    int const wwrrAbvGndWWR(5);
+    int constexpr wwrcTotal(1);
+    int constexpr wwrcNorth(2);
+    int constexpr wwrcEast(3);
+    int constexpr wwrcSouth(4);
+    int constexpr wwrcWest(5);
+    int constexpr wwrrWall(1);
+    int constexpr wwrrAbvGndWall(2);
+    int constexpr wwrrWindow(3);
+    int constexpr wwrrWWR(4);
+    int constexpr wwrrAbvGndWWR(5);
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -12142,17 +12144,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
             }
 
-            std::string tags;
-            bool firstTag = true;
-            for (std::string const &tag : curSpace.tags) {
-                if (firstTag) {
-                    tags += tag;
-                    firstTag = false;
-                } else {
-                    tags += ", " + tag;
-                }
-            }
-            spaceTableBody(colSpaceTags, spaceTableRowNum) = tags;
+            spaceTableBody(colSpaceTags, spaceTableRowNum) = fmt::format("{}", fmt::join(curSpace.tags, ", "));
 
             // If not part of total, goes directly to this row
             if (!useSpaceFloorArea) {
@@ -12527,12 +12519,12 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
     // Using/Aliasing
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
+        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                  "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                 "but no Daylight Method is defined in Zone:" +
+                                 "but no Daylighting Controls are defined in Zone:" +
                                      state.dataHeatBal->Zone(ZoneNum).Name);
             }
         }
@@ -13843,7 +13835,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
             // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, state.dataOutRptTab->ZoneNumGCLS) +=
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(state.dataOutRptTab->iSurfGCLS) +
-                state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(state.dataOutRptTab->iSurfGCLS) +
+                state.dataSurface->SurfWinConvHeatFlowNatural(state.dataOutRptTab->iSurfGCLS) +
                 state.dataSurface->SurfWinGainConvShadeToZoneRep(state.dataOutRptTab->iSurfGCLS) +
                 state.dataSurface->SurfWinGainFrameDividerToZoneRep(state.dataOutRptTab->iSurfGCLS);
             // for now assume zero instant solar - may change related
@@ -13853,7 +13845,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         }
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
-            InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, state.dataOutRptTab->IntGainTypesTubularGCLS, tubularGain);
+            tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
         }
     }
@@ -13999,7 +13991,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   to each surface, the EnclRadThermAbsMult and ITABSF sequences were also stored
     //   which allocates the total radiant to each surface in the zone. The
     //   formula used is:
-    //       QRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
+    //       SurfQRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
 
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
@@ -14882,7 +14874,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             // if exterior is other side coefficients using ground preprocessor terms then
             // set it to ground instead of other side coefficients
             if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                if (has_prefixi(AsString(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name), "surfPropOthSdCoef")) {
+                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
                     curExtBoundCond = Ground;
                 }
             }
@@ -16374,6 +16366,7 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // Return value
     std::string StringOut;
+    StringOut.reserve(reportString.size() + objectString.size() + 2);
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -16389,15 +16382,15 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    for (std::string::size_type i = 0, e = reportString.length(); i < e; ++i) {
-        if (has(validChars, reportString[i])) {
-            StringOut += reportString[i];
+    for (auto const i : reportString) {
+        if (has(validChars, i)) {
+            StringOut += i;
         }
     }
     StringOut += "::";
-    for (std::string::size_type i = 0, e = objectString.length(); i < e; ++i) {
-        if (has(validChars, objectString[i])) {
-            StringOut += objectString[i];
+    for (auto const i : objectString) {
+        if (has(validChars, i)) {
+            StringOut += i;
         }
     }
     return StringOut;
@@ -16774,7 +16767,7 @@ void ResetBinGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all timebins gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     auto &ort(state.dataOutRptTab);
 
     // clear the binning arrays to zeros
@@ -16974,7 +16967,7 @@ void ResetRemainingPredefinedEntries(EnergyPlusData &state)
     // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
     // simulations so that only last year is reported in tabular reports
 
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     int iLight;
     int iZone;
     auto &Zone(state.dataHeatBal->Zone);
@@ -17187,7 +17180,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
 
     // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::array<const char *, 10> formDigitsA{
-        "{:#12.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
+        "{:#11.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
 
     static constexpr std::array<Real64, 10> maxvalDigitsA(
         {9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0});
@@ -17207,7 +17200,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
     if (std::abs(RealIn) > maxvalDigitsA.at(nDigits)) {
         return format("{:12.6Z}", RealIn);
     } else {
-        return format(formDigitsA.at(nDigits), RealIn);
+        return format<FormatSyntax::FMT>(formDigitsA.at(nDigits), RealIn);
     }
     //  WRITE(FMT=, UNIT=stringOut) RealIn
     // check if it did not fit
@@ -17218,7 +17211,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
     // WRITE(FMT="(F10.4)", UNIT=stringOut, IOSTAT=status ) RealIn
 }
 
-Real64 StrToReal(std::string const &stringIn)
+Real64 StrToReal(std::string_view stringIn)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -17229,14 +17222,14 @@ Real64 StrToReal(std::string const &stringIn)
     // PURPOSE OF THIS SUBROUTINE:
     //   Abstract away the internal read concept
 
-    // Return value
-    Real64 realValue;
+    auto first_char = stringIn.find_first_not_of(' ');
+    if (first_char != std::string_view::npos) {
+        stringIn.remove_prefix(first_char);
+    }
 
-    std::stringstream ss{stringIn};
-    ss.imbue(std::locale("C"));
-    ss >> realValue;
-
-    if (ss.bad()) {
+    Real64 realValue = -99999.0;
+    auto answer = fast_float::from_chars(stringIn.data(), stringIn.data() + stringIn.size(), realValue);
+    if (answer.ec != std::errc()) {
         return -99999.0;
     }
     return realValue;
@@ -17254,64 +17247,28 @@ std::string DateToString(int const codedDate) // word containing encoded month, 
     //   Convert the coded date format into a usable
     //   string
 
-    // Using/Aliasing
-    using General::DecodeMonDayHrMin;
-
-    // Return value
-    std::string StringOut;
-
-    // Locals
-    // ((month*100 + day)*100 + hour)*100 + minute
-
     int Month;  // month in integer format (1-12)
     int Day;    // day in integer format (1-31)
     int Hour;   // hour in integer format (1-24)
     int Minute; // minute in integer format (0:59)
-    std::string monthName;
+    static constexpr std::array<std::string_view, 12> Months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
-    if (codedDate != 0) {
-        DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
-        --Hour;
-        if (Minute == 60) {
-            ++Hour;
-            Minute = 0;
-        }
-        if (Month == 1) {
-            monthName = "JAN";
-        } else if (Month == 2) {
-            monthName = "FEB";
-        } else if (Month == 3) {
-            monthName = "MAR";
-        } else if (Month == 4) {
-            monthName = "APR";
-        } else if (Month == 5) {
-            monthName = "MAY";
-        } else if (Month == 6) {
-            monthName = "JUN";
-        } else if (Month == 7) {
-            monthName = "JUL";
-        } else if (Month == 8) {
-            monthName = "AUG";
-        } else if (Month == 9) {
-            monthName = "SEP";
-        } else if (Month == 10) {
-            monthName = "OCT";
-        } else if (Month == 11) {
-            monthName = "NOV";
-        } else if (Month == 12) {
-            monthName = "DEC";
-        } else {
-            monthName = "***";
-        }
-        StringOut = format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
-        if (has(StringOut, "*")) {
-            StringOut = "-";
-        }
-    } else { // codeddate = 0
-        StringOut = "-";
+    if (codedDate == 0) {
+        return "-";
     }
 
-    return StringOut;
+    General::DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
+    if (Month < 1 || Month > 12) {
+        return "-";
+    }
+
+    --Hour;
+    if (Minute == 60) {
+        ++Hour;
+        Minute = 0;
+    }
+
+    return fmt::format("{:02}-{:3}-{:02}:{:02}", Day, Months[Month - 1], Hour, Minute);
 }
 
 bool isNumber(std::string const &s)
@@ -17325,7 +17282,7 @@ bool isNumber(std::string const &s)
 
 // return the number of digits after the decimal point
 // Glazer - November 2016
-int digitsAferDecimal(std::string s)
+int digitsAferDecimal(std::string const &s)
 {
     std::size_t decimalpos = s.find('.');
     std::size_t numDigits;
@@ -17917,10 +17874,10 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
 
     std::string unitSIOnly;
     int modeInString;
-    int const misBrac(1);
-    int const misParen(2);
-    int const misBrce(3);
-    int const misNoHint(4);
+    int constexpr misBrac(1);
+    int constexpr misParen(2);
+    int constexpr misBrce(3);
+    int constexpr misNoHint(4);
     std::string const stringInUpper(UtilityRoutines::MakeUPPERCase(stringInWithSI));
     auto &ort(state.dataOutRptTab);
 

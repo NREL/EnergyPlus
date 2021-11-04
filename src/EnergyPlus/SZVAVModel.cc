@@ -97,9 +97,9 @@ namespace SZVAVModel {
                         int const CompressorONFlag)
     {
 
-        int const MaxIter(100);    // maximum number of iterations
-        int SolFlag(0);            // return flag from RegulaFalsi for sensible load
-        std::string MessagePrefix; // label for warning reporting
+        int constexpr MaxIter(100); // maximum number of iterations
+        int SolFlag(0);             // return flag from RegulaFalsi for sensible load
+        std::string MessagePrefix;  // label for warning reporting
 
         Array1D<Real64> Par(18); // parameters passed to RegulaFalsi function
         Real64 lowBoundaryLoad(0.0);
@@ -537,9 +537,9 @@ namespace SZVAVModel {
                         int const CompressorONFlag)
     {
 
-        int const MaxIter(100);    // maximum number of iterations
-        int SolFlag(0);            // return flag from RegulaFalsi for sensible load
-        std::string MessagePrefix; // label for warning reporting
+        int constexpr MaxIter(100); // maximum number of iterations
+        int SolFlag(0);             // return flag from RegulaFalsi for sensible load
+        std::string MessagePrefix;  // label for warning reporting
 
         Array1D<Real64> Par(17); // parameters passed to RegulaFalsi function
         Real64 lowBoundaryLoad(0.0);
@@ -982,9 +982,9 @@ namespace SZVAVModel {
 
         UnitarySystems::UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[SysIndex];
 
-        int const MaxIter(100);    // maximum number of iterations
-        int SolFlag(0);            // return flag from RegulaFalsi for sensible load
-        std::string MessagePrefix; // label for warning reporting
+        int constexpr MaxIter(100); // maximum number of iterations
+        int SolFlag(0);             // return flag from RegulaFalsi for sensible load
+        std::string MessagePrefix;  // label for warning reporting
 
         std::vector<Real64> Par(18); // parameters passed to RegulaFalsi function
         Real64 boundaryLoadMet(0.0);

@@ -4417,7 +4417,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
     using WindowAC::GetWindowACZoneInletAirNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallLoad(0.1); // (W)
+    Real64 constexpr SmallLoad(0.1); // (W)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CtrlZoneNum;             // ZONE counter
@@ -4516,9 +4516,9 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
         ZoneVolume = state.dataHeatBal->Zone(ActualZoneNum).Volume * state.dataHeatBal->Zone(ActualZoneNum).Multiplier *
                      state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier; // CR 7170
 
-        bool const UseOccSchFlag = true;
-        bool const UseMinOASchFlag = true;
-        state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+        bool constexpr UseOccSchFlag = true;
+        bool constexpr UseMinOASchFlag = true;
+        state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataSizing::calcDesignSpecificationOutdoorAir(
             state, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
         if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
             state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) =
@@ -5154,7 +5154,7 @@ void MatchPlantSys(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const EnergyTrans(1);
+    int constexpr EnergyTrans(1);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5373,22 +5373,22 @@ void ReportAirLoopConnections(EnergyPlusData &state)
     // na
 
     // Formats
-    static constexpr fmt::string_view Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
-    static constexpr fmt::string_view Format_708(
+    static constexpr std::string_view Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
+    static constexpr std::string_view Format_708(
         "! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>");
-    static constexpr fmt::string_view Format_709(
+    static constexpr std::string_view Format_709(
         "! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return "
         "Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>");
-    static constexpr fmt::string_view Format_710(
+    static constexpr std::string_view Format_710(
         "! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply "
         "Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>");
-    static constexpr fmt::string_view Format_711(
+    static constexpr std::string_view Format_711(
         "! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
         "Node Name>,<AirLoopHVAC Name>");
-    static constexpr fmt::string_view Format_712(
+    static constexpr std::string_view Format_712(
         "! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet "
         "Node Name>,<AirLoopHVAC Name>");
-    static constexpr fmt::string_view Format_714(
+    static constexpr std::string_view Format_714(
         "! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
         "Air Outlet Node Name>,<AirLoopHVAC Name>");
 

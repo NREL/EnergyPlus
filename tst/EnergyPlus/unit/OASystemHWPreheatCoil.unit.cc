@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACControllers.hh>
@@ -64,7 +63,6 @@
 #include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::HVACControllers;

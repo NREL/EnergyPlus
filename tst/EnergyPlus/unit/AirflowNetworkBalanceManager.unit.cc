@@ -4502,7 +4502,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).SurfaceName, "WEST WALL ATTIC");
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).ViewFactor, 0.02052);
 
-    Real64 const tol = 0.01;
+    Real64 constexpr tol = 0.01;
 
     // Outside convection coefficients
     // Calculate convection resistance given a convection coefficient
@@ -4534,7 +4534,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 {
 
-    Real64 const tol = 0.00001;
+    Real64 constexpr tol = 0.00001;
 
     EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -30), 0.02212, tol);
     EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -20), 0.02212, tol);
@@ -4549,7 +4549,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
 {
 
-    Real64 const tol = 0.000001;
+    Real64 constexpr tol = 0.000001;
 
     EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-30), 1.635e-5, tol);
     EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-20), 1.635e-5, tol);
@@ -4564,7 +4564,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
 {
 
-    Real64 const tol = 0.000001;
+    Real64 constexpr tol = 0.000001;
 
     EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -30, 0.001, 101000), 1.169e-5, tol);
     EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -20, 0.001, 101000), 1.169e-5, tol);
@@ -4579,7 +4579,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
 {
 
-    Real64 const tol = 0.000001;
+    Real64 constexpr tol = 0.000001;
 
     EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -30, 0.001, 101000), 1.578e-5, tol);
     EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -20, 0.001, 101000), 1.578e-5, tol);
@@ -4594,7 +4594,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 {
 
-    Real64 const tol = 0.0001;
+    Real64 constexpr tol = 0.0001;
 
     EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -30, 0.001, 101000), 0.7362, tol);
     EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -20, 0.001, 101000), 0.7362, tol);
@@ -20410,12 +20410,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
                                                     state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
     EXPECT_GT(GetIndex, 0);
     EXPECT_EQ(GetIndex, state->dataAirflowNetwork->MultizoneSurfaceData(1).VentingSchNum);
-    EXPECT_EQ(state->dataAirflowNetwork->MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp);
+    EXPECT_TRUE(compare_enums(state->dataAirflowNetwork->MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp));
 
     // MultizoneSurfaceData(2) is connected to an air boundary surface
     // venting schedule should be zero and venting method should be Constant
     EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceData(2).VentingSchNum);
-    EXPECT_EQ(state->dataAirflowNetwork->MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
+    EXPECT_TRUE(compare_enums(state->dataAirflowNetwork->MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const));
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneERV)
@@ -21392,7 +21392,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.BldgType, "LOWRISE");
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
     EXPECT_FALSE(state->dataAirflowNetwork->AirflowNetworkSimu.TExtHeightDep);
-    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU);
+    EXPECT_TRUE(compare_enums(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU));
     //// Use default values for numerical fields
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.MaxIteration, 500);
     EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);

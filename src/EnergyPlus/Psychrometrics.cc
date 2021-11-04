@@ -55,6 +55,7 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -122,7 +123,6 @@ namespace Psychrometrics {
         state.dataPsychCache->cached_Twb.fill(cached_twb_t());
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-        state.dataPsychCache->cached_Psat.fill(cached_psat_t());
         state.dataPsychCache->cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
@@ -498,7 +498,9 @@ namespace Psychrometrics {
         for (iter = 1; iter <= itmax; ++iter) {
 
             // Assigning a value to WBT
-            if (WBT >= (tBoil - 0.09)) WBT = tBoil - 0.1;
+            if (WBT >= (tBoil - 0.09)) {
+                WBT = tBoil - 0.1;
+            }
 
             // Determine the saturation pressure for wet bulb temperature
             PSatstar =
@@ -523,10 +525,9 @@ namespace Psychrometrics {
             WBT = ResultX;
 
             // If converged, leave iteration loop.
-            if (icvg == 1) break;
-
-            // Error Trap for the Discontinuous nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
-            if ((PSatstar > 611.000) && (PSatstar < 611.25) && (std::abs(error) <= 0.0001) && (iter > 4)) break;
+            if (icvg == 1) {
+                break;
+            }
 
         } // End of Iteration Loop
 
@@ -682,6 +683,11 @@ namespace Psychrometrics {
         // Compared to Table 3 values (August 2007) with average error of 0.00%, max .30%,
         // min -.39%.  (Spreadsheet available on request - Lawrie).
 
+        // Note: the ASHRAE Handbook of Fundamentals  is being slightly inaccurate in its wording,
+        // and referring to Eq 5 applying to -100°C to 0°C and Eq 6 applying to 0°C to 200°C
+        // In fact, it is **not** 0°C, but the triple-point of water, which is 0.01°C. Evaluating the Eq 5 and 6 up to and from the triple-point
+        // is removing the discontinuity altogether.
+
         // USE STATEMENTS:
 
         // Return value
@@ -734,29 +740,34 @@ namespace Psychrometrics {
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {
-            Pascal = 0.0017;
+            Pascal = 0.001405102123874164;
 
             // If below freezing, calculate saturation pressure over ice.
-        } else if (Tkel < DataGlobalConstants::KelvinConv) { // Tkel >= 173.15
-            Real64 constexpr C1(-5674.5359);                 // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C2(6.3925247);                  // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C3(-0.9677843e-2);              // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C4(0.62215701e-6);              // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C5(0.20747825e-8);              // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C6(-0.9484024e-12);             // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C7(4.1635019);                  // Coefficient for TKel < KelvinConvK
+        } else if (Tkel < DataGlobalConstants::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
+            Real64 constexpr C1(-5674.5359);
+            Real64 constexpr C2(6.3925247);
+            Real64 constexpr C3(-0.9677843e-2);
+            Real64 constexpr C4(0.62215701e-6);
+            Real64 constexpr C5(0.20747825e-8);
+            Real64 constexpr C6(-0.9484024e-12);
+            Real64 constexpr C7(4.1635019);
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
 
             // If above freezing, calculate saturation pressure over liquid water.
-        } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= KelvinConv
+        } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= TriplePointOfWaterTempKelvin
 #ifndef EP_IF97
-            Real64 constexpr C8(-5800.2206);      // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C9(1.3914993);       // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C10(-0.048640239);   // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C11(0.41764768e-4);  // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C12(-0.14452093e-7); // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C13(6.5459673);      // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C8(-5800.2206);
+            Real64 constexpr C9(1.3914993);
+            Real64 constexpr C10(-0.048640239);
+            Real64 constexpr C11(0.41764768e-4);
+            Real64 constexpr C12(-0.14452093e-7);
+            Real64 constexpr C13(6.5459673);
             Pascal = std::exp(C8 / Tkel + C9 + Tkel * (C10 + Tkel * (C11 + Tkel * C12)) + C13 * std::log(Tkel));
+
+            // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
+        } else { // Tkel >= 173.15 // Tkel >= TriplePointOfWaterTempKelvin // Tkel > 473.15
+            Pascal = 1555073.745636215;
+        }
 #else
             // Table 34 in IF97
             Real64 constexpr N1(0.11670521452767e04);
@@ -776,12 +787,12 @@ namespace Psychrometrics {
             Real64 const B = N3 * phi2 + N4 * phi + N5;
             Real64 const C = N6 * phi2 + N7 * phi + N8;
             Pascal = 1000000.0 * pow_4((2.0 * C) / (-B + std::sqrt((B * B) - 4.0 * A * C)));
-#endif
+
             // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
         } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
-            Pascal = 1555000.0;
+            Pascal = 1554671.8682698254;
         }
-
+#endif
         return Pascal;
     }
 
@@ -1444,9 +1455,9 @@ namespace Psychrometrics {
 
         return Temp;
     }
-    Real64 CSplineint(int const n,    // sample data size
-                      Real64 const x) // given value of x
-    {                                 // Cubic Spline interpolation
+    Real64 CSplineint(int const n, // sample data size
+                      Real64 x)    // given value of x
+    {                              // Cubic Spline interpolation
         // Reference: Numerical Recipies in C (pp.97)
         Real64 A, B, y;
         // find location of x in arrays without searching since array bins are equally sized

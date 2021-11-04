@@ -87,8 +87,8 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr auto CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
     constexpr auto CurrentModuleObject2("ZoneHVAC:VentilatedSlab:SlabGroup");
-    Real64 const FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
-    Real64 const SurfListMinFlowFrac(0.001);    // Minimum allowed flow fraction (to avoid divide by zero)
+    Real64 constexpr FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
+    Real64 constexpr SurfListMinFlowFrac(0.001);    // Minimum allowed flow fraction (to avoid divide by zero)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_string Alphas;         // Alpha items for object
@@ -191,8 +191,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     }
                     if (SurfNum > 1) {
                         if (ZoneForSurface != state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
-                            ShowWarningError(
-                                state, format("{}{}{}", "Not all surfaces in same zone for ", CurrentModuleObject1, " = " + SurfList(Item).Name));
+                            ShowWarningError(state, format("Not all surfaces in same zone for {} = {}", CurrentModuleObject1, SurfList(Item).Name));
                             if (!state.dataGlobal->DisplayExtraWarnings) {
                                 ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
                                 ShowContinueError(state,

@@ -21,6 +21,14 @@
     EXPECT_STREQ(ExpectedOut.c_str(), buffer.str().c_str());                                       \
   }
 
+namespace Btwxt {
+    template<typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
+    constexpr std::ostream& operator<<(std::ostream& stream, T e)
+    {
+        return stream << static_cast<typename std::underlying_type_t<T>>(e);
+    }
+}
+
 using namespace Btwxt;
 
 class OneDFixture : public testing::Test {
