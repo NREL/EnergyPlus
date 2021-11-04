@@ -445,7 +445,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->EscalatedTotEnergy.deallocate();
         this->EscalatedEnergy.clear();
         this->RecurringCosts.clear();
-        this->NonrecurringCost.deallocate();
+        this->NonrecurringCost.clear();
         this->UsePriceEscalation.deallocate();
         this->UseAdjustment.deallocate();
         this->CashFlow.clear();
