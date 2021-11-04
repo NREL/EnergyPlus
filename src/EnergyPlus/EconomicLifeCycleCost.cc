@@ -661,11 +661,11 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
     elcc->numNonrecurringCost = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     numComponentCostLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
     if (numComponentCostLineItems > 0) {                                // leave room for component cost total
-        elcc->NonrecurringCost.allocate(elcc->numNonrecurringCost + 1); // add a place for CostEstimate total
+        elcc->NonrecurringCost.resize(elcc->numNonrecurringCost + 1); // add a place for CostEstimate total
     } else {
-        elcc->NonrecurringCost.allocate(elcc->numNonrecurringCost);
+        elcc->NonrecurringCost.resize(elcc->numNonrecurringCost);
     }
-    for (iInObj = 1; iInObj <= elcc->numNonrecurringCost; ++iInObj) {
+    for (iInObj = 0; iInObj < elcc->numNonrecurringCost; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -690,7 +690,7 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         // A1,  \field Name
         //      \required-field
         //      \type alpha
-        elcc->NonrecurringCost(iInObj).name = AlphaArray(1);
+        elcc->NonrecurringCost[iInObj].name = AlphaArray(1);
         // A2,  \field Category
         //      \type choice
         //      \key Construction
@@ -698,31 +698,31 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \key OtherCapital
         //      \default Construction
         if (UtilityRoutines::SameString(AlphaArray(2), "Construction")) {
-            elcc->NonrecurringCost(iInObj).category = CostCategory::Construction;
+            elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "Salvage")) {
-            elcc->NonrecurringCost(iInObj).category = CostCategory::Salvage;
+            elcc->NonrecurringCost[iInObj].category = CostCategory::Salvage;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "OtherCapital")) {
-            elcc->NonrecurringCost(iInObj).category = CostCategory::OtherCapital;
+            elcc->NonrecurringCost[iInObj].category = CostCategory::OtherCapital;
         } else {
-            elcc->NonrecurringCost(iInObj).category = CostCategory::Construction;
+            elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". The category of Construction will be used.");
         }
         // N1,  \field Cost
         //      \type real
-        elcc->NonrecurringCost(iInObj).cost = NumArray(1);
+        elcc->NonrecurringCost[iInObj].cost = NumArray(1);
         // A3,  \field Start of Costs
         //      \type choice
         //      \key ServicePeriod
         //      \key BasePeriod
         //      \default ServicePeriod
         if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-            elcc->NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+            elcc->NonrecurringCost[iInObj].startOfCosts = iStartCosts::ServicePeriod;
         } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-            elcc->NonrecurringCost(iInObj).startOfCosts = iStartCosts::BasePeriod;
+            elcc->NonrecurringCost[iInObj].startOfCosts = iStartCosts::BasePeriod;
         } else {
-            elcc->NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+            elcc->NonrecurringCost[iInObj].startOfCosts = iStartCosts::ServicePeriod;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
@@ -731,14 +731,14 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \type integer
         //      \minimum 0
         //      \maximum 100
-        elcc->NonrecurringCost(iInObj).yearsFromStart = int(NumArray(2));
-        if (elcc->NonrecurringCost(iInObj).yearsFromStart > 100) {
+        elcc->NonrecurringCost[iInObj].yearsFromStart = int(NumArray(2));
+        if (elcc->NonrecurringCost[iInObj].yearsFromStart > 100) {
             ShowWarningError(
                 state,
                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
         }
-        if (elcc->NonrecurringCost(iInObj).yearsFromStart < 0) {
+        if (elcc->NonrecurringCost[iInObj].yearsFromStart < 0) {
             ShowWarningError(
                 state,
                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
@@ -748,22 +748,22 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //       \type integer
         //       \minimum 0
         //       \maximum 11
-        elcc->NonrecurringCost(iInObj).monthsFromStart = int(NumArray(3));
-        if (elcc->NonrecurringCost(iInObj).monthsFromStart > 1200) {
+        elcc->NonrecurringCost[iInObj].monthsFromStart = int(NumArray(3));
+        if (elcc->NonrecurringCost[iInObj].monthsFromStart > 1200) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
                                  "economic evaluation. ");
         }
-        if (elcc->NonrecurringCost(iInObj).monthsFromStart < 0) {
+        if (elcc->NonrecurringCost[iInObj].monthsFromStart < 0) {
             ShowWarningError(
                 state,
                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                     ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
         }
         // express the years and months fields in total months
-        elcc->NonrecurringCost(iInObj).totalMonthsFromStart =
-            elcc->NonrecurringCost(iInObj).yearsFromStart * 12 + elcc->NonrecurringCost(iInObj).monthsFromStart;
+        elcc->NonrecurringCost[iInObj].totalMonthsFromStart =
+            elcc->NonrecurringCost[iInObj].yearsFromStart * 12 + elcc->NonrecurringCost[iInObj].monthsFromStart;
     }
 }
 
@@ -1162,14 +1162,14 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     if (state.dataCostEstimateManager->CurntBldg.GrandTotal >
         0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
         ++elcc->numNonrecurringCost;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).name = "Total of ComponentCost:*";
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).lineItem = "";
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).category = CostCategory::Construction;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).yearsFromStart = 0;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).monthsFromStart = 0;
-        elcc->NonrecurringCost(elcc->numNonrecurringCost).totalMonthsFromStart = 0;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].name = "Total of ComponentCost:*";
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].lineItem = "";
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].category = CostCategory::Construction;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].startOfCosts = iStartCosts::BasePeriod;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].yearsFromStart = 0;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].monthsFromStart = 0;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].totalMonthsFromStart = 0;
     }
 
     // gather costs from EconomicTariff for each end use

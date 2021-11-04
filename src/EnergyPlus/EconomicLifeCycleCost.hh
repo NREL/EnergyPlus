@@ -395,7 +395,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
 
     std::vector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
-    EPVector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
+    std::vector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
     EPVector<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
     EPVector<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
     std::vector<EconomicLifeCycleCost::CashFlowType> CashFlow;
