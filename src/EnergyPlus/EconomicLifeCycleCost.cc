@@ -660,7 +660,7 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
     AlphaArray.allocate(NumAlphas);
     elcc->numNonrecurringCost = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     numComponentCostLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
-    if (numComponentCostLineItems > 0) {                                // leave room for component cost total
+    if (numComponentCostLineItems > 0) {                              // leave room for component cost total
         elcc->NonrecurringCost.resize(elcc->numNonrecurringCost + 1); // add a place for CostEstimate total
     } else {
         elcc->NonrecurringCost.resize(elcc->numNonrecurringCost);
@@ -1365,7 +1365,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         elcc->CashFlow[jCost].SourceKind = SourceKindType::Sum;
     }
     // add the cashflows by category
-    for (jCost = CostCategory::Num-1; jCost < elcc->numCashFlow; ++jCost) {
+    for (jCost = CostCategory::Num - 1; jCost < elcc->numCashFlow; ++jCost) {
         curCategory = elcc->CashFlow[jCost].Category;
         if ((curCategory < CostCategory::Num) && (curCategory >= 0)) {
             for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
@@ -1383,8 +1383,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
             elcc->CashFlow[CostCategory::OtherOperational].mnAmount(jMonth) + elcc->CashFlow[CostCategory::Water].mnAmount(jMonth) +
             elcc->CashFlow[CostCategory::Energy].mnAmount(jMonth);
         elcc->CashFlow[CostCategory::TotCaptl].mnAmount(jMonth) = elcc->CashFlow[CostCategory::Construction].mnAmount(jMonth) +
-                                                           elcc->CashFlow[CostCategory::Salvage].mnAmount(jMonth) +
-                                                           elcc->CashFlow[CostCategory::OtherCapital].mnAmount(jMonth);
+                                                                  elcc->CashFlow[CostCategory::Salvage].mnAmount(jMonth) +
+                                                                  elcc->CashFlow[CostCategory::OtherCapital].mnAmount(jMonth);
         elcc->CashFlow[CostCategory::TotGrand].mnAmount(jMonth) =
             elcc->CashFlow[CostCategory::TotOper].mnAmount(jMonth) + elcc->CashFlow[CostCategory::TotCaptl].mnAmount(jMonth);
     }
@@ -1501,31 +1501,31 @@ void ComputePresentValue(EnergyPlusData &state)
 
     // identify how each cashflow should be treated
     for (iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
-        switch (elcc->CashFlow[iCashFlow].SourceKind){
+        switch (elcc->CashFlow[iCashFlow].SourceKind) {
         case (SourceKindType::Resource): {
-                // only for real fuels purchased such as electricity, natural gas, etc..
-                if ((elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::Electricity) &&
-                    (elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
-                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
-                } else {
-                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
-                }
-                break;
+            // only for real fuels purchased such as electricity, natural gas, etc..
+            if ((elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::Electricity) &&
+                (elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
+                elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
+            } else {
+                elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
             }
-            case (SourceKindType::Recurring):
-            case (SourceKindType::Nonrecurring): {
-                if (elcc->CashFlow[iCashFlow].Category == CostCategory::Energy) {
-                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
-                } else {
-                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
-                }
             break;
+        }
+        case (SourceKindType::Recurring):
+        case (SourceKindType::Nonrecurring): {
+            if (elcc->CashFlow[iCashFlow].Category == CostCategory::Energy) {
+                elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
+            } else {
+                elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
             }
-            case (SourceKindType::Sum):
-            default: {
-                elcc->CashFlow[iCashFlow].pvKind = PrValKind::NotComputed;
             break;
-            }
+        }
+        case (SourceKindType::Sum):
+        default: {
+            elcc->CashFlow[iCashFlow].pvKind = PrValKind::NotComputed;
+            break;
+        }
         }
     }
     // compute the Single Present Value factors based on the discount rate
@@ -1550,16 +1550,16 @@ void ComputePresentValue(EnergyPlusData &state)
         // NIST 155 D.2.1.1 - Single Present Value (SPV) formula
         switch (elcc->discountConvention) {
         case (DiscConv::BeginOfYear): {
-                effectiveYear = double(jYear) - 1.0;
+            effectiveYear = double(jYear) - 1.0;
             break;
         }
         case (DiscConv::MidYear): {
-                effectiveYear = double(jYear) - 0.5;
+            effectiveYear = double(jYear) - 0.5;
             break;
         }
         case (DiscConv::EndOfYear): {
-                effectiveYear = double(jYear);
-        break;
+            effectiveYear = double(jYear);
+            break;
         }
         default:
             break;
@@ -1580,15 +1580,15 @@ void ComputePresentValue(EnergyPlusData &state)
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                 switch (elcc->discountConvention) {
                 case (DiscConv::BeginOfYear): {
-                        effectiveYear = double(jYear) - 1.0;
+                    effectiveYear = double(jYear) - 1.0;
                     break;
                 }
                 case (DiscConv::MidYear): {
-                        effectiveYear = double(jYear) - 0.5;
+                    effectiveYear = double(jYear) - 0.5;
                     break;
                 }
                 case (DiscConv::EndOfYear): {
-                        effectiveYear = double(jYear);
+                    effectiveYear = double(jYear);
                     break;
                 }
                 default:
@@ -1602,30 +1602,30 @@ void ComputePresentValue(EnergyPlusData &state)
     for (iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
         switch (elcc->CashFlow[iCashFlow].pvKind) {
         case (PrValKind::NonEnergy): {
+            totalPV = 0.0;
+            for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+                elcc->CashFlow[iCashFlow].yrPresVal(jYear) = elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->SPV(jYear);
+                totalPV += elcc->CashFlow[iCashFlow].yrPresVal(jYear);
+            }
+            elcc->CashFlow[iCashFlow].presentValue = totalPV;
+            break;
+        }
+        case (PrValKind::Energy): {
+            auto curResource = elcc->CashFlow[iCashFlow].Resource;
+            if (curResource != DataGlobalConstants::ResourceType::None) {
                 totalPV = 0.0;
                 for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-                    elcc->CashFlow[iCashFlow].yrPresVal(jYear) = elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->SPV(jYear);
+                    elcc->CashFlow[iCashFlow].yrPresVal(jYear) =
+                        elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->energySPV.at(jYear).at(curResource);
                     totalPV += elcc->CashFlow[iCashFlow].yrPresVal(jYear);
                 }
                 elcc->CashFlow[iCashFlow].presentValue = totalPV;
-                break;
             }
-            case (PrValKind::Energy): {
-                auto curResource = elcc->CashFlow[iCashFlow].Resource;
-                if (curResource != DataGlobalConstants::ResourceType::None) {
-                    totalPV = 0.0;
-                    for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-                        elcc->CashFlow[iCashFlow].yrPresVal(jYear) =
-                            elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->energySPV.at(jYear).at(curResource);
-                        totalPV += elcc->CashFlow[iCashFlow].yrPresVal(jYear);
-                    }
-                    elcc->CashFlow[iCashFlow].presentValue = totalPV;
-                }
-                break;
-            }
-//            case (iPrValKind::NotComputed): included in default
-            default:
-                break; //do nothing
+            break;
+        }
+            //            case (iPrValKind::NotComputed): included in default
+        default:
+            break; // do nothing
         }
     }
     // sum by category
@@ -1644,13 +1644,16 @@ void ComputePresentValue(EnergyPlusData &state)
     // create total categories
     elcc->CashFlow[CostCategory::TotEnergy].presentValue = elcc->CashFlow[CostCategory::Energy].presentValue;
     elcc->CashFlow[CostCategory::TotOper].presentValue =
-        elcc->CashFlow[CostCategory::Maintenance].presentValue + elcc->CashFlow[CostCategory::Repair].presentValue + elcc->CashFlow[CostCategory::Operation].presentValue +
-        elcc->CashFlow[CostCategory::Replacement].presentValue + elcc->CashFlow[CostCategory::MinorOverhaul].presentValue +
-        elcc->CashFlow[CostCategory::MajorOverhaul].presentValue + elcc->CashFlow[CostCategory::OtherOperational].presentValue +
-        elcc->CashFlow[CostCategory::Water].presentValue + elcc->CashFlow[CostCategory::Energy].presentValue;
-    elcc->CashFlow[CostCategory::TotCaptl].presentValue = elcc->CashFlow[CostCategory::Construction].presentValue + elcc->CashFlow[CostCategory::Salvage].presentValue +
-                                                   elcc->CashFlow[CostCategory::OtherCapital].presentValue;
-    elcc->CashFlow[CostCategory::TotGrand].presentValue = elcc->CashFlow[CostCategory::TotOper].presentValue + elcc->CashFlow[CostCategory::TotCaptl].presentValue;
+        elcc->CashFlow[CostCategory::Maintenance].presentValue + elcc->CashFlow[CostCategory::Repair].presentValue +
+        elcc->CashFlow[CostCategory::Operation].presentValue + elcc->CashFlow[CostCategory::Replacement].presentValue +
+        elcc->CashFlow[CostCategory::MinorOverhaul].presentValue + elcc->CashFlow[CostCategory::MajorOverhaul].presentValue +
+        elcc->CashFlow[CostCategory::OtherOperational].presentValue + elcc->CashFlow[CostCategory::Water].presentValue +
+        elcc->CashFlow[CostCategory::Energy].presentValue;
+    elcc->CashFlow[CostCategory::TotCaptl].presentValue = elcc->CashFlow[CostCategory::Construction].presentValue +
+                                                          elcc->CashFlow[CostCategory::Salvage].presentValue +
+                                                          elcc->CashFlow[CostCategory::OtherCapital].presentValue;
+    elcc->CashFlow[CostCategory::TotGrand].presentValue =
+        elcc->CashFlow[CostCategory::TotOper].presentValue + elcc->CashFlow[CostCategory::TotCaptl].presentValue;
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
         elcc->CashFlow[CostCategory::TotEnergy].yrPresVal(jYear) = elcc->CashFlow[CostCategory::Energy].yrPresVal(jYear);
         elcc->CashFlow[CostCategory::TotOper].yrPresVal(jYear) =
@@ -1660,8 +1663,8 @@ void ComputePresentValue(EnergyPlusData &state)
             elcc->CashFlow[CostCategory::OtherOperational].yrPresVal(jYear) + elcc->CashFlow[CostCategory::Water].yrPresVal(jYear) +
             elcc->CashFlow[CostCategory::Energy].yrPresVal(jYear);
         elcc->CashFlow[CostCategory::TotCaptl].yrPresVal(jYear) = elcc->CashFlow[CostCategory::Construction].yrPresVal(jYear) +
-                                                           elcc->CashFlow[CostCategory::Salvage].yrPresVal(jYear) +
-                                                           elcc->CashFlow[CostCategory::OtherCapital].yrPresVal(jYear);
+                                                                  elcc->CashFlow[CostCategory::Salvage].yrPresVal(jYear) +
+                                                                  elcc->CashFlow[CostCategory::OtherCapital].yrPresVal(jYear);
         elcc->CashFlow[CostCategory::TotGrand].yrPresVal(jYear) =
             elcc->CashFlow[CostCategory::TotOper].yrPresVal(jYear) + elcc->CashFlow[CostCategory::TotCaptl].yrPresVal(jYear);
     }
@@ -1691,7 +1694,6 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -1730,7 +1732,8 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
         for (jYear = 0; jYear < SizeDepr; ++jYear) {
             curDepYear = iYear + jYear; // start depreciating with the year that the capital was shown and go to years following
             if (curDepYear <= elcc->lengthStudyYears) {
-                elcc->DepreciatedCapital(curDepYear) += curCapital * (DepreciationPercentTable[static_cast<int>(elcc->depreciationMethod)][jYear] / 100);
+                elcc->DepreciatedCapital(curDepYear) +=
+                    curCapital * (DepreciationPercentTable[static_cast<int>(elcc->depreciationMethod)][jYear] / 100);
             }
         }
     }
@@ -1975,7 +1978,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
             curCashFlow = CostCategory::Num + jObj;
-            columnHead(jObj+1) = elcc->CashFlow[curCashFlow].name;
+            columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
 
             if (elcc->CashFlow[curCashFlow].SourceKind == SourceKindType::Nonrecurring) {
                 tableBody(jObj + 1, 1) = "Nonrecurring";
@@ -1984,7 +1987,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
 
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj+1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                tableBody(jObj + 1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
         WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
@@ -2022,14 +2025,15 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
             curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
-            columnHead(jObj+1) = elcc->CashFlow[curCashFlow].name;
+            columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj+1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
         columnHead(numColumns) = "Total";
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(jObj+1, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+            tableBody(jObj + 1, iYear) =
+                RealToStr(elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
         WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2057,21 +2061,21 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
             curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
-            columnHead(jObj+1) = elcc->CashFlow[curCashFlow].name;
+            columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
             auto curResource = elcc->CashFlow[curCashFlow].Resource;
             if (elcc->CashFlow[curCashFlow].Resource != DataGlobalConstants::ResourceType::Water) {
                 for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                    tableBody(jObj+1, iYear) = RealToStr(elcc->EscalatedEnergy.at(iYear).at(curResource), 2);
+                    tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedEnergy.at(iYear).at(curResource), 2);
                 }
             } else { // for water just use the original cashflow since not involved in escalation
                 for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                    tableBody(jObj+1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                    tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
                 }
             }
         }
         columnHead(numColumns) = "Total";
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(jObj+1, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+            tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
         WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2194,8 +2198,8 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             tableBody(7, iYear) = RealToStr(elcc->CashFlow[CostCategory::MinorOverhaul].yrAmount(iYear), 2);
             tableBody(8, iYear) = RealToStr(elcc->CashFlow[CostCategory::MajorOverhaul].yrAmount(iYear), 2);
             tableBody(9, iYear) = RealToStr(elcc->CashFlow[CostCategory::OtherOperational].yrAmount(iYear), 2);
-            Real64 yearly_total_cost =
-                elcc->CashFlow[CostCategory::TotOper].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) - elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
+            Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotOper].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
+                                       elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
             tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
         }
         WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
@@ -2237,7 +2241,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(15) = "tCap";
             columnHead(16) = "Totl";
             for (jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
-                columnHead(jObj+1) = elcc->CashFlow[jObj].name;
+                columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 rowHead(kMonth) =
@@ -2245,7 +2249,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 for (jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
-                    tableBody(jObj+1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
+                    tableBody(jObj + 1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
                 }
             }
             WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
@@ -2312,55 +2316,56 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         rowHead(numRows + 1) = "TOTAL";
         for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
             offset = CostCategory::Num;
-            rowHead(jObj+1) = elcc->CashFlow[offset + jObj].name;
+            rowHead(jObj + 1) = elcc->CashFlow[offset + jObj].name;
             switch (elcc->CashFlow[offset + jObj].Category) {
-                case (CostCategory::Maintenance):
-                case (CostCategory::Repair):
-                case (CostCategory::Operation):
-                case (CostCategory::Replacement):
-                case (CostCategory::MinorOverhaul):
-                case (CostCategory::MajorOverhaul):
-                case (CostCategory::OtherOperational):
-                case (CostCategory::Construction):
-                case (CostCategory::Salvage):
-                case (CostCategory::OtherCapital):
-                case (CostCategory::Water):
-                case (CostCategory::Energy): {
-                    tableBody(1, jObj+1) = CostCategoryNames[static_cast<int>(elcc->CashFlow[offset + jObj].Category)];
-                    break;
-                }
-                default:
-                    tableBody(1, jObj+1) = "-";
-                    break;
+            case (CostCategory::Maintenance):
+            case (CostCategory::Repair):
+            case (CostCategory::Operation):
+            case (CostCategory::Replacement):
+            case (CostCategory::MinorOverhaul):
+            case (CostCategory::MajorOverhaul):
+            case (CostCategory::OtherOperational):
+            case (CostCategory::Construction):
+            case (CostCategory::Salvage):
+            case (CostCategory::OtherCapital):
+            case (CostCategory::Water):
+            case (CostCategory::Energy): {
+                tableBody(1, jObj + 1) = CostCategoryNames[static_cast<int>(elcc->CashFlow[offset + jObj].Category)];
+                break;
             }
-            switch (elcc->CashFlow[offset + jObj].SourceKind){
+            default:
+                tableBody(1, jObj + 1) = "-";
+                break;
+            }
+            switch (elcc->CashFlow[offset + jObj].SourceKind) {
             case (SourceKindType::Nonrecurring): {
-                    tableBody(2, jObj+1) = "Nonrecurring";
+                tableBody(2, jObj + 1) = "Nonrecurring";
                 break;
             }
             case (SourceKindType::Recurring): {
-                    tableBody(2, jObj+1) = "Recurring";
+                tableBody(2, jObj + 1) = "Recurring";
                 break;
-            } case (SourceKindType::Resource): {
-                    if (elcc->CashFlow[offset + jObj].Category == CostCategory::Water) {
-                        tableBody(2, jObj+1) = "Water Cost";
-                    } else {
-                        tableBody(2, jObj+1) = "Energy Cost";
-                    }
+            }
+            case (SourceKindType::Resource): {
+                if (elcc->CashFlow[offset + jObj].Category == CostCategory::Water) {
+                    tableBody(2, jObj + 1) = "Water Cost";
+                } else {
+                    tableBody(2, jObj + 1) = "Energy Cost";
+                }
                 break;
             }
             default: {
-                    tableBody(2, jObj+1) = "-";
+                tableBody(2, jObj + 1) = "-";
                 break;
-                }
             }
-            tableBody(3, jObj+1) = RealToStr(elcc->CashFlow[offset + jObj].orginalCost, 2);
-            tableBody(4, jObj+1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue, 2);
+            }
+            tableBody(3, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].orginalCost, 2);
+            tableBody(4, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue, 2);
             totalPV += elcc->CashFlow[offset + jObj].presentValue;
             if (elcc->CashFlow[offset + jObj].orginalCost != 0.0) {
-                tableBody(5, jObj+1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue / elcc->CashFlow[offset + jObj].orginalCost, 4);
+                tableBody(5, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue / elcc->CashFlow[offset + jObj].orginalCost, 4);
             } else {
-                tableBody(5, jObj+1) = "-";
+                tableBody(5, jObj + 1) = "-";
             }
         }
         tableBody(4, numRows + 1) = RealToStr(totalPV, 2);
@@ -2460,8 +2465,8 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             rowHead(iYear) = format("{} {}", MonthNames(elcc->baseDateMonth), elcc->baseDateYear + iYear - 1);
             tableBody(1, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear), 2);
             // adjust for escalated energy costs
-            Real64 yearly_total_cost =
-                elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) - elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
+            Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
+                                       elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
             tableBody(2, iYear) = RealToStr(yearly_total_cost, 2);
             tableBody(3, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear), 2);
             totalPV += elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear);

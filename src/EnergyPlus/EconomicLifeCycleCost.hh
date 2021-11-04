@@ -104,34 +104,32 @@ namespace EconomicLifeCycleCost {
 
     int constexpr SizeDepr(41);
 
-    constexpr std::array<std::array<Real64, SizeDepr>, static_cast<int>(DeprMethod::Num)>  DepreciationPercentTable
-    {{
-        {33.33, 44.45, 14.81, 7.41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         0,     0,     0,     0,    0, 0},
-            {20.0, 32.0, 19.2, 11.52, 11.52, 5.76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    constexpr std::array<std::array<Real64, SizeDepr>, static_cast<int>(DeprMethod::Num)> DepreciationPercentTable{
+        {{33.33, 44.45, 14.81, 7.41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {20.0, 32.0, 19.2, 11.52, 11.52, 5.76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
           0,    0,    0,    0,     0,     0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         0,     0,     0,     0,     0,    0,    0,    0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {10.0, 18.0, 14.4, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         0,    0,    0,    0,     0,    0,    0,    0,    0,    0,    0,    0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {5.0, 9.5, 8.55, 7.7, 6.93, 6.23, 5.9, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 2.95, 0, 0, 0, 0, 0,
-         0,   0,   0,    0,   0,    0,    0,   0,   0,    0,   0,    0,   0,    0,   0,    0,    0, 0, 0, 0},
-        {3.75,  7.219, 6.677, 6.177, 5.713, 5.285, 4.888, 4.522, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461,
-         4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 2.231, 0,     0,     0,     0,     0,     0,     0,
-         0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0},
-        {1.97,  3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637,
-         3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.485,
-         0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0},
-        {1.72,  3.175, 3.175, 3.175, 3.175, 3.175, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174,
-         3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174,
-         3.175, 3.174, 3.175, 3.042, 0,     0,     0,     0,     0,     0,     0,     0,     0},
-        {1.391, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564,
-         2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564,
-         2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 1.177, 0},
+         {14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0,     0,     0,     0,     0,    0,    0,    0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {10.0, 18.0, 14.4, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0,    0,    0,    0,     0,    0,    0,    0,    0,    0,    0,    0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {5.0, 9.5, 8.55, 7.7, 6.93, 6.23, 5.9, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 2.95, 0, 0, 0, 0, 0,
+          0,   0,   0,    0,   0,    0,    0,   0,   0,    0,   0,    0,   0,    0,   0,    0,    0, 0, 0, 0},
+         {3.75,  7.219, 6.677, 6.177, 5.713, 5.285, 4.888, 4.522, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461,
+          4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 2.231, 0,     0,     0,     0,     0,     0,     0,
+          0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0},
+         {1.97,  3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637,
+          3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.485,
+          0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0},
+         {1.72,  3.175, 3.175, 3.175, 3.175, 3.175, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174,
+          3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174,
+          3.175, 3.174, 3.175, 3.042, 0,     0,     0,     0,     0,     0,     0,     0,     0},
+         {1.391, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564,
+          2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564,
+          2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 1.177, 0},
          {1.354, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5,  2.5,
           2.5,   2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 1.146}}};
 
-    constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)>  DeprMethodNames {
+    constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)> DeprMethodNames{
         "ModifiedAcceleratedCostRecoverySystem-3year",
         "ModifiedAcceleratedCostRecoverySystem-5year",
         "ModifiedAcceleratedCostRecoverySystem-7year",
@@ -144,7 +142,7 @@ namespace EconomicLifeCycleCost {
         "StraightLine-40year",
         "None",
     };
-    
+
     enum CostCategory
     {
         Unassigned = -1,
@@ -167,19 +165,19 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)>  CostCategoryNames {
-"Maintenance",
-"Repair",
-"Operation",
-"Replacement",
-"Minor Overhaul",
-"Major Overhaul",
-"Other Operational",
-"Construction",
-"Salvage",
-"Other Capital",
-"Water",
-"Energy",
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{
+        "Maintenance",
+        "Repair",
+        "Operation",
+        "Replacement",
+        "Minor Overhaul",
+        "Major Overhaul",
+        "Other Operational",
+        "Construction",
+        "Salvage",
+        "Other Capital",
+        "Water",
+        "Energy",
     };
 
     // The NIST supplement includes UPV* factors for
@@ -255,7 +253,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;            // Name
         std::string lineItem;        // Line Item
-        CostCategory category;                // Category
+        CostCategory category;       // Category
         Real64 cost;                 // Cost
         iStartCosts startOfCosts;    // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
@@ -279,7 +277,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;         // Name
         std::string lineItem;     // Line Item
-        CostCategory category;             // Category
+        CostCategory category;    // Category
         Real64 cost;              // Cost
         iStartCosts startOfCosts; // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
@@ -328,21 +326,21 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;                           // Name - just for labeling output - use Category for aggregation
-        SourceKindType SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
+        SourceKindType SourceKind;                  // 1=recurring, 2=nonrecurring, 3=resource
         DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        CostCategory Category;                               // uses "costCat" constants above
+        CostCategory Category;                      // uses "costCat" constants above
         Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
-        PrValKind pvKind;         // kind of present value 1=energy, 2=non-energy,3=not computed but summed
+        PrValKind pvKind;          // kind of present value 1=energy, 2=non-energy,3=not computed but summed
         Real64 presentValue;       // total present value for cashflow
         Real64 orginalCost;        // original cost from recurring, non-recurring or energy cost
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned), pvKind(PrValKind::Unassigned),
-              presentValue(0.), orginalCost(0.)
+            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned),
+              pvKind(PrValKind::Unassigned), presentValue(0.), orginalCost(0.)
         {
         }
     };
@@ -406,7 +404,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     // related to LifeCycleCost:Parameters
     bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
     std::string LCCname;          // Name
-    EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;     // Discounting Convention
+    EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;       // Discounting Convention
     EconomicLifeCycleCost::iInflAppr inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar; // Inflation Approach
     Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
     Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
