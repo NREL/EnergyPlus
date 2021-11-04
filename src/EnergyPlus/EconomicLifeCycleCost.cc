@@ -1691,7 +1691,7 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int constexpr SizeDepr(41);
+
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -1700,7 +1700,6 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D<Real64> DepreciationPercent(SizeDepr); // values expressed as percent 5% is 5.0 (based on tables)
     Real64 curCapital;
     int curDepYear;
     int iYear;
@@ -1723,256 +1722,15 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // Table A-7a for 39 years. Table A-13 for 40 years. These years are a classification of property
     // and should not be confused with the length of the study. For 27 years, 31 years, 39 years and 40 years
     // the June value was used.
-    DepreciationPercent = 0.0; // default all values to zero
-    switch (elcc->depreciationMethod) {
-    case (DeprMethod::MACRS3): { // IRS Publication 946 for 2009 Table A-1
-            DepreciationPercent(1) = 33.33;
-            DepreciationPercent(2) = 44.45;
-            DepreciationPercent(3) = 14.81;
-            DepreciationPercent(4) = 7.41;
-        break;
-    }
-    case (DeprMethod::MACRS5): { // IRS Publication 946 for 2009 Table A-1
-            DepreciationPercent(1) = 20.0;
-            DepreciationPercent(2) = 32.0;
-            DepreciationPercent(3) = 19.2;
-            DepreciationPercent(4) = 11.52;
-            DepreciationPercent(5) = 11.52;
-            DepreciationPercent(6) = 5.76;
-        break;
-    }
-    case (DeprMethod::MACRS7): { // IRS Publication 946 for 2009 Table A-1
-            DepreciationPercent(1) = 14.29;
-            DepreciationPercent(2) = 24.49;
-            DepreciationPercent(3) = 17.49;
-            DepreciationPercent(4) = 12.49;
-            DepreciationPercent(5) = 8.93;
-            DepreciationPercent(6) = 8.92;
-            DepreciationPercent(7) = 8.93;
-            DepreciationPercent(8) = 4.46;
-        break;
-    }
-    case (DeprMethod::MACRS10): { // IRS Publication 946 for 2009 Table A-1
-            DepreciationPercent(1) = 10.0;
-            DepreciationPercent(2) = 18.0;
-            DepreciationPercent(3) = 14.4;
-            DepreciationPercent(4) = 11.52;
-            DepreciationPercent(5) = 9.22;
-            DepreciationPercent(6) = 7.37;
-            DepreciationPercent(7) = 6.55;
-            DepreciationPercent(8) = 6.55;
-            DepreciationPercent(9) = 6.56;
-            DepreciationPercent(10) = 6.55;
-            DepreciationPercent(11) = 3.28;
-        break;
-    }
-    case (DeprMethod::MACRS15): { // IRS Publication 946 for 2009 Table A-1
-            DepreciationPercent(1) = 5.0;
-            DepreciationPercent(2) = 9.5;
-            DepreciationPercent(3) = 8.55;
-            DepreciationPercent(4) = 7.7;
-            DepreciationPercent(5) = 6.93;
-            DepreciationPercent(6) = 6.23;
-            DepreciationPercent(7) = 5.9;
-            DepreciationPercent(8) = 5.9;
-            DepreciationPercent(9) = 5.91;
-            DepreciationPercent(10) = 5.9;
-            DepreciationPercent(11) = 5.91;
-            DepreciationPercent(12) = 5.9;
-            DepreciationPercent(13) = 5.91;
-            DepreciationPercent(14) = 5.9;
-            DepreciationPercent(15) = 5.91;
-            DepreciationPercent(16) = 2.95;
-        break;
-    }
-    case (DeprMethod::MACRS20): { // IRS Publication 946 for 2009 Table A-1
-            DepreciationPercent(1) = 3.75;
-            DepreciationPercent(2) = 7.219;
-            DepreciationPercent(3) = 6.677;
-            DepreciationPercent(4) = 6.177;
-            DepreciationPercent(5) = 5.713;
-            DepreciationPercent(6) = 5.285;
-            DepreciationPercent(7) = 4.888;
-            DepreciationPercent(8) = 4.522;
-            DepreciationPercent(9) = 4.462;
-            DepreciationPercent(10) = 4.461;
-            DepreciationPercent(11) = 4.462;
-            DepreciationPercent(12) = 4.461;
-            DepreciationPercent(13) = 4.462;
-            DepreciationPercent(14) = 4.461;
-            DepreciationPercent(15) = 4.462;
-            DepreciationPercent(16) = 4.461;
-            DepreciationPercent(17) = 4.462;
-            DepreciationPercent(18) = 4.461;
-            DepreciationPercent(19) = 4.462;
-            DepreciationPercent(20) = 4.461;
-            DepreciationPercent(21) = 2.231;
-        break;
-    }
-    case (DeprMethod::Straight27): { // IRS Publication 946 for 2009 Table A-6 (June)
-            DepreciationPercent(1) = 1.97;
-            DepreciationPercent(2) = 3.636;
-            DepreciationPercent(3) = 3.636;
-            DepreciationPercent(4) = 3.636;
-            DepreciationPercent(5) = 3.636;
-            DepreciationPercent(6) = 3.636;
-            DepreciationPercent(7) = 3.636;
-            DepreciationPercent(8) = 3.636;
-            DepreciationPercent(9) = 3.636;
-            DepreciationPercent(10) = 3.637;
-            DepreciationPercent(11) = 3.636;
-            DepreciationPercent(12) = 3.637;
-            DepreciationPercent(13) = 3.636;
-            DepreciationPercent(14) = 3.637;
-            DepreciationPercent(15) = 3.636;
-            DepreciationPercent(16) = 3.637;
-            DepreciationPercent(17) = 3.636;
-            DepreciationPercent(18) = 3.637;
-            DepreciationPercent(19) = 3.636;
-            DepreciationPercent(20) = 3.637;
-            DepreciationPercent(21) = 3.636;
-            DepreciationPercent(22) = 3.637;
-            DepreciationPercent(23) = 3.636;
-            DepreciationPercent(24) = 3.637;
-            DepreciationPercent(25) = 3.636;
-            DepreciationPercent(26) = 3.637;
-            DepreciationPercent(27) = 3.636;
-            DepreciationPercent(28) = 3.485;
-        break;
-    }
-    case (DeprMethod::Straight31): { // IRS Publication 946 for 2009 Table A-7 (June)
-            DepreciationPercent(1) = 1.72;
-            DepreciationPercent(2) = 3.175;
-            DepreciationPercent(3) = 3.175;
-            DepreciationPercent(4) = 3.175;
-            DepreciationPercent(5) = 3.175;
-            DepreciationPercent(6) = 3.175;
-            DepreciationPercent(7) = 3.175;
-            DepreciationPercent(8) = 3.174;
-            DepreciationPercent(9) = 3.175;
-            DepreciationPercent(10) = 3.174;
-            DepreciationPercent(11) = 3.175;
-            DepreciationPercent(12) = 3.174;
-            DepreciationPercent(13) = 3.175;
-            DepreciationPercent(14) = 3.174;
-            DepreciationPercent(15) = 3.175;
-            DepreciationPercent(16) = 3.174;
-            DepreciationPercent(17) = 3.175;
-            DepreciationPercent(18) = 3.174;
-            DepreciationPercent(19) = 3.175;
-            DepreciationPercent(20) = 3.174;
-            DepreciationPercent(21) = 3.175;
-            DepreciationPercent(22) = 3.174;
-            DepreciationPercent(23) = 3.175;
-            DepreciationPercent(24) = 3.174;
-            DepreciationPercent(25) = 3.175;
-            DepreciationPercent(26) = 3.174;
-            DepreciationPercent(27) = 3.175;
-            DepreciationPercent(28) = 3.174;
-            DepreciationPercent(29) = 3.175;
-            DepreciationPercent(30) = 3.174;
-            DepreciationPercent(31) = 3.175;
-            DepreciationPercent(32) = 3.042;
-        break;
-    }
-    case (DeprMethod::Straight39): { // IRS Publication 946 for 2009 Table A-7a (June)
-            DepreciationPercent(1) = 1.391;
-            DepreciationPercent(2) = 2.564;
-            DepreciationPercent(3) = 2.564;
-            DepreciationPercent(4) = 2.564;
-            DepreciationPercent(5) = 2.564;
-            DepreciationPercent(6) = 2.564;
-            DepreciationPercent(7) = 2.564;
-            DepreciationPercent(8) = 2.564;
-            DepreciationPercent(9) = 2.564;
-            DepreciationPercent(10) = 2.564;
-            DepreciationPercent(11) = 2.564;
-            DepreciationPercent(12) = 2.564;
-            DepreciationPercent(13) = 2.564;
-            DepreciationPercent(14) = 2.564;
-            DepreciationPercent(15) = 2.564;
-            DepreciationPercent(16) = 2.564;
-            DepreciationPercent(17) = 2.564;
-            DepreciationPercent(18) = 2.564;
-            DepreciationPercent(19) = 2.564;
-            DepreciationPercent(20) = 2.564;
-            DepreciationPercent(21) = 2.564;
-            DepreciationPercent(22) = 2.564;
-            DepreciationPercent(23) = 2.564;
-            DepreciationPercent(24) = 2.564;
-            DepreciationPercent(25) = 2.564;
-            DepreciationPercent(26) = 2.564;
-            DepreciationPercent(27) = 2.564;
-            DepreciationPercent(28) = 2.564;
-            DepreciationPercent(29) = 2.564;
-            DepreciationPercent(30) = 2.564;
-            DepreciationPercent(31) = 2.564;
-            DepreciationPercent(32) = 2.564;
-            DepreciationPercent(33) = 2.564;
-            DepreciationPercent(34) = 2.564;
-            DepreciationPercent(35) = 2.564;
-            DepreciationPercent(36) = 2.564;
-            DepreciationPercent(37) = 2.564;
-            DepreciationPercent(38) = 2.564;
-            DepreciationPercent(39) = 2.564;
-            DepreciationPercent(40) = 1.177;
-        break;
-    }
-    case (DeprMethod::Straight40): { // IRS Publication 946 for 2009 Table A-13 (June)
-            DepreciationPercent(1) = 1.354;
-            DepreciationPercent(2) = 2.5;
-            DepreciationPercent(3) = 2.5;
-            DepreciationPercent(4) = 2.5;
-            DepreciationPercent(5) = 2.5;
-            DepreciationPercent(6) = 2.5;
-            DepreciationPercent(7) = 2.5;
-            DepreciationPercent(8) = 2.5;
-            DepreciationPercent(9) = 2.5;
-            DepreciationPercent(10) = 2.5;
-            DepreciationPercent(11) = 2.5;
-            DepreciationPercent(12) = 2.5;
-            DepreciationPercent(13) = 2.5;
-            DepreciationPercent(14) = 2.5;
-            DepreciationPercent(15) = 2.5;
-            DepreciationPercent(16) = 2.5;
-            DepreciationPercent(17) = 2.5;
-            DepreciationPercent(18) = 2.5;
-            DepreciationPercent(19) = 2.5;
-            DepreciationPercent(20) = 2.5;
-            DepreciationPercent(21) = 2.5;
-            DepreciationPercent(22) = 2.5;
-            DepreciationPercent(23) = 2.5;
-            DepreciationPercent(24) = 2.5;
-            DepreciationPercent(25) = 2.5;
-            DepreciationPercent(26) = 2.5;
-            DepreciationPercent(27) = 2.5;
-            DepreciationPercent(28) = 2.5;
-            DepreciationPercent(29) = 2.5;
-            DepreciationPercent(30) = 2.5;
-            DepreciationPercent(31) = 2.5;
-            DepreciationPercent(32) = 2.5;
-            DepreciationPercent(33) = 2.5;
-            DepreciationPercent(34) = 2.5;
-            DepreciationPercent(35) = 2.5;
-            DepreciationPercent(36) = 2.5;
-            DepreciationPercent(37) = 2.5;
-            DepreciationPercent(38) = 2.5;
-            DepreciationPercent(39) = 2.5;
-            DepreciationPercent(40) = 2.5;
-            DepreciationPercent(41) = 1.146;
-        break;
-    }
-    default:
-        break;
-    }
+
     // convert construction costs (not salvage) into depreciation
     elcc->DepreciatedCapital = 0.0; // set all years to zero
     for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
         curCapital = elcc->CashFlow[CostCategory::Construction].yrAmount(iYear) + elcc->CashFlow[CostCategory::OtherCapital].yrAmount(iYear);
-        for (jYear = 1; jYear <= SizeDepr; ++jYear) {
-            curDepYear = iYear + jYear - 1; // start depreciating with the year that the capital was shown and go to years following
+        for (jYear = 0; jYear < SizeDepr; ++jYear) {
+            curDepYear = iYear + jYear; // start depreciating with the year that the capital was shown and go to years following
             if (curDepYear <= elcc->lengthStudyYears) {
-                elcc->DepreciatedCapital(curDepYear) += curCapital * (DepreciationPercent(jYear) / 100);
+                elcc->DepreciatedCapital(curDepYear) += curCapital * (DepreciationPercentTable[static_cast<int>(elcc->depreciationMethod)][jYear] / 100);
             }
         }
     }
