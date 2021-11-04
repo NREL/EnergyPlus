@@ -146,12 +146,13 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    enum class iPrValKind
+    enum class PrValKind
     {
-        Unassigned,
+        Unassigned = -1,
         Energy,
         NonEnergy,
         NotComputed,
+        Num
     };
 
     constexpr const char *MonthNames(int const &i)
@@ -273,14 +274,14 @@ namespace EconomicLifeCycleCost {
         Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
-        iPrValKind pvKind;         // kind of present value 1=energy, 2=non-energy,3=not computed but summed
+        PrValKind pvKind;         // kind of present value 1=energy, 2=non-energy,3=not computed but summed
         Real64 presentValue;       // total present value for cashflow
         Real64 orginalCost;        // original cost from recurring, non-recurring or energy cost
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned), pvKind(iPrValKind::Unassigned),
+            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned), pvKind(PrValKind::Unassigned),
               presentValue(0.), orginalCost(0.)
         {
         }

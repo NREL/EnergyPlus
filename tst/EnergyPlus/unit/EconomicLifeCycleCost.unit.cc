@@ -424,7 +424,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     state->dataEconLifeCycleCost->numCashFlow = 1;
     state->dataEconLifeCycleCost->CashFlow.resize(state->dataEconLifeCycleCost->numCashFlow);
-    state->dataEconLifeCycleCost->CashFlow[0].pvKind = iPrValKind::Energy;
+    state->dataEconLifeCycleCost->CashFlow[0].pvKind = PrValKind::Energy;
     state->dataEconLifeCycleCost->CashFlow[0].Resource = DataGlobalConstants::ResourceType::Electricity;
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount(1) = 100;

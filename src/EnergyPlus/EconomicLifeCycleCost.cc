@@ -1421,7 +1421,7 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
     auto &elcc(state.dataEconLifeCycleCost);
 
     for (int iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
-        if (elcc->CashFlow[iCashFlow].pvKind == iPrValKind::Energy) {
+        if (elcc->CashFlow[iCashFlow].pvKind == PrValKind::Energy) {
             // make sure this is not water
             auto curResource = elcc->CashFlow[iCashFlow].Resource;
             if (elcc->CashFlow[iCashFlow].Resource == DataGlobalConstants::ResourceType::Water ||
@@ -1506,24 +1506,24 @@ void ComputePresentValue(EnergyPlusData &state)
                 // only for real fuels purchased such as electricity, natural gas, etc..
                 if ((elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::Electricity) &&
                     (elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
-                    elcc->CashFlow[iCashFlow].pvKind = iPrValKind::Energy;
+                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
                 } else {
-                    elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NonEnergy;
+                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
                 }
                 break;
             }
             case (SourceKindType::Recurring):
             case (SourceKindType::Nonrecurring): {
                 if (elcc->CashFlow[iCashFlow].Category == CostCategory::Energy) {
-                    elcc->CashFlow[iCashFlow].pvKind = iPrValKind::Energy;
+                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
                 } else {
-                    elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NonEnergy;
+                    elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
                 }
             break;
             }
             case (SourceKindType::Sum):
             default: {
-                elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NotComputed;
+                elcc->CashFlow[iCashFlow].pvKind = PrValKind::NotComputed;
             break;
             }
         }
@@ -1600,16 +1600,17 @@ void ComputePresentValue(EnergyPlusData &state)
         }
     }
     for (iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
-        {
-            auto const SELECT_CASE_var(elcc->CashFlow[iCashFlow].pvKind);
-            if (SELECT_CASE_var == iPrValKind::NonEnergy) {
+        switch (elcc->CashFlow[iCashFlow].pvKind) {
+        case (PrValKind::NonEnergy): {
                 totalPV = 0.0;
                 for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                     elcc->CashFlow[iCashFlow].yrPresVal(jYear) = elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->SPV(jYear);
                     totalPV += elcc->CashFlow[iCashFlow].yrPresVal(jYear);
                 }
                 elcc->CashFlow[iCashFlow].presentValue = totalPV;
-            } else if (SELECT_CASE_var == iPrValKind::Energy) {
+                break;
+            }
+            case (PrValKind::Energy): {
                 auto curResource = elcc->CashFlow[iCashFlow].Resource;
                 if (curResource != DataGlobalConstants::ResourceType::None) {
                     totalPV = 0.0;
@@ -1620,9 +1621,11 @@ void ComputePresentValue(EnergyPlusData &state)
                     }
                     elcc->CashFlow[iCashFlow].presentValue = totalPV;
                 }
-            } else if (SELECT_CASE_var == iPrValKind::NotComputed) {
-                // do nothing
+                break;
             }
+//            case (iPrValKind::NotComputed): included in default
+            default:
+                break; //do nothing
         }
     }
     // sum by category
