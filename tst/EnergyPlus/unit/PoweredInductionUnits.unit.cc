@@ -554,7 +554,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds)
     int PIUNum = 1;
     state->dataPowerInductionUnits->PIU(PIUNum).Name = "Series PIU";
     state->dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
-    state->dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = PoweredInductionUnits::iHCoilType::Electric;
+    state->dataPowerInductionUnits->PIU(PIUNum).HCoilType = PoweredInductionUnits::iHCoilType::Electric;
 
     // Go into all of the autosize blocks (aside from Heating/Steam coils)
     state->dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = AutoSize;
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     Real64 SecMassFlowAtPrimMax = thisSeriesAT.MaxTotAirMassFlow - PriMaxMassFlow;
 
     // Needs an airloop, assume 20% outdoor air
-    Real64 const AirLoopOAFraction = 0.20;
+    Real64 constexpr AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;

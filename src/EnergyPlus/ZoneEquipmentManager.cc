@@ -3261,9 +3261,9 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 } else if (SELECT_CASE_var == VRFTerminalUnit_Num) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
                     bool HeatingActive = false;
                     bool CoolingActive = false;
-                    int const OAUnitNum = 0;
-                    Real64 const OAUCoilOutTemp = 0.0;
-                    bool const ZoneEquipment = true;
+                    int constexpr OAUnitNum = 0;
+                    Real64 constexpr OAUCoilOutTemp = 0.0;
+                    bool constexpr ZoneEquipment = true;
                     SimulateVRF(state,
                                 state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                 FirstHVACIteration,
@@ -3860,7 +3860,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
         // Nothing to do here for this case
         {
             // Set the load (with load fraction) for the first equipment in priority order
-            const int priorityNum = 1;
+            constexpr int priorityNum = 1;
             const int &equipNum = state.dataZoneEquipmentManager->PrioritySimOrder(priorityNum).EquipPtr;
 
             // Determine whether we're heating or cooling and choose the appropriate fraction
@@ -4342,8 +4342,8 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
     auto &ZoneMassBalanceHVACReSim = state.dataHVACGlobal->ZoneMassBalanceHVACReSim;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    int const IterMax(25);
-    Real64 const ConvergenceTolerance(0.000010);
+    int constexpr IterMax(25);
+    Real64 constexpr ConvergenceTolerance(0.000010);
 
     int NodeNum;
     int ZoneNode; // zone air node number
@@ -4880,7 +4880,7 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                                Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
 )
 {
-    Real64 const ConvergenceTolerance(0.000010);
+    Real64 constexpr ConvergenceTolerance(0.000010);
     Real64 ZoneInfiltrationMassFlowRate = 0.0;
 
     // Set zone infiltration flow rate

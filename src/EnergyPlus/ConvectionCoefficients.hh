@@ -831,22 +831,21 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMitchell(EnergyPlusData &state, Real64 WindAtZ, Real64 LengthScale, int SurfNum);
 
-    Real64 CalcBlockenWindward(Real64 WindAt10m,
-                               Real64 WindDir,    // Wind direction measured clockwise from geographic North
-                               Real64 SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
-    );
+    Real64 CalcBlockenWindward(EnergyPlusData &state,
+                               Real64 WindAt10m,
+                               Real64 WindDir,     // Wind direction measured clockwise from geographic North
+                               Real64 SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
+                               int SurfNum);
 
-    Real64 CalcEmmelVertical(EnergyPlusData &state,
-                             Real64 WindAt10m,
-                             Real64 WindDir,     // Wind direction measured clockwise from geographic North
-                             Real64 SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
-                             int SurfNum);
+    Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth);
 
-    Real64 CalcEmmelRoof(EnergyPlusData &state,
-                         Real64 WindAt10m,
-                         Real64 WindDir,                // Wind direction measured clockwise from geographic North
-                         Real64 LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
-                         int SurfNum);
+    Real64 CalcEmmelVertical(Real64 WindAt10m,
+                             Real64 WindDir,      // Wind direction measured clockwise from geographic North
+                             Real64 SurfAzimuth); // or Facing, Direction the surface outward normal faces (degrees)
+
+    Real64 CalcEmmelRoof(Real64 WindAt10m,
+                         Real64 WindDir,                 // Wind direction measured clockwise from geographic North
+                         Real64 LongAxisOutwardAzimuth); // or Facing, Direction the surface outward normal faces (degrees)
 
     Real64 CalcClearRoof(EnergyPlusData &state,
                          Real64 AirTemp,
@@ -908,8 +907,7 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
     int CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
     int CalcSparrowWindwardErrorIDX = 0;
     int CalcSparrowLeewardErrorIDX = 0;
-    int CalcEmmelVerticalErrorIDX = 0;
-    int CalcEmmelRoofErrorIDX = 0;
+    int CalcBlockenWindwardErrorIDX = 0;
     int CalcClearRoofErrorIDX = 0;
     int CalcMitchellErrorIDX = 0;
 
@@ -971,8 +969,7 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
         this->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
         this->CalcSparrowWindwardErrorIDX = 0;
         this->CalcSparrowLeewardErrorIDX = 0;
-        this->CalcEmmelVerticalErrorIDX = 0;
-        this->CalcEmmelRoofErrorIDX = 0;
+        this->CalcBlockenWindwardErrorIDX = 0;
         this->CalcClearRoofErrorIDX = 0;
         this->CalcMitchellErrorIDX = 0;
 

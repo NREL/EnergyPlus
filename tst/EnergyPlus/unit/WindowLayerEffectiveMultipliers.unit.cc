@@ -65,9 +65,9 @@ using namespace EnergyPlus::TARCOGParams;
 TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_0_deg)
 {
     {
-        int const nlayer = 1;
-        Real64 const width = 1;
-        Real64 const height = 1;
+        int constexpr nlayer = 1;
+        Real64 constexpr width = 1;
+        Real64 constexpr height = 1;
         Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
@@ -97,9 +97,9 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
 TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_0_deg)
 {
     {
-        int const nlayer = 1;
-        Real64 const width = 1;
-        Real64 const height = 1;
+        int constexpr nlayer = 1;
+        Real64 constexpr width = 1;
+        Real64 constexpr height = 1;
         Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
@@ -129,9 +129,9 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
 TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_45_deg)
 {
     {
-        int const nlayer = 1;
-        Real64 const width = 1;
-        Real64 const height = 1;
+        int constexpr nlayer = 1;
+        Real64 constexpr width = 1;
+        Real64 constexpr height = 1;
         Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
@@ -161,9 +161,9 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
 TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_45_deg)
 {
     {
-        int const nlayer = 1;
-        Real64 const width = 1;
-        Real64 const height = 1;
+        int constexpr nlayer = 1;
+        Real64 constexpr width = 1;
+        Real64 constexpr height = 1;
         Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
@@ -193,9 +193,9 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
 TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
 {
     {
-        int const nlayer = 1;
-        Real64 const width = 1;
-        Real64 const height = 1;
+        int constexpr nlayer = 1;
+        Real64 constexpr width = 1;
+        Real64 constexpr height = 1;
         Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);

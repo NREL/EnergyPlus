@@ -113,13 +113,10 @@ namespace EnergyPlus::PipeHeatTransfer {
 
 // Using/Aliasing
 using namespace GroundTemperatureManager;
-using DataPlant::TypeOf_PipeExterior;
-using DataPlant::TypeOf_PipeInterior;
-using DataPlant::TypeOf_PipeUnderground;
 
 // Functions
 
-PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+PlantComponent *PipeHTData::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     // Process the input data for pipes if it hasn't been done already
     if (state.dataPipeHT->GetPipeInputFlag) {
@@ -128,7 +125,7 @@ PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::
     }
     // Now look for this particular pipe in the list
     for (auto &pipe : state.dataPipeHT->PipeHT) {
-        if (pipe.TypeOf == objectType && pipe.Name == objectName) {
+        if (pipe.Type == objectType && pipe.Name == objectName) {
             return &pipe;
         }
     }
@@ -203,8 +200,8 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const NumPipeSections(20);
-    int const NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
+    int constexpr NumPipeSections(20);
+    int constexpr NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
     Real64 const SecondsInHour(DataGlobalConstants::SecInHour);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -261,7 +258,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeInterior;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeInterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -416,7 +413,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeExterior;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeExterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -553,7 +550,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeUnderground;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeUnderground;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -913,7 +910,7 @@ void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }
@@ -1336,10 +1333,10 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const NumSections(20);
-    Real64 const ConvCrit(0.05);
-    int const MaxIterations(200);
-    Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    int constexpr NumSections(20);
+    Real64 constexpr ConvCrit(0.05);
+    int constexpr MaxIterations(200);
+    Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IterationIndex(0);    // Index when stepping through equations
@@ -1572,7 +1569,7 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
     // Only pass pressure if we aren't doing a pressure simulation
     switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
-    case DataPlant::iPressSimType::NoPressure:
+    case DataPlant::PressSimType::NoPressure:
         state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
         break;
     default:
@@ -1711,8 +1708,8 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
-    Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-    int const NumOfPropDivisions(13);  // intervals in property correlation
+    Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+    int constexpr NumOfPropDivisions(13);  // intervals in property correlation
     static Array1D<Real64> const Temps(
         NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
     static Array1D<Real64> const Mu(NumOfPropDivisions,
@@ -1834,16 +1831,16 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Pr(0.7);           // Prandl number for air (assume constant)
-    Real64 const CondAir(0.025);    // thermal conductivity of air (assume constant) [W/m.K]
-    Real64 const RoomAirVel(0.381); // room air velocity of 75 ft./min [m/s]
-    Real64 const NaturalConvNusselt(0.36);
+    Real64 constexpr Pr(0.7);           // Prandl number for air (assume constant)
+    Real64 constexpr CondAir(0.025);    // thermal conductivity of air (assume constant) [W/m.K]
+    Real64 constexpr RoomAirVel(0.381); // room air velocity of 75 ft./min [m/s]
+    Real64 constexpr NaturalConvNusselt(0.36);
     // Nusselt for natural convection for horizontal cylinder
     // from: Correlations for Convective Heat Transfer
     //      Dr. Bernhard Spang
     //      Chemical Engineers' Resource Page: http://www.cheresources.com/convection.pdf
-    int const NumOfParamDivisions(5); // intervals in property correlation
-    int const NumOfPropDivisions(12); // intervals in property correlation
+    int constexpr NumOfParamDivisions(5); // intervals in property correlation
+    int constexpr NumOfPropDivisions(12); // intervals in property correlation
 
     static Array1D<Real64> const CCoef(NumOfParamDivisions, {0.989, 0.911, 0.683, 0.193, 0.027});         // correlation coefficient
     static Array1D<Real64> const mExp(NumOfParamDivisions, {0.33, 0.385, 0.466, 0.618, 0.805});           // exponent
@@ -1879,9 +1876,9 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
 
     // Set environmental variables
     {
-        auto const SELECT_CASE_var(this->TypeOf);
+        auto const SELECT_CASE_var(this->Type);
 
-        if (SELECT_CASE_var == TypeOf_PipeInterior) {
+        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
 
             {
                 auto const SELECT_CASE_var1(this->EnvironmentPtr);
@@ -1895,7 +1892,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
                 }
             }
 
-        } else if (SELECT_CASE_var == TypeOf_PipeExterior) {
+        } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) {
 
             {
                 auto const SELECT_CASE_var1(this->EnvironmentPtr);
