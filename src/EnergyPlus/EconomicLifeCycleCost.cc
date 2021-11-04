@@ -460,8 +460,8 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
     NumArray.allocate(NumNums);
     AlphaArray.allocate(NumAlphas);
     elcc->numRecurringCosts = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    elcc->RecurringCosts.allocate(elcc->numRecurringCosts);
-    for (iInObj = 1; iInObj <= elcc->numRecurringCosts; ++iInObj) {
+    elcc->RecurringCosts.resize(elcc->numRecurringCosts);
+    for (iInObj = 0; iInObj < elcc->numRecurringCosts; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -486,7 +486,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //   A1,  \field Name
         //        \required-field
         //        \type alpha
-        elcc->RecurringCosts(iInObj).name = AlphaArray(1);
+        elcc->RecurringCosts[iInObj].name = AlphaArray(1);
         //   A2,  \field Category
         //        \type choice
         //        \key Maintenance
@@ -498,39 +498,39 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \key OtherOperational
         //        \default Maintenance
         if (UtilityRoutines::SameString(AlphaArray(2), "Maintenance")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::Maintenance;
+            elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "Repair")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::Repair;
+            elcc->RecurringCosts[iInObj].category = CostCategory::Repair;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "Operation")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::Operation;
+            elcc->RecurringCosts[iInObj].category = CostCategory::Operation;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "Replacement")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::Replacement;
+            elcc->RecurringCosts[iInObj].category = CostCategory::Replacement;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "MinorOverhaul")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::MinorOverhaul;
+            elcc->RecurringCosts[iInObj].category = CostCategory::MinorOverhaul;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "MajorOverhaul")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::MajorOverhaul;
+            elcc->RecurringCosts[iInObj].category = CostCategory::MajorOverhaul;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "OtherOperational")) {
-            elcc->RecurringCosts(iInObj).category = CostCategory::OtherOperational;
+            elcc->RecurringCosts[iInObj].category = CostCategory::OtherOperational;
         } else {
-            elcc->RecurringCosts(iInObj).category = CostCategory::Maintenance;
+            elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". The category of Maintenance will be used.");
         }
         //   N1,  \field Cost
         //        \type real
-        elcc->RecurringCosts(iInObj).cost = NumArray(1);
+        elcc->RecurringCosts[iInObj].cost = NumArray(1);
         //   A3,  \field Start of Costs
         //        \type choice
         //        \key ServicePeriod
         //        \key BasePeriod
         //        \default ServicePeriod
         if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-            elcc->RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+            elcc->RecurringCosts[iInObj].startOfCosts = iStartCosts::ServicePeriod;
         } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-            elcc->RecurringCosts(iInObj).startOfCosts = iStartCosts::BasePeriod;
+            elcc->RecurringCosts[iInObj].startOfCosts = iStartCosts::BasePeriod;
         } else {
-            elcc->RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+            elcc->RecurringCosts[iInObj].startOfCosts = iStartCosts::ServicePeriod;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
@@ -539,14 +539,14 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \type integer
         //        \minimum 0
         //        \maximum 100
-        elcc->RecurringCosts(iInObj).yearsFromStart = int(NumArray(2));
-        if (elcc->RecurringCosts(iInObj).yearsFromStart > 100) {
+        elcc->RecurringCosts[iInObj].yearsFromStart = int(NumArray(2));
+        if (elcc->RecurringCosts[iInObj].yearsFromStart > 100) {
             ShowWarningError(
                 state,
                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
         }
-        if (elcc->RecurringCosts(iInObj).yearsFromStart < 0) {
+        if (elcc->RecurringCosts[iInObj].yearsFromStart < 0) {
             ShowWarningError(
                 state,
                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
@@ -556,14 +556,14 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \type integer
         //        \minimum 0
         //        \maximum 1200
-        elcc->RecurringCosts(iInObj).monthsFromStart = int(NumArray(3));
-        if (elcc->RecurringCosts(iInObj).monthsFromStart > 1200) {
+        elcc->RecurringCosts[iInObj].monthsFromStart = int(NumArray(3));
+        if (elcc->RecurringCosts[iInObj].monthsFromStart > 1200) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
                                  "economic evaluation. ");
         }
-        if (elcc->RecurringCosts(iInObj).monthsFromStart < 0) {
+        if (elcc->RecurringCosts[iInObj].monthsFromStart < 0) {
             ShowWarningError(
                 state,
                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
@@ -573,14 +573,14 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \type integer
         //        \minimum 1
         //        \maximum 100
-        elcc->RecurringCosts(iInObj).repeatPeriodYears = int(NumArray(4));
-        if (elcc->RecurringCosts(iInObj).repeatPeriodYears > 100) {
+        elcc->RecurringCosts[iInObj].repeatPeriodYears = int(NumArray(4));
+        if (elcc->RecurringCosts[iInObj].repeatPeriodYears > 100) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  This value is the number of years between occurrences of the cost so a value greater than 100 is not reasonable "
                                  "for an economic evaluation. ");
         }
-        if (elcc->RecurringCosts(iInObj).repeatPeriodYears < 1) {
+        if (elcc->RecurringCosts[iInObj].repeatPeriodYears < 1) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
                                  ".  This value is the number of years between occurrences of the cost so a value less than 1 is not reasonable for "
@@ -590,42 +590,42 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \type integer
         //        \minimum 0
         //        \maximum 1200
-        elcc->RecurringCosts(iInObj).repeatPeriodMonths = int(NumArray(5));
-        if (elcc->RecurringCosts(iInObj).repeatPeriodMonths > 1200) {
+        elcc->RecurringCosts[iInObj].repeatPeriodMonths = int(NumArray(5));
+        if (elcc->RecurringCosts[iInObj].repeatPeriodMonths > 1200) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
                                  ".  This value is the number of months between occurrences of the cost so a value greater than 1200 is not "
                                  "reasonable for an economic evaluation. ");
         }
-        if (elcc->RecurringCosts(iInObj).repeatPeriodMonths < 0) {
+        if (elcc->RecurringCosts[iInObj].repeatPeriodMonths < 0) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
                                  ".  This value is the number of months between occurrences of the cost so a value less than 0 is not reasonable for "
                                  "an economic evaluation. ");
         }
-        if ((elcc->RecurringCosts(iInObj).repeatPeriodMonths == 0) && (elcc->RecurringCosts(iInObj).repeatPeriodYears == 0)) {
+        if ((elcc->RecurringCosts[iInObj].repeatPeriodMonths == 0) && (elcc->RecurringCosts[iInObj].repeatPeriodYears == 0)) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in fields " + state.dataIPShortCut->cNumericFieldNames(5) + " and " +
                                  state.dataIPShortCut->cNumericFieldNames(4) + ".  The repeat period must not be zero months and zero years. ");
         }
         //   N6;  \field Annual escalation rate
         //        \type real
-        elcc->RecurringCosts(iInObj).annualEscalationRate = int(NumArray(6));
-        if (elcc->RecurringCosts(iInObj).annualEscalationRate > 0.30) {
+        elcc->RecurringCosts[iInObj].annualEscalationRate = int(NumArray(6));
+        if (elcc->RecurringCosts[iInObj].annualEscalationRate > 0.30) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
                                  ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
         }
-        if (elcc->RecurringCosts(iInObj).annualEscalationRate < -0.30) {
+        if (elcc->RecurringCosts[iInObj].annualEscalationRate < -0.30) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
                                  ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
         }
         // express the years and months fields in total months
-        elcc->RecurringCosts(iInObj).totalMonthsFromStart =
-            elcc->RecurringCosts(iInObj).yearsFromStart * 12 + elcc->RecurringCosts(iInObj).monthsFromStart;
-        elcc->RecurringCosts(iInObj).totalRepeatPeriodMonths =
-            elcc->RecurringCosts(iInObj).repeatPeriodYears * 12 + elcc->RecurringCosts(iInObj).repeatPeriodMonths;
+        elcc->RecurringCosts[iInObj].totalMonthsFromStart =
+            elcc->RecurringCosts[iInObj].yearsFromStart * 12 + elcc->RecurringCosts[iInObj].monthsFromStart;
+        elcc->RecurringCosts[iInObj].totalRepeatPeriodMonths =
+            elcc->RecurringCosts[iInObj].repeatPeriodYears * 12 + elcc->RecurringCosts[iInObj].repeatPeriodMonths;
     }
 }
 

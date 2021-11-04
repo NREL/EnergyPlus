@@ -394,7 +394,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     Array1D<Real64> EscalatedTotEnergy;
     std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
 
-    EPVector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
+    std::vector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
     EPVector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
     EPVector<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
     EPVector<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
@@ -444,7 +444,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->AfterTaxPresentValue.deallocate();
         this->EscalatedTotEnergy.deallocate();
         this->EscalatedEnergy.clear();
-        this->RecurringCosts.deallocate();
+        this->RecurringCosts.clear();
         this->NonrecurringCost.deallocate();
         this->UsePriceEscalation.deallocate();
         this->UseAdjustment.deallocate();
