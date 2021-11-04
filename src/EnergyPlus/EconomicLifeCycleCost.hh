@@ -85,8 +85,9 @@ namespace EconomicLifeCycleCost {
         CurrentDollar,
     };
 
-    enum class iDeprMethod
+    enum class DeprMethod
     {
+        Unassigned = -1,
         MACRS3,
         MACRS5,
         MACRS7,
@@ -98,6 +99,21 @@ namespace EconomicLifeCycleCost {
         Straight39,
         Straight40,
         None,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)>  DeprMethodNames {
+        "ModifiedAcceleratedCostRecoverySystem-3year",
+        "ModifiedAcceleratedCostRecoverySystem-5year",
+        "ModifiedAcceleratedCostRecoverySystem-7year",
+        "ModifiedAcceleratedCostRecoverySystem-10year",
+        "ModifiedAcceleratedCostRecoverySystem-15year",
+        "ModifiedAcceleratedCostRecoverySystem-20year",
+        "StraightLine-27year",
+        "StraightLine-31year",
+        "StraightLine-39year",
+        "StraightLine-40year",
+        "None",
     };
     
     enum CostCategory
@@ -120,6 +136,21 @@ namespace EconomicLifeCycleCost {
         TotCaptl,
         TotGrand,
         Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)>  CostCategoryNames {
+"Maintenance",
+"Repair",
+"Operation",
+"Replacement",
+"Minor Overhaul",
+"Major Overhaul",
+"Other Operational",
+"Construction",
+"Salvage",
+"Other Capital",
+"Water",
+"Energy",
     };
 
     // The NIST supplement includes UPV* factors for
@@ -358,7 +389,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     int lengthStudyYears = 0;                                                                              // Length of Study Period in Years
     int lengthStudyTotalMonths = 0; // Length of Study expressed in months (years x 12)
     Real64 taxRate = 0.0;           // Tax rate
-    EconomicLifeCycleCost::iDeprMethod depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None; // Depreciation Method
+    EconomicLifeCycleCost::DeprMethod depreciationMethod = EconomicLifeCycleCost::DeprMethod::None; // Depreciation Method
     // derived
     int lastDateMonth = 0; // Last Date Month (the month before the base date month)
     int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
@@ -420,7 +451,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->lengthStudyYears = 0;
         this->lengthStudyTotalMonths = 0;
         this->taxRate = 0.0;
-        this->depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None;
+        this->depreciationMethod = EconomicLifeCycleCost::DeprMethod::None;
         this->lastDateMonth = 0;
         this->lastDateYear = 0;
         this->numRecurringCosts = 0;

@@ -390,33 +390,33 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key None
         //      \default None
         if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-3year")) {
-            elcc->depreciationMethod = iDeprMethod::MACRS3;
+            elcc->depreciationMethod = DeprMethod::MACRS3;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-5year")) {
-            elcc->depreciationMethod = iDeprMethod::MACRS5;
+            elcc->depreciationMethod = DeprMethod::MACRS5;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-7year")) {
-            elcc->depreciationMethod = iDeprMethod::MACRS7;
+            elcc->depreciationMethod = DeprMethod::MACRS7;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-10year")) {
-            elcc->depreciationMethod = iDeprMethod::MACRS10;
+            elcc->depreciationMethod = DeprMethod::MACRS10;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-15year")) {
-            elcc->depreciationMethod = iDeprMethod::MACRS15;
+            elcc->depreciationMethod = DeprMethod::MACRS15;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-20year")) {
-            elcc->depreciationMethod = iDeprMethod::MACRS20;
+            elcc->depreciationMethod = DeprMethod::MACRS20;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-27year")) {
-            elcc->depreciationMethod = iDeprMethod::Straight27;
+            elcc->depreciationMethod = DeprMethod::Straight27;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-31year")) {
-            elcc->depreciationMethod = iDeprMethod::Straight31;
+            elcc->depreciationMethod = DeprMethod::Straight31;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-39year")) {
-            elcc->depreciationMethod = iDeprMethod::Straight39;
+            elcc->depreciationMethod = DeprMethod::Straight39;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-40year")) {
-            elcc->depreciationMethod = iDeprMethod::Straight40;
+            elcc->depreciationMethod = DeprMethod::Straight40;
         } else if (UtilityRoutines::SameString(AlphaArray(6), "None")) {
-            elcc->depreciationMethod = iDeprMethod::None;
+            elcc->depreciationMethod = DeprMethod::None;
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            elcc->depreciationMethod = iDeprMethod::None;
+            elcc->depreciationMethod = DeprMethod::None;
             ShowWarningError(
                 state, CurrentModuleObject + ": The input field " + state.dataIPShortCut->cAlphaFieldNames(6) + "is blank. \"None\" will be used.");
         } else {
-            elcc->depreciationMethod = iDeprMethod::None;
+            elcc->depreciationMethod = DeprMethod::None;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphaArray(6) +
                                  R"(". "None" will be used.)");
@@ -1724,21 +1724,24 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // and should not be confused with the length of the study. For 27 years, 31 years, 39 years and 40 years
     // the June value was used.
     DepreciationPercent = 0.0; // default all values to zero
-    {
-        auto const SELECT_CASE_var(elcc->depreciationMethod);
-        if (SELECT_CASE_var == iDeprMethod::MACRS3) { // IRS Publication 946 for 2009 Table A-1
+    switch (elcc->depreciationMethod) {
+    case (DeprMethod::MACRS3): { // IRS Publication 946 for 2009 Table A-1
             DepreciationPercent(1) = 33.33;
             DepreciationPercent(2) = 44.45;
             DepreciationPercent(3) = 14.81;
             DepreciationPercent(4) = 7.41;
-        } else if (SELECT_CASE_var == iDeprMethod::MACRS5) { // IRS Publication 946 for 2009 Table A-1
+        break;
+    }
+    case (DeprMethod::MACRS5): { // IRS Publication 946 for 2009 Table A-1
             DepreciationPercent(1) = 20.0;
             DepreciationPercent(2) = 32.0;
             DepreciationPercent(3) = 19.2;
             DepreciationPercent(4) = 11.52;
             DepreciationPercent(5) = 11.52;
             DepreciationPercent(6) = 5.76;
-        } else if (SELECT_CASE_var == iDeprMethod::MACRS7) { // IRS Publication 946 for 2009 Table A-1
+        break;
+    }
+    case (DeprMethod::MACRS7): { // IRS Publication 946 for 2009 Table A-1
             DepreciationPercent(1) = 14.29;
             DepreciationPercent(2) = 24.49;
             DepreciationPercent(3) = 17.49;
@@ -1747,7 +1750,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(6) = 8.92;
             DepreciationPercent(7) = 8.93;
             DepreciationPercent(8) = 4.46;
-        } else if (SELECT_CASE_var == iDeprMethod::MACRS10) { // IRS Publication 946 for 2009 Table A-1
+        break;
+    }
+    case (DeprMethod::MACRS10): { // IRS Publication 946 for 2009 Table A-1
             DepreciationPercent(1) = 10.0;
             DepreciationPercent(2) = 18.0;
             DepreciationPercent(3) = 14.4;
@@ -1759,7 +1764,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(9) = 6.56;
             DepreciationPercent(10) = 6.55;
             DepreciationPercent(11) = 3.28;
-        } else if (SELECT_CASE_var == iDeprMethod::MACRS15) { // IRS Publication 946 for 2009 Table A-1
+        break;
+    }
+    case (DeprMethod::MACRS15): { // IRS Publication 946 for 2009 Table A-1
             DepreciationPercent(1) = 5.0;
             DepreciationPercent(2) = 9.5;
             DepreciationPercent(3) = 8.55;
@@ -1776,7 +1783,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(14) = 5.9;
             DepreciationPercent(15) = 5.91;
             DepreciationPercent(16) = 2.95;
-        } else if (SELECT_CASE_var == iDeprMethod::MACRS20) { // IRS Publication 946 for 2009 Table A-1
+        break;
+    }
+    case (DeprMethod::MACRS20): { // IRS Publication 946 for 2009 Table A-1
             DepreciationPercent(1) = 3.75;
             DepreciationPercent(2) = 7.219;
             DepreciationPercent(3) = 6.677;
@@ -1798,7 +1807,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(19) = 4.462;
             DepreciationPercent(20) = 4.461;
             DepreciationPercent(21) = 2.231;
-        } else if (SELECT_CASE_var == iDeprMethod::Straight27) { // IRS Publication 946 for 2009 Table A-6 (June)
+        break;
+    }
+    case (DeprMethod::Straight27): { // IRS Publication 946 for 2009 Table A-6 (June)
             DepreciationPercent(1) = 1.97;
             DepreciationPercent(2) = 3.636;
             DepreciationPercent(3) = 3.636;
@@ -1827,7 +1838,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(26) = 3.637;
             DepreciationPercent(27) = 3.636;
             DepreciationPercent(28) = 3.485;
-        } else if (SELECT_CASE_var == iDeprMethod::Straight31) { // IRS Publication 946 for 2009 Table A-7 (June)
+        break;
+    }
+    case (DeprMethod::Straight31): { // IRS Publication 946 for 2009 Table A-7 (June)
             DepreciationPercent(1) = 1.72;
             DepreciationPercent(2) = 3.175;
             DepreciationPercent(3) = 3.175;
@@ -1860,7 +1873,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(30) = 3.174;
             DepreciationPercent(31) = 3.175;
             DepreciationPercent(32) = 3.042;
-        } else if (SELECT_CASE_var == iDeprMethod::Straight39) { // IRS Publication 946 for 2009 Table A-7a (June)
+        break;
+    }
+    case (DeprMethod::Straight39): { // IRS Publication 946 for 2009 Table A-7a (June)
             DepreciationPercent(1) = 1.391;
             DepreciationPercent(2) = 2.564;
             DepreciationPercent(3) = 2.564;
@@ -1901,7 +1916,9 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(38) = 2.564;
             DepreciationPercent(39) = 2.564;
             DepreciationPercent(40) = 1.177;
-        } else if (SELECT_CASE_var == iDeprMethod::Straight40) { // IRS Publication 946 for 2009 Table A-13 (June)
+        break;
+    }
+    case (DeprMethod::Straight40): { // IRS Publication 946 for 2009 Table A-13 (June)
             DepreciationPercent(1) = 1.354;
             DepreciationPercent(2) = 2.5;
             DepreciationPercent(3) = 2.5;
@@ -1943,7 +1960,10 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
             DepreciationPercent(39) = 2.5;
             DepreciationPercent(40) = 2.5;
             DepreciationPercent(41) = 1.146;
-        }
+        break;
+    }
+    default:
+        break;
     }
     // convert construction costs (not salvage) into depreciation
     elcc->DepreciatedCapital = 0.0; // set all years to zero
@@ -2090,32 +2110,8 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody(1, 8) = format("{} {}", MonthNames(elcc->serviceDateMonth), elcc->serviceDateYear);
         tableBody(1, 9) = fmt::to_string(elcc->lengthStudyYears);
         tableBody(1, 10) = RealToStr(elcc->taxRate, 4);
-        {
-            auto const SELECT_CASE_var(elcc->depreciationMethod);
-            if (SELECT_CASE_var == iDeprMethod::MACRS3) {
-                tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-3year";
-            } else if (SELECT_CASE_var == iDeprMethod::MACRS5) {
-                tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-5year";
-            } else if (SELECT_CASE_var == iDeprMethod::MACRS7) {
-                tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-7year";
-            } else if (SELECT_CASE_var == iDeprMethod::MACRS10) {
-                tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-10year";
-            } else if (SELECT_CASE_var == iDeprMethod::MACRS15) {
-                tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-15year";
-            } else if (SELECT_CASE_var == iDeprMethod::MACRS20) {
-                tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-20year";
-            } else if (SELECT_CASE_var == iDeprMethod::Straight27) {
-                tableBody(1, 11) = "StraightLine-27year";
-            } else if (SELECT_CASE_var == iDeprMethod::Straight31) {
-                tableBody(1, 11) = "StraightLine-31year";
-            } else if (SELECT_CASE_var == iDeprMethod::Straight39) {
-                tableBody(1, 11) = "StraightLine-39year";
-            } else if (SELECT_CASE_var == iDeprMethod::Straight40) {
-                tableBody(1, 11) = "StraightLine-40year";
-            } else if (SELECT_CASE_var == iDeprMethod::None) {
-                tableBody(1, 11) = "None";
-            }
-        }
+        tableBody(1, 11) = DeprMethodNames[static_cast<int>(elcc->depreciationMethod)];
+
         columnWidth = 14; // array assignment - same for all columns
         WriteSubtitle(state, "Life-Cycle Cost Parameters");
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2559,35 +2555,25 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
             offset = CostCategory::Num;
             rowHead(jObj+1) = elcc->CashFlow[offset + jObj].name;
-            {
-                auto const SELECT_CASE_var(elcc->CashFlow[offset + jObj].Category);
-                if (SELECT_CASE_var == CostCategory::Maintenance) {
-                    tableBody(1, jObj+1) = "Maintenance";
-                } else if (SELECT_CASE_var == CostCategory::Repair) {
-                    tableBody(1, jObj+1) = "Repair";
-                } else if (SELECT_CASE_var == CostCategory::Operation) {
-                    tableBody(1, jObj+1) = "Operation";
-                } else if (SELECT_CASE_var == CostCategory::Replacement) {
-                    tableBody(1, jObj+1) = "Replacement";
-                } else if (SELECT_CASE_var == CostCategory::MinorOverhaul) {
-                    tableBody(1, jObj+1) = "Minor Overhaul";
-                } else if (SELECT_CASE_var == CostCategory::MajorOverhaul) {
-                    tableBody(1, jObj+1) = "Major Overhaul";
-                } else if (SELECT_CASE_var == CostCategory::OtherOperational) {
-                    tableBody(1, jObj+1) = "Other Operational";
-                } else if (SELECT_CASE_var == CostCategory::Construction) {
-                    tableBody(1, jObj+1) = "Construction";
-                } else if (SELECT_CASE_var == CostCategory::Salvage) {
-                    tableBody(1, jObj+1) = "Salvage";
-                } else if (SELECT_CASE_var == CostCategory::OtherCapital) {
-                    tableBody(1, jObj+1) = "Other Capital";
-                } else if (SELECT_CASE_var == CostCategory::Water) {
-                    tableBody(1, jObj+1) = "Water";
-                } else if (SELECT_CASE_var == CostCategory::Energy) {
-                    tableBody(1, jObj+1) = "Energy";
-                } else {
-                    tableBody(1, jObj+1) = "-";
+            switch (elcc->CashFlow[offset + jObj].Category) {
+                case (CostCategory::Maintenance):
+                case (CostCategory::Repair):
+                case (CostCategory::Operation):
+                case (CostCategory::Replacement):
+                case (CostCategory::MinorOverhaul):
+                case (CostCategory::MajorOverhaul):
+                case (CostCategory::OtherOperational):
+                case (CostCategory::Construction):
+                case (CostCategory::Salvage):
+                case (CostCategory::OtherCapital):
+                case (CostCategory::Water):
+                case (CostCategory::Energy): {
+                    tableBody(1, jObj+1) = CostCategoryNames[static_cast<int>(elcc->CashFlow[offset + jObj].Category)];
+                    break;
                 }
+                default:
+                    tableBody(1, jObj+1) = "-";
+                    break;
             }
             switch (elcc->CashFlow[offset + jObj].SourceKind){
             case (SourceKindType::Nonrecurring): {
