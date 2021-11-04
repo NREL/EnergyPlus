@@ -869,7 +869,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int const HoursInDay(24);
+    int constexpr HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -2197,7 +2197,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int const HoursInDay(24);
+    int constexpr HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -2964,7 +2964,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    int const HoursInDay(24);
+    int constexpr HoursInDay(24);
     state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
         state->dataSurface->SurfSunCosHourly(hour) = 0.0;

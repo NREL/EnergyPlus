@@ -136,13 +136,13 @@ namespace EcoRoofManager {
         using ConvectionCoefficients::SetIntConvectionCoeff;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Kv(0.4);           // Von Karmen's constant (source FASST)
-        Real64 const rch(0.63);         // Turbulent Schimdt Number
-        Real64 const rche(0.71);        // Turbulent Prandtl Number
-        Real64 const Rair(0.286e3);     // Gas Constant of air J/Kg K
-        Real64 const g1(9.81);          // Gravity. In m/sec^2.
-        Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant W/m^2K^4
-        Real64 const Cpa(1005.6);       // Specific heat of Water Vapor. (J/Kg.K)
+        Real64 constexpr Kv(0.4);           // Von Karmen's constant (source FASST)
+        Real64 constexpr rch(0.63);         // Turbulent Schimdt Number
+        Real64 constexpr rche(0.71);        // Turbulent Prandtl Number
+        Real64 constexpr Rair(0.286e3);     // Gas Constant of air J/Kg K
+        Real64 constexpr g1(9.81);          // Gravity. In m/sec^2.
+        Real64 constexpr Sigma(5.6697e-08); // Stefan-Boltzmann constant W/m^2K^4
+        Real64 constexpr Cpa(1005.6);       // Specific heat of Water Vapor. (J/Kg.K)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
@@ -492,7 +492,7 @@ namespace EcoRoofManager {
                 Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                              F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                                        state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                                       state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
+                                       state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
                                        state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
@@ -797,11 +797,11 @@ namespace EcoRoofManager {
         static Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
 
         // Soil Parameters from Reference listed in the code:
-        Real64 const alpha(23.0); // These parameters are empirical constants
-        Real64 const n(1.27);     // These parameters are empirical constants
-        Real64 const lambda(0.5); // These parameters are empirical constants
+        Real64 constexpr alpha(23.0); // These parameters are empirical constants
+        Real64 constexpr n(1.27);     // These parameters are empirical constants
+        Real64 constexpr lambda(0.5); // These parameters are empirical constants
         // This is another parameter of the soil which describes the soil conductivity at the saturation point (m/s)
-        Real64 const SoilConductivitySaturation(5.157e-7);
+        Real64 constexpr SoilConductivitySaturation(5.157e-7);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

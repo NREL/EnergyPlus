@@ -857,11 +857,11 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
         } else { // don't rely on sizing, use loop setpoints
             // loop supply side
-            if (state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp =
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPoint;
             } else if (state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme ==
-                       DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                       DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp =
                     (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPointHi +
                      state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPointLo) /
@@ -873,11 +873,11 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp;
         } else { // don't rely on sizing, use loop setpoints
             // loop demand side
-            if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp =
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPoint;
             } else if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme ==
-                       DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                       DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp =
                     (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPointHi +
                      state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPointLo) /
@@ -1813,8 +1813,8 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
     static constexpr std::string_view RoutineName("CalcFluidHeatExchanger");
 
-    int const CmaxMixedCminUnmixed(40);
-    int const CmaxUnMixedCminMixed(41);
+    int constexpr CmaxMixedCminUnmixed(40);
+    int constexpr CmaxUnMixedCminMixed(41);
 
     Real64 SupSideLoopInletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
     Real64 DmdSideLoopInletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
@@ -2039,8 +2039,8 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     // METHODOLOGY EMPLOYED:
     // uses E+'s Regula Falsi numerical method
 
-    int const MaxIte(500);   // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3); // Accuracy of solver result
+    int constexpr MaxIte(500); // Maximum number of iterations for solver
+    Real64 const Acc(1.e-3);   // Accuracy of solver result
 
     int SolFla;             // Flag of solver
     Array1D<Real64> Par(2); // Parameter array passed to solver
@@ -2266,7 +2266,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                 this->DemandSideLoop.loopNum,
                                                 this->DemandSideLoop.loopSideNum,
                                                 this->DemandSideLoop.branchNum,
@@ -2282,7 +2282,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
-                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
                                    this->Name));
             ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
@@ -2290,7 +2290,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                 this->SupplySideLoop.loopNum,
                                                 this->SupplySideLoop.loopSideNum,
                                                 this->SupplySideLoop.branchNum,
@@ -2306,7 +2306,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
-                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
                                    this->Name));
             ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
@@ -2317,7 +2317,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
-                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg)],
                                    this->Name));
             ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;
@@ -2328,7 +2328,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                           this->SupplySideLoop.loopSideNum,
                                                           this->DemandSideLoop.loopNum,
                                                           this->DemandSideLoop.loopSideNum,
-                                                          DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                          DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                           true);
         }
 
@@ -2361,12 +2361,12 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                 auto const SELECT_CASE_var(
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed);
 
-                if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCap) {
+                if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCap) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
-                        DataPlant::HowMet_ByNominalCapFreeCoolCntrl;
-                } else if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCapLowOutLimit) {
+                        DataPlant::HowMet::ByNominalCapFreeCoolCntrl;
+                } else if (SELECT_CASE_var == DataPlant::HowMet::ByNominalCapLowOutLimit) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
-                        DataPlant::HowMet_ByNominalCapLowOutLimitFreeCoolCntrl;
+                        DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl;
                 }
             }
 
@@ -2374,13 +2374,13 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                 auto const SELECT_CASE_var(this->ControlSignalTemp);
                 if (SELECT_CASE_var == iCtrlTemp::WetBulbTemperature) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                        DataPlant::iFreeCoolControlMode::WetBulb;
+                        DataPlant::FreeCoolControlMode::WetBulb;
                 } else if (SELECT_CASE_var == iCtrlTemp::DryBulbTemperature) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                        DataPlant::iFreeCoolControlMode::DryBulb;
+                        DataPlant::FreeCoolControlMode::DryBulb;
                 } else if (SELECT_CASE_var == iCtrlTemp::LoopTemperature) {
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                        DataPlant::iFreeCoolControlMode::Loop;
+                        DataPlant::FreeCoolControlMode::Loop;
                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
                         this->OtherCompDemandSideLoop.inletNodeNum;
                 }
@@ -2390,7 +2390,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             if (this->OtherCompSupplySideLoop.inletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->ComponentUserName,
-                                                        this->ComponentTypeOfNum,
+                                                        this->ComponentType,
                                                         this->OtherCompSupplySideLoop.loopNum,
                                                         this->OtherCompSupplySideLoop.loopSideNum,
                                                         this->OtherCompSupplySideLoop.branchNum,
@@ -2405,7 +2405,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             if (this->OtherCompDemandSideLoop.inletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->ComponentUserName,
-                                                        this->ComponentTypeOfNum,
+                                                        this->ComponentType,
                                                         this->OtherCompDemandSideLoop.loopNum,
                                                         this->OtherCompDemandSideLoop.loopSideNum,
                                                         this->OtherCompDemandSideLoop.branchNum,

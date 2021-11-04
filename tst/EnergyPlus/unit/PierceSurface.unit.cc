@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Triangular)
 
 TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexOctagonal)
 {
-    int const N(8); // Number of vertices and edges
+    int constexpr N(8); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
     Real64 const wedge(TwoPi / N);
     DataSurfaces::SurfaceData floor;
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
 
 TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexNGon)
 {
-    int const N(32); // Number of vertices and edges
+    int constexpr N(32); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
     Real64 const wedge(TwoPi / N);
     DataSurfaces::SurfaceData floor;

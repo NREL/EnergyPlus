@@ -65,10 +65,10 @@ struct EnergyPlusData;
 
 namespace HeatBalanceKivaManager {
 
-    const int KIVAZONE_UNCONTROLLED = 0;
-    const int KIVAZONE_TEMPCONTROL = 1;
-    const int KIVAZONE_COMFORTCONTROL = 2;
-    const int KIVAZONE_STAGEDCONTROL = 3;
+    constexpr int KIVAZONE_UNCONTROLLED = 0;
+    constexpr int KIVAZONE_TEMPCONTROL = 1;
+    constexpr int KIVAZONE_COMFORTCONTROL = 2;
+    constexpr int KIVAZONE_STAGEDCONTROL = 3;
 
     class KivaWeatherData
     {

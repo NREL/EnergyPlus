@@ -1884,9 +1884,6 @@ namespace HVACMultiSpeedHeatPump {
         // temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
         // Using/Aliasing
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
-        using DataPlant::TypeOf_MultiSpeedHeatPumpRecovery;
         using DataSizing::AutoSize;
         using Fans::GetFanIndex;
         using Fans::GetFanVolFlow;
@@ -1954,7 +1951,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).Name,
-                                        TypeOf_MultiSpeedHeatPumpRecovery,
+                                        DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery,
                                         MSHeatPump(MSHeatPumpNum).HRLoopNum,
                                         MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
@@ -1977,7 +1974,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
@@ -2015,7 +2012,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
@@ -2049,7 +2046,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
@@ -2087,7 +2084,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
@@ -3220,7 +3217,7 @@ namespace HVACMultiSpeedHeatPump {
         using Psychrometrics::PsyCpAirFnW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500); // maximum number of iterations
+        int constexpr MaxIte(500); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;         // unit full output when compressor is operating [W]
@@ -4686,8 +4683,8 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-        int const SolveMaxIter(50);
+        Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+        int constexpr SolveMaxIter(50);
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

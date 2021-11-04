@@ -97,8 +97,8 @@ namespace WaterUse {
         // This routine is called from non zone equipment manager and serves to call
         // water use and connections that are not connected to a full plant loop
 
-        int const MaxIterations(100);
-        Real64 const Tolerance(0.1); // Make input?
+        int constexpr MaxIterations(100);
+        Real64 constexpr Tolerance(0.1); // Make input?
 
         int WaterEquipNum;
         int WaterConnNum;
@@ -220,8 +220,8 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Plant sim call for plant loop connected water use and connections
 
-        int const MaxIterations(100);
-        Real64 const Tolerance(0.1); // Make input?
+        int constexpr MaxIterations(100);
+        Real64 constexpr Tolerance(0.1); // Make input?
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             if (state.dataWaterUse->numWaterEquipment > 0) {
@@ -855,7 +855,7 @@ namespace WaterUse {
                                   this->Zone,
                                   "WaterUse:Equipment",
                                   this->Name,
-                                  DataHeatBalance::IntGainTypeOf_WaterUseEquipment,
+                                  DataHeatBalance::IntGainType::WaterUseEquipment,
                                   &this->SensibleRateNoMultiplier,
                                   nullptr,
                                   nullptr,
@@ -1674,7 +1674,7 @@ namespace WaterUse {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_WaterUseConnection,
+                                                    DataPlant::PlantEquipmentType::WaterUseConnection,
                                                     this->PlantLoopNum,
                                                     this->PlantLoopSide,
                                                     this->PlantLoopBranchNum,

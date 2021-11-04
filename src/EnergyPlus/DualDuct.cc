@@ -1885,7 +1885,7 @@ namespace DualDuct {
 
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+        bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
         Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
         Real64 OAMassFlow;       // outside air mass flow rate (kg/s)
@@ -1944,7 +1944,7 @@ namespace DualDuct {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+        bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

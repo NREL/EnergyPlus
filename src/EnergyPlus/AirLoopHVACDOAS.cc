@@ -503,7 +503,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterCooling,
+                                                                DataPlant::PlantEquipmentType::CoilWaterCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -536,7 +536,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterSimpleHeating,
+                                                                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                                                 thisDOAS.HWLoopNum,
                                                                 thisDOAS.HWLoopSide,
                                                                 thisDOAS.HWBranchNum,
@@ -576,7 +576,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
+                                                                DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -1056,8 +1056,8 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
 
-        int const summerDesignDayTypeIndex(9);
-        int const winterDesignDayTypeIndex(10);
+        int constexpr summerDesignDayTypeIndex(9);
+        int constexpr winterDesignDayTypeIndex(10);
 
         for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day

@@ -271,6 +271,8 @@ namespace DataTimings {
 #ifdef EP_Timings
         int loop;
 
+        char const tabchar = '\t';
+
         print(auditFile, "Timing Element{}# calls{}Time {{s}}{}Time {{s}} (per call)\n", tabchar, tabchar, tabchar);
 
         for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {

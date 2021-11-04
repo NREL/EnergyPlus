@@ -65,7 +65,7 @@ namespace PlantPressureSystem {
     void SimPressureDropSystem(EnergyPlusData &state,
                                int LoopNum,                        // Plant Loop to update pressure information
                                bool FirstHVACIteration,            // System flag
-                               DataPlant::iPressureCall CallType,  // Enumerated call type
+                               DataPlant::PressureCall CallType,   // Enumerated call type
                                Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
                                Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );

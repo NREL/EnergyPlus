@@ -518,7 +518,7 @@ namespace SplitterComponent {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        Real64 const FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
+        Real64 constexpr FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
 
         int InletNode;
         int OutletNode;
