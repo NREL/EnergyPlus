@@ -70,11 +70,13 @@ namespace EconomicLifeCycleCost {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    enum class iDiscConv
+    enum class DiscConv
     {
+        Unassigned = -1,
         BeginOfYear,
         MidYear,
         EndOfYear,
+        Num
     };
 
     enum class iInflAppr
@@ -343,7 +345,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     // related to LifeCycleCost:Parameters
     bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
     std::string LCCname;          // Name
-    EconomicLifeCycleCost::iDiscConv discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;     // Discounting Convention
+    EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;     // Discounting Convention
     EconomicLifeCycleCost::iInflAppr inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar; // Inflation Approach
     Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
     Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
@@ -405,7 +407,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     {
         this->LCCparamPresent = false;
         this->LCCname.clear();
-        this->discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;
+        this->discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;
         this->inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar;
         this->realDiscountRate = 0.0;
         this->nominalDiscountRate = 0.0;

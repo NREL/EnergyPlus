@@ -223,13 +223,13 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key BeginningOfYear
         //      \default EndOfYear
         if (UtilityRoutines::SameString(AlphaArray(2), "EndOfYear")) {
-            elcc->discountConvention = iDiscConv::EndOfYear;
+            elcc->discountConvention = DiscConv::EndOfYear;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "MidYear")) {
-            elcc->discountConvention = iDiscConv::MidYear;
+            elcc->discountConvention = DiscConv::MidYear;
         } else if (UtilityRoutines::SameString(AlphaArray(2), "BeginningOfYear")) {
-            elcc->discountConvention = iDiscConv::BeginOfYear;
+            elcc->discountConvention = DiscConv::BeginOfYear;
         } else {
-            elcc->discountConvention = iDiscConv::EndOfYear;
+            elcc->discountConvention = DiscConv::EndOfYear;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". EndOfYear will be used.");
@@ -1548,16 +1548,21 @@ void ComputePresentValue(EnergyPlusData &state)
     // compute single present values based on real discount rates
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
         // NIST 155 D.2.1.1 - Single Present Value (SPV) formula
-        {
-            auto const SELECT_CASE_var(elcc->discountConvention);
-            if (SELECT_CASE_var == iDiscConv::BeginOfYear) {
+        switch (elcc->discountConvention) {
+        case (DiscConv::BeginOfYear): {
                 effectiveYear = double(jYear) - 1.0;
-            } else if (SELECT_CASE_var == iDiscConv::MidYear) {
+            break;
+        }
+        case (DiscConv::MidYear): {
                 effectiveYear = double(jYear) - 0.5;
-            } else if (SELECT_CASE_var == iDiscConv::EndOfYear) {
+            break;
+        }
+        case (DiscConv::EndOfYear): {
                 effectiveYear = double(jYear);
-            } else {
-            }
+        break;
+        }
+        default:
+            break;
         }
         elcc->SPV(jYear) = 1.0 / std::pow(1.0 + curDiscountRate, effectiveYear);
     }
@@ -1573,16 +1578,21 @@ void ComputePresentValue(EnergyPlusData &state)
         if (curResource != DataGlobalConstants::ResourceType::None) {
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
-                {
-                    auto const SELECT_CASE_var(elcc->discountConvention);
-                    if (SELECT_CASE_var == iDiscConv::BeginOfYear) {
+                switch (elcc->discountConvention) {
+                case (DiscConv::BeginOfYear): {
                         effectiveYear = double(jYear) - 1.0;
-                    } else if (SELECT_CASE_var == iDiscConv::MidYear) {
+                    break;
+                }
+                case (DiscConv::MidYear): {
                         effectiveYear = double(jYear) - 0.5;
-                    } else if (SELECT_CASE_var == iDiscConv::EndOfYear) {
+                    break;
+                }
+                case (DiscConv::EndOfYear): {
                         effectiveYear = double(jYear);
-                    } else {
-                    }
+                    break;
+                }
+                default:
+                    break;
                 }
                 elcc->energySPV.at(jYear).at(curResource) =
                     elcc->UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
@@ -2046,11 +2056,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(1) = "Value";
 
         tableBody(1, 1) = elcc->LCCname;
-        if (elcc->discountConvention == iDiscConv::EndOfYear) {
+        if (elcc->discountConvention == DiscConv::EndOfYear) {
             tableBody(1, 2) = "EndOfYear";
-        } else if (elcc->discountConvention == iDiscConv::MidYear) {
+        } else if (elcc->discountConvention == DiscConv::MidYear) {
             tableBody(1, 2) = "MidYear";
-        } else if (elcc->discountConvention == iDiscConv::BeginOfYear) {
+        } else if (elcc->discountConvention == DiscConv::BeginOfYear) {
             tableBody(1, 2) = "BeginningOfYear";
         }
         if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
