@@ -134,13 +134,14 @@ namespace EconomicLifeCycleCost {
         BasePeriod,
     };
 
-    enum class iSourceKind
+    enum class SourceKindType
     {
-        Unassigned,
+        Unassigned = -1,
         Recurring,
         Nonrecurring,
         Resource,
         Sum,
+        Num
     };
 
     enum class iPrValKind
@@ -264,7 +265,7 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;                           // Name - just for labeling output - use Category for aggregation
-        iSourceKind SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
+        SourceKindType SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
         DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         CostCategory Category;                               // uses "costCat" constants above
         Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
@@ -277,7 +278,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(iSourceKind::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned), pvKind(iPrValKind::Unassigned),
+            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned), pvKind(iPrValKind::Unassigned),
               presentValue(0.), orginalCost(0.)
         {
         }

@@ -1234,7 +1234,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     offset = CostCategory::Num + elcc->numRecurringCosts;
     for (jCost = 0; jCost < elcc->numNonrecurringCost; ++jCost) {
         elcc->CashFlow[offset + jCost].name = elcc->NonrecurringCost[jCost].name;
-        elcc->CashFlow[offset + jCost].SourceKind = iSourceKind::Nonrecurring;
+        elcc->CashFlow[offset + jCost].SourceKind = SourceKindType::Nonrecurring;
         elcc->CashFlow[offset + jCost].Category = elcc->NonrecurringCost[jCost].category;
         elcc->CashFlow[offset + jCost].orginalCost = elcc->NonrecurringCost[jCost].cost;
         elcc->CashFlow[offset + jCost].mnAmount = 0.0;
@@ -1255,7 +1255,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     offset = CostCategory::Num;
     for (jCost = 0; jCost < elcc->numRecurringCosts; ++jCost) {
         elcc->CashFlow[offset + jCost].name = elcc->RecurringCosts[jCost].name;
-        elcc->CashFlow[offset + jCost].SourceKind = iSourceKind::Recurring;
+        elcc->CashFlow[offset + jCost].SourceKind = SourceKindType::Recurring;
         elcc->CashFlow[offset + jCost].Category = elcc->RecurringCosts[jCost].category;
         elcc->CashFlow[offset + jCost].orginalCost = elcc->RecurringCosts[jCost].cost;
         if (elcc->RecurringCosts[jCost].startOfCosts == iStartCosts::ServicePeriod) {
@@ -1318,7 +1318,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
             }
 
             elcc->CashFlow[cashFlowCounter].Resource = iResource;
-            elcc->CashFlow[cashFlowCounter].SourceKind = iSourceKind::Resource;
+            elcc->CashFlow[cashFlowCounter].SourceKind = SourceKindType::Resource;
             elcc->CashFlow[cashFlowCounter].name = GetResourceTypeChar(iResource);
             if (cashFlowCounter <= elcc->numCashFlow) {
                 // put the monthly energy costs into the cashflow prior to adjustments
@@ -1362,7 +1362,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // put cashflows into categories
     for (jCost = 0; jCost < CostCategory::Num; ++jCost) {
         elcc->CashFlow[jCost].Category = static_cast<CostCategory>(jCost); // make each category the type indicated
-        elcc->CashFlow[jCost].SourceKind = iSourceKind::Sum;
+        elcc->CashFlow[jCost].SourceKind = SourceKindType::Sum;
     }
     // add the cashflows by category
     for (jCost = CostCategory::Num-1; jCost < elcc->numCashFlow; ++jCost) {
@@ -1501,9 +1501,8 @@ void ComputePresentValue(EnergyPlusData &state)
 
     // identify how each cashflow should be treated
     for (iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
-        {
-            auto const SELECT_CASE_var(elcc->CashFlow[iCashFlow].SourceKind);
-            if (SELECT_CASE_var == iSourceKind::Resource) {
+        switch (elcc->CashFlow[iCashFlow].SourceKind){
+        case (SourceKindType::Resource): {
                 // only for real fuels purchased such as electricity, natural gas, etc..
                 if ((elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::Electricity) &&
                     (elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
@@ -1511,16 +1510,21 @@ void ComputePresentValue(EnergyPlusData &state)
                 } else {
                     elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NonEnergy;
                 }
-            } else if ((SELECT_CASE_var == iSourceKind::Recurring) || (SELECT_CASE_var == iSourceKind::Nonrecurring)) {
+                break;
+            }
+            case (SourceKindType::Recurring):
+            case (SourceKindType::Nonrecurring): {
                 if (elcc->CashFlow[iCashFlow].Category == CostCategory::Energy) {
                     elcc->CashFlow[iCashFlow].pvKind = iPrValKind::Energy;
                 } else {
                     elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NonEnergy;
                 }
-            } else if (SELECT_CASE_var == iSourceKind::Sum) {
+            break;
+            }
+            case (SourceKindType::Sum):
+            default: {
                 elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NotComputed;
-            } else {
-                elcc->CashFlow[iCashFlow].pvKind = iPrValKind::NotComputed;
+            break;
             }
         }
     }
@@ -2205,14 +2209,13 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
             curCashFlow = CostCategory::Num + jObj;
             columnHead(jObj+1) = elcc->CashFlow[curCashFlow].name;
-            {
-                auto const SELECT_CASE_var(elcc->CashFlow[curCashFlow].SourceKind);
-                if (SELECT_CASE_var == iSourceKind::Nonrecurring) {
-                    tableBody(jObj+1, 1) = "Nonrecurring";
-                } else if (SELECT_CASE_var == iSourceKind::Recurring) {
-                    tableBody(jObj+1, 1) = "Recurring";
-                }
+
+            if (elcc->CashFlow[curCashFlow].SourceKind == SourceKindType::Nonrecurring) {
+                tableBody(jObj + 1, 1) = "Nonrecurring";
+            } else if (elcc->CashFlow[curCashFlow].SourceKind == SourceKindType::Recurring) {
+                tableBody(jObj + 1, 1) = "Recurring";
             }
+
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 tableBody(jObj+1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
@@ -2575,11 +2578,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             {
                 auto const SELECT_CASE_var(elcc->CashFlow[offset + jObj].SourceKind);
-                if (SELECT_CASE_var == iSourceKind::Nonrecurring) {
+                if (SELECT_CASE_var == SourceKindType::Nonrecurring) {
                     tableBody(2, jObj+1) = "Nonrecurring";
-                } else if (SELECT_CASE_var == iSourceKind::Recurring) {
+                } else if (SELECT_CASE_var == SourceKindType::Recurring) {
                     tableBody(2, jObj+1) = "Recurring";
-                } else if (SELECT_CASE_var == iSourceKind::Resource) {
+                } else if (SELECT_CASE_var == SourceKindType::Resource) {
                     if (elcc->CashFlow[offset + jObj].Category == CostCategory::Water) {
                         tableBody(2, jObj+1) = "Water Cost";
                     } else {
