@@ -47,3 +47,42 @@ Sky Daylight Factors,Clear Sky,01/21,ZN_1_FLR_1_SEC_1_DAYLCTRL,ZN_1_FLR_1_SEC_1,
 ```
 
 See pull request [#9102](https://github.com/NREL/EnergyPlus/pull/9102/files) for more details.
+
+
+### DXF Changes for Daylighting Reference Points
+
+The following changes were made to Daylighting reference points in dxf output:
+  * Duplicate daylighting reference points are removed
+  * The actual reference point names are used in the label, rather than RefPt1, 2, etc.
+
+See pull request [#9102](https://github.com/NREL/EnergyPlus/pull/9102/files) for more details.
+
+### DFS Changes for Daylighting
+
+For `Output:DaylightFactors`, the daylight factors are now reported by Enclosure instead of by Zone, and Enclosure Name is added as a new field along with Zone Name.
+This may alter the order and number of entries.
+
+```
+This file contains daylight factors for all exterior windows of daylight zones.
+MonthAndDay,Zone Name,Window Name,Window State
+Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky
+01/21,PERIMETER_BOT_ZN_1,PERIMETER_BOT_ZN_1_WALL_SOUTH_WINDOW,Base Window
+```
+
+are now
+
+```
+This file contains daylight factors for all exterior windows of daylight enclosures.
+MonthAndDay,Enclosure Name,Zone Name,Window Name,Window State
+Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky
+01/21,PERIMETER_BOT_ZN_3,PERIMETER_BOT_ZN_3,PERIMETER_BOT_ZN_3_WALL_NORTH_WINDOW,Base Window
+```
+
+See pull request [#9102](https://github.com/NREL/EnergyPlus/pull/9102/files) for more details.
+
+### Row Order Changes for Lighting Summary, Daylighting subtable
+
+The row order may change in this subtable.
+
+See pull request [#9102](https://github.com/NREL/EnergyPlus/pull/9102/files) for more details.
+
