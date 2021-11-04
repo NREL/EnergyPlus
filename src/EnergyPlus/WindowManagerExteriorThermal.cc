@@ -269,32 +269,40 @@ namespace WindowManager {
         auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
 
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
-        double hExtConvCoeff(0.0);
-        double hIntConvCoeff(0.0);
 
         for (bool isSummer : {false, true}) {
-            if (isSummer) {
-                // films from ISO 15099 Section 8.2.3 Summer conditions
-                hExtConvCoeff = 8.0;
-                hIntConvCoeff = 2.5;
-            } else {
-                // films from ISO 15099 Section 8.2.2 Winter conditions
-                hExtConvCoeff = 20.0;
-                hIntConvCoeff = 3.6;
-            }
-            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, surface.Construction, hIntConvCoeff, isSummer);
+            //double hExtConvCoeff(0.0);
+            //double hIntConvCoeff(0.0);
+            //if (isSummer) {
+            //    // films from ISO 15099 Section 8.2.3 Summer conditions
+            //    hExtConvCoeff = 8.0;
+            //    hIntConvCoeff = 2.5;
+            //} else {
+            //    // films from ISO 15099 Section 8.2.2 Winter conditions
+            //    hExtConvCoeff = 20.0;
+            //    hIntConvCoeff = 3.6;
+            //}
+
+            const auto framehExtConvCoeff{30.0};
+            const auto framehIntConvCoeff{8.0};
+            const auto tilt{90.0};
+
+            auto insulGlassUnit =
+                aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt);
 
             const double centerOfGlassUvalue = insulGlassUnit->getUValue();
 
-            const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
-            const double frameEdgeUValue{centerOfGlassUvalue * frameDivider.FrEdgeToCenterGlCondRatio}; // not sure about this
+            auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt);
+
+            const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, framehIntConvCoeff, framehExtConvCoeff);
+            const double frameEdgeUValue{winterGlassUnit->getUValue() * frameDivider.FrEdgeToCenterGlCondRatio}; // not sure about this
             const double frameProjectedDimension{frameDivider.FrameWidth};
             const double frameWettedLength{frameProjectedDimension + frameDivider.FrameProjectionIn};
             const double frameAbsorptance{frameDivider.FrameSolAbsorp};
 
             Tarcog::ISO15099::FrameData frameData{frameUvalue, frameEdgeUValue, frameProjectedDimension, frameWettedLength, frameAbsorptance};
 
-            const double dividerUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.DividerConductance, hIntConvCoeff, hExtConvCoeff);
+            const double dividerUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.DividerConductance, framehIntConvCoeff, framehExtConvCoeff);
             const double dividerEdgeUValue{centerOfGlassUvalue * frameDivider.DivEdgeToCenterGlCondRatio}; // not sure about this
             const double dividerProjectedDimension{frameDivider.DividerWidth};
             const double dividerWettedLength{dividerProjectedDimension + frameDivider.DividerProjectionIn};
@@ -436,38 +444,39 @@ namespace WindowManager {
         return aSystem;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::IIGUSystem>
-    CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state, int ConstrNum, double hcInterior, bool const useSummerConditions)
+    std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
+        EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt)
     {
         std::shared_ptr<Tarcog::ISO15099::IIGUSystem> result;
-        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
-            auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
-            auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
-            auto aIGU = getIGU();
+        // if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+        auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
+        auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
+        auto aIGU = getIGU(width, height, tilt);
 
-            // pick-up all layers and put them in IGU (this includes gap layers as well)
-            for (auto i = 0; i < m_TotLay; ++i) {
-                auto aLayer = getIGULayer(state, i + 1);
-                assert(aLayer != nullptr);
-                // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
-                // and it will be created here
-                if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
-                    auto aAirLayer = getShadeToGlassLayer(state, i + 1);
-                    aIGU.addLayer(aAirLayer);
-                }
-                aIGU.addLayer(aLayer);
-                if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
-                    auto aAirLayer = getShadeToGlassLayer(state, i + 1);
-                    aIGU.addLayer(aAirLayer);
-                }
+        // pick-up all layers and put them in IGU (this includes gap layers as well)
+        for (auto i = 0; i < m_TotLay; ++i) {
+            auto aLayer = getIGULayer(state, i + 1);
+            assert(aLayer != nullptr);
+            // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
+            // and it will be created here
+            if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1);
+                aIGU.addLayer(aAirLayer);
             }
-
-            result = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
-        } else { // Need to retrieve legacy values while code is still active. This is constructed as simple IGU for the purpose of reporting. (Simon)
-            const auto COGUValue{state.dataHeatBal->NominalU(ConstrNum)};
-            const auto SHGCCOG{state.dataConstruction->Construct(ConstrNum).SummerSHGC};
-            result = std::make_shared<Tarcog::ISO15099::SimpleIGU>(COGUValue, SHGCCOG, hcInterior);
+            aIGU.addLayer(aLayer);
+            if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1);
+                aIGU.addLayer(aAirLayer);
+            }
         }
+
+        result = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
+        //} else { // Need to retrieve legacy values while code is still active. This is constructed as simple IGU for the purpose of reporting.
+        //(Simon)
+        //    const auto COGUValue{state.dataHeatBal->NominalU(ConstrNum)};
+        //    const auto SHGCCOG{state.dataConstruction->Construct(ConstrNum).SummerSHGC};
+        //    result = std::make_shared<Tarcog::ISO15099::SimpleIGU>(COGUValue, SHGCCOG, hcInterior);
+        //}
 
         return result;
     }
@@ -828,6 +837,21 @@ namespace WindowManager {
         // Creates IGU object from surface properties in EnergyPlus
 
         return {m_Surface.Width, m_Surface.Height, m_Surface.Tilt};
+    }
+
+    Tarcog::ISO15099::CIGU CWCEHeatTransferFactory::getIGU(double width, double height, double tilt)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   November 2021
+        //       MODIFIED       na
+        //       RE-ENGINEERED
+        //          April 2021: Return CIGU object rather than pointer to it
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Creates IGU object for given width, height and tilt
+
+        return {width, height, tilt};
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

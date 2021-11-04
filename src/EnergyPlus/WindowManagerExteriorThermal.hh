@@ -120,10 +120,12 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoor(EnergyPlusData &state) const;
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         Tarcog::ISO15099::CIGU getIGU() const;
+        Tarcog::ISO15099::CIGU getIGU(double width, double height, double tilt);
 
         // for assembly windoww reporting
         std::shared_ptr<Tarcog::ISO15099::IIGUSystem>
-        getTarcogSystemForReporting(EnergyPlusData &state, int ConstrNum, double hcInterior, bool const useSummerConditions);
+        getTarcogSystemForReporting(EnergyPlusData &state, bool const useSummerConditions, const double width, const
+                                    double height, const double tilt);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from
