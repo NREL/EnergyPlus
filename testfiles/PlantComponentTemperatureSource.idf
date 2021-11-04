@@ -8,7 +8,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with A PlantComponent:TemperatureSource supply object.
 
-  Version,9.6;
+  Version,22.03;
 
   Building,
     Plant Load Profile Example,  !- Name

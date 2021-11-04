@@ -78,7 +78,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.6;
+  Version,22.03;
 
 !
 !- Run Controls sections
