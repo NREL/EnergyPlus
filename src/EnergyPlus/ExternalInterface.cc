@@ -288,8 +288,8 @@ void StopExternalInterfaceIfError(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int retVal; // Return value, needed to catch return value of function call
-    int const flag1(-10);
-    int const flag2(-20);
+    int constexpr flag1(-10);
+    int constexpr flag2(-20);
 
     if ((state.dataExternalInterface->NumExternalInterfacesBCVTB != 0) || (state.dataExternalInterface->NumExternalInterfacesFMUExport != 0)) {
         if (state.dataExternalInterface->ErrorsFound) {
@@ -2322,7 +2322,7 @@ void CalcExternalInterface(EnergyPlusData &state)
     // using DataPrecisionGlobals;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const nDblMax(1024); // Maximum number of doubles
+    int constexpr nDblMax(1024); // Maximum number of doubles
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int i;      // Loop counter

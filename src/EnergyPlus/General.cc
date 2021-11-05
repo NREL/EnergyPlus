@@ -839,7 +839,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     // Return value
     std::string OutputString;
 
-    Real64 const FracToMin(60.0);
+    Real64 constexpr FracToMin(60.0);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 ActualTimeS; // Start of current interval (HVAC time step)
@@ -938,8 +938,8 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     // Linear Correction based on the RegulaFalsi routine in EnergyPlus
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const small(1.e-9); // Small Number used to approximate zero
-    Real64 const Perturb(0.1); // Perturbation applied to X to initialize iteration
+    Real64 const small(1.e-9);     // Small Number used to approximate zero
+    Real64 constexpr Perturb(0.1); // Perturbation applied to X to initialize iteration
 
     Real64 DY; // Linear fit result
 
@@ -1080,7 +1080,7 @@ int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStep
     int ActualTimeMin; // calculated Minute for reporting
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const FracToMin(60.0);
+    Real64 constexpr FracToMin(60.0);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 ActualTimeS; // Start of current interval (HVAC time step)
@@ -1304,7 +1304,7 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // - seconds < 60
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const MinToSec(60);
+    int constexpr MinToSec(60);
     int const HourToSec(MinToSec * 60);
 
     // Get number of hours

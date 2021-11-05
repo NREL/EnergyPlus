@@ -153,7 +153,7 @@ namespace ThermalChimney {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
+        Real64 constexpr FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
@@ -659,7 +659,7 @@ namespace ThermalChimney {
 
         using ScheduleManager::GetCurrentScheduleValue;
 
-        int const NTC(15); // Number of subregions in thermal chimney air channel for FINITE DIFFERENCE
+        int constexpr NTC(15); // Number of subregions in thermal chimney air channel for FINITE DIFFERENCE
 
         // To be obtained from other modules and subroutines
         Real64 SurfTempAbsorberWall;     // Absorber wall surface temperature (K)

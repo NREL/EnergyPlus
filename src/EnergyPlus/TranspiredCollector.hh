@@ -185,11 +185,6 @@ namespace TranspiredCollector {
 struct TranspiredCollectorData : BaseGlobalStruct
 {
 
-    int const Layout_Square = 1;
-    int const Layout_Triangle = 2;
-    int const Correlation_Kutscher1994 = 1;
-    int const Correlation_VanDeckerHollandsBrunger2001 = 2;
-
     int NumUTSC = 0; // number of transpired collectors in model
     Array1D_bool CheckEquipName;
     bool GetInputFlag = true; // First time, input is gotten

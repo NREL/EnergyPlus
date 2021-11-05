@@ -337,22 +337,6 @@ namespace SolarShading {
 
 struct SolarShadingData : BaseGlobalStruct
 {
-
-    Real64 const SmallIncrement = 1.0e-10; // Small increment added for shading/sunlit area calculations.
-    Real64 const HCMULT = 100000.0;        // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
-                                    // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
-                                    // to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
-    Real64 const sqHCMULT = (HCMULT * HCMULT);        // Square of HCMult used in Homogeneous coordinates
-    Real64 const sqHCMULT_fac = (0.5 / sqHCMULT);     // ( 0.5 / sqHCMULT ) factor
-    Real64 const kHCMULT = (1.0 / (HCMULT * HCMULT)); // half of inverse square of HCMult used in Homogeneous coordinates
-
-    // Parameters for use with the variable OverlapStatus...
-    int const NoOverlap = 1;
-    int const FirstSurfWithinSecond = 2;
-    int const SecondSurfWithinFirst = 3;
-    int const PartialOverlap = 4;
-    int const TooManyVertices = 5;
-    int const TooManyFigures = 6;
     Array1D_string const cOverLapStatus;
     int MaxHCV = 15;             // Maximum number of HC vertices
                                  // (needs to be based on maxnumvertices)

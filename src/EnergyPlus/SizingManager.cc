@@ -885,8 +885,8 @@ bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
     // This needs to be done not just on the first day of a simulation because when the user picks a design day derived from
     // an attached weather file the design day is not necessarily the first day of the simulation.
 
-    int const HourDayToPulse(10);
-    int const TimeStepToPulse(1);
+    int constexpr HourDayToPulse(10);
+    int constexpr TimeStepToPulse(1);
 
     if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
         ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {

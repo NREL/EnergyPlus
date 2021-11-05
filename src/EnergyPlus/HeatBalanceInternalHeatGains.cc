@@ -124,7 +124,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
 
     using namespace DataHeatBalance;
 
-    int const DeviceAllocInc(100);
+    int constexpr DeviceAllocInc(100);
 
     int IntGainsNum;
     bool FoundIntGainsType;
