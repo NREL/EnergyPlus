@@ -125,10 +125,10 @@ namespace StandardRatings {
     // volume flow rate to account for indoor fan electric power consumption
     // when the standard tests are conducted on units that do not have an
     // indoor air circulating fan. Used if user doesn't enter a specific value.
-    Real64 constexpr PLRforSEER(0.5);                             // Part-load ratio for SEER calculation (single speed DX cooling coils)
-    Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
-    Array1D<Real64> const IEERWeightingFactor(4, {0.020, 0.617, 0.238, 0.125}); // EER Weighting factors (IEER)
-    Real64 constexpr OADBTempLowReducedCapacityTest(18.3);                      // Outdoor air dry-bulb temp in degrees C (65F)
+    Real64 constexpr PLRforSEER(0.5); // Part-load ratio for SEER calculation (single speed DX cooling coils)
+    static constexpr std::array<Real64, 4> ReducedPLR = {1.0, 0.75, 0.50, 0.25};               // Reduced Capacity part-load conditions
+    static constexpr std::array<Real64, 4> IEERWeightingFactor = {0.020, 0.617, 0.238, 0.125}; // EER Weighting factors (IEER)
+    Real64 constexpr OADBTempLowReducedCapacityTest(18.3);                                     // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
     int constexpr TotalNumOfStandardDHRs(16);                               // Total number of standard design heating requirements
@@ -240,33 +240,19 @@ namespace StandardRatings {
         //                                  Compression Cycle. Arlington, VA:  Air-Conditioning, Heating,
         //                                  and Refrigeration Institute.
 
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using General::SolveRoot;
-
-        // Locals
-        Real64 constexpr ConvFromSIToIP(3.412141633);                        // Conversion from SI to IP [3.412 Btu/hr-W]
-        static Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // (function of leaving chilled water temperature and
-        //  entering condenser fluid temperature)
-        // (function of leaving chilled water temperature and
-        //  entering condenser fluid temperature)
 
         Real64 constexpr EvapOutletTemp(6.67); // (44F)
         Real64 constexpr Acc(0.0001);          // Accuracy of result
         int constexpr NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
         int constexpr IterMax(500);            // Maximum number of iterations
-        static Array1D<Real64> const IPLVWeightingFactor(4, {0.010, 0.42, 0.45, 0.12}); // EER Weighting factors (IPLV)
+        static constexpr std::array<Real64, 4> IPLVWeightingFactor = {0.010, 0.42, 0.45, 0.12}; // EER Weighting factors (IPLV)
         static constexpr std::string_view RoutineName("CalcChillerIPLV");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -332,26 +318,26 @@ namespace StandardRatings {
         CheckCurveLimitsForIPLV(state, ChillerName, ChillerType, CondenserType, CapFTempCurveIndex, EIRFTempCurveIndex);
 
         // IPLV calculations:
-        for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
+        for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
             if (CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // get the entering water temperature for the reduced capacity test conditions
-                if (ReducedPLR(RedCapNum) > 0.50) {
-                    EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR(RedCapNum);
+                if (ReducedPLR[RedCapNum] > 0.50) {
+                    EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR[RedCapNum];
                 } else {
                     EnteringWaterTempReduced = 19.0;
                 }
                 CondenserInletTemp = EnteringWaterTempReduced;
             } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR(RedCapNum) > 0.3125) {
-                    EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR(RedCapNum);
+                if (ReducedPLR[RedCapNum] > 0.3125) {
+                    EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR[RedCapNum];
                 } else {
                     EnteringAirDryBulbTempReduced = 13.0;
                 }
                 CondenserInletTemp = EnteringAirDryBulbTempReduced;
             } else { // EvaporativelyCooled Condenser
                 // get the outdoor air wet bulb temperature for the reduced capacity test conditions
-                EnteringAirWetBulbTempReduced = 10.0 + 14.0 * ReducedPLR(RedCapNum);
+                EnteringAirWetBulbTempReduced = 10.0 + 14.0 * ReducedPLR[RedCapNum];
                 CondenserInletTemp = EnteringAirWetBulbTempReduced;
             }
 
@@ -359,7 +345,7 @@ namespace StandardRatings {
                 auto const SELECT_CASE_var(ChillerType);
 
                 if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
-                    if (RedCapNum == 1.0) {
+                    if (RedCapNum == 0) {
                         // Get curve modifier values at rated conditions (load = 100%)
                         ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
                         ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
@@ -374,7 +360,7 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    PartLoadRatio = ReducedPLR(RedCapNum) * ChillerCapFT_rated / ChillerCapFT;
+                    PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
 
                     if (PartLoadRatio >= MinUnloadRat) {
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, PartLoadRatio);
@@ -399,7 +385,7 @@ namespace StandardRatings {
                     Par(1) = EnteringWaterTempReduced;
                     Par(2) = EvapOutletTemp;
                     Par(3) = Cp;
-                    Par(4) = ReducedPLR(RedCapNum);
+                    Par(4) = ReducedPLR[RedCapNum];
                     Par(5) = EvapVolFlowRate * Rho;
                     Par(6) = CapFTempCurveIndex;
                     Par(7) = EIRFTempCurveIndex;
@@ -426,7 +412,7 @@ namespace StandardRatings {
                         ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
                     }
 
-                    if (RedCapNum == 1.0) {
+                    if (RedCapNum == 0) {
                         // Get curve modifier values at rated conditions (load = 100%)
                         ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
                         ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
@@ -440,7 +426,7 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
-                    PartLoadRatio = ReducedPLR(RedCapNum) * ChillerCapFT_rated / ChillerCapFT;
+                    PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
 
                     if (PartLoadRatio >= MinUnloadRat) {
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
@@ -459,14 +445,14 @@ namespace StandardRatings {
                 Power = (AvailChillerCap / RefCOP) * ChillerEIRFPLR * ChillerEIRFT;
                 EIR = Power / (PartLoadRatio * AvailChillerCap);
 
-                if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
+                if (ReducedPLR[RedCapNum] >= MinUnloadRat) {
                     COPReduced = 1.0 / EIR;
                 } else {
-                    LoadFactor = (ReducedPLR(RedCapNum) * RefCap) / (MinUnloadRat * AvailChillerCap);
+                    LoadFactor = (ReducedPLR[RedCapNum] * RefCap) / (MinUnloadRat * AvailChillerCap);
                     DegradationCoeff = 1.130 - 0.130 * LoadFactor;
                     COPReduced = 1.0 / (DegradationCoeff * EIR);
                 }
-                IPLV += IPLVWeightingFactor(RedCapNum) * COPReduced;
+                IPLV += IPLVWeightingFactor[RedCapNum] * COPReduced;
             } else {
                 {
                     auto const SELECT_CASE_var(ChillerType);
@@ -688,18 +674,14 @@ namespace StandardRatings {
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
         Real64 CapacityLWTempMax(0.0);           // Capacity modifier Max value (leaving water temp), from the Curve:BiQuadratic object
-        Real64 CapacityEnteringCondTempMin(0.0); // Capacity modifier Min value (entering cond temp),
-        // from the Curve:BiQuadratic object
-        Real64 CapacityEnteringCondTempMax(0.0); // Capacity modifier Max value (entering cond temp),
-        // from the Curve:BiQuadratic object
+        Real64 CapacityEnteringCondTempMin(0.0); // Capacity modifier Min value (entering cond temp), from the Curve:BiQuadratic object
+        Real64 CapacityEnteringCondTempMax(0.0); // Capacity modifier Max value (entering cond temp), from the Curve:BiQuadratic object
 
         //  Minimum and Maximum independent variable limits from Energy Input Ratio (EIR) Function of Temperature Curve
         Real64 EIRLWTempMin(0.0);           // EIR modifier Min value (leaving water temp), from the Curve:BiQuadratic object
         Real64 EIRLWTempMax(0.0);           // EIR modifier Max value (leaving water temp), from the Curve:BiQuadratic object
-        Real64 EIREnteringCondTempMin(0.0); // EIR modifier Min value (entering cond temp),
-        // from the Curve:BiQuadratic object
-        Real64 EIREnteringCondTempMax(0.0); // EIR modifier Max value (entering cond temp),
-        // from the Curve:BiQuadratic object
+        Real64 EIREnteringCondTempMin(0.0); // EIR modifier Min value (entering cond temp), from the Curve:BiQuadratic object
+        Real64 EIREnteringCondTempMax(0.0); // EIR modifier Max value (entering cond temp), from the Curve:BiQuadratic object
 
         Real64 HighCondenserEnteringTempLimit(0.0); // High limit of entering condenser temperature
         Real64 LowCondenserEnteringTempLimit(0.0);  // Low limit of entering condenser temperature
@@ -1657,10 +1639,10 @@ namespace StandardRatings {
             // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
             TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             NetCoolingCapRated = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
-            for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
+            for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR(RedCapNum) > 0.444) {
-                    OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR(RedCapNum);
+                if (ReducedPLR[RedCapNum] > 0.444) {
+                    OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR[RedCapNum];
                 } else {
                     OutdoorUnitInletAirDryBulbTempReduced = OADBTempLowReducedCapacityTest;
                 }
@@ -1673,7 +1655,7 @@ namespace StandardRatings {
                     EIR = 0.0;
                 }
                 if (NetCoolingCapReduced > 0.0) {
-                    LoadFactor = ReducedPLR(RedCapNum) * NetCoolingCapRated / NetCoolingCapReduced;
+                    LoadFactor = ReducedPLR[RedCapNum] * NetCoolingCapRated / NetCoolingCapReduced;
                 } else {
                     LoadFactor = 1.0;
                 }
@@ -1681,7 +1663,7 @@ namespace StandardRatings {
                 ElecPowerReducedCap = DegradationCoeff * EIR * (RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac);
                 EERReduced =
                     (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate);
-                IEER += IEERWeightingFactor(RedCapNum) * EERReduced;
+                IEER += IEERWeightingFactor[RedCapNum] * EERReduced;
             }
 
         } else {

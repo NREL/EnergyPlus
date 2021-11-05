@@ -63,9 +63,6 @@ struct EnergyPlusData;
 
 namespace StandardRatings {
 
-    // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    extern Array1D<Real64> const IEERWeightingFactor; // EER Weighting factors (IEER)
-
     Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
 
     Real64 constexpr HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)

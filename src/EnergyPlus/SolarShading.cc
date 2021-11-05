@@ -9355,39 +9355,12 @@ void SUN3(int const JulianDayOfYear,      // Julian Day Of Year
     // REFERENCES:
     // BLAST/IBLAST code, original author George Walton
 
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D<Real64> const SineSolDeclCoef(9,
-                                                 {0.00561800,
-                                                  0.0657911,
-                                                  -0.392779,
-                                                  0.00064440,
-                                                  -0.00618495,
-                                                  -0.00010101,
-                                                  -0.00007951,
-                                                  -0.00011691,
-                                                  0.00002096}); // Fitted coefficients of Fourier series | SINE OF DECLINATION | COEFFICIENTS
-    static Array1D<Real64> const EqOfTimeCoef(9,
-                                              {0.00021971,
-                                               -0.122649,
-                                               0.00762856,
-                                               -0.156308,
-                                               -0.0530028,
-                                               -0.00388702,
-                                               -0.00123978,
-                                               -0.00270502,
-                                               -0.00167992}); // Fitted coefficients of Fourier Series | EQUATION OF TIME | COEFFICIENTS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
+    // Fitted coefficients of Fourier series | Sine of declination coefficients
+    static constexpr std::array<Real64, 9> SineSolDeclCoef = {
+        0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096};
+    // Fitted coefficients of Fourier Series | Equation of Time coefficients
+    static constexpr std::array<Real64, 9> EqOfTimeCoef = {
+        0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 X;     // Day of Year in Radians (Computed from Input JulianDayOfYear)
@@ -9400,19 +9373,19 @@ void SUN3(int const JulianDayOfYear,      // Julian Day Of Year
     SineX = std::sin(X);
     CosX = std::cos(X);
 
-    SineOfSolarDeclination = SineSolDeclCoef(1) + SineSolDeclCoef(2) * SineX + SineSolDeclCoef(3) * CosX + SineSolDeclCoef(4) * (SineX * CosX * 2.0) +
-                             SineSolDeclCoef(5) * (pow_2(CosX) - pow_2(SineX)) +
-                             SineSolDeclCoef(6) * (SineX * (pow_2(CosX) - pow_2(SineX)) + CosX * (SineX * CosX * 2.0)) +
-                             SineSolDeclCoef(7) * (CosX * (pow_2(CosX) - pow_2(SineX)) - SineX * (SineX * CosX * 2.0)) +
-                             SineSolDeclCoef(8) * (2.0 * (SineX * CosX * 2.0) * (pow_2(CosX) - pow_2(SineX))) +
-                             SineSolDeclCoef(9) * (pow_2(pow_2(CosX) - pow_2(SineX)) - pow_2(SineX * CosX * 2.0));
+    SineOfSolarDeclination = SineSolDeclCoef[0] + SineSolDeclCoef[1] * SineX + SineSolDeclCoef[2] * CosX + SineSolDeclCoef[3] * (SineX * CosX * 2.0) +
+                             SineSolDeclCoef[4] * (pow_2(CosX) - pow_2(SineX)) +
+                             SineSolDeclCoef[5] * (SineX * (pow_2(CosX) - pow_2(SineX)) + CosX * (SineX * CosX * 2.0)) +
+                             SineSolDeclCoef[6] * (CosX * (pow_2(CosX) - pow_2(SineX)) - SineX * (SineX * CosX * 2.0)) +
+                             SineSolDeclCoef[7] * (2.0 * (SineX * CosX * 2.0) * (pow_2(CosX) - pow_2(SineX))) +
+                             SineSolDeclCoef[8] * (pow_2(pow_2(CosX) - pow_2(SineX)) - pow_2(SineX * CosX * 2.0));
 
-    EquationOfTime = EqOfTimeCoef(1) + EqOfTimeCoef(2) * SineX + EqOfTimeCoef(3) * CosX + EqOfTimeCoef(4) * (SineX * CosX * 2.0) +
-                     EqOfTimeCoef(5) * (pow_2(CosX) - pow_2(SineX)) +
-                     EqOfTimeCoef(6) * (SineX * (pow_2(CosX) - pow_2(SineX)) + CosX * (SineX * CosX * 2.0)) +
-                     EqOfTimeCoef(7) * (CosX * (pow_2(CosX) - pow_2(SineX)) - SineX * (SineX * CosX * 2.0)) +
-                     EqOfTimeCoef(8) * (2.0 * (SineX * CosX * 2.0) * (pow_2(CosX) - pow_2(SineX))) +
-                     EqOfTimeCoef(9) * (pow_2(pow_2(CosX) - pow_2(SineX)) - pow_2(SineX * CosX * 2.0));
+    EquationOfTime = EqOfTimeCoef[0] + EqOfTimeCoef[1] * SineX + EqOfTimeCoef[2] * CosX + EqOfTimeCoef[3] * (SineX * CosX * 2.0) +
+                     EqOfTimeCoef[4] * (pow_2(CosX) - pow_2(SineX)) +
+                     EqOfTimeCoef[5] * (SineX * (pow_2(CosX) - pow_2(SineX)) + CosX * (SineX * CosX * 2.0)) +
+                     EqOfTimeCoef[6] * (CosX * (pow_2(CosX) - pow_2(SineX)) - SineX * (SineX * CosX * 2.0)) +
+                     EqOfTimeCoef[7] * (2.0 * (SineX * CosX * 2.0) * (pow_2(CosX) - pow_2(SineX))) +
+                     EqOfTimeCoef[8] * (pow_2(pow_2(CosX) - pow_2(SineX)) - pow_2(SineX * CosX * 2.0));
 }
 
 void SUN4(EnergyPlusData &state,
