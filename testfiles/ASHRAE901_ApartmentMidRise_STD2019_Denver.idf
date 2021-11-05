@@ -1,6 +1,6 @@
 !- Windows Line endings
 
-Version,9.6;                      !- Version Identifier
+Version,22.03;                      !- Version Identifier
 
 SimulationControl,
     Yes,                      !- Do Zone Sizing Calculation
