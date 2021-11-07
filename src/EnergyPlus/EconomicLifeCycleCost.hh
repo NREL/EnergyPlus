@@ -79,6 +79,12 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
+    std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNamesUC {
+        "BEGINNINGOFYEAR",
+        "MIDYEAR",
+        "ENDOFYEAR"
+    };
+
     enum class iInflAppr
     {
         ConstantDollar,

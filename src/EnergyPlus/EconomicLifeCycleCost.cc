@@ -222,18 +222,13 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key MidYear
         //      \key BeginningOfYear
         //      \default EndOfYear
-        if (UtilityRoutines::SameString(AlphaArray(2), "EndOfYear")) {
-            elcc->discountConvention = DiscConv::EndOfYear;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "MidYear")) {
-            elcc->discountConvention = DiscConv::MidYear;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "BeginningOfYear")) {
-            elcc->discountConvention = DiscConv::BeginOfYear;
-        } else {
-            elcc->discountConvention = DiscConv::EndOfYear;
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
-                                 "\". EndOfYear will be used.");
-        }
+        elcc->discountConvention = static_cast<DiscConv>(getEnumerationValue(DiscConvNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+        if (elcc->discountConvention == DiscConv::Unassigned) {
+        elcc->discountConvention = DiscConv::EndOfYear;
+        ShowWarningError(state,
+                         CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
+                             "\". EndOfYear will be used.");
+    }
         // A3,  \field Inflation Approach
         //      \type choice
         //      \key ConstantDollar
