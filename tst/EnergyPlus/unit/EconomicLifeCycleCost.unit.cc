@@ -266,14 +266,14 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
     EXPECT_EQ(5, state->dataEconLifeCycleCost->numNonrecurringCost);
     EXPECT_EQ("RESIDUALVALUE", state->dataEconLifeCycleCost->NonrecurringCost[4].name);
     EXPECT_EQ(CostCategory::Salvage, state->dataEconLifeCycleCost->NonrecurringCost[4].category);
-    EXPECT_TRUE(compare_enums(iStartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost[4].startOfCosts));
+    EXPECT_TRUE(compare_enums(StartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost[4].startOfCosts));
     EXPECT_EQ(-20000., state->dataEconLifeCycleCost->NonrecurringCost[4].cost);
 
     EXPECT_EQ(1, state->dataEconLifeCycleCost->numRecurringCosts);
     EXPECT_EQ("ANNUALMAINT", state->dataEconLifeCycleCost->RecurringCosts[0].name);
     EXPECT_EQ(CostCategory::Maintenance, state->dataEconLifeCycleCost->RecurringCosts[0].category);
     EXPECT_EQ(7000., state->dataEconLifeCycleCost->RecurringCosts[0].cost);
-    EXPECT_TRUE(compare_enums(iStartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts[0].startOfCosts));
+    EXPECT_TRUE(compare_enums(StartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts[0].startOfCosts));
     EXPECT_EQ(1, state->dataEconLifeCycleCost->RecurringCosts[0].repeatPeriodYears);
 
     EXPECT_EQ(3, state->dataEconLifeCycleCost->numUsePriceEscalation);
@@ -540,7 +540,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     state->dataEconLifeCycleCost->NonrecurringCost[0].name = "MiscConstruction";
     state->dataEconLifeCycleCost->NonrecurringCost[0].category = CostCategory::Construction;
     state->dataEconLifeCycleCost->NonrecurringCost[0].cost = 123456.;
-    state->dataEconLifeCycleCost->NonrecurringCost[0].startOfCosts = iStartCosts::ServicePeriod;
+    state->dataEconLifeCycleCost->NonrecurringCost[0].startOfCosts = StartCosts::ServicePeriod;
     state->dataEconLifeCycleCost->NonrecurringCost[0].totalMonthsFromStart = 10;
 
     ExpressAsCashFlows(*state);

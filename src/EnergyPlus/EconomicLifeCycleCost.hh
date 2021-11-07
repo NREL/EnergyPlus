@@ -196,6 +196,10 @@ namespace EconomicLifeCycleCost {
     constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
         "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
 
+    constexpr int NumNonRecurringCostCategory = 3;
+    constexpr std::array<std::string_view, NumNonRecurringCostCategory> NonRecurringCostCategoryNamesUC{
+        "Construction", "Salvage", "OtherCapital"};
+
     constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{
         "Maintenance",
         "Repair",
@@ -219,11 +223,17 @@ namespace EconomicLifeCycleCost {
     //   Residual oil - FuelOilNo2
     //   Coal
 
-    enum class iStartCosts
+    enum class StartCosts
     {
+        Unassigned = -1,
         ServicePeriod,
         BasePeriod,
+        Num
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(StartCosts::Num)> StartCostNamesUC{
+        "SERVICEPERIOD", "BASEPERIOD"};
+
 
     enum class SourceKindType
     {
@@ -286,7 +296,7 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;        // Line Item
         CostCategory category;       // Category
         Real64 cost;                 // Cost
-        iStartCosts startOfCosts;    // Start of Costs
+        StartCosts startOfCosts;    // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
         int monthsFromStart;         // Months from Start 0 - 11
         int totalMonthsFromStart;    // Total months (12 x years) + months
@@ -297,7 +307,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(CostCategory::Maintenance), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+            : category(CostCategory::Maintenance), cost(0.0), startOfCosts(StartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
               totalMonthsFromStart(0), repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
@@ -310,14 +320,14 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;     // Line Item
         CostCategory category;    // Category
         Real64 cost;              // Cost
-        iStartCosts startOfCosts; // Start of Costs
+        StartCosts startOfCosts; // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
         int monthsFromStart;      // Months from Start 0 - 11
         int totalMonthsFromStart; // Total months (12 x years) + months
 
         // Default Constructor
         NonrecurringCostType()
-            : category(CostCategory::Construction), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+            : category(CostCategory::Construction), cost(0.0), startOfCosts(StartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
               totalMonthsFromStart(0)
         {
         }

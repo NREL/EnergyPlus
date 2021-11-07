@@ -485,12 +485,9 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \key ServicePeriod
         //        \key BasePeriod
         //        \default ServicePeriod
-        if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-            elcc->RecurringCosts[iInObj].startOfCosts = iStartCosts::ServicePeriod;
-        } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-            elcc->RecurringCosts[iInObj].startOfCosts = iStartCosts::BasePeriod;
-        } else {
-            elcc->RecurringCosts[iInObj].startOfCosts = iStartCosts::ServicePeriod;
+        elcc->RecurringCosts[iInObj].startOfCosts = static_cast<StartCosts>(getEnumerationValue(StartCostNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3))));
+        if (elcc->RecurringCosts[iInObj].startOfCosts == StartCosts::Unassigned) {
+            elcc->RecurringCosts[iInObj].startOfCosts= StartCosts::ServicePeriod;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
@@ -657,13 +654,8 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \key Salvage
         //      \key OtherCapital
         //      \default Construction
-        if (UtilityRoutines::SameString(AlphaArray(2), "Construction")) {
-            elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "Salvage")) {
-            elcc->NonrecurringCost[iInObj].category = CostCategory::Salvage;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "OtherCapital")) {
-            elcc->NonrecurringCost[iInObj].category = CostCategory::OtherCapital;
-        } else {
+        elcc->NonrecurringCost[iInObj].category = static_cast<CostCategory>(getEnumerationValue(NonRecurringCostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+        if (elcc->NonrecurringCost[iInObj].category == CostCategory::Unassigned) {
             elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
@@ -677,12 +669,9 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \key ServicePeriod
         //      \key BasePeriod
         //      \default ServicePeriod
-        if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-            elcc->NonrecurringCost[iInObj].startOfCosts = iStartCosts::ServicePeriod;
-        } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-            elcc->NonrecurringCost[iInObj].startOfCosts = iStartCosts::BasePeriod;
-        } else {
-            elcc->NonrecurringCost[iInObj].startOfCosts = iStartCosts::ServicePeriod;
+        elcc->NonrecurringCost[iInObj].startOfCosts = static_cast<StartCosts>(getEnumerationValue(StartCostNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3))));
+        if ( elcc->NonrecurringCost[iInObj].startOfCosts == StartCosts::Unassigned) {
+            elcc->NonrecurringCost[iInObj].startOfCosts = StartCosts::ServicePeriod;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
@@ -1126,7 +1115,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         elcc->NonrecurringCost[elcc->numNonrecurringCost].lineItem = "";
         elcc->NonrecurringCost[elcc->numNonrecurringCost].category = CostCategory::Construction;
         elcc->NonrecurringCost[elcc->numNonrecurringCost].cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-        elcc->NonrecurringCost[elcc->numNonrecurringCost].startOfCosts = iStartCosts::BasePeriod;
+        elcc->NonrecurringCost[elcc->numNonrecurringCost].startOfCosts = StartCosts::BasePeriod;
         elcc->NonrecurringCost[elcc->numNonrecurringCost].yearsFromStart = 0;
         elcc->NonrecurringCost[elcc->numNonrecurringCost].monthsFromStart = 0;
         elcc->NonrecurringCost[elcc->numNonrecurringCost].totalMonthsFromStart = 0;
@@ -1198,9 +1187,9 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         elcc->CashFlow[offset + jCost].Category = elcc->NonrecurringCost[jCost].category;
         elcc->CashFlow[offset + jCost].orginalCost = elcc->NonrecurringCost[jCost].cost;
         elcc->CashFlow[offset + jCost].mnAmount = 0.0;
-        if (elcc->NonrecurringCost[jCost].startOfCosts == iStartCosts::ServicePeriod) {
+        if (elcc->NonrecurringCost[jCost].startOfCosts == StartCosts::ServicePeriod) {
             month = elcc->NonrecurringCost[jCost].totalMonthsFromStart + monthsBaseToService + 1;
-        } else if (elcc->NonrecurringCost[jCost].startOfCosts == iStartCosts::BasePeriod) {
+        } else if (elcc->NonrecurringCost[jCost].startOfCosts == StartCosts::BasePeriod) {
             month = elcc->NonrecurringCost[jCost].totalMonthsFromStart + 1;
         }
         if ((month >= 1) && (month <= elcc->lengthStudyTotalMonths)) {
@@ -1218,9 +1207,9 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         elcc->CashFlow[offset + jCost].SourceKind = SourceKindType::Recurring;
         elcc->CashFlow[offset + jCost].Category = elcc->RecurringCosts[jCost].category;
         elcc->CashFlow[offset + jCost].orginalCost = elcc->RecurringCosts[jCost].cost;
-        if (elcc->RecurringCosts[jCost].startOfCosts == iStartCosts::ServicePeriod) {
+        if (elcc->RecurringCosts[jCost].startOfCosts == StartCosts::ServicePeriod) {
             firstMonth = elcc->RecurringCosts[jCost].totalMonthsFromStart + monthsBaseToService + 1;
-        } else if (elcc->RecurringCosts[jCost].startOfCosts == iStartCosts::BasePeriod) {
+        } else if (elcc->RecurringCosts[jCost].startOfCosts == StartCosts::BasePeriod) {
             firstMonth = elcc->RecurringCosts[jCost].totalMonthsFromStart + 1;
         }
         if ((firstMonth >= 1) && (firstMonth <= elcc->lengthStudyTotalMonths)) {
