@@ -85,10 +85,17 @@ namespace EconomicLifeCycleCost {
         "ENDOFYEAR"
     };
 
-    enum class iInflAppr
+    enum class InflAppr
     {
+        Unassigned = -1,
         ConstantDollar,
         CurrentDollar,
+        Num
+    };
+
+    std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNamesUC {
+        "CONSTANTDOLLAR",
+        "CURRENTDOLLAR"
     };
 
     enum class DeprMethod
@@ -411,7 +418,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
     std::string LCCname;          // Name
     EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;       // Discounting Convention
-    EconomicLifeCycleCost::iInflAppr inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar; // Inflation Approach
+    EconomicLifeCycleCost::InflAppr inflationApproach = EconomicLifeCycleCost::InflAppr::ConstantDollar; // Inflation Approach
     Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
     Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
     Real64 inflation = 0.0;                                                                                // Inflation
@@ -473,7 +480,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->LCCparamPresent = false;
         this->LCCname.clear();
         this->discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;
-        this->inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar;
+        this->inflationApproach = EconomicLifeCycleCost::InflAppr::ConstantDollar;
         this->realDiscountRate = 0.0;
         this->nominalDiscountRate = 0.0;
         this->inflation = 0.0;

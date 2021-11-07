@@ -234,20 +234,17 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key ConstantDollar
         //      \key CurrentDollar
         //      \default ConstantDollar
-        if (UtilityRoutines::SameString(AlphaArray(3), "ConstantDollar")) {
-            elcc->inflationApproach = iInflAppr::ConstantDollar;
-        } else if (UtilityRoutines::SameString(AlphaArray(3), "CurrentDollar")) {
-            elcc->inflationApproach = iInflAppr::CurrentDollar;
-        } else {
-            elcc->inflationApproach = iInflAppr::ConstantDollar;
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
-                                 "\". ConstantDollar will be used.");
-        }
-        // N1,  \field Real Discount Rate
+    elcc->inflationApproach = static_cast<InflAppr>(getEnumerationValue(InflApprNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3))));
+    if (elcc->inflationApproach == InflAppr::Unassigned) {
+        elcc->inflationApproach = InflAppr::ConstantDollar;
+        ShowWarningError(state,
+                         CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                             "\". ConstantDollar will be used.");
+    }
+    // N1,  \field Real Discount Rate
         //      \type real
         elcc->realDiscountRate = NumArray(1);
-        if ((elcc->inflationApproach == iInflAppr::ConstantDollar) && state.dataIPShortCut->lNumericFieldBlanks(1)) {
+        if ((elcc->inflationApproach == InflAppr::ConstantDollar) && state.dataIPShortCut->lNumericFieldBlanks(1)) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(1) +
                                  " to be blank when ConstantDollar analysis is be used.");
@@ -260,7 +257,7 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         // N2,  \field Nominal Discount Rate
         //      \type real
         elcc->nominalDiscountRate = NumArray(2);
-        if ((elcc->inflationApproach == iInflAppr::CurrentDollar) && state.dataIPShortCut->lNumericFieldBlanks(2)) {
+        if ((elcc->inflationApproach == InflAppr::CurrentDollar) && state.dataIPShortCut->lNumericFieldBlanks(2)) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(2) +
                                  " to be blank when CurrentDollar analysis is be used.");
@@ -273,7 +270,7 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         // N3,  \field Inflation
         //      \type real
         elcc->inflation = NumArray(3);
-        if ((elcc->inflationApproach == iInflAppr::ConstantDollar) && (!state.dataIPShortCut->lNumericFieldBlanks(3))) {
+        if ((elcc->inflationApproach == InflAppr::ConstantDollar) && (!state.dataIPShortCut->lNumericFieldBlanks(3))) {
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(3) +
                                  " contain a value when ConstantDollar analysis is be used.");
@@ -1198,9 +1195,9 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
     // pre-compute the inflation factors for each year
     monthlyInflationFactor.allocate(elcc->lengthStudyTotalMonths);
-    if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
+    if (elcc->inflationApproach == InflAppr::ConstantDollar) {
         monthlyInflationFactor = 1.0; // not really used but just in case
-    } else if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
+    } else if (elcc->inflationApproach == InflAppr::CurrentDollar) {
         // to allocate an interest rate (in this case inflation) cannot just use 1/12
         // for the monthly value since it will be slightly wrong. Instead use inverse of
         // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
@@ -1535,9 +1532,9 @@ void ComputePresentValue(EnergyPlusData &state)
 
     // Depending if using Constant or Current Dollar analysis
     // use the appropriate discount rate
-    if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
+    if (elcc->inflationApproach == InflAppr::ConstantDollar) {
         curDiscountRate = elcc->realDiscountRate;
-    } else if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
+    } else if (elcc->inflationApproach == InflAppr::CurrentDollar) {
         curDiscountRate = elcc->nominalDiscountRate;
     }
     // compute single present values based on real discount rates
@@ -1842,22 +1839,22 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         } else if (elcc->discountConvention == DiscConv::BeginOfYear) {
             tableBody(1, 2) = "BeginningOfYear";
         }
-        if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
+        if (elcc->inflationApproach == InflAppr::ConstantDollar) {
             tableBody(1, 3) = "ConstantDollar";
-        } else if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
+        } else if (elcc->inflationApproach == InflAppr::CurrentDollar) {
             tableBody(1, 3) = "CurrentDollar";
         }
-        if (elcc->inflationApproach == iInflAppr::ConstantDollar) {
+        if (elcc->inflationApproach == InflAppr::ConstantDollar) {
             tableBody(1, 4) = RealToStr(elcc->realDiscountRate, 4);
         } else {
             tableBody(1, 4) = "-- N/A --";
         }
-        if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
+        if (elcc->inflationApproach == InflAppr::CurrentDollar) {
             tableBody(1, 5) = RealToStr(elcc->nominalDiscountRate, 4);
         } else {
             tableBody(1, 5) = "-- N/A --";
         }
-        if (elcc->inflationApproach == iInflAppr::CurrentDollar) {
+        if (elcc->inflationApproach == InflAppr::CurrentDollar) {
             tableBody(1, 6) = RealToStr(elcc->inflation, 4);
         } else {
             tableBody(1, 6) = "-- N/A --";
