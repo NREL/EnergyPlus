@@ -470,21 +470,8 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \key MajorOverhaul
         //        \key OtherOperational
         //        \default Maintenance
-        if (UtilityRoutines::SameString(AlphaArray(2), "Maintenance")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "Repair")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::Repair;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "Operation")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::Operation;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "Replacement")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::Replacement;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "MinorOverhaul")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::MinorOverhaul;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "MajorOverhaul")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::MajorOverhaul;
-        } else if (UtilityRoutines::SameString(AlphaArray(2), "OtherOperational")) {
-            elcc->RecurringCosts[iInObj].category = CostCategory::OtherOperational;
-        } else {
+        elcc->RecurringCosts[iInObj].category = static_cast<CostCategory>(getEnumerationValue(RecurringCostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+        if (elcc->RecurringCosts[iInObj].category == CostCategory::Unassigned) {
             elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +

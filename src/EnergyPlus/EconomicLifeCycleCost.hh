@@ -192,6 +192,10 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
+    constexpr int NumRecurringCostCategory = 7;
+    constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
+        "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
+
     constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{
         "Maintenance",
         "Repair",
