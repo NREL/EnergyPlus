@@ -85,6 +85,12 @@ namespace EconomicLifeCycleCost {
         "ENDOFYEAR"
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNames {
+        "BeginningOfYear",
+        "MidYear",
+        "EndOfYear"
+    };
+
     enum class InflAppr
     {
         Unassigned = -1,
@@ -97,6 +103,8 @@ namespace EconomicLifeCycleCost {
         "CONSTANTDOLLAR",
         "CURRENTDOLLAR"
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNames{"ConstantDollar", "CurrentDollar"};
 
     enum class DeprMethod
     {

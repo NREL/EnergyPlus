@@ -1760,18 +1760,8 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(1) = "Value";
 
         tableBody(1, 1) = elcc->LCCname;
-        if (elcc->discountConvention == DiscConv::EndOfYear) {
-            tableBody(1, 2) = "EndOfYear";
-        } else if (elcc->discountConvention == DiscConv::MidYear) {
-            tableBody(1, 2) = "MidYear";
-        } else if (elcc->discountConvention == DiscConv::BeginOfYear) {
-            tableBody(1, 2) = "BeginningOfYear";
-        }
-        if (elcc->inflationApproach == InflAppr::ConstantDollar) {
-            tableBody(1, 3) = "ConstantDollar";
-        } else if (elcc->inflationApproach == InflAppr::CurrentDollar) {
-            tableBody(1, 3) = "CurrentDollar";
-        }
+        tableBody(1, 2) = DiscConvNames[static_cast<int>(elcc->discountConvention)];
+        tableBody(1, 3) = InflApprNames[static_cast<int>(elcc->inflationApproach)];
         if (elcc->inflationApproach == InflAppr::ConstantDollar) {
             tableBody(1, 4) = RealToStr(elcc->realDiscountRate, 4);
         } else {
