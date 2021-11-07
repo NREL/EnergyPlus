@@ -224,11 +224,11 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \default EndOfYear
         elcc->discountConvention = static_cast<DiscConv>(getEnumerationValue(DiscConvNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
         if (elcc->discountConvention == DiscConv::Unassigned) {
-        elcc->discountConvention = DiscConv::EndOfYear;
-        ShowWarningError(state,
-                         CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
-                             "\". EndOfYear will be used.");
-    }
+            elcc->discountConvention = DiscConv::EndOfYear;
+            ShowWarningError(state,
+                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
+                                 "\". EndOfYear will be used.");
+        }
         // A3,  \field Inflation Approach
         //      \type choice
         //      \key ConstantDollar
@@ -381,37 +381,18 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key StraightLine-40year
         //      \key None
         //      \default None
-        if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-3year")) {
-            elcc->depreciationMethod = DeprMethod::MACRS3;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-5year")) {
-            elcc->depreciationMethod = DeprMethod::MACRS5;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-7year")) {
-            elcc->depreciationMethod = DeprMethod::MACRS7;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-10year")) {
-            elcc->depreciationMethod = DeprMethod::MACRS10;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-15year")) {
-            elcc->depreciationMethod = DeprMethod::MACRS15;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-20year")) {
-            elcc->depreciationMethod = DeprMethod::MACRS20;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-27year")) {
-            elcc->depreciationMethod = DeprMethod::Straight27;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-31year")) {
-            elcc->depreciationMethod = DeprMethod::Straight31;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-39year")) {
-            elcc->depreciationMethod = DeprMethod::Straight39;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-40year")) {
-            elcc->depreciationMethod = DeprMethod::Straight40;
-        } else if (UtilityRoutines::SameString(AlphaArray(6), "None")) {
+        elcc->depreciationMethod = static_cast<DeprMethod>(getEnumerationValue(DeprMethodNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(6))));
+        if (elcc->depreciationMethod == DeprMethod::Unassigned) {
             elcc->depreciationMethod = DeprMethod::None;
-        } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            elcc->depreciationMethod = DeprMethod::None;
-            ShowWarningError(
-                state, CurrentModuleObject + ": The input field " + state.dataIPShortCut->cAlphaFieldNames(6) + "is blank. \"None\" will be used.");
-        } else {
-            elcc->depreciationMethod = DeprMethod::None;
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphaArray(6) +
-                                 R"(". "None" will be used.)");
+            if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                ShowWarningError(state,
+                                 CurrentModuleObject + ": The input field " + state.dataIPShortCut->cAlphaFieldNames(6) +
+                                     "is blank. \"None\" will be used.");
+            } else {
+                ShowWarningError(state,
+                                 CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphaArray(6) +
+                                     R"(". "None" will be used.)");
+            }
         }
         // compute derived variables
         elcc->lastDateMonth = elcc->baseDateMonth - 1; // same month of the year for first and last month

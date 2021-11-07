@@ -79,7 +79,7 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNamesUC {
+    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNamesUC {
         "BEGINNINGOFYEAR",
         "MIDYEAR",
         "ENDOFYEAR"
@@ -93,7 +93,7 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNamesUC {
+    constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNamesUC {
         "CONSTANTDOLLAR",
         "CURRENTDOLLAR"
     };
@@ -141,6 +141,20 @@ namespace EconomicLifeCycleCost {
           2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 1.177, 0},
          {1.354, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5,  2.5,
           2.5,   2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 1.146}}};
+
+    constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)> DeprMethodNamesUC{
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-3YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-5YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-7YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-10YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-15YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-20YEAR",
+        "STRAIGHTLINE-27YEAR",
+        "STRAIGHTLINE-31YEAR",
+        "STRAIGHTLINE-39YEAR",
+        "STRAIGHTLINE-40YEAR",
+        "NONE",
+    };
 
     constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)> DeprMethodNames{
         "ModifiedAcceleratedCostRecoverySystem-3year",
