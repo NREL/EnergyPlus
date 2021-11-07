@@ -253,6 +253,9 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{
+        "Nonrecurring", "Recurring"};
+
     enum class PrValKind
     {
         Unassigned = -1,

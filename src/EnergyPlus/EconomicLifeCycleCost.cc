@@ -1890,11 +1890,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             curCashFlow = CostCategory::Num + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
 
-            if (elcc->CashFlow[curCashFlow].SourceKind == SourceKindType::Nonrecurring) {
-                tableBody(jObj + 1, 1) = "Nonrecurring";
-            } else if (elcc->CashFlow[curCashFlow].SourceKind == SourceKindType::Recurring) {
-                tableBody(jObj + 1, 1) = "Recurring";
-            }
+            tableBody(jObj + 1, 1) = SourceKindTypeNames[static_cast<int>(elcc->CashFlow[curCashFlow].SourceKind)];
 
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 tableBody(jObj + 1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
