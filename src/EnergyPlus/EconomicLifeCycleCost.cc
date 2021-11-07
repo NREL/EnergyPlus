@@ -1495,24 +1495,10 @@ void ComputePresentValue(EnergyPlusData &state)
         curDiscountRate = elcc->nominalDiscountRate;
     }
     // compute single present values based on real discount rates
+    constexpr std::array<Real64, static_cast<int>(DiscConv::Num)> DiscConv2EffectiveYearAdjustment = {1.0, 0.5, 0.0};
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
         // NIST 155 D.2.1.1 - Single Present Value (SPV) formula
-        switch (elcc->discountConvention) {
-        case (DiscConv::BeginOfYear): {
-            effectiveYear = double(jYear) - 1.0;
-            break;
-        }
-        case (DiscConv::MidYear): {
-            effectiveYear = double(jYear) - 0.5;
-            break;
-        }
-        case (DiscConv::EndOfYear): {
-            effectiveYear = double(jYear);
-            break;
-        }
-        default:
-            break;
-        }
+        effectiveYear = double(jYear) - DiscConv2EffectiveYearAdjustment[static_cast<int>(elcc->discountConvention)];
         elcc->SPV(jYear) = 1.0 / std::pow(1.0 + curDiscountRate, effectiveYear);
     }
     // use SPV as default values for all energy types
@@ -1527,22 +1513,7 @@ void ComputePresentValue(EnergyPlusData &state)
         if (curResource != DataGlobalConstants::ResourceType::None) {
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
-                switch (elcc->discountConvention) {
-                case (DiscConv::BeginOfYear): {
-                    effectiveYear = double(jYear) - 1.0;
-                    break;
-                }
-                case (DiscConv::MidYear): {
-                    effectiveYear = double(jYear) - 0.5;
-                    break;
-                }
-                case (DiscConv::EndOfYear): {
-                    effectiveYear = double(jYear);
-                    break;
-                }
-                default:
-                    break;
-                }
+                effectiveYear = double(jYear) - DiscConv2EffectiveYearAdjustment[static_cast<int>(elcc->discountConvention)];
                 elcc->energySPV.at(jYear).at(curResource) =
                     elcc->UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
             }
