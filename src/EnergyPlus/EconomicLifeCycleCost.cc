@@ -332,7 +332,13 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key November
         //      \key December
         //      \default January
-        elcc->serviceDateMonth = MonthToMonthNumber(AlphaArray(5), 1);
+        elcc->serviceDateMonth = getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(5)));
+        if (elcc->serviceDateMonth == -1) {
+            elcc->serviceDateMonth = 0;
+            ShowWarningError(state,
+                             CurrentModuleObject + ": Invalid month entered in field " + state.dataIPShortCut->cAlphaFieldNames(5) +
+                                 ". Using January instead of \"" + AlphaArray(5) + "\"");
+        }
         // N5,  \field Service Date Year
         //      \type integer
         //      \minimum 1900
@@ -1114,7 +1120,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // compute months from 1900 for base and service period
     elcc->ExpressAsCashFlows_baseMonths1900 =
         (elcc->baseDateYear - 1900) * 12 + (elcc->baseDateMonth + 1); // elcc->baseDateMonth + 1 to account for baseDateMonth starting at 0
-    elcc->ExpressAsCashFlows_serviceMonths1900 = (elcc->serviceDateYear - 1900) * 12 + elcc->serviceDateMonth;
+    elcc->ExpressAsCashFlows_serviceMonths1900 = (elcc->serviceDateYear - 1900) * 12 + elcc->serviceDateMonth + 1; // elcc->serviceDateMonth + 1 to account for serviceDateMonth starting at 0
     monthsBaseToService = elcc->ExpressAsCashFlows_serviceMonths1900 - elcc->ExpressAsCashFlows_baseMonths1900;
     // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
     if (state.dataCostEstimateManager->CurntBldg.GrandTotal >
@@ -1787,7 +1793,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             tableBody(1, 6) = "-- N/A --";
         }
         tableBody(1, 7) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear);
-        tableBody(1, 8) = format("{} {}", MonthNames(elcc->serviceDateMonth), elcc->serviceDateYear);
+        tableBody(1, 8) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear);
         tableBody(1, 9) = fmt::to_string(elcc->lengthStudyYears);
         tableBody(1, 10) = RealToStr(elcc->taxRate, 4);
         tableBody(1, 11) = DeprMethodNames[static_cast<int>(elcc->depreciationMethod)];
@@ -1858,7 +1864,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead = "none";
             rowHead(1) = "";
             for (iYear = 1; iYear <= numYears; ++iYear) {
-                rowHead(iYear + 1) = format("{} {}", MonthNames(elcc->serviceDateMonth), elcc->serviceDateYear + iYear - 1);
+                rowHead(iYear + 1) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;

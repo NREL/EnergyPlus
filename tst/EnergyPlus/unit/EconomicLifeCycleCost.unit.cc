@@ -509,7 +509,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     state->dataEconLifeCycleCost->baseDateMonth = 0;
 
     state->dataEconLifeCycleCost->serviceDateYear = 2023;
-    state->dataEconLifeCycleCost->serviceDateMonth = 1;
+    state->dataEconLifeCycleCost->serviceDateMonth = 0;
 
     state->dataEconLifeCycleCost->lengthStudyYears = 5;
     state->dataEconLifeCycleCost->lengthStudyTotalMonths = state->dataEconLifeCycleCost->lengthStudyYears * 12;
