@@ -840,7 +840,13 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //      \key November
             //      \key December
             //      \default January
-            elcc->UsePriceEscalation(iInObj).escalationStartMonth = MonthToMonthNumber(AlphaArray(3), 1);
+            elcc->UsePriceEscalation(iInObj).escalationStartMonth  = getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3)));
+            if (elcc->UsePriceEscalation(iInObj).escalationStartMonth == -1) {
+                elcc->UsePriceEscalation(iInObj).escalationStartMonth = 0;
+                ShowWarningError(state,
+                                 CurrentModuleObject + ": Invalid month entered in field " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                     ". Using January instead of \"" + AlphaArray(3) + "\"");
+            }
             // N2,  \field Year 1 Escalation
             //      \type real
             //      \begin-extensible
@@ -1831,7 +1837,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
             tableBody(jObj, 1) = GetResourceTypeChar(elcc->UsePriceEscalation(jObj).resource);
             tableBody(jObj, 2) =
-                format("{} {}", MonthNames(elcc->UsePriceEscalation(jObj).escalationStartMonth), elcc->UsePriceEscalation(jObj).escalationStartYear);
+                format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)], elcc->UsePriceEscalation(jObj).escalationStartYear);
         }
         for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
