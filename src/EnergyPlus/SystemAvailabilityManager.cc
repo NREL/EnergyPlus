@@ -134,6 +134,33 @@ namespace SystemAvailabilityManager {
     int constexpr HybridVentCtrl_Open = 1;     // Open windows or doors
     int constexpr HybridVentCtrl_Close = 2;    // Close windows or doors
 
+    Array1D_string const cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
+                                                    {"AvailabilityManager:Scheduled",
+                                                     "AvailabilityManager:ScheduledOn",
+                                                     "AvailabilityManager:ScheduledOff",
+                                                     "AvailabilityManager:NightCycle",
+                                                     "AvailabilityManager:DifferentialThermostat",
+                                                     "AvailabilityManager:HighTemperatureTurnOff",
+                                                     "AvailabilityManager:HighTemperatureTurnOn",
+                                                     "AvailabilityManager:LowTemperatureTurnOff",
+                                                     "AvailabilityManager:LowTemperatureTurnOn",
+                                                     "AvailabilityManager:NightVentilation",
+                                                     "AvailabilityManager:HybridVentilation",
+                                                     "AvailabilityManager:OptimumStart"});
+
+    static constexpr std::array<int, NumValidSysAvailManagerTypes> ValidSysAvailManagerTypes = {SysAvailMgr_Scheduled,
+                                                                                                SysAvailMgr_ScheduledOn,
+                                                                                                SysAvailMgr_ScheduledOff,
+                                                                                                SysAvailMgr_NightCycle,
+                                                                                                SysAvailMgr_DiffThermo,
+                                                                                                SysAvailMgr_HiTempTOff,
+                                                                                                SysAvailMgr_HiTempTOn,
+                                                                                                SysAvailMgr_LoTempTOff,
+                                                                                                SysAvailMgr_LoTempTOn,
+                                                                                                SysAvailMgr_NightVent,
+                                                                                                SysAvailMgr_HybridVent,
+                                                                                                SysAvailMgr_OptimumStart};
+
     void ManageSystemAvailability(EnergyPlusData &state)
     {
 
@@ -1379,7 +1406,7 @@ namespace SystemAvailabilityManager {
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType(listItem) = availManagerObjType;
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) =
-                            ValidateAndSetSysAvailabilityManagerType(state, availManagerObjType);
+                            ValidateAndSetSysAvailabilityManagerType(availManagerObjType);
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
                     }
                 }
@@ -3841,7 +3868,7 @@ namespace SystemAvailabilityManager {
         state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).AvailStatus = AvailStatus;
     }
 
-    int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName) // name to validate
+    int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName) // name to validate
     {
 
         // FUNCTION INFORMATION:
@@ -3860,12 +3887,11 @@ namespace SystemAvailabilityManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found;
 
-        Found =
-            UtilityRoutines::FindItem(AvailMgrName, state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes, NumValidSysAvailManagerTypes);
+        Found = UtilityRoutines::FindItem(AvailMgrName, cValidSysAvailManagerTypes, NumValidSysAvailManagerTypes);
         if (Found > 0) {
             //   Hybrid ventilation must not be specified in a list
-            if (state.dataSystemAvailabilityManager->ValidSysAvailManagerTypes(Found) != SysAvailMgr_HybridVent) {
-                ValidType = state.dataSystemAvailabilityManager->ValidSysAvailManagerTypes(Found);
+            if (ValidSysAvailManagerTypes[Found - 1] != SysAvailMgr_HybridVent) {
+                ValidType = ValidSysAvailManagerTypes[Found - 1];
             } else {
                 ValidType = 0;
             }
@@ -4645,7 +4671,7 @@ namespace SystemAvailabilityManager {
                                 }
                                 if (!zoneFound) {
                                     ShowSevereError(state,
-                                                    state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes(
+                                                    cValidSysAvailManagerTypes(
                                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
                                                         ", The controlled zone =" +
                                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlZoneName +
@@ -4703,8 +4729,7 @@ namespace SystemAvailabilityManager {
 
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlledZoneNum == 0) {
                     ShowSevereError(state,
-                                    state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes(
-                                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
+                                    cValidSysAvailManagerTypes(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
                                         ", The controlled zone is not defined correctly =" +
                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlZoneName);
                     ErrorsFound = true;
@@ -4743,8 +4768,7 @@ namespace SystemAvailabilityManager {
                 if (AirLoopCount > 1) {
                     ShowSevereError(
                         state,
-                        state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes(
-                            state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailIndex).MgrType) +
+                        cValidSysAvailManagerTypes(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailIndex).MgrType) +
                             ", The AirLoopHVAC name found more than once=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                     ShowContinueError(state, "Each AirLoopHVAC allows one hybrid ventilation control object.");
                     ErrorsFound = true;
@@ -5036,14 +5060,13 @@ namespace SystemAvailabilityManager {
                 } else {
                     ShowSevereError(
                         state,
-                        state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes(
-                            state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
+                        cValidSysAvailManagerTypes(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
                             ": incorrect Control Type: " + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName);
-                    ShowFatalError(state,
-                                   "Errors found in getting " +
-                                       state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes(
-                                           state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
-                                       " Control mode value");
+                    ShowFatalError(
+                        state,
+                        "Errors found in getting " +
+                            cValidSysAvailManagerTypes(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType) +
+                            " Control mode value");
                 }
             }
 
