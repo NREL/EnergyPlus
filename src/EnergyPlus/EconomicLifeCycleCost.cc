@@ -2104,7 +2104,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 rowHead(kMonth) =
-                    format("{} {}", MonthNames(1 + (kMonth + elcc->baseDateMonth - 2) % 12), elcc->baseDateYear + int((kMonth - 1) / 12));
+                    format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) + 1], elcc->baseDateYear + int((kMonth - 1) / 12));
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 for (jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
@@ -2134,7 +2134,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody.allocate(12, elcc->lengthStudyYears);
         tableBody = "";
         for (kMonth = 1; kMonth <= 12; ++kMonth) {
-            columnHead(kMonth) = MonthNames(kMonth);
+            columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth +1)];
         }
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = fmt::to_string(elcc->baseDateYear + iYear - 1);
