@@ -419,9 +419,6 @@ namespace EconomicLifeCycleCost {
     void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
 
     void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
-
-    int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth);
-
     //======================================================================================================================
     //======================================================================================================================
 
