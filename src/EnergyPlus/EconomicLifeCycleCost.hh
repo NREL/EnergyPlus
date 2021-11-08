@@ -79,17 +79,9 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNamesUC {
-        "BEGINNINGOFYEAR",
-        "MIDYEAR",
-        "ENDOFYEAR"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNamesUC{"BEGINNINGOFYEAR", "MIDYEAR", "ENDOFYEAR"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNames {
-        "BeginningOfYear",
-        "MidYear",
-        "EndOfYear"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNames{"BeginningOfYear", "MidYear", "EndOfYear"};
 
     enum class InflAppr
     {
@@ -99,10 +91,7 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNamesUC {
-        "CONSTANTDOLLAR",
-        "CURRENTDOLLAR"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNamesUC{"CONSTANTDOLLAR", "CURRENTDOLLAR"};
 
     constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNames{"ConstantDollar", "CurrentDollar"};
 
@@ -199,14 +188,14 @@ namespace EconomicLifeCycleCost {
         TotGrand,
         Num
     };
-//
-//    constexpr int NumRecurringCostCategory = 7;
-//    constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
-//        "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
-//
-//    constexpr int NumNonRecurringCostCategory = 3;
-//    constexpr std::array<std::string_view, NumNonRecurringCostCategory> NonRecurringCostCategoryNamesUC{
-//        "CONSTRUCTION", "SALVAGE", "OTHERCAPITAL"};
+    //
+    //    constexpr int NumRecurringCostCategory = 7;
+    //    constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
+    //        "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
+    //
+    //    constexpr int NumNonRecurringCostCategory = 3;
+    //    constexpr std::array<std::string_view, NumNonRecurringCostCategory> NonRecurringCostCategoryNamesUC{
+    //        "CONSTRUCTION", "SALVAGE", "OTHERCAPITAL"};
 
     constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{
         "Maintenance",
@@ -223,20 +212,18 @@ namespace EconomicLifeCycleCost {
         "Energy",
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{
-        "MAINTENANCE",
-        "REPAIR",
-        "OPERATION",
-        "REPLACEMENT",
-        "MINOROVERHAUL",
-        "MAJOROVERHAUL",
-        "OTHEROPERATIONAL",
-        "CONSTRUCTION",
-        "SALVAGE",
-        "OTHERCAPITAL",
-        "WATER",
-        "ENERGY"
-    };
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{"MAINTENANCE",
+                                                                                                    "REPAIR",
+                                                                                                    "OPERATION",
+                                                                                                    "REPLACEMENT",
+                                                                                                    "MINOROVERHAUL",
+                                                                                                    "MAJOROVERHAUL",
+                                                                                                    "OTHEROPERATIONAL",
+                                                                                                    "CONSTRUCTION",
+                                                                                                    "SALVAGE",
+                                                                                                    "OTHERCAPITAL",
+                                                                                                    "WATER",
+                                                                                                    "ENERGY"};
 
     // The NIST supplement includes UPV* factors for
     //   Electricity
@@ -254,9 +241,7 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(StartCosts::Num)> StartCostNamesUC{
-        "SERVICEPERIOD", "BASEPERIOD"};
-
+    constexpr std::array<std::string_view, static_cast<int>(StartCosts::Num)> StartCostNamesUC{"SERVICEPERIOD", "BASEPERIOD"};
 
     enum class SourceKindType
     {
@@ -268,8 +253,7 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{
-        "Nonrecurring", "Recurring"};
+    constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{"Nonrecurring", "Recurring"};
 
     enum class PrValKind
     {
@@ -322,7 +306,7 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;        // Line Item
         CostCategory category;       // Category
         Real64 cost;                 // Cost
-        StartCosts startOfCosts;    // Start of Costs
+        StartCosts startOfCosts;     // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
         int monthsFromStart;         // Months from Start 0 - 11
         int totalMonthsFromStart;    // Total months (12 x years) + months
@@ -346,7 +330,7 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;     // Line Item
         CostCategory category;    // Category
         Real64 cost;              // Cost
-        StartCosts startOfCosts; // Start of Costs
+        StartCosts startOfCosts;  // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
         int monthsFromStart;      // Months from Start 0 - 11
         int totalMonthsFromStart; // Total months (12 x years) + months
@@ -471,21 +455,21 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     // related to LifeCycleCost:Parameters
     bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
     std::string LCCname;          // Name
-    EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;       // Discounting Convention
+    EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;     // Discounting Convention
     EconomicLifeCycleCost::InflAppr inflationApproach = EconomicLifeCycleCost::InflAppr::ConstantDollar; // Inflation Approach
-    Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
-    Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
-    Real64 inflation = 0.0;                                                                                // Inflation
-    int baseDateMonth = 0;                                                                                 // Base Date Month (1=Jan, 12=Dec)
-    int baseDateYear = 0;                                                                                  // Base Date Year  1900-2100
-    int serviceDateMonth = 0;                                                                              // Service Date Month (1=Jan, 12=Dec)
-    int serviceDateYear = 0;                                                                               // Service Date Year 1900-2100
-    int lengthStudyYears = 0;                                                                              // Length of Study Period in Years
+    Real64 realDiscountRate = 0.0;                                                                       // Real Discount Rate
+    Real64 nominalDiscountRate = 0.0;                                                                    // Nominal Discount Rate
+    Real64 inflation = 0.0;                                                                              // Inflation
+    int baseDateMonth = 0;                                                                               // Base Date Month (1=Jan, 12=Dec)
+    int baseDateYear = 0;                                                                                // Base Date Year  1900-2100
+    int serviceDateMonth = 0;                                                                            // Service Date Month (1=Jan, 12=Dec)
+    int serviceDateYear = 0;                                                                             // Service Date Year 1900-2100
+    int lengthStudyYears = 0;                                                                            // Length of Study Period in Years
     int lengthStudyTotalMonths = 0; // Length of Study expressed in months (years x 12)
     Real64 taxRate = 0.0;           // Tax rate
     EconomicLifeCycleCost::DeprMethod depreciationMethod = EconomicLifeCycleCost::DeprMethod::None; // Depreciation Method
     // derived
-    int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
+    int lastDateYear = 0; // Last Date Year (base date year + length of study period in years)
     int numRecurringCosts = 0;
     int numNonrecurringCost = 0;
     int numUsePriceEscalation = 0;
