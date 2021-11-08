@@ -199,14 +199,14 @@ namespace EconomicLifeCycleCost {
         TotGrand,
         Num
     };
-
-    constexpr int NumRecurringCostCategory = 7;
-    constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
-        "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
-
-    constexpr int NumNonRecurringCostCategory = 3;
-    constexpr std::array<std::string_view, NumNonRecurringCostCategory> NonRecurringCostCategoryNamesUC{
-        "Construction", "Salvage", "OtherCapital"};
+//
+//    constexpr int NumRecurringCostCategory = 7;
+//    constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
+//        "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
+//
+//    constexpr int NumNonRecurringCostCategory = 3;
+//    constexpr std::array<std::string_view, NumNonRecurringCostCategory> NonRecurringCostCategoryNamesUC{
+//        "CONSTRUCTION", "SALVAGE", "OTHERCAPITAL"};
 
     constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{
         "Maintenance",
@@ -221,6 +221,21 @@ namespace EconomicLifeCycleCost {
         "Other Capital",
         "Water",
         "Energy",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{
+        "MAINTENANCE",
+        "REPAIR",
+        "OPERATION",
+        "REPLACEMENT",
+        "MINOR OVERHAUL",
+        "MAJOR OVERHAUL",
+        "OTHER OPERATIONAL",
+        "CONSTRUCTION",
+        "SALVAGE",
+        "OTHER CAPITAL",
+        "WATER",
+        "ENERGY"
     };
 
     // The NIST supplement includes UPV* factors for
@@ -470,7 +485,6 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     Real64 taxRate = 0.0;           // Tax rate
     EconomicLifeCycleCost::DeprMethod depreciationMethod = EconomicLifeCycleCost::DeprMethod::None; // Depreciation Method
     // derived
-    int lastDateMonth = 0; // Last Date Month (the month before the base date month)
     int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
     int numRecurringCosts = 0;
     int numNonrecurringCost = 0;
@@ -531,7 +545,6 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->lengthStudyTotalMonths = 0;
         this->taxRate = 0.0;
         this->depreciationMethod = EconomicLifeCycleCost::DeprMethod::None;
-        this->lastDateMonth = 0;
         this->lastDateYear = 0;
         this->numRecurringCosts = 0;
         this->numNonrecurringCost = 0;

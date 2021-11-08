@@ -208,6 +208,10 @@ void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
 
+
+    static constexpr std::array<std::string_view, 12> MonthNamesCC{
+        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
     template <class T> struct is_shared_ptr : std::false_type
     {
     };

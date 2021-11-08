@@ -259,7 +259,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
     EXPECT_TRUE(compare_enums(DiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention));
     EXPECT_TRUE(compare_enums(InflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach));
     EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
-    EXPECT_EQ(1, state->dataEconLifeCycleCost->baseDateMonth);
+    EXPECT_EQ(0, state->dataEconLifeCycleCost->baseDateMonth);
     EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
     EXPECT_EQ(22 * 12, state->dataEconLifeCycleCost->lengthStudyTotalMonths);
 
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
     EXPECT_TRUE(compare_enums(DiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention));
     EXPECT_TRUE(compare_enums(InflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach));
     EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
-    EXPECT_EQ(1, state->dataEconLifeCycleCost->baseDateMonth);
+    EXPECT_EQ(0, state->dataEconLifeCycleCost->baseDateMonth);
     EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
     EXPECT_EQ(100 * 12, state->dataEconLifeCycleCost->lengthStudyTotalMonths);
 
@@ -506,7 +506,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_MonthToMonthNumber)
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
 {
     state->dataEconLifeCycleCost->baseDateYear = 2020;
-    state->dataEconLifeCycleCost->baseDateMonth = 1;
+    state->dataEconLifeCycleCost->baseDateMonth = 0;
 
     state->dataEconLifeCycleCost->serviceDateYear = 2023;
     state->dataEconLifeCycleCost->serviceDateMonth = 1;
