@@ -2451,24 +2451,30 @@ void DecideWorkMode(EnergyPlusData &state,
         state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum).Temp =
             state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).Temp;
 
-        int tankType = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankType;
+        DataPlant::PlantEquipmentType tankType = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankType;
 
-        if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
-            (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+        switch (tankType) {
+        case DataPlant::PlantEquipmentType::WtrHeaterMixed:
+        case DataPlant::PlantEquipmentType::WtrHeaterStratified:
+        case DataPlant::PlantEquipmentType::ChilledWaterTankMixed:
+        case DataPlant::PlantEquipmentType::ChilledWaterTankStratified:
 
+        {
             int tankIDX = WaterThermalTanks::getTankIDX(state,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankName,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankID);
             auto &tank = state.dataWaterThermalTanks->WaterThermalTank(tankIDX);
             tank.callerLoopNum = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).LoopNum;
-
             PlantLocation A(0, 0, 0, 0);
             tank.simulate(state, A, true, MyLoad, true);
-
             tank.callerLoopNum = 0;
 
-        } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
+            break;
+        }
+        case DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped:
+        case DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped:
 
+        {
             int hpIDX = WaterThermalTanks::getHPTankIDX(state,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankName,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankID);
@@ -2477,11 +2483,13 @@ void DecideWorkMode(EnergyPlusData &state,
             auto &tank = state.dataWaterThermalTanks->WaterThermalTank(tankIDX);
             tank.callerLoopNum = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).LoopNum;
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
-
             PlantLocation A(0, 0, 0, 0);
             HPWH.simulate(state, A, true, MyLoad, true);
-
             tank.callerLoopNum = 0;
+            break;
+        }
+        default:
+            break;
         }
     }
     state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CheckWHCall = false; // clear checking flag

@@ -2911,7 +2911,7 @@ void SolveAirLoopControllers(
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Maximum iterations of an air system/controllers simulation sequence
-    int const MaxIter(50);
+    int constexpr MaxIter(50);
 
     // INTERFACE BLOCK DEFINITIONS: None
 
@@ -3717,9 +3717,9 @@ void SimAirLoopComponent(EnergyPlusData &state,
             // Ducts
         } else if (SELECT_CASE_var == CompType::ZoneVRFasAirLoopEquip) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
             int ControlledZoneNum = 0;
-            int const OAUnitNumLocal = 0;
-            Real64 const OAUCoilOutTempLocal = 0.0;
-            bool const ZoneEquipment = false;
+            int constexpr OAUnitNumLocal = 0;
+            Real64 constexpr OAUCoilOutTempLocal = 0.0;
+            bool constexpr ZoneEquipment = false;
             Real64 sysOut = 0.0;
             Real64 latOut = 0.0;
             HVACVariableRefrigerantFlow::SimulateVRF(state,

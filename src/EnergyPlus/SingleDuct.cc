@@ -250,8 +250,7 @@ void GetSysInput(EnergyPlusData &state)
     using Fans::GetFanInletNode;
     using Fans::GetFanOutletNode;
     using namespace DataHeatBalance;
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
 
@@ -391,11 +390,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp.empty()) {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(8) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -797,11 +798,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp.empty()) {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(5) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -1108,11 +1111,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(5) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -2054,11 +2059,13 @@ void GetSysInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
                                                "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
+                DataPlant::PlantEquipmentType::CoilSteamAirHeating;
         } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp.empty()) {
             ShowSevereError(
                 state, "Illegal " + cAlphaFields(7) + " = " + state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp + '.');
@@ -2483,8 +2490,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     using DataZoneEquipment::CheckZoneEquipmentList;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -2523,7 +2529,8 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     }
 
     if (this->PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
-        if ((this->ReheatComp_PlantType == TypeOf_CoilWaterSimpleHeating) || (this->ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
+        if ((this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+            (this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             // setup plant topology indices for plant fed heating coils
             errFlag = false;
             ScanPlantLoopsForObject(state,
@@ -4334,7 +4341,7 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
     // FUNCTION PARAMETER DEFINITIONS:
     // na
@@ -4766,7 +4773,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     using SteamCoils::GetCoilCapacity;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const BigLoad(1.0e+20);
+    Real64 constexpr BigLoad(1.0e+20);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow = 0; // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets

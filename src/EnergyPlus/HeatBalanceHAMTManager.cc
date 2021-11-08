@@ -641,7 +641,7 @@ namespace HeatBalanceHAMTManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
+        Real64 constexpr adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
         static constexpr std::string_view RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

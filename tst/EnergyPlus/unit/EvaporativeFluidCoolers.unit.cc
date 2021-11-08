@@ -100,7 +100,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     // In general, values set here attempt to avoid as much code as possible so that only the defect code is run.
     // Obviously, not everything can be skipped so some of this information is needed to avoid crashes in other routines.
     auto &thisEFC = state->dataEvapFluidCoolers->SimpleEvapFluidCooler(1);
-    thisEFC.TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
+    thisEFC.Type = DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
     thisEFC.MyOneTimeFlag = false;
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;
@@ -127,12 +127,12 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.05;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).ON = false;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = DataPlant::OpScheme::Unassigned;
     thisEFC.DesignWaterFlowRateWasAutoSized = false;
     thisEFC.LowSpeedAirFlowRateWasAutoSized = false;
     thisEFC.HighSpeedEvapFluidCoolerUAWasAutoSized = false;

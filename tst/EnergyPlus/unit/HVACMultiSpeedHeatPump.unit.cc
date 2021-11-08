@@ -97,9 +97,9 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 {
 
     bool ErrorsFound(false);
-    int const MSHeatPumpNum(2);
+    int constexpr MSHeatPumpNum(2);
     bool const FirstHVACIteration(true);
-    int const AirLoopNum(2);
+    int constexpr AirLoopNum(2);
     Real64 QZnReq(-10000.0);
     Real64 OnOffAirFlowRatio(1.0);
 

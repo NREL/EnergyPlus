@@ -93,7 +93,7 @@ namespace DXFEarClipping {
         //'The circumcircle centre is returned in (xc,yc) and the radius r
         //'NOTE: A point on the edge is inside the circumcircle
 
-        Real64 const epsilon(0.0000001);
+        Real64 constexpr epsilon(0.0000001);
         Real64 anglesum;
         Real64 costheta;
         int vert;
@@ -184,7 +184,7 @@ namespace DXFEarClipping {
         EP_SIZE_CHECK(polygon, nsides);
 
         // Subroutine parameter definitions:
-        Real64 const point_tolerance(0.00001);
+        Real64 constexpr point_tolerance(0.00001);
 
         // Subroutine local variable declarations:
         bool errFlag;
@@ -352,7 +352,7 @@ namespace DXFEarClipping {
         // angle is set to PI/2 in the degenerate case.
 
         // Function parameter definitions:
-        Real64 const epsilon(0.0000001);
+        Real64 constexpr epsilon(0.0000001);
 
         // Function local variable declarations:
         Real64 t;

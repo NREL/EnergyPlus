@@ -64,6 +64,20 @@ struct EnergyPlusData;
 
 namespace UnitarySystems {
 
+    // Supply Air Sizing Option
+    int constexpr None = 1;
+    int constexpr SupplyAirFlowRate = 2;
+    int constexpr FlowPerFloorArea = 3;
+    int constexpr FractionOfAutoSizedCoolingValue = 4;
+    int constexpr FractionOfAutoSizedHeatingValue = 5;
+    int constexpr FlowPerCoolingCapacity = 6;
+    int constexpr FlowPerHeatingCapacity = 7;
+
+    // Last mode of operation
+    int constexpr CoolingMode = 1; // last compressor operating mode was in cooling
+    int constexpr HeatingMode = 2; // last compressor operating mode was in heating
+    int constexpr NoCoolHeat = 3;  // last operating mode was no cooling or heating
+
     struct UnitarySysInputSpec
     {
         // system_type is not an object input but the actual type of object (e.g., UnitarySystem, CoilSystem:Cooling:DX, etc.).
@@ -935,31 +949,11 @@ struct UnitarySystemsData : BaseGlobalStruct
     int numUnitarySystems = 0;
     bool economizerFlag = false;      // holds air loop economizer status
     bool SuppHeatingCoilFlag = false; // set to TRUE when simulating supplemental heating coil
-
-    // Supply Air Sizing Option
-    int const None = 1;
-    int const SupplyAirFlowRate = 2;
-    int const FlowPerFloorArea = 3;
-    int const FractionOfAutoSizedCoolingValue = 4;
-    int const FractionOfAutoSizedHeatingValue = 5;
-    int const FlowPerCoolingCapacity = 6;
-    int const FlowPerHeatingCapacity = 7;
-
-    // Coil type for SimWater and SimSteamCoil
-    int const CoolingCoil = 0;
-    int const HeatingCoil = 1;
-    int const SuppHeatCoil = 2;
-
-    // Last mode of operation
-    int const CoolingMode = 1; // last compressor operating mode was in cooling
-    int const HeatingMode = 2; // last compressor operating mode was in heating
-    int const NoCoolHeat = 3;  // last operating mode was no cooling or heating
-
-    bool HeatingLoad = false;     // True when zone needs heating
-    bool CoolingLoad = false;     // True when zone needs cooling
-    Real64 MoistureLoad = 0.0;    // Dehumidification Load (W)
-    Real64 CompOnMassFlow = 0.0;  // Supply air mass flow rate w/ compressor ON [kg/s]
-    Real64 CompOffMassFlow = 0.0; // Supply air mass flow rate w/ compressor OFF [kg/s]
+    bool HeatingLoad = false;         // True when zone needs heating
+    bool CoolingLoad = false;         // True when zone needs cooling
+    Real64 MoistureLoad = 0.0;        // Dehumidification Load (W)
+    Real64 CompOnMassFlow = 0.0;      // Supply air mass flow rate w/ compressor ON [kg/s]
+    Real64 CompOffMassFlow = 0.0;     // Supply air mass flow rate w/ compressor OFF [kg/s]
 
     Real64 CompOnFlowRatio = 0.0;       // fan flow ratio when coil on
     Real64 CompOffFlowRatio = 0.0;      // fan flow ratio when coil off
@@ -972,9 +966,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     Real64 m_massFlow2 = 0.0;           // Mass flow rate in operating mode 2 (CompOff) [kg/s]
     Real64 m_runTimeFraction1 = 0.0;    // Fan runtime fraction in operating mode 1 (CompOn)
     Real64 m_runTimeFraction2 = 0.0;    // Fan runtime fraction in operating mode 2 (CompOff)
-
-    int const On = 1;  // normal compressor operation
-    int const Off = 0; // signal DXCoil that compressor shouldn't run
 
     bool initUnitarySystemsErrFlag = false;
     bool initUnitarySystemsErrorsFound = false;

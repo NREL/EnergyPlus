@@ -1893,8 +1893,7 @@ void GetPTUnit(EnergyPlusData &state)
                         state, "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 }
-                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) !=
-                    state.dataSteamCoils->ZoneLoadControl) {
+                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) != SteamCoils::ZoneLoadControl) {
                     if (errFlag) {
                         ShowContinueError(state,
                                           "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" +
@@ -4040,8 +4039,7 @@ void InitPTUnit(EnergyPlusData &state,
     using SteamCoils::SimulateSteamCoilComponents;
     auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
     auto &GetSteamCoilCapacity(SteamCoils::GetCoilCapacity);
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     using Fans::GetFanVolFlow;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -4132,7 +4130,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4169,7 +4167,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4214,7 +4212,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
@@ -4244,7 +4242,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
@@ -5942,8 +5940,8 @@ void ControlPTUnitOutput(EnergyPlusData &state,
     Real64 mdot; // coil fluid mass flow rate (kg/s)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500);    // maximum number of iterations
-    Real64 const MinPLF(0.0); // minimum part load factor allowed
+    int constexpr MaxIte(500);    // maximum number of iterations
+    Real64 constexpr MinPLF(0.0); // minimum part load factor allowed
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 FullOutput;   // unit full output when compressor is operating [W]
@@ -6259,8 +6257,8 @@ void CalcPTUnit(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-    int const SolveMaxIter(50);
+    Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+    int constexpr SolveMaxIter(50);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;            // PTHP air outlet node
@@ -6283,12 +6281,12 @@ void CalcPTUnit(EnergyPlusData &state,
     int ATMixOutNode(0); // outlet node of ATM Mixer
 
     // Tuned Named constants to avoid heap allocation when passed to Optional args
-    bool const True(true);
-    bool const False(false);
-    int const iZero(0);
-    int const iOne(1);
-    Real64 const dZero(0.0);
-    Real64 const dOne(1.0);
+    bool constexpr True(true);
+    bool constexpr False(false);
+    int constexpr iZero(0);
+    int constexpr iOne(1);
+    Real64 constexpr dZero(0.0);
+    Real64 constexpr dOne(1.0);
 
     OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
     InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
@@ -7828,7 +7826,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500); // maximum number of iterations
+    int constexpr MaxIte(500); // maximum number of iterations
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

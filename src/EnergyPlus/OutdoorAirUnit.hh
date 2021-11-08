@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -71,19 +72,53 @@ namespace OutdoorAirUnit {
     enum class CompType : int
     {
         Unassigned = -1,
-        WaterCoil_SimpleCool = 0,
-        WaterCoil_Cooling = 1,
-        WaterCoil_SimpleHeat = 2,
-        SteamCoil_AirHeat = 3,
-        Coil_ElectricHeat = 4,
-        WaterCoil_DetailedCool = 5,
-        WaterCoil_CoolingHXAsst = 6,
-        Coil_GasHeat = 7,
-        DXSystem = 8,
-        HeatXchngr = 9,
-        Desiccant = 10,
-        DXHeatPumpSystem = 11,
-        UnitarySystemModel = 12
+        WaterCoil_Cooling,       // "COIL:COOLING:WATER",
+        WaterCoil_SimpleHeat,    // "COIL:HEATING:WATER",
+        SteamCoil_AirHeat,       // "COIL:HEATING:STEAM",
+        Coil_ElectricHeat,       // "COIL:HEATING:ELECTRIC",
+        WaterCoil_DetailedCool,  // "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+        WaterCoil_CoolingHXAsst, // "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
+        Coil_GasHeat,            // "COIL:HEATING:FUEL",
+        DXSystem,                // "COILSYSTEM:COOLING:DX",
+        HeatXchngrFP,            // "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+        HeatXchngrSL,            // "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
+        Desiccant,               // "DEHUMIDIFIER:DESICCANT:NOFANS",
+        DXHeatPumpSystem,        // "COILSYSTEM:HEATING:DX",
+        UnitarySystemModel,      // "AIRLOOPHVAC:UNITARYSYSTEM",
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNames{
+        "Coil:Cooling:Water",
+        "Coil:Heating:Water",
+        "Coil:Heating:Steam",
+        "Coil:Heating:Electric",
+        "Coil:Cooling:Water:DetailedGeometry",
+        "CoilSystem:Cooling:Water:HeatExchangerAssisted",
+        "Coil:Heating:Fuel",
+        "CoilSystem:Cooling:DX",
+        "HeatExchanger:AirToAir:FlatPlate",
+        "HeatExchanger:AirToAir:SensibleAndLatent",
+        "Dehumidifier:Desiccant:NoFans",
+        "CoilSystem:Heating:DX",
+        "AirLoopHVAC:UnitarySystem",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNamesUC{
+
+        "COIL:COOLING:WATER",
+        "COIL:HEATING:WATER",
+        "COIL:HEATING:STEAM",
+        "COIL:HEATING:ELECTRIC",
+        "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+        "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
+        "COIL:HEATING:FUEL",
+        "COILSYSTEM:COOLING:DX",
+        "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+        "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
+        "DEHUMIDIFIER:DESICCANT:NOFANS",
+        "COILSYSTEM:HEATING:DX",
+        "AIRLOOPHVAC:UNITARYSYSTEM",
     };
 
     enum class Control
@@ -124,15 +159,14 @@ namespace OutdoorAirUnit {
         // Members
         // Equipment List Data
         std::string ComponentName;
-        std::string ComponentType;
-        CompType ComponentType_Num; // Parameterized Component Types this module can address
-        int ComponentIndex;         // Which one in list -- updated by routines called from here
+        CompType Type;      // Parameterized Component Types this module can address
+        int ComponentIndex; // Which one in list -- updated by routines called from here
         HVACSystemData *compPointer = nullptr;
         int CoilAirInletNode;
         int CoilAirOutletNode;
         int CoilWaterInletNode;
         int CoilWaterOutletNode;
-        int CoilPlantTypeOfNum;
+        DataPlant::PlantEquipmentType CoilType;
         int LoopNum;
         int LoopSideNum;
         int BranchNum;
@@ -147,8 +181,8 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAEquipList()
-            : ComponentType_Num(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
-              CoilWaterOutletNode(0), CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
+            : Type(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
+              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
               MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
@@ -272,7 +306,7 @@ namespace OutdoorAirUnit {
 
     void SimOutdoorAirEquipComps(EnergyPlusData &state,
                                  int OAUnitNum,                // actual outdoor air unit num
-                                 std::string const &EquipType, // the component type
+                                 std::string_view EquipType,   // the component type
                                  std::string const &EquipName, // the component Name
                                  int EquipNum,
                                  CompType CompTypeNum, // Component Type -- Integerized for this module

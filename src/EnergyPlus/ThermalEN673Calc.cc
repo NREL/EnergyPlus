@@ -307,7 +307,7 @@ namespace ThermalEN673Calc {
         Real64 sumRs;
         Real64 sumRsold;
 
-        Real64 const eps(1.0e-4); // set iteration accuracy
+        Real64 constexpr eps(1.0e-4); // set iteration accuracy
 
         Array1D<Real64> frctg(maxgas);
         Array1D_int ipropg(maxgas);

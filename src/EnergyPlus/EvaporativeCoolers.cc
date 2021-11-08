@@ -2195,7 +2195,7 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum)
     // Using/Aliasing
     using DataHVACGlobals::TempControlTol;
 
-    Real64 const MinAirMassFlow(0.001);
+    Real64 constexpr MinAirMassFlow(0.001);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CompName;
@@ -2537,8 +2537,8 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     using Psychrometrics::PsyHfgAirFnWTdb;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500);      // Maximum number of iterations for solver
-    Real64 const TempTol(0.01); // convergence tollerance
+    int constexpr MaxIte(500);      // Maximum number of iterations for solver
+    Real64 constexpr TempTol(0.01); // convergence tollerance
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TEDB;      // Entering Dry Bulb Temperature
@@ -4640,8 +4640,8 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     // calculates unit cooling part load ratio using root solver numerical method
 
     // local variables
-    int const MaxIte(50);          // maximum number of iterations
-    Real64 const Tol(0.01);        // error tolerance
+    int constexpr MaxIte(50);      // maximum number of iterations
+    Real64 constexpr Tol(0.01);    // error tolerance
     int SolFla;                    // Flag of root solver
     Real64 PartLoadRatio;          // cooling part load ratio
     Real64 FullFlowSensibleOutput; // full flow sensible cooling output
@@ -4734,7 +4734,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
     auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500); // maximum number of iterations
+    int constexpr MaxIte(500); // maximum number of iterations
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MinHumRat;
