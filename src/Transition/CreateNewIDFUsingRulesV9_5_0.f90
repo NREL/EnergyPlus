@@ -678,7 +678,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1)=InArgs(1)
                 OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
                 OutArgs(3:5)=InArgs(2:4)
-                OutArgs(6)=OutArgs(8)
+                OutArgs(6)=InArgs(8)
                 OutArgs(7:10)=InArgs(12:15)
                 OutArgs(11:22)=InArgs(18:29)
                 OutArgs(23:24)=InArgs(32:33)
