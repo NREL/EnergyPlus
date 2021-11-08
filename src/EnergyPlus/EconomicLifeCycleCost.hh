@@ -228,12 +228,12 @@ namespace EconomicLifeCycleCost {
         "REPAIR",
         "OPERATION",
         "REPLACEMENT",
-        "MINOR OVERHAUL",
-        "MAJOR OVERHAUL",
-        "OTHER OPERATIONAL",
+        "MINOROVERHAUL",
+        "MAJOROVERHAUL",
+        "OTHEROPERATIONAL",
         "CONSTRUCTION",
         "SALVAGE",
-        "OTHER CAPITAL",
+        "OTHERCAPITAL",
         "WATER",
         "ENERGY"
     };
