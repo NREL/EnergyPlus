@@ -349,38 +349,38 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
 {
     bool errorsFound = false;
-    constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
-                                                                      "HVACTemplate:Zone:IdealLoadsAirSystem",
-                                                                      "HVACTemplate:Zone:BaseboardHeat",
-                                                                      "HVACTemplate:Zone:FanCoil",
-                                                                      "HVACTemplate:Zone:PTAC",
-                                                                      "HVACTemplate:Zone:PTHP",
-                                                                      "HVACTemplate:Zone:WaterToAirHeatPump",
-                                                                      "HVACTemplate:Zone:VRF",
-                                                                      "HVACTemplate:Zone:Unitary",
-                                                                      "HVACTemplate:Zone:VAV",
-                                                                      "HVACTemplate:Zone:VAV:FanPowered",
-                                                                      "HVACTemplate:Zone:VAV:HeatAndCool",
-                                                                      "HVACTemplate:Zone:ConstantVolume",
-                                                                      "HVACTemplate:Zone:DualDuct",
-                                                                      "HVACTemplate:System:VRF",
-                                                                      "HVACTemplate:System:Unitary",
-                                                                      "HVACTemplate:System:UnitaryHeatPump:AirToAir",
-                                                                      "HVACTemplate:System:UnitarySystem",
-                                                                      "HVACTemplate:System:VAV",
-                                                                      "HVACTemplate:System:PackagedVAV",
-                                                                      "HVACTemplate:System:ConstantVolume",
-                                                                      "HVACTemplate:System:DualDuct",
-                                                                      "HVACTemplate:System:DedicatedOutdoorAir",
-                                                                      "HVACTemplate:Plant:ChilledWaterLoop",
-                                                                      "HVACTemplate:Plant:Chiller",
-                                                                      "HVACTemplate:Plant:Chiller:ObjectReference",
-                                                                      "HVACTemplate:Plant:Tower",
-                                                                      "HVACTemplate:Plant:Tower:ObjectReference",
-                                                                      "HVACTemplate:Plant:HotWaterLoop",
-                                                                      "HVACTemplate:Plant:Boiler",
-                                                                      "HVACTemplate:Plant:Boiler:ObjectReference",
-                                                                      "HVACTemplate:Plant:MixedWaterLoop"};
+    static constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                             "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                             "HVACTemplate:Zone:BaseboardHeat",
+                                                                             "HVACTemplate:Zone:FanCoil",
+                                                                             "HVACTemplate:Zone:PTAC",
+                                                                             "HVACTemplate:Zone:PTHP",
+                                                                             "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                             "HVACTemplate:Zone:VRF",
+                                                                             "HVACTemplate:Zone:Unitary",
+                                                                             "HVACTemplate:Zone:VAV",
+                                                                             "HVACTemplate:Zone:VAV:FanPowered",
+                                                                             "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                             "HVACTemplate:Zone:ConstantVolume",
+                                                                             "HVACTemplate:Zone:DualDuct",
+                                                                             "HVACTemplate:System:VRF",
+                                                                             "HVACTemplate:System:Unitary",
+                                                                             "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                             "HVACTemplate:System:UnitarySystem",
+                                                                             "HVACTemplate:System:VAV",
+                                                                             "HVACTemplate:System:PackagedVAV",
+                                                                             "HVACTemplate:System:ConstantVolume",
+                                                                             "HVACTemplate:System:DualDuct",
+                                                                             "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                             "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                             "HVACTemplate:Plant:Chiller",
+                                                                             "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                             "HVACTemplate:Plant:Tower",
+                                                                             "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                             "HVACTemplate:Plant:HotWaterLoop",
+                                                                             "HVACTemplate:Plant:Boiler",
+                                                                             "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                             "HVACTemplate:Plant:MixedWaterLoop"};
 
     // For EnergyPlus, there is no option to convert or allow these objects
     bool objectFound = false;
@@ -399,32 +399,32 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         errorsFound = true;
     }
 
-    constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
-                                                                  "GroundHeatTransfer:Slab:Materials",
-                                                                  "GroundHeatTransfer:Slab:MatlProps",
-                                                                  "GroundHeatTransfer:Slab:BoundConds",
-                                                                  "GroundHeatTransfer:Slab:BldgProps",
-                                                                  "GroundHeatTransfer:Slab:Insulation",
-                                                                  "GroundHeatTransfer:Slab:EquivalentSlab",
-                                                                  "GroundHeatTransfer:Slab:AutoGrid",
-                                                                  "GroundHeatTransfer:Slab:ManualGrid",
-                                                                  "GroundHeatTransfer:Slab:XFACE",
-                                                                  "GroundHeatTransfer:Slab:YFACE",
-                                                                  "GroundHeatTransfer:Slab:ZFACE",
-                                                                  "GroundHeatTransfer:Basement:SimParameters",
-                                                                  "GroundHeatTransfer:Basement:MatlProps",
-                                                                  "GroundHeatTransfer:Basement:Insulation",
-                                                                  "GroundHeatTransfer:Basement:SurfaceProps",
-                                                                  "GroundHeatTransfer:Basement:BldgData",
-                                                                  "GroundHeatTransfer:Basement:Interior",
-                                                                  "GroundHeatTransfer:Basement:ComBldg",
-                                                                  "GroundHeatTransfer:Basement:EquivSlab",
-                                                                  "GroundHeatTransfer:Basement:EquivAutoGrid",
-                                                                  "GroundHeatTransfer:Basement:AutoGrid",
-                                                                  "GroundHeatTransfer:Basement:ManualGrid",
-                                                                  "GroundHeatTransfer:Basement:XFACE",
-                                                                  "GroundHeatTransfer:Basement:YFACE",
-                                                                  "GroundHeatTransfer:Basement:ZFACE"};
+    static constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                         "GroundHeatTransfer:Slab:Materials",
+                                                                         "GroundHeatTransfer:Slab:MatlProps",
+                                                                         "GroundHeatTransfer:Slab:BoundConds",
+                                                                         "GroundHeatTransfer:Slab:BldgProps",
+                                                                         "GroundHeatTransfer:Slab:Insulation",
+                                                                         "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                         "GroundHeatTransfer:Slab:AutoGrid",
+                                                                         "GroundHeatTransfer:Slab:ManualGrid",
+                                                                         "GroundHeatTransfer:Slab:XFACE",
+                                                                         "GroundHeatTransfer:Slab:YFACE",
+                                                                         "GroundHeatTransfer:Slab:ZFACE",
+                                                                         "GroundHeatTransfer:Basement:SimParameters",
+                                                                         "GroundHeatTransfer:Basement:MatlProps",
+                                                                         "GroundHeatTransfer:Basement:Insulation",
+                                                                         "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                         "GroundHeatTransfer:Basement:BldgData",
+                                                                         "GroundHeatTransfer:Basement:Interior",
+                                                                         "GroundHeatTransfer:Basement:ComBldg",
+                                                                         "GroundHeatTransfer:Basement:EquivSlab",
+                                                                         "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                         "GroundHeatTransfer:Basement:AutoGrid",
+                                                                         "GroundHeatTransfer:Basement:ManualGrid",
+                                                                         "GroundHeatTransfer:Basement:XFACE",
+                                                                         "GroundHeatTransfer:Basement:YFACE",
+                                                                         "GroundHeatTransfer:Basement:ZFACE"};
 
     objectFound = false;
     for (size_t count = 0; count < groundHTObjects.size(); ++count) {
@@ -441,7 +441,7 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         errorsFound = true;
     }
 
-    constexpr std::array<std::string_view, 4> parametricObjects = {
+    static constexpr std::array<std::string_view, 4> parametricObjects = {
         "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
 
     objectFound = false;

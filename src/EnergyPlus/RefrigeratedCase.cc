@@ -219,8 +219,8 @@ Real64 constexpr EvaporatorAirVolExponent(1.54); // exponent for evaporator air 
 Real64 constexpr FanHalfSpeedRatio(0.1768);      // = 1/(2**2.5) for power step for two speed fan
 Real64 constexpr CapFac60Percent(0.60);          // = 60%, load served by half power 2-speed fan
 
-constexpr std::array<Real64, 5> EuropeanWetCoilFactor = {1.35, 1.15, 1.05, 1.01, 1.0};
-constexpr std::array<Real64, 5> EuropeanAirInletTemp = {10.0, 0.0, -18.0, -25.0, -34.0};
+static constexpr std::array<Real64, 5> EuropeanWetCoilFactor = {1.35, 1.15, 1.05, 1.01, 1.0};
+static constexpr std::array<Real64, 5> EuropeanAirInletTemp = {10.0, 0.0, -18.0, -25.0, -34.0};
 
 void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
 {

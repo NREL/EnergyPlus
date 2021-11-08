@@ -1955,16 +1955,16 @@ namespace SolarCollectors {
         Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
 
         int constexpr NumOfPropDivisions(11);
-        constexpr std::array<Real64, NumOfPropDivisions> Temps = {
+        static constexpr std::array<Real64, NumOfPropDivisions> Temps = {
             -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}; // Temperature, in C
-        constexpr std::array<Real64, NumOfPropDivisions> Mu = {
+        static constexpr std::array<Real64, NumOfPropDivisions> Mu = {
             0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}; // Viscosity, in
                                                                                                                                     // kg/(m.s)
-        constexpr std::array<Real64, NumOfPropDivisions> Conductivity = {
+        static constexpr std::array<Real64, NumOfPropDivisions> Conductivity = {
             0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}; // Conductivity, in W/mK
-        constexpr std::array<Real64, NumOfPropDivisions> Pr = {
+        static constexpr std::array<Real64, NumOfPropDivisions> Pr = {
             0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}; // Prandtl number (dimensionless)
-        constexpr std::array<Real64, NumOfPropDivisions> Density = {
+        static constexpr std::array<Real64, NumOfPropDivisions> Density = {
             1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}; // Density, in kg/m3
 
         Real64 CondOfAir; // thermal conductivity of air [W/mK]

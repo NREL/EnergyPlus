@@ -91,7 +91,7 @@ namespace DataPlant {
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 
-    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
+    static constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
         "Boiler:HotWater",
         "Boiler:Steam",
         "Chiller:Absorption",
@@ -189,7 +189,7 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating"};
 
-    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
+    static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
         "BOILER:STEAM",
         "CHILLER:ABSORPTION",
@@ -287,7 +287,7 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
         "HEATPUMP:PLANTLOOP:EIR:HEATING"};
 
-    constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
+    static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,

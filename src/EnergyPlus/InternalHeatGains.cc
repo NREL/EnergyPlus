@@ -7026,7 +7026,7 @@ namespace InternalHeatGains {
         using WaterUse::CalcWaterUseZoneGains;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr std::array<Real64, 9> C = {
+        static constexpr std::array<Real64, 9> C = {
             6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532};
         static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
@@ -7613,12 +7613,12 @@ namespace InternalHeatGains {
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-        constexpr std::array<Real64, 7> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
-        constexpr std::array<Real64, 7> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0};        // Maximum dry-bulb temperature [C]
-        constexpr std::array<Real64, 7> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}; // Minimum dewpoint temperature [C]
-        constexpr std::array<Real64, 7> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0};        // Maximum dewpoint temperature [C]
-        constexpr std::array<Real64, 7> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
-        constexpr std::array<Real64, 7> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0};        // Maximum relative humidity [%]
+        static constexpr std::array<Real64, 7> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
+        static constexpr std::array<Real64, 7> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0};        // Maximum dry-bulb temperature [C]
+        static constexpr std::array<Real64, 7> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}; // Minimum dewpoint temperature [C]
+        static constexpr std::array<Real64, 7> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0};        // Maximum dewpoint temperature [C]
+        static constexpr std::array<Real64, 7> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
+        static constexpr std::array<Real64, 7> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0};        // Maximum relative humidity [%]
 
         static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
@@ -8101,14 +8101,14 @@ namespace InternalHeatGains {
         // OutputDataStructure.doc (EnergyPlus documentation)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        constexpr std::array<DataHeatBalance::IntGainType, 8> TradIntGainTypes = {DataHeatBalance::IntGainType::People,
-                                                                                  DataHeatBalance::IntGainType::Lights,
-                                                                                  DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                                  DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                                  DataHeatBalance::IntGainType::GasEquipment,
-                                                                                  DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                                  DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                  DataHeatBalance::IntGainType::OtherEquipment};
+        static constexpr std::array<DataHeatBalance::IntGainType, 8> TradIntGainTypes = {DataHeatBalance::IntGainType::People,
+                                                                                         DataHeatBalance::IntGainType::Lights,
+                                                                                         DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                         DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                         DataHeatBalance::IntGainType::GasEquipment,
+                                                                                         DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                         DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                         DataHeatBalance::IntGainType::OtherEquipment};
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             state.dataHeatBal->People(Loop).RadGainEnergy = state.dataHeatBal->People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -9206,15 +9206,15 @@ namespace InternalHeatGains {
         using namespace DataHeatBalance;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
-        constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
-        constexpr std::array<DataHeatBalance::IntGainType, 6> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                                   DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                                   DataHeatBalance::IntGainType::GasEquipment,
-                                                                                   DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                                   DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                   DataHeatBalance::IntGainType::OtherEquipment};
-        constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
+        static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
+        static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
+        static constexpr std::array<DataHeatBalance::IntGainType, 6> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                          DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                          DataHeatBalance::IntGainType::GasEquipment,
+                                                                                          DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                          DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                          DataHeatBalance::IntGainType::OtherEquipment};
+        static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
             DataHeatBalance::IntGainType::RefrigerationCase,
             DataHeatBalance::IntGainType::RefrigerationCompressorRack,
             DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
@@ -9225,10 +9225,10 @@ namespace InternalHeatGains {
             DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
             DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
             DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT};
-        constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
-                                                                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                                                                      DataHeatBalance::IntGainType::WaterHeaterStratified};
-        constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
+        static constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
+                                                                                             DataHeatBalance::IntGainType::WaterHeaterMixed,
+                                                                                             DataHeatBalance::IntGainType::WaterHeaterStratified};
+        static constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
             DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
             DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
             DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
@@ -9249,7 +9249,7 @@ namespace InternalHeatGains {
             DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
             DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
             DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed};
-        constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
+        static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
             DataHeatBalance::IntGainType::GeneratorFuelCell,
             DataHeatBalance::IntGainType::GeneratorMicroCHP,
             DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,

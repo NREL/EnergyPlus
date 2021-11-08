@@ -1710,9 +1710,9 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
     Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
     int constexpr NumOfPropDivisions(13);  // intervals in property correlation
-    constexpr std::array<Real64, NumOfPropDivisions> Temps = {
+    static constexpr std::array<Real64, NumOfPropDivisions> Temps = {
         1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}; // Temperature, in C
-    constexpr std::array<Real64, NumOfPropDivisions> Pr = {
+    static constexpr std::array<Real64, NumOfPropDivisions> Pr = {
         12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}; // Prandtl number (dimensionless)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1815,12 +1815,12 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     int constexpr NumOfParamDivisions(5); // intervals in property correlation
     int constexpr NumOfPropDivisions(12); // intervals in property correlation
 
-    constexpr std::array<Real64, NumOfParamDivisions> CCoef = {0.989, 0.911, 0.683, 0.193, 0.027};         // correlation coefficient
-    constexpr std::array<Real64, NumOfParamDivisions> mExp = {0.33, 0.385, 0.466, 0.618, 0.805};           // exponent
-    constexpr std::array<Real64, NumOfParamDivisions> UpperBound = {4.0, 40.0, 4000.0, 40000.0, 400000.0}; // upper bound of correlation range
-    constexpr std::array<Real64, NumOfPropDivisions> Temperature = {
+    static constexpr std::array<Real64, NumOfParamDivisions> CCoef = {0.989, 0.911, 0.683, 0.193, 0.027};         // correlation coefficient
+    static constexpr std::array<Real64, NumOfParamDivisions> mExp = {0.33, 0.385, 0.466, 0.618, 0.805};           // exponent
+    static constexpr std::array<Real64, NumOfParamDivisions> UpperBound = {4.0, 40.0, 4000.0, 40000.0, 400000.0}; // upper bound of correlation range
+    static constexpr std::array<Real64, NumOfPropDivisions> Temperature = {
         -73.0, -23.0, -10.0, 0.0, 10.0, 20.0, 27.0, 30.0, 40.0, 50.0, 76.85, 126.85}; // temperature [C]
-    constexpr std::array<Real64, NumOfPropDivisions> DynVisc = {
+    static constexpr std::array<Real64, NumOfPropDivisions> DynVisc = {
         75.52e-7, 11.37e-6, 12.44e-6, 13.3e-6, 14.18e-6, 15.08e-6, 15.75e-6, 16e-6, 16.95e-6, 17.91e-6, 20.92e-6, 26.41e-6}; // dynamic
     // viscosity
     // [m^2/s]

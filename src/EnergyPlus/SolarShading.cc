@@ -2476,16 +2476,16 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr std::array<Real64, 7> EpsilonLimit = {
+    static constexpr std::array<Real64, 7> EpsilonLimit = {
         1.065, 1.23, 1.5, 1.95, 2.8, 4.5, 6.2}; // Upper limit of bins of the sky clearness parameter, Epsilon
     // Circumsolar brightening coefficients; index corresponds to range of Epsilon, the sky clearness parameter
-    constexpr std::array<Real64, 8> F11R = {-0.0083117, 0.1299457, 0.3296958, 0.5682053, 0.8730280, 1.1326077, 1.0601591, 0.6777470};
-    constexpr std::array<Real64, 8> F12R = {0.5877285, 0.6825954, 0.4868735, 0.1874525, -0.3920403, -1.2367284, -1.5999137, -0.3272588};
-    constexpr std::array<Real64, 8> F13R = {-0.0620636, -0.1513752, -0.2210958, -0.2951290, -0.3616149, -0.4118494, -0.3589221, -0.2504286};
+    static constexpr std::array<Real64, 8> F11R = {-0.0083117, 0.1299457, 0.3296958, 0.5682053, 0.8730280, 1.1326077, 1.0601591, 0.6777470};
+    static constexpr std::array<Real64, 8> F12R = {0.5877285, 0.6825954, 0.4868735, 0.1874525, -0.3920403, -1.2367284, -1.5999137, -0.3272588};
+    static constexpr std::array<Real64, 8> F13R = {-0.0620636, -0.1513752, -0.2210958, -0.2951290, -0.3616149, -0.4118494, -0.3589221, -0.2504286};
     // Horizon/zenith brightening coefficient array; index corresponds to range of Epsilon, the sky clearness parameter
-    constexpr std::array<Real64, 8> F21R = {-0.0596012, -0.0189325, 0.0554140, 0.1088631, 0.2255647, 0.2877813, 0.2642124, 0.1561313};
-    constexpr std::array<Real64, 8> F22R = {0.0721249, 0.0659650, -0.0639588, -0.1519229, -0.4620442, -0.8230357, -1.1272340, -1.3765031};
-    constexpr std::array<Real64, 8> F23R = {-0.0220216, -0.0288748, -0.0260542, -0.0139754, 0.0012448, 0.0558651, 0.1310694, 0.2506212};
+    static constexpr std::array<Real64, 8> F21R = {-0.0596012, -0.0189325, 0.0554140, 0.1088631, 0.2255647, 0.2877813, 0.2642124, 0.1561313};
+    static constexpr std::array<Real64, 8> F22R = {0.0721249, 0.0659650, -0.0639588, -0.1519229, -0.4620442, -0.8230357, -1.1272340, -1.3765031};
+    static constexpr std::array<Real64, 8> F23R = {-0.0220216, -0.0288748, -0.0260542, -0.0139754, 0.0012448, 0.0558651, 0.1310694, 0.2506212};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

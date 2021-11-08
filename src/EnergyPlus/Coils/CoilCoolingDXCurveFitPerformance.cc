@@ -445,14 +445,14 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
     // indoor air circulating fan. Used if user doesn't enter a specific value.
     Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s).
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44);          // 19.44C (67F)  Tests A and B
-    Real64 constexpr OutdoorUnitInletAirDryBulbTemp(27.78);               // 27.78C (82F)  Test B (for SEER)
-    Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);           // 35.00C (95F)  Test A (rated capacity)
-    Real64 constexpr AirMassFlowRatioRated(1.0);                          // AHRI test is at the design flow rate so AirMassFlowRatio is 1.0
-    Real64 constexpr PLRforSEER(0.5);                                     // Part-load ratio for SEER calculation (single speed DX cooling coils)
-    constexpr std::array<Real64, 4> ReducedPLR = {1.0, 0.75, 0.50, 0.25}; // Reduced Capacity part-load conditions
-    constexpr std::array<Real64, 4> IEERWeightingFactor = {0.020, 0.617, 0.238, 0.125}; // EER Weighting factors (IEER)
-    Real64 constexpr OADBTempLowReducedCapacityTest(18.3);                              // Outdoor air dry-bulb temp in degrees C (65F)
+    Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
+    Real64 constexpr OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
+    Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
+    Real64 constexpr AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate so AirMassFlowRatio is 1.0
+    Real64 constexpr PLRforSEER(0.5);                            // Part-load ratio for SEER calculation (single speed DX cooling coils)
+    static constexpr std::array<Real64, 4> ReducedPLR = {1.0, 0.75, 0.50, 0.25};               // Reduced Capacity part-load conditions
+    static constexpr std::array<Real64, 4> IEERWeightingFactor = {0.020, 0.617, 0.238, 0.125}; // EER Weighting factors (IEER)
+    Real64 constexpr OADBTempLowReducedCapacityTest(18.3);                                     // Outdoor air dry-bulb temp in degrees C (65F)
 
     // some conveniences
     auto &mode = this->normalMode;
