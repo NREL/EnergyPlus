@@ -158,24 +158,15 @@ namespace StandardRatings {
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
     static constexpr std::array<Real64, 18> OutdoorBinTemperature = {
         16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56};
-    // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    static constexpr std::array<Real64, 18> RegionOneFracBinHoursAtOutdoorBinTemp = {
-        0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    static constexpr std::array<Real64, 18> RegionTwoFracBinHoursAtOutdoorBinTemp = {
-        0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    static constexpr std::array<Real64, 18> RegionThreeFracBinHoursAtOutdoorBinTemp = {
-        0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0};
-    // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    static constexpr std::array<Real64, 18> RegionFourFracBinHoursAtOutdoorBinTemp = {
-        0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0};
-    // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    static constexpr std::array<Real64, 18> RegionFiveFracBinHoursAtOutdoorBinTemp = {
-        0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001};
-    // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    static constexpr std::array<Real64, 18> RegionSixFracBinHoursAtOutdoorBinTemp = {
-        0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    // Fractional bin hours for different bin temperatures from ANSI/AHRI 210/240
+    static constexpr std::array<std::array<Real64, 18>, 6> FracBinHoursAtOutdoorBinTemp = {
+        {{0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+         {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+         {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0},
+         {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0},
+         {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001},
+         {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     int constexpr NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
@@ -1415,19 +1406,7 @@ namespace StandardRatings {
 
         for (BinNum = 0; BinNum < TotalNumOfTemperatureBins[RegionNum - 1]; ++BinNum) {
 
-            if (RegionNum == 1) {
-                FractionalBinHours = RegionOneFracBinHoursAtOutdoorBinTemp[BinNum];
-            } else if (RegionNum == 2) {
-                FractionalBinHours = RegionTwoFracBinHoursAtOutdoorBinTemp[BinNum];
-            } else if (RegionNum == 3) {
-                FractionalBinHours = RegionThreeFracBinHoursAtOutdoorBinTemp[BinNum];
-            } else if (RegionNum == 4) {
-                FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp[BinNum];
-            } else if (RegionNum == 5) {
-                FractionalBinHours = RegionFiveFracBinHoursAtOutdoorBinTemp[BinNum];
-            } else if (RegionNum == 6) {
-                FractionalBinHours = RegionSixFracBinHoursAtOutdoorBinTemp[BinNum];
-            }
+            FractionalBinHours = FracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
 
             BuildingLoad = (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum - 1]) * CorrectionFactor *
                            DesignHeatingRequirement;
@@ -2244,24 +2223,7 @@ namespace StandardRatings {
 
         for (BinNum = 0; BinNum < TotalNumOfTemperatureBins[RegionNum - 1]; ++BinNum) { // NumOfOATempBins
 
-            {
-                auto const SELECT_CASE_var(RegionNum);
-                if (SELECT_CASE_var == 1) {
-                    FractionalBinHours = RegionOneFracBinHoursAtOutdoorBinTemp[BinNum];
-                } else if (SELECT_CASE_var == 2) {
-                    FractionalBinHours = RegionTwoFracBinHoursAtOutdoorBinTemp[BinNum];
-                } else if (SELECT_CASE_var == 3) {
-                    FractionalBinHours = RegionThreeFracBinHoursAtOutdoorBinTemp[BinNum];
-                } else if (SELECT_CASE_var == 4) {
-                    FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp[BinNum];
-                } else if (SELECT_CASE_var == 5) {
-                    FractionalBinHours = RegionFiveFracBinHoursAtOutdoorBinTemp[BinNum];
-                } else if (SELECT_CASE_var == 6) {
-                    FractionalBinHours = RegionSixFracBinHoursAtOutdoorBinTemp[BinNum];
-                } else {
-                    FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp[BinNum];
-                }
-            }
+            FractionalBinHours = FracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
 
             // Calculate the building heating load
             BuildingHeatingLoad = (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum - 1]) * CorrectionFactor *
