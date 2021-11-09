@@ -319,6 +319,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         case DataHeatBalance::MaterialGroup::EcoRoof:
         case DataHeatBalance::MaterialGroup::IRTMaterial:
             break; // Purposely not doing anything
+        default:
+            assert(false);
         }
     }
 

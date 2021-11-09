@@ -103,9 +103,11 @@ constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> Gen
 
 enum class ThermalLossDestination : int
 {
+    Invalid = -1,
     heatLossNotDetermined = 0,
-    zoneGains,    // device thermal losses are added to a zone as internal gains
-    lostToOutside // device thermal losses have no destination
+    zoneGains,     // device thermal losses are added to a zone as internal gains
+    lostToOutside, // device thermal losses have no destination
+    Num
 };
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
@@ -118,11 +120,14 @@ class DCtoACInverter
 public: // Methods
     enum class InverterModelType : int
     {
+        // TODO: enum check
+        Invalid = -1,
         notYetSet,
         cECLookUpTableModel,
         curveFuncOfPower,
         simpleConstantEff,
         pvWatts,
+        Num
     };
 
     // Constructor
@@ -225,9 +230,11 @@ private: // methods
 private: // data
     enum class ConverterModelType : int
     {
+        Invalid = -1,
         notYetSet,
         curveFuncOfPower,
-        simpleConstantEff
+        simpleConstantEff,
+        Num
     };
 
     std::string name_; // user identifier
@@ -354,17 +361,21 @@ private:                            // methods
 private: // data
     enum class StorageModelType : int
     {
+        Invalid = -1,
         storageTypeNotSet = 0,
         simpleBucketStorage,
         kiBaMBattery,
         liIonNmcBattery,
+        Num
     };
 
     enum class BatteryDegradationModelType : int
     {
+        Invalid = -1,
         degredationNotSet = 0,
         lifeCalculationYes,
-        lifeCalculationNo
+        lifeCalculationNo,
+        Num
     };
 
     std::string name_;               // name of this electrical storage module
@@ -481,16 +492,23 @@ public: // methods
 private: // data
     enum class TransformerUse : int
     {
+        // TODO: enum check
+        Invalid = -1,
         usenotYetSet = 0,
-        powerInFromGrid,              // condition power from grid going into building buss
-        powerOutFromBldgToGrid,       // condition power from building buss going out to grid
-        powerBetweenLoadCenterAndBldg // condition power from a load center going into building buss, or from building buss into load center for draws
+        powerInFromGrid,               // condition power from grid going into building buss
+        powerOutFromBldgToGrid,        // condition power from building buss going out to grid
+        powerBetweenLoadCenterAndBldg, // condition power from a load center going into building buss, or from building buss into load center for
+                                       // draws
+        Num
     };
     enum class TransformerPerformanceInput : int
     {
+        // TODO: enum check
+        Invalid = -1,
         perfInputMethodNotSet = 0,
         lossesMethod,
-        efficiencyMethod
+        efficiencyMethod,
+        Num
     };
 
     std::string name_; // user identifier
@@ -630,12 +648,15 @@ private: // Methods
 public: // data public for unit test
     enum class ElectricBussType : int
     {
+        // TODO: enum check
+        Invalid = -1,
         notYetSet = 0,
         aCBuss,
         dCBussInverter,
         aCBussStorage,
         dCBussInverterDCStorage,
-        dCBussInverterACStorage
+        dCBussInverterACStorage,
+        Num
     };
 
     std::unique_ptr<ElectricStorage> storageObj;
@@ -667,6 +688,8 @@ public: // data public for unit test
 private: // data
     enum class GeneratorOpScheme : int
     {
+        // TODO: enum check
+        Invalid = -1,
         notYetSet = 0,
         baseLoad,
         demandLimit,
@@ -674,16 +697,20 @@ private: // data
         trackSchedule,
         trackMeter,
         thermalFollow,
-        thermalFollowLimitElectrical
+        thermalFollowLimitElectrical,
+        Num
     };
 
     enum class StorageOpScheme : int
     {
+        // TODO: enum check
+        Invalid = -1,
         notYetSet = 0,
         facilityDemandStoreExcessOnSite, // legacy control behavior
         meterDemandStoreExcessOnSite,
         chargeDischargeSchedules,
-        facilityDemandLeveling
+        facilityDemandLeveling,
+        Num
     };
 
     std::string name_;                     // user identifier

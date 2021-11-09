@@ -321,6 +321,7 @@ namespace GroundHeatExchangers {
         Invalid = -1,
         UniformHeatFlux,
         UniformBoreholeWallTemp,
+        Num
     };
 
     struct GLHEVert : GLHEBase // LCOV_EXCL_LINE

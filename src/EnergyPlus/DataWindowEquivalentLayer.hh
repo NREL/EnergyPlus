@@ -85,7 +85,8 @@ namespace DataWindowEquivalentLayer {
         VBVER,  // venetian blinds - vertical
         INSCRN, // insect screen
         ROOM,   // indoor space and/or make no adjustment
-        GZS     // glazing with spectral data (read from aux file)
+        GZS,    // glazing with spectral data (read from aux file)
+        Num
     };
 
     // index for solar arrays
@@ -93,7 +94,8 @@ namespace DataWindowEquivalentLayer {
     {
         Unassigned = -1,
         DIFF,
-        BEAM
+        BEAM,
+        Num
     };
 
     // Parameters to indicate blind orientation for use with the Material
@@ -102,14 +104,16 @@ namespace DataWindowEquivalentLayer {
     {
         Unassigned = -1,
         Horizontal,
-        Vertical
+        Vertical,
+        Num
     };
 
     enum class AngleType
     {
         Unassigned = -1,
         Fixed,
-        Variable
+        Variable,
+        Num
     };
 
     struct CFSLWP

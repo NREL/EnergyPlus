@@ -82,12 +82,15 @@ namespace HVACVariableRefrigerantFlow {
         ScheduledPriority,        // cooling and heating modes are scheduled
         MasterThermostatPriority, // Master zone thermostat dictates operation
         FirstOnPriority,          // first unit to respond dictates operation (not used at this time)
+        Num
     };
 
     enum class iWaterSupply
     {
+        Invalid = -1,
         FromMains, // mains water line used as water source
         FromTank,  // storage tank used as water source
+        Num
     };
 
     constexpr Real64 MaxCap(1.0e+20); // limit of zone terminal unit capacity
@@ -98,6 +101,7 @@ namespace HVACVariableRefrigerantFlow {
         Unassigned = -1,
         SysCurve,   // VRF model based on system curve
         FluidTCtrl, // VRF model based on physics, appreciable for Fluid Temperature Control
+        Num
     };
 
     // VRF System Types (strings used in integer conversions)
@@ -118,8 +122,10 @@ namespace HVACVariableRefrigerantFlow {
     // Flag for hex operation
     enum class iHXOpMode
     {
+        Invalid = -1,
         CondMode, // Flag for the hex running as condenser [-]
         EvapMode, // Flag for the hex running as evaporator [-]
+        Num
     };
 
     // Flag for VRF operational mode

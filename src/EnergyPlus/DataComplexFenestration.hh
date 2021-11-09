@@ -68,7 +68,8 @@ namespace DataComplexFenestration {
         Air,
         Argon,
         Krypton,
-        Xenon
+        Xenon,
+        Num
     };
 
     // Parameters for thermal model
@@ -78,7 +79,8 @@ namespace DataComplexFenestration {
         ISO15099,
         ScaledCavityWidth,
         ConvectiveScalarModel_NoSDThickness,
-        ConvectiveScalarModel_WithSDThickness
+        ConvectiveScalarModel_WithSDThickness,
+        Num
     };
 
     struct GapSupportPillar

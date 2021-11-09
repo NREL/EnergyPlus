@@ -87,6 +87,7 @@ namespace DataRuntimeLanguage {
         EndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
         While,    // While statement, begins a While block
         EndWhile, // EndWhile statement, terminates a While block
+        Num
     };
 
     enum class Value
@@ -99,7 +100,8 @@ namespace DataRuntimeLanguage {
         Variable,   // Erl entity type,  Erl variable
         Expression, // Erl entity type,  Erl expression
         Trend,      // Erl entity type,  Erl trend variable
-        Error       // Erl entity type, processing of an expression failed, returned error
+        Error,      // Erl entity type, processing of an expression failed, returned error
+        Num
     };
 
     enum class PtrDataType
@@ -107,7 +109,8 @@ namespace DataRuntimeLanguage {
         Unassigned = -1,
         Real,    // data type for overloaded pointer management, double real
         Integer, // data type for overloaded pointer management, integer
-        Logical  // data type for overloaded pointer management, logical
+        Logical, // data type for overloaded pointer management, logical
+        Num
     };
 
     // Parameters for identifying operator types in Erl
@@ -227,7 +230,8 @@ namespace DataRuntimeLanguage {
         TomorrowBeamSolarRad,    // Access TomorrowBeamSolarRad(hour, timestep)
         TomorrowDifSolarRad,     // Access TomorrowDifSolarRad(hour, timestep)
         TomorrowAlbedo,          // Access TomorrowAlbedo(hour, timestep)
-        TomorrowLiquidPrecip     // Access TomorrowLiquidPrecip(hour, timestep)
+        TomorrowLiquidPrecip,    // Access TomorrowLiquidPrecip(hour, timestep)
+        Num
     };
 
     int constexpr NumPossibleOperators(96); // total number of operators and built-in functions

@@ -65,15 +65,17 @@ namespace DataGenerators {
     {
         Unassigned = -1,
         Normalized, // mode where efficiency curves are modifier curves
-        Direct      // mode where efficiency curves are direct
+        Direct,     // mode where efficiency curves are direct
+        Num
     };
 
     enum class SkinLoss
     {
         Unassigned = -1,
         ConstantRate,
-        UADT,             // UAdelta T mode for skin losses
-        QuadraticFuelNdot // Quadratic function of fuel flow for skin losses
+        UADT,              // UAdelta T mode for skin losses
+        QuadraticFuelNdot, // Quadratic function of fuel flow for skin losses
+        Num
     };
 
     enum class AirSupRateMode
@@ -81,7 +83,8 @@ namespace DataGenerators {
         Unassigned = -1,
         QuadraticFuncofNdot,  // function of fuel rate mode for air flow
         ConstantStoicsAirRat, // Constant air ratio in stoics with fuel constituents
-        QuadraticFuncofPel    // function of electric power mode
+        QuadraticFuncofPel,   // function of electric power mode
+        Num
     };
 
     enum class RecoverMode
@@ -92,21 +95,24 @@ namespace DataGenerators {
         RecoverAuxiliaryBurner, // mode for controlling intake air heat recovery
         RecoverInverterBatt,    // mode for controlling intake air heat recovery
         RecoverInverter,        // mode for controlling intake air heat recovery
-        RecoverBattery          // mode for controlling intake air heat recovery
+        RecoverBattery,         // mode for controlling intake air heat recovery
+        Num
     };
 
     enum class ConstituentMode
     {
         Unassigned = -1,
         RegularAir,
-        UserDefinedConstituents
+        UserDefinedConstituents,
+        Num
     };
 
     enum class FuelTemperatureMode
     {
         Unassigned = -1,
         FuelInTempFromNode,
-        FuelInTempSchedule
+        FuelInTempSchedule,
+        Num
     };
 
     enum class WaterTemperatureMode
@@ -115,14 +121,16 @@ namespace DataGenerators {
         WaterInReformMains,
         WaterInReformAirNode,
         WaterInReformWaterNode,
-        WaterInReformSchedule
+        WaterInReformSchedule,
+        Num
     };
 
     enum class InverterEfficiencyMode
     {
         Unassigned = -1,
         Constant,
-        Quadratic
+        Quadratic,
+        Num
     };
 
     enum class ExhaustGasHX
@@ -131,39 +139,44 @@ namespace DataGenerators {
         FixedEffectiveness,   // exhaust gas HX modeling mode
         LMTDempiricalUAeff,   // exhaust gas HX modeling mode
         LMTDfundementalUAeff, // exhaust gas HX modeling mode
-        Condensing            // exhaust gas HX modeling mode
+        Condensing,           // exhaust gas HX modeling mode
+        Num
     };
 
     enum class ElectricalStorage
     {
         Unassigned = -1,
-        SimpleEffConstraints,        // electrical storage modeling mode
-        LeadAcidBatterySaupe,        // electrical storage modeling mode
-        LeadAcidBatterManwellMcGowan // electrical storage modeling mode
+        SimpleEffConstraints,         // electrical storage modeling mode
+        LeadAcidBatterySaupe,         // electrical storage modeling mode
+        LeadAcidBatterManwellMcGowan, // electrical storage modeling mode
+        Num
     };
 
     enum class LossDestination
     {
         Unassigned = -1,
         SurroundingZone,
-        AirInletForFC
+        AirInletForFC,
+        Num
     };
 
     enum class OperatingMode
     {
         Unassigned = -1,
-        OpModeOff,     // CHP operating mode OFF
-        OpModeStandby, // CHP operating mode Stand By
-        OpModeWarmUp,  // CHP operating mode Warm Up or start up
-        OpModeNormal,  // CHP operating mode Normal
-        OpModeCoolDown // CHP operating mode Cool down or shut down
+        OpModeOff,      // CHP operating mode OFF
+        OpModeStandby,  // CHP operating mode Stand By
+        OpModeWarmUp,   // CHP operating mode Warm Up or start up
+        OpModeNormal,   // CHP operating mode Normal
+        OpModeCoolDown, // CHP operating mode Cool down or shut down
+        Num
     };
 
     enum class FuelMode
     {
         Unassigned = -1,
         fuelModeGaseousConstituents,
-        fuelModeGenericLiquid
+        fuelModeGenericLiquid,
+        Num
     };
 
     Real64 constexpr MinProductGasTemp(-100.0); // Minimum bound on search for product gas temps
@@ -173,7 +186,8 @@ namespace DataGenerators {
     {
         Unassigned = -1,
         NISTShomate,
-        NASAPolynomial
+        NASAPolynomial,
+        Num
     };
 
     Real64 constexpr RinKJperMolpK(0.0083145); // R is ideal gas constant (kJ/mol-K)

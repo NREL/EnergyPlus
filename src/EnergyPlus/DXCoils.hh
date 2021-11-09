@@ -93,14 +93,18 @@ namespace DXCoils {
     // Water Systems
     enum class iCondensate
     {
+        Invalid = -1,
         Discarded, // default mode where water is "lost"
         ToTank,    // collect coil condensate from air and store in water storage tank
+        Num
     };
 
     enum class iWaterSupply
     {
+        Invalid = -1,
         FromMains,
         FromTank,
+        Num
     };
 
     // Types

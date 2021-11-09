@@ -63,6 +63,8 @@ enum class AutoSizingType
 {
     // align with DataHVACGlobals so scalable sizing strings can be applied
     // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
+    // TODO: enum check
+    Invalid = -1,
     ASHRAEMinSATCoolingSizing = 30,
     ASHRAEMaxSATHeatingSizing = 31,
     AutoCalculateSizing = 25,
@@ -98,14 +100,17 @@ enum class AutoSizingType
     WaterHeatingCoilUASizing = 20,
     ZoneCoolingLoadSizing = 26,
     ZoneHeatingLoadSizing = 27,
-    Unknown = 0
+    Unknown = 0,
+    Num
 };
 
 enum class AutoSizingResultType
 {
+    Invalid = -1,
     NoError,    // no errors found
     ErrorType1, // sizing error
-    ErrorType2  // uninitialized sizing type
+    ErrorType2, // uninitialized sizing type
+    Num
 };
 
 struct BaseSizer

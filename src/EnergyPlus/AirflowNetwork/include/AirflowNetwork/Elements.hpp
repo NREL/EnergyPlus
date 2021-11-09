@@ -126,10 +126,13 @@ namespace AirflowNetwork {
         REL = 20, // Distribution system relief air
         SMF = 21, // Specified mass flow component
         SVF = 22, // Specified volume flow component
+        Num
     };
 
     enum class ComponentType
     {
+        // TODO: enum check
+        Invalid = -1,
         DOP = 1, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
@@ -151,7 +154,8 @@ namespace AirflowNetwork {
         OAF,     // Distribution system OA
         REL,     // Distribution system relief air
         SMF,     // Specified mass flow component
-        SVF      // Specified volume flow component
+        SVF,     // Specified volume flow component
+        Num
     };
 
     // EPlus component Type
@@ -164,7 +168,8 @@ namespace AirflowNetwork {
         FAN = 4, // Fan
         COI = 5, // Heating or cooling coil
         HEX = 6, // Heat exchanger
-        RVD = 7  // Reheat VAV terminal damper
+        RVD = 7, // Reheat VAV terminal damper
+        Num
     };
 
     // EPlus node type
@@ -184,14 +189,16 @@ namespace AirflowNetwork {
         DIN = 11, // Damper Inlet node
         DOU = 12, // Damper Outlet Node
         SPI = 13, // Splitter inlet Node
-        SPO = 14  // Splitter Outlet Node
+        SPO = 14, // Splitter Outlet Node
+        Num
     };
 
     enum class iWPCCntr : int
     {
         Unassigned = 0,
         Input = 1,
-        SurfAvg = 2
+        SurfAvg = 2,
+        Num
     };
 
     int constexpr PressureCtrlExhaust = 1;
@@ -225,9 +232,12 @@ namespace AirflowNetwork {
     {
         enum class Solver
         {
+            Invalid = -1,
             SkylineLU,
-            ConjugateGradient
+            ConjugateGradient,
+            Num
         };
+
         // Members
         std::string AirflowNetworkSimuName; // Provide a unique object name
         std::string Control;                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,

@@ -195,6 +195,8 @@ std::string ControlVariableTypes(iCtrl const &c)
         return "Temperature and humidity ratio";
     case iCtrl::Flow:
         return "Flow rate";
+    default:
+        assert(false);
     }
     return "no controller type found";
 }

@@ -64,7 +64,8 @@ namespace HVACCooledBeam {
     {
         Unassigned = -1,
         Passive,
-        Active
+        Active,
+        Num
     };
 
     Real64 constexpr NomMassFlowPerBeam(0.07); // nominal water mass flow rate per beam [kg/s]

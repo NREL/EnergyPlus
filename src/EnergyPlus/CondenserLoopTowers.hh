@@ -75,40 +75,48 @@ namespace CondenserLoopTowers {
         CoolToolsXFModel,
         CoolToolsUserDefined,
         YorkCalcModel,
-        YorkCalcUserDefined
+        YorkCalcUserDefined,
+        Num
     };
 
     enum class EvapLoss
     {
+        Invalid = -1,
         UserFactor,
-        MoistTheory
+        MoistTheory,
+        Num
     };
 
     enum class Blowdown
     {
+        Invalid = -1,
         Concentration,
-        Schedule
+        Schedule,
+        Num
     };
 
     enum class PIM
     {
         Unassigned = -1,
         NominalCapacity,
-        UFactor
+        UFactor,
+        Num
     };
 
     enum class CapacityCtrlEnum
     {
         Unassigned = -1,
         FanCycling,
-        FluidBypass
+        FluidBypass,
+        Num
     };
 
     enum class CellCtrl
     {
         Unassigned = -1,
         MinCell,
-        MaxCell
+        MaxCell,
+        Num
     };
 
     struct CoolingTower : PlantComponent

@@ -74,7 +74,8 @@ namespace DemandManager {
         ManagerTypeLights,
         ManagerTypeElecEquip,
         ManagerTypeThermostats,
-        ManagerTypeVentilation
+        ManagerTypeVentilation,
+        Num
     };
 
     enum class ManagePriorityType
@@ -82,7 +83,8 @@ namespace DemandManager {
         Unassigned = -1,
         ManagerPrioritySequential,
         ManagerPriorityOptimal,
-        ManagerPriorityAll
+        ManagerPriorityAll,
+        Num
     };
 
     enum class Limit
@@ -91,7 +93,8 @@ namespace DemandManager {
         ManagerLimitOff,
         ManagerLimitFixed,
         ManagerLimitVariable,
-        ManagerLimitReductionRatio
+        ManagerLimitReductionRatio,
+        Num
     };
 
     enum class Selection
@@ -99,14 +102,17 @@ namespace DemandManager {
         Unassigned = -1,
         ManagerSelectionAll,
         ManagerSelectionMany,
-        ManagerSelectionOne
+        ManagerSelectionOne,
+        Num
     };
 
     enum class DemandAction
     {
+        Invalid = -1,
         CheckCanReduce,
         SetLimit,
-        ClearLimit
+        ClearLimit,
+        Num
     };
 
     // Types

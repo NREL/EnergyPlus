@@ -70,14 +70,16 @@ namespace DataBSDFWindow {
     {
         Unassigned = -1,
         WINDOW,
-        Custom
+        Custom,
+        Num
     };
 
     enum class BasisSymmetry
     {
         Unassigned = -1,
         Axisymmetric,
-        None
+        None,
+        Num
     };
 
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
@@ -88,7 +90,8 @@ namespace DataBSDFWindow {
     {
         Unassigned = -1,
         summerCondition,
-        winterCondition
+        winterCondition,
+        Num
     };
 
     struct BasisElemDescr

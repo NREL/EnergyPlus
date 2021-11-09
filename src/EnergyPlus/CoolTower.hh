@@ -67,13 +67,16 @@ namespace CoolTower {
     {
         Unassigned = -1,
         FlowSchedule,
-        WindDriven
+        WindDriven,
+        Num
     };
 
     enum class WaterSupplyMode
     {
+        Invalid = -1,
         FromMains,
-        FromTank
+        FromTank,
+        Num
     };
 
     struct CoolTowerParams

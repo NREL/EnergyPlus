@@ -65,10 +65,12 @@ namespace DataDaylightingDevices {
 
     enum class iRadType
     {
+        Invalid = -1,
         VisibleBeam,
         SolarBeam,
         SolarAniso,
-        SolarIso
+        SolarIso,
+        Num
     };
 
     struct TDDPipeData

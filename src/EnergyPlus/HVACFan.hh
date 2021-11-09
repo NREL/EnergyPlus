@@ -123,9 +123,12 @@ namespace HVACFan {
 
         enum class SpeedControlMethod : int
         {
+            // TODO: enum check
+            Invalid = -1,
             NotSet = 0,
             Discrete,
-            Continuous
+            Continuous,
+            Num
         };
 
         // data
@@ -171,16 +174,20 @@ namespace HVACFan {
 
         enum class PowerSizingMethod : int
         {
+            Invalid = -1,
             powerSizingMethodNotSet = 0,
             powerPerFlow,
             powerPerFlowPerPressure,
-            totalEfficiencyAndPressure
+            totalEfficiencyAndPressure,
+            Num
         };
         enum class ThermalLossDestination : int
         {
+            Invalid = -1,
             heatLossNotDetermined = 0,
             zoneGains,
-            lostToOutside
+            lostToOutside,
+            Num
         };
 
         std::string m_fanType;                   // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.

@@ -86,6 +86,7 @@ namespace DataDefineEquip {
         SingleDuctUserDefined,
         SingleDuctATMixer,
         SingleDuctConstVolFourPipeBeam,
+        Num
     };
 
     struct ZoneAirEquip

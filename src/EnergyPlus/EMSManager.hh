@@ -68,6 +68,7 @@ namespace EMSManager {
 
     enum class SPControlType
     {
+        Invalid = -1,
         iTemperatureSetPoint,      // integer for node setpoint control type
         iTemperatureMinSetPoint,   // integer for node setpoint control type
         iTemperatureMaxSetPoint,   // integer for node setpoint control type
@@ -76,7 +77,8 @@ namespace EMSManager {
         iHumidityRatioMaxSetPoint, // integer for node setpoint control type
         iMassFlowRateSetPoint,     // integer for node setpoint control type
         iMassFlowRateMinSetPoint,  // integer for node setpoint control type
-        iMassFlowRateMaxSetPoint   // integer for node setpoint control type
+        iMassFlowRateMaxSetPoint,  // integer for node setpoint control type
+        Num
     };
 
     // Parameters for EMS Calling Points
@@ -102,7 +104,8 @@ namespace EMSManager {
         UnitarySystemSizing,
         BeginZoneTimestepBeforeInitHeatBalance,
         BeginZoneTimestepAfterInitHeatBalance,
-        BeginZoneTimestepBeforeSetCurrentWeather
+        BeginZoneTimestepBeforeSetCurrentWeather,
+        Num
     };
 
     void CheckIfAnyEMS(EnergyPlusData &state);

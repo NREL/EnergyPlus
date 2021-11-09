@@ -81,7 +81,8 @@ namespace HeatRecovery {
         CounterFlow,
         ParallelFlow,
         CrossFlowBothUnmixed,
-        CrossFlowOther
+        CrossFlowOther,
+        Num
     };
 
     // Heat exchanger configuration types
@@ -89,7 +90,8 @@ namespace HeatRecovery {
     {
         Unassigned = -1,
         Plate,
-        Rotary
+        Rotary,
+        Num
     };
 
     // Economizer lockout operation
@@ -97,7 +99,8 @@ namespace HeatRecovery {
     {
         Unassigned = -1,
         No,
-        Yes
+        Yes,
+        Num
     };
 
     struct HeatExchCond

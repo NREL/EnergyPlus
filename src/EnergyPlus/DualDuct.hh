@@ -73,7 +73,8 @@ namespace DualDuct {
         Unassigned = -1,
         ConstantVolume,
         VariableVolume,
-        OutdoorAir
+        OutdoorAir,
+        Num
     };
 
     enum class DualDuctOAMode
@@ -81,14 +82,17 @@ namespace DualDuct {
         Unassigned = -1,
         ConstantOAMode = 11,
         ScheduleOAMode = 12,
-        DynamicOAMode = 13
+        DynamicOAMode = 13,
+        Num
     };
 
     enum class PerPersonMode
     {
+        Invalid = -1,
         ModeNotSet = 20,
         DCVByCurrentLevel = 21,
-        ByDesignLevel = 22
+        ByDesignLevel = 22,
+        Num
     };
 
     // DERIVED TYPE DEFINITIONS

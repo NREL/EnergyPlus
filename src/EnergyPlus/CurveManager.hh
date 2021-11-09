@@ -103,14 +103,16 @@ namespace CurveManager {
         QuadLinear,
         QuintLinear,
         CubicLinear,
-        ChillerPartLoadWithLift
+        ChillerPartLoadWithLift,
+        Num
     };
 
     enum class InterpTypeEnum
     {
         Unassigned = -1,
         EvaluateCurveToLimits,
-        BtwxtMethod
+        BtwxtMethod,
+        Num
     };
 
     struct TriQuadraticCurveDataStruct

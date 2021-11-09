@@ -67,6 +67,8 @@ namespace EconomicTariff {
 
     enum class iEconVarObjType
     {
+        // TODO: enum check
+        Invalid = -1,
         Unknown,
         Tariff,
         Qualify,
@@ -78,10 +80,12 @@ namespace EconomicTariff {
         Category,
         Native,
         AssignCompute,
+        Num
     };
 
     enum class iEconConv
     {
+        Invalid = -1,
         USERDEF,
         KWH,
         THERM,
@@ -93,6 +97,7 @@ namespace EconomicTariff {
         M3,  // cubic meter
         GAL,
         KGAL, // thousand gallons
+        Num
     };
 
     constexpr std::string_view convEneStrings(iEconConv &e)
@@ -165,6 +170,7 @@ namespace EconomicTariff {
         Hour,
         Day,
         Week,
+        Num
     };
 
     constexpr std::string_view demWindowStrings(iDemandWindow &e)

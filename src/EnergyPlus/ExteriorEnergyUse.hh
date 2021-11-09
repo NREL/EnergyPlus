@@ -67,6 +67,8 @@ namespace ExteriorEnergyUse {
 
     enum class ExteriorFuelUsage
     {
+        // TODO: enum check
+        Invalid = -1,
         Unknown = 0,
         ElecUse = 1,
         GasUse = 2,
@@ -81,13 +83,16 @@ namespace ExteriorEnergyUse {
         DistrictCoolUse = 11,
         DistrictHeatUse = 12,
         OtherFuel1Use = 13,
-        OtherFuel2Use = 14
+        OtherFuel2Use = 14,
+        Num
     };
 
     enum class LightControlType
     {
-        ScheduleOnly = 1,      // exterior lights only on schedule
-        AstroClockOverride = 2 // exterior lights controlled to turn off during day.
+        Invalid = -1,
+        ScheduleOnly = 1,       // exterior lights only on schedule
+        AstroClockOverride = 2, // exterior lights controlled to turn off during day.
+        Num
     };
 
     struct ExteriorLightUsage

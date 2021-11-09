@@ -1111,11 +1111,13 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     enum class CellType
     {
+        Invalid = -1,
         FLUID,
         CONVECTION,
         PIPE,
         GROUT,
-        SOIL
+        SOIL,
+        Num
     };
 
     struct Cell

@@ -67,7 +67,8 @@ namespace DataPhotovoltaics {
         Unassigned = -1,
         Simple,
         TRNSYS,
-        Sandia
+        Sandia,
+        Num
     };
 
     enum class CellIntegration
@@ -78,21 +79,24 @@ namespace DataPhotovoltaics {
         SurfaceOutsideFace,       // cell temp method based on coupling to E+'s heat balance
         TranspiredCollector,      // cell temp method based on coupling to unglazed transpired co
         ExteriorVentedCavity,     // cell temp method based on coupling to nat vent exterior cavi
-        PVTSolarCollector         // cell temp method based on coupling to PVT model
+        PVTSolarCollector,        // cell temp method based on coupling to PVT model
+        Num
     };
 
     enum class Efficiency
     {
         Unassigned = -1,
-        Fixed,    // simple PV, constant efficiency
-        Scheduled // simpel PV, scheduled efficiency
+        Fixed,     // simple PV, constant efficiency
+        Scheduled, // simple PV, scheduled efficiency
+        Num
     };
 
     enum class SiPVCells
     {
         Unassigned = -1,
         Crystalline,
-        Amorphous
+        Amorphous,
+        Num
     };
 
     struct SimplePVParamsStruct

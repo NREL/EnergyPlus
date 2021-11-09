@@ -67,7 +67,8 @@ enum class GroundTempObjType
     SiteShallowGroundTemp,
     SiteDeepGroundTemp,
     SiteFCFactorMethodGroundTemp,
-    XingGroundTemp
+    XingGroundTemp,
+    Num
 };
 
 // Base class

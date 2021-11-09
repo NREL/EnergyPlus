@@ -69,7 +69,8 @@ namespace ChillerReformulatedEIR {
     {
         Unassigned = -1,
         LeavingCondenserWaterTemperature, // Type 1_LeavingCondenserWaterTemperature
-        Lift                              // Type 2_Lift
+        Lift,                             // Type 2_Lift
+        Num
     };
 
     struct ReformulatedEIRChillerSpecs : PlantComponent

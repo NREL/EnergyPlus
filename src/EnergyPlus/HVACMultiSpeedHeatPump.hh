@@ -79,6 +79,7 @@ namespace HVACMultiSpeedHeatPump {
         Unassigned = -1,
         CoolingMode, // System operating mode is cooling
         HeatingMode, // System operating mode is heating
+        Num
     };
 
     // Airflow control for constant fan mode
@@ -87,6 +88,7 @@ namespace HVACMultiSpeedHeatPump {
         Unassigned = -1,
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+        Num
     };
 
     // Compressor operation

@@ -64,9 +64,11 @@ namespace DataHVACControllers {
 
     enum class ControllerAction // Controller action used in modules HVACControllers and ZoneControllers
     {
+        // TODO: enum check
         NoAction = -1,
         ReverseAction,
-        NormalAction
+        NormalAction,
+        Num
     };
 
     enum class ControllerMode // Controller mode used in modules HVACControllers and ZoneControllers
@@ -77,7 +79,8 @@ namespace DataHVACControllers {
         Inactive,     // Controller inactive (equip not available for current step)
         Active,       // Controller active (schedule>0 and min<actuated<max)
         MinActive,    // Controller active and min-constrained (equip available and actuated=min)
-        MaxActive     // Controller active and max-constrained (equip available and actuated=max)
+        MaxActive,    // Controller active and max-constrained (equip available and actuated=max)
+        Num
     };
 
     int constexpr iFirstMode(static_cast<int>(ControllerMode::invalid));  // First operating mode in range
@@ -89,15 +92,16 @@ namespace DataHVACControllers {
         ColdStart,   // Reset for cold start
         WarmRestart, // Reset for warm restart with previous solution
         Iterate,     // Check convergence and estimate next guess if needed
-        End          // Check convergence only and trace
-
+        End,         // Check convergence only and trace
+        Num
     };
 
     enum class ControllerWarmRestart // Controller restart flag used in module HVACControllers
     {
         None = -1, // Indicates that warm restart was not attempted
         Fail,      // Indicates that warm restart failed
-        Success    // Indicates that warm restart was successful
+        Success,   // Indicates that warm restart was successful
+        Num
     };
 
 } // namespace DataHVACControllers

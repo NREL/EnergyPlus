@@ -107,7 +107,8 @@ namespace DataHeatBalance {
         DrapeEquivalentLayer,
         BlindEquivalentLayer,
         ScreenEquivalentLayer,
-        GapEquivalentLayer
+        GapEquivalentLayer,
+        Num
     };
 
     // Parameters for Interior and Exterior Solar Distribution
@@ -117,7 +118,8 @@ namespace DataHeatBalance {
         MinimalShadowing,     // all incoming solar hits floor, no exterior shadowing except reveals
         FullExterior,         // all incoming solar hits floor, full exterior shadowing
         FullInteriorExterior, // full interior solar distribution, full exterior solar shadowing
-        FullExteriorWithRefl  // all incoming solar hits floor, full exterior shadowing and reflections
+        FullExteriorWithRefl, // all incoming solar hits floor, full exterior shadowing and reflections
+        Num
     };
 
     // Parameters to indicate the zone type for use with the Zone derived

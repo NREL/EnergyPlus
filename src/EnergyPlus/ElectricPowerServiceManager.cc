@@ -1619,6 +1619,8 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
     case GeneratorOpScheme::notYetSet: {
         // do nothing
     }
+    default:
+        assert(false);
     } // end switch
 
     // sum up generator production
@@ -1657,6 +1659,8 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
         storOpCVGenRate = inverterObj->aCPowerOut();
         break;
     }
+    default:
+        assert(false);
     } // end switch buss type
 
     // 2.  determine subpanel feed in and draw requests based on storage operation control scheme
@@ -1700,6 +1704,8 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
         }
         break;
     }
+    default:
+        assert(false);
     }
 
     // 3. adjust feed in and draw rates from subpanel to storage operation control volume
@@ -1745,6 +1751,8 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
         }
         break;
     }
+    default:
+        assert(false);
     } // end switch buss type
 
     switch (storageScheme_) {
@@ -1844,6 +1852,8 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
         }
         break;
     }
+    default:
+        assert(true);
     }
 
     // handle EMS overrides
@@ -2091,7 +2101,8 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::notYetSet: {
         // do nothing
     }
-
+    default:
+        assert(false);
     } // end switch
     thermalProdRate = 0.0;
     thermalProd = 0.0;
@@ -2583,7 +2594,8 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             pvWattsInverterEfficiency_ = state.dataIPShortCut->rNumericArgs(2);
             break;
         }
-
+        default:
+            assert(false);
         } // end switch modelType
 
         SetupOutputVariable(state,
@@ -2722,6 +2734,8 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             case InverterModelType::pvWatts: {
                 break;
             }
+            default:
+                assert(false);
             } // end switch modelType
         }
     } else {
@@ -2901,6 +2915,8 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
         // do nothing
         break;
     }
+    default:
+        assert(false);
     } // end switch
 }
 
@@ -3024,6 +3040,8 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         case ConverterModelType::notYetSet: {
             // do nothing
         }
+        default:
+            assert(false);
         } // end switch
 
         standbyPower_ = state.dataIPShortCut->rNumericArgs(3);
@@ -3217,6 +3235,8 @@ void ACtoDCConverter::calcEfficiency(EnergyPlusData &state)
         efficiency_ = CurveManager::CurveValue(state, curveNum_, normalizedPower);
         break;
     }
+    default:
+        assert(false);
     } // end switch
 }
 
@@ -3593,7 +3613,8 @@ ElectricStorage::ElectricStorage( // main constructor
             // do nothing
             break;
         }
-
+        default:
+            assert(false);
         } // switch storage model type
 
         if (storageModelMode_ == StorageModelType::kiBaMBattery || storageModelMode_ == StorageModelType::liIonNmcBattery) {
@@ -3759,7 +3780,8 @@ ElectricStorage::ElectricStorage( // main constructor
                 // do nothing
                 break;
             }
-
+            default:
+                assert(false);
             } // switch storage model type
         }
     } else { // storage not found
@@ -5012,6 +5034,8 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         // do nothing
         break;
     }
+    default:
+        assert(false);
     } // switch usage mode
 
     // check availability schedule
@@ -5096,6 +5120,8 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         // do nothing
         assert(false);
     }
+    default:
+        assert(false);
     } // switch
 
     if (powerIn_ <= 0) {

@@ -68,7 +68,8 @@ namespace HVACSingleDuctInduc {
     {
         Unassigned = -1,
         TwoPipeInduc,
-        FourPipeInduc
+        FourPipeInduc,
+        Num
     };
 
     struct IndUnitData

@@ -70,9 +70,11 @@ namespace Boilers {
     // water temperature evaluation method
     enum class TempMode
     {
+        Invalid = -1,
         NOTSET,
         ENTERINGBOILERTEMP,
-        LEAVINGBOILERTEMP
+        LEAVINGBOILERTEMP,
+        Num
     };
 
     struct BoilerSpecs : PlantComponent

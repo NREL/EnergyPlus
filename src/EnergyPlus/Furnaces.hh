@@ -72,6 +72,7 @@ namespace Furnaces {
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
         NoCoolHeat,  // last operating mode was coil off
+        Num
     };
 
     // Airflow control for contant fan mode
@@ -79,7 +80,8 @@ namespace Furnaces {
     {
         Unassigned = -1,      // default
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
-        UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+        UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value,
+        Num
     };
 
     // Compressor operation
@@ -89,9 +91,11 @@ namespace Furnaces {
     // Dehumidification control modes (DehumidControlMode)
     enum class DehumidificationControlMode
     {
+        Invalid = -1,
         DehumidControl_None,
         DehumidControl_Multimode,
         DehumidControl_CoolReheat,
+        Num
     };
 
     struct FurnaceEquipConditions

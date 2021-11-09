@@ -69,14 +69,16 @@ namespace EvaporativeCoolers {
     {
         Unassigned = -1,
         FromMains,
-        FromTank
+        FromTank,
+        Num
     };
 
     enum class FanPlacement
     {
         Unassigned = -1,
         BlowThruFan,
-        DrawThruFan
+        DrawThruFan,
+        Num
     };
 
     enum class ControlType
@@ -84,7 +86,8 @@ namespace EvaporativeCoolers {
         Unassigned = -1,
         ZoneTemperatureDeadBandOnOffCycling,
         ZoneCoolingLoadOnOffCycling,
-        ZoneCoolingLoadVariableSpeedFan
+        ZoneCoolingLoadVariableSpeedFan,
+        Num
     };
 
     enum class OperatingMode
@@ -95,7 +98,8 @@ namespace EvaporativeCoolers {
         DryFull,         // the evaporative cooler Research Special is run in full capacity in Dry Mode
         DryWetModulated, // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode
         WetModulated,    // the evaporative cooler Research Special is modulated in wet Mode
-        WetFull          // the evaporative cooler Research Special is run in full capacity in Wet Mode
+        WetFull,         // the evaporative cooler Research Special is run in full capacity in Wet Mode
+        Num
     };
 
     enum class EvapCoolerType
@@ -105,7 +109,8 @@ namespace EvaporativeCoolers {
         IndirectCELDEKPAD,
         IndirectWETCOIL,
         IndirectRDDSpecial,
-        DirectResearchSpecial
+        DirectResearchSpecial,
+        Num
     };
 
     struct EvapConditions

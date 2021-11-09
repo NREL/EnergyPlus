@@ -206,9 +206,11 @@ namespace DataAirSystems {
     };
     enum class fanPlacement
     {
+        Invalid = -1,
         fanPlaceNotSet,
         BlowThru,
-        DrawThru
+        DrawThru,
+        Num
     };
 
     struct DefinePrimaryAirSystem // There is an array of these for each primary air system

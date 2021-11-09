@@ -74,7 +74,8 @@ namespace HVACInterfaceManager {
     {
         Unassigned = -1,
         Constant,
-        Variable
+        Variable,
+        Num
     };
 
     struct CommonPipeData

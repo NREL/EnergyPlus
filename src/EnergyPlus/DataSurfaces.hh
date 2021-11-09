@@ -90,6 +90,8 @@ namespace DataSurfaces {
 
     enum class SurfaceShape : int
     {
+        // TODO: enum check
+        Invalid = -1,
         None = 0,
         Triangle,
         Quadrilateral,
@@ -100,7 +102,8 @@ namespace DataSurfaces {
         RectangularRightFin,
         TriangularWindow,
         TriangularDoor,
-        Polygonal
+        Polygonal,
+        Num
     };
 
     enum class SurfaceClass : int
@@ -143,11 +146,13 @@ namespace DataSurfaces {
         IntBlindConditionallyOff = 13,
         ExtBlindConditionallyOff = 14,
         BGShadeConditionallyOff = 15,
-        BGBlindConditionallyOff = 16
+        BGBlindConditionallyOff = 16,
+        Num
     }; // Valid window shading types: IntShade <= Type <= BGBlind; the rest are shading status
 
     enum class WindowShadingControlType : int
     {
+        Invalid = -1,
         UnControlled = 0,
         AlwaysOn = 1,
         AlwaysOff = 2,
@@ -169,7 +174,8 @@ namespace DataSurfaces {
         OnHiOutTemp_HiSolarWindow = 18,
         OnHiOutTemp_HiHorzSolar = 19,
         OnHiZoneTemp_HiSolarWindow = 20,
-        OnHiZoneTemp_HiHorzSolar = 21
+        OnHiZoneTemp_HiHorzSolar = 21,
+        Num
     };
 
     // Parameters to indicate exterior boundary conditions for use with
@@ -222,7 +228,7 @@ namespace DataSurfaces {
         TDD,                 // tubular daylighting device
         Kiva,                // Kiva ground calculations
         AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
-        Num,                 // count, always the final element
+        Num                  // count, always the final element
     };
 
     constexpr std::array<std::string_view, (int)DataSurfaces::iHeatTransferModel::Num> HeatTransAlgoStrs = {
@@ -247,7 +253,8 @@ namespace DataSurfaces {
         MediumRough,
         MediumSmooth,
         Smooth,
-        VerySmooth
+        VerySmooth,
+        Num
     };
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control

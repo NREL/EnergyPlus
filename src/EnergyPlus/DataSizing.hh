@@ -179,9 +179,11 @@ namespace DataSizing {
 
     enum class zoneFanPlacement
     {
+        Invalid = -1,
         zoneFanPlaceNotSet,
         zoneBlowThru,
-        zoneDrawThru
+        zoneDrawThru,
+        Num
     };
 
     // Types

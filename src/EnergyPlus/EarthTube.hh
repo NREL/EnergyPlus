@@ -69,7 +69,8 @@ namespace EarthTube {
         Unassigned = -1,
         Natural,
         Intake,
-        Exhaust
+        Exhaust,
+        Num
     };
 
     struct EarthTubeData

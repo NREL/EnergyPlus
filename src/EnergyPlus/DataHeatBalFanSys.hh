@@ -78,7 +78,8 @@ namespace DataHeatBalFanSys {
         CorrectStep,
         RevertZoneTimestepHistories,
         PushZoneTimestepHistories,
-        PushSystemTimestepHistories
+        PushSystemTimestepHistories,
+        Num
     };
 
     struct ZoneComfortControlsFangerData

@@ -135,11 +135,13 @@ namespace HVACMultiSpeedHeatPump {
     // Curve Types
     enum class CurveType
     {
+        Invalid = -1,
         Linear,      // Linear curve type
         BiLinear,    // Bi-linear curve type
         Quadratic,   // Quadratic curve type
         BiQuadratic, // Bi-quadratic curve type
         Cubic,       // Cubic curve type
+        Num
     };
 
     static constexpr std::string_view fluidNameSteam("STEAM");

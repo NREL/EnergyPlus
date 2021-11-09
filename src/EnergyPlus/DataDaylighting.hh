@@ -70,39 +70,49 @@ namespace DataDaylighting {
 
     enum class SkyType : int
     {
+        Invalid = -1,
         Clear = 1,
         ClearTurbid,
         Intermediate,
-        Overcast
+        Overcast,
+        Num
     };
 
     enum class iExtWinType
     {
+        Invalid = -1,
         NotInOrAdjZoneExtWin, // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
         InZoneExtWin,         // Exterior window is in a Daylighting:Detailed zone
-        AdjZoneExtWin         // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+        AdjZoneExtWin,        // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+        Num
     };
 
     enum class iCalledFor
     {
+        Invalid = -1,
         RefPoint,
-        MapPoint
+        MapPoint,
+        Num
     };
 
     enum class iDaylightingMethod
     {
+        Invalid = -1,
         NoDaylighting,
         SplitFluxDaylighting,
-        DElightDaylighting
+        DElightDaylighting,
+        Num
     };
 
     // Parameters for "Lighting Control Type" - these are the values expected by DElight
     enum class LtgCtrlType
     {
+        // TODO: enum check
         Invalid = 0,
         Continuous = 1,
         Stepped = 2,
-        ContinuousOff = 3
+        ContinuousOff = 3,
+        Num
     };
 
     constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};

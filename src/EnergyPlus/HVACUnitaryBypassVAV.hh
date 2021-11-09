@@ -78,9 +78,12 @@ namespace HVACUnitaryBypassVAV {
 
     enum class DehumidControl // Dehumidification control modes (DehumidControlMode) for Multimode units only
     {
+        // TODO: enum check
+        Invalid = -1,
         None,
         Multimode,
-        CoolReheat
+        CoolReheat,
+        Num
     };
 
     enum class PriorityCtrlMode // Priority control mode (prioritized thermostat signal)
@@ -89,14 +92,16 @@ namespace HVACUnitaryBypassVAV {
         CoolingPriority, // Controls CBVAV system based on cooling priority
         HeatingPriority, // Controls CBVAV system based on heating priority
         ZonePriority,    // Controls CBVAV system based on number of zones priority
-        LoadPriority     // Controls CBVAV system based on total load priority
+        LoadPriority,    // Controls CBVAV system based on total load priority
+        Num
     };
 
     enum class AirFlowCtrlMode // Airflow control for contant fan mode
     {
         Unassigned = -1,
-        UseCompressorOnFlow, // Set compressor OFF air flow rate equal to compressor ON air flow rate
-        UseCompressorOffFlow // Set compressor OFF air flow rate equal to user defined value
+        UseCompressorOnFlow,  // Set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow, // Set compressor OFF air flow rate equal to user defined value
+        Num
     };
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE

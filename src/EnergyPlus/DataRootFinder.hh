@@ -60,11 +60,13 @@ enum class Slope
 {
     Unassigned = -1, // Undefined slope specification
     Increasing,      // For overall increasing function F(X) between min and max points
-    Decreasing       // For overall decreasing function F(X) between min and max points
+    Decreasing,      // For overall decreasing function F(X) between min and max points
+    Num
 };
 
 enum class iStatus
 {
+    Invalid = -1,
     ErrorSingular, // Error because the overall slope appears to be flat between the min and max points, implying that the
                    // function might be singular over the interval: F(XMin) == F(XMax)
 
@@ -87,16 +89,19 @@ enum class iStatus
     OKRoundOff,          // Reached requested tolerance in X variables although Y=F(X) does not satisfy unconstrained convergence check
     WarningNonMonotonic, // Error because F(X) is not strictly monotonic between the lower and upper points
     WarningSingular,     // Error because F(X) == YLower or F(X) == YUpper
+    Num
 };
 
 enum class iMethod
 {
+    Invalid = -1,
     None,          // No solution method (used internally only when root finder is reset)
     Bracket,       // Bracketing mode (used internally only to bracket root)
     Bisection,     // Step performed using bisection method (aka interval halving)
     FalsePosition, // Step performed using false position method (aka regula falsi)
     Secant,        // Step performed using secant method
     Brent,         // Step performed using Brent's method
+    Num
 };
 
 struct ControlsType

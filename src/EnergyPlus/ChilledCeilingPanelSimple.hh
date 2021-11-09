@@ -68,21 +68,24 @@ namespace CoolingPanelSimple {
     enum class Control
     {
         Unassigned = -1,
-        MAT,               // Controls system using mean air temperature
-        MRT,               // Controls system using mean radiant temperature
-        Operative,         // Controls system using operative temperature
-        ODB,               // Controls system using outside air dry-bulb temperature
-        OWB,               // Controls system using outside air wet-bulb temperature
-        ZoneTotalLoad,     // Controls system using zone total remaining load
-        ZoneConvectiveLoad // Controls system using zone convective remaining load
+        MAT,                // Controls system using mean air temperature
+        MRT,                // Controls system using mean radiant temperature
+        Operative,          // Controls system using operative temperature
+        ODB,                // Controls system using outside air dry-bulb temperature
+        OWB,                // Controls system using outside air wet-bulb temperature
+        ZoneTotalLoad,      // Controls system using zone total remaining load
+        ZoneConvectiveLoad, // Controls system using zone convective remaining load
+        Num
     };
 
     // Condensation control types:
     enum class CondCtrl
     {
+        Invalid = -1,
         NONE,      // Condensation control--none, so system never shuts down
         SIMPLEOFF, // Condensation control--simple off, system shuts off when condensation predicted
-        VARIEDOFF  // Condensation control--variable off, system modulates to keep running if possible
+        VARIEDOFF, // Condensation control--variable off, system modulates to keep running if possible
+        Num
     };
 
     struct CoolingPanelParams

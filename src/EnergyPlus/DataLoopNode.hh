@@ -67,15 +67,20 @@ namespace DataLoopNode {
 
     enum class NodeFluidType
     {
+        // TODO: enum check
+        Invalid = -1,
         blank,
         Air,
         Water,
         Steam,
-        Electric
+        Electric,
+        Num
     };
 
     enum class NodeConnectionType
     {
+        // TODO: enum check
+        Invalid = -1,
         blank,
         Inlet,
         Outlet,
@@ -91,7 +96,8 @@ namespace DataLoopNode {
         SetPoint,
         Electric,
         OutsideAirReference,
-        InducedAir
+        InducedAir,
+        Num
     };
 
     constexpr int NumValidConnectionTypes(15);

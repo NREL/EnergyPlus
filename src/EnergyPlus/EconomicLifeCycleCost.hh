@@ -72,19 +72,24 @@ namespace EconomicLifeCycleCost {
     // MODULE PARAMETER DEFINITIONS:
     enum class iDiscConv
     {
+        Invalid = -1,
         BeginOfYear,
         MidYear,
         EndOfYear,
+        Num
     };
 
     enum class iInflAppr
     {
+        Invalid = -1,
         ConstantDollar,
         CurrentDollar,
+        Num
     };
 
     enum class iDeprMethod
     {
+        Invalid = -1,
         MACRS3,
         MACRS5,
         MACRS7,
@@ -96,6 +101,7 @@ namespace EconomicLifeCycleCost {
         Straight39,
         Straight40,
         None,
+        Num
     };
 
     constexpr int costCatMaintenance(1);
@@ -127,8 +133,10 @@ namespace EconomicLifeCycleCost {
 
     enum class iStartCosts
     {
+        Invalid = -1,
         ServicePeriod,
         BasePeriod,
+        Num
     };
 
     enum class iSourceKind
@@ -138,6 +146,7 @@ namespace EconomicLifeCycleCost {
         Nonrecurring,
         Resource,
         Sum,
+        Num
     };
 
     enum class iPrValKind
@@ -146,6 +155,7 @@ namespace EconomicLifeCycleCost {
         Energy,
         NonEnergy,
         NotComputed,
+        Num
     };
 
     constexpr const char *MonthNames(int const &i)

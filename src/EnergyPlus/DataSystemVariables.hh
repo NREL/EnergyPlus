@@ -69,10 +69,12 @@ namespace DataSystemVariables {
     // Shading methods
     enum class ShadingMethod
     {
+        Invalid = -1,
         PolygonClipping,
         PixelCounting,
         Scheduled,
-        Imported
+        Imported,
+        Num
     };
 
     // Functions

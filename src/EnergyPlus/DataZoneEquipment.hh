@@ -129,18 +129,22 @@ namespace DataZoneEquipment {
 
     enum class LoadDist
     {
+        Invalid = -1,
         SequentialLoading,
         UniformLoading,
         UniformPLRLoading,
-        SequentialUniformPLRLoading
+        SequentialUniformPLRLoading,
+        Num
     };
 
     enum class iLightReturnExhaustConfig : int
     {
+        Invalid = -1,
         NoExhast = 0, // No exhaust node
         Single = 1,   // One to one configuration
         Multi = 2,    // Multiple return node referred
-        Shared = 3    // Shared exhaust node
+        Shared = 3,   // Shared exhaust node
+        Num
     };
 
     struct EquipMeterData

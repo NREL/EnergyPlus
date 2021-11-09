@@ -81,7 +81,8 @@ namespace FaultsManager {
     {
         Unassigned = -1,
         UARated,
-        FoulingFactor
+        FoulingFactor,
+        Num
     };
 
     // FaultTypeEnum
@@ -103,7 +104,8 @@ namespace FaultsManager {
         TemperatureSensorOffset_CoilSupplyAir,
         Fouling_Boiler,
         Fouling_Chiller,
-        Fouling_EvapCooler
+        Fouling_EvapCooler,
+        Num
     };
 
     // Types of faults under Group Operational Faults in IDD

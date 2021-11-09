@@ -71,14 +71,15 @@ namespace DataRoomAirModel {
     enum class RoomAirModel : int
     {
         Unassigned = -1,
-        UserDefined,   // user defined patterns
-        Mixing,        // mixing air model
-        Mundt,         // Mundt nodal model
-        UCSDDV,        // UCSD Displacement Ventilation model
-        UCSDCV,        // UCSD-CV
-        UCSDUFI,       // UCSD UFAD interior zone model
-        UCSDUFE,       // UCSD UFAD exterior zone model
-        AirflowNetwork // RoomAirModel_AirflowNetwork interior zone model
+        UserDefined,    // user defined patterns
+        Mixing,         // mixing air model
+        Mundt,          // Mundt nodal model
+        UCSDDV,         // UCSD Displacement Ventilation model
+        UCSDCV,         // UCSD-CV
+        UCSDUFI,        // UCSD UFAD interior zone model
+        UCSDUFE,        // UCSD UFAD exterior zone model
+        AirflowNetwork, // RoomAirModel_AirflowNetwork interior zone model
+        Num
     };
     constexpr const char *ChAirModel[] = {
         "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
@@ -88,7 +89,8 @@ namespace DataRoomAirModel {
     {
         Unassigned = -1,
         Direct,
-        Indirect
+        Indirect,
+        Num
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
@@ -103,7 +105,8 @@ namespace DataRoomAirModel {
         ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
         AirflowNetworkRoomAirNode, // air node for airflow network based room air model
         PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
-        RoomAirNode                // air node for vertical walls (for Rees&Haves Model)
+        RoomAirNode,               // air node for vertical walls (for Rees&Haves Model)
+        Num
     };
 
     // user-defined pattern two gradient interpolation modes
@@ -114,7 +117,8 @@ namespace DataRoomAirModel {
         SensibleCoolingMode, // by sensible cooling load
         SensibleHeatingMode, // by sensible heating load
         ZoneAirTempMode,     // by zone air temperature
-        DeltaOutdoorZone     // by difference between zone and outdoor
+        DeltaOutdoorZone,    // by difference between zone and outdoor
+        Num
     };
 
     // user defined temperature pattern types
@@ -124,7 +128,8 @@ namespace DataRoomAirModel {
         ConstGradTempPattern,  // constant gradient in vertical direction
         TwoGradInterpPattern,  // two gradient interpolation
         NonDimenHeightPattern, // non-dimensionalized height
-        SurfMapTempPattern     // arbitrary surface mappings
+        SurfMapTempPattern,    // arbitrary surface mappings
+        Num
     };
 
     // parameters to indicate diffuser type
@@ -135,14 +140,17 @@ namespace DataRoomAirModel {
         VarArea,
         DisplVent,
         LinBarGrille,
-        Custom
+        Custom,
+        Num
     };
 
     enum class Comfort
     {
+        Invalid = -1,
         VComfort_Invalid,
         VComfort_Jet,
-        VComfort_Recirculation
+        VComfort_Recirculation,
+        Num
     };
 
     struct AirModelData

@@ -80,11 +80,13 @@ namespace HVACControllers {
     // Parameters for controls used here
     enum class iCtrl
     {
+        Invalid = -1,
         NoControlVariable,
         Temperature,
         HumidityRatio,
         TemperatureAndHumidityRatio,
         Flow,
+        Num
     };
 
     struct SolutionTrackerType

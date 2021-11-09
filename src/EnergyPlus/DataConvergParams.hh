@@ -104,9 +104,11 @@ namespace DataConvergParams {
 
     enum class iCalledFrom
     {
+        Invalid = -1,
         AirSystemDemandSide,
         AirSystemSupplySideDeck1,
-        AirSystemSupplySideDeck2
+        AirSystemSupplySideDeck2,
+        Num
     };
 
     struct HVACNodeConvergLogStruct

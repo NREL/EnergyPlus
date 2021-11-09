@@ -81,7 +81,7 @@ namespace DataSurfaceColors {
         TDDDiffuser,
         DaylSensor1,
         DaylSensor2,
-        NUM
+        NUM,
     };
 
     bool MatchAndSetColorTextString(EnergyPlusData &state,
