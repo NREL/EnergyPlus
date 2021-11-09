@@ -198,7 +198,7 @@ N/A
 
 ## Proposed Report Variables: ##
 
-The following variables will be added to the advanced reporting: Heating Unmet Degree Hours, Cooling Unmet Degree Hours, Very-cold Exceedance OccupantHours, Cool Exceedance OccupantHours, Warm Exceedance OccupantHours, Very-hot Exceedance OccupantHours
+The following variables will be added to the "advanced report variable" set: Heating Unmet Degree Hours, Cooling Unmet Degree Hours, Very-cold Exceedance OccupantHours, Cool Exceedance OccupantHours, Warm Exceedance OccupantHours, Very-hot Exceedance OccupantHours
 
 ## References ##
 
