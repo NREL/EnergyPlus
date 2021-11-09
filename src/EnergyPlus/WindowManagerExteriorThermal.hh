@@ -99,6 +99,9 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
+    double GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight);
+    double GetSHGCValueForNFRCReporting(EnergyPlusData& state, int surfNum, double windowWidth, double windowHeight);
+
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
                                         double windowWidth,
@@ -114,7 +117,7 @@ namespace WindowManager {
     public:
         CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int const t_SurfNum);
 
-        std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
+        std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, int const SurfNum, Real64 const t_HextConvCoeff);
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoor(EnergyPlusData &state) const;
@@ -153,8 +156,7 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
                                                                        DataSurfaces::SurfaceData const &surface,
                                                                        Material::MaterialProperties const &material,
-                                                                       int const t_Index,
-                                                                       int const t_SurfNum);
+                                                                       int const t_Index);
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 
@@ -168,8 +170,8 @@ namespace WindowManager {
         Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
 
         // methods specifically for helping in NFRC assembly calculations
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorUvalueNfrc(bool const useSummerConditions);
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorUvalueNfrc(bool const useSummerConditions);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorNfrc(bool const useSummerConditions);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorNfrc(bool const useSummerConditions);
     };
 } // namespace WindowManager
 

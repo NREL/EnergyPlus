@@ -944,6 +944,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                             CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             state.dataConstruction->Construct(curCons).SummerSHGC = SHGCSummer;
                             state.dataConstruction->Construct(curCons).VisTransNorm = TransVisNorm;
+                            state.dataConstruction->Construct(curCons).SolTransNorm = TransSolNorm;
                         }
                     }
                     mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
@@ -989,6 +990,11 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
 
                         GetWindowAssemblyNfrcForReport(state, iSurf, windowWidth, windowHeight, vision, uValueRep, shgcRep, vtRep);
+                        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+                            state.dataHeatBal->NominalU(Surface(iSurf).Construction) = GetIGUUValueForNFRCReport(state, iSurf, windowWidth, windowHeight);
+                            SHGCSummer = GetSHGCValueForNFRCReporting(state, iSurf, windowWidth, windowHeight);
+                            TransVisNorm = state.dataConstruction->Construct(Surface(iSurf).Construction).VisTransNorm;
+                        }
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueRep, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcRep, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtRep, 3);

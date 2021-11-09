@@ -61,6 +61,7 @@
 
 // Windows library headers
 #include <WCETarcog.hpp>
+#include <WCEMultiLayerOptics.hpp>
 
 // EnergyPlus headers
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
@@ -101,7 +102,7 @@ namespace WindowManager {
 
         // Tarcog thermal system for solving heat transfer through the window
         auto aFactory = CWCEHeatTransferFactory(state, surface, SurfNum);
-        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);
+        auto aSystem = aFactory.getTarcogSystem(state, SurfNum, HextConvCoeff);
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -254,6 +255,30 @@ namespace WindowManager {
             state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv;
             state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas(2 * k) - DataGlobalConstants::KelvinConv;
         }
+    }
+
+    double GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const double windowWidth, const double windowHeight)
+    {
+        const auto tilt{90.0};
+
+        auto &surface(state.dataSurface->Surface(surfNum));
+        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+
+        const auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt);
+
+        return winterGlassUnit->getUValue();
+    }
+
+    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight)
+    {
+        const auto tilt{90.0};
+
+        auto &surface(state.dataSurface->Surface(surfNum));
+        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+
+        const auto summerGlassUnit = aFactory.getTarcogSystemForReporting(state, true, windowWidth, windowHeight, tilt);
+        return summerGlassUnit->getSHGC(state.dataConstruction->Construct(surface.Construction).SolTransNorm);
+
     }
 
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
@@ -416,7 +441,8 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
+    std::shared_ptr<Tarcog::ISO15099::CSingleSystem>
+    CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, int const SurfNum, Real64 const t_HextConvCoeff)
     {
         auto Indoor = getIndoor(state);
         auto Outdoor = getOutdoor(state, t_HextConvCoeff);
@@ -447,11 +473,11 @@ namespace WindowManager {
     std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
         EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt)
     {
-        std::shared_ptr<Tarcog::ISO15099::IIGUSystem> result;
-        // if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
-        auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
-        auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
+        auto Indoor = getIndoorNfrc(useSummerConditions);
+        auto Outdoor = getOutdoorNfrc(useSummerConditions);
         auto aIGU = getIGU(width, height, tilt);
+
+        m_SolidLayerIndex = 0;
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
         for (auto i = 0; i < m_TotLay; ++i) {
@@ -470,15 +496,7 @@ namespace WindowManager {
             }
         }
 
-        result = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
-        //} else { // Need to retrieve legacy values while code is still active. This is constructed as simple IGU for the purpose of reporting.
-        //(Simon)
-        //    const auto COGUValue{state.dataHeatBal->NominalU(ConstrNum)};
-        //    const auto SHGCCOG{state.dataConstruction->Construct(ConstrNum).SummerSHGC};
-        //    result = std::make_shared<Tarcog::ISO15099::SimpleIGU>(COGUValue, SHGCCOG, hcInterior);
-        //}
-
-        return result;
+        return std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -509,7 +527,7 @@ namespace WindowManager {
                               BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                               BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
-            aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
+            aLayer = getSolidLayer(state, m_Surface, *material, t_Index);
         } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
             aLayer = getGapLayer(*material);
         } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
@@ -527,7 +545,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getSolidLayer(
-        EnergyPlusData &state, SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index, int const t_SurfNum)
+        EnergyPlusData &state, SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -639,15 +657,36 @@ namespace WindowManager {
             auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront);
             aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
         }
-        const auto swRadiation = surface.getSWIncident(state, t_SurfNum);
-        if (swRadiation > 0) {
+        if(state.dataWindowManager->inExtWindowModel->isExternalLibraryModel())
+        {
+            const auto ConstrNum{state.dataSurface->Surface(m_SurfNum).Construction};
+            std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> aLayer =
+                CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
 
-            auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(t_SurfNum, t_Index) / swRadiation;
-            if ((2 * t_Index - 1) == m_TotLay) {
-                absCoeff += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(t_SurfNum) / swRadiation;
+            // Report is done for normal incidence
+            const auto Theta{0.0};
+            const auto Phi{0.0};
+            const auto SolarRadiation{783.0};
+            const auto absCoeff =
+                aLayer->getAbsorptanceLayer(t_Index, FenestrationCommon::Side::Front, FenestrationCommon::ScatteringSimple::Diffuse, Theta, Phi);
+            aSolidLayer->setSolarAbsorptance(absCoeff, SolarRadiation);
+        }
+        else
+        {
+            const auto swRadiation = surface.getSWIncident(state, m_SurfNum);
+            if (swRadiation > 0) {
+
+                auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(m_SurfNum, m_SolidLayerIndex) / swRadiation;
+                if ((2 * t_Index - 1) == m_TotLay) {
+                    absCoeff += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(m_SurfNum) / swRadiation;
+                }
+
+                aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);
+            } else {
+                const auto SolarRadiation{783.0};
+                const auto absCoeff{state.dataConstruction->Construct(state.dataSurface->Surface(m_SurfNum).Construction).AbsDiff(m_SolidLayerIndex)};
+                aSolidLayer->setSolarAbsorptance(absCoeff, SolarRadiation);
             }
-
-            aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);
         }
         return aSolidLayer;
     }
@@ -860,7 +899,7 @@ namespace WindowManager {
         return m_InteriorBSDFShade;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorUvalueNfrc(bool const useSummerConditions)
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorNfrc(bool const useSummerConditions)
     {
         // NFRC 100 Section 4.3.1
         auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
@@ -880,7 +919,7 @@ namespace WindowManager {
         return Outdoor;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorUvalueNfrc(bool const useSummerConditions)
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorNfrc(bool const useSummerConditions)
     {
         // NFRC 100 Section 4.3.1
         auto roomTemperature{21. + DataGlobalConstants::KelvinConv};

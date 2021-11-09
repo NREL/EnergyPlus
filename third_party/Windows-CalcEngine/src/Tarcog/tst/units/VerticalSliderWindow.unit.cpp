@@ -138,5 +138,5 @@ TEST_F(TestVerticalSliderWindow, CalculatedCOG)
     EXPECT_NEAR(4.074413, uvalue, 1e-6);
 
     const double windowSHGC{window.shgc()};
-    EXPECT_NEAR(0.324773, windowSHGC, 1e-6);
+    EXPECT_NEAR(0.324160, windowSHGC, 1e-6);
 }

@@ -200,15 +200,19 @@ namespace WindowManager {
 
                         auto aRange = WavelengthRange::Solar;
                         auto aSolarLayer = getScatteringLayer(state, material, aRange);
+                        auto testS{aSolarLayer.getPropertySimple(0.38, 0.78, PropertySimple::T, Side::Front, Scattering::DirectHemispherical)};
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aSolarLayer);
 
                         aRange = WavelengthRange::Visible;
                         auto aVisibleLayer = getScatteringLayer(state, material, aRange);
+                        auto testV{aVisibleLayer.getPropertySimple(0.38, 0.78, PropertySimple::T, Side::Front, Scattering::DirectHemispherical)};
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aVisibleLayer);
                     }
                 }
             }
         }
+
+
 
         // Get effective glass and shade/blind emissivities for windows that have interior blind or
         // shade. These are used to calculate zone MRT contribution from window when
@@ -272,6 +276,22 @@ namespace WindowManager {
         }         // End of surface loop
     }
 
+    double GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
+    {
+        const auto aWinConstSimp =
+            CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
+        return aWinConstSimp->getPropertySimple(
+            0.3, 2.5, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectHemispherical);
+    }
+
+    double GetVisibleTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
+    {
+        const auto aWinConstSimp =
+            CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Visible, ConstrNum);
+        return aWinConstSimp->getPropertySimple(
+            0.38, 0.78, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectHemispherical);
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
@@ -314,7 +334,8 @@ namespace WindowManager {
         auto lowLambda = aRange.minLambda();
         auto highLambda = aRange.maxLambda();
 
-        if (m_Range == WavelengthRange::Visible) {
+        // Do not apply detector data if we do not have spectral data. This will only cause more inaccurate results at the end. (Simon)
+        if (m_Range == WavelengthRange::Visible && m_MaterialProperties.GlassSpectralDataPtr != 0) {
             const auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(state);
             aSample->setDetectorData(aPhotopicResponse);
         }

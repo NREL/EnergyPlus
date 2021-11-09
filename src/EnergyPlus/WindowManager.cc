@@ -6992,6 +6992,14 @@ namespace WindowManager {
                 }
             }
         }
+
+
+        // Need to add variables writing here since this routine will override previously calcualted values from WinCalc-Engine
+        if(state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+            TSolNorm = GetSolarTransDirectHemispherical(state, ConstrNum);
+            TVisNorm = GetVisibleTransDirectHemispherical(state, ConstrNum);
+        }
+
     }
 
     void EvalNominalWindowCond(EnergyPlusData &state,
