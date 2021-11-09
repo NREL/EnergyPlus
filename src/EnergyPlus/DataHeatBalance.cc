@@ -121,12 +121,6 @@ Array2D<Real64> const GasCoeffsCp(
          0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
         {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-// Air       Argon     Krypton   Xenon
-Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
-
-// Gas specific heat ratios.  Used for gasses in low pressure
-Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
-
 // Functions
 
 void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)

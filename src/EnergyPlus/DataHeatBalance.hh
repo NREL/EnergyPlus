@@ -468,10 +468,11 @@ namespace DataHeatBalance {
     extern Array2D<Real64> const GasCoeffsCp; // Gas specific heat coefficients for gases in a mixture
 
     // Air       Argon     Krypton   Xenon
-    extern Array1D<Real64> const GasWght; // Gas molecular weights for gases in a mixture
+    static constexpr std::array<Real64, 10> GasWght = {
+        28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Gas molecular weights for gases in a mixture
 
     // Gas specific heat ratios.  Used for gasses in low pressure
-    extern Array1D<Real64> const GasSpecificHeatRatio;
+    static constexpr std::array<Real64, 10> GasSpecificHeatRatio = {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     struct TCGlazingsType
     {

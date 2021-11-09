@@ -2666,7 +2666,7 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        DataComplexFenestration::GasCoeffs GasType; // locally used coefficent to point at correct gas type
+        int GasType; // locally used coefficient to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2838,13 +2838,13 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = DataComplexFenestration::GasCoeffs::Air;
-        wght(iprop(1, 1)) = GasWght(static_cast<int>(GasType));
-        gama(iprop(1, 1)) = GasSpecificHeatRatio(static_cast<int>(GasType));
+        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        wght(iprop(1, 1)) = GasWght[GasType - 1];
+        gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, static_cast<int>(GasType));
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, static_cast<int>(GasType));
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, static_cast<int>(GasType));
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, GasType);
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, GasType);
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, GasType);
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
@@ -2914,8 +2914,6 @@ namespace WindowComplexManager {
 
                 nmix(IGap + 1) = state.dataMaterial->Material(GasPointer).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    // iprop(IGap+1, IMix) = dataMaterial.Material(LayPtr)%GasType(IMix)
-                    // iprop(IGap+1, IMix) = GetGasIndex(dataMaterial.Material(LayPtr)%GasWght(IMix))
                     frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer).GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
