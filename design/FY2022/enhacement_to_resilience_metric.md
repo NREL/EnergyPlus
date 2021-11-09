@@ -145,11 +145,16 @@ We will add a new object *Output:Table:ReportPeriod* to add supplementary inform
 
     Output:Table:ReportPeriod,
         \memo This object allows the user to add a reporting period to a certain tabular report when the reporting period is not the whole simulation period. When defined, the declared summary report is based on aggregations from the start date to the end date defined. 
-      A1, \field Report Name,
+        \memo Multiple run periods may be input.
+      A1, \field Name,
+          \required-field
+          \note descriptive name
+          \note cannot be blank and must be unique
+      A2, \field Report Name,
           \key ThermalResilienceSummary
           \key CO2ResilienceSummary
           \key VisualResilienceSummary
-        \key …
+          \key …
       N1 , \field Begin Year
           \note start year of reporting, if specified
           \type integer
@@ -193,7 +198,7 @@ N/A
 
 ## Proposed Report Variables: ##
 
-N/A
+The following variables will be added to the advanced reporting: Heating Unmet Degree Hours, Heating Unmet Degree Hours, Very-cold Exceedance OccupantHours, Cool Exceedance OccupantHours, Warm Exceedance OccupantHours, Very-hot Exceedance OccupantHours
 
 ## References ##
 
