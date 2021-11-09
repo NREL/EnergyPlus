@@ -102,6 +102,7 @@ struct DataGlobal : BaseGlobalStruct
     Real64 WeightPreviousHour = 0.0;                  // Weighting of value for previous hour
     Real64 WeightNow = 0.0;                           // Weighting of value for current hour
     int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
+    bool OverrideTimestep = false;                    // True if PerformancePrecision object overrides the number of time steps in each hour
     int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
     int NumOfZones = 0;                               // Total number of Zones for simulation
     int numSpaces = 0;                                // Total number of Spaces for simulation
@@ -210,6 +211,7 @@ struct DataGlobal : BaseGlobalStruct
         this->WeightPreviousHour = 0.0;
         this->WeightNow = 0.0;
         this->NumOfDayInEnvrn = 0;
+        this->OverrideTimestep = false;
         this->NumOfTimeStepInHour = 0;
         this->NumOfZones = 0;
         this->numSpaces = 0;

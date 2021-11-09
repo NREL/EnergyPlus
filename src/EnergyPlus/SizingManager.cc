@@ -2809,7 +2809,7 @@ void GetSizingParams(EnergyPlusData &state)
     } else {
         ShowFatalError(state, cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
     }
-
+    if (state.dataGlobal->OverrideTimestep) state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
     if (state.dataSize->NumTimeStepsInAvg < state.dataGlobal->NumOfTimeStepInHour) {
         ShowWarningError(state,
                          format("{}: note {} entered value=[{}] is less than 1 hour (i.e., {} timesteps).",
