@@ -988,10 +988,10 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         double shgcRep{0.1};
                         double vtRep{0.1};
 
-
                         GetWindowAssemblyNfrcForReport(state, iSurf, windowWidth, windowHeight, vision, uValueRep, shgcRep, vtRep);
                         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
-                            state.dataHeatBal->NominalU(Surface(iSurf).Construction) = GetIGUUValueForNFRCReport(state, iSurf, windowWidth, windowHeight);
+                            state.dataHeatBal->NominalU(Surface(iSurf).Construction) =
+                                GetIGUUValueForNFRCReport(state, iSurf, windowWidth, windowHeight);
                             SHGCSummer = GetSHGCValueForNFRCReporting(state, iSurf, windowWidth, windowHeight);
                             TransVisNorm = state.dataConstruction->Construct(Surface(iSurf).Construction).VisTransNorm;
                         }

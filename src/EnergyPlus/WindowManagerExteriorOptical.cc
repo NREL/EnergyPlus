@@ -111,7 +111,8 @@ namespace WindowManager {
         // Scattering will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowGlass) {
+        if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowGlass ||
+            t_Material.Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
         } else if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
@@ -200,19 +201,15 @@ namespace WindowManager {
 
                         auto aRange = WavelengthRange::Solar;
                         auto aSolarLayer = getScatteringLayer(state, material, aRange);
-                        auto testS{aSolarLayer.getPropertySimple(0.38, 0.78, PropertySimple::T, Side::Front, Scattering::DirectHemispherical)};
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aSolarLayer);
 
                         aRange = WavelengthRange::Visible;
                         auto aVisibleLayer = getScatteringLayer(state, material, aRange);
-                        auto testV{aVisibleLayer.getPropertySimple(0.38, 0.78, PropertySimple::T, Side::Front, Scattering::DirectHemispherical)};
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aVisibleLayer);
                     }
                 }
             }
         }
-
-
 
         // Get effective glass and shade/blind emissivities for windows that have interior blind or
         // shade. These are used to calculate zone MRT contribution from window when
@@ -319,29 +316,42 @@ namespace WindowManager {
 
     void CWCESpecularMaterialsFactory::init(EnergyPlusData &state)
     {
-        auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
-        std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
         if (m_MaterialProperties.GlassSpectralDataPtr > 0) {
+            auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
+            std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
             aSampleData = CWCESpecturmProperties::getSpectralSample(state, m_MaterialProperties.GlassSpectralDataPtr);
+
+            auto aSample = std::make_shared<CSpectralSample>(aSampleData, aSolarSpectrum);
+
+            auto aType = MaterialType::Monolithic;
+            auto aRange = CWavelengthRange(m_Range);
+            auto lowLambda = aRange.minLambda();
+            auto highLambda = aRange.maxLambda();
+
+            // Do not apply detector data if we do not have spectral data. This will only cause more inaccurate results at the end. (Simon)
+            if (m_Range == WavelengthRange::Visible && m_MaterialProperties.GlassSpectralDataPtr != 0) {
+                const auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(state);
+                aSample->setDetectorData(aPhotopicResponse);
+            }
+
+            auto thickness = m_MaterialProperties.Thickness;
+            m_Material = std::make_shared<CMaterialSample>(aSample, thickness, aType, lowLambda, highLambda);
         } else {
-            aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties);
+            if (m_Range == WavelengthRange::Solar) {
+                m_Material = std::make_shared<CMaterialSingleBand>(m_MaterialProperties.Trans,
+                                                                   m_MaterialProperties.Trans,
+                                                                   m_MaterialProperties.ReflectSolBeamFront,
+                                                                   m_MaterialProperties.ReflectSolBeamBack,
+                                                                   m_Range);
+            }
+            if (m_Range == WavelengthRange::Visible) {
+                m_Material = std::make_shared<CMaterialSingleBand>(m_MaterialProperties.TransVis,
+                                                                   m_MaterialProperties.TransVis,
+                                                                   m_MaterialProperties.ReflectVisBeamFront,
+                                                                   m_MaterialProperties.ReflectVisBeamBack,
+                                                                   m_Range);
+            }
         }
-
-        auto aSample = std::make_shared<CSpectralSample>(aSampleData, aSolarSpectrum);
-
-        auto aType = MaterialType::Monolithic;
-        auto aRange = CWavelengthRange(m_Range);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
-
-        // Do not apply detector data if we do not have spectral data. This will only cause more inaccurate results at the end. (Simon)
-        if (m_Range == WavelengthRange::Visible && m_MaterialProperties.GlassSpectralDataPtr != 0) {
-            const auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(state);
-            aSample->setDetectorData(aPhotopicResponse);
-        }
-
-        auto thickness = m_MaterialProperties.Thickness;
-        m_Material = std::make_shared<CMaterialSample>(aSample, thickness, aType, lowLambda, highLambda);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

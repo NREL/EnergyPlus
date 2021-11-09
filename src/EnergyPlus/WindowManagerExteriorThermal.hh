@@ -100,7 +100,7 @@ namespace WindowManager {
     );
 
     double GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight);
-    double GetSHGCValueForNFRCReporting(EnergyPlusData& state, int surfNum, double windowWidth, double windowHeight);
+    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight);
 
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
@@ -126,9 +126,8 @@ namespace WindowManager {
         Tarcog::ISO15099::CIGU getIGU(double width, double height, double tilt);
 
         // for assembly windoww reporting
-        std::shared_ptr<Tarcog::ISO15099::IIGUSystem>
-        getTarcogSystemForReporting(EnergyPlusData &state, bool const useSummerConditions, const double width, const
-                                    double height, const double tilt);
+        std::shared_ptr<Tarcog::ISO15099::IIGUSystem> getTarcogSystemForReporting(
+            EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from

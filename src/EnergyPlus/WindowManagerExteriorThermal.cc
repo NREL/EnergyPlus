@@ -60,8 +60,8 @@
 #include <EnergyPlus/WindowManager.hh>
 
 // Windows library headers
-#include <WCETarcog.hpp>
 #include <WCEMultiLayerOptics.hpp>
+#include <WCETarcog.hpp>
 
 // EnergyPlus headers
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
@@ -278,7 +278,6 @@ namespace WindowManager {
 
         const auto summerGlassUnit = aFactory.getTarcogSystemForReporting(state, true, windowWidth, windowHeight, tilt);
         return summerGlassUnit->getSHGC(state.dataConstruction->Construct(surface.Construction).SolTransNorm);
-
     }
 
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
@@ -296,9 +295,9 @@ namespace WindowManager {
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
 
         for (bool isSummer : {false, true}) {
-            //double hExtConvCoeff(0.0);
-            //double hIntConvCoeff(0.0);
-            //if (isSummer) {
+            // double hExtConvCoeff(0.0);
+            // double hIntConvCoeff(0.0);
+            // if (isSummer) {
             //    // films from ISO 15099 Section 8.2.3 Summer conditions
             //    hExtConvCoeff = 8.0;
             //    hIntConvCoeff = 2.5;
@@ -312,8 +311,7 @@ namespace WindowManager {
             const auto framehIntConvCoeff{8.0};
             const auto tilt{90.0};
 
-            auto insulGlassUnit =
-                aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt);
+            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt);
 
             const double centerOfGlassUvalue = insulGlassUnit->getUValue();
 
@@ -327,7 +325,8 @@ namespace WindowManager {
 
             Tarcog::ISO15099::FrameData frameData{frameUvalue, frameEdgeUValue, frameProjectedDimension, frameWettedLength, frameAbsorptance};
 
-            const double dividerUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.DividerConductance, framehIntConvCoeff, framehExtConvCoeff);
+            const double dividerUvalue =
+                aFactory.overallUfactorFromFilmsAndCond(frameDivider.DividerConductance, framehIntConvCoeff, framehExtConvCoeff);
             const double dividerEdgeUValue{centerOfGlassUvalue * frameDivider.DivEdgeToCenterGlCondRatio}; // not sure about this
             const double dividerProjectedDimension{frameDivider.DividerWidth};
             const double dividerWettedLength{dividerProjectedDimension + frameDivider.DividerProjectionIn};
@@ -527,7 +526,7 @@ namespace WindowManager {
                               BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                               BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
-            aLayer = getSolidLayer(state, m_Surface, *material, t_Index);
+            aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex);
         } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
             aLayer = getGapLayer(*material);
         } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
@@ -544,8 +543,10 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getSolidLayer(
-        EnergyPlusData &state, SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index)
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state,
+                                                                                            SurfaceData const &surface,
+                                                                                            Material::MaterialProperties const &material,
+                                                                                            int const t_Index)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -657,8 +658,7 @@ namespace WindowManager {
             auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront);
             aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
         }
-        if(state.dataWindowManager->inExtWindowModel->isExternalLibraryModel())
-        {
+        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             const auto ConstrNum{state.dataSurface->Surface(m_SurfNum).Construction};
             std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> aLayer =
                 CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
@@ -670,9 +670,7 @@ namespace WindowManager {
             const auto absCoeff =
                 aLayer->getAbsorptanceLayer(t_Index, FenestrationCommon::Side::Front, FenestrationCommon::ScatteringSimple::Diffuse, Theta, Phi);
             aSolidLayer->setSolarAbsorptance(absCoeff, SolarRadiation);
-        }
-        else
-        {
+        } else {
             const auto swRadiation = surface.getSWIncident(state, m_SurfNum);
             if (swRadiation > 0) {
 
