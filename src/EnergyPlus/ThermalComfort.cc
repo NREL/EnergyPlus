@@ -1869,7 +1869,7 @@ namespace ThermalComfort {
         int J;
         Real64 B;
         Real64 H2;
-        static Array1D<Real64> const A(2, {0.29289321881345, 1.70710678118654});
+        static constexpr std::array<Real64, 2> A = {0.29289321881345, 1.70710678118654};
 
         H2 = 0.5 * H;
 
@@ -1882,12 +1882,12 @@ namespace ThermalComfort {
 
         X += H2;
 
-        for (J = 1; J <= 2; ++J) {
+        for (J = 0; J < 2; ++J) {
             DERIV(state, NEQ, Y, DY);
             for (I = 1; I <= NEQ; ++I) {
-                B = A(J) * (H * DY(I) - C(I));
+                B = A[J] * (H * DY(I) - C(I));
                 Y(I) += B;
-                C(I) += 3.0 * B - A(J) * H * DY(I);
+                C(I) += 3.0 * B - A[J] * H * DY(I);
             }
         }
 
@@ -2957,7 +2957,7 @@ namespace ThermalComfort {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 constexpr alpha(0.8);
-        static Array1D<Real64> const alpha_pow({pow_6(alpha), pow_5(alpha), pow_4(alpha), pow_3(alpha), pow_2(alpha), alpha, 1.0}); // alpha^(7-i)
+        static constexpr std::array<Real64, 7> alpha_pow = {0.262144, 0.32768, 0.4096, 0.512, 0.64, 0.8, 1.0}; // alpha^(6-0)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string epwLine;
@@ -3013,7 +3013,7 @@ namespace ThermalComfort {
                         epwFile.readLine();
                     }
                     state.dataThermalComforts->runningAverageCEN = 0.0;
-                    for (i = 1; i <= 7; ++i) {
+                    for (i = 0; i < 7; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
@@ -3025,7 +3025,7 @@ namespace ThermalComfort {
                             dryBulb = StrToReal(epwLine.substr(0, pos));
                             state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->runningAverageCEN += alpha_pow(i) * state.dataThermalComforts->avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += alpha_pow[i] * state.dataThermalComforts->avgDryBulbCEN;
                     }
                 } else { // Do special things for wrapping the epw
                     calcEndDay = jStartDay;
@@ -3049,7 +3049,7 @@ namespace ThermalComfort {
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
                         epwFile.readLine();
                     }
-                    for (i = 1; i <= 7 - calcEndDay; ++i) {
+                    for (i = 0; i < 7 - calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
@@ -3061,7 +3061,7 @@ namespace ThermalComfort {
                             dryBulb = StrToReal(epwLine.substr(0, pos));
                             state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->runningAverageCEN += alpha_pow(i) * state.dataThermalComforts->avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += alpha_pow[i] * state.dataThermalComforts->avgDryBulbCEN;
                     }
                 }
                 state.dataThermalComforts->runningAverageCEN *= (1.0 - alpha);

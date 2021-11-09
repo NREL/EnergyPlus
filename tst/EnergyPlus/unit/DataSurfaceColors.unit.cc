@@ -45,67 +45,36 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DataUCSDSharedData_hh_INCLUDED
-#define DataUCSDSharedData_hh_INCLUDED
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSurfaceColors.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-struct UCSDSharedData : BaseGlobalStruct
+using namespace EnergyPlus;
+
+TEST_F(EnergyPlusFixture, TestMatchAndSetColorTextString)
 {
-    // The Eplus surface numbers will be stored in the arrays Apos according to the
-    // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
-    // for each zone it has 2 positions: the start and end positions in the Apos_Wall array
-    // for that specific zone.
-    Array1D_int APos_Wall;
-    Array1D_int APos_Floor;
-    Array1D_int APos_Ceiling;
-    Array1D_int PosZ_Wall;
-    Array1D_int PosZ_Floor;
-    Array1D_int PosZ_Ceiling;
-    Array1D_int APos_Window;
-    Array1D_int APos_Door;
-    Array1D_int APos_Internal;
-    Array1D_int PosZ_Window;
-    Array1D_int PosZ_Door;
-    Array1D_int PosZ_Internal;
-    // Convection coefficients for the various surfaces
-    Array1D<Real64> HCeiling;
-    Array1D<Real64> HWall;
-    Array1D<Real64> HFloor;
-    Array1D<Real64> HInternal;
-    Array1D<Real64> HWindow;
-    Array1D<Real64> HDoor;
-    void clear_state() override
-    {
-        this->APos_Wall.clear();
-        this->APos_Floor.clear();
-        this->APos_Ceiling.clear();
-        this->PosZ_Wall.clear();
-        this->PosZ_Floor.clear();
-        this->PosZ_Ceiling.clear();
-        this->APos_Window.clear();
-        this->APos_Door.clear();
-        this->APos_Internal.clear();
-        this->PosZ_Window.clear();
-        this->PosZ_Door.clear();
-        this->PosZ_Internal.clear();
-        // Convection coeficients for the various surfaces
-        this->HCeiling.clear();
-        this->HWall.clear();
-        this->HFloor.clear();
-        this->HInternal.clear();
-        this->HWindow.clear();
-        this->HDoor.clear();
-    }
-};
+    // test match "Text"
+    std::string testStr = "Text";
+    int setVal = 1;
+    bool colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
+    ASSERT_TRUE(colorSet);
+    ASSERT_EQ(state->dataSurfColor->DXFcolorno[0], setVal);
 
-} // namespace EnergyPlus
+    // test match "DaylightReferencePoint2"
+    testStr = "DaylightReferencePoint2";
+    setVal = 3;
+    colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
+    ASSERT_TRUE(colorSet);
+    ASSERT_EQ(state->dataSurfColor->DXFcolorno[14], setVal);
 
-#endif
+    // test invalid
+    testStr = "Invalid";
+    setVal = 3;
+    colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
+    ASSERT_FALSE(colorSet);
+}

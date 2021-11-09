@@ -6385,8 +6385,8 @@ namespace WeatherManager {
                                                                                {DDHumIndType::WBProfMul, "WetBulbProfileMultiplierSchedule []"}};
 
         // Below are the 2009 fractions, HOF, Chap 14, Table 6
-        static Array1D<Real64> const DefaultTempRangeMult(24, {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
-                                                               0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82});
+        static constexpr std::array<Real64, 24> DefaultTempRangeMult = {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
+                                                                        0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string units;
@@ -6704,14 +6704,14 @@ namespace WeatherManager {
                 }
             } else {
                 // Default dry-bulb temperature Range
-                Real64 LastHrValue = DefaultTempRangeMult(24);
+                Real64 LastHrValue = DefaultTempRangeMult[23];
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         Real64 WNow = state.dataWeatherManager->Interpolation(ts);
                         Real64 WPrev = 1.0 - WNow;
-                        state.dataWeatherManager->DDDBRngModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult(hour) * WNow;
+                        state.dataWeatherManager->DDDBRngModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult[hour - 1] * WNow;
                     }
-                    LastHrValue = DefaultTempRangeMult(hour);
+                    LastHrValue = DefaultTempRangeMult[hour - 1];
                 }
             }
 
@@ -7011,14 +7011,14 @@ namespace WeatherManager {
 
             } else if (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef) {
                 // re WetBulbProfileDefaultMultipliers
-                Real64 LastHrValue = DefaultTempRangeMult(24);
+                Real64 LastHrValue = DefaultTempRangeMult[23];
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         Real64 WNow = state.dataWeatherManager->Interpolation(ts);
                         Real64 WPrev = 1.0 - WNow;
-                        state.dataWeatherManager->DDHumIndModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult(hour) * WNow;
+                        state.dataWeatherManager->DDHumIndModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult[hour - 1] * WNow;
                     }
-                    LastHrValue = DefaultTempRangeMult(hour);
+                    LastHrValue = DefaultTempRangeMult[hour - 1];
                 }
             }
 
