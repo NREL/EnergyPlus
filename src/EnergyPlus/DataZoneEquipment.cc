@@ -932,8 +932,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                      ObjectIsParent);
 
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType_Num.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType_Num = DataZoneEquipment::AirLoopHVAC::Unassigned;
+        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
+        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVAC::Unassigned;
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
@@ -956,9 +956,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 if (AlphArray(Counter) == "AIRLOOPHVAC:ZONESPLITTER")
-                    state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType_Num(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneSplitter;
+                    state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneSplitter;
                 if (AlphArray(Counter) == "AIRLOOPHVAC:SUPPLYPLENUM")
-                    state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType_Num(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum;
+                    state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum;
 
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->SupplyAirPath(PathNum).Name + "\"");
@@ -1005,8 +1005,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                       ObjectIsParent);
 
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num = DataZoneEquipment::AirLoopHVAC::Unassigned;
+        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
+        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVAC::Unassigned;
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
 
@@ -1029,9 +1029,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
                 if (AlphArray(Counter) == "AIRLOOPHVAC:ZONEMIXER")
-                    state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneMixer;
+                    state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneMixer;
                 if (AlphArray(Counter) == "AIRLOOPHVAC:RETURNPLENUM")
-                    state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum;
+                    state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum;
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->ReturnAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");

@@ -2402,7 +2402,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
                 }
                 // Loop over components in return path and each component's inlet nodes
                 for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
-                    DataZoneEquipment::AirLoopHVAC compType = thisRetPath.ComponentType_Num(compNum);
+                    DataZoneEquipment::AirLoopHVAC compType = thisRetPath.ComponentTypeEnum(compNum);
                     if (compType == DataZoneEquipment::AirLoopHVAC::ZoneMixer) {
                         auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
@@ -7825,7 +7825,7 @@ bool CheckWaterCoilOnOASystem(EnergyPlusData &state, SimAirServingZones::AirLoop
     if (NumOASys > 0) {
         for (int OASysNum = 1; OASysNum <= NumOASys; ++OASysNum) {
             for (int OACompNum = 1; OACompNum <= OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
-                if ((CompTypeNum == OutsideAirSys(OASysNum).ComponentType_Num(OACompNum)) &&
+                if ((CompTypeNum == OutsideAirSys(OASysNum).ComponentTypeEnum(OACompNum)) &&
                     (UtilityRoutines::SameString(CompName, OutsideAirSys(OASysNum).ComponentName(OACompNum)))) {
                     return true;
                 }

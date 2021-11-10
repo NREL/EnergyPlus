@@ -96,6 +96,9 @@ namespace DataZoneEquipment {
         NUM
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNamesCC = {
+        "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
+
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
     enum ZoneEquip
@@ -378,7 +381,7 @@ namespace DataZoneEquipment {
         int NumOfEquipTypes;                        // Number of items on this list
         int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
         int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
-        Array1D_string EquipType;
+        Array1D_string EquipType;                   // TODO: Convert this from string to enum and remove EquipTypeEnum below
         Array1D<DataZoneEquipment::ZoneEquip> EquipTypeEnum;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
@@ -427,8 +430,8 @@ namespace DataZoneEquipment {
         std::string Name;
         int NumOfComponents;
         int InletNodeNum;
-        Array1D_string ComponentType;
-        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentType_Num;
+        Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
+        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
@@ -451,8 +454,8 @@ namespace DataZoneEquipment {
         std::string Name;
         int NumOfComponents;
         int OutletNodeNum;
-        Array1D_string ComponentType;
-        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentType_Num;
+        Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
+        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
 

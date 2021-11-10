@@ -3062,37 +3062,42 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     for (SupplyAirPathNum = 1; SupplyAirPathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SupplyAirPathNum) {
 
         for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).NumOfComponents; ++CompNum) {
-            {
-                auto const SELECT_CASE_var(state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType_Num(CompNum));
 
-                if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneSplitter) { // 'AirLoopHVAC:ZoneSplitter'
+            switch (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum)) {
+            case DataZoneEquipment::AirLoopHVAC::ZoneSplitter: { // 'AirLoopHVAC:ZoneSplitter'
 
-                    if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirLoopSplitter(state,
-                                           state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
-                                           FirstHVACIteration,
-                                           FirstCall,
-                                           SupPathInletChanged,
-                                           state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum));
-                    }
-
-                } else if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
-
-                    SimAirZonePlenum(state,
-                                     state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
-                                     DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum,
-                                     state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
-                                     FirstHVACIteration,
-                                     FirstCall,
-                                     SupPathInletChanged);
-
-                } else {
-                    ShowSevereError(state, "Error found in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).Name);
-                    ShowContinueError(
-                        state, "Invalid Supply Air Path Component=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
-                    ShowFatalError(state, "Preceding condition causes termination.");
+                if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
+                      state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                    SimAirLoopSplitter(state,
+                                       state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                                       FirstHVACIteration,
+                                       FirstCall,
+                                       SupPathInletChanged,
+                                       state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum));
                 }
+
+                break;
+            }
+            case DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum: { // 'AirLoopHVAC:SupplyPlenum'
+
+                SimAirZonePlenum(state,
+                                 state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                                 DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum,
+                                 state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
+                                 FirstHVACIteration,
+                                 FirstCall,
+                                 SupPathInletChanged);
+
+                break;
+            }
+            default: {
+                ShowSevereError(state, "Error found in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).Name);
+                ShowContinueError(state,
+                                  "Invalid Supply Air Path Component=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
+                ShowFatalError(state, "Preceding condition causes termination.");
+
+                break;
+            }
             }
         }
     }
@@ -3591,7 +3596,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
         for (CompNum = state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).NumOfComponents; CompNum >= 1; --CompNum) {
             {
-                auto const SELECT_CASE_var(state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType_Num(CompNum));
+                auto const SELECT_CASE_var(state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum));
 
                 if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneSplitter) { // 'AirLoopHVAC:ZoneSplitter'
 

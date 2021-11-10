@@ -522,9 +522,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
     state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = state->dataWaterCoils->WaterCoil(1).Name;
     state->dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::AirLoopHVAC::WaterCoil_SimpleHeat;
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::AirLoopHVAC::OAMixer_Num;
+    state->dataAirLoop->OutsideAirSys(1).ComponentTypeEnum.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentTypeEnum(1) = SimAirServingZones::AirLoopHVAC::WaterCoil_SimpleHeat;
+    state->dataAirLoop->OutsideAirSys(1).ComponentTypeEnum(2) = SimAirServingZones::AirLoopHVAC::OAMixer_Num;
 
     state->dataMixedAir->OAMixer.allocate(1);
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
@@ -654,9 +654,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
     state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = "HXAssisting Cooling Coil";
     state->dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::AirLoopHVAC::WaterCoil_CoolingHXAsst;
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::AirLoopHVAC::OAMixer_Num;
+    state->dataAirLoop->OutsideAirSys(1).ComponentTypeEnum.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentTypeEnum(1) = SimAirServingZones::AirLoopHVAC::WaterCoil_CoolingHXAsst;
+    state->dataAirLoop->OutsideAirSys(1).ComponentTypeEnum(2) = SimAirServingZones::AirLoopHVAC::OAMixer_Num;
 
     state->dataMixedAir->OAMixer.allocate(1);
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";

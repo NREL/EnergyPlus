@@ -125,7 +125,7 @@ namespace OutdoorAirUnit {
         // Equipment List Data
         std::string ComponentName;
         std::string ComponentType;
-        AirLoopHVAC ComponentType_Num; // Parameterized Component Types this module can address
+        AirLoopHVAC ComponentTypeEnum; // Parameterized Component Types this module can address
         int ComponentIndex;         // Which one in list -- updated by routines called from here
         HVACSystemData *compPointer = nullptr;
         int CoilAirInletNode;
@@ -147,7 +147,7 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAEquipList()
-            : ComponentType_Num(AirLoopHVAC::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
+            : ComponentTypeEnum(AirLoopHVAC::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
               CoilWaterOutletNode(0), CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
               MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
