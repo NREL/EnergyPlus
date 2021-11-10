@@ -840,7 +840,8 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //      \key November
             //      \key December
             //      \default January
-            elcc->UsePriceEscalation(iInObj).escalationStartMonth  = getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3)));
+            elcc->UsePriceEscalation(iInObj).escalationStartMonth =
+                getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3)));
             if (elcc->UsePriceEscalation(iInObj).escalationStartMonth == -1) {
                 elcc->UsePriceEscalation(iInObj).escalationStartMonth = 0;
                 ShowWarningError(state,
@@ -1057,7 +1058,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // compute months from 1900 for base and service period
     elcc->ExpressAsCashFlows_baseMonths1900 =
         (elcc->baseDateYear - 1900) * 12 + (elcc->baseDateMonth + 1); // elcc->baseDateMonth + 1 to account for baseDateMonth starting at 0
-    elcc->ExpressAsCashFlows_serviceMonths1900 = (elcc->serviceDateYear - 1900) * 12 + elcc->serviceDateMonth + 1; // elcc->serviceDateMonth + 1 to account for serviceDateMonth starting at 0
+    elcc->ExpressAsCashFlows_serviceMonths1900 =
+        (elcc->serviceDateYear - 1900) * 12 + elcc->serviceDateMonth + 1; // elcc->serviceDateMonth + 1 to account for serviceDateMonth starting at 0
     monthsBaseToService = elcc->ExpressAsCashFlows_serviceMonths1900 - elcc->ExpressAsCashFlows_baseMonths1900;
     // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
     if (state.dataCostEstimateManager->CurntBldg.GrandTotal >
@@ -1767,8 +1769,9 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
             tableBody(jObj, 1) = GetResourceTypeChar(elcc->UsePriceEscalation(jObj).resource);
-            tableBody(jObj, 2) =
-                format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)], elcc->UsePriceEscalation(jObj).escalationStartYear);
+            tableBody(jObj, 2) = format("{} {}",
+                                        UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)],
+                                        elcc->UsePriceEscalation(jObj).escalationStartYear);
         }
         for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
             for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
@@ -1801,7 +1804,8 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead = "none";
             rowHead(1) = "";
             for (iYear = 1; iYear <= numYears; ++iYear) {
-                rowHead(iYear + 1) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
+                rowHead(iYear + 1) =
+                    format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
@@ -2103,8 +2107,9 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
-                rowHead(kMonth) =
-                    format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) + 1], elcc->baseDateYear + int((kMonth - 1) / 12));
+                rowHead(kMonth) = format("{} {}",
+                                         UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) + 1],
+                                         elcc->baseDateYear + int((kMonth - 1) / 12));
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 for (jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
@@ -2134,7 +2139,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody.allocate(12, elcc->lengthStudyYears);
         tableBody = "";
         for (kMonth = 1; kMonth <= 12; ++kMonth) {
-            columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth +1)];
+            columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth + 1)];
         }
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = fmt::to_string(elcc->baseDateYear + iYear - 1);
