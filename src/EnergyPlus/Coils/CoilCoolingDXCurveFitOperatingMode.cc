@@ -210,8 +210,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
-    Real64 const ratedInletAirTemp(26.6667);     // 26.6667C or 80F
-    Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 constexpr ratedInletAirTemp(26.6667);     // 26.6667C or 80F
+    Real64 constexpr ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     this->ratedEvapAirMassFlowRate =
         this->ratedEvapAirFlowRate *
         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);

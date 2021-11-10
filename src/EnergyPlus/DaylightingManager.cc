@@ -3879,7 +3879,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // this version is just for reference points.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating the daylighting and glare factors
+    Real64 constexpr tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating the daylighting and glare factors
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ISky;   // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
@@ -4018,7 +4018,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // this version is just for map points.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
+    Real64 constexpr tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
     // the daylighting and glare factors
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5034,7 +5034,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
         }
 
-        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5));
+        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
         daylightControl.LightControlType = static_cast<DataDaylighting::LtgCtrlType>(typeNum);
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Invalid) {
             ShowWarningError(state,

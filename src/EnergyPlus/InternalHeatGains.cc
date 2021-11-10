@@ -128,16 +128,16 @@ namespace InternalHeatGains {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const ITEClassNone(0);
-    int const ITEClassA1(1);
-    int const ITEClassA2(2);
-    int const ITEClassA3(3);
-    int const ITEClassA4(4);
-    int const ITEClassB(5);
-    int const ITEClassC(6);
-    int const ITEInletAdjustedSupply(0);
-    int const ITEInletZoneAirNode(1);
-    int const ITEInletRoomAirModel(2);
+    int constexpr ITEClassNone(0);
+    int constexpr ITEClassA1(1);
+    int constexpr ITEClassA2(2);
+    int constexpr ITEClassA3(3);
+    int constexpr ITEClassA4(4);
+    int constexpr ITEClassB(5);
+    int constexpr ITEClassC(6);
+    int constexpr ITEInletAdjustedSupply(0);
+    int constexpr ITEInletZoneAirNode(1);
+    int constexpr ITEInletRoomAirModel(2);
 
     void ManageInternalHeatGains(EnergyPlusData &state,
                                  Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
@@ -586,7 +586,7 @@ namespace InternalHeatGains {
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
                         // comfort model.
-                        int const NumFirstTCModel = 14;
+                        int constexpr NumFirstTCModel = 14;
                         if (NumAlpha < NumFirstTCModel) {
                             bool NoTCModelSelectedWithSchedules = false;
                             NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(state.dataIPShortCut->lAlphaFieldBlanks(9),

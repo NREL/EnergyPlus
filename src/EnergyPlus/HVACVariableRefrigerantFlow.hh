@@ -134,7 +134,7 @@ namespace HVACVariableRefrigerantFlow {
         std::string Name;                       // Name of the VRF Terminal Unit
         int VRFSystemTypeNum;                   // integer equivalent of system type
         iAlgorithmType VRFAlgorithmTypeNum;     // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
-        int VRFPlantTypeOfNum;                  // integer equivalent of index to DataPlant type
+        DataPlant::PlantEquipmentType VRFType;  // integer equivalent of index to DataPlant type
         int SourceLoopNum;                      // plant data for water-cooled only
         int SourceLoopSideNum;                  // plant data for water-cooled only
         int SourceBranchNum;                    // plant data for water-cooled only
@@ -370,20 +370,20 @@ namespace HVACVariableRefrigerantFlow {
 
         // Default Constructor
         VRFCondenserEquipment()
-            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(iAlgorithmType::Unassigned), VRFPlantTypeOfNum(0), SourceLoopNum(0), SourceLoopSideNum(0),
-              SourceBranchNum(0), SourceCompNum(0), WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0), QCondenser(0.0), QCondEnergy(0.0),
-              CondenserSideOutletTemp(0.0), SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0), CoolingCombinationRatio(1.0),
-              VRFCondPLR(0.0), VRFCondRTF(0.0), VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0), OperatingCoolingCOP(0.0),
-              RatedCoolingPower(0.0), HeatingCapacity(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false), TotalHeatingCapacity(0.0),
-              HeatingCombinationRatio(1.0), HeatingCOP(0.0), OperatingHeatingCOP(0.0), RatedHeatingPower(0.0), MinOATCooling(0.0), MaxOATCooling(0.0),
-              MinOATHeating(0.0), MaxOATHeating(0.0), CoolCapFT(0), CoolEIRFT(0), HeatCapFT(0), HeatEIRFT(0), CoolBoundaryCurvePtr(0),
-              HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0), CoolEIRFTHi(0), HeatCapFTHi(0),
-              HeatEIRFTHi(0), EIRHeatBoundaryCurvePtr(0), HeatEIRFPLR1(0), HeatEIRFPLR2(0), CoolPLFFPLR(0), HeatPLFFPLR(0),
-              HeatingPerformanceOATType(0), MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0), ThermostatPriority(iThermostatCtrlType::Unassigned),
-              SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0),
-              EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0), EquivPipeLngthHeat(0.0),
-              PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0),
-              DefrostFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Unassigned),
+            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(iAlgorithmType::Unassigned), VRFType(DataPlant::PlantEquipmentType::Invalid), SourceLoopNum(0),
+              SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0), WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0),
+              QCondenser(0.0), QCondEnergy(0.0), CondenserSideOutletTemp(0.0), SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0),
+              CoolingCombinationRatio(1.0), VRFCondPLR(0.0), VRFCondRTF(0.0), VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0),
+              OperatingCoolingCOP(0.0), RatedCoolingPower(0.0), HeatingCapacity(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false),
+              TotalHeatingCapacity(0.0), HeatingCombinationRatio(1.0), HeatingCOP(0.0), OperatingHeatingCOP(0.0), RatedHeatingPower(0.0),
+              MinOATCooling(0.0), MaxOATCooling(0.0), MinOATHeating(0.0), MaxOATHeating(0.0), CoolCapFT(0), CoolEIRFT(0), HeatCapFT(0), HeatEIRFT(0),
+              CoolBoundaryCurvePtr(0), HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0),
+              CoolEIRFTHi(0), HeatCapFTHi(0), HeatEIRFTHi(0), EIRHeatBoundaryCurvePtr(0), HeatEIRFPLR1(0), HeatEIRFPLR2(0), CoolPLFFPLR(0),
+              HeatPLFFPLR(0), HeatingPerformanceOATType(0), MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0),
+              ThermostatPriority(iThermostatCtrlType::Unassigned), SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0),
+              PCFLengthCoolPtr(0), PCFHeightCool(0.0), EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0),
+              EquivPipeLngthHeat(0.0), PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0),
+              MaxOATCCHeater(0.0), DefrostEIRPtr(0), DefrostFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Unassigned),
               DefrostControl(StandardRatings::HPdefrostControl::Unassigned), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
               MaxOATDefrost(0.0), CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), CondenserNodeNum(0),
               SkipCondenserNodeNumCheck(false), CondenserOutletNodeNum(0), WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0),

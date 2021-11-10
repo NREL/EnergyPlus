@@ -1118,13 +1118,13 @@ namespace AirflowNetwork {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-        Real64 const Rough(0.0001);
-        Real64 const InitLamCoef(128.0);
-        Real64 const LamDynCoef(64.0);
-        Real64 const LamFriCoef(0.0001);
-        Real64 const TurDynCoef(0.0001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr Rough(0.0001);
+        Real64 constexpr InitLamCoef(128.0);
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.0001);
+        Real64 constexpr TurDynCoef(0.0001);
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1920,7 +1920,7 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const PSea(101325.0);
+        Real64 constexpr PSea(101325.0);
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

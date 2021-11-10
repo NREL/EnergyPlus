@@ -539,8 +539,8 @@ namespace CTElectricGenerator {
         // curve fit of performance data.  This model was originally
         // developed by Dale Herron for the BLAST program
 
-        Real64 const exhaustCp(1.047); // Exhaust Gas Specific Heat (J/kg-K)
-        Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
+        Real64 constexpr exhaustCp(1.047); // Exhaust Gas Specific Heat (J/kg-K)
+        Real64 constexpr KJtoJ(1000.0);    // convert Kjoules to joules
         static constexpr std::string_view RoutineName("CalcCTGeneratorModel");
 
         // min allowed operating frac full load
@@ -828,7 +828,7 @@ namespace CTElectricGenerator {
                 errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_Generator_CTurbine,
+                                                        DataPlant::PlantEquipmentType::Generator_CTurbine,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         this->HRBranchNum,

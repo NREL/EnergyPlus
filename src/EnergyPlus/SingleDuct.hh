@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -121,20 +122,20 @@ namespace SingleDuct {
     struct SingleDuctAirTerminal
     {
         // Members
-        int SysNum;                     // index to single duct air terminal unit
-        std::string SysName;            // Name of the Sys
-        std::string SysType;            // Type of Sys ie. VAV, Mixing, Inducing, etc.
-        enum SysType SysType_Num;       // Numeric Equivalent for System type
-        std::string Schedule;           // Sys Operation Schedule
-        int SchedPtr;                   // Pointer to the correct schedule
-        std::string ReheatComp;         // Type of the Reheat Coil Object
-        HeatingCoilType ReheatComp_Num; // Numeric Equivalent in this module for Coil type
-        int ReheatComp_Index;           // Returned Index number from other routines
-        std::string ReheatName;         // name of reheat coil
-        int ReheatComp_PlantType;       // typeOf_ number for plant type of heating coil
-        std::string FanType;            // Type of the Fan Object
-        int Fan_Num;                    // Numeric Equivalent in this module for fan type
-        int Fan_Index;                  // Returned Index number from other routines
+        int SysNum;                                         // index to single duct air terminal unit
+        std::string SysName;                                // Name of the Sys
+        std::string SysType;                                // Type of Sys ie. VAV, Mixing, Inducing, etc.
+        enum SysType SysType_Num;                           // Numeric Equivalent for System type
+        std::string Schedule;                               // Sys Operation Schedule
+        int SchedPtr;                                       // Pointer to the correct schedule
+        std::string ReheatComp;                             // Type of the Reheat Coil Object
+        HeatingCoilType ReheatComp_Num;                     // Numeric Equivalent in this module for Coil type
+        int ReheatComp_Index;                               // Returned Index number from other routines
+        std::string ReheatName;                             // name of reheat coil
+        DataPlant::PlantEquipmentType ReheatComp_PlantType; // typeOf_ number for plant type of heating coil
+        std::string FanType;                                // Type of the Fan Object
+        int Fan_Num;                                        // Numeric Equivalent in this module for fan type
+        int Fan_Index;                                      // Returned Index number from other routines
         int ControlCompTypeNum;
         int CompErrIndex;
         std::string FanName;                  // name of fan
@@ -219,15 +220,15 @@ namespace SingleDuct {
         // Default Constructor
         SingleDuctAirTerminal()
             : SysNum(-1), SysType_Num(SysType::Unknown), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
-              ReheatComp_PlantType(0), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlowRate(0.0),
-              AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0), ZoneMinAirFracMethod(MinFlowFraction::Constant),
-              ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0), ZoneFixedMinAir(0.0), ZoneMinAirFracSchPtr(0),
-              ConstantMinAirFracSetByUser(false), FixedMinAirSetByUser(false), DesignMinAirFrac(0.0), DesignFixedMinAir(0.0), InletNodeNum(0),
-              OutletNodeNum(0), ReheatControlNode(0), ReheatCoilOutletNode(0), ReheatCoilMaxCapacity(0.0), ReheatAirOutletNode(0),
-              MaxReheatWaterVolFlow(0.0), MaxReheatSteamVolFlow(0.0), MaxReheatWaterFlow(0.0), MaxReheatSteamFlow(0.0), MinReheatWaterVolFlow(0.0),
-              MinReheatSteamVolFlow(0.0), MinReheatWaterFlow(0.0), MinReheatSteamFlow(0.0), ControllerOffset(0.0), MaxReheatTemp(0.0),
-              MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingActionNotUsed), DamperPosition(0.0), ADUNum(0), FluidIndex(0),
-              ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
+              ReheatComp_PlantType(DataPlant::PlantEquipmentType::Invalid), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0),
+              MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0),
+              ZoneMinAirFracMethod(MinFlowFraction::Constant), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),
+              ZoneFixedMinAir(0.0), ZoneMinAirFracSchPtr(0), ConstantMinAirFracSetByUser(false), FixedMinAirSetByUser(false), DesignMinAirFrac(0.0),
+              DesignFixedMinAir(0.0), InletNodeNum(0), OutletNodeNum(0), ReheatControlNode(0), ReheatCoilOutletNode(0), ReheatCoilMaxCapacity(0.0),
+              ReheatAirOutletNode(0), MaxReheatWaterVolFlow(0.0), MaxReheatSteamVolFlow(0.0), MaxReheatWaterFlow(0.0), MaxReheatSteamFlow(0.0),
+              MinReheatWaterVolFlow(0.0), MinReheatSteamVolFlow(0.0), MinReheatWaterFlow(0.0), MinReheatSteamFlow(0.0), ControllerOffset(0.0),
+              MaxReheatTemp(0.0), MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingActionNotUsed), DamperPosition(0.0), ADUNum(0),
+              FluidIndex(0), ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),

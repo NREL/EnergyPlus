@@ -126,29 +126,29 @@ namespace SolarCollectors {
     struct CollectorData : PlantComponent
     {
         // Members
-        std::string Name;         // Name of solar collector
-        std::string BCType;       // Boundary condition Type
-        std::string OSCMName;     // OtherSideConditionsModel
-        int VentCavIndex;         // index of ventilated cavity object
-        TankTypeEnum ICSType_Num; // ICS collector type number
-        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant
-        int WLoopNum;             // Water plant loop index number
-        int WLoopSideNum;         // Water plant loop side index
-        int WLoopBranchNum;       // Water plant loop branch index
-        int WLoopCompNum;         // Water plant loop component index
-        bool Init;                // Flag for initialization:  TRUE means do the init
-        bool InitSizing;          // Flag for initialization of plant sizing
-        int Parameters;           // Parameters object number
-        int Surface;              // Surface object number
-        int InletNode;            // Inlet node
-        Real64 InletTemp;         // Inlet temperature from plant (C)
-        int OutletNode;           // Outlet node
-        Real64 OutletTemp;        // Outlet temperature or stagnation temperature in the collector (C)
-        Real64 MassFlowRate;      // Mass flow rate through the collector (kg/s)
-        Real64 MassFlowRateMax;   // Maximum mass flow rate through the collector (kg/s)
-        Real64 VolFlowRateMax;    // Maximum volumetric flow rate through the collector (m3/s)
-        int ErrIndex;             // Error index for recurring error
-        int IterErrIndex;         // Error index for recurring error (iteration - did not converge)
+        std::string Name;                   // Name of solar collector
+        std::string BCType;                 // Boundary condition Type
+        std::string OSCMName;               // OtherSideConditionsModel
+        int VentCavIndex;                   // index of ventilated cavity object
+        TankTypeEnum ICSType_Num;           // ICS collector type number
+        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
+        int WLoopNum;                       // Water plant loop index number
+        int WLoopSideNum;                   // Water plant loop side index
+        int WLoopBranchNum;                 // Water plant loop branch index
+        int WLoopCompNum;                   // Water plant loop component index
+        bool Init;                          // Flag for initialization:  TRUE means do the init
+        bool InitSizing;                    // Flag for initialization of plant sizing
+        int Parameters;                     // Parameters object number
+        int Surface;                        // Surface object number
+        int InletNode;                      // Inlet node
+        Real64 InletTemp;                   // Inlet temperature from plant (C)
+        int OutletNode;                     // Outlet node
+        Real64 OutletTemp;                  // Outlet temperature or stagnation temperature in the collector (C)
+        Real64 MassFlowRate;                // Mass flow rate through the collector (kg/s)
+        Real64 MassFlowRateMax;             // Maximum mass flow rate through the collector (kg/s)
+        Real64 VolFlowRateMax;              // Maximum volumetric flow rate through the collector (m3/s)
+        int ErrIndex;                       // Error index for recurring error
+        int IterErrIndex;                   // Error index for recurring error (iteration - did not converge)
         // Report variables
         Real64 IncidentAngleModifier; // Net incident angle modifier
         Real64 Efficiency;            // Thermal efficiency of solar energy conversion
@@ -209,14 +209,15 @@ namespace SolarCollectors {
 
         // Default Constructor
         CollectorData()
-            : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0),
-              WLoopCompNum(0), Init(true), InitSizing(true), Parameters(0), Surface(0), InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0),
-              MassFlowRate(0.0), MassFlowRateMax(0.0), VolFlowRateMax(0.0), ErrIndex(0), IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0),
-              Power(0.0), HeatGain(0.0), HeatLoss(0.0), Energy(0.0), HeatRate(0.0), HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0),
-              HeatGainRate(0.0), HeatGainEnergy(0.0), HeatLossRate(0.0), HeatLossEnergy(0.0), SkinHeatLossRate(0.0), CollHeatLossEnergy(0.0),
-              TauAlpha(0.0), UTopLoss(0.0), TempOfWater(0.0), TempOfAbsPlate(0.0), TempOfInnerCover(0.0), TempOfOuterCover(0.0), TauAlphaNormal(0.0),
-              TauAlphaSkyDiffuse(0.0), TauAlphaGndDiffuse(0.0), TauAlphaBeam(0.0), CoversAbsSkyDiffuse(2, 0.0), CoversAbsGndDiffuse(2, 0.0),
-              CoverAbs(2, 0.0), TimeElapsed(0.0), UbLoss(0.0), UsLoss(0.0), AreaRatio(0.0), RefSkyDiffInnerCover(0.0), RefGrnDiffInnerCover(0.0),
+            : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), Type(DataPlant::PlantEquipmentType::Invalid), WLoopNum(0),
+              WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), Parameters(0), Surface(0), InletNode(0),
+              InletTemp(0.0), OutletNode(0), OutletTemp(0.0), MassFlowRate(0.0), MassFlowRateMax(0.0), VolFlowRateMax(0.0), ErrIndex(0),
+              IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0), Power(0.0), HeatGain(0.0), HeatLoss(0.0), Energy(0.0), HeatRate(0.0),
+              HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0), HeatGainRate(0.0), HeatGainEnergy(0.0), HeatLossRate(0.0),
+              HeatLossEnergy(0.0), SkinHeatLossRate(0.0), CollHeatLossEnergy(0.0), TauAlpha(0.0), UTopLoss(0.0), TempOfWater(0.0),
+              TempOfAbsPlate(0.0), TempOfInnerCover(0.0), TempOfOuterCover(0.0), TauAlphaNormal(0.0), TauAlphaSkyDiffuse(0.0),
+              TauAlphaGndDiffuse(0.0), TauAlphaBeam(0.0), CoversAbsSkyDiffuse(2, 0.0), CoversAbsGndDiffuse(2, 0.0), CoverAbs(2, 0.0),
+              TimeElapsed(0.0), UbLoss(0.0), UsLoss(0.0), AreaRatio(0.0), RefSkyDiffInnerCover(0.0), RefGrnDiffInnerCover(0.0),
               RefDiffInnerCover(0.0), SavedTempOfWater(0.0), SavedTempOfAbsPlate(0.0), SavedTempOfInnerCover(0.0), SavedTempOfOuterCover(0.0),
               SavedTempCollectorOSCM(0.0), Length(1.0), TiltR2V(0.0), Tilt(0.0), CosTilt(0.0), SinTilt(0.0), SideArea(0.0), Area(0.0), Volume(0.0),
               OSCM_ON(false), InitICS(false), SetLoopIndexFlag(true), SetDiffRadFlag(true)

@@ -66,10 +66,10 @@ namespace WaterToAirHeatPump {
     struct WatertoAirHPEquipConditions
     {
         // Members
-        std::string Name;             // Name of the Water to Air Heat pump
-        std::string WatertoAirHPType; // Type of WatertoAirHP ie. Heating or Cooling
-        int WAHPPlantTypeOfNum;       // type of component in plant
-        std::string Refrigerant;      // Refrigerant name
+        std::string Name;                       // Name of the Water to Air Heat pump
+        std::string WatertoAirHPType;           // Type of WatertoAirHP ie. Heating or Cooling
+        DataPlant::PlantEquipmentType WAHPType; // type of component in plant
+        std::string Refrigerant;                // Refrigerant name
         bool SimFlag;
         Real64 InletAirMassFlowRate;    // Inlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
         Real64 OutletAirMassFlowRate;   // Outlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
@@ -141,17 +141,17 @@ namespace WaterToAirHeatPump {
 
         // Default Constructor
         WatertoAirHPEquipConditions()
-            : WAHPPlantTypeOfNum(0), SimFlag(false), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0), InletAirDBTemp(0.0), InletAirHumRat(0.0),
-              OutletAirDBTemp(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0),
-              InletWaterMassFlowRate(0.0), OutletWaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0), DesignWaterVolFlowRate(0.0),
-              InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0), Power(0.0), Energy(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0),
-              EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), RunFrac(0.0), PartLoadRatio(0.0), HeatingCapacity(0.0), CoolingCapacity(0.0),
-              QLoadTotal(0.0), EnergyLoadTotal(0.0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0),
-              FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0), CompPistonDisp(0.0),
-              CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0), RefVolFlowRate(0.0),
-              VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0), LowPressCutoff(0.0),
-              CompressorType(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LowPressClgError(0),
-              HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0)
+            : WAHPType(DataPlant::PlantEquipmentType::Invalid), SimFlag(false), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
+              InletAirDBTemp(0.0), InletAirHumRat(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0),
+              InletWaterTemp(0.0), OutletWaterTemp(0.0), InletWaterMassFlowRate(0.0), OutletWaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0),
+              DesignWaterVolFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0), Power(0.0), Energy(0.0), QSensible(0.0), QLatent(0.0),
+              QSource(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), RunFrac(0.0), PartLoadRatio(0.0), HeatingCapacity(0.0),
+              CoolingCapacity(0.0), QLoadTotal(0.0), EnergyLoadTotal(0.0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0),
+              HPTimeConstant(0.0), FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0),
+              CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
+              RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
+              LowPressCutoff(0.0), CompressorType(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0)
         {
         }
     };

@@ -112,6 +112,10 @@ namespace SurfaceGeometry {
 
     static std::string const BlankString;
 
+    int constexpr UnenteredAdjacentZoneSurface = -998; // allows users to enter one zone surface ("Zone")
+                                                       // referencing another in adjacent zone
+    int constexpr UnreconciledZoneSurface = -999;      // interim value between entering surfaces ("Surface") and reconciling
+
     void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces)
     {
         state.dataSurface->SurfWinA.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
@@ -1393,7 +1397,7 @@ namespace SurfaceGeometry {
         // Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) CurNewSurf = FirstTotalSurfaces;
         for (int SurfNum = 1; SurfNum <= FirstTotalSurfaces; ++SurfNum) {
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond != state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface) continue;
+            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond != UnenteredAdjacentZoneSurface) continue;
             // Need to add surface
             ++CurNewSurf;
             // Debug    write(outputfiledebug,*) ' adding surface=',curnewsurf
@@ -1474,8 +1478,8 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Name = "iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
             // Debug   write(outputfiledebug,*) ' new surf name=',TRIM(SurfaceTmp(CurNewSurf)%Name)
             // Debug   write(outputfiledebug,*) ' new surf in zone=',TRIM(surfacetmp(curnewsurf)%zoneName)
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCond = state.dataSurfaceGeometry->UnreconciledZoneSurface;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCond = UnreconciledZoneSurface;
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
             state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Name;
             if (state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class == SurfaceClass::Roof ||
@@ -1855,7 +1859,7 @@ namespace SurfaceGeometry {
             //   If other surface, match it up
             //  Both interzone and "internal" surfaces have this pointer set
             //  Internal surfaces point to themselves, Interzone to another
-            if (state.dataSurface->Surface(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond == UnreconciledZoneSurface) {
                 if (not_blank(state.dataSurface->Surface(SurfNum).ExtBoundCondName)) {
                     if (state.dataSurface->Surface(SurfNum).ExtBoundCondName == state.dataSurface->Surface(SurfNum).Name) {
                         Found = SurfNum;
@@ -1867,7 +1871,7 @@ namespace SurfaceGeometry {
                         state.dataSurface->Surface(SurfNum).ExtBoundCond = Found;
                         // Check that matching surface is also "OtherZoneSurface"
                         if (state.dataSurface->Surface(Found).ExtBoundCond <= 0 &&
-                            state.dataSurface->Surface(Found).ExtBoundCond != state.dataSurfaceGeometry->UnreconciledZoneSurface) {
+                            state.dataSurface->Surface(Found).ExtBoundCond != UnreconciledZoneSurface) {
                             ShowSevereError(state, std::string{RoutineName} + "Potential \"OtherZoneSurface\" is not matched correctly:");
 
                             ShowContinueError(state,
@@ -2909,8 +2913,8 @@ namespace SurfaceGeometry {
     {
         bool sameSurfNormal(false); // True if surface has the same surface normal within tolerance
         bool baseSurfHoriz(false);  // True if base surface is near horizontal
-        Real64 const warningTolerance(30.0);
-        Real64 const errorTolerance(90.0);
+        Real64 constexpr warningTolerance(30.0);
+        Real64 constexpr errorTolerance(90.0);
 
         surfaceError = false;
 
@@ -3883,7 +3887,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = ExternalEnvironment;
 
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "Adiabatic")) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
 
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "Ground")) {
@@ -3967,7 +3971,7 @@ namespace SurfaceGeometry {
                     // this will be found on the second pass through the surface input
                     // for flagging, set the value to UnreconciledZoneSurface
                     // name (ExtBoundCondName) will be validated later.
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
                     if (state.dataIPShortCut->lAlphaFieldBlanks(ArgPointer + 1)) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
                         ShowSevereError(state,
@@ -3980,7 +3984,7 @@ namespace SurfaceGeometry {
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "Zone")) {
                     // This is the code for an unmatched "other surface"
                     // will be set up later.
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnenteredAdjacentZoneSurface;
                     // check OutsideFaceEnvironment for legal zone
                     Found = UtilityRoutines::FindItemInList(
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
@@ -4229,7 +4233,7 @@ namespace SurfaceGeometry {
         // Check number of Vertex between base surface and Outside Boundary surface
         int ExtSurfNum;
         for (int i = 1; i <= SurfNum; i++) {
-            if (state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface &&
+            if (state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface &&
                 state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCondName != "") {
                 ExtSurfNum =
                     UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCondName, state.dataSurfaceGeometry->SurfaceTmp);
@@ -4325,13 +4329,13 @@ namespace SurfaceGeometry {
                 ItemsToGet = TotRectIntWalls;
                 GettingIZSurfaces = false;
                 OtherSurfaceField = 0;
-                ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                ExtBoundCondition = UnreconciledZoneSurface;
                 ClassItem = 1;
             } else if (Item == 3) {
                 ItemsToGet = TotRectIZWalls;
                 GettingIZSurfaces = true;
                 OtherSurfaceField = 5;
-                ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                ExtBoundCondition = UnreconciledZoneSurface;
                 ClassItem = 1;
             } else if (Item == 4) {
                 ItemsToGet = TotRectUGWalls;
@@ -4349,13 +4353,13 @@ namespace SurfaceGeometry {
                 ItemsToGet = TotRectCeilings;
                 GettingIZSurfaces = false;
                 OtherSurfaceField = 0;
-                ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                ExtBoundCondition = UnreconciledZoneSurface;
                 ClassItem = 3;
             } else if (Item == 7) {
                 ItemsToGet = TotRectIZCeilings;
                 GettingIZSurfaces = false;
                 OtherSurfaceField = 5;
-                ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                ExtBoundCondition = UnreconciledZoneSurface;
                 ClassItem = 3;
             } else if (Item == 8) {
                 ItemsToGet = TotRectGCFloors;
@@ -4367,13 +4371,13 @@ namespace SurfaceGeometry {
                 ItemsToGet = TotRectIntFloors;
                 GettingIZSurfaces = false;
                 OtherSurfaceField = 0;
-                ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                ExtBoundCondition = UnreconciledZoneSurface;
                 ClassItem = 2;
             } else { // IF (Item == 10) THEN
                 ItemsToGet = TotRectIZFloors;
                 GettingIZSurfaces = true;
                 OtherSurfaceField = 5;
-                ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                ExtBoundCondition = UnreconciledZoneSurface;
                 ClassItem = 2;
             }
 
@@ -4502,7 +4506,7 @@ namespace SurfaceGeometry {
                     //                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtEcoRoof =
                     //                            state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
-                } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
+                } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) {
                     if (GettingIZSurfaces) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataIPShortCut->cAlphaArgs(OtherSurfaceField);
                         Found = UtilityRoutines::FindItemInList(
@@ -4510,7 +4514,7 @@ namespace SurfaceGeometry {
                         // see if match to zone, then it's an unentered other surface, else reconciled later
                         if (Found > 0) {
                             ++NeedToAddSurfaces;
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface;
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnenteredAdjacentZoneSurface;
                         }
                     } else {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
@@ -5037,7 +5041,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = state.dataSurfaceGeometry->SurfaceTmp(Found).Zone;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = state.dataSurfaceGeometry->SurfaceTmp(Found).ZoneName;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OSCPtr = state.dataSurfaceGeometry->SurfaceTmp(Found).OSCPtr;
-                if (state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface &&
+                if (state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond == UnreconciledZoneSurface &&
                     state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCondName ==
                         state.dataSurfaceGeometry->SurfaceTmp(Found).Name) { // Adiabatic surface, no windows or doors allowed
                     ShowSevereError(state,
@@ -5072,8 +5076,7 @@ namespace SurfaceGeometry {
                 }
             }
 
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                state.dataSurfaceGeometry->UnreconciledZoneSurface) { // "Surface" Base Surface
+            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) { // "Surface" Base Surface
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataIPShortCut->cAlphaArgs(5);
                 } else {
@@ -5089,8 +5092,7 @@ namespace SurfaceGeometry {
                 }
             }
 
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface) { // "Zone" - unmatched interior surface
+            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnenteredAdjacentZoneSurface) { // "Zone" - unmatched interior surface
                 ++NeedToAddSurfaces;
                 // ignoring window5datafiles for now -- will need to add.
             }
@@ -5456,7 +5458,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                     continue;
                 }
-                if (state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface &&
+                if (state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond == UnreconciledZoneSurface &&
                     state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCondName ==
                         state.dataSurfaceGeometry->SurfaceTmp(Found).Name) { // Adiabatic surface, no windows or doors allowed
                     ShowSevereError(state,
@@ -5468,8 +5470,7 @@ namespace SurfaceGeometry {
                                       "Interzone surfaces for transmission to result.");
                 }
 
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                    state.dataSurfaceGeometry->UnreconciledZoneSurface) { // "Surface" Base Surface
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) { // "Surface" Base Surface
                     if (!GettingIZSurfaces) {
                         ShowSevereError(
                             state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid use of object");
@@ -5483,14 +5484,12 @@ namespace SurfaceGeometry {
                     }
                 }
 
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                    state.dataSurfaceGeometry->UnreconciledZoneSurface) { // "Surface" Base Surface
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) { // "Surface" Base Surface
                     if (GettingIZSurfaces) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataIPShortCut->cAlphaArgs(OtherSurfaceField);
                         IZFound = UtilityRoutines::FindItemInList(
                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
-                        if (IZFound > 0)
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface;
+                        if (IZFound > 0) state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnenteredAdjacentZoneSurface;
                     } else { // Interior Window
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
                     }
@@ -5498,7 +5497,7 @@ namespace SurfaceGeometry {
 
                 // This is the parent's property:
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                    state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface) { // OtherZone - unmatched interior surface
+                    UnenteredAdjacentZoneSurface) { // OtherZone - unmatched interior surface
                     if (GettingIZSurfaces) {
                         ++NeedToAddSubSurfaces;
                     } else { // Interior Window
@@ -5515,14 +5514,13 @@ namespace SurfaceGeometry {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(OtherSurfaceField)) {
                         // blank -- set it up for unentered adjacent zone
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                            state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface) { // already set but need Zone
+                            UnenteredAdjacentZoneSurface) { // already set but need Zone
                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName =
                                 state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCondName; // base surface has it
-                        } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond ==
-                                   state.dataSurfaceGeometry->UnreconciledZoneSurface) {
+                        } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) {
                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName =
                                 state.dataSurfaceGeometry->SurfaceTmp(Found).ZoneName; // base surface has it
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface;
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnenteredAdjacentZoneSurface;
                         } else { // not correct boundary condition for interzone subsurface
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
@@ -6399,7 +6397,7 @@ namespace SurfaceGeometry {
                                     state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
                 ErrorsFound = true;
             }
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface) {
+            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnenteredAdjacentZoneSurface) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
@@ -6408,7 +6406,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond =
                     ExternalEnvironment; // reset so program won't crash during "add surfaces"
             }
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
+            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
@@ -6617,7 +6615,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                     continue;
                 }
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface) {
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnenteredAdjacentZoneSurface) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                         state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
@@ -6626,7 +6624,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond =
                         ExternalEnvironment; // reset so program won't crash during "add surfaces"
                 }
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == UnreconciledZoneSurface) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                         state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
@@ -7173,7 +7171,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = SurfNum;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnreconciledZoneSurface;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
                 }
             }
         }
@@ -9447,7 +9445,7 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        int const NumValidShadingTypes(9);
+        int constexpr NumValidShadingTypes(9);
         static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
                                                        {
                                                            "SHADEOFF",          // 1
@@ -9461,7 +9459,7 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int const NumValidWindowShadingControlTypes(21);
+        int constexpr NumValidWindowShadingControlTypes(21);
         static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
                                                                     {"ALWAYSON",
                                                                      "ALWAYSOFF",
@@ -15440,7 +15438,7 @@ namespace SurfaceGeometry {
                 (revMatLay.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
-                Real64 const SmallDiff = 0.0001;
+                Real64 constexpr SmallDiff = 0.0001;
                 if ((thisMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass) &&
                     (revMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed

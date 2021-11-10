@@ -551,10 +551,10 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &st
     Real64 latentHeatVaporization;
     Real64 evapotransHeatLoss_MJhrmin;
 
-    Real64 const rho_water(998.0);      // [kg/m3]
-    Real64 const airSpecificHeat(1003); // '[J/kg-K]
+    Real64 constexpr rho_water(998.0);      // [kg/m3]
+    Real64 constexpr airSpecificHeat(1003); // '[J/kg-K]
     // evapotranspiration parameters
-    Real64 const absor_Corrected(0.77);
+    Real64 constexpr absor_Corrected(0.77);
     Real64 const convert_Wm2_To_MJhrmin(3600.0 / 1000000.0);
     Real64 const convert_MJhrmin_To_Wm2(1.0 / convert_Wm2_To_MJhrmin);
 
@@ -763,7 +763,7 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
-    Real64 const finalTempConvergenceCriteria = 0.05;
+    Real64 constexpr finalTempConvergenceCriteria = 0.05;
 
     if (state.dataGlobal->FDnumIterYears == maxYearsToIterate) return converged;
 
@@ -798,7 +798,7 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
-    Real64 const iterationTempConvergenceCriteria = 0.00001;
+    Real64 constexpr iterationTempConvergenceCriteria = 0.00001;
 
     for (int cell = 1; cell <= totalNumCells; ++cell) {
 

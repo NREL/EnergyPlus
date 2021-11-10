@@ -877,10 +877,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int FaultIndex = 1;
         EXPECT_EQ("AHU HW HEATING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
         EXPECT_NEAR(6.64, state->dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.0001);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_TRUE(
+            compare_enums(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilType));
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -905,10 +906,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int CoilNum = 2;
         int FaultIndex = 2;
         EXPECT_EQ("AHU CHW COOLING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilType));
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -938,7 +939,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     {
         int CoilNum = 3;
         EXPECT_EQ("AHU CHW COIL WITH NO FAULT", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_FALSE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(0, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);

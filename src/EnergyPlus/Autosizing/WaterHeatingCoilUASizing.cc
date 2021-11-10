@@ -60,9 +60,9 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
         return 0.0;
     }
     Array1D<Real64> Par(4);
-    Real64 const Acc(0.0001); // Accuracy of result
-    int const MaxIte(500);    // Maximum number of iterations
-    int SolFla = 0;           // Flag of solver
+    Real64 constexpr Acc(0.0001); // Accuracy of result
+    int constexpr MaxIte(500);    // Maximum number of iterations
+    int SolFla = 0;               // Flag of solver
 
     this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {

@@ -4417,7 +4417,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
     using WindowAC::GetWindowACZoneInletAirNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallLoad(0.1); // (W)
+    Real64 constexpr SmallLoad(0.1); // (W)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CtrlZoneNum;             // ZONE counter
@@ -4516,8 +4516,8 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
         ZoneVolume = state.dataHeatBal->Zone(ActualZoneNum).Volume * state.dataHeatBal->Zone(ActualZoneNum).Multiplier *
                      state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier; // CR 7170
 
-        bool const UseOccSchFlag = true;
-        bool const UseMinOASchFlag = true;
+        bool constexpr UseOccSchFlag = true;
+        bool constexpr UseMinOASchFlag = true;
         state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataSizing::calcDesignSpecificationOutdoorAir(
             state, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
         if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
@@ -5184,7 +5184,7 @@ void MatchPlantSys(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const EnergyTrans(1);
+    int constexpr EnergyTrans(1);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

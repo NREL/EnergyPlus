@@ -76,7 +76,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_TestGetMeteredVariables)
     {
-        int const NumVariables = 2;
+        int constexpr NumVariables = 2;
         Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
         Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)

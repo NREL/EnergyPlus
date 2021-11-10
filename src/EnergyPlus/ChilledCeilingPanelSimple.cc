@@ -121,9 +121,6 @@ void SimCoolingPanel(EnergyPlusData &state,
     // REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
 
-    // Using/Aliasing
-    using DataPlant::TypeOf_CoolingPanel_Simple;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CoolingPanelNum; // Index of unit in baseboard array
     Real64 QZnReq;       // Zone load not yet satisfied
@@ -187,7 +184,7 @@ void SimCoolingPanel(EnergyPlusData &state,
         {
             auto const SELECT_CASE_var(ThisCP.EquipType);
 
-            if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                 ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
             } else {
                 ShowSevereError(state,
@@ -227,21 +224,20 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
     using DataLoopNode::ObjectIsNotParent;
-    using DataPlant::TypeOf_CoolingPanel_Simple;
     using NodeInputManager::GetOnlySingleNode;
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetCoolingPanelInput:");
-    Real64 const MaxFraction(1.0);
-    Real64 const MinFraction(0.0);
-    Real64 const MaxWaterTempAvg(30.0);       // Maximum limit of average water temperature in degree C
-    Real64 const MinWaterTempAvg(0.0);        // Minimum limit of average water temperature in degree C
-    Real64 const MaxWaterFlowRate(10.0);      // Maximum limit of water volume flow rate in m3/s
-    Real64 const MinWaterFlowRate(0.00001);   // Minimum limit of water volume flow rate in m3/s
-    Real64 const WaterMassFlowDefault(0.063); // Default water mass flow rate in kg/s
-    int const MinDistribSurfaces(1);          // Minimum number of surfaces that a baseboard heater can radiate to
-    Real64 const MinThrottlingRange(0.5);     // Smallest throttling range allowed in degrees Celsius
+    Real64 constexpr MaxFraction(1.0);
+    Real64 constexpr MinFraction(0.0);
+    Real64 constexpr MaxWaterTempAvg(30.0);       // Maximum limit of average water temperature in degree C
+    Real64 constexpr MinWaterTempAvg(0.0);        // Minimum limit of average water temperature in degree C
+    Real64 constexpr MaxWaterFlowRate(10.0);      // Maximum limit of water volume flow rate in m3/s
+    Real64 constexpr MinWaterFlowRate(0.00001);   // Minimum limit of water volume flow rate in m3/s
+    Real64 constexpr WaterMassFlowDefault(0.063); // Default water mass flow rate in kg/s
+    int constexpr MinDistribSurfaces(1);          // Minimum number of surfaces that a baseboard heater can radiate to
+    Real64 constexpr MinThrottlingRange(0.5);     // Smallest throttling range allowed in degrees Celsius
     static constexpr std::string_view MeanAirTemperature("MeanAirTemperature");
     static constexpr std::string_view MeanRadiantTemperature("MeanRadiantTemperature");
     static constexpr std::string_view OperativeTemperature("OperativeTemperature");
@@ -305,8 +301,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         }
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-        ThisCP.EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this simple cooling panel
-        ThisCP.EquipType = TypeOf_CoolingPanel_Simple;        //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+        ThisCP.EquipID = state.dataIPShortCut->cAlphaArgs(1);                  // Name of this simple cooling panel
+        ThisCP.EquipType = DataPlant::PlantEquipmentType::CoolingPanel_Simple; //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 
         // Get schedule
         ThisCP.Schedule = state.dataIPShortCut->cAlphaArgs(2);
@@ -1262,9 +1258,9 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
-    int const Maxiter(20);        // Maximum number of iterations to achieve tolerance
-    Real64 const IterTol(0.005);  // Tolerance of 0.5%
+    Real64 constexpr MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
+    int constexpr Maxiter(20);        // Maximum number of iterations to achieve tolerance
+    Real64 constexpr IterTol(0.005);  // Tolerance of 0.5%
     static constexpr std::string_view RoutineName("CalcCoolingPanel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1686,7 +1682,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     using DataHeatBalFanSys::MaxRadHeatFlux;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+    Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater

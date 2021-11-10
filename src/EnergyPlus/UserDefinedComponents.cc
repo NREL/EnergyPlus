@@ -641,7 +641,8 @@ namespace UserDefinedComponents {
 
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                static_cast<DataPlant::HowMet>(getEnumerationValue(DataPlant::HowMetTypeNamesUC, cAlphaArgs(aArgCount + 2)));
+                                static_cast<DataPlant::HowMet>(
+                                    getEnumerationValue(DataPlant::HowMetTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 2))));
                             if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed ==
                                 DataPlant::HowMet::ByNominalCapLowOutLimit) {
                                 // actuator for low out limit
@@ -667,8 +668,8 @@ namespace UserDefinedComponents {
 
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                static_cast<DataPlant::LoopFlowStatus>(
-                                    getEnumerationValue(DataPlant::LoopFlowStatusTypeNamesUC, cAlphaArgs(aArgCount + 3)));
+                                static_cast<DataPlant::LoopFlowStatus>(getEnumerationValue(
+                                    DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 3))));
                         }
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection
@@ -2414,7 +2415,7 @@ namespace UserDefinedComponents {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_CoilUserDefined,
+                                                        DataPlant::PlantEquipmentType::CoilUserDefined,
                                                         this->Loop.LoopNum,
                                                         this->Loop.LoopSideNum,
                                                         this->Loop.BranchNum,
@@ -2490,7 +2491,7 @@ namespace UserDefinedComponents {
                     bool errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
-                                                            DataPlant::TypeOf_ZoneHVACAirUserDefined,
+                                                            DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined,
                                                             this->Loop(loop).LoopNum,
                                                             this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
@@ -2581,7 +2582,7 @@ namespace UserDefinedComponents {
                     bool errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
-                                                            DataPlant::TypeOf_AirTerminalUserDefined,
+                                                            DataPlant::PlantEquipmentType::AirTerminalUserDefined,
                                                             this->Loop(loop).LoopNum,
                                                             this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
@@ -2728,7 +2729,7 @@ namespace UserDefinedComponents {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_PlantComponentUserDefined,
+                                                        DataPlant::PlantEquipmentType::PlantComponentUserDefined,
                                                         this->Loop(ConnectionNum).LoopNum,
                                                         this->Loop(ConnectionNum).LoopSideNum,
                                                         this->Loop(ConnectionNum).BranchNum,
