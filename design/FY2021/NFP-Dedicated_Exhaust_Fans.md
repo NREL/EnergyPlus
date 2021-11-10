@@ -154,6 +154,63 @@ ZoneHVAC:ExhaustSystem,
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
+## Approach D ##
+
+In this approach, an AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhasut system would then be similar to that of a return path, including objects such as AirLoopHVAC:ZoneMixer. However, it could be different from the return path, in that in general, this exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust fan to be connected to the zone exhaust or plenum exhaust, as part of the exhaust system.  
+
+```
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust,            !- Name
+    Exhaust Avail List,         !- Availability Manager List Name
+	,                            !- Exhaust syste outlet node name
+    ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
+    Zone1 Exhaust System,       !- Component 1 Name
+    AirLoopHVAC:ReturnPlenum,   !- Component 2 Object Type, will use the exhaust nodes connection only, so may not need to inlcude this object
+    Return plenum,              !- Component 2 Name
+    AirLoopHVAC:ZoneMixer,      !- Component 3 Object Type
+    Exhaust Zone Mixer,         !- Component 3 Name
+    Fan:SystemModel,            !- Component 4 Object Type
+    Central Exhaust Fan;        !- Component 4 Name
+```
+
+This method would expand the usage scenarios of AirLoopHVAC:ZoneMixer object, to allow it to be used in the exhaust system. Originally, the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects to be used with AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
+
+In the current development, we propose to allow an AirLoopHVAC:Mixer to be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust node of a zone, the outlet node a fan:zoneexhaust object, or even the exhaust outlet of a return plenum (maybe?). For the return plenum object, the exhaust system should be connected to the "Induced Air Outlet Node or NodeList", by either reuse this field or creating another new field for the "exhaust node(s)" connected to the exhaust system(s). 
+
+The ZoneHVAC:ExhaustSystem is also to be added as a new object, as a more advanced version of fan:zoneexhaust connected to a zone exhaust. It will allow the exhaust system to use the newer fan:systemmodel or fan:componentmodel: 
+```
+ZoneHVAC:ExhaustSystem,
+    Zone2 Exhaust System,           !-Name
+    HVACOperationSchd,              !- Availability Schedule Name
+    Zone2 Exhaust Node,             !- Inlet Node Name
+    Exhaust Mixer Inlet Node 2,     !- Outlet Node Name
+    0.1,                            !- Design Flow Rate {m3/s}
+    Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
+    Zone2 Exhaust Fan,              !- Fan Name
+    Scheduled,                      !- Fan Control Type (Scheduled, Passive, FollowSupply, ????)
+    Zone2 Exhaust Fan Flow Sched,   !- Flow Fraction Schedule Name
+    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+    ,                               !- System Availability Manager Name
+    ,                               !- Minimum Zone Temperature Limit Schedule Name
+    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
+```
+
+## Exhaust system AirLoop Assignment ##
+For reporting purposes, such as reporting the exhaust flow rate and fan energy, the exhaust system should be tied to a proper airloop system. For each centralized exhaust (usually characterized by a central exhaust fan), it could be assigend to one of existing the connected airloops. Or a new AirLoopHVAC object can be used to hold the object and the sytem simulation: 
+```
+AirLoopHVAC,
+    Exhaust System,                    !- Name
+    ,                        !- Controller List Name
+    DOAS Availability Managers,  !- Availability Manager List Name
+    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    DOAS Branches,           !- Branch List Name
+    ,                        !- Connector List Name
+    central_exhaust_inlet_point,     !- Supply Side Inlet Node Name
+    ,                        !- Demand Side Outlet Node Name
+    <you may need to give this a dummy node name just to avoid an error>,  !- Demand Side Inlet Node Names
+    DOAS Heating Coil Outlet;!- Supply Side Outlet Node Names
+```
+
 ### IDD changes ###
 
 The following IDD blocks will be added to the Energy+.idd file.
