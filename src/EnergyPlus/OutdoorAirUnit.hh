@@ -69,7 +69,7 @@ namespace OutdoorAirUnit {
     // component types addressed by this module
     extern std::string const cMO_OutdoorAirUnit;
 
-    enum class AirLoopHVAC : int
+    enum class CompType : int
     {
         Unassigned = -1,
         WaterCoil_Cooling,       // "COIL:COOLING:WATER",
@@ -309,7 +309,7 @@ namespace OutdoorAirUnit {
                                  std::string_view EquipType,   // the component type
                                  std::string const &EquipName, // the component Name
                                  int EquipNum,
-                                 AirLoopHVAC CompTypeNum, // Component Type -- Integerized for this module
+                                 CompType CompTypeNum, // Component Type -- Integerized for this module
                                  bool FirstHVACIteration,
                                  int &CompIndex,
                                  bool Sim // if TRUE, simulate component

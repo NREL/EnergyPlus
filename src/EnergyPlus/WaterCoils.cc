@@ -1091,8 +1091,8 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         bool WaterCoilOnAirLoop = true;
         for (tempCoilNum = 1; tempCoilNum <= state.dataWaterCoils->NumWaterCoils; ++tempCoilNum) {
             if (state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerIndex > 0) {
-                SimAirServingZones::AirLoopHVAC CoilTypeNum(SimAirServingZones::AirLoopHVAC::Unassigned);
-                std::string AirLoopHVAC;
+                SimAirServingZones::CompType CoilTypeNum(SimAirServingZones::CompType::Unassigned);
+                std::string CompType;
                 std::string CompName = state.dataWaterCoils->WaterCoil(tempCoilNum).Name;
                 if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                     CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
@@ -1106,7 +1106,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                     CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
                 }
                 WaterCoilOnAirLoop = true;
-                CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, AirLoopHVAC, CompName, WaterCoilOnAirLoop);
+                CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
                 if (!WaterCoilOnAirLoop) {
                     ShowContinueError(state,
                                       "Controller:WaterCoil = " + state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerName +
@@ -2297,7 +2297,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 rho;
     int FieldNum = 2;                      // IDD numeric field number where input field description is found
-    std::string AirLoopHVAC;                  // component type
+    std::string AirLoopHVAC;               // component type
     int SizingType;                        // type of sizing to perform
     std::string SizingString;              // input field sizing description (e.g., Nominal Capacity)
     bool bPRINT = true;                    // TRUE if sizing is reported to output (eio)
@@ -2349,7 +2349,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             state.dataSize->DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum;
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
-                AirLoopHVAC = cAllCoilTypes(Coil_CoolingWaterDetailed);                                      // Coil:Cooling:Water:DetailedGeometry
+                AirLoopHVAC = cAllCoilTypes(Coil_CoolingWaterDetailed);                                   // Coil:Cooling:Water:DetailedGeometry
             } else {
                 AirLoopHVAC = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
             }
@@ -2757,9 +2757,9 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             } else {
                 NomCapUserInp = false;
             }
-            bPRINT = false;                              // do not print this sizing request
-            TempSize = AutoSize;                         // get the autosized air volume flow rate for use in other calculations
-            SizingString.clear();                        // doesn't matter
+            bPRINT = false;                                 // do not print this sizing request
+            TempSize = AutoSize;                            // get the autosized air volume flow rate for use in other calculations
+            SizingString.clear();                           // doesn't matter
             AirLoopHVAC = cAllCoilTypes(Coil_HeatingWater); // "Coil:Heating:Water"
             CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesiccantRegenerationCoil) {

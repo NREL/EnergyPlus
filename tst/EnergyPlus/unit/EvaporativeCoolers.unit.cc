@@ -935,7 +935,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     int compNum = 0;
     SimAirServingZones::SimAirLoopComponent(*state,
                                             EvapCond(EvapCoolNum).EvapCoolerName,
-                                            SimAirServingZones::AirLoopHVAC::EvapCooler,
+                                            SimAirServingZones::CompType::EvapCooler,
                                             false,
                                             AirLoopNum,
                                             EvapCoolNum,

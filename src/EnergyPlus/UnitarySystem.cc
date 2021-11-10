@@ -3258,7 +3258,7 @@ namespace UnitarySystems {
             this->UnitarySystemType_Num = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
             this->m_OKToPrintSizing = true;
         } else {
-            this->UnitarySystemType_Num = static_cast<int>(SimAirServingZones::AirLoopHVAC::UnitarySystemModel);
+            this->UnitarySystemType_Num = static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel);
         }
 
         this->m_IterationMode.resize(3);

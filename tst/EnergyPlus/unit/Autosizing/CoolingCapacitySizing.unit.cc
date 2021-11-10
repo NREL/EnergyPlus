@@ -494,7 +494,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::AirLoopHVAC::Fan_System_Object;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;

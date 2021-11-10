@@ -434,7 +434,7 @@ namespace AirLoopHVACDOAS {
                         errorsFound = true;
                     } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
                         thisDOAS.FanName = CompName;
-                        thisDOAS.m_FanTypeNum = SimAirServingZones::AirLoopHVAC::Fan_System_Object;
+                        thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
                         thisDOAS.m_FanIndex = HVACFan::getFanObjectVectorIndex(state, CompName);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             state.dataHVACFan->fanObjs[thisDOAS.m_FanIndex]->inletNodeNum;
@@ -459,7 +459,7 @@ namespace AirLoopHVACDOAS {
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
-                        thisDOAS.m_FanTypeNum = SimAirServingZones::AirLoopHVAC::Fan_ComponentModel;
+                        thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_ComponentModel;
                         Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound, ObjexxFCL::Optional_string_const());
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
@@ -1024,14 +1024,14 @@ namespace AirLoopHVACDOAS {
         this->SizingMassFlow = sizingMassFlow;
         this->GetDesignDayConditions(state);
 
-        if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::AirLoopHVAC::Fan_System_Object) {
+        if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
             state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
             state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
         }
         bool errorsFound = false;
-        if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::AirLoopHVAC::Fan_ComponentModel) {
+        if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
             Fans::SetFanData(state, this->m_FanIndex, errorsFound, Name, sizingMassFlow / state.dataEnvrn->StdRhoAir, 0);
             state.dataFans->Fan(this->m_FanIndex).MaxAirMassFlowRate = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
