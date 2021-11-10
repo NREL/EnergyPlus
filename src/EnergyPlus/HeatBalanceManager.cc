@@ -2513,9 +2513,9 @@ namespace HeatBalanceManager {
                 state.dataMaterial->Material(MaterNum).GasWght(1) = GasWght[GasType - 1];
                 state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasType - 1];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
+                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasType - 1];
                 }
             }
 
@@ -2632,9 +2632,9 @@ namespace HeatBalanceManager {
                 state.dataMaterial->Material(MaterNum).GasWght(1) = GasWght[GasType - 1];
                 state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasType - 1];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
+                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasType - 1];
                 }
             }
 
@@ -2767,9 +2767,9 @@ namespace HeatBalanceManager {
                     state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[GasType - 1];
                     state.dataMaterial->Material(MaterNum).GasFract(NumGas) = MaterialProps(2 + NumGas);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        state.dataMaterial->Material(MaterNum).GasCon(ICoeff, NumGas) = GasCoeffsCon(ICoeff, GasType);
-                        state.dataMaterial->Material(MaterNum).GasVis(ICoeff, NumGas) = GasCoeffsVis(ICoeff, GasType);
-                        state.dataMaterial->Material(MaterNum).GasCp(ICoeff, NumGas) = GasCoeffsCp(ICoeff, GasType);
+                        state.dataMaterial->Material(MaterNum).GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+                        state.dataMaterial->Material(MaterNum).GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+                        state.dataMaterial->Material(MaterNum).GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][GasType - 1];
                     }
                 }
             }

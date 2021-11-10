@@ -2842,9 +2842,9 @@ namespace WindowComplexManager {
         wght(iprop(1, 1)) = GasWght[GasType - 1];
         gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, GasType);
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, GasType);
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, GasType);
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][GasType - 1];
         }
 
         // Fill window layer properties needed for window layer heat balance calculation

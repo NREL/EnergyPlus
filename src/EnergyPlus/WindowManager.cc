@@ -2628,9 +2628,9 @@ namespace WindowManager {
                 state.dataWindowManager->gnmix(IGap) = 1;
                 state.dataWindowManager->gwght(1, IGap) = GasWght[0];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataWindowManager->gcon(ICoeff, 1, IGap) = GasCoeffsCon(ICoeff, 1);
-                    state.dataWindowManager->gvis(ICoeff, 1, IGap) = GasCoeffsVis(ICoeff, 1);
-                    state.dataWindowManager->gcp(ICoeff, 1, IGap) = GasCoeffsCp(ICoeff, 1);
+                    state.dataWindowManager->gcon(ICoeff, 1, IGap) = GasCoeffsCon[ICoeff - 1][0];
+                    state.dataWindowManager->gvis(ICoeff, 1, IGap) = GasCoeffsVis[ICoeff - 1][0];
+                    state.dataWindowManager->gcp(ICoeff, 1, IGap) = GasCoeffsCp[ICoeff - 1][0];
                 }
             }
 
