@@ -970,7 +970,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // without Theta and Phi.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Small(1.E-9); // Small Number used to approximate zero
+    Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
     // FUNCTION PARAMETER DEFINITIONS:
     int ScNum;                        // Index to screen data

@@ -2126,7 +2126,7 @@ namespace WindowComplexManager {
 
         // Error tolerance is used to make small numbers equal to zero.  Due to precision of pi constant used in E+, performing
         // trigonometric operations on those constant will not cause absolutely accurate results
-        Real64 const ErrorTolerance(1.e-10);
+        Real64 constexpr ErrorTolerance(1.e-10);
 
         UnitVect = Vector(0.0, 0.0, 0.0);
 
