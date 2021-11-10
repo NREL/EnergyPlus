@@ -156,7 +156,7 @@ ZoneHVAC:ExhaustSystem,
 
 ## Approach D ##
 
-In this approach, an AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhasut system would then be similar to that of a return path, including objects such as AirLoopHVAC:ZoneMixer. However, it could be different from the return path, in that in general, this exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust fan to be connected to the zone exhaust or plenum exhaust, as part of the exhaust system.  
+In this approach, an AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhasut system would then be similar to that of a return path, including objects such as AirLoopHVAC:ZoneMixer. However, it could be different from the return path, in that in general, this exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust fan to be connected to the zone exhaust or plenum exhaust, as part of the exhaust system. Further, beyond the fan, there could also be another heat/enthalpy exchanger for the heat recovery purposes. 
 
 ```
 AirLoopHVAC:ExhaustSystem,
@@ -170,7 +170,9 @@ AirLoopHVAC:ExhaustSystem,
     AirLoopHVAC:ZoneMixer,      !- Component 3 Object Type
     Exhaust Zone Mixer,         !- Component 3 Name
     Fan:SystemModel,            !- Component 4 Object Type
-    Central Exhaust Fan;        !- Component 4 Name
+    Central Exhaust Fan,        !- Component 4 Name
+    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 5 Object Type
+    Heat recovery exchanger,    !- Component 5 Name
 ```
 
 This method would expand the usage scenarios of AirLoopHVAC:ZoneMixer object, to allow it to be used in the exhaust system. Originally, the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects to be used with AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
