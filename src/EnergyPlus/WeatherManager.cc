@@ -214,23 +214,23 @@ namespace WeatherManager {
     Real64
     calculateWaterBoundaryConvectionCoefficient(Real64 const curWaterTemp, Real64 const freeStreamVelocity, Real64 const distanceFromLeadingEdge)
     {
-        Real64 const waterKinematicViscosity = 1e-6; // m2/s
-        Real64 const waterPrandtlNumber = 6;         // -
-        Real64 const waterThermalConductivity = 0.6; // W/mK
+        Real64 constexpr waterKinematicViscosity = 1e-6; // m2/s
+        Real64 constexpr waterPrandtlNumber = 6;         // -
+        Real64 constexpr waterThermalConductivity = 0.6; // W/mK
         // do some calculation for forced convection from the leading edge of the ship
         Real64 const localReynoldsNumber = freeStreamVelocity * distanceFromLeadingEdge / waterKinematicViscosity;
         Real64 const localNusseltNumber = 0.0296 * pow(localReynoldsNumber, 0.8) * pow(waterPrandtlNumber, 1.0 / 3.0);
         Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / distanceFromLeadingEdge;
 
         // do some calculations for natural convection from the bottom of the ship
-        Real64 const distanceFromBottomOfHull = 12; // meters, assumed for now
-                                                    // this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
+        Real64 constexpr distanceFromBottomOfHull = 12; // meters, assumed for now
+                                                        // this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
         Real64 const prandtlCorrection =
             (0.75 * pow(waterPrandtlNumber, 0.5)) / pow(0.609 + 1.221 * pow(waterPrandtlNumber, 0.5) + 1.238 * waterPrandtlNumber, 0.25);
         // calculate the Grashof number
-        Real64 const gravity = 9.81;          // m/s2
-        Real64 const beta = 0.000214;         // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
-        Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
+        Real64 constexpr gravity = 9.81;          // m/s2
+        Real64 constexpr beta = 0.000214;         // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
+        Real64 constexpr assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
         Real64 const localGrashofNumber =
             (gravity * beta * (assumedSurfaceTemp - curWaterTemp) * pow(distanceFromBottomOfHull, 3)) / pow(waterKinematicViscosity, 2);
         Real64 const localNusseltFreeConvection = pow(localGrashofNumber / 4, 0.25) * prandtlCorrection;
@@ -3750,14 +3750,14 @@ namespace WeatherManager {
         constexpr Real64 GlobalSolarConstant(1367.0);
         constexpr Real64 ZHGlobalSolarConstant(1355.0);
 
-        Real64 const ZhangHuangModCoeff_C0(0.5598);   // 37.6865d0
-        Real64 const ZhangHuangModCoeff_C1(0.4982);   // 13.9263d0
-        Real64 const ZhangHuangModCoeff_C2(-0.6762);  // -20.2354d0
-        Real64 const ZhangHuangModCoeff_C3(0.02842);  // 0.9695d0
-        Real64 const ZhangHuangModCoeff_C4(-0.00317); // -0.2046d0
-        Real64 const ZhangHuangModCoeff_C5(0.014);    // -0.0980d0
-        Real64 const ZhangHuangModCoeff_D(-17.853);   // -10.8568d0
-        Real64 const ZhangHuangModCoeff_K(0.843);     // 49.3112d0
+        Real64 constexpr ZhangHuangModCoeff_C0(0.5598);   // 37.6865d0
+        Real64 constexpr ZhangHuangModCoeff_C1(0.4982);   // 13.9263d0
+        Real64 constexpr ZhangHuangModCoeff_C2(-0.6762);  // -20.2354d0
+        Real64 constexpr ZhangHuangModCoeff_C3(0.02842);  // 0.9695d0
+        Real64 constexpr ZhangHuangModCoeff_C4(-0.00317); // -0.2046d0
+        Real64 constexpr ZhangHuangModCoeff_C5(0.014);    // -0.0980d0
+        Real64 constexpr ZhangHuangModCoeff_D(-17.853);   // -10.8568d0
+        Real64 constexpr ZhangHuangModCoeff_K(0.843);     // 49.3112d0
         static constexpr std::string_view RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
         static constexpr std::string_view RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
         static constexpr std::string_view RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
@@ -4774,7 +4774,7 @@ namespace WeatherManager {
 
                 int endcol = len(Line.data);
                 if (endcol > 0) {
-                    if (int(Line.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
+                    if (int(Line.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                         ShowSevereError(state,
                                         "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.",
                                         OptionalOutputFileRef(state.files.eso));
@@ -7919,7 +7919,7 @@ namespace WeatherManager {
 
         Real64 const Ratio = 0.4 + 0.01 * (Tavg - 44.0);
         Real64 const Lag = 35.0 - 1.0 * (Tavg - 44.0);
-        Real64 const Offset = 6.0;
+        Real64 constexpr Offset = 6.0;
         int const latitude_sign = (state.dataEnvrn->Latitude >= 0) ? 1 : -1;
 
         // calculated water main temp (F)

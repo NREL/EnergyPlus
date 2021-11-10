@@ -128,8 +128,8 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -279,8 +279,8 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -767,7 +767,7 @@ namespace AirflowNetwork {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const CycFanCycComp(1); // fan cycles with compressor operation
+        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int k;
@@ -879,7 +879,7 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const TOL(0.00001);
+        Real64 constexpr TOL(0.00001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int j;
@@ -1008,7 +1008,7 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const TOL(0.00001);
+        Real64 constexpr TOL(0.00001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int j;
@@ -1897,7 +1897,7 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SQRT2(1.414213562373095);
+        Real64 constexpr SQRT2(1.414213562373095);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DPMID; // pressure drop at mid-height of doorway.
@@ -2273,13 +2273,13 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-        Real64 const Rough(0.0001);
-        Real64 const InitLamCoef(128.0);
-        Real64 const LamDynCoef(64.0);
-        Real64 const LamFriCoef(0.0001);
-        Real64 const TurDynCoef(0.0001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr Rough(0.0001);
+        Real64 constexpr InitLamCoef(128.0);
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.0001);
+        Real64 constexpr TurDynCoef(0.0001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2432,12 +2432,12 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-        Real64 const Rough(0.0001);
-        Real64 const LamDynCoef(64.0);
-        Real64 const LamFriCoef(0.0001);
-        Real64 const TurDynCoef(0.0001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr Rough(0.0001);
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.0001);
+        Real64 constexpr TurDynCoef(0.0001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2575,13 +2575,13 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a terminal unit component
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-        Real64 const Rough(0.0001);
-        Real64 const InitLamCoef(128.0);
-        Real64 const LamDynCoef(64.0);
-        Real64 const LamFriCoef(0.0001);
-        Real64 const TurDynCoef(0.0001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr Rough(0.0001);
+        Real64 constexpr InitLamCoef(128.0);
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.0001);
+        Real64 constexpr TurDynCoef(0.0001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2742,13 +2742,13 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-        Real64 const Rough(0.0001);
-        Real64 const InitLamCoef(128.0);
-        Real64 const LamDynCoef(64.0);
-        Real64 const LamFriCoef(0.0001);
-        Real64 const TurDynCoef(0.0001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr Rough(0.0001);
+        Real64 constexpr InitLamCoef(128.0);
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.0001);
+        Real64 constexpr TurDynCoef(0.0001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2889,12 +2889,12 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-        Real64 const Rough(0.0001);
-        Real64 const LamDynCoef(64.0);
-        Real64 const LamFriCoef(0.0001);
-        Real64 const TurDynCoef(0.0001);
+        Real64 constexpr C(0.868589);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr Rough(0.0001);
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.0001);
+        Real64 constexpr TurDynCoef(0.0001);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -3471,7 +3471,7 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const CycFanCycComp(1); // fan cycles with compressor operation
+        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
@@ -3589,7 +3589,7 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const CycFanCycComp(1); // fan cycles with compressor operation
+        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;

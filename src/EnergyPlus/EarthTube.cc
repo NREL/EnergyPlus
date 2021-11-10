@@ -134,7 +134,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     using ScheduleManager::GetScheduleValuesForDay;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const EarthTubeTempLimit(100.0); // degrees Celsius
+    Real64 constexpr EarthTubeTempLimit(100.0); // degrees Celsius
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlpha;

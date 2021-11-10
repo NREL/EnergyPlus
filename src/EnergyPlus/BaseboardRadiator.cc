@@ -92,7 +92,6 @@ namespace BaseboardRadiator {
 
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    using DataPlant::TypeOf_Baseboard_Conv_Water;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -262,8 +261,8 @@ namespace BaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
-        int const iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
+        int constexpr iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
@@ -322,7 +321,7 @@ namespace BaseboardRadiator {
 
                 ++BaseboardNum;
                 baseboard->Baseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // name of this baseboard
-                baseboard->Baseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Conv_Water;
+                baseboard->Baseboard(BaseboardNum).EquipType = DataPlant::PlantEquipmentType::Baseboard_Conv_Water;
                 baseboard->Baseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     baseboard->Baseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -699,8 +698,8 @@ namespace BaseboardRadiator {
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Acc(0.0001); // Accuracy of result
-        int const MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
         static std::string const RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

@@ -1236,10 +1236,10 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Curve fits of performance data.
 
-    Real64 const KJtoJ(1000.0);          // Convert kilojoules to joules
-    int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
-    Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
-    Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
+    Real64 constexpr KJtoJ(1000.0);          // Convert kilojoules to joules
+    int constexpr MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
+    Real64 constexpr AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
+    Real64 constexpr RelaxFactor(0.7);       // Relaxation factor for iteration loop
     static constexpr std::string_view RoutineName("CalcMTGeneratorModel");
 
     //   Load local variables from data structure (for code readability)
@@ -1975,7 +1975,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Generator_MicroTurbine,
+                                                DataPlant::PlantEquipmentType::Generator_MicroTurbine,
                                                 this->HRLoopNum,
                                                 this->HRLoopSideNum,
                                                 this->HRBranchNum,
