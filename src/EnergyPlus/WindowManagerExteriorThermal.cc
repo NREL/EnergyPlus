@@ -658,6 +658,7 @@ namespace WindowManager {
             auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront);
             aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
         }
+        static constexpr double standardizedRadiationIntensity{783.0};
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             const auto ConstrNum{state.dataSurface->Surface(m_SurfNum).Construction};
             std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> aLayer =
@@ -666,25 +667,12 @@ namespace WindowManager {
             // Report is done for normal incidence
             const auto Theta{0.0};
             const auto Phi{0.0};
-            const auto SolarRadiation{783.0};
             const auto absCoeff =
                 aLayer->getAbsorptanceLayer(t_Index, FenestrationCommon::Side::Front, FenestrationCommon::ScatteringSimple::Diffuse, Theta, Phi);
-            aSolidLayer->setSolarAbsorptance(absCoeff, SolarRadiation);
+            aSolidLayer->setSolarAbsorptance(absCoeff, standardizedRadiationIntensity);
         } else {
-            const auto swRadiation = surface.getSWIncident(state, m_SurfNum);
-            if (swRadiation > 0) {
-
-                auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(m_SurfNum, m_SolidLayerIndex) / swRadiation;
-                if ((2 * t_Index - 1) == m_TotLay) {
-                    absCoeff += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(m_SurfNum) / swRadiation;
-                }
-
-                aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);
-            } else {
-                const auto SolarRadiation{783.0};
-                const auto absCoeff{state.dataConstruction->Construct(state.dataSurface->Surface(m_SurfNum).Construction).AbsDiff(m_SolidLayerIndex)};
-                aSolidLayer->setSolarAbsorptance(absCoeff, SolarRadiation);
-            }
+            const auto absCoeff{state.dataConstruction->Construct(state.dataSurface->Surface(m_SurfNum).Construction).AbsDiff(t_Index)};
+            aSolidLayer->setSolarAbsorptance(absCoeff, standardizedRadiationIntensity);
         }
         return aSolidLayer;
     }
