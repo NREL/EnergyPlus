@@ -668,7 +668,10 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \default Construction
         elcc->NonrecurringCost[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        if (elcc->NonrecurringCost[iInObj].category == CostCategory::Unassigned) {
+        bool isNotNonRecurringCost =  BITF_TEST_NONE(BITF(elcc->NonrecurringCost[iInObj].category),
+                             BITF(CostCategory::Construction) | BITF(CostCategory::Salvage) |
+                                 BITF(CostCategory::OtherCapital));
+        if (isNotNonRecurringCost) {
             elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
