@@ -247,6 +247,15 @@ namespace EconomicLifeCycleCost {
 
     constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{"Nonrecurring", "Recurring"};
 
+    enum class ResourceCostCategory
+    {
+        Unassigned = -1,
+        Water,
+        Energy,
+        Num
+    };
+    constexpr std::array<std::string_view, 2> ResourceCostCategoryNames{"Water Cost", "Energy Cost"};
+
     enum class PrValKind
     {
         Unassigned = -1,

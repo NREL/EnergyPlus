@@ -2209,19 +2209,16 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 break;
             }
             switch (elcc->CashFlow[offset + jObj].SourceKind) {
-            case (SourceKindType::Nonrecurring): {
-                tableBody(2, jObj + 1) = "Nonrecurring";
-                break;
-            }
+            case (SourceKindType::Nonrecurring):
             case (SourceKindType::Recurring): {
-                tableBody(2, jObj + 1) = "Recurring";
+                tableBody(2, jObj + 1) = SourceKindTypeNames[static_cast<int>(elcc->CashFlow[offset + jObj].SourceKind)];
                 break;
             }
             case (SourceKindType::Resource): {
                 if (elcc->CashFlow[offset + jObj].Category == CostCategory::Water) {
-                    tableBody(2, jObj + 1) = "Water Cost";
+                    tableBody(2, jObj + 1) = SourceKindTypeNames[static_cast<int>(ResourceCostCategory::Water)];
                 } else {
-                    tableBody(2, jObj + 1) = "Energy Cost";
+                    tableBody(2, jObj + 1) = SourceKindTypeNames[static_cast<int>(ResourceCostCategory::Energy)];
                 }
                 break;
             }
