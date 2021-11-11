@@ -188,14 +188,6 @@ namespace EconomicLifeCycleCost {
         TotGrand,
         Num
     };
-    //
-    //    constexpr int NumRecurringCostCategory = 7;
-    //    constexpr std::array<std::string_view, NumRecurringCostCategory> RecurringCostCategoryNamesUC{
-    //        "MAINTENANCE", "REPAIR", "OPERATION", "REPLACEMENT", "MINOR OVERHAUL", "MAJOR OVERHAUL", "OTHER OPERATIONAL"};
-    //
-    //    constexpr int NumNonRecurringCostCategory = 3;
-    //    constexpr std::array<std::string_view, NumNonRecurringCostCategory> NonRecurringCostCategoryNamesUC{
-    //        "CONSTRUCTION", "SALVAGE", "OTHERCAPITAL"};
 
     constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{
         "Maintenance",

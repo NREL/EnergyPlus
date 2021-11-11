@@ -447,7 +447,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
     for (iInObj = 0; iInObj < elcc->numRecurringCosts; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
-                                                                 iInObj + 1,
+                                                                 iInObj + 1, //since this index needs to start from 1
                                                                  AlphaArray,
                                                                  NumAlphas,
                                                                  NumArray,
@@ -641,7 +641,7 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
     for (iInObj = 0; iInObj < elcc->numNonrecurringCost; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
-                                                                 iInObj + 1,
+                                                                 iInObj + 1, //since this index needs to start from 1
                                                                  AlphaArray,
                                                                  NumAlphas,
                                                                  NumArray,
