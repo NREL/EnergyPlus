@@ -1969,9 +1969,9 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(4, elcc->lengthStudyYears);
         tableBody = "";
-        columnHead(1) = "Construction";
-        columnHead(2) = "Salvage";
-        columnHead(3) = "OtherCapital";
+        columnHead(1) = CostCategoryNames[static_cast<int>(CostCategory::Construction)];
+        columnHead(2) = CostCategoryNames[static_cast<int>(CostCategory::Salvage)];
+        columnHead(3) = CostCategoryNames[static_cast<int>(CostCategory::OtherCapital)];
         columnHead(4) = "Total";
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
