@@ -162,22 +162,17 @@ In this approach, an AirLoopHVAC:ExhaustSystem is made to be something similar t
 AirLoopHVAC:ExhaustSystem,
     Central Exhaust,            !- Name
     Exhaust Avail List,         !- Availability Manager List Name
-	,                            !- Exhaust syste outlet node name
     ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
     Zone1 Exhaust System,       !- Component 1 Name
-    AirLoopHVAC:ReturnPlenum,   !- Component 2 Object Type, will use the exhaust nodes connection only, so may not need to inlcude this object
-    Return plenum,              !- Component 2 Name
-    AirLoopHVAC:ZoneMixer,      !- Component 3 Object Type
-    Exhaust Zone Mixer,         !- Component 3 Name
-    Fan:SystemModel,            !- Component 4 Object Type
-    Central Exhaust Fan,        !- Component 4 Name
-    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 5 Object Type
-    Heat recovery exchanger,    !- Component 5 Name
+    AirLoopHVAC:ZoneMixer,      !- Component 2 Object Type
+    Exhaust Zone Mixer,         !- Component 2 Name
+    Fan:SystemModel,            !- Component 3 Object Type
+    Central Exhaust Fan;        !- Component 3 Name
 ```
 
 This method would expand the usage scenarios of AirLoopHVAC:ZoneMixer object, to allow it to be used in the exhaust system. Originally, the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects to be used with AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
 
-In the current development, we propose to allow an AirLoopHVAC:Mixer to be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust node of a zone, the outlet node a fan:zoneexhaust object, or even the exhaust outlet of a return plenum (maybe?). For the return plenum object, the exhaust system should be connected to the "Induced Air Outlet Node or NodeList", by either reuse this field or creating another new field for the "exhaust node(s)" connected to the exhaust system(s). 
+In the current development, we propose to allow an AirLoopHVAC:Mixer to be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust node of a zone, the outlet node a fan:zoneexhaust object, or the exhaust fan outlet of a newly developed ZoneHVAC:ExhaustSystem. 
 
 The ZoneHVAC:ExhaustSystem is also to be added as a new object, as a more advanced version of fan:zoneexhaust connected to a zone exhaust. It will allow the exhaust system to use the newer fan:systemmodel or fan:componentmodel: 
 ```
@@ -197,21 +192,27 @@ ZoneHVAC:ExhaustSystem,
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
-## Exhaust system AirLoop Assignment ##
-For reporting purposes, such as reporting the exhaust flow rate and fan energy, the exhaust system should be tied to a proper airloop system. For each centralized exhaust (usually characterized by a central exhaust fan), it could be assigend to one of existing the connected airloops. Or a new AirLoopHVAC object can be used to hold the object and the sytem simulation: 
+## Approach E ##
+
+Another approach to model the central exhaust system is to describe the system in an AirLoopHVAC object. The current AirLoopHVAC logic and required nodes need to be modified in order to make the configuration work. For example, it should allow1 a disconnected the the demand side (especially the inlet) configuration. 
+ 
 ```
 AirLoopHVAC,
     Exhaust System,                    !- Name
     ,                        !- Controller List Name
     DOAS Availability Managers,  !- Availability Manager List Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
-    DOAS Branches,           !- Branch List Name
+    DOAS exhaust Branches,   !- Branch List Name
     ,                        !- Connector List Name
     central_exhaust_inlet_point,     !- Supply Side Inlet Node Name
     ,                        !- Demand Side Outlet Node Name
-    <you may need to give this a dummy node name just to avoid an error>,  !- Demand Side Inlet Node Names
-    DOAS Heating Coil Outlet;!- Supply Side Outlet Node Names
+    ,                        !- Demand Side Inlet Node Names
+    central_exhaust_outlet;  !- Supply Side Outlet Node Names
 ```
+
+The exhaust system can have two options to specify the exhaust connections. The first one is via the AirLoopHVAC's exhaust path (with needs the added objects in Approaches A-D ). 
+
+The second option is to add node-branch-connector descriptions to the current AirLoopHVAC object's branch and/or connectors list, which will be connected from a suitable supply side inlet node or demand side outlet node. The supply side inlet node should be from the starting point of the zone exhaust nodes in this scenario. 
 
 ### IDD changes ###
 
