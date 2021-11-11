@@ -482,7 +482,11 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \default Maintenance
         elcc->RecurringCosts[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        if (elcc->RecurringCosts[iInObj].category == CostCategory::Unassigned) {
+        bool isNotRecurringCost = BITF_TEST_NONE(BITF(elcc->RecurringCosts[iInObj].category),
+                                                 BITF(CostCategory::Maintenance) | BITF(CostCategory::Repair) | BITF(CostCategory::Operation) |
+                                                     BITF(CostCategory::Replacement) | BITF(CostCategory::MinorOverhaul) |
+                                                     BITF(CostCategory::MajorOverhaul) | BITF(CostCategory::OtherOperational));
+        if (isNotRecurringCost) {
             elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
