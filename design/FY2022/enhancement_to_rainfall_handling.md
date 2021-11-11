@@ -26,7 +26,7 @@ As local weather stations are providing hourly precipitation for the past decade
 
 ## Approach ##
 
-When a *WaterUse:RainCollector* or a RoofIrrigation object is defined without a *Site:Precipitation* object presented, we will use the hourly precipitation value defined in the EPW file instead. When every entry of the liquid precipitation depth is missing in the 8760 hourly period, we will throw a warning and use the precipitation flag to estimate the precipitation quantity (as 1.5mm).
+When a *WaterUse:RainCollector* or a *RoofIrrigation* object is defined without a *Site:Precipitation* object presented, we will use the hourly precipitation value defined in the EPW file instead. At the same time, warning messages will be shown indicating EPW precipitation is used in the calculation instead of the *Site:Precipitation*. In addition, when EPW hourly precipitation data is greater than the 24-hour precipitation extremes for the corresponding state ([source table](https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp)), the program will display a warning message of precipitation data out of range. When every entry of the liquid precipitation depth is missing in the 8760 hourly period, we will also throw a warning and use the precipitation flag to estimate the precipitation quantity (as 1.5mm).
 
 ## Testing/Validation/Data Source(s): ##
 
