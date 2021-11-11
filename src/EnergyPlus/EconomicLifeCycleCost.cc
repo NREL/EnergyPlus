@@ -2139,7 +2139,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody.allocate(12, elcc->lengthStudyYears);
         tableBody = "";
         for (kMonth = 1; kMonth <= 12; ++kMonth) {
-            columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth + 1)];
+            columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth - 1)];
         }
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = fmt::to_string(elcc->baseDateYear + iYear - 1);
