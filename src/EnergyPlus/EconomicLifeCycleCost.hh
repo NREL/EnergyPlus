@@ -254,7 +254,7 @@ namespace EconomicLifeCycleCost {
         Energy,
         Num
     };
-    constexpr std::array<std::string_view, 2> ResourceCostCategoryNames{"Water Cost", "Energy Cost"};
+    constexpr std::array<std::string_view, static_cast<int>(ResourceCostCategory::Num)> ResourceCostCategoryNames{"Water Cost", "Energy Cost"};
 
     enum class PrValKind
     {
