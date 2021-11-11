@@ -472,32 +472,32 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string CompName;
     int BranchIndex;
 
     // Case 1 Find OA System on DOAS branch
     // Note the strings need to be uppercase at this point
-    AirLoopHVAC = "AIRLOOPHVAC:OUTDOORAIRSYSTEM";
+    CompType = "AIRLOOPHVAC:OUTDOORAIRSYSTEM";
     CompName = "DOAS OA SYSTEM";
 
-    BranchIndex = GetAirBranchIndex(*state, AirLoopHVAC, CompName);
+    BranchIndex = GetAirBranchIndex(*state, CompType, CompName);
 
     EXPECT_EQ(1, BranchIndex);
 
     // Case 3 Find pipe
-    AirLoopHVAC = "PIPE:ADIABATIC";
+    CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE";
 
-    BranchIndex = GetAirBranchIndex(*state, AirLoopHVAC, CompName);
+    BranchIndex = GetAirBranchIndex(*state, CompType, CompName);
 
     EXPECT_EQ(2, BranchIndex);
 
     // Case 4 Not found
-    AirLoopHVAC = "PIPE:ADIABATIC";
+    CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE NOT THERE";
 
-    BranchIndex = GetAirBranchIndex(*state, AirLoopHVAC, CompName);
+    BranchIndex = GetAirBranchIndex(*state, CompType, CompName);
 
     EXPECT_EQ(0, BranchIndex);
 }

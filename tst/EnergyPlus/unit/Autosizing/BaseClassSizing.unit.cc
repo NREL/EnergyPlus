@@ -253,7 +253,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
 {
 
     std::string CompName;       // component name
-    std::string AirLoopHVAC;       // component type
+    std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
     int SizingType;             // integer type of sizing requested
     Real64 SizingResult;        // autosized value of coil input field
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     state->dataSize->UnitarySysEqSizing.allocate(1);
     state->dataSize->OASysEqSizing.allocate(1);
 
-    AirLoopHVAC = "COIL:COOLING:DX:SINGLESPEED";
+    CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     bool errorsFound = false;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*state, SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
 
@@ -317,14 +317,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     EXPECT_NEAR(state->dataSize->DataCoilSizingFanCoolLoad, 0.0, 0.0000001);
     EXPECT_NEAR(state->dataSize->DataCoilSizingCapFT, 1.0, 0.0000001);
 
-    AirLoopHVAC = "COIL:COOLING:WATER";
+    CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
     state->dataEnvrn->StdRhoAir = 1.18;
     state->dataSize->DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*state, SizingResult, errorsFound);
     EXPECT_NEAR(19234.6, SizingResult, 0.1);
 }
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     EXPECT_NEAR(locDesignHeatGain4, 50.0, 0.1);
 
     std::string CompName;       // component name
-    std::string AirLoopHVAC;       // component type
+    std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
     int SizingType;             // integer type of sizing requested
     Real64 SizingResult;        // autosized value of coil input field
@@ -470,7 +470,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataSize->OASysEqSizing.allocate(1);
 
     // Without fan heat
-    AirLoopHVAC = "COIL:COOLING:DX:SINGLESPEED";
+    CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
@@ -483,7 +483,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     bool errorsFound = false;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
     Real64 dxCoilSizeNoFan = SizingResult;
@@ -492,7 +492,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    AirLoopHVAC = "COIL:COOLING:DX:SINGLESPEED";
+    CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
@@ -504,7 +504,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     Real64 expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain4;
 
     // dx cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
@@ -513,7 +513,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanVecIndex = 2;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
-    AirLoopHVAC = "COIL:COOLING:DX:SINGLESPEED";
+    CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
@@ -525,7 +525,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain3;
 
     // dx cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 }
@@ -534,7 +534,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 {
     int constexpr ZoneNum = 1;
     std::string CompName;       // component name
-    std::string AirLoopHVAC;       // component type
+    std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
     int SizingType;             // integerized type of sizing requested
     Real64 SizingResult;        // autosized value of coil input field
@@ -567,7 +567,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow;
 
-    AirLoopHVAC = "COIL:COOLING:DX:SINGLESPEED";
+    CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
@@ -580,11 +580,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     bool errorsFound = false;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(5664.6, SizingResult, 0.1);
 
-    AirLoopHVAC = "COIL:COOLING:WATER";
+    CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
     state->dataEnvrn->StdRhoAir = 1.18;
@@ -593,7 +593,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     state->dataSize->DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(5770.4, SizingResult, 0.1);
 }
@@ -602,21 +602,21 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
 {
     // issue #6112
     std::string CompName;
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string VarDesc;
     std::string UsrDesc;
     Real64 VarValue;
     Real64 UsrValue;
 
     // input values
-    AirLoopHVAC = "BOILER:HOTWATER";
+    CompType = "BOILER:HOTWATER";
     CompName = "RESIDENTIAL BOILER ELECTRIC";
     VarDesc = "Design Size Nominal Capacity [W]";
     VarValue = 105977.98934;
     UsrDesc = "User-Specified Nominal Capacity [W]";
     UsrValue = 26352.97405;
     // boiler hot water autosizing and userspecified nominal capacity reporting to SQLite output
-    BaseSizer::reportSizerOutput(*state, AirLoopHVAC, CompName, VarDesc, VarValue, UsrDesc, UsrValue);
+    BaseSizer::reportSizerOutput(*state, CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue);
     // get the sqlite output
     // query the sqLite
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
@@ -885,14 +885,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 
     int constexpr ZoneNum = 1;
     std::string CompName;       // component name
-    std::string AirLoopHVAC;       // component type
+    std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
     int SizingType;             // integerized type of sizing requested
     Real64 SizingResult;        // autosized value of coil input field
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
-    AirLoopHVAC = "Fan:ConstantVolume";
+    CompType = "Fan:ConstantVolume";
     CompName = "My Fan";
     SizingType = DataHVACGlobals::SystemAirflowSizing;
     SizingString = "Nominal Capacity";
@@ -933,7 +933,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     // Now, we're ready to call the function
     bool errorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
-    sizerSystemAirFlow.initializeWithinEP(*state, AirLoopHVAC, CompName, PrintWarning, CallingRoutine);
+    sizerSystemAirFlow.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
     SizingResult = sizerSystemAirFlow.size(*state, SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
