@@ -175,7 +175,7 @@ void InitEnergyReports(EnergyPlusData &state)
     int FirstIndex;
     int LastIndex;
     int LoopCount;
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string CompName;
     bool MatchFound;
     bool ConnectionFlag(false);
@@ -398,10 +398,10 @@ void InitEnergyReports(EnergyPlusData &state)
                         if (state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).MeteredVar(VarNum).ResourceType ==
                             DataGlobalConstants::ResourceType::EnergyTransfer) {
                             state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).EnergyTransComp = EnergyTransfer;
-                            AirLoopHVAC = state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).TypeOf;
+                            CompType = state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).TypeOf;
                             CompName = state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).Name;
                             Idx = 0;
-                            FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                            FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                             if (MatchFound)
                                 UpdateZoneCompPtrArray(state, Idx, ListNum, AirDistUnitNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                             state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).ZoneEqToPlantPtr = Idx;
@@ -420,10 +420,10 @@ void InitEnergyReports(EnergyPlusData &state)
                                     .ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                                 state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).EnergyTransComp =
                                     EnergyTransfer;
-                                AirLoopHVAC = state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).TypeOf;
+                                CompType = state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).TypeOf;
                                 CompName = state.dataZoneEquip->ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).Name;
                                 Idx = 0;
-                                FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 if (MatchFound)
                                     UpdateZoneSubCompPtrArray(
                                         state, Idx, ListNum, AirDistUnitNum, SubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
@@ -453,18 +453,18 @@ void InitEnergyReports(EnergyPlusData &state)
                                         .SubEquipData(SubEquipNum)
                                         .SubSubEquipData(SubSubEquipNum)
                                         .EnergyTransComp = EnergyTransfer;
-                                    AirLoopHVAC = state.dataZoneEquip->ZoneEquipList(ListNum)
-                                                      .EquipData(AirDistUnitNum)
-                                                      .SubEquipData(SubEquipNum)
-                                                      .SubSubEquipData(SubSubEquipNum)
-                                                      .TypeOf;
+                                    CompType = state.dataZoneEquip->ZoneEquipList(ListNum)
+                                                   .EquipData(AirDistUnitNum)
+                                                   .SubEquipData(SubEquipNum)
+                                                   .SubSubEquipData(SubSubEquipNum)
+                                                   .TypeOf;
                                     CompName = state.dataZoneEquip->ZoneEquipList(ListNum)
                                                    .EquipData(AirDistUnitNum)
                                                    .SubEquipData(SubEquipNum)
                                                    .SubSubEquipData(SubSubEquipNum)
                                                    .Name;
                                     Idx = 0;
-                                    FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     if (MatchFound)
                                         UpdateZoneSubSubCompPtrArray(state,
                                                                      Idx,
@@ -795,9 +795,9 @@ void InitEnergyReports(EnergyPlusData &state)
                              ++CompNum) {
                             {
                                 auto &thisVentRepComp(state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum).Branch(BranchNum).Comp(CompNum));
-                                AirLoopHVAC = thisVentRepComp.TypeOf;
+                                CompType = thisVentRepComp.TypeOf;
                                 CompName = thisVentRepComp.Name;
-                                FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 thisVentRepComp.ConnectPlant.LoopType = MatchLoopType;
                                 thisVentRepComp.ConnectPlant.LoopNum = MatchLoop;
                                 thisVentRepComp.ConnectPlant.BranchNum = MatchBranch;
@@ -813,9 +813,9 @@ void InitEnergyReports(EnergyPlusData &state)
                              ++CompNum) {
                             {
                                 auto &thisVentRepComp(state.dataPlnt->VentRepCondSupplySide(PlantLoopNum).Branch(BranchNum).Comp(CompNum));
-                                AirLoopHVAC = thisVentRepComp.TypeOf;
+                                CompType = thisVentRepComp.TypeOf;
                                 CompName = thisVentRepComp.Name;
-                                FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 thisVentRepComp.ConnectPlant.LoopType = MatchLoopType;
                                 thisVentRepComp.ConnectPlant.LoopNum = MatchLoop;
                                 thisVentRepComp.ConnectPlant.BranchNum = MatchBranch;
@@ -3831,7 +3831,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 void CalcSystemEnergyUse(EnergyPlusData &state,
                          bool const CompLoadFlag,
                          int const AirLoopNum,
-                         std::string const &AirLoopHVAC,
+                         std::string const &CompType,
                          DataGlobalConstants::ResourceType const EnergyType,
                          Real64 const CompLoad,
                          Real64 const CompEnergy)
@@ -4047,7 +4047,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
 
     // Find enum for the component type string
     ComponentTypes comp_type;
-    auto const it = component_map.find(AirLoopHVAC);
+    auto const it = component_map.find(CompType);
     if (it != component_map.end()) {
         comp_type = it->second;
     } else {
@@ -4351,14 +4351,14 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         found = 0;
         if (state.dataSysRpts->NumCompTypes > 0) {
             found = UtilityRoutines::FindItemInList(
-                AirLoopHVAC, state.dataSysRpts->CompTypeErrors, &CompTypeError::AirLoopHVAC, state.dataSysRpts->NumCompTypes);
+                CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
         }
         if (found == 0) {
-            state.dataSysRpts->CompTypeErrors(++state.dataSysRpts->NumCompTypes).AirLoopHVAC = AirLoopHVAC;
+            state.dataSysRpts->CompTypeErrors(++state.dataSysRpts->NumCompTypes).CompType = CompType;
             found = state.dataSysRpts->NumCompTypes;
         }
         ShowRecurringSevereErrorAtEnd(state,
-                                      "CalcSystemEnergyUse: Component Type=" + AirLoopHVAC + " not logged as one of allowable Component Types.",
+                                      "CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.",
                                       state.dataSysRpts->CompTypeErrors(found).CompErrIndex);
         break;
     } // switch
@@ -5193,7 +5193,7 @@ void MatchPlantSys(EnergyPlusData &state,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string CompName;
     int CompNum; // counter for components on air loop branch connected to air distribution unit
     int VarNum;
@@ -5212,10 +5212,10 @@ void MatchPlantSys(EnergyPlusData &state,
             for (VarNum = 1; VarNum <= thisComp.NumMeteredVars; ++VarNum) {
                 if (thisComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                     thisComp.EnergyTransComp = EnergyTrans;
-                    AirLoopHVAC = thisComp.TypeOf;
+                    CompType = thisComp.TypeOf;
                     CompName = thisComp.Name;
                     Idx = 0;
-                    FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                     if (MatchFound)
                         UpdateAirSysCompPtrArray(state, Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                     thisComp.AirSysToPlantPtr = Idx;
@@ -5229,10 +5229,10 @@ void MatchPlantSys(EnergyPlusData &state,
                     for (VarNum = 1; VarNum <= thisSubComp.NumMeteredVars; ++VarNum) {
                         if (thisSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                             thisSubComp.EnergyTransComp = EnergyTrans;
-                            AirLoopHVAC = thisSubComp.TypeOf;
+                            CompType = thisSubComp.TypeOf;
                             CompName = thisSubComp.Name;
                             Idx = 0;
-                            FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                            FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                             if (MatchFound)
                                 UpdateAirSysSubCompPtrArray(
                                     state, Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
@@ -5247,10 +5247,10 @@ void MatchPlantSys(EnergyPlusData &state,
                             for (VarNum = 1; VarNum <= thisSubSubComp.NumMeteredVars; ++VarNum) {
                                 if (thisSubSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                                     thisSubSubComp.EnergyTransComp = EnergyTrans;
-                                    AirLoopHVAC = thisSubSubComp.TypeOf;
+                                    CompType = thisSubSubComp.TypeOf;
                                     CompName = thisSubSubComp.Name;
                                     Idx = 0;
-                                    FindDemandSideMatch(state, AirLoopHVAC, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     if (MatchFound)
                                         UpdateAirSysSubSubCompPtrArray(state,
                                                                        Idx,
@@ -5276,13 +5276,13 @@ void MatchPlantSys(EnergyPlusData &state,
 }
 
 void FindDemandSideMatch(EnergyPlusData &state,
-                         std::string const &AirLoopHVAC, // Inlet node of the component to find the match of
-                         std::string_view CompName,      // Outlet node of the component to find the match of
-                         bool &MatchFound,               // Set to .TRUE. when a match is found
-                         int &MatchLoopType,             // Loop number of the match
-                         int &MatchLoop,                 // Loop number of the match
-                         int &MatchBranch,               // Branch number of the match
-                         int &MatchComp                  // Component number of the match
+                         std::string const &CompType, // Inlet node of the component to find the match of
+                         std::string_view CompName,   // Outlet node of the component to find the match of
+                         bool &MatchFound,            // Set to .TRUE. when a match is found
+                         int &MatchLoopType,          // Loop number of the match
+                         int &MatchLoop,              // Loop number of the match
+                         int &MatchBranch,            // Branch number of the match
+                         int &MatchComp               // Component number of the match
 )
 {
 
@@ -5325,7 +5325,7 @@ void FindDemandSideMatch(EnergyPlusData &state,
                 for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
                     if (UtilityRoutines::SameString(
-                            AirLoopHVAC, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
+                            CompType, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
                         UtilityRoutines::SameString(
                             CompName, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
                         // Found a match on the plant demand side--increment the counter
@@ -5349,7 +5349,7 @@ void FindDemandSideMatch(EnergyPlusData &state,
                 for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
                     if (UtilityRoutines::SameString(
-                            AirLoopHVAC, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
+                            CompType, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
                         UtilityRoutines::SameString(
                             CompName, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
                         // Found a match on the plant demand side--increment the counter

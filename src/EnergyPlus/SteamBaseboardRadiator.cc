@@ -1093,7 +1093,7 @@ namespace SteamBaseboardRadiator {
         Real64 SteamVolFlowRateMaxDes(0.0);  // Design maximum steam volume flow for reporting
         Real64 SteamVolFlowRateMaxUser(0.0); // User hard-sized maximum steam volume flow for reporting
         std::string CompName;                // component name
-        std::string AirLoopHVAC;                // component type
+        std::string CompType;                // component type
         std::string SizingString;            // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;                     // autosized value of coil input field
         int FieldNum = 1;                    // IDD numeric field number where input field description is found
@@ -1135,7 +1135,7 @@ namespace SteamBaseboardRadiator {
                                     state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
 
-                    AirLoopHVAC = state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam;
+                    CompType = state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam;
                     CompName = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
@@ -1150,7 +1150,7 @@ namespace SteamBaseboardRadiator {
 
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                                CheckZoneSizing(state, AirLoopHVAC, CompName);
+                                CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             }
@@ -1163,7 +1163,7 @@ namespace SteamBaseboardRadiator {
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             state.dataSize->DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                            CheckZoneSizing(state, AirLoopHVAC, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity =
                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -1176,7 +1176,7 @@ namespace SteamBaseboardRadiator {
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
-                        sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         state.dataSize->DataScalableCapSizingON = false;
                     } else {

@@ -4094,8 +4094,8 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
     using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
     using WaterCoils::SetCoilDesFlow;
 
-    std::string AirLoopHVAC; // Component type
-    std::string CompName;    // Component name
+    std::string CompType; // Component type
+    std::string CompName; // Component name
     std::string CoilName;
     std::string CoilType;
     std::string ScalableSM;                    // scalable sizing methods label for reporting
@@ -4160,17 +4160,17 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
     // Loop over components in branch; pass the design air flow rate to the coil components that don't have
     // design air flow as an input
     for (CompNum = 1; CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-        AirLoopHVAC = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+        CompType = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
         CompName = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
         CompType_Num = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
         if (CompType_Num == CompType::WaterCoil_DetailedCool || CompType_Num == CompType::WaterCoil_SimpleHeat ||
             CompType_Num == CompType::WaterCoil_CoolingHXAsst) {
             if (CompType_Num == CompType::WaterCoil_CoolingHXAsst) {
-                CoilName = GetHXDXCoilName(state, AirLoopHVAC, CompName, ErrorsFound);
-                CoilType = GetHXCoilType(state, AirLoopHVAC, CompName, ErrorsFound);
+                CoilName = GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
+                CoilType = GetHXCoilType(state, CompType, CompName, ErrorsFound);
             } else {
                 CoilName = CompName;
-                CoilType = AirLoopHVAC;
+                CoilType = CompType;
             }
             SetCoilDesFlow(state, CoilType, CoilName, PrimaryAirSystems(AirLoopNum).DesignVolFlowRate, ErrorsFound);
         }
@@ -7746,7 +7746,7 @@ Real64 GetHeatingSATempHumRatForSizing(EnergyPlusData &state, int const IndexAir
 
 void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state,
                                SimAirServingZones::CompType const CompTypeNum,
-                               std::string const &AirLoopHVAC,
+                               std::string const &CompType,
                                std::string const &CompName,
                                bool &WaterCoilOnAirLoop)
 {
@@ -7767,7 +7767,7 @@ void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state,
         CheckWaterCoilIsOnAirLoop = CheckWaterCoilSystemOnAirLoopOrOASystem(state, CompTypeNum, CompName);
     }
     if (!CheckWaterCoilIsOnAirLoop) {
-        ShowSevereError(state, "CheckWaterCoilIsOnAirLoop: = " + AirLoopHVAC + " = " + CompName + ".");
+        ShowSevereError(state, "CheckWaterCoilIsOnAirLoop: = " + CompType + " = " + CompName + ".");
         ShowContinueError(state,
                           "The water coil or coil system is neither on primary air branch nor on outdoor air system hence does not require "
                           "'Controller:WaterCoil' object.");
@@ -7861,9 +7861,9 @@ bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, SimAirServin
     if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
         // check if the water coil is placed on 'CoilSystem:Cooling:Water:HeatExchangerAssisted' object
         for (int HXASSCoilNum = 1; HXASSCoilNum <= state.dataHVACAssistedCC->TotalNumHXAssistedCoils; ++HXASSCoilNum) {
-            std::string AirLoopHVAC = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilType;
-            if ((UtilityRoutines::SameString(AirLoopHVAC, "Coil:Cooling:Water") ||
-                 UtilityRoutines::SameString(AirLoopHVAC, "Coil:Cooling:Water:DetailedGeometry")) &&
+            std::string CompType = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilType;
+            if ((UtilityRoutines::SameString(CompType, "Coil:Cooling:Water") ||
+                 UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry")) &&
                 UtilityRoutines::SameString(CompName, state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilName)) {
                 CoilSystemName = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).Name;
                 CoilSystemTypeNum = SimAirServingZones::CompType::WaterCoil_CoolingHXAsst;

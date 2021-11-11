@@ -427,7 +427,7 @@ namespace WaterCoils {
     );
 
     void CheckWaterCoilSchedule(EnergyPlusData &state,
-                                std::string const &AirLoopHVAC, // unused1208
+                                std::string const &CompType, // unused1208
                                 std::string_view CompName,
                                 Real64 &Value,
                                 int &CompIndex);

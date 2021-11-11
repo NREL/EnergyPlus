@@ -716,7 +716,7 @@ namespace SteamCoils {
         Real64 CpWater;   // specific heat of water (condensed steam)
 
         std::string CompName;     // component name
-        std::string AirLoopHVAC;     // component type
+        std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         bool bPRINT = false;      // TRUE if sizing is reported to output (eio)
         Real64 TempSize;          // autosized value
@@ -762,17 +762,17 @@ namespace SteamCoils {
 
                         state.dataSize->DataDesicRegCoil = true;
                         state.dataSize->DataDesicDehumNum = state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum;
-                        AirLoopHVAC = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType;
+                        CompType = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType;
                         CompName = state.dataSteamCoils->SteamCoil(CoilNum).Name;
                         bPRINT = false;
                         HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
                         bool ErrorsFound = false;
-                        sizerHeatingDesInletTemp.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
+                        sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                         state.dataSize->DataDesInletAirTemp = sizerHeatingDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                         HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
                         ErrorsFound = false;
-                        sizerHeatingDesOutletTemp.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
+                        sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                         state.dataSize->DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                         if (state.dataSize->CurOASysNum > 0) {
@@ -807,7 +807,7 @@ namespace SteamCoils {
                         HeatingAirFlowSizer sizingHeatingAirFlow;
                         sizingHeatingAirFlow.overrideSizingString(SizingString);
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                        sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
+                        sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                         DesVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
@@ -1628,7 +1628,7 @@ namespace SteamCoils {
     }
 
     void CheckSteamCoilSchedule(
-        EnergyPlusData &state, [[maybe_unused]] std::string const &AirLoopHVAC, std::string_view CompName, Real64 &Value, int &CompIndex)
+        EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:

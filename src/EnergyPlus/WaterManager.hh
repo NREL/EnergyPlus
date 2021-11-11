@@ -76,7 +76,7 @@ namespace WaterManager {
 
     void SetupTankSupplyComponent(EnergyPlusData &state,
                                   std::string_view CompName,
-                                  std::string_view AirLoopHVAC,
+                                  std::string_view CompType,
                                   std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
@@ -84,7 +84,7 @@ namespace WaterManager {
 
     void InternalSetupTankSupplyComponent(EnergyPlusData &state,
                                           std::string_view CompName,
-                                          std::string_view AirLoopHVAC,
+                                          std::string_view CompType,
                                           std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
@@ -92,7 +92,7 @@ namespace WaterManager {
 
     void SetupTankDemandComponent(EnergyPlusData &state,
                                   std::string_view CompName,
-                                  std::string_view const AirLoopHVAC,
+                                  std::string_view const CompType,
                                   std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
@@ -100,7 +100,7 @@ namespace WaterManager {
 
     void InternalSetupTankDemandComponent(EnergyPlusData &state,
                                           std::string_view CompName,
-                                          std::string_view const AirLoopHVAC,
+                                          std::string_view const CompType,
                                           std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,

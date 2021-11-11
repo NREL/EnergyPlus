@@ -1180,7 +1180,7 @@ namespace WaterManager {
 
     void SetupTankSupplyComponent(EnergyPlusData &state,
                                   std::string_view CompName,
-                                  std::string_view AirLoopHVAC,
+                                  std::string_view CompType,
                                   std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
@@ -1206,12 +1206,12 @@ namespace WaterManager {
             GetWaterManagerInput(state);
         }
 
-        InternalSetupTankSupplyComponent(state, CompName, AirLoopHVAC, TankName, ErrorsFound, TankIndex, WaterSupplyIndex);
+        InternalSetupTankSupplyComponent(state, CompName, CompType, TankName, ErrorsFound, TankIndex, WaterSupplyIndex);
     }
 
     void InternalSetupTankSupplyComponent(EnergyPlusData &state,
                                           std::string_view CompName,
-                                          std::string_view AirLoopHVAC,
+                                          std::string_view CompType,
                                           std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
@@ -1241,7 +1241,7 @@ namespace WaterManager {
         TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
             ShowSevereError(state,
-                            "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{AirLoopHVAC} +
+                            "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{CompType} +
                                 " called " + std::string{CompName});
             ErrorsFound = true;
             return; // So we don't pass TankIndex=0
@@ -1264,7 +1264,7 @@ namespace WaterManager {
                 state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes.deallocate();
                 state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes.allocate(oldNumSupply + 1);
                 state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes({1, oldNumSupply}) = oldSupplyCompTypes; // array assignment
-                state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes(oldNumSupply + 1) = AirLoopHVAC;
+                state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes(oldNumSupply + 1) = CompType;
             }
             state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply.deallocate();
             state.dataWaterData->WaterStorage(TankIndex).VdotAvailSupply.allocate(oldNumSupply + 1);
@@ -1283,7 +1283,7 @@ namespace WaterManager {
             state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames.allocate(1);
             state.dataWaterData->WaterStorage(TankIndex).SupplyCompNames(1) = CompName;
             state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes.allocate(1);
-            state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes(1) = AirLoopHVAC;
+            state.dataWaterData->WaterStorage(TankIndex).SupplyCompTypes(1) = CompType;
             WaterSupplyIndex = 1;
             state.dataWaterData->WaterStorage(TankIndex).NumWaterSupplies = 1;
         }
@@ -1291,7 +1291,7 @@ namespace WaterManager {
 
     void SetupTankDemandComponent(EnergyPlusData &state,
                                   std::string_view CompName,
-                                  std::string_view const AirLoopHVAC,
+                                  std::string_view const CompType,
                                   std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
@@ -1317,12 +1317,12 @@ namespace WaterManager {
             GetWaterManagerInput(state);
         }
 
-        InternalSetupTankDemandComponent(state, CompName, AirLoopHVAC, TankName, ErrorsFound, TankIndex, WaterDemandIndex);
+        InternalSetupTankDemandComponent(state, CompName, CompType, TankName, ErrorsFound, TankIndex, WaterDemandIndex);
     }
 
     void InternalSetupTankDemandComponent(EnergyPlusData &state,
                                           std::string_view CompName,
-                                          std::string_view const AirLoopHVAC,
+                                          std::string_view const CompType,
                                           std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
@@ -1352,7 +1352,7 @@ namespace WaterManager {
         TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
             ShowSevereError(state,
-                            "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{AirLoopHVAC} +
+                            "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{CompType} +
                                 " called " + std::string{CompName});
             ErrorsFound = true;
             return;
@@ -1375,7 +1375,7 @@ namespace WaterManager {
                 state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes.deallocate();
                 state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes.allocate(oldNumDemand + 1);
                 state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes({1, oldNumDemand}) = oldDemandCompTypes; // array assignment
-                state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes(oldNumDemand + 1) = AirLoopHVAC;
+                state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes(oldNumDemand + 1) = CompType;
             }
 
             state.dataWaterData->WaterStorage(TankIndex).VdotRequestDemand.deallocate();
@@ -1397,7 +1397,7 @@ namespace WaterManager {
             state.dataWaterData->WaterStorage(TankIndex).DemandCompNames.allocate(1);
             state.dataWaterData->WaterStorage(TankIndex).DemandCompNames(1) = CompName;
             state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes.allocate(1);
-            state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes(1) = AirLoopHVAC;
+            state.dataWaterData->WaterStorage(TankIndex).DemandCompTypes(1) = CompType;
             state.dataWaterData->WaterStorage(TankIndex).NumWaterDemands = 1;
             WaterDemandIndex = 1;
         }

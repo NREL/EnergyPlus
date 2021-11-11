@@ -203,7 +203,7 @@ namespace SimAirServingZones {
 
     void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state,
                                    SimAirServingZones::CompType CompTypeNum,
-                                   std::string const &AirLoopHVAC,
+                                   std::string const &CompType,
                                    std::string const &CompName,
                                    bool &WaterCoilOnAirLoop);
 

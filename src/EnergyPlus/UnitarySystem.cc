@@ -1658,7 +1658,7 @@ namespace UnitarySystems {
         }
         std::string SizingString;
         std::string CompName = this->Name;
-        std::string AirLoopHVAC = this->UnitType;
+        std::string CompType = this->UnitType;
         int CoolingSAFlowMethod = this->m_CoolingSAFMethod;
         int HeatingSAFlowMethod = this->m_HeatingSAFMethod;
         // can't reset this to 0 for systems where DX heating coil is in downstream unit and DX cooling coil is in upstream unit
@@ -1728,19 +1728,19 @@ namespace UnitarySystems {
             if ((CoolingSAFlowMethod == SupplyAirFlowRate) || (CoolingSAFlowMethod == None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysCoolingFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             } else if (CoolingSAFlowMethod == FlowPerFloorArea) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysCoolingFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else if (CoolingSAFlowMethod == FractionOfAutoSizedCoolingValue) {
                 TempSize = DataSizing::AutoSize;
                 CoolingAirFlowSizer sizingCoolingAirFlow;
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysCoolingFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 SysCoolingFlow *= this->m_MaxCoolAirVolFlow;
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
@@ -1749,7 +1749,7 @@ namespace UnitarySystems {
                     TempSize = DataSizing::AutoSize;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                    sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     state.dataSize->DataFlowUsedForSizing = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                     TempSize = DataSizing::AutoSize;
@@ -1766,7 +1766,7 @@ namespace UnitarySystems {
                     }
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
-                    sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     SysCoolingFlow = CoolCapAtPeak * this->m_MaxCoolAirVolFlow;
                     state.dataSize->DataTotCapCurveIndex = 0;
@@ -1780,7 +1780,7 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
                 // should never happen
-                ShowSevereError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
@@ -1810,7 +1810,7 @@ namespace UnitarySystems {
                 }
                 CoolingCapacitySizer sizerCoolingCapacity;
                 sizerCoolingCapacity.overrideSizingString(SizingString);
-                sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DXCoolCap = CoolCapAtPeak;
                 // CoilSystem does not size the cooling coil (#8761)
@@ -1838,7 +1838,7 @@ namespace UnitarySystems {
                     TempSize = DataSizing::AutoSize;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
-                    sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     state.dataSize->DXCoolCap = CoolCapAtPeak;
                     EqSizing.CoolingCapacity = true;
@@ -1866,14 +1866,14 @@ namespace UnitarySystems {
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysHeatingFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             } else if (HeatingSAFlowMethod == FlowPerFloorArea) {
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysHeatingFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
             } else if (HeatingSAFlowMethod == FractionOfAutoSizedHeatingValue) {
@@ -1882,7 +1882,7 @@ namespace UnitarySystems {
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 SysHeatingFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 SysHeatingFlow *= this->m_MaxHeatAirVolFlow;
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -1892,7 +1892,7 @@ namespace UnitarySystems {
                 HeatingAirFlowSizer sizingHeatingAirFlow;
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-                sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataSize->DataFlowUsedForSizing = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                 TempSize = DataSizing::AutoSize;
@@ -1908,7 +1908,7 @@ namespace UnitarySystems {
                         false; // set to false to allow calculation of actual heating capacity
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 SysHeatingFlow = HeatCapAtPeak * this->m_MaxHeatAirVolFlow;
@@ -1917,7 +1917,7 @@ namespace UnitarySystems {
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 // should never happen
-                ShowSevereError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
@@ -1942,7 +1942,7 @@ namespace UnitarySystems {
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 EqSizing.HeatingCapacity = true;
@@ -1962,7 +1962,7 @@ namespace UnitarySystems {
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
-                        sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                         EqSizing.HeatingCapacity = true;
@@ -2016,7 +2016,7 @@ namespace UnitarySystems {
             SystemAirFlowSizer sizerSystemAirFlow;
             std::string sizingString = "Supply Air Flow Rate [m3/s]";
             sizerSystemAirFlow.overrideSizingString(sizingString);
-            sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_DesignFanVolFlowRate = sizerSystemAirFlow.size(state, this->m_DesignFanVolFlowRate, errorsFound);
 
             state.dataSize->DataEMSOverrideON = false;
@@ -2047,7 +2047,7 @@ namespace UnitarySystems {
             HeatingAirFlowSizer sizingHeatingAirFlow;
             sizingHeatingAirFlow.overrideSizingString(SizingString);
             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             state.dataSize->DataEMSOverrideON = false;
             state.dataSize->DataConstantUsedForSizing = 0.0;
@@ -2067,7 +2067,7 @@ namespace UnitarySystems {
             if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
             sizingCoolingAirFlow.overrideSizingString(stringOverride);
             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             state.dataSize->DataEMSOverrideON = false;
             state.dataSize->DataConstantUsedForSizing = 0.0;
@@ -2079,7 +2079,7 @@ namespace UnitarySystems {
             this->m_DesignFanVolFlowRate = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
             if (this->m_ActualFanVolFlowRate > 0.0) this->m_DesignFanVolFlowRate = this->m_ActualFanVolFlowRate;
             if (this->m_DesignFanVolFlowRate <= 0.0) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowFatalError(state, "Unable to determine fan air flow rate.");
             }
         }
@@ -2214,7 +2214,7 @@ namespace UnitarySystems {
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
             // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
             state.dataSize->DataEMSOverrideON = false;
             state.dataSize->DataConstantUsedForSizing = 0.0;
@@ -2273,7 +2273,7 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
             if (this->m_NumOfSpeedCooling != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state,
                                "Cooling coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
@@ -2323,7 +2323,7 @@ namespace UnitarySystems {
             auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
             // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
             if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state, "Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
@@ -2480,7 +2480,7 @@ namespace UnitarySystems {
                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                             if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] < 1.0 &&
                                 this->m_ControlType == ControlType::Setpoint) {
-                                ShowWarningError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                                 ShowContinueError(state, "Design specification object = " + state.dataUnitarySystems->designSpecMSHP[MSHPIndex].name);
                                 ShowContinueError(state,
                                                   "When control type = SetPointBased the outlet air temperature must change with coil capacity, if "
@@ -2549,7 +2549,7 @@ namespace UnitarySystems {
                                                       0.0); // conduct the sizing operation in the VS WSHP
 
             if (this->m_NumOfSpeedHeating != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + AirLoopHVAC + " = " + std::string{CompName});
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of heating speeds does not match coil object.");
                 ShowFatalError(state,
                                "Heating coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).VarSpeedCoilType + ": " +
@@ -2772,7 +2772,7 @@ namespace UnitarySystems {
                 PackagedThermalStorageCoil::SimTESCoil(
                     state, this->m_CoolingCoilName, this->m_CoolingCoilIndex, this->m_FanOpMode, this->m_TESOpMode, 0.0);
                 PackagedThermalStorageCoil::GetTESCoilCoolingCapacity(
-                    state, this->m_CoolingCoilName, state.dataSize->DataConstantUsedForSizing, ErrFound, AirLoopHVAC);
+                    state, this->m_CoolingCoilName, state.dataSize->DataConstantUsedForSizing, ErrFound, CompType);
                 EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
@@ -2784,7 +2784,7 @@ namespace UnitarySystems {
             bool errorsFound = false;
             CoolingCapacitySizer sizerCoolingCapacity;
             sizerCoolingCapacity.overrideSizingString(SizingString);
-            sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_DesignCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, errorsFound);
             state.dataSize->DataConstantUsedForSizing = 0.0;
             state.dataSize->DataFractionUsedForSizing = 0.0;
@@ -2818,7 +2818,7 @@ namespace UnitarySystems {
             bool errorsFound = false;
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
-            sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) state.dataSize->DXCoolCap = TempSize;
             if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
@@ -2841,7 +2841,7 @@ namespace UnitarySystems {
 
             TempSize = this->DesignMaxOutletTemp;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
-            sizerMaxHeaterOutTemp.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(state, TempSize, ErrFound);
         }
 
@@ -2857,7 +2857,7 @@ namespace UnitarySystems {
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             }
             // logic here isn't accurate. Replicating temporarily to minimize diffs in AutoSizingLibrary refactor
@@ -2874,7 +2874,7 @@ namespace UnitarySystems {
             bool errorsFound = false;
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
-            sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             IsAutoSize = false;
             state.dataSize->DataConstantUsedForSizing = 0.0;
@@ -2974,7 +2974,7 @@ namespace UnitarySystems {
             std::string stringOverride = "Minimum Supply Air Temperature [C]";
             if (state.dataGlobal->isEpJSON) stringOverride = "minimum_supply_air_temperature [C]";
             sizerASHRAEMinSATCooling.overrideSizingString(stringOverride);
-            sizerASHRAEMinSATCooling.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, this->DesignMinOutletTemp, ErrFound);
 
             if (SizingDesRunThisSys) {
@@ -2988,7 +2988,7 @@ namespace UnitarySystems {
             stringOverride = "Maximum Supply Air Temperature [C]";
             if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_temperature [C]";
             sizerASHRAEMaxSATHeating.overrideSizingString(stringOverride);
-            sizerASHRAEMaxSATHeating.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(state, this->DesignMaxOutletTemp, ErrFound);
 
             state.dataSize->DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently

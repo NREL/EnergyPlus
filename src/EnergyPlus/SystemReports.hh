@@ -117,7 +117,7 @@ namespace SystemReports {
     struct CompTypeError
     {
         // Members
-        std::string AirLoopHVAC;
+        std::string CompType;
         int CompErrIndex;
 
         // Default Constructor
@@ -233,7 +233,7 @@ namespace SystemReports {
     void CalcSystemEnergyUse(EnergyPlusData &state,
                              bool const CompLoadFlag,
                              int const AirLoopNum,
-                             std::string const &AirLoopHVAC,
+                             std::string const &CompType,
                              DataGlobalConstants::ResourceType const EnergyType,
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
@@ -246,7 +246,7 @@ namespace SystemReports {
     );
 
     void FindDemandSideMatch(EnergyPlusData &state,
-                             std::string const &AirLoopHVAC, // Inlet node of the component to find the match of
+                             std::string const &CompType, // Inlet node of the component to find the match of
                              std::string_view CompName,   // Outlet node of the component to find the match of
                              bool &MatchFound,            // Set to .TRUE. when a match is found
                              int &MatchLoopType,          // Loop number of the match
