@@ -73,7 +73,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,22.03;
+  Version,22.1;
 
   Building,
     BUILDING #1,             !- Name

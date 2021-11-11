@@ -39,7 +39,7 @@
 !        above the econo limit temperature.
 !        The third design day is very hot and all cooling is by the DX unit.
 
-  Version,22.03;
+  Version,22.1;
 
   Building,
     NONE,                    !- Name
