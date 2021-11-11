@@ -2108,7 +2108,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 rowHead(kMonth) = format("{} {}",
-                                         UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) + 1],
+                                         UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
                                          elcc->baseDateYear + int((kMonth - 1) / 12));
             }
             for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
