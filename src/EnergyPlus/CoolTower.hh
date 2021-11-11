@@ -80,7 +80,7 @@ namespace CoolTower {
     {
         // Members
         std::string Name;                     // The component name
-        std::string AirLoopHVAC;                 // Type of component
+        std::string CompType;                 // Type of component
         std::string Schedule;                 // Available schedule
         std::string ZoneName;                 // Name of zone the component is serving
         int SchedPtr;                         // Index to schedule

@@ -123,7 +123,7 @@ struct ZoneEquipControllerProps
 
 void ControlCompOutput(EnergyPlusData &state,
                        std::string const &CompName,               // the component Name
-                       std::string const &AirLoopHVAC,               // Type of component
+                       std::string const &CompType,               // Type of component
                        int &CompNum,                              // Index of component in component array
                        bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
                        Real64 const QZnReq,                       // zone load to be met
@@ -147,14 +147,14 @@ void ControlCompOutput(EnergyPlusData &state,
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
 
 void CheckSysSizing(EnergyPlusData &state,
-                    std::string const &AirLoopHVAC, // Component Type (e.g. Chiller:Electric)
+                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
-                     std::string const &AirLoopHVAC, // Component Type (e.g. Chiller:Electric)
+                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
@@ -170,7 +170,7 @@ void ValidateComponent(EnergyPlusData &state,
 );
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &AirLoopHVAC,    // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid

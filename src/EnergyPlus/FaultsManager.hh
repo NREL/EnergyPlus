@@ -394,7 +394,7 @@ namespace FaultsManager {
     void CheckAndReadFaults(EnergyPlusData &state);
 
     void SetFaultyCoilSATSensor(
-        EnergyPlusData &state, std::string const &AirLoopHVAC, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
+        EnergyPlusData &state, std::string const &CompType, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
 
 } // namespace FaultsManager
 

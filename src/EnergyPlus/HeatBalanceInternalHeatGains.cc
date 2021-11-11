@@ -151,7 +151,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
     for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
         if ((thisIntGain.device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
-            (thisIntGain.device(IntGainsNum).AirLoopHVAC == IntGainCompType)) {
+            (thisIntGain.device(IntGainsNum).CompType == IntGainCompType)) {
             FoundIntGainsType = true;
             if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
@@ -180,7 +180,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
 
     thisIntGain.device(thisIntGain.numberOfDevices).CompObjectType = UpperCaseObjectType;
     thisIntGain.device(thisIntGain.numberOfDevices).CompObjectName = UpperCaseObjectName;
-    thisIntGain.device(thisIntGain.numberOfDevices).AirLoopHVAC = IntGainCompType;
+    thisIntGain.device(thisIntGain.numberOfDevices).CompType = IntGainCompType;
     thisIntGain.device(thisIntGain.numberOfDevices).spaceGainFrac = spaceGainFraction;
 
     // note pointer assignments in code below!

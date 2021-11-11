@@ -201,7 +201,7 @@ namespace BranchInputManager {
                        DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of a pressure curve object
                        int &PressCurveIndex,                                      // Index of a pressure curve object
                        int &NumComps,                                             // Number of Components on Branch
-                       Array1D_string &AirLoopHVAC,                                  // Component Type for each item on Branch
+                       Array1D_string &CompType,                                  // Component Type for each item on Branch
                        Array1D_string &CompName,                                  // Component Name for each item on Branch
                        Array1D_string &CompInletNodeNames,                        // Component Inlet Node IDs for each item on Branch
                        Array1D_int &CompInletNodeNums,                            // Component Inlet Node Numbers for each item on Branch
@@ -211,7 +211,7 @@ namespace BranchInputManager {
 
     int NumCompsInBranch(EnergyPlusData &state, std::string const &BranchName);
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &AirLoopHVAC, std::string_view CompName);
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string_view CompName);
 
     void GetBranchFanTypeName(EnergyPlusData &state,
                               int BranchNum,
@@ -338,7 +338,7 @@ namespace BranchInputManager {
 
     void AuditBranches(EnergyPlusData &state,
                        bool mustprint,                     // true if the warning should be printed.
-                       Optional_string_const AirLoopHVAC = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
+                       Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 

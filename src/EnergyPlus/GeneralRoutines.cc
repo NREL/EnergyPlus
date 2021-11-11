@@ -114,7 +114,7 @@ enum GeneralRoutinesEquipNums
 
 void ControlCompOutput(EnergyPlusData &state,
                        std::string const &CompName,           // the component Name
-                       std::string const &AirLoopHVAC,           // Type of component
+                       std::string const &CompType,           // Type of component
                        int &CompNum,                          // Index of component in component array
                        bool const FirstHVACIteration,         // flag for 1st HVAV iteration in the time step
                        Real64 const QZnReq,                   // zone load to be met
@@ -209,7 +209,7 @@ void ControlCompOutput(EnergyPlusData &state,
     if (ControlCompTypeNum != 0) {
         SimCompNum = ControlCompTypeNum;
     } else {
-        SimCompNum = UtilityRoutines::FindItemInSortedList(AirLoopHVAC, ListOfComponents, NumComponents);
+        SimCompNum = UtilityRoutines::FindItemInSortedList(CompType, ListOfComponents, NumComponents);
         ControlCompTypeNum = SimCompNum;
     }
 
@@ -238,7 +238,7 @@ void ControlCompOutput(EnergyPlusData &state,
             state.dataLoopNodes->Node(ActuatedNode).MassFlowRateMinAvail = MinFlow;
             // Check to make sure that the Minimum Flow rate is less than the max.
             if (MinFlow > MaxFlow) {
-                ShowSevereError(state, "ControlCompOutput:" + AirLoopHVAC + ':' + CompName + ", Min Control Flow is > Max Control Flow");
+                ShowSevereError(state, "ControlCompOutput:" + CompType + ':' + CompName + ", Min Control Flow is > Max Control Flow");
                 ShowContinueError(
                     state, format("Acuated Node={} MinFlow=[{:.3T}], Max Flow={:.3T}", state.dataLoopNodes->NodeID(ActuatedNode), MinFlow, MaxFlow));
                 ShowContinueErrorTimeStamp(state, "");
@@ -565,7 +565,7 @@ void ControlCompOutput(EnergyPlusData &state,
         ++Iter;
         if ((Iter > MaxIter) && (!state.dataGlobal->WarmupFlag)) {
             // if ( CompErrIndex == 0 ) {
-            ShowWarningMessage(state, "ControlCompOutput: Maximum iterations exceeded for " + AirLoopHVAC + " = " + CompName);
+            ShowWarningMessage(state, "ControlCompOutput: Maximum iterations exceeded for " + CompType + " = " + CompName);
             ShowContinueError(state, format("... Load met       = {:.5T} W.", LoadMet));
             ShowContinueError(state, format("... Load requested = {:.5T} W.", QZnReq));
             ShowContinueError(state, format("... Error          = {:.8T} %.", std::abs((LoadMet - QZnReq) * 100.0 / Denom)));
@@ -574,7 +574,7 @@ void ControlCompOutput(EnergyPlusData &state,
             ShowContinueError(state, format("... Actuated Node Mass Flow Rate ={:.9R} kg/s", state.dataLoopNodes->Node(ActuatedNode).MassFlowRate));
             ShowContinueErrorTimeStamp(state, "");
             ShowRecurringWarningErrorAtEnd(state,
-                                           "ControlCompOutput: Maximum iterations error for " + AirLoopHVAC + " = " + CompName,
+                                           "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -583,7 +583,7 @@ void ControlCompOutput(EnergyPlusData &state,
                                            "%");
             //}
             ShowRecurringWarningErrorAtEnd(state,
-                                           "ControlCompOutput: Maximum iterations error for " + AirLoopHVAC + " = " + CompName,
+                                           "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -637,7 +637,7 @@ bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const Mi
 }
 
 void CheckSysSizing(EnergyPlusData &state,
-                    std::string const &AirLoopHVAC, // Component Type (e.g. Chiller:Electric)
+                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 )
 {
@@ -656,7 +656,7 @@ void CheckSysSizing(EnergyPlusData &state,
     // Checks SysSizingRunDone flag. If false throws a fatal error.
 
     if (!state.dataSize->SysSizingRunDone) {
-        ShowSevereError(state, "For autosizing of " + AirLoopHVAC + ' ' + CompName + ", a system sizing run must be done.");
+        ShowSevereError(state, "For autosizing of " + CompType + ' ' + CompName + ", a system sizing run must be done.");
         if (state.dataSize->NumSysSizInput == 0) {
             ShowContinueError(state, "No \"Sizing:System\" objects were entered.");
         }
@@ -691,7 +691,7 @@ void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bo
 }
 
 void CheckZoneSizing(EnergyPlusData &state,
-                     std::string const &AirLoopHVAC, // Component Type (e.g. Chiller:Electric)
+                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 )
 {
@@ -710,7 +710,7 @@ void CheckZoneSizing(EnergyPlusData &state,
     // Checks ZoneSizingRunDone flag. If false throws a fatal error.
 
     if (!state.dataSize->ZoneSizingRunDone) {
-        ShowSevereError(state, "For autosizing of " + AirLoopHVAC + ' ' + CompName + ", a zone sizing run must be done.");
+        ShowSevereError(state, "For autosizing of " + CompType + ' ' + CompName + ", a zone sizing run must be done.");
         if (state.dataSize->NumZoneSizingInput == 0) {
             ShowContinueError(state, "No \"Sizing:Zone\" objects were entered.");
         }
@@ -795,7 +795,7 @@ void ValidateComponent(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &AirLoopHVAC,    // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
@@ -826,15 +826,15 @@ void ValidateComponent(EnergyPlusData &state,
 
     IsNotOK = false;
 
-    ItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, AirLoopHVAC, CompValType, CompName);
+    ItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, CompType, CompValType, CompName);
 
     if (ItemNum < 0) {
-        ShowSevereError(state, "During " + CallString + " Input, Invalid Component Type input=" + AirLoopHVAC);
+        ShowSevereError(state, "During " + CallString + " Input, Invalid Component Type input=" + CompType);
         ShowContinueError(state, "Component name=" + CompName);
         IsNotOK = true;
     } else if (ItemNum == 0) {
         ShowSevereError(state, "During " + CallString + " Input, Invalid Component Name input=" + CompName);
-        ShowContinueError(state, "Component type=" + AirLoopHVAC);
+        ShowContinueError(state, "Component type=" + CompType);
         IsNotOK = true;
     }
 }

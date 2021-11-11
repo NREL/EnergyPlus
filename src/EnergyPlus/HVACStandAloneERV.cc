@@ -1468,7 +1468,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     DesignSAFanVolFlowRateUser = 0.0;
     ExhaustAirVolFlowDes = 0.0;
     ExhaustAirVolFlowUser = 0.0;
-    std::string AirLoopHVAC("ZoneHVAC:EnergyRecoveryVentilator");
+    std::string CompType("ZoneHVAC:EnergyRecoveryVentilator");
     std::string CompName(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name);
     bool PrintFlag = true;
     bool ErrorsFound = false;
@@ -1532,7 +1532,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
         if (TempSize > 0.0) {
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
-            sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             TempSize = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
         }
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow = TempSize;
@@ -1569,7 +1569,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
         if (TempSize > 0.0) {
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
-            sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             TempSize = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
         }
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow = TempSize;

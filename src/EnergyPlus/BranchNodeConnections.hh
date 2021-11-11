@@ -143,7 +143,7 @@ namespace BranchNodeConnections {
     void SetUpCompSets(EnergyPlusData &state,
                        std::string_view ParentType,          // Parent Object Type
                        std::string_view ParentName,          // Parent Object Name
-                       std::string_view AirLoopHVAC,            // Component Type
+                       std::string_view CompType,            // Component Type
                        std::string_view CompName,            // Component Name
                        std::string_view InletNode,           // Inlet Node Name
                        std::string_view OutletNode,          // Outlet Node Name
@@ -153,7 +153,7 @@ namespace BranchNodeConnections {
     void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
     void TestCompSet(EnergyPlusData &state,
-                     std::string const &AirLoopHVAC,   // Component Type
+                     std::string const &CompType,   // Component Type
                      std::string_view CompName,     // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name

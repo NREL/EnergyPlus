@@ -1268,7 +1268,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
     Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
     std::string CompName;       // component name
-    std::string AirLoopHVAC;       // component type
+    std::string CompType;       // component type
     std::string SizingString;   // input field sizing description (e.g., Nominal Capacity)
     bool bPRINT = true;         // TRUE if sizing is reported to output (eio)
     Real64 TempFlow;            // autosized flow rate of fan [m3/s]
@@ -1288,7 +1288,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
     TempFlow = Fan(FanNum).MaxAirFlowRate;
     state.dataSize->DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
-    AirLoopHVAC = Fan(FanNum).FanType;
+    CompType = Fan(FanNum).FanType;
     CompName = Fan(FanNum).FanName;
     state.dataSize->DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
     state.dataSize->DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
@@ -1296,7 +1296,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     bool errorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
     sizerSystemAirFlow.overrideSizingString(SizingString);
-    sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, bPRINT, RoutineName);
+    sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
     Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(state, TempFlow, errorsFound);
 
     state.dataSize->DataAutosizable = true;

@@ -700,7 +700,7 @@ namespace ElectricBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CompName;     // component name
-        std::string AirLoopHVAC;     // component type
+        std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
         Real64 FracOfAutoSzCap;   // fraction of autosized capacity
@@ -718,7 +718,7 @@ namespace ElectricBaseboardRadiator {
 
         if (state.dataSize->CurZoneEqNum > 0) {
 
-            AirLoopHVAC = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
+            CompType = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
             CompName = ElecBaseboard(BaseboardNum).EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = ElecBaseboard(BaseboardNum).ZonePtr;
@@ -732,7 +732,7 @@ namespace ElectricBaseboardRadiator {
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        CheckZoneSizing(state, AirLoopHVAC, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
                             state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     } else {
@@ -749,7 +749,7 @@ namespace ElectricBaseboardRadiator {
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    CheckZoneSizing(state, AirLoopHVAC, CompName);
+                    CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
@@ -758,7 +758,7 @@ namespace ElectricBaseboardRadiator {
                     bool ErrorsFound = false;
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
-                    sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     FracOfAutoSzCap = sizerHeatingCapacity.size(state, FracOfAutoSzCap, ErrorsFound);
                     TempSize = FracOfAutoSzCap;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;

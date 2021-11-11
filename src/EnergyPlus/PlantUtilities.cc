@@ -1945,7 +1945,7 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &AirLoopHVAC,           // component description
+                       std::string const &CompType,           // component description
                        std::string_view CompName,             // user name of component
                        int const NodeNumIn,                   // component water inlet node
                        [[maybe_unused]] int const NodeNumOut, // component water outlet node
@@ -2006,13 +2006,13 @@ int MyPlantSizingIndex(EnergyPlusData &state,
             if (PrintErrorFlag) {
                 ShowSevereError(state,
                                 "MyPlantSizingIndex: Could not find " + state.dataPlnt->PlantLoop(MyPltLoopNum).Name + " in Sizing:Plant objects.");
-                ShowContinueError(state, "...reference Component Type=\"" + AirLoopHVAC + "\", Name=\"" + std::string{CompName} + "\".");
+                ShowContinueError(state, "...reference Component Type=\"" + CompType + "\", Name=\"" + std::string{CompName} + "\".");
             }
             ErrorsFound = true;
         }
     } else {
         if (PrintErrorFlag) {
-            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + AirLoopHVAC + " with name " + std::string{CompName} + " on any plant loop");
+            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + CompType + " with name " + std::string{CompName} + " on any plant loop");
         }
         ErrorsFound = true;
     }

@@ -1285,7 +1285,7 @@ void GetChildrenData(EnergyPlusData &state,
 void SetUpCompSets(EnergyPlusData &state,
                    std::string_view ParentType,      // Parent Object Type
                    std::string_view ParentName,      // Parent Object Name
-                   std::string_view AirLoopHVAC,        // Component Type
+                   std::string_view CompType,        // Component Type
                    std::string_view CompName,        // Component Name
                    std::string_view InletNode,       // Inlet Node Name
                    std::string_view OutletNode,      // Outlet Node Name
@@ -1317,7 +1317,7 @@ void SetUpCompSets(EnergyPlusData &state,
     // Object Data
 
     ParentTypeUC = UtilityRoutines::MakeUPPERCase(ParentType);
-    CompTypeUC = UtilityRoutines::MakeUPPERCase(AirLoopHVAC);
+    CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
     Found = 0;
 
     // See if Component-Nodes set is already there - should be unique
@@ -1549,7 +1549,7 @@ void TestInletOutletNodes(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFo
 }
 
 void TestCompSet(EnergyPlusData &state,
-                 std::string const &AirLoopHVAC,   // Component Type
+                 std::string const &CompType,   // Component Type
                  std::string_view CompName,     // Component Name
                  std::string const &InletNode,  // Inlet Node Name
                  std::string const &OutletNode, // Outlet Node Name
@@ -1584,7 +1584,7 @@ void TestCompSet(EnergyPlusData &state,
     int Found;
     std::string CompTypeUC; // Component type in upper case
 
-    CompTypeUC = UtilityRoutines::MakeUPPERCase(AirLoopHVAC);
+    CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
 
     // See if Already there
     Found = 0;
@@ -1605,7 +1605,7 @@ void TestCompSet(EnergyPlusData &state,
     }
 
     if (Found == 0) {
-        SetUpCompSets(state, "UNDEFINED", "UNDEFINED", AirLoopHVAC, CompName, InletNode, OutletNode, Description);
+        SetUpCompSets(state, "UNDEFINED", "UNDEFINED", CompType, CompName, InletNode, OutletNode, Description);
     } else {
         // Fill in node names and component type for previously undefined values:
         //   If the parent object did not specify a component type or inlet or outlet node, then that value

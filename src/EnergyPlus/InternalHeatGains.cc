@@ -8780,7 +8780,7 @@ namespace InternalHeatGains {
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ConvectGainRate;
                     }
                 }
@@ -8792,7 +8792,7 @@ namespace InternalHeatGains {
                 }
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                     for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
                         }
                     }
@@ -8862,7 +8862,7 @@ namespace InternalHeatGains {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
                     }
                 }
@@ -8922,7 +8922,7 @@ namespace InternalHeatGains {
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
                     }
                 }
@@ -8934,7 +8934,7 @@ namespace InternalHeatGains {
                 }
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                     for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
                         }
                     }
@@ -8987,7 +8987,7 @@ namespace InternalHeatGains {
             }
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC != DataHeatBalance::IntGainType::People) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType != DataHeatBalance::IntGainType::People) {
                     SumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                 }
             }
@@ -9018,7 +9018,7 @@ namespace InternalHeatGains {
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).LatentGainRate;
                     }
                 }
@@ -9030,7 +9030,7 @@ namespace InternalHeatGains {
                 }
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                     for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                         }
                     }
@@ -9114,7 +9114,7 @@ namespace InternalHeatGains {
             }
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC != DataHeatBalance::IntGainType::People) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType != DataHeatBalance::IntGainType::People) {
                     SumCO2GainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
                 }
             }
@@ -9150,7 +9150,7 @@ namespace InternalHeatGains {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC == GainTypeARR[TypeNum]) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumCO2GainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
                     }
                 }
@@ -9333,7 +9333,7 @@ namespace InternalHeatGains {
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
             if ((UtilityRoutines::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName,
                                              intGainName.data())) &&
-                (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).AirLoopHVAC == intGainType)) {
+                (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == intGainType)) {
                 DeviceIndex = DeviceNum;
                 break;
             } else {

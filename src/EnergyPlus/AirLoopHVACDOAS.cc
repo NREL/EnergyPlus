@@ -398,7 +398,7 @@ namespace AirLoopHVACDOAS {
                 // get inlet and outlet node number from equipment list
                 CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem:EquipmentList";
                 for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents; ++CompNum) {
-                    std::string AirLoopHVAC = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum);
+                    std::string CompType = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum);
                     std::string CompName = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum);
                     bool InletNodeErrFlag = false;
                     bool OutletNodeErrFlag = false;
@@ -553,9 +553,9 @@ namespace AirLoopHVACDOAS {
 
                     } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            SteamCoils::GetCoilSteamInletNode(state, AirLoopHVAC, CompName, InletNodeErrFlag);
+                            SteamCoils::GetCoilSteamInletNode(state, CompType, CompName, InletNodeErrFlag);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            SteamCoils::GetCoilSteamOutletNode(state, AirLoopHVAC, CompName, OutletNodeErrFlag);
+                            SteamCoils::GetCoilSteamOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             WaterCoils::GetCoilInletNode(state,
@@ -614,9 +614,9 @@ namespace AirLoopHVACDOAS {
                                                             OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, AirLoopHVAC, CompName, InletNodeErrFlag);
+                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, CompType, CompName, InletNodeErrFlag);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, AirLoopHVAC, CompName, OutletNodeErrFlag);
+                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
                         if (state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum] == nullptr) {
                             UnitarySystems::UnitarySys thisSys;
@@ -889,16 +889,16 @@ namespace AirLoopHVACDOAS {
             Real64 rho;
             state.dataSize->CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
-                std::string AirLoopHVAC = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
+                std::string CompType = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
                 std::string CompName = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentName(CompNum);
-                if (UtilityRoutines::SameString(AirLoopHVAC, "FAN:SYSTEMMODEL")) {
+                if (UtilityRoutines::SameString(CompType, "FAN:SYSTEMMODEL")) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state);
                 }
-                if (UtilityRoutines::SameString(AirLoopHVAC, "FAN:COMPONENTMODEL")) {
+                if (UtilityRoutines::SameString(CompType, "FAN:COMPONENTMODEL")) {
                     Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, this->m_FanIndex);
                 }
 
-                if (UtilityRoutines::SameString(AirLoopHVAC, "COIL:HEATING:WATER")) {
+                if (UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
@@ -916,7 +916,7 @@ namespace AirLoopHVACDOAS {
                                                        this->HWBranchNum,
                                                        this->HWCompNum);
                 }
-                if (UtilityRoutines::SameString(AirLoopHVAC, "COIL:COOLING:WATER")) {
+                if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
@@ -934,7 +934,7 @@ namespace AirLoopHVACDOAS {
                                                        this->CWBranchNum,
                                                        this->CWCompNum);
                 }
-                if (UtilityRoutines::SameString(AirLoopHVAC, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
+                if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);

@@ -7969,7 +7969,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     Real64 EvapCondPumpPowerUser;                                        // Hardsized evaporative condenser pump power for reporting
 
     std::string CompName;     // component name
-    std::string AirLoopHVAC;     // component type
+    std::string CompType;     // component type
     std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
     Real64 TempSize;          // autosized value of coil input field
     int FieldNum = 2;         // IDD numeric field number where input field description is found
@@ -8055,7 +8055,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         state.dataHVACVarRefFlow->MyOneTimeSizeFlag = false;
     }
 
-    AirLoopHVAC = DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num);
+    CompType = DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num);
     CompName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name;
     state.dataSize->DataZoneNumber = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum;
 
@@ -8157,7 +8157,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
             sizingCoolingAirFlow.overrideSizingString(stringOverride);
             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
         } else if (SAFMethod == FlowPerCoolingCapacity) {
@@ -8171,7 +8171,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             }
             CoolingCapacitySizer sizerCoolingCapacity;
             sizerCoolingCapacity.overrideSizingString(SizingString);
-            sizerCoolingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataSize->DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, errorsFound);
             state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
             PrintFlag = true;
@@ -8181,7 +8181,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
             sizingCoolingAirFlow.overrideSizingString(stringOverride);
             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
         }
 
@@ -8215,7 +8215,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             HeatingAirFlowSizer sizingHeatingAirFlow;
             sizingHeatingAirFlow.overrideSizingString(SizingString);
             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
         } else if (SAFMethod == FlowPerHeatingCapacity) {
             SizingMethod = HeatingCapacitySizing;
@@ -8229,7 +8229,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             bool errorsFound = false;
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
-            sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
             SizingMethod = HeatingAirflowSizing;
@@ -8239,7 +8239,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             HeatingAirFlowSizer sizingHeatingAirFlow;
             sizingHeatingAirFlow.overrideSizingString(SizingString);
             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
         }
 
@@ -8278,7 +8278,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataGlobal->isEpJSON) stringOverride = "no_cooling_supply_air_flow_rate [m3/s]";
             sizingCoolingAirFlow.overrideSizingString(stringOverride);
             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
         }
 
@@ -8319,7 +8319,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             HeatingAirFlowSizer sizingNoHeatingAirFlow;
             sizingNoHeatingAirFlow.overrideSizingString(SizingString);
             // sizingNoHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-            sizingNoHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+            sizingNoHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizingNoHeatingAirFlow.size(state, TempSize, errorsFound);
         }
 
@@ -8379,7 +8379,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         if (state.dataGlobal->isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
         sizingCoolingAirFlow.overrideSizingString(stringOverride);
         // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-        sizingCoolingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+        sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
         FieldNum = 3; // N3, \field Supply Air Flow Rate During Heating Operation
@@ -8390,21 +8390,21 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         HeatingAirFlowSizer sizingHeatingAirFlow;
         sizingHeatingAirFlow.overrideSizingString(SizingString);
         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
-        sizingHeatingAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+        sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
         errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         std::string sizingString = "No Cooling Supply Air Flow Rate [m3/s]";
         sizerSystemAirFlow.overrideSizingString(sizingString);
-        sizerSystemAirFlow.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+        sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirVolFlow =
             sizerSystemAirFlow.size(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirVolFlow, errorsFound);
 
         SystemAirFlowSizer sizerSystemAirFlow2;
         sizingString = "No Heating Supply Air Flow Rate [m3/s]";
         sizerSystemAirFlow2.overrideSizingString(sizingString);
-        sizerSystemAirFlow2.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+        sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirVolFlow =
             sizerSystemAirFlow2.size(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoHeatAirVolFlow, errorsFound);
     }
@@ -8658,7 +8658,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         std::string stringOverride = "Maximum Supply Air Temperature from Supplemental Heater [C]";
         if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_temperature_from_supplemental_heater [C]";
         sizerMaxHeaterOutTemp.overrideSizingString(stringOverride);
-        sizerMaxHeaterOutTemp.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+        sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(state, TempSize, ErrorsFound);
     }
 
@@ -8672,7 +8672,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     }
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
-        AirLoopHVAC = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType;
+        CompType = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType;
         CompName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName;
         PrintFlag = false; // why isn't this being reported?
         TempSize = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
@@ -8684,7 +8684,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 std::string stringOverride = "Supplemental Heating Coil Nominal Capacity [W]";
                 if (state.dataGlobal->isEpJSON) stringOverride = "supplemental_heating_coil_nominal_capacity [W]";
                 sizerWaterHeatingCapacity.overrideSizingString(stringOverride);
-                sizerWaterHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerWaterHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerWaterHeatingCapacity.size(state, TempSize, ErrorsFound);
             }
         } else {
@@ -8695,7 +8695,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             }
         }

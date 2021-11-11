@@ -407,7 +407,7 @@ namespace MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOAComponent(EnergyPlusData &state,
-                        std::string const &AirLoopHVAC,                 // the component type
+                        std::string const &CompType,                    // the component type
                         std::string const &CompName,                    // the component Name
                         SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
@@ -599,7 +599,7 @@ struct MixedAirData : BaseGlobalStruct
     EPVector<MixedAir::VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string CompName;
     std::string CtrlName;
     Array1D_bool OAControllerMyOneTimeFlag;

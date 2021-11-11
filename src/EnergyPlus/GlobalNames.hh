@@ -70,7 +70,7 @@ namespace GlobalNames {
     struct ComponentNameData
     {
         // Members
-        std::string AirLoopHVAC; // Component Type
+        std::string CompType; // Component Type
         std::string CompName; // Component Name (user supplied)
 
         // Default Constructor

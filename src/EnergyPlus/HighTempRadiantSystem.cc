@@ -803,7 +803,7 @@ namespace HighTempRadiantSystem {
         bool IsAutoSize;          // Indicator to autosizing nominal capacity
 
         std::string CompName;     // component name
-        std::string AirLoopHVAC;     // component type
+        std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
         int FieldNum = 1;         // IDD numeric field number where input field description is found
@@ -824,7 +824,7 @@ namespace HighTempRadiantSystem {
 
         if (state.dataSize->CurZoneEqNum > 0) {
 
-            AirLoopHVAC = "ZoneHVAC:HighTemperatureRadiant";
+            CompType = "ZoneHVAC:HighTemperatureRadiant";
             CompName = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).Name;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
@@ -839,7 +839,7 @@ namespace HighTempRadiantSystem {
 
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity == AutoSize) {
-                        CheckZoneSizing(state, AirLoopHVAC, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
                             FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad / (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant +
                                                                                   state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect);
@@ -855,7 +855,7 @@ namespace HighTempRadiantSystem {
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    CheckZoneSizing(state, AirLoopHVAC, CompName);
+                    CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
@@ -869,7 +869,7 @@ namespace HighTempRadiantSystem {
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, AirLoopHVAC, CompName, PrintFlag, RoutineName);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataHighTempRadSys->HighTempRadSys(RadSysNum).MaxPowerCapac = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DataScalableCapSizingON = false;
             }

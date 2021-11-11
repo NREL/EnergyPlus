@@ -221,7 +221,7 @@ void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName,
 void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
 {
     int CompNum;
-    auto &AirLoopHVAC = state.dataMixedAir->AirLoopHVAC;
+    auto &CompType = state.dataMixedAir->CompType;
     auto &CompName = state.dataMixedAir->CompName;
     bool ReSim(false);
     bool Sim(true);
@@ -230,10 +230,10 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
     bool OAHX(false);
 
     for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
-        AirLoopHVAC = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
+        CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
         CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
         SimOAComponent(state,
-                       AirLoopHVAC,
+                       CompType,
                        CompName,
                        state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum),
                        FirstHVACIteration,
@@ -251,10 +251,10 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
     // exit node
     if (ReSim) {
         for (CompNum = state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents - 1; CompNum >= 1; --CompNum) {
-            AirLoopHVAC = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
+            CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
             CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
             SimOAComponent(state,
-                           AirLoopHVAC,
+                           CompType,
                            CompName,
                            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum),
                            FirstHVACIteration,
@@ -268,10 +268,10 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
         }
         // now simulate again propagate current temps back through OA system
         for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
-            AirLoopHVAC = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
+            CompType = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum);
             CompName = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum);
             SimOAComponent(state,
-                           AirLoopHVAC,
+                           CompType,
                            CompName,
                            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum),
                            FirstHVACIteration,
@@ -302,9 +302,9 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
     int CompNum;
     // INTEGER :: CtrlNum
     int OAMixerNum;
-    int OAControllerNum;                                 // OA controller index in OAController
-    auto &AirLoopHVAC = state.dataMixedAir->AirLoopHVAC; // Tuned Made static
-    auto &CompName = state.dataMixedAir->CompName;       // Tuned Made static
+    int OAControllerNum;                           // OA controller index in OAController
+    auto &CompType = state.dataMixedAir->CompType; // Tuned Made static
+    auto &CompName = state.dataMixedAir->CompName; // Tuned Made static
     bool FatalErrorFlag(false);
 
     // SimOutsideAirSys can handle only 1 controller right now.  This must be
@@ -327,9 +327,9 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
                 state, "AirLoopHVAC:OutdoorAirSystem " + CurrentOASystem.Name + " has more than 1 outside air controller; only the 1st will be used");
         }
         for (CompNum = 1; CompNum <= CurrentOASystem.NumComponents; ++CompNum) {
-            AirLoopHVAC = CurrentOASystem.ComponentType(CompNum);
+            CompType = CurrentOASystem.ComponentType(CompNum);
             CompName = CurrentOASystem.ComponentName(CompNum);
-            if (UtilityRoutines::SameString(AirLoopHVAC, "OutdoorAir:Mixer")) {
+            if (UtilityRoutines::SameString(CompType, "OutdoorAir:Mixer")) {
                 OAMixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixedAir->OAMixer);
                 OAControllerNum = CurrentOASystem.OAControllerIndex;
                 if (state.dataMixedAir->OAController(OAControllerNum).MixNode != state.dataMixedAir->OAMixer(OAMixerNum).MixNode) {
@@ -387,7 +387,7 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
 }
 
 void SimOAComponent(EnergyPlusData &state,
-                    std::string const &AirLoopHVAC,                 // the component type
+                    std::string const &CompType,                    // the component type
                     std::string const &CompName,                    // the component Name
                     SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
                     bool const FirstHVACIteration,
@@ -778,7 +778,7 @@ void SimOAComponent(EnergyPlusData &state,
         }
 
     } else {
-        ShowFatalError(state, "Invalid Outside Air Component=" + AirLoopHVAC);
+        ShowFatalError(state, "Invalid Outside Air Component=" + CompType);
     }
 }
 
@@ -5098,9 +5098,9 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
     static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 OAFlowRatio;      // Used for error checking
-    std::string AirLoopHVAC; // Component type
-    std::string CompName;    // Component name
+    Real64 OAFlowRatio;   // Used for error checking
+    std::string CompType; // Component type
+    std::string CompName; // Component name
     std::string CoilName;
     std::string CoilType;
     int CompNum;
@@ -5199,17 +5199,17 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
     // to the coil components that don't have design air flow as an input.
     if (state.dataSize->CurOASysNum > 0) {
         for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).NumComponents; ++CompNum) {
-            AirLoopHVAC = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentType(CompNum);
+            CompType = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentType(CompNum);
             CompName = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentName(CompNum);
-            if (UtilityRoutines::SameString(AirLoopHVAC, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
-                UtilityRoutines::SameString(AirLoopHVAC, "COIL:HEATING:WATER") ||
-                UtilityRoutines::SameString(AirLoopHVAC, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
-                if (UtilityRoutines::SameString(AirLoopHVAC, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
-                    CoilName = GetHXDXCoilName(state, AirLoopHVAC, CompName, ErrorsFound);
-                    CoilType = GetHXCoilType(state, AirLoopHVAC, CompName, ErrorsFound);
+            if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
+                UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER") ||
+                UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
+                if (UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
+                    CoilName = GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
+                    CoilType = GetHXCoilType(state, CompType, CompName, ErrorsFound);
                 } else {
                     CoilName = CompName;
-                    CoilType = AirLoopHVAC;
+                    CoilType = CompType;
                 }
                 SetCoilDesFlow(state, CoilType, CoilName, this->MinOA, ErrorsFound);
             }
@@ -5879,7 +5879,7 @@ int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
     // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string CompName;
     bool Sim(false);
     bool FirstHVACIteration(false);
@@ -5896,10 +5896,10 @@ int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
 
     NumHeatingCoils = 0;
     for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNumber).NumComponents; ++CompNum) {
-        AirLoopHVAC = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType(CompNum);
+        CompType = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType(CompNum);
         CompName = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentName(CompNum);
         SimOAComponent(state,
-                       AirLoopHVAC,
+                       CompType,
                        CompName,
                        state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentTypeEnum(CompNum),
                        FirstHVACIteration,
@@ -6013,7 +6013,7 @@ int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
     // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    std::string AirLoopHVAC;
+    std::string CompType;
     std::string CompName;
     bool Sim(false);
     bool FirstHVACIteration(false);
@@ -6030,10 +6030,10 @@ int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
 
     NumCoolingCoils = 0;
     for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNumber).NumComponents; ++CompNum) {
-        AirLoopHVAC = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType(CompNum);
+        CompType = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType(CompNum);
         CompName = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentName(CompNum);
         SimOAComponent(state,
-                       AirLoopHVAC,
+                       CompType,
                        CompName,
                        state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentTypeEnum(CompNum),
                        FirstHVACIteration,
