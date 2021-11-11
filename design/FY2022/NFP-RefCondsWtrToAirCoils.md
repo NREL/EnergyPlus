@@ -4,7 +4,7 @@ Reference Temperature Inputs for Water To Air Coils
 **Jeremy Lerond, Wooyoung Jung, and Jian Zhang, PNNL**
 
  - Original Date: 10/21/2021
- - Revision Date: 11/01/2021
+ - Revision Date: 11/10/2021
 
 
 ## Justification for New Feature ##
