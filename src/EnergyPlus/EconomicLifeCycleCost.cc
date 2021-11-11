@@ -447,7 +447,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
     for (iInObj = 0; iInObj < elcc->numRecurringCosts; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
-                                                                 iInObj + 1, //since this index needs to start from 1
+                                                                 iInObj + 1, // since this index needs to start from 1
                                                                  AlphaArray,
                                                                  NumAlphas,
                                                                  NumArray,
@@ -641,7 +641,7 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
     for (iInObj = 0; iInObj < elcc->numNonrecurringCost; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
-                                                                 iInObj + 1, //since this index needs to start from 1
+                                                                 iInObj + 1, // since this index needs to start from 1
                                                                  AlphaArray,
                                                                  NumAlphas,
                                                                  NumArray,
@@ -672,9 +672,9 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \default Construction
         elcc->NonrecurringCost[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotNonRecurringCost =  BITF_TEST_NONE(BITF(elcc->NonrecurringCost[iInObj].category),
-                             BITF(CostCategory::Construction) | BITF(CostCategory::Salvage) |
-                                 BITF(CostCategory::OtherCapital));
+        bool isNotNonRecurringCost =
+            BITF_TEST_NONE(BITF(elcc->NonrecurringCost[iInObj].category),
+                           BITF(CostCategory::Construction) | BITF(CostCategory::Salvage) | BITF(CostCategory::OtherCapital));
         if (isNotNonRecurringCost) {
             elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
             ShowWarningError(state,
