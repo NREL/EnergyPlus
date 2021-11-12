@@ -154,6 +154,7 @@ We will add a new object *Output:Table:ReportPeriod* to add supplementary inform
           \key ThermalResilienceSummary
           \key CO2ResilienceSummary
           \key VisualResilienceSummary
+          \key AllResilienceSummaries
           \key …
       N1 , \field Begin Year
           \note start year of reporting, if specified
