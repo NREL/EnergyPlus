@@ -54,6 +54,8 @@ We propose to add an *Output:Table:ReportPeriod* that takes an input of a Summar
 
 ## Approach ##
 
+### 1. Addition of reporting tables.
+
 The following tables will be appended to the existing Thermal Resilience Summary reports as part of the tabular summary reports.
 
 Report: **Thermal Resilience Summary**
@@ -120,6 +122,14 @@ Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 4. Sample report table of discomfort-weighted exceedance hours.</p>
 
 When *ThermalResilienceSummary* is declared in *Output:Table:SummaryReports*, the above three tables will be generated and presented in the tabular reports. In particular, the *Hours of Safety* table will only be presented if an *Output:Table:ReportPeriod* object is defined for ThermalResilienceSummary report. 
+
+### 2. Warnings for power outage ###
+
+During the power outage period, a warning will be thrown when the electricity usage is non-zero.
+
+### 3. Documentation updates ###
+
+The documentation of the *Output:Table:ReportPeriod* will be updated, suggesting users to include adaptation strategies people usually adopt during power outages, such as increased airflow rate from window usage during hot events and the use of alternative space heating strategies, such as fireplaces, natural gas or propane portable heaters during code events.
 
 ## Testing/Validation/Data Source(s): ##
 
