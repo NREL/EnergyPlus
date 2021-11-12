@@ -14691,8 +14691,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
-    state->dataLoopNodes->Node(8).Temp = 23.822;        // 24C db
-    state->dataLoopNodes->Node(8).HumRat = 0.0145946;   // 17C wb
+    state->dataLoopNodes->Node(8).Temp = 23.822;      // 24C db
+    state->dataLoopNodes->Node(8).HumRat = 0.0145946; // 17C wb
     state->dataLoopNodes->Node(8).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(8).Temp, state->dataLoopNodes->Node(8).HumRat);
     state->dataLoopNodes->Node(8).Press = state->dataEnvrn->OutBaroPress;
     Real64 SenOutput;
@@ -14725,10 +14725,10 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
-    state->dataLoopNodes->Node(1).HumRat = 0.0114544;   // 17C wb
+    state->dataLoopNodes->Node(1).HumRat = 0.0114544; // 17C wb
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataLoopNodes->Node(8).Temp = 24.18496;    // 24C db
-    state->dataLoopNodes->Node(8).HumRat = 0.0121542;   // 17C wb
+    state->dataLoopNodes->Node(8).HumRat = 0.0121542; // 17C wb
     state->dataLoopNodes->Node(8).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(8).Temp, state->dataLoopNodes->Node(8).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
     state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
@@ -15984,8 +15984,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
     state->dataLoopNodes->Node(7).FluidType = DataLoopNode::NodeFluidType::Air;
-    state->dataLoopNodes->Node(7).Temp = 24.0;                                       // 24C db
-    state->dataLoopNodes->Node(7).HumRat = 0.01522;                                  // 17C wb
+    state->dataLoopNodes->Node(7).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(7).HumRat = 0.01522; // 17C wb
     state->dataLoopNodes->Node(7).Press = state->dataEnvrn->OutBaroPress;
     state->dataLoopNodes->Node(7).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy; // www.sugartech.com/psychro/index.php
     thisSys->NodeNumOfControlledZone = 7;
