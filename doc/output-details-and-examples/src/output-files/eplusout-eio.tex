@@ -2304,42 +2304,36 @@ A separate report is available for windows (note that both nominal conductance a
 
 \begin{lstlisting}
 ! <WindowConstruction>,Construction Name,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},Convection Coefficient Adjustment Ratio,SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
-WindowConstruction,DOUBLE PANE WITH SCREEN,~~ 4,MediumRough,~~ 2.514,~~ 2.514,~~ 1.000,~~ 0.555,~~ 0.511,~~ 0.589
-WindowConstruction,DOUBLE PANE WITH SHADE,~~ 4,VerySmooth,~~ 2.716,~~ 2.716,~~ 1.000,~~ 0.482,~~ 0.039,~~ 0.050
-WindowConstruction,DOUBLE PANE WITH BLIND,~~ 4,VerySmooth,~~ 2.761,~~ 2.761,~~ 1.000,~~ 0.714,~~ 0.395,~~ 0.456
+WindowConstruction,DOUBLE PANE WITH SCREEN, 4,MediumRough, 2.514, 2.514, 1.000, 0.555, 0.511, 0.589
+WindowConstruction,DOUBLE PANE WITH SHADE, 4,VerySmooth, 2.716, 2.716, 1.000, 0.482, 0.039, 0.050
+WindowConstruction,DOUBLE PANE WITH BLIND, 4,VerySmooth, 2.761, 2.761, 1.000, 0.714, 0.395, 0.456
 \end{lstlisting}
 \begin{lstlisting}
 ! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, Front Thermal Emissivity, Back Thermal Emissivity,Conductivity {W/m-K},Dirt Factor,Solar Diffusing
-WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,~ 0.00300,~ 0.83700,~ 0.07500,~ 0.07500,~ 0.89800,~ 0.08100,~ 0.08100,~ 0.00000,~ 0.84000,~ 0.84000,~ 0.90000,~ 1.00000,No
-\end{lstlisting}
-\begin{lstlisting}
+WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,, 0.00300, 0.83700, 0.07500, 0.07500, 0.89800, 0.08100, 0.08100, 0.00000, 0.84000, 0.84000, 0.90000, 1.00000,No
 ! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}
-WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,~ 1.300E-02
-\end{lstlisting}
-\begin{lstlisting}
+WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air, 1.300E-02
 ! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},ThermalAbsorptance,Transmittance,VisibleTransmittance,ShadeReflectance
-WindowMaterial:Shade,SHADE ROLL - LIGHT OPAQUE,~ 0.003,~ 1.000E-01,~ 0.900,~ 0.050,~ 0.050,~ 0.500
-\end{lstlisting}
-\begin{lstlisting}
+WindowMaterial:Shade,SHADE ROLL - LIGHT OPAQUE, 0.003, 1.000E-01, 0.900, 0.050, 0.050, 0.500
 ! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},ThermalAbsorptance,Transmittance,Reflectance,VisibleReflectance,DiffuseReflectance,DiffuseVisibleReflectance,ScreenMaterialDiameterToSpacingRatio,ScreenToGlassDistance {m}
-WindowMaterial:Screen,BRIGHT ALUMINUM SCREEN 1, 0.00025,~ 2.210E+02,~ 0.272,~ 0.697,~ 0.166,~ 0.166,~ 0.195,~ 0.195,~ 0.165,~ 0.025
-\end{lstlisting}
-\begin{lstlisting}
+WindowMaterial:Screen,BRIGHT ALUMINUM SCREEN 1, 0.00025, 2.210E+02, 0.272, 0.697, 0.166, 0.166, 0.195, 0.195, 0.165, 0.025
 ! <WindowMaterial:Blind>,Material Name,SlatWidth {m},SlatSeparation {m},SlatThickness {m},SlatAngle {deg},SlatBeamSolarTransmittance,SlatBeamSolarFrontReflectance,BlindToGlassDistance {m}
-WindowMaterial:Blind,INTERIOR BLIND, 0.0010, 0.0022, 0.0010,~ 0.000,~ 0.000,~ 0.200,~ 0.025
+WindowMaterial:Blind,INTERIOR BLIND, 0.0010, 0.0022, 0.0010, 0.000, 0.000, 0.200, 0.025
 \end{lstlisting}
 
 \subsubsection{Fields in Part 1 -- Window Construction Report}\label{fields-in-part-1-window-construction-report}
 
-\textbf{Line 1:} ! \textless{}WindowConstruction\textgreater{},Construction Name,\#Layers,Roughness,Conductance \{W/m2-K\},Conductance (Before Adjusted) \{W/m2-K\},Convection Coefficient Adjustment Ratio,SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
+\begin{lstlisting}
+! <WindowConstruction>,Construction Name,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},Convection Coefficient Adjustment Ratio,SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
+\end{lstlisting}
 
 \subsubsection{Field: \textless{}WindowConstruction\textgreater{}}\label{field-windowconstruction}
 
-This will be filled with the constant ``Construction'' for each Window Construction line.
+This will be filled with the constant ``WindowConstruction'' for each Window Construction line.
 
 \subsubsection{Field: Construction Name}\label{field-construction-name-1}
 
-This is the name of the window as entered in the IDF.
+This is the name of the window construction as entered in the IDF.
 
 \subsubsection{Field: \#Layers}\label{field-layers-1}
 
@@ -2359,7 +2353,7 @@ This is the center-of-glass conductance of the construction calculated with film
 
 \subsubsection{Field: Convection Coefficient Adjustment Ratio}\label{field-convection-coefficient-adjustment-ratio}
 
-This is the adjustment ratio to both inside and outside window film coefficients assuming highly conducted frames are applied given high Nominal U input. The adjustment ratio is applied when the winter-conditions-evaluated conductance for glazing only is lower than the input Nominal U. The adjustment ratio is evaluated as Conductance divided by Conductance (Before Adjusted).
+For simple glazing (WindowMaterial:SimpleGlazingSystem), this is the adjustment ratio to both inside and outside window film coefficients assuming highly conducting frames are applied to achieve a high Nominal U-Factor. The adjustment ratio is calculated such that the glazing-only conductance evaluated at winter conditions equals the input Nominal U-Factor.
 
 \subsubsection{Field: SHGC}\label{field-shgc}
 
@@ -2379,17 +2373,15 @@ Transmittance normal incidence averaged over the solar spectrum and weighted by 
 
 Part 2 of the Window Construction Report encompasses several ``lines''.
 
-\textbf{Line 2:} ! \textless{}WindowMaterial:Glazing\textgreater{}, Material Name, Optical Data Type, Spectral Data Set Name, Thickness \{m\}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, Front Thermal Emissivity, Back Thermal Emissivity,Conductivity \{W/m-K\},Dirt Factor,Solar Diffusing
+\begin{lstlisting}
+! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, Front Thermal Emissivity, Back Thermal Emissivity,Conductivity {W/m-K},Dirt Factor,Solar Diffusing
+! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}
+! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},ThermalAbsorptance,Transmittance,VisibleTransmittance,ShadeReflectance
+! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},ThermalAbsorptance,Transmittance,Reflectance,VisibleReflectance,DiffuseReflectance,DiffuseVisibleReflectance,ScreenMaterialDiameterToSpacingRatio,ScreenToGlassDistance {m}
+! <WindowMaterial:Blind>,Material Name,SlatWidth {m},SlatSeparation {m},SlatThickness {m},SlatAngle {deg},SlatBeamSolarTransmittance,SlatBeamSolarFrontReflectance,BlindToGlassDistance {m}
+\end{lstlisting}
 
-\textbf{Line 3:} ! \textless{}WindowMaterial:Gas\textgreater{},Material Name,GasType,Thickness \{m\}
-
-\textbf{Line 4:} ! \textless{}WindowMaterial:Shade\textgreater{},Material Name,Thickness \{m\},Conductivity \{W/m-K\},ThermalAbsorptance,Transmittance,VisibleTransmittance,ShadeReflectance
-
-\textbf{Line 5:} ! \textless{}WindowMaterial:Screen\textgreater{},Material Name,Thickness \{m\},Conductivity \{W/m-K\},ThermalAbsorptance,Transmittance,Reflectance,VisibleReflectance,DiffuseReflectance,DiffuseVisibleReflectance,ScreenMaterialDiameterToSpacingRatio,ScreenToGlassDistance \{m\}
-
-\textbf{Line 6:} ! \textless{}WindowMaterial:Blind\textgreater{},Material Name,SlatWidth \{m\},SlatSeparation \{m\},SlatThickness \{m\},SlatAngle \{deg\},SlatBeamSolarTransmittance,SlatBeamSolarFrontReflectance,BlindToGlassDistance \{m\}
-
-\subsection{Material\textbf{:}WindowGlass}\label{materialwindowglass}
+\subsubsection{WindowMaterial:Glazing}\label{materialwindowglass}
 
 \subsubsection{Field:~ \textless{}WindowMaterial:Glazing\textgreater{}}\label{field-materialwindowglass}
 
@@ -2499,7 +2491,7 @@ Transmittance of the window shade layer averaged over the solar spectrum and wei
 
 Reflectance of the window shade layer averaged over the solar spectrum. Assumed same for beam solar radiation and diffuse solar radiation. Reflectance of beam solar radiation is assumed to be independent of angle of incidence. Reflectance is assumed to be the same for the front and back faces of the shade layer.
 
-\subsection{WindowMaterial:Blind}\label{materialwindowblind}
+\subsubsection{WindowMaterial:Blind}\label{materialwindowblind}
 
 This will be filled with the constant ``WindowMaterial:Blind'' for each material of this type in the construction.
 
