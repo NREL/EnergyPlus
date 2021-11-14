@@ -756,7 +756,7 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
     // appropriate Month and Day.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_int const EndOfMonth({0, 12}, {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+    static constexpr std::array<int, 13> EndOfMonth = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int WMonth;
@@ -775,10 +775,10 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
             LeapAddPrev = LeapYr;
             LeapAddCur = LeapYr;
         }
-        if (Number > (EndOfMonth(WMonth - 1) + LeapAddPrev) && Number <= (EndOfMonth(WMonth) + LeapAddCur)) break;
+        if (Number > (EndOfMonth[WMonth - 1] + LeapAddPrev) && Number <= (EndOfMonth[WMonth] + LeapAddCur)) break;
     }
     PMonth = WMonth;
-    PDay = Number - (EndOfMonth(WMonth - 1) + LeapAddCur);
+    PDay = Number - (EndOfMonth[WMonth - 1] + LeapAddCur);
 }
 
 bool BetweenDates(int const TestDate,  // Date to test
