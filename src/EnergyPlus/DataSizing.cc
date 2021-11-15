@@ -517,9 +517,11 @@ Real64 calcDesignSpecificationOutdoorAir(EnergyPlusData &state,
 
     auto &thisDSOA = state.dataSize->OARequirements(DSOAPtr);
 
-    if (thisDSOA.numDSOA == 1) {
+    if (thisDSOA.numDSOA == 0) {
+        // This is a simple DesignSpecification:OutdoorAir
         return thisDSOA.calcOAFlowRate(state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
     } else {
+        // This is a DesignSpecification:OutdoorAir:SpaceList
         for (int dsoaCount = 1; dsoaCount <= thisDSOA.numDSOA; ++dsoaCount) {
             totOAFlowRate += state.dataSize->OARequirements(thisDSOA.dsoaIndexes(dsoaCount))
                                  .calcOAFlowRate(state,
@@ -539,11 +541,13 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
 )
 {
     Real64 desFlowPA = 0.0;
-    if (this->numDSOA == 1) {
+    if (this->numDSOA == 0) {
+        // This is a simple DesignSpecification:OutdoorAir
         if (this->OAFlowMethod != DataSizing::OAFlowPPer && this->OAFlowMethod != DataSizing::OAFlow && this->OAFlowMethod != DataSizing::OAFlowACH) {
             desFlowPA = this->OAFlowPerArea;
         }
     } else {
+        // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumAreaOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
@@ -565,12 +569,14 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
 )
 {
     Real64 desFlowPP = 0.0;
-    if (this->numDSOA == 1) {
+    if (this->numDSOA == 0) {
+        // This is a simple DesignSpecification:OutdoorAir
         if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
             this->OAFlowMethod != DataSizing::OAFlowACH) {
             desFlowPP = this->OAFlowPerPerson;
         }
     } else {
+        // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumPeopleOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
@@ -639,7 +645,11 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (spaceNum > 0) {
         floorArea = state.dataHeatBal->space(spaceNum).floorArea;
         // TODO MJW: For now just proportion space volume by floor area
-        volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+        if (thisZone.FloorArea > 0.0) {
+            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+        } else {
+            volume = 0.0;
+        }
         nomTotOccupants = state.dataHeatBal->space(spaceNum).totOccupants;
         curNumOccupants = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
         maxOccupants = state.dataHeatBal->space(spaceNum).maxOccupants;

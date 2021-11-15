@@ -7037,7 +7037,9 @@ namespace SurfaceGeometry {
             if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
                 ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->ZoneList);
             if (Item1 > 0) {
-                ++NumIntMassSurfaces;
+                if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    ++NumIntMassSurfaces;
+                }
                 state.dataSurface->IntMassObjects(Item).NumOfZones = 1;
                 state.dataSurface->IntMassObjects(Item).ZoneListActive = false;
                 state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr = Item1;
@@ -7068,6 +7070,16 @@ namespace SurfaceGeometry {
                     state.dataSurface->IntMassObjects(Item).numOfSpaces = 1;
                     state.dataSurface->IntMassObjects(Item).spaceListActive = false;
                     state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
+                    if (!state.dataSurface->IntMassObjects(Item).ZoneListActive) {
+                        if (state.dataHeatBal->space(Item1).zoneNum != state.dataSurface->IntMassObjects(Item).ZoneOrZoneListPtr) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
+                                                "\" is not part of Zone =\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                            ErrorsFound = true;
+                            errFlag = true;
+                        }
+                    }
                 } else if (SLItem > 0) {
                     int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
                     NumIntMassSurfaces += numOfSpaces;
@@ -7077,7 +7089,7 @@ namespace SurfaceGeometry {
                 } else {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                     ++SurfNum;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                     ErrorsFound = true;
@@ -7108,35 +7120,51 @@ namespace SurfaceGeometry {
         }
 
         if (NumIntMassSurfaces > 0) {
+            int spaceNum = 0;
             for (int Loop = 1; Loop <= TotIntMass; ++Loop) {
+                int numberOfZonesOrSpaces = 1;
+                if (state.dataSurface->IntMassObjects(Loop).ZoneListActive) {
+                    numberOfZonesOrSpaces = state.dataSurface->IntMassObjects(Loop).NumOfZones;
+                } else if (state.dataSurface->IntMassObjects(Loop).spaceListActive) {
+                    numberOfZonesOrSpaces = state.dataSurface->IntMassObjects(Loop).numOfSpaces;
+                }
 
-                for (int Item1 = 1; Item1 <= state.dataSurface->IntMassObjects(Loop).NumOfZones; ++Item1) {
+                for (int Item1 = 1; Item1 <= numberOfZonesOrSpaces; ++Item1) {
 
                     ++SurfNum;
 
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction = state.dataSurface->IntMassObjects(Loop).Construction;
-                    if (!state.dataSurface->IntMassObjects(Loop).ZoneListActive) {
+                    if (!state.dataSurface->IntMassObjects(Loop).ZoneListActive && !state.dataSurface->IntMassObjects(Loop).spaceListActive) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr;
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = state.dataSurface->IntMassObjects(Loop).spaceOrSpaceListPtr;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataSurface->IntMassObjects(Loop).Name;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::IntMass;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListName;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = true;
                     } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            cCurrentModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataSurface->IntMassObjects(Loop).Name,
-                            state.dataSurfaceGeometry->SurfaceTmp,
-                            SurfNum - 1,
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                            errFlag);
+                        if (state.dataSurface->IntMassObjects(Loop).ZoneListActive) {
+                            CheckCreatedZoneItemName(
+                                state,
+                                RoutineName,
+                                cCurrentModuleObject,
+                                state.dataHeatBal
+                                    ->Zone(state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1))
+                                    .Name,
+                                state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                state.dataSurface->IntMassObjects(Loop).Name,
+                                state.dataSurfaceGeometry->SurfaceTmp,
+                                SurfNum - 1,
+                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                errFlag);
 
-                        ZoneNum = state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1);
+                            ZoneNum = state.dataHeatBal->ZoneList(state.dataSurface->IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1);
+                        } else if (state.dataSurface->IntMassObjects(Loop).spaceListActive) {
+                            spaceNum = state.dataHeatBal->spaceList(state.dataSurface->IntMassObjects(Loop).spaceOrSpaceListPtr).spaces(Item1);
+                            ZoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                            const std::string spaceName = state.dataHeatBal->space(spaceNum).Name;
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = spaceName + ' ' + state.dataSurface->IntMassObjects(Loop).Name;
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = spaceNum;
+                        }
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = ZoneNum;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::IntMass;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
@@ -7215,9 +7243,24 @@ namespace SurfaceGeometry {
             if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
                 ZLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->ZoneList);
             if (Item1 > 0) {
-                ++NumIntMassSurf;
+                if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    ++NumIntMassSurf;
+                }
             } else if (ZLItem > 0) {
                 NumIntMassSurf += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
+            }
+
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                int Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->space);
+                int SLItem = 0;
+                if (Item1 == 0 && int(state.dataHeatBal->spaceList.size()) > 0)
+                    SLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->spaceList);
+                if (Item1 > 0) {
+                    ++NumIntMassSurf;
+                } else if (SLItem > 0) {
+                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
+                    NumIntMassSurf += numOfSpaces;
+                }
             }
         }
         NumIntMassSurf = max(NumIntMassSurf, TotIntMass);
@@ -14921,6 +14964,7 @@ namespace SurfaceGeometry {
                 if (spaceEnclosureNum == 0) {
                     spaceHasOnlyFloors = true;
                     for (int const surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                        if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::IntMass) continue;
                         if (state.dataSurface->Surface(surfNum).Class != SurfaceClass::Floor) {
                             spaceHasOnlyFloors = false;
                             break;
