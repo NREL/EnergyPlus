@@ -282,25 +282,6 @@ namespace EconomicLifeCycleCost {
 
     constexpr std::array<std::string_view, static_cast<int>(StartCosts::Num)> StartCostNamesUC{"SERVICEPERIOD", "BASEPERIOD"};
 
-    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategorytoSourceKind{
-        "Recurring",
-        "Recurring",
-        "Recurring",
-        "Recurring",
-        "Recurring",
-        "Recurring",
-        "Recurring",
-        "Resource",
-        "Resource",
-        "Sum",
-        "Nonrecurring",
-        "Nonrecurring",
-        "Nonrecurring",
-        "Sum",
-        "Sum",
-        "Sum"
-    };
-
     enum class SourceKindType
     {
         Unassigned = -1,
@@ -311,7 +292,7 @@ namespace EconomicLifeCycleCost {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{"Nonrecurring", "Recurring"};
+    constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{"Recurring", "Nonrecurring"};
 
     enum class ResourceCostCategory
     {

@@ -2226,9 +2226,9 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             case (SourceKindType::Resource): {
                 if (elcc->CashFlow[offset + jObj].Category == CostCategory::Water) {
-                    tableBody(2, jObj + 1) = SourceKindTypeNames[static_cast<int>(ResourceCostCategory::Water)];
+                    tableBody(2, jObj + 1) = ResourceCostCategoryNames[static_cast<int>(ResourceCostCategory::Water)];
                 } else {
-                    tableBody(2, jObj + 1) = SourceKindTypeNames[static_cast<int>(ResourceCostCategory::Energy)];
+                    tableBody(2, jObj + 1) = ResourceCostCategoryNames[static_cast<int>(ResourceCostCategory::Energy)];
                 }
                 break;
             }
