@@ -518,24 +518,24 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name;                  // Space name
-        int zoneNum = 0;                   // Pointer to Zone wich contains this space
-        Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
-        std::string spaceType = "General"; // Space type tag
-        int spaceTypeNum = 0;              // Points to spaceType for this space
-        EPVector<std::string> tags;        // Optional tags for reporting
-        EPVector<int> surfaces;            // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;        // Calculated floor area used for this space
-        Real64 floorArea = 0.0;            // Floor area used for this space
-        bool hasFloor = false;             // Has "Floor" surface
-        Real64 extWindowArea = 0.0;        // Exterior Window Area for Zone
-        Real64 totalSurfArea = 0.0;        // Total surface area for Zone
-        int radiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
-        int solarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
-        Real64 totOccupants = 0.0;         // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
-        Real64 minOccupants = 0.0;         // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
-        Real64 maxOccupants = 0.0;         // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
-        bool isRemainderSpace = false;     // True if this space is auto-generated "-Remainder" space
+        std::string Name;                                                 // Space name
+        int zoneNum = 0;                                                  // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this space
+        std::string spaceType = "General";                                // Space type tag
+        int spaceTypeNum = 0;                                             // Points to spaceType for this space
+        EPVector<std::string> tags;                                       // Optional tags for reporting
+        EPVector<int> surfaces;                                           // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;                                       // Calculated floor area used for this space
+        Real64 floorArea = 0.0;                                           // Floor area used for this space
+        bool hasFloor = false;                                            // Has "Floor" surface
+        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for Zone
+        Real64 totalSurfArea = 0.0;                                       // Total surface area for Zone
+        int radiantEnclosureNum = 0;                                      // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;                                        // Solar distribution enclosure this space belongs to
+        Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
     };
