@@ -199,7 +199,7 @@ namespace EconomicLifeCycleCost {
         "Other Operational",
         "Water",
         "Energy",
-        "Total Operational",
+        "Total Operation",
         "Construction",
         "Salvage",
         "Other Capital",

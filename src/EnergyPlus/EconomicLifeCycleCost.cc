@@ -2256,40 +2256,14 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(1, 16);
         tableBody = "";
-        rowHead(1) = "Construction";
-        rowHead(2) = "Salvage";
-        rowHead(3) = "Other Capital";
-        rowHead(4) = "Energy";
-        rowHead(5) = "Water";
-        rowHead(6) = "Maintenance";
-        rowHead(7) = "Repair";
-        rowHead(8) = "Operation";
-        rowHead(9) = "Replacement";
-        rowHead(10) = "Minor Overhaul";
-        rowHead(11) = "Major Overhaul";
-        rowHead(12) = "Other Operational";
-        rowHead(13) = "Total Energy";
-        rowHead(14) = "Total Operation";
-        rowHead(15) = "Total Capital";
-        rowHead(16) = "Grand Total";
+        for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotGrand; ++CashFlowCostCategory) {
+            rowHead(CashFlowCostCategory+1) = CostCategoryNames[CashFlowCostCategory];
+        }
         columnHead(1) = "Present Value";
 
-        tableBody(1, 1) = RealToStr(elcc->CashFlow[CostCategory::Construction].presentValue, 2);
-        tableBody(1, 2) = RealToStr(elcc->CashFlow[CostCategory::Salvage].presentValue, 2);
-        tableBody(1, 3) = RealToStr(elcc->CashFlow[CostCategory::OtherCapital].presentValue, 2);
-        tableBody(1, 4) = RealToStr(elcc->CashFlow[CostCategory::Energy].presentValue, 2);
-        tableBody(1, 5) = RealToStr(elcc->CashFlow[CostCategory::Water].presentValue, 2);
-        tableBody(1, 6) = RealToStr(elcc->CashFlow[CostCategory::Maintenance].presentValue, 2);
-        tableBody(1, 7) = RealToStr(elcc->CashFlow[CostCategory::Repair].presentValue, 2);
-        tableBody(1, 8) = RealToStr(elcc->CashFlow[CostCategory::Operation].presentValue, 2);
-        tableBody(1, 9) = RealToStr(elcc->CashFlow[CostCategory::Replacement].presentValue, 2);
-        tableBody(1, 10) = RealToStr(elcc->CashFlow[CostCategory::MinorOverhaul].presentValue, 2);
-        tableBody(1, 11) = RealToStr(elcc->CashFlow[CostCategory::MajorOverhaul].presentValue, 2);
-        tableBody(1, 12) = RealToStr(elcc->CashFlow[CostCategory::OtherOperational].presentValue, 2);
-        tableBody(1, 13) = RealToStr(elcc->CashFlow[CostCategory::TotEnergy].presentValue, 2);
-        tableBody(1, 14) = RealToStr(elcc->CashFlow[CostCategory::TotOper].presentValue, 2);
-        tableBody(1, 15) = RealToStr(elcc->CashFlow[CostCategory::TotCaptl].presentValue, 2);
-        tableBody(1, 16) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].presentValue, 2);
+        for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotGrand; ++CashFlowCostCategory) {
+            tableBody(1, CashFlowCostCategory+1) = RealToStr(elcc->CashFlow[CashFlowCostCategory].presentValue, 2);
+        }
 
         WriteSubtitle(state, "Present Value by Category");
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
