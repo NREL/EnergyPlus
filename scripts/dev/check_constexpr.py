@@ -58,6 +58,7 @@ import os
 import re
 import sys
 from pathlib import Path
+import unittest
 
 sci_notation_str = r"[+-]?\d+\.?(\d+)?e[+-]?\d+"
 sci_notation_pattern = re.compile(sci_notation_str)
@@ -99,263 +100,321 @@ array_us_const_str = array_us_const_str.replace("VARNAME", var_name_str)
 array_us_const_pattern = re.compile(array_us_const_str)
 
 
-def test_array_underscore_const():
-    # match these
-    assert re.match(array_us_const_pattern, "Array1D_int const A(")
-    assert re.match(array_us_const_pattern, "Array1D_int const Abc(")
-    assert re.match(array_us_const_pattern, "Array1D_bool const A(")
-    assert re.match(array_us_const_pattern, "Array1D_bool const Abc(")
-    assert re.match(array_us_const_pattern, "Array1D_double const A(")
-    assert re.match(array_us_const_pattern, "Array1D_double const Abc(")
-    assert re.match(array_us_const_pattern, "Array2D_int const A(")
-    assert re.match(array_us_const_pattern, "Array2D_int const Abc(")
-    assert re.match(array_us_const_pattern, "Array2D_bool const A(")
-    assert re.match(array_us_const_pattern, "Array2D_bool const Abc(")
-    assert re.match(array_us_const_pattern, "Array2D_double const A(")
-    assert re.match(array_us_const_pattern, "Array2D_double const Abc(")
-    assert re.match(array_us_const_pattern, "static Array1D_int const A(")
-    assert re.match(array_us_const_pattern, "static Array1D_int const Abc(")
-    assert re.match(array_us_const_pattern, "static Array1D_bool const A(")
-    assert re.match(array_us_const_pattern, "static Array1D_bool const Abc(")
-    assert re.match(array_us_const_pattern, "static Array1D_double const A(")
-    assert re.match(array_us_const_pattern, "static Array1D_double const Abc(")
-    assert re.match(array_us_const_pattern, "static Array2D_int const A(")
-    assert re.match(array_us_const_pattern, "static Array2D_int const Abc(")
-    assert re.match(array_us_const_pattern, "static Array2D_bool const A(")
-    assert re.match(array_us_const_pattern, "static Array2D_bool const Abc(")
-    assert re.match(array_us_const_pattern, "static Array2D_double const A(")
-    assert re.match(array_us_const_pattern, "static Array2D_double const Abc(")
+class TestMatching(unittest.TestCase):
 
-    # don't match these
-    assert not re.match(array_us_const_pattern, "Array1D_int A(")
-    assert not re.match(array_us_const_pattern, "Array1D_int Abc(")
-    assert not re.match(array_us_const_pattern, "Array1D_bool A(")
-    assert not re.match(array_us_const_pattern, "Array1D_bool Abc(")
-    assert not re.match(array_us_const_pattern, "Array1D_double A(")
-    assert not re.match(array_us_const_pattern, "Array1D_double Abc(")
-    assert not re.match(array_us_const_pattern, "static Array2D_int A(")
-    assert not re.match(array_us_const_pattern, "static Array2D_int Abc(")
-    assert not re.match(array_us_const_pattern, "static Array2D_bool A(")
-    assert not re.match(array_us_const_pattern, "static Array2D_bool Abc(")
-    assert not re.match(array_us_const_pattern, "static Array2D_double A(")
-    assert not re.match(array_us_const_pattern, "static Array2D_double Abc(")
+    def test_array_underscore_const(self):
+        # match these
+        yes_match = [
+            "Array1D_int const A(",
+            "Array1D_int const Abc(",
+            "Array1D_bool const A(",
+            "Array1D_bool const Abc(",
+            "Array1D_double const A(",
+            "Array1D_double const Abc(",
+            "Array2D_int const A(",
+            "Array2D_int const Abc(",
+            "Array2D_bool const A(",
+            "Array2D_bool const Abc(",
+            "Array2D_double const A(",
+            "Array2D_double const Abc(",
+            "static Array1D_int const A(",
+            "static Array1D_int const Abc(",
+            "static Array1D_bool const A(",
+            "static Array1D_bool const Abc(",
+            "static Array1D_double const A(",
+            "static Array1D_double const Abc(",
+            "static Array2D_int const A(",
+            "static Array2D_int const Abc(",
+            "static Array2D_bool const A(",
+            "static Array2D_bool const Abc(",
+            "static Array2D_double const A(",
+            "static Array2D_double const Abc("
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(array_us_const_pattern, y))
+        # don't match these
+        no_match = [
+            "Array1D_int A(",
+            "Array1D_int Abc(",
+            "Array1D_bool A(",
+            "Array1D_bool Abc(",
+            "Array1D_double A(",
+            "Array1D_double Abc(",
+            "static Array2D_int A(",
+            "static Array2D_int Abc(",
+            "static Array2D_bool A(",
+            "static Array2D_bool Abc(",
+            "static Array2D_double A(",
+            "static Array2D_double Abc("
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(array_us_const_pattern, n))
+
+    def test_array_const(self):
+        # match these
+        yes_match = [
+            "Array1D<int> const A(",
+            "Array1D<int> const Abc(",
+            "Array1D<bool> const A(",
+            "Array1D<bool> const Abc(",
+            "Array1D<double> const A(",
+            "Array1D<double> const Abc(",
+            "Array2D<int> const A(",
+            "Array2D<int> const Abc(",
+            "Array2D<bool> const A(",
+            "Array2D<bool> const Abc(",
+            "Array2D<double> const A(",
+            "Array2D<double> const Abc(",
+            "static Array1D<int> const A(",
+            "static Array1D<int> const Abc(",
+            "static Array1D<bool> const A(",
+            "static Array1D<bool> const Abc(",
+            "static Array1D<double> const A(",
+            "static Array1D<double> const Abc(",
+            "static Array2D<int> const A(",
+            "static Array2D<int> const Abc(",
+            "static Array2D<bool> const A(",
+            "static Array2D<bool> const Abc(",
+            "static Array2D<double> const A(",
+            "static Array2D<double> const Abc("
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(array_const_pattern, y))
+        # don't match these
+        no_match = [
+            "Array1D<int> A(",
+            "Array1D<int> Abc(",
+            "Array1D<bool> A(",
+            "Array1D<bool> Abc(",
+            "Array1D<double> A(",
+            "Array1D<double> Abc(",
+            "static Array2D<int> A(",
+            "static Array2D<int> Abc(",
+            "static Array2D<bool> A(",
+            "static Array2D<bool> Abc(",
+            "static Array2D<double> A(",
+            "static Array2D<double> Abc("
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(array_const_pattern, n))
+
+    def test_const_num(self):
+        # match these
+        yes_match = [
+            "const int VarName = 1;",
+            "const int VarName(1);",
+            "const int A(1);"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(const_num_pattern, y))
+        # don't match these
+        no_match = [
+            "Real64 constexpr VarName = 1.e1;",
+            "constexpr int VarName = 1;",
+            "Real64 constexpr VarName(1.e1);",
+            "constexpr int VarName(1);"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(const_num_pattern, n))
+
+    def test_const_num_equal(self):
+        # match these
+        yes_match = [
+            "const int VarName = 1;",
+            "const int VarName = 1.0;",
+            "const int VarName = 1.0e1;",
+            "const int VarName = 1.e1;",
+            "int const VarName = 1;",
+            "int const VarName = 1.0;",
+            "int const VarName = 1.0e1;",
+            "int const VarName = 1.e1;",
+            "const bool VarName = 1;",
+            "const bool VarName = 1.0;",
+            "const bool VarName = 1.0e1;",
+            "const bool VarName = 1.e1;",
+            "bool const VarName = 1;",
+            "bool const VarName = 1.0;",
+            "bool const VarName = 1.0e1;",
+            "bool const VarName = 1.e1;",
+            "const double VarName = 1;",
+            "const double VarName = 1.0;",
+            "const double VarName = 1.0e1;",
+            "const double VarName = 1.e1;",
+            "double const VarName = 1;",
+            "double const VarName = 1.0;",
+            "double const VarName = 1.0e1;",
+            "double const VarName = 1.e1;",
+            "const Real64 VarName = 1;",
+            "const Real64 VarName = 1.0;",
+            "const Real64 VarName = 1.0e1;",
+            "const Real64 VarName = 1.e1;",
+            "Real64 const VarName = 1;",
+            "Real64 const VarName = 1.0;",
+            "Real64 const VarName = 1.0e1;",
+            "Real64 const VarName = 1.e1;"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(const_num_equal_pattern, y))
+        # don't match these
+        no_match = [
+            "Real64 constexpr VarName = 1.e1;",
+            "constexpr int VarName = 1;"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(const_num_equal_pattern, n))
+
+    def test_const_num_paren(self):
+        # match these
+        yes_match = [
+            "const int VarName(1);",
+            "const int VarName(1.0);",
+            "const int VarName(1.0e1);",
+            "const int VarName(1.e1);",
+            "int const VarName(1);",
+            "int const VarName(1.0);",
+            "int const VarName(1.0e1);",
+            "int const VarName(1.e1);",
+            "const bool VarName(1);",
+            "const bool VarName(1.0);",
+            "const bool VarName(1.0e1);",
+            "const bool VarName(1.e1);",
+            "bool const VarName(1);",
+            "bool const VarName(1.0);",
+            "bool const VarName(1.0e1);",
+            "bool const VarName(1.e1);",
+            "const double VarName(1);",
+            "const double VarName(1.0);",
+            "const double VarName(1.0e1);",
+            "const double VarName(1.e1);",
+            "double const VarName(1);",
+            "double const VarName(1.0);",
+            "double const VarName(1.0e1);",
+            "double const VarName(1.e1);",
+            "const Real64 VarName(1);",
+            "const Real64 VarName(1.0);",
+            "const Real64 VarName(1.0e1);",
+            "const Real64 VarName(1.e1);",
+            "Real64 const VarName(1);",
+            "Real64 const VarName(1.0);",
+            "Real64 const VarName(1.0e1);",
+            "Real64 const VarName(1.e1);"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(const_num_paren_pattern, y))
+        # don't match these
+        no_match = [
+            "Real64 constexpr VarName(1.e1);",
+            "constexpr int VarName(1);"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(const_num_paren_pattern, n))
+
+    def test_var_name(self):
+        # match these
+        yes_match = [
+            "VarName",
+            "VarName_",
+            "_VarName_",
+            "_VarName",
+            "_VarName123",
+            "VarName123",
+            "VarName123_",
+            "_VarName123_"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(var_name_pattern, y))
+        # don't match these
+        no_match = [
+            "123",
+            "9.81",
+            "9.81e0"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(var_name_pattern, n))
+
+    def test_const_type(self):
+        # match these
+        yes_match = [
+            "const int",
+            "const bool",
+            "const double",
+            "const Real64",
+            "int const",
+            "bool const",
+            "double const",
+            "Real64 const"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(const_type_pattern, y))
+            # don't match these
+        no_match = [
+            "constexpr int",
+            "constexpr bool",
+            "constexpr double",
+            "constexpr Real64",
+            "int constexpr",
+            "bool constexpr",
+            "double constexpr",
+            "Real64 constexpr"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(const_type_pattern, n))
+
+    def test_int_real(self):
+        # match these
+        yes_match = [
+            "1",
+            "+1",
+            "-1",
+            "1.0",
+            "+1.0",
+            "-1.0"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(int_real_pattern, y))
+            # don't match these
+        no_match = [
+            "Var",
+            "Var123"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(int_real_pattern, n))
+
+    def test_sci_notation(self):
+        # match these
+        yes_match = [
+            "9.81e0",
+            "9.81e-0",
+            "9.81e+0",
+            "+9.81e0",
+            "+9.81e-0",
+            "+9.81e+0",
+            "-9.81e0",
+            "-9.81e-0",
+            "-9.81e+0",
+            "9.e0",
+            "9.e-0",
+            "9.e+0",
+            "+9.e0",
+            "+9.e-0",
+            "+9.e+0",
+            "-9.e0",
+            "-9.e-0",
+            "-9.e+0"
+        ]
+        for y in yes_match:
+            self.assertTrue(re.match(sci_notation_pattern, y))
+            # don't match these
+        no_match = [
+            "VarName"
+        ]
+        for n in no_match:
+            self.assertFalse(re.match(sci_notation_pattern, n))
 
 
-def test_array_const():
-    # match these
-    assert re.match(array_const_pattern, "Array1D<int> const A(")
-    assert re.match(array_const_pattern, "Array1D<int> const Abc(")
-    assert re.match(array_const_pattern, "Array1D<bool> const A(")
-    assert re.match(array_const_pattern, "Array1D<bool> const Abc(")
-    assert re.match(array_const_pattern, "Array1D<double> const A(")
-    assert re.match(array_const_pattern, "Array1D<double> const Abc(")
-    assert re.match(array_const_pattern, "Array2D<int> const A(")
-    assert re.match(array_const_pattern, "Array2D<int> const Abc(")
-    assert re.match(array_const_pattern, "Array2D<bool> const A(")
-    assert re.match(array_const_pattern, "Array2D<bool> const Abc(")
-    assert re.match(array_const_pattern, "Array2D<double> const A(")
-    assert re.match(array_const_pattern, "Array2D<double> const Abc(")
-    assert re.match(array_const_pattern, "static Array1D<int> const A(")
-    assert re.match(array_const_pattern, "static Array1D<int> const Abc(")
-    assert re.match(array_const_pattern, "static Array1D<bool> const A(")
-    assert re.match(array_const_pattern, "static Array1D<bool> const Abc(")
-    assert re.match(array_const_pattern, "static Array1D<double> const A(")
-    assert re.match(array_const_pattern, "static Array1D<double> const Abc(")
-    assert re.match(array_const_pattern, "static Array2D<int> const A(")
-    assert re.match(array_const_pattern, "static Array2D<int> const Abc(")
-    assert re.match(array_const_pattern, "static Array2D<bool> const A(")
-    assert re.match(array_const_pattern, "static Array2D<bool> const Abc(")
-    assert re.match(array_const_pattern, "static Array2D<double> const A(")
-    assert re.match(array_const_pattern, "static Array2D<double> const Abc(")
-
-    # don't match these
-    assert not re.match(array_const_pattern, "Array1D<int> A(")
-    assert not re.match(array_const_pattern, "Array1D<int> Abc(")
-    assert not re.match(array_const_pattern, "Array1D<bool> A(")
-    assert not re.match(array_const_pattern, "Array1D<bool> Abc(")
-    assert not re.match(array_const_pattern, "Array1D<double> A(")
-    assert not re.match(array_const_pattern, "Array1D<double> Abc(")
-    assert not re.match(array_const_pattern, "static Array2D<int> A(")
-    assert not re.match(array_const_pattern, "static Array2D<int> Abc(")
-    assert not re.match(array_const_pattern, "static Array2D<bool> A(")
-    assert not re.match(array_const_pattern, "static Array2D<bool> Abc(")
-    assert not re.match(array_const_pattern, "static Array2D<double> A(")
-    assert not re.match(array_const_pattern, "static Array2D<double> Abc(")
-
-
-def test_const_num():
-    # match these
-    assert re.match(const_num_pattern, "const int VarName = 1;")
-    assert re.match(const_num_pattern, "const int VarName(1);")
-    assert re.match(const_num_pattern, "const int A(1);")
-
-    # don't match these
-    assert not re.match(const_num_pattern, "Real64 constexpr VarName = 1.e1;")
-    assert not re.match(const_num_pattern, "constexpr int VarName = 1;")
-    assert not re.match(const_num_pattern, "Real64 constexpr VarName(1.e1);")
-    assert not re.match(const_num_pattern, "constexpr int VarName(1);")
-
-
-def test_const_num_equal():
-    # match these
-    assert re.match(const_num_equal_pattern, "const int VarName = 1;")
-    assert re.match(const_num_equal_pattern, "const int VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "const int VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "const int VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "int const VarName = 1;")
-    assert re.match(const_num_equal_pattern, "int const VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "int const VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "int const VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "const bool VarName = 1;")
-    assert re.match(const_num_equal_pattern, "const bool VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "const bool VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "const bool VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "bool const VarName = 1;")
-    assert re.match(const_num_equal_pattern, "bool const VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "bool const VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "bool const VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "const double VarName = 1;")
-    assert re.match(const_num_equal_pattern, "const double VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "const double VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "const double VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "double const VarName = 1;")
-    assert re.match(const_num_equal_pattern, "double const VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "double const VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "double const VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "const Real64 VarName = 1;")
-    assert re.match(const_num_equal_pattern, "const Real64 VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "const Real64 VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "const Real64 VarName = 1.e1;")
-    assert re.match(const_num_equal_pattern, "Real64 const VarName = 1;")
-    assert re.match(const_num_equal_pattern, "Real64 const VarName = 1.0;")
-    assert re.match(const_num_equal_pattern, "Real64 const VarName = 1.0e1;")
-    assert re.match(const_num_equal_pattern, "Real64 const VarName = 1.e1;")
-
-    # don't match these
-    assert not re.match(const_num_equal_pattern, "Real64 constexpr VarName = 1.e1;")
-    assert not re.match(const_num_equal_pattern, "constexpr int VarName = 1;")
-
-
-def test_const_num_paren():
-    # match these
-    assert re.match(const_num_paren_pattern, "const int VarName(1);")
-    assert re.match(const_num_paren_pattern, "const int VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "const int VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "const int VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "int const VarName(1);")
-    assert re.match(const_num_paren_pattern, "int const VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "int const VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "int const VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "const bool VarName(1);")
-    assert re.match(const_num_paren_pattern, "const bool VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "const bool VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "const bool VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "bool const VarName(1);")
-    assert re.match(const_num_paren_pattern, "bool const VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "bool const VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "bool const VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "const double VarName(1);")
-    assert re.match(const_num_paren_pattern, "const double VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "const double VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "const double VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "double const VarName(1);")
-    assert re.match(const_num_paren_pattern, "double const VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "double const VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "double const VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "const Real64 VarName(1);")
-    assert re.match(const_num_paren_pattern, "const Real64 VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "const Real64 VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "const Real64 VarName(1.e1);")
-    assert re.match(const_num_paren_pattern, "Real64 const VarName(1);")
-    assert re.match(const_num_paren_pattern, "Real64 const VarName(1.0);")
-    assert re.match(const_num_paren_pattern, "Real64 const VarName(1.0e1);")
-    assert re.match(const_num_paren_pattern, "Real64 const VarName(1.e1);")
-
-    # don't match these
-    assert not re.match(const_num_paren_pattern, "Real64 constexpr VarName(1.e1);")
-    assert not re.match(const_num_paren_pattern, "constexpr int VarName(1);")
-
-
-def test_var_name():
-    # match these
-    assert re.match(var_name_pattern, "VarName")
-    assert re.match(var_name_pattern, "VarName_")
-    assert re.match(var_name_pattern, "_VarName_")
-    assert re.match(var_name_pattern, "_VarName")
-    assert re.match(var_name_pattern, "_VarName123")
-    assert re.match(var_name_pattern, "VarName123")
-    assert re.match(var_name_pattern, "VarName123_")
-    assert re.match(var_name_pattern, "_VarName123_")
-
-    # don't match these
-    assert not re.match(var_name_pattern, "123")
-    assert not re.match(var_name_pattern, "9.81")
-    assert not re.match(var_name_pattern, "9.81e0")
-
-
-def test_const_type():
-    # match these
-    assert re.match(const_type_pattern, "const int")
-    assert re.match(const_type_pattern, "const bool")
-    assert re.match(const_type_pattern, "const double")
-    assert re.match(const_type_pattern, "const Real64")
-    assert re.match(const_type_pattern, "int const")
-    assert re.match(const_type_pattern, "bool const")
-    assert re.match(const_type_pattern, "double const")
-    assert re.match(const_type_pattern, "Real64 const")
-
-    # don't match these
-    assert not re.match(const_type_pattern, "constexpr int")
-    assert not re.match(const_type_pattern, "constexpr bool")
-    assert not re.match(const_type_pattern, "constexpr double")
-    assert not re.match(const_type_pattern, "constexpr Real64")
-    assert not re.match(const_type_pattern, "int constexpr")
-    assert not re.match(const_type_pattern, "bool constexpr")
-    assert not re.match(const_type_pattern, "double constexpr")
-    assert not re.match(const_type_pattern, "Real64 constexpr")
-
-
-def test_int_real():
-    # match these
-    assert re.match(int_real_pattern, "1")
-    assert re.match(int_real_pattern, "+1")
-    assert re.match(int_real_pattern, "-1")
-    assert re.match(int_real_pattern, "1.0")
-    assert re.match(int_real_pattern, "+1.0")
-    assert re.match(int_real_pattern, "-1.0")
-
-    # don't match these
-    assert not re.match(int_real_pattern, "Var")
-    assert not re.match(int_real_pattern, "Var123")
-
-
-def test_sci_notation():
-    # match these
-    assert re.match(sci_notation_pattern, "9.81e0")
-    assert re.match(sci_notation_pattern, "9.81e-0")
-    assert re.match(sci_notation_pattern, "9.81e+0")
-    assert re.match(sci_notation_pattern, "+9.81e0")
-    assert re.match(sci_notation_pattern, "+9.81e-0")
-    assert re.match(sci_notation_pattern, "+9.81e+0")
-    assert re.match(sci_notation_pattern, "-9.81e0")
-    assert re.match(sci_notation_pattern, "-9.81e-0")
-    assert re.match(sci_notation_pattern, "-9.81e+0")
-    assert re.match(sci_notation_pattern, "9.e0")
-    assert re.match(sci_notation_pattern, "9.e-0")
-    assert re.match(sci_notation_pattern, "9.e+0")
-    assert re.match(sci_notation_pattern, "+9.e0")
-    assert re.match(sci_notation_pattern, "+9.e-0")
-    assert re.match(sci_notation_pattern, "+9.e+0")
-    assert re.match(sci_notation_pattern, "-9.e0")
-    assert re.match(sci_notation_pattern, "-9.e-0")
-    assert re.match(sci_notation_pattern, "-9.e+0")
-
-    # don't match
-    assert not re.match(sci_notation_pattern, "VarName")
-
-
-def constexpr_check(search_path: Path):
-    errors_found = False
+def constexpr_check(search_path: Path) -> int:
+    """Checks for missing constexpr tags, returns the number of tags found that should be changed"""
+    num_errors = 0
 
     files_to_search = []
     for p in [search_path]:
@@ -393,39 +452,32 @@ def constexpr_check(search_path: Path):
                 tokens = line.split("//")
                 line = tokens[0].strip()
 
-            if (re.match(const_num_pattern, line) or
-                re.match(array_const_pattern, line) or re.match(array_us_const_pattern, line)) and bracket_count == 0:
+            re_match_1 = re.match(const_num_pattern, line)
+            re_match_2 = re.match(array_const_pattern, line)
+            re_match_3 = re.match(array_us_const_pattern, line)
+            if (re_match_1 or re_match_2 or re_match_3) and bracket_count == 0:
                 print("ERROR: 'const' found, convert to 'constexpr'")
                 s = f"{file.name}: {idx + 1} - {line}"
                 print(s)
-                errors_found = True
+                num_errors += 1
 
             # count brackets in line
             bracket_count += line.count("(")
             bracket_count -= line.count(")")
 
-    return errors_found
+    return num_errors
 
 
 if __name__ == "__main__":
-
-    # run tests
-    if True:
-        test_array_underscore_const()
-        test_array_const()
-        test_const_num()
-        test_const_num_equal()
-        test_const_num_paren()
-        test_var_name()
-        test_const_type()
-        test_int_real()
-        test_sci_notation()
-
+    print("**** Verifying script regexes ****")
+    unittest.main(exit=False)
+    print("**** DONE ****")
+    print("")
+    print("**** Checking EnergyPlus code for Constexprness ****")
     root_path = Path(__file__).parent.parent.parent
     src_path = root_path / "src" / "EnergyPlus"
     tst_path = root_path / "tst" / "EnergyPlus" / "unit"
-    errors_found = constexpr_check(src_path)
-    errors_found &= constexpr_check(tst_path)
-
-    if errors_found:
+    errors_found = constexpr_check(src_path) + constexpr_check(tst_path)
+    print("**** DONE ****")
+    if errors_found > 0:
         raise sys.exit(1)
