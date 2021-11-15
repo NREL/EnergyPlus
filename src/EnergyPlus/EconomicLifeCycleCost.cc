@@ -2039,28 +2039,23 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(10, elcc->lengthStudyYears);
         tableBody = "";
-        columnHead(1) = "Energy";
-        columnHead(2) = "Water";
-        columnHead(3) = "Maintenance";
-        columnHead(4) = "Repair";
-        columnHead(5) = "Operation";
-        columnHead(6) = "Replacement";
-        columnHead(7) = "MinorOverhaul";
-        columnHead(8) = "MajorOverhaul";
-        columnHead(9) = "OtherOperational";
+        columnHead(1) = "Maintenance";
+        columnHead(2) = "Repair";
+        columnHead(3) = "Operation";
+        columnHead(4) = "Replacement";
+        columnHead(5) = "MinorOverhaul";
+        columnHead(6) = "MajorOverhaul";
+        columnHead(7) = "OtherOperational";
+        columnHead(8) = "Water";
+        columnHead(9) = "Energy";
         columnHead(10) = "Total";
 
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
-            tableBody(1, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear), 2);
-            tableBody(2, iYear) = RealToStr(elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
-            tableBody(3, iYear) = RealToStr(elcc->CashFlow[CostCategory::Maintenance].yrAmount(iYear), 2);
-            tableBody(4, iYear) = RealToStr(elcc->CashFlow[CostCategory::Repair].yrAmount(iYear), 2);
-            tableBody(5, iYear) = RealToStr(elcc->CashFlow[CostCategory::Operation].yrAmount(iYear), 2);
-            tableBody(6, iYear) = RealToStr(elcc->CashFlow[CostCategory::Replacement].yrAmount(iYear), 2);
-            tableBody(7, iYear) = RealToStr(elcc->CashFlow[CostCategory::MinorOverhaul].yrAmount(iYear), 2);
-            tableBody(8, iYear) = RealToStr(elcc->CashFlow[CostCategory::MajorOverhaul].yrAmount(iYear), 2);
-            tableBody(9, iYear) = RealToStr(elcc->CashFlow[CostCategory::OtherOperational].yrAmount(iYear), 2);
+            for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::Water; ++CashFlowCostCategory) {
+                tableBody(CashFlowCostCategory+1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
+            }
+            tableBody(9, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear), 2);
             Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotOper].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
                                        elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
             tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
