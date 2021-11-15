@@ -5279,10 +5279,15 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
         pt.Name = state.dataIPShortCut->cAlphaArgs(1);
         pt.ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (pt.ZoneNum == 0) {
-            ShowSevereError(state,
-                            cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
-                                state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
+            int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
+            if (spaceNum == 0) {
+                ShowSevereError(state,
+                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
+                                    state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                ErrorsFound = true;
+            } else {
+                pt.ZoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+            }
         }
         pt.x = state.dataIPShortCut->rNumericArgs(1);
         pt.y = state.dataIPShortCut->rNumericArgs(2);
