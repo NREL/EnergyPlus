@@ -1900,7 +1900,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
-        columnHead(numColumns) = "Total";
+        columnHead(numColumns) = Total;
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             tableBody(jObj + 1, iYear) =
                 RealToStr(elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
@@ -1943,7 +1943,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 }
             }
         }
-        columnHead(numColumns) = "Total";
+        columnHead(numColumns) = Total;
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
@@ -1969,16 +1969,15 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(4, elcc->lengthStudyYears);
         tableBody = "";
-        columnHead(1) = CostCategoryNamesNoSpace[static_cast<int>(CostCategory::Construction)];
-        columnHead(2) = CostCategoryNamesNoSpace[static_cast<int>(CostCategory::Salvage)];
-        columnHead(3) = CostCategoryNamesNoSpace[static_cast<int>(CostCategory::OtherCapital)];
-        columnHead(4) = "Total";
+        for (int CostCategory = CostCategory::Construction, tableColumnIndex = 1; CostCategory <= CostCategory::OtherCapital; ++tableColumnIndex, ++ CostCategory){
+            columnHead(tableColumnIndex) = CostCategoryNamesNoSpace[static_cast<int>(CostCategory)];
+        }
+        columnHead(4) = Total;
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
-            tableBody(1, iYear) = RealToStr(elcc->CashFlow[CostCategory::Construction].yrAmount(iYear), 2);
-            tableBody(2, iYear) = RealToStr(elcc->CashFlow[CostCategory::Salvage].yrAmount(iYear), 2);
-            tableBody(3, iYear) = RealToStr(elcc->CashFlow[CostCategory::OtherCapital].yrAmount(iYear), 2);
-            tableBody(4, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotCaptl].yrAmount(iYear), 2);
+            for (int CostCategory = CostCategory::Construction, tableColumnIndex = 1; CostCategory <= CostCategory::TotCaptl; ++tableColumnIndex, ++ CostCategory){
+                tableBody(tableColumnIndex, iYear) = RealToStr(elcc->CashFlow[CostCategory].yrAmount(iYear), 2);
+            }
         }
         WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2001,16 +2000,10 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(10, elcc->lengthStudyYears);
         tableBody = "";
-        columnHead(1) = "Maintenance";
-        columnHead(2) = "Repair";
-        columnHead(3) = "Operation";
-        columnHead(4) = "Replacement";
-        columnHead(5) = "MinorOverhaul";
-        columnHead(6) = "MajorOverhaul";
-        columnHead(7) = "OtherOperational";
-        columnHead(8) = "Water";
-        columnHead(9) = "Energy";
-        columnHead(10) = "Total";
+        for (int CostCategory = CostCategory::Maintenance, tableColumnIndex = 1; CostCategory <= CostCategory::Energy; ++tableColumnIndex, ++ CostCategory){
+            columnHead(tableColumnIndex) = CostCategoryNamesNoSpace[CostCategory];
+        }
+        columnHead(10) = Total;
 
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
@@ -2039,16 +2032,10 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(10, elcc->lengthStudyYears);
         tableBody = "";
-        columnHead(1) = "Maintenance";
-        columnHead(2) = "Repair";
-        columnHead(3) = "Operation";
-        columnHead(4) = "Replacement";
-        columnHead(5) = "MinorOverhaul";
-        columnHead(6) = "MajorOverhaul";
-        columnHead(7) = "OtherOperational";
-        columnHead(8) = "Water";
-        columnHead(9) = "Energy";
-        columnHead(10) = "Total";
+        for (int CostCategory = CostCategory::Maintenance, tableColumnIndex = 1; CostCategory <= CostCategory::Energy; ++tableColumnIndex, ++ CostCategory){
+            columnHead(tableColumnIndex) = CostCategoryNamesNoSpace[CostCategory];
+        }
+        columnHead(10) = Total;
 
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
@@ -2172,7 +2159,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(4) = "Present Value";
         columnHead(5) = "Present Value Factor";
         totalPV = 0.0;
-        rowHead(numRows + 1) = "TOTAL";
+        rowHead(numRows + 1) = TotalUC;
         for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
             offset = CostCategory::Num;
             rowHead(jObj + 1) = elcc->CashFlow[offset + jObj].name;
@@ -2302,7 +2289,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             totalPV += elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear);
         }
 
-        rowHead(elcc->lengthStudyYears + 1) = "TOTAL";
+        rowHead(elcc->lengthStudyYears + 1) = TotalUC;
         tableBody(3, elcc->lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
         WriteSubtitle(state, "Present Value by Year");
@@ -2345,7 +2332,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 totalPV += elcc->AfterTaxPresentValue(iYear);
             }
 
-            rowHead(elcc->lengthStudyYears + 1) = "TOTAL";
+            rowHead(elcc->lengthStudyYears + 1) = TotalUC;
             tableBody(5, elcc->lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
             WriteSubtitle(state, "After Tax Estimate");

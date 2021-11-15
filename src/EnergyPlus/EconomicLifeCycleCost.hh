@@ -264,6 +264,9 @@ namespace EconomicLifeCycleCost {
         "GRANDTOTAL"
     };
 
+    constexpr std::string_view Total{"Total"};
+    constexpr std::string_view TotalUC{"TOTAL"};
+
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
