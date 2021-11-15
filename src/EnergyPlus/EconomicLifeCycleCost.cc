@@ -481,7 +481,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \key OtherOperational
         //        \default Maintenance
         elcc->RecurringCosts[iInObj].category =
-            static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+            static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
         bool isNotRecurringCost = BITF_TEST_NONE(BITF(elcc->RecurringCosts[iInObj].category),
                                                  BITF(CostCategory::Maintenance) | BITF(CostCategory::Repair) | BITF(CostCategory::Operation) |
                                                      BITF(CostCategory::Replacement) | BITF(CostCategory::MinorOverhaul) |
@@ -671,7 +671,7 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \key OtherCapital
         //      \default Construction
         elcc->NonrecurringCost[iInObj].category =
-            static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+            static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
         bool isNotNonRecurringCost =
             BITF_TEST_NONE(BITF(elcc->NonrecurringCost[iInObj].category),
                            BITF(CostCategory::Construction) | BITF(CostCategory::Salvage) | BITF(CostCategory::OtherCapital));
@@ -2011,6 +2011,16 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(8) = "MajorOverhaul";
         columnHead(9) = "OtherOperational";
         columnHead(10) = "Total";
+//        columnHead(1) = "Maintenance";
+//        columnHead(2) = "Repair";
+//        columnHead(3) = "Operation";
+//        columnHead(4) = "Replacement";
+//        columnHead(5) = "MinorOverhaul";
+//        columnHead(6) = "MajorOverhaul";
+//        columnHead(7) = "OtherOperational";
+//        columnHead(8) = "Energy";
+//        columnHead(9) = "Water";
+//        columnHead(10) = "Total";
 
         for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);

@@ -177,14 +177,14 @@ namespace EconomicLifeCycleCost {
         MinorOverhaul,
         MajorOverhaul,
         OtherOperational,
+        Water,
+        Energy,
+        TotOper,
         Construction,
         Salvage,
         OtherCapital,
-        Water,
-        Energy,
-        TotEnergy,
-        TotOper,
         TotCaptl,
+        TotEnergy,
         TotGrand,
         Num
     };
@@ -197,25 +197,53 @@ namespace EconomicLifeCycleCost {
         "Minor Overhaul",
         "Major Overhaul",
         "Other Operational",
+        "Water",
+        "Energy",
+        "Total Operational",
         "Construction",
         "Salvage",
         "Other Capital",
-        "Water",
-        "Energy",
+        "Total Capital",
+        "Total Energy",
+        "Grand Total"
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{"MAINTENANCE",
-                                                                                                    "REPAIR",
-                                                                                                    "OPERATION",
-                                                                                                    "REPLACEMENT",
-                                                                                                    "MINOROVERHAUL",
-                                                                                                    "MAJOROVERHAUL",
-                                                                                                    "OTHEROPERATIONAL",
-                                                                                                    "CONSTRUCTION",
-                                                                                                    "SALVAGE",
-                                                                                                    "OTHERCAPITAL",
-                                                                                                    "WATER",
-                                                                                                    "ENERGY"};
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{
+        "MAINTENANCE",
+        "REPAIR",
+        "OPERATION",
+        "REPLACEMENT",
+        "MINOR OVERHAUL",
+        "MAJOR OVERHAUL",
+        "OTHER OPERATIONAL",
+        "WATER",
+        "ENERGY",
+        "TOTAL OPERATIONAL",
+        "CONSTRUCTION",
+        "SALVAGE",
+        "OTHER CAPITAL",
+        "TOTAL CAPITAL",
+        "TOTAL ENERGY",
+        "GRAND TOTAL"
+    };
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUCNoSpace{
+        "MAINTENANCE",
+        "REPAIR",
+        "OPERATION",
+        "REPLACEMENT",
+        "MINOROVERHAUL",
+        "MAJOROVERHAUL",
+        "OTHEROPERATIONAL",
+        "WATER",
+        "ENERGY",
+        "TOTALOPERATIONAL",
+        "CONSTRUCTION",
+        "SALVAGE",
+        "OTHERCAPITAL", //No space
+        "TOTALCAPITAL",
+        "TOTALENERGY",
+        "GRANDTOTAL"
+    };
 
     // The NIST supplement includes UPV* factors for
     //   Electricity
@@ -234,6 +262,25 @@ namespace EconomicLifeCycleCost {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(StartCosts::Num)> StartCostNamesUC{"SERVICEPERIOD", "BASEPERIOD"};
+
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategorytoSourceKind{
+        "Recurring",
+        "Recurring",
+        "Recurring",
+        "Recurring",
+        "Recurring",
+        "Recurring",
+        "Recurring",
+        "Resource",
+        "Resource",
+        "Sum",
+        "Nonrecurring",
+        "Nonrecurring",
+        "Nonrecurring",
+        "Sum",
+        "Sum",
+        "Sum"
+    };
 
     enum class SourceKindType
     {
