@@ -208,6 +208,25 @@ namespace EconomicLifeCycleCost {
         "Grand Total"
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesNoSpace{
+        "Maintenance",
+        "Repair",
+        "Operation",
+        "Replacement",
+        "MinorOverhaul",
+        "MajorOverhaul",
+        "OtherOperational",
+        "Water",
+        "Energy",
+        "TotalOperational",
+        "Construction",
+        "Salvage",
+        "OtherCapital",
+        "TotalCapital",
+        "TotalEnergy",
+        "GrandTotal"
+    };
+
     constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{
         "MAINTENANCE",
         "REPAIR",
