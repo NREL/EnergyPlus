@@ -1322,6 +1322,37 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                                      state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).MinOA);
         }
     }
+
+    // Populate DesignSpecification:OutdoorAir:SpaceList spaces
+    bool dsoaError = false;
+    for (int oaIndex = 1; oaIndex <= state.dataSize->NumOARequirements; ++oaIndex) {
+        auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
+        // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
+        if (thisOAReq.numDSOA > 0) {
+            for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
+                std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
+                int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                if (thisSpaceNum > 0) {
+                    thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
+                } else {
+                    ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                    ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                    dsoaError = true;
+                    ErrorsFound = true;
+                }
+                // Check for duplicate spaces
+                for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
+                    if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
+                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                        ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in the list.");
+                        dsoaError = true;
+                        ErrorsFound = true;
+                    }
+                }
+            }
+        }
+    }
+
     // Use the max occupancy data from the PEOPLE structure to calculate design min OA for each zone
     // Calculate the zone design minimum outside air flow rate from the 3 Zone Sizing OA inputs and
     // from the specified OA method
@@ -1333,31 +1364,18 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         Real64 ZoneMinOccupancy = 0.;
         ZoneIndex = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
         int DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
-        if (DSOAPtr > 0) {
+        if ((DSOAPtr > 0) && !dsoaError) {
             auto &thisOAReq = state.dataSize->OARequirements(DSOAPtr);
             // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
-            if (thisOAReq.numDSOA > 1) {
+            if (thisOAReq.numDSOA > 0) {
                 for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
                     std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
-                    int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                    int thisSpaceNum = thisOAReq.dsoaSpaceIndexes(spaceCounter);
                     if (thisSpaceNum > 0) {
-                        thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                         if (state.dataHeatBal->space(thisSpaceNum).zoneNum != state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                             ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
                             ShowContinueError(state, "is invalid for Sizing:Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
                             ShowContinueError(state, "All spaces in the list must be part of this zone.");
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                        ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
-                        ErrorsFound = true;
-                    }
-                    // Check for duplicate spaces
-                    for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
-                        if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
-                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                            ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in list.");
                             ErrorsFound = true;
                         }
                     }
@@ -1410,7 +1428,11 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex =
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use
-        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
+        if (!dsoaError) {
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
+        } else {
+            OAVolumeFlowRate = 0.0;
+        }
 
         // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
         state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA = OAVolumeFlowRate;
@@ -3239,9 +3261,9 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 } else if (SELECT_CASE_var == VRFTerminalUnit_Num) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
                     bool HeatingActive = false;
                     bool CoolingActive = false;
-                    int const OAUnitNum = 0;
-                    Real64 const OAUCoilOutTemp = 0.0;
-                    bool const ZoneEquipment = true;
+                    int constexpr OAUnitNum = 0;
+                    Real64 constexpr OAUCoilOutTemp = 0.0;
+                    bool constexpr ZoneEquipment = true;
                     SimulateVRF(state,
                                 state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                 FirstHVACIteration,
@@ -3838,7 +3860,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
         // Nothing to do here for this case
         {
             // Set the load (with load fraction) for the first equipment in priority order
-            const int priorityNum = 1;
+            constexpr int priorityNum = 1;
             const int &equipNum = state.dataZoneEquipmentManager->PrioritySimOrder(priorityNum).EquipPtr;
 
             // Determine whether we're heating or cooling and choose the appropriate fraction
@@ -4320,8 +4342,8 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
     auto &ZoneMassBalanceHVACReSim = state.dataHVACGlobal->ZoneMassBalanceHVACReSim;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    int const IterMax(25);
-    Real64 const ConvergenceTolerance(0.000010);
+    int constexpr IterMax(25);
+    Real64 constexpr ConvergenceTolerance(0.000010);
 
     int NodeNum;
     int ZoneNode; // zone air node number
@@ -4858,7 +4880,7 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                                Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
 )
 {
-    Real64 const ConvergenceTolerance(0.000010);
+    Real64 constexpr ConvergenceTolerance(0.000010);
     Real64 ZoneInfiltrationMassFlowRate = 0.0;
 
     // Set zone infiltration flow rate

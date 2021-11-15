@@ -2937,7 +2937,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
     int DXCoilNum = 1;
     int CompOp = 0;
-    int const SpeedCal = 1;
+    int constexpr SpeedCal = 1;
     Real64 RuntimeFrac = 1.0;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;

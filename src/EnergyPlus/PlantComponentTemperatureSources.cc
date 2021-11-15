@@ -438,7 +438,7 @@ namespace PlantComponentTemperatureSources {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_WaterSource,
+                                                    DataPlant::PlantEquipmentType::WaterSource,
                                                     this->Location.loopNum,
                                                     this->Location.loopSideNum,
                                                     this->Location.branchNum,

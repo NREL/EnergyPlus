@@ -3879,7 +3879,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // this version is just for reference points.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating the daylighting and glare factors
+    Real64 constexpr tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating the daylighting and glare factors
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ISky;   // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
@@ -4018,7 +4018,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // this version is just for map points.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
+    Real64 constexpr tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
     // the daylighting and glare factors
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5034,7 +5034,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
         }
 
-        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5));
+        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
         daylightControl.LightControlType = static_cast<DataDaylighting::LtgCtrlType>(typeNum);
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Invalid) {
             ShowWarningError(state,
@@ -5414,10 +5414,15 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
         pt.Name = state.dataIPShortCut->cAlphaArgs(1);
         pt.ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (pt.ZoneNum == 0) {
-            ShowSevereError(state,
-                            cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
-                                state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
+            int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
+            if (spaceNum == 0) {
+                ShowSevereError(state,
+                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
+                                    state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                ErrorsFound = true;
+            } else {
+                pt.ZoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+            }
         }
         pt.x = state.dataIPShortCut->rNumericArgs(1);
         pt.y = state.dataIPShortCut->rNumericArgs(2);

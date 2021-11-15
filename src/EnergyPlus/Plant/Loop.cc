@@ -140,7 +140,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
 
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
 
                 // Pick up the loop setpoint temperature
                 LoopSetPointTemperature = this->LoopSide(DataPlant::SupplySide).TempSetPoint;
@@ -150,7 +150,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
                 // Calculate the demand on the loop
                 LoadToLoopSetPoint = MassFlowRate * Cp * DeltaTemp;
 
-            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
 
                 // Get the range of setpoints
                 LoopSetPointTemperatureHi = state.dataLoopNodes->Node(this->TempSetPointNodeNum).TempSetPointHi;
@@ -185,7 +185,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
 
-            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
 
                 // Pick up the loop setpoint temperature
                 LoopSetPointTemperature = this->LoopSide(DataPlant::SupplySide).TempSetPoint;

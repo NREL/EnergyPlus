@@ -299,7 +299,7 @@ void ManageControllers(EnergyPlusData &state,
 
         if (state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum)
                 .LoopSide(ControllerProps(ControlNum).ActuatedNodePlantLoopSide)
-                .FlowLock == DataPlant::iFlowLock::Locked) {
+                .FlowLock == DataPlant::FlowLock::Locked) {
             // plant is rigid so controller cannot change anything.
             // Update the current Controller to the outlet nodes
             UpdateController(state, ControlNum);
@@ -710,14 +710,14 @@ void GetControllerInput(EnergyPlusData &state)
 
     // check that actuator nodes are matched by a water coil inlet node
     for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-        int iNodeType;
-        CheckActuatorNode(state, ControllerProps(Num).ActuatedNode, iNodeType, ActuatorNodeNotFound);
+        DataPlant::PlantEquipmentType WaterCoilType{};
+        CheckActuatorNode(state, ControllerProps(Num).ActuatedNode, WaterCoilType, ActuatorNodeNotFound);
         if (ActuatorNodeNotFound) {
             ErrorsFound = true;
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
             ShowContinueError(state, "...the actuator node must also be a water inlet node of a water coil");
         } else { // Node found, check type and action
-            if (iNodeType == DataPlant::TypeOf_CoilWaterCooling) {
+            if (WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                 if (ControllerProps(Num).Action == ControllerAction::NoAction) {
                     ControllerProps(Num).Action = ControllerAction::ReverseAction;
                 } else if (ControllerProps(Num).Action == ControllerAction::NormalAction) {
@@ -726,7 +726,7 @@ void GetControllerInput(EnergyPlusData &state)
                     ShowContinueError(state, "...overriding user input action with Reverse Action.");
                     ControllerProps(Num).Action = ControllerAction::ReverseAction;
                 }
-            } else if (iNodeType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
+            } else if (WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                 if (ControllerProps(Num).Action == ControllerAction::NoAction) {
                     ControllerProps(Num).Action = ControllerAction::NormalAction;
                 } else if (ControllerProps(Num).Action == ControllerAction::ReverseAction) {

@@ -2223,7 +2223,7 @@ namespace HeatRecovery {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrorTol(0.001); // error tolerence
+        Real64 constexpr ErrorTol(0.001); // error tolerence
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3244,7 +3244,7 @@ namespace HeatRecovery {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const ErrorTol(0.001); // error tolerence for iteration loop
+        Real64 constexpr ErrorTol(0.001); // error tolerence for iteration loop
         // na
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -3948,8 +3948,8 @@ namespace HeatRecovery {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const Acc(0.0001); // Accuracy of result
-        int const MaxIte(500);    // Maximum number of iterations
+        Real64 constexpr Acc(0.0001); // Accuracy of result
+        int constexpr MaxIte(500);    // Maximum number of iterations
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3959,9 +3959,9 @@ namespace HeatRecovery {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-        int SolFla;              // Flag of solver
-        Real64 const NTU0(0.0);  // lower bound for NTU
-        Real64 const NTU1(50.0); // upper bound for NTU
+        int SolFla;                  // Flag of solver
+        Real64 constexpr NTU0(0.0);  // lower bound for NTU
+        Real64 constexpr NTU1(50.0); // upper bound for NTU
         std::array<Real64, 2> Par = {Eps, Z};
 
         SolveRoot(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);

@@ -2187,7 +2187,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using DataPlant::TypeOf_PackagedTESCoolingCoil;
+
     using PlantUtilities::ScanPlantLoopsForObject;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2222,7 +2222,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
-                                    TypeOf_PackagedTESCoolingCoil,
+                                    DataPlant::PlantEquipmentType::PackagedTESCoolingCoil,
                                     plloopnum,
                                     lsnum,
                                     brnum,
@@ -2493,7 +2493,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeTESCoil ");
     static constexpr std::string_view calcTESWaterStorageTank("CalcTESWaterStorageTank");
-    Real64 const FluidTankSizingDeltaT(10.0);
+    Real64 constexpr FluidTankSizingDeltaT(10.0);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MixTemp;
@@ -2916,9 +2916,9 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIter(30);
-    Real64 const RelaxationFactor(0.4);
-    Real64 const Tolerance(0.1);
+    int constexpr MaxIter(30);
+    Real64 constexpr RelaxationFactor(0.4);
+    Real64 constexpr Tolerance(0.1);
     static constexpr std::string_view RoutineName("CalcTESCoilCoolingOnlyMode");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3243,9 +3243,9 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIter(30);
-    Real64 const RelaxationFactor(0.4);
-    Real64 const Tolerance(0.1);
+    int constexpr MaxIter(30);
+    Real64 constexpr RelaxationFactor(0.4);
+    Real64 constexpr Tolerance(0.1);
     static constexpr std::string_view RoutineName("CalcTESCoilCoolingAndChargeMode");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3749,9 +3749,9 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIter(30);
-    Real64 const RelaxationFactor(0.4);
-    Real64 const Tolerance(0.1);
+    int constexpr MaxIter(30);
+    Real64 constexpr RelaxationFactor(0.4);
+    Real64 constexpr Tolerance(0.1);
     static constexpr std::string_view RoutineName("CalcTESCoilCoolingAndDischargeMode");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4394,9 +4394,9 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIter(30);
-    Real64 const RelaxationFactor(0.4);
-    Real64 const Tolerance(0.1);
+    int constexpr MaxIter(30);
+    Real64 constexpr RelaxationFactor(0.4);
+    Real64 constexpr Tolerance(0.1);
     static constexpr std::string_view RoutineName("CalcTESCoilDischargeOnlyMode");
     static constexpr std::string_view StorageTankName("CalcTESWaterStorageTank");
 
@@ -4753,7 +4753,7 @@ void ControlTESIceStorageTankCoil(
     using General::SolveRoot;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500);         // Maximum number of iterations for solver
+    int constexpr MaxIte(500);     // Maximum number of iterations for solver
     Real64 const Acc(1.e-3);       // Accuracy of solver result
     Real64 const HumRatAcc(1.e-6); // Accuracy of solver result
 

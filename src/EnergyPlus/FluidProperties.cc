@@ -164,7 +164,7 @@ namespace FluidProperties {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const PressToler(1.0); // Some reasonable value for comparisons
+        Real64 constexpr PressToler(1.0); // Some reasonable value for comparisons
         static constexpr std::string_view RoutineName("GetFluidPropertiesData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -7158,10 +7158,10 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            std::array<Real64, 3> Par;    // Parameters passed to RegulaFalsi
-            Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-            int const MaxIte(500);        // maximum number of iterations
-            int SolFla;                   // Flag of RegulaFalsi solver
+            std::array<Real64, 3> Par;        // Parameters passed to RegulaFalsi
+            Real64 constexpr ErrorTol(0.001); // tolerance for RegulaFalsi iterations
+            int constexpr MaxIte(500);        // maximum number of iterations
+            int SolFla;                       // Flag of RegulaFalsi solver
 
             Par[0] = RefrigNum;
             Par[1] = Enthalpy;
