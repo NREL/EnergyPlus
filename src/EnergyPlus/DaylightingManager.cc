@@ -566,7 +566,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                 // for first time that daylight factors are calculated and so is insensitive to possible variation
                 // due to change in ground reflectance from month to month, or change in storm window status.
-                static constexpr std::string_view Format_700("! <Sky Daylight Factors>, MonthAndDay, Daylighting Control Name, Enclosure Name, "
+                static constexpr std::string_view Format_700("! <Sky Daylight Factors>, Sky Type, MonthAndDay, Daylighting Control Name, Enclosure Name, "
                                                              "Window Name, Reference Point, Daylight Factor\n");
                 print(state.files.eio, Format_700);
                 for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
