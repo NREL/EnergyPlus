@@ -2280,7 +2280,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     eiooutput = delimited_string(
         {
-            "! <Sky Daylight Factors>, MonthAndDay, Daylighting Control Name, Enclosure Name, Window Name, Reference Point, Daylight Factor",
+            "! <Sky Daylight Factors>, Sky Type, MonthAndDay, Daylighting Control Name, Enclosure Name, Window Name, Reference Point, Daylight Factor",
             " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
             " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
             " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
