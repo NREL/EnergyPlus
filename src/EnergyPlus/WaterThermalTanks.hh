@@ -709,10 +709,10 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterThermalTankData()
-            : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
-              TimeElapsed(0.0), AmbientTempIndicator(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientTempZone(0),
-              AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0), OffCycLossFracToZone(0.0),
-              OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(HeaterControlMode::Cycle),
+            : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
+              VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0),
+              AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
+              OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(HeaterControlMode::Cycle),
               StratifiedControlMode(PriorityControlMode::Unassigned), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
               Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0),
               IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0),
@@ -971,14 +971,15 @@ namespace WaterThermalTanks {
         // Default Constructor
         WaterHeaterDesuperheaterData()
             : InsuffTemperatureWarn(0), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), HeatReclaimRecoveryEff(0.0),
-              WaterInletNode(0), WaterOutletNode(0), RatedInletWaterTemp(0.0), RatedOutdoorAirTemp(0.0), MaxInletWaterTemp(0.0), TankTypeNum(DataPlant::PlantEquipmentType::Invalid),
-              TankNum(0), StandAlone(false), HeaterRate(0.0), HeaterEnergy(0.0), PumpPower(0.0), PumpEnergy(0.0), PumpElecPower(0.0),
-              PumpFracToWater(0.0), OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0), SetPointTemp(0.0), WaterHeaterTankNum(0),
-              DesuperheaterPLR(0.0), OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0), OnCycParaFuelRate(0.0),
-              OffCycParaFuelEnergy(0.0), OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
-              ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(ReclaimHeatObjectType::DXCooling), SetPointError(0), SetPointErrIndex1(0),
-              IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0),
-              IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ValidSourceType(false)
+              WaterInletNode(0), WaterOutletNode(0), RatedInletWaterTemp(0.0), RatedOutdoorAirTemp(0.0), MaxInletWaterTemp(0.0),
+              TankTypeNum(DataPlant::PlantEquipmentType::Invalid), TankNum(0), StandAlone(false), HeaterRate(0.0), HeaterEnergy(0.0), PumpPower(0.0),
+              PumpEnergy(0.0), PumpElecPower(0.0), PumpFracToWater(0.0), OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0),
+              SetPointTemp(0.0), WaterHeaterTankNum(0), DesuperheaterPLR(0.0), OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0),
+              OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0), OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0),
+              BackupElementCapacity(0.0), DXSysPLR(0.0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(ReclaimHeatObjectType::DXCooling),
+              SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0),
+              RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0),
+              FirstTimeThroughFlag(true), ValidSourceType(false)
         {
         }
     };

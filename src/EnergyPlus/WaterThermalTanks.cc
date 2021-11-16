@@ -4251,7 +4251,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         state, HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWH.OutletNodeName1, HPWH.InletNodeName1, "HPWH To Tank");
 
                     // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
-                    if ((Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) && (Tank.ControlType == HeaterControlMode::Modulate)) {
+                    if ((Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
+                        (Tank.ControlType == HeaterControlMode::Modulate)) {
                         ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
                         ShowContinueError(state, "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
                         ErrorsFound = true;
@@ -10347,7 +10348,8 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     //  Calls residuals to get tank temperature at the given speed ratio between a lower and an upper speed levels
-    //  and calculates the residual as defined respectively for DataPlant::PlantEquipmentType::WtrHeaterMixed or DataPlant::PlantEquipmentType::WtrHeaterStratified
+    //  and calculates the residual as defined respectively for DataPlant::PlantEquipmentType::WtrHeaterMixed or
+    //  DataPlant::PlantEquipmentType::WtrHeaterStratified
 
     Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling variable-speed coil function
 

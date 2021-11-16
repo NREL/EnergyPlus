@@ -1678,8 +1678,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     }
                                 }
                             }
-                        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType ==
-                                   CtrlType::DualOp) {
+                        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType == CtrlType::DualOp) {
                             if ((state.dataLoopNodes
                                      ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
                                      .TempSetPointHi == SensedNodeFlagValue) ||

@@ -1636,8 +1636,7 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 }
@@ -1743,8 +1742,7 @@ namespace PlantChillers {
                     } else {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     }
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
@@ -3770,8 +3768,7 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 }
@@ -3880,8 +3877,7 @@ namespace PlantChillers {
                     } else {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     }
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
@@ -5863,8 +5859,7 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     EvapDeltaTemp =
                         state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi;
                 }
@@ -5962,8 +5957,7 @@ namespace PlantChillers {
                     } else {
                         TempEvapOutSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     }
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
@@ -7574,8 +7568,7 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     EvapDeltaTemp = std::abs(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                              state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint);
-                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme ==
-                           DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     EvapDeltaTemp = std::abs(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp -
                                              state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi);
                 }
