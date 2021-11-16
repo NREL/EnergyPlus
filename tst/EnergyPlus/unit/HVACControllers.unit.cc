@@ -264,7 +264,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
@@ -411,7 +411,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     GetControllerInput(*state);
 
     ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).Name, "CHILLED WATER COIL");
-    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::TypeOf_CoilWaterCooling);
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::PlantEquipmentType::CoilWaterCooling);
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
@@ -504,7 +504,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     GetControllerInput(*state);
 
     ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).Name, "OA PREHEAT HW COIL");
-    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::TypeOf_CoilWaterSimpleHeating);
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::PlantEquipmentType::CoilWaterSimpleHeating);
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
@@ -636,7 +636,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     GetControllerInput(*state);
 
     ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
-    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::TypeOf_CoilWaterDetailedFlatCooling);
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling);
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
@@ -697,7 +697,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     state->dataHVACControllers->ControllerProps.allocate(1);
     state->dataHVACControllers->RootFinders.allocate(1);
     bool isConverged = true;
-    int const controlNum = 1;
+    int constexpr controlNum = 1;
     auto &thisController(state->dataHVACControllers->ControllerProps(1));
     thisController.ControlVar = HVACControllers::iCtrl::TemperatureAndHumidityRatio;
     thisController.Offset = 0.0001;
@@ -977,7 +977,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";

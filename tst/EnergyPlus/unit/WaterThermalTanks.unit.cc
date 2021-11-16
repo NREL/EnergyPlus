@@ -80,10 +80,10 @@ using namespace OutputReportPredefined;
 TEST_F(EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
 {
     Real64 DeltaT = 0.0;
-    Real64 const SourceInletTemp = 62.0;
-    Real64 const Cp = 4178.; // water, J/(kg * K)
-    Real64 const SetPointTemp = 60.0;
-    Real64 const SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
+    Real64 constexpr SourceInletTemp = 62.0;
+    Real64 constexpr Cp = 4178.; // water, J/(kg * K)
+    Real64 constexpr SetPointTemp = 60.0;
+    Real64 constexpr SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
     Real64 SourceMassFlowRate = SourceMassFlowRateOrig;
     Real64 Qheatpump = 0.0;
     Real64 Qsource = 0.0;
@@ -1935,7 +1935,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 20.0 / 60.0;
     TimeStepSys = state->dataGlobal->TimeStepZone;
-    const int TankNum = 1;
+    constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     for (auto &node : Tank.Node) {
         node.Temp = 60.0;
@@ -2127,7 +2127,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
-    const int TankNum = 1;
+    constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     Tank.SourceInletNode = 1;
     Tank.SourceOutletNode = 2;
@@ -2682,7 +2682,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
     CoilBranch.TotalComponents = 1;
     CoilBranch.Comp.allocate(CompNum);
-    CoilBranch.Comp(CompNum).TypeOf_Num = 67;
+    CoilBranch.Comp(CompNum).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -5352,7 +5352,7 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     auto &DSup = state->dataWaterThermalTanks->WaterHeaterDesuperheater(1);
     auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
-    HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
+    HPWH.HPWHType = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped;
 
     // Test 1: Heat Pump Hot Water Heater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
     Tank.HeatPumpNum = 1;
@@ -5403,7 +5403,7 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
 
     // Test 6: Wrapped Heat Pump Water Heater.  Do not do anything.
-    HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
+    HPWH.HPWHType = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped;
     Tank.HeatPumpNum = 1;
     Tank.DesuperheaterNum = 0;
     Tank.MaxCapacity = 200.0;

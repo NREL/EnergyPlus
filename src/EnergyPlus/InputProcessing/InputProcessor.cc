@@ -573,7 +573,7 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
         auto const &default_val = find_default.value();
         if (default_val.is_string() && !default_val.get<std::string>().empty()) {
             // autosize and autocalculate
-            default_value = -99999;
+            default_value = DataGlobalConstants::AutoCalculate;
         } else if (default_val.is_number_integer()) {
             default_value = default_val.get<std::int64_t>();
         } else {
@@ -650,7 +650,7 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
 Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     // Return the value of fieldName in ep_object as a Real64.
-    // If the field value is a string, then assum autosize and return -99999.
+    // If the field value is a string, then assum autosize and return DataGlobalConstants::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0.0
     auto const &schema_field_obj = schema_obj_props[fieldName];
     assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
@@ -670,7 +670,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
             if (is_empty) {
                 isDefaulted = findDefault(value, schema_field_obj);
             } else {
-                value = -99999; // autosize and autocalculate
+                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
             }
         }
     } else {
@@ -685,7 +685,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
 int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
-    // If the field value is a string, then assume autosize or autocalulate and return -99999.
+    // If the field value is a string, then assume autosize or autocalulate and return DataGlobalConstants::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0
 
     auto const &schema_field_obj = schema_obj_props[fieldName];
@@ -707,7 +707,7 @@ int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_o
             if (is_empty) {
                 isDefaulted = findDefault(defaultValue, schema_field_obj);
             } else {
-                value = -99999; // autosize and autocalculate
+                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
             }
         }
     } else {
@@ -862,7 +862,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
                 if (is_empty) {
                     findDefault(Numbers(numeric_index), schema_field_obj);
                 } else {
-                    Numbers(numeric_index) = -99999; // autosize and autocalculate
+                    Numbers(numeric_index) = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
                 }
                 if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
             }

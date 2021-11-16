@@ -97,8 +97,6 @@ namespace WaterToAirHeatPump {
     using namespace DataLoopNode;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
-    using DataPlant::TypeOf_CoilWAHPCoolingParamEst;
-    using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
 
     static constexpr std::string_view fluidNameWater("WATER");
 
@@ -173,14 +171,14 @@ namespace WaterToAirHeatPump {
         }
         // Calculate the Correct Water to Air HP Model with the current HPNum
 
-        if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
+        if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
-        } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
+        } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
@@ -298,7 +296,7 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPCoolingParamEst;
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType = DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Refrigerant = AlphArray(3);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate = NumArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CoolingCapacity = NumArray(2);
@@ -491,7 +489,7 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "HEATING";
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPHeatingParamEst;
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType = DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Refrigerant = AlphArray(3);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate = NumArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HeatingCapacity = NumArray(2);
@@ -650,7 +648,7 @@ namespace WaterToAirHeatPump {
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPump->NumWatertoAirHPs; ++HPNum) {
 
-            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
+            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
                 // COOLING COIL: Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Cooling Coil Electricity Rate",
@@ -764,7 +762,7 @@ namespace WaterToAirHeatPump {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-            } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
+            } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
                 // HEATING COIL Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Heating Coil Electricity Rate",
@@ -941,7 +939,7 @@ namespace WaterToAirHeatPump {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum,
+                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
@@ -1822,14 +1820,14 @@ namespace WaterToAirHeatPump {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const CpWater(4210.0);         // Specific heat of water J/kg_C
-        Real64 const DegreeofSuperheat(80.0); // Initial guess of degree of superheat
-        Real64 const gamma(1.114);            // Expnasion Coefficient
-        Real64 RelaxParam(0.5);               // Relaxation Parameter
-        Real64 const ERR(0.01);               // Error Value
-        int const STOP1(1000);                // Iteration stopper1
-        int const STOP2(1000);                // Iteration stopper2
-        int const STOP3(1000);                // Iteration stopper3
+        Real64 constexpr CpWater(4210.0);         // Specific heat of water J/kg_C
+        Real64 constexpr DegreeofSuperheat(80.0); // Initial guess of degree of superheat
+        Real64 constexpr gamma(1.114);            // Expnasion Coefficient
+        Real64 RelaxParam(0.5);                   // Relaxation Parameter
+        Real64 constexpr ERR(0.01);               // Error Value
+        int constexpr STOP1(1000);                // Iteration stopper1
+        int constexpr STOP2(1000);                // Iteration stopper2
+        int constexpr STOP3(1000);                // Iteration stopper3
 
         static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcWatertoAirHPHeating:SourceSideInletTemp");
         static constexpr std::string_view RoutineNameSourceSideTemp("CalcWatertoAirHPHeating:SourceSideTemp");

@@ -528,10 +528,10 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
     for (auto &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
             for (auto &g : lc->elecGenCntrlObj) {
-                if (g->compGenTypeOf_Num == GeneratorType::PV) {
+                if (g->generatorType == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
-                if (g->compGenTypeOf_Num == GeneratorType::WindTurbine) {
+                if (g->generatorType == GeneratorType::WindTurbine) {
                     windTotalCapacity_ += g->maxPowerOut;
                 }
             }
@@ -1043,7 +1043,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                     errorsFound = true;
                     ShowSevereError(state, std::string{routineName} + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
                     ShowContinueError(state, "ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
-                    ShowContinueError(state, "\"" + generatorController->name + "\" is of type " + generatorController->typeOfName);
+                    ShowContinueError(state,
+                                      format("\"{}\" is of type {}",
+                                             generatorController->name,
+                                             GeneratorTypeNames[static_cast<int>(generatorController->generatorType)]));
                 } else {
                     totalDCCapacity += generatorController->pvwattsGenerator->getDCSystemCapacity();
 
@@ -2106,7 +2109,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
             plantNotFound = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     g->compPlantName,
-                                                    g->compPlantTypeOf_Num,
+                                                    g->compPlantType,
                                                     g->cogenLocation.loopNum,
                                                     g->cogenLocation.loopSideNum,
                                                     g->cogenLocation.branchNum,
@@ -2142,40 +2145,40 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf_Num(0), generatorType(GeneratorType::Unassigned), generatorIndex(0),
-      maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false),
-      plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0),
-      electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr), errCountNegElectProd_(0)
+    : generatorType(GeneratorType::Unassigned), compPlantType(DataPlant::PlantEquipmentType::Invalid), generatorIndex(0), maxPowerOut(0.0),
+      availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false), plantInfoFound(false),
+      cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0), electricityProd(0.0),
+      electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr), errCountNegElectProd_(0)
 {
 
     static constexpr std::string_view routineName = "GeneratorController constructor ";
 
     name = objectName;
-    typeOfName = objectType;
-    if (UtilityRoutines::SameString(objectType, "Generator:InternalCombustionEngine")) {
-        generatorType = GeneratorType::ICEngine;
-        compGenTypeOf_Num = GeneratorType::ICEngine;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
+
+    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypeNamesUC, UtilityRoutines::MakeUPPERCase(objectType)));
+    switch (generatorType) {
+    case GeneratorType::ICEngine: {
+        compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:CombustionTurbine")) {
-        generatorType = GeneratorType::CombTurbine;
-        compGenTypeOf_Num = GeneratorType::CombTurbine;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
+        break;
+    }
+    case GeneratorType::CombTurbine: {
+        compPlantType = DataPlant::PlantEquipmentType::Generator_CTurbine;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:MicroTurbine")) {
-        generatorType = GeneratorType::Microturbine;
-        compGenTypeOf_Num = GeneratorType::Microturbine;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
+        break;
+    }
+    case GeneratorType::Microturbine: {
+        compPlantType = DataPlant::PlantEquipmentType::Generator_MicroTurbine;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:Photovoltaic")) {
-        generatorType = GeneratorType::PV;
-        compGenTypeOf_Num = GeneratorType::PV;
-        compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
+        break;
+    }
+    case GeneratorType::PV: {
+        compPlantType = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
-        generatorType = GeneratorType::PVWatts;
-        compGenTypeOf_Num = GeneratorType::PVWatts;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Other;
+        break;
+    }
+    case GeneratorType::PVWatts: {
+        compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
         int ObjNum =
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
@@ -2185,28 +2188,31 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         }
         pvwattsGenerator = PVWatts::PVWattsGenerator::createFromIdfObj(state, ObjNum);
         pvwattsGenerator->setupOutputVariables(state);
-
-    } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
-        generatorType = GeneratorType::FuelCell;
-        compGenTypeOf_Num = GeneratorType::FuelCell;
+        break;
+    }
+    case GeneratorType::FuelCell: {
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
-        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
+        compPlantType = DataPlant::PlantEquipmentType::Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->ExhaustHX.Name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
-        generatorType = GeneratorType::MicroCHP;
-        compGenTypeOf_Num = GeneratorType::MicroCHP;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
+        break;
+    }
+    case GeneratorType::MicroCHP: {
+        compPlantType = DataPlant::PlantEquipmentType::Generator_MicroCHP;
         compPlantName = name;
-    } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
-        generatorType = GeneratorType::WindTurbine;
-        compGenTypeOf_Num = GeneratorType::WindTurbine;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Other;
-    } else {
+        break;
+    }
+    case GeneratorType::WindTurbine: {
+        compPlantType = DataPlant::PlantEquipmentType::Invalid;
+        break;
+    }
+    default: {
         ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
         ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);
+        break;
+    }
     }
 
     availSched = availSchedName;
@@ -2398,7 +2404,8 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::Unassigned: {
+    case GeneratorType::Unassigned:
+    case GeneratorType::Num: {
         // do nothing
         break;
     }
@@ -2407,15 +2414,19 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     // check if generator production has gone wrong and is negative, reset to zero and warn
     if (electricPowerOutput < 0.0) {
         if (errCountNegElectProd_ == 0) {
-            ShowWarningMessage(state, typeOfName + " named " + name + " is producing negative electric power, check generator inputs.");
+            ShowWarningMessage(state,
+                               format("{} named {} is producing negative electric power, check generator inputs.",
+                                      GeneratorTypeNames[static_cast<int>(generatorType)],
+                                      name));
             ShowContinueError(state, format("Electric power production rate ={:.4R}", electricPowerOutput));
             ShowContinueError(state, "The power will be set to zero, and the simulation continues... ");
         }
-        ShowRecurringWarningErrorAtEnd(state,
-                                       typeOfName + " named " + name + " is producing negative electric power ",
-                                       errCountNegElectProd_,
-                                       electricPowerOutput,
-                                       electricPowerOutput);
+        ShowRecurringWarningErrorAtEnd(
+            state,
+            format("{} named {} is producing negative electric power ", GeneratorTypeNames[static_cast<int>(generatorType)], name),
+            errCountNegElectProd_,
+            electricPowerOutput,
+            electricPowerOutput);
         electricPowerOutput = 0.0;
     }
 }
@@ -2861,10 +2872,10 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
         // This code is lifted from ssc cmod_pvwatts5.cpp:powerout() method.
         // It was easier to do this calculation here because we have a many to one relationship between inverter
         // and generator whereas theirs is one to one.
-        Real64 const etaref = 0.9637;
-        Real64 const A = -0.0162;
-        Real64 const B = -0.0059;
-        Real64 const C = 0.9858;
+        Real64 constexpr etaref = 0.9637;
+        Real64 constexpr A = -0.0162;
+        Real64 constexpr B = -0.0059;
+        Real64 constexpr C = 0.9858;
         Real64 const pdc0 = ratedPower_ / pvWattsInverterEfficiency_;
         Real64 const plr = dCPowerIn_ / pdc0;
         Real64 ac = 0;
@@ -3253,7 +3264,7 @@ ElectricStorage::ElectricStorage( // main constructor
     EnergyPlusData &state,
     std::string const &objectName)
     : storedPower_(0.0), storedEnergy_(0.0), drawnPower_(0.0), drawnEnergy_(0.0), decrementedEnergyStored_(0.0), maxRainflowArrayBounds_(100),
-      maxRainflowArrayInc_(100), myWarmUpFlag_(false), storageModelMode_(StorageModelType::storageTypeNotSet), availSchedPtr_(0),
+      myWarmUpFlag_(false), storageModelMode_(StorageModelType::storageTypeNotSet), availSchedPtr_(0),
       heatLossesDestination_(ThermalLossDestination::heatLossNotDetermined), zoneNum_(0), zoneRadFract_(0.0), startingEnergyStored_(0.0),
       energeticEfficCharge_(0.0), energeticEfficDischarge_(0.0), maxPowerDraw_(0.0), maxPowerStore_(0.0), maxEnergyCapacity_(0.0), parallelNum_(0),
       seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0),
@@ -3762,8 +3773,8 @@ ElectricStorage::ElectricStorage( // main constructor
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound)
 {
-    Real64 const minChargeEfficiency = 0.001;
-    Real64 const minDischargeEfficiency = 0.001;
+    Real64 constexpr minChargeEfficiency = 0.001;
+    Real64 constexpr minDischargeEfficiency = 0.001;
 
     // Fix for Defect #8867.  Do not allow either efficiency to be zero as it will lead to a divide by zero (NaN).
     if (UtilityRoutines::SameString(whichType, "CHARGING")) {
@@ -3914,8 +3925,11 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
                 Real64 input0 = (lastTimeStepAvailable_ + lastTimeStepBound_) / maxAhCapacity_;
                 b10_[count0_] = input0;
 
-                //        The arrary size needs to be increased when count = MaxRainflowArrayBounds. Please note that (MaxRainflowArrayBounds +1)
+                //        The array size needs to be increased when count = MaxRainflowArrayBounds. Please note that (MaxRainflowArrayBounds +1)
                 //        is the index used in the subroutine RainFlow. So we cannot reallocate array size until count = MaxRainflowArrayBounds +1.
+
+                int constexpr maxRainflowArrayInc_ = 100;
+
                 if (count0_ == maxRainflowArrayBounds_) {
                     b10_.resize(maxRainflowArrayBounds_ + 1 + maxRainflowArrayInc_, 0.0);
                     x0_.resize(maxRainflowArrayBounds_ + 1 + maxRainflowArrayInc_, 0.0);
@@ -4931,7 +4945,7 @@ Real64 ElectricTransformer::getLossRateForInputPower(EnergyPlusData &state, Real
 
 void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const surplusPowerOutFromLoadCenters)
 {
-    Real64 const ambTempRef = 20.0; // reference ambient temperature (C)
+    Real64 constexpr ambTempRef = 20.0; // reference ambient temperature (C)
     if (myOneTimeFlag_) {
         // calculate rated no load losses and rated load losses if the performance input method is based on
         // nominal efficiency. This calculation is done only once

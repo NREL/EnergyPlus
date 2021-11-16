@@ -1181,7 +1181,7 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
-            const int NumVar = 4;
+            constexpr int NumVar = 4;
             std::string VarNames[NumVar] = {"w", "x", "y", "z"};
             for (int i = 1; i <= NumVar; ++i) {
                 int MinIndex = 2 * i + 4;
@@ -1263,7 +1263,7 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
-            const int NumVar = 5;
+            constexpr int NumVar = 5;
             std::string VarNames[NumVar] = {"v", "w", "x", "y", "z"};
             for (int i = 1; i <= NumVar; ++i) {
                 int MinIndex = 2 * i + 5;

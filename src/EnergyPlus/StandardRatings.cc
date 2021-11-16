@@ -107,32 +107,31 @@ namespace StandardRatings {
     // OTHER NOTES: none
 
     // Data
-    Real64 const IndoorCoilInletAirWetBulbTempRated(19.44);   // 19.44C (67F)  Tests A2, B2, B1, and F1
-    Real64 const OutdoorCoilInletAirDryBulbTempRated(35.0);   // 35.00C (95F)  Tests A2, B2, B1, and F1
-    Real64 const OutdoorCoilInletAirDryBulbTempTestA2(35.0);  // 35.00C (95F)  Test A2 (high speed)
-    Real64 const OutdoorCoilInletAirDryBulbTempTestB2(27.78); // 27.78C (82F)  Test B2 (high speed)
-    Real64 const OutdoorCoilInletAirDryBulbTempTestB1(27.78); // 27.78C (82F)  Test B1 (Low speed)
-    Real64 const OutdoorCoilInletAirDryBulbTempTestF1(19.44); // 19.44C (67F)  Test B1 (Low speed)
+    Real64 constexpr IndoorCoilInletAirWetBulbTempRated(19.44);   // 19.44C (67F)  Tests A2, B2, B1, and F1
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempRated(35.0);   // 35.00C (95F)  Tests A2, B2, B1, and F1
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestA2(35.0);  // 35.00C (95F)  Test A2 (high speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestB2(27.78); // 27.78C (82F)  Test B2 (high speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestB1(27.78); // 27.78C (82F)  Test B1 (Low speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestF1(19.44); // 19.44C (67F)  Test B1 (Low speed)
 
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    Real64 const CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
-    Real64 const OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
-    Real64 const OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
-    Real64 const AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
+    Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
+    Real64 constexpr OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
+    Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
+    Real64 constexpr AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
     // and hence AirMassFlowRatio is 1.0
-    Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
-    Real64 const DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
+    Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
     // specifies a nominal/default fan electric power consumption per rated air
     // volume flow rate to account for indoor fan electric power consumption
     // when the standard tests are conducted on units that do not have an
-    // indoor air circulting fan. Used if user doesn't enter a specific value.
-    Real64 const PLRforSEER(0.5);                                 // Part-load ratio for SEER calculation (single speed DX cooling coils)
+    // indoor air circulating fan. Used if user doesn't enter a specific value.
+    Real64 constexpr PLRforSEER(0.5);                             // Part-load ratio for SEER calculation (single speed DX cooling coils)
     Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
     Array1D<Real64> const IEERWeightingFactor(4, {0.020, 0.617, 0.238, 0.125}); // EER Weighting factors (IEER)
-    Real64 const OADBTempLowReducedCapacityTest(18.3);                          // Outdoor air dry-bulb temp in degrees C (65F)
+    Real64 constexpr OADBTempLowReducedCapacityTest(18.3);                      // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
-    int const TotalNumOfStandardDHRs(16);                                   // Total number of standard design heating requirements
+    int constexpr TotalNumOfStandardDHRs(16);                               // Total number of standard design heating requirements
     Array1D_int const TotalNumOfTemperatureBins(6, {9, 10, 13, 15, 18, 9}); // Total number of temperature
     // bins for a region
     Array1D<Real64> const StandardDesignHeatingRequirement(16,
@@ -153,9 +152,9 @@ namespace StandardRatings {
                                                             32237.83,
                                                             38099.26});
     // Standardized DHRs from ANSI/AHRI 210/240
-    Real64 const CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
+    Real64 constexpr CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
-    Real64 const CyclicDegradationCoeff(0.25);
+    Real64 constexpr CyclicDegradationCoeff(0.25);
 
     int constexpr NumberOfRegions{6};
     int constexpr NumberOfBins{18};
@@ -175,22 +174,16 @@ namespace StandardRatings {
     }};
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
-    int const NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
+    int constexpr NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
     Array1D<Real64> const OutdoorBinTemperatureSEER(NumOfOATempBins, {19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89});
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
     Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp(NumOfOATempBins, {0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004});
 
-    Real64 const HeatingIndoorCoilInletAirDBTempRated(21.11); // Heating coil entering air dry-bulb temperature in
+    Real64 constexpr HeatingIndoorCoilInletAirDBTempRated(21.11); // Heating coil entering air dry-bulb temperature in
     // degrees C (70F) Test H1, H2 and H3
     // (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempH0Test(16.67); // Outdoor air dry-bulb temp in degrees C (47F)
+    Real64 constexpr HeatingOutdoorCoilInletAirDBTempH0Test(16.67); // Outdoor air dry-bulb temp in degrees C (47F)
     // Test H0 (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)
-    // Test H1 or rated (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempH2Test(1.67); // Outdoor air dry-bulb temp in degrees C (35F)
-    // Test H2 (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempH3Test(-8.33); // Outdoor air dry-bulb temp in degrees C (17F)
-    // Test H3 (low and High Speed) Std. AHRI 210/240
 
     // ANSI/ASHRAE Standard 127-2012 -- Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
     //  Class 1 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F )
@@ -198,7 +191,7 @@ namespace StandardRatings {
     //    Class 3 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F )
     //    Class 4 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F )
     Array1D<Real64> const IndoorDBTempClassI2IV(4, {23.9, 29.4, 35.0, 40.5});
-    Real64 const IndoorTDPA2D(11.1);
+    Real64 constexpr IndoorTDPA2D(11.1);
     // 35.0C( 95.0F ) 26.7C( 80.0F ) 18.3C( 65.0F ) 4.4C( 40.0F )
     Array1D<Real64> const OutdoorDBTempAllClassA2D(4, {35.0, 26.7, 18.3, 4.4});
 
@@ -206,7 +199,7 @@ namespace StandardRatings {
 
     void CalcChillerIPLV(EnergyPlusData &state,
                          std::string const &ChillerName,               // Name of Chiller for which IPLV is calculated
-                         int const ChillerType,                        // Type of Chiller - EIR or Reformulated EIR
+                         DataPlant::PlantEquipmentType ChillerType,    // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                          // Reference capacity of chiller [W]
                          Real64 const RefCOP,                          // Reference coefficient of performance [W/W]
                          DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
@@ -248,15 +241,14 @@ namespace StandardRatings {
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
+
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using General::SolveRoot;
 
         // Locals
-        Real64 const ConvFromSIToIP(3.412141633);                            // Conversion from SI to IP [3.412 Btu/hr-W]
+        Real64 constexpr ConvFromSIToIP(3.412141633);                        // Conversion from SI to IP [3.412 Btu/hr-W]
         static Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -265,10 +257,10 @@ namespace StandardRatings {
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
 
-        Real64 const EvapOutletTemp(6.67); // (44F)
-        Real64 const Acc(0.0001);          // Accuracy of result
-        int const NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
-        int const IterMax(500);            // Maximum number of iterations
+        Real64 constexpr EvapOutletTemp(6.67); // (44F)
+        Real64 constexpr Acc(0.0001);          // Accuracy of result
+        int constexpr NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
+        int constexpr IterMax(500);            // Maximum number of iterations
         static Array1D<Real64> const IPLVWeightingFactor(4, {0.010, 0.42, 0.45, 0.12}); // EER Weighting factors (IPLV)
         static constexpr std::string_view RoutineName("CalcChillerIPLV");
 
@@ -358,7 +350,7 @@ namespace StandardRatings {
                 CondenserInletTemp = EnteringAirWetBulbTempReduced;
             }
 
-            if (ChillerType == TypeOf_Chiller_ElectricEIR) {
+            if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                 if (RedCapNum == 1.0) {
                     // Get curve modifier values at rated conditions (load = 100%)
                     ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
@@ -383,7 +375,7 @@ namespace StandardRatings {
                     PartLoadRatio = MinUnloadRat;
                 }
 
-            } else if (ChillerType == TypeOf_Chiller_ElectricReformEIR) {
+            } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
                 Cp = GetSpecificHeatGlycol(state,
                                            state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
                                            EnteringWaterTempReduced,
@@ -468,10 +460,10 @@ namespace StandardRatings {
                 IPLV += IPLVWeightingFactor(RedCapNum) * COPReduced;
             } else {
                 {
-                    if (ChillerType == TypeOf_Chiller_ElectricEIR) {
+                    if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                         ShowWarningError(state,
                                          "Chiller:Electric:EIR = " + ChillerName + ":  Integrated Part Load Value (IPLV) cannot be calculated.");
-                    } else if (ChillerType == TypeOf_Chiller_ElectricReformEIR) {
+                    } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:ReformulatedEIR = " + ChillerName +
@@ -601,10 +593,10 @@ namespace StandardRatings {
     }
 
     void ReportChillerIPLV(EnergyPlusData &state,
-                           std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
-                           int const ChillerType,          // Type of Chiller - EIR or Reformulated EIR
-                           Real64 const IPLVValueSI,       // IPLV value in SI units {W/W}
-                           Real64 const IPLVValueIP        // IPLV value in IP units {Btu/W-h}
+                           std::string const &ChillerName,            // Name of Chiller for which IPLV is calculated
+                           DataPlant::PlantEquipmentType ChillerType, // Type of Chiller - EIR or Reformulated EIR
+                           Real64 const IPLVValueSI,                  // IPLV value in SI units {W/W}
+                           Real64 const IPLVValueIP                   // IPLV value in IP units {Btu/W-h}
     )
     {
 
@@ -620,8 +612,6 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using namespace OutputReportPredefined;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &StandardRatingsMyOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyOneTimeFlag;
@@ -637,12 +627,12 @@ namespace StandardRatings {
 
         {
             static constexpr std::string_view Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
-            if (ChillerType == TypeOf_Chiller_ElectricEIR) {
+            if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:EIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
-            } else if (ChillerType == TypeOf_Chiller_ElectricReformEIR) {
+            } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:ReformulatedEIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
@@ -656,7 +646,7 @@ namespace StandardRatings {
 
     void CheckCurveLimitsForIPLV(EnergyPlusData &state,
                                  std::string const &ChillerName,               // Name of Chiller
-                                 int const ChillerType,                        // Type of Chiller - EIR or ReformulatedEIR
+                                 DataPlant::PlantEquipmentType ChillerType,    // Type of Chiller - EIR or ReformulatedEIR
                                  DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                                  int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                                  int const EIRFTempCurveIndex                  // Index for the energy input ratio modifier curve
@@ -676,15 +666,13 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
         // Following parameters are taken from AHRI 551/591,2011 Table 3
-        Real64 const HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
-        Real64 const LowEWTemp(19.0);        // Entering water temp in degrees C at minimum reduced capacity (65F)
-        Real64 const OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
-        Real64 const OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
-        Real64 const LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
+        Real64 constexpr HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
+        Real64 constexpr LowEWTemp(19.0);        // Entering water temp in degrees C at minimum reduced capacity (65F)
+        Real64 constexpr OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
+        Real64 constexpr OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
+        Real64 constexpr LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
@@ -738,12 +726,12 @@ namespace StandardRatings {
         if (CapCurveIPLVLimitsExceeded || EIRCurveIPLVLimitsExceeded) {
             if (state.dataGlobal->DisplayExtraWarnings) {
 
-                if (ChillerType == TypeOf_Chiller_ElectricEIR) {
+                if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                     ShowWarningError(state,
                                      "Chiller:Electric:EIR = " + ChillerName +
                                          ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
-                } else if (ChillerType == TypeOf_Chiller_ElectricReformEIR) {
+                } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                     ShowWarningError(state,
                                      "Chiller:Electric:ReformulatedEIR = " + ChillerName +
@@ -1557,7 +1545,7 @@ namespace StandardRatings {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumOfReducedCap(4); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
+        int constexpr NumOfReducedCap(4); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1842,7 +1830,7 @@ namespace StandardRatings {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // CHARACTER(len=*), PARAMETER    :: RoutineName='MultiSpeedDXCoolingCoilStandardRatings: ' ! Include trailing blank space
-        Real64 const SizingFactor(1.10); // sizing factor per AHRI Std 210/240-2008
+        Real64 constexpr SizingFactor(1.10); // sizing factor per AHRI Std 210/240-2008
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 

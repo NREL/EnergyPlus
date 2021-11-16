@@ -820,9 +820,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     std::string const onOff("ON/OFF");
     std::string const window("Window");
     std::string const wall("Wall");
-    double const one = 1.0;
-    double const zero = 0.0;
-    double const two = 2.0;
+    double constexpr one = 1.0;
+    double constexpr zero = 0.0;
+    double constexpr two = 2.0;
 
     state->dataSQLiteProcedures->sqlite->addScheduleData(1, alwaysOn, onOff, one, one);
     state->dataSQLiteProcedures->sqlite->addScheduleData(2, alwaysOff, onOff, zero, zero);

@@ -479,7 +479,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     PerformanceCurveData *pCurve;
 
-    int const nCapfT1 = 1;
+    int constexpr nCapfT1 = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT1);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT1";
@@ -496,7 +496,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSCCapFTemp(1) = nCapfT1;
 
-    int const nCapfFF1 = 2;
+    int constexpr nCapfFF1 = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF1);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF1";
@@ -510,7 +510,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSCCapFFlow(1) = nCapfFF1;
 
-    int const nEIRfT1 = 3;
+    int constexpr nEIRfT1 = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT1);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT1";
@@ -527,7 +527,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSEIRFTemp(1) = nEIRfT1;
 
-    int const nEIRfFF1 = 4;
+    int constexpr nEIRfFF1 = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF1);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF1";
@@ -541,7 +541,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSEIRFFlow(1) = nEIRfFF1;
 
-    int const nPLFfPLR1 = 5;
+    int constexpr nPLFfPLR1 = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR1);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR1";
@@ -555,7 +555,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSPLFFPLR(1) = nPLFfPLR1;
 
-    int const nConstantBiquadratic = 6;
+    int constexpr nConstantBiquadratic = 6;
     pCurve = &state->dataCurveManager->PerfCurve(nConstantBiquadratic);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "ConstantBiquadratic";
@@ -573,7 +573,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.MSWasteHeat(1) = nConstantBiquadratic;
     Coil.MSWasteHeat(2) = nConstantBiquadratic;
 
-    int const nCapfT2 = 7;
+    int constexpr nCapfT2 = 7;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT2);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT2";
@@ -590,7 +590,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSCCapFTemp(2) = nCapfT2;
 
-    int const nCapfFF2 = 8;
+    int constexpr nCapfFF2 = 8;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF2);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF2";
@@ -604,7 +604,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSCCapFFlow(2) = nCapfFF2;
 
-    int const nEIRfT2 = 9;
+    int constexpr nEIRfT2 = 9;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT2);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT2";
@@ -621,7 +621,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSEIRFTemp(2) = nEIRfT2;
 
-    int const nEIRfFF2 = 10;
+    int constexpr nEIRfFF2 = 10;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF2);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF2";
@@ -635,7 +635,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.MSEIRFFlow(2) = nEIRfFF2;
 
-    int const nPLFfPLR2 = 11;
+    int constexpr nPLFfPLR2 = 11;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR2);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR2";
@@ -820,7 +820,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     PerformanceCurveData *pCurve;
 
-    int const nCapfT2 = 1;
+    int constexpr nCapfT2 = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT2);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT2";
@@ -837,7 +837,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     Coil.CCapFTemp(1) = nCapfT2;
 
-    int const nCapfFF2 = 2;
+    int constexpr nCapfFF2 = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF2);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF2";
@@ -851,7 +851,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     Coil.CCapFFlow(1) = nCapfFF2;
 
-    int const nEIRfT2 = 3;
+    int constexpr nEIRfT2 = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT2);
     pCurve->CurveType = CurveTypeEnum::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT2";
@@ -868,7 +868,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     Coil.EIRFTemp(1) = nEIRfT2;
 
-    int const nEIRfFF2 = 4;
+    int constexpr nEIRfFF2 = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF2);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF2";
@@ -882,7 +882,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     Coil.EIRFFlow(1) = nEIRfFF2;
 
-    int const nPLFfPLR2 = 5;
+    int constexpr nPLFfPLR2 = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR2);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR2";
@@ -916,7 +916,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.InletAirEnthalpy = PsyHFnTdbW(Coil.InletAirTemp, Coil.InletAirHumRat);
 
     int const FanOpMode = ContFanCycCoil;
-    Real64 const PLR = 1.0;
+    Real64 constexpr PLR = 1.0;
 
     // Defrost Off
     state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
@@ -943,9 +943,9 @@ TEST_F(EnergyPlusFixture, TestCalcCBF)
     Real64 InletDBTemp(19.722222222222221);
     Real64 InletWBTemp(13.078173565729553);
     Real64 InletAirHumRat;
-    const Real64 TotalCap(1303.5987246916557);
-    const Real64 AirVolFlowRate(0.085422486640000003);
-    const Real64 SHR(0.88);
+    constexpr Real64 TotalCap(1303.5987246916557);
+    constexpr Real64 AirVolFlowRate(0.085422486640000003);
+    constexpr Real64 SHR(0.88);
     Real64 AirPressure;
     Real64 CBF_expected;
     Real64 CBF_calculated;
@@ -1477,8 +1477,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     SizeDXCoil(*state, 1); // normal sizing
 
-    Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
-    Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 constexpr RatedInletAirTemp(26.6667);   // 26.6667C or 80F
+    Real64 constexpr RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     std::string const CallingRoutine("DXCoil_ValidateADPFunction");
 
     Real64 CBF_calculated = CalcCBF(*state,

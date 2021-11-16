@@ -3963,7 +3963,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     Real64 WaterFlowRateRatio = 0.75;
     Real64 AirWetBulbTemp = state->dataEnvrn->OutWetBulbTemp;
 
-    state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = DataPlant::FlowLock::Locked;
     state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 

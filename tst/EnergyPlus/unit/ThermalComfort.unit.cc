@@ -1030,7 +1030,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
         Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
-    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
     // Test 1 - Air velocity = 0.15 m/s.

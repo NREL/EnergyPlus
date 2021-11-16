@@ -447,7 +447,7 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
         HourofDay = hr;
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
-                Real64 const minutesPerHour(60.0);
+                Real64 constexpr minutesPerHour(60.0);
                 ZoneTimestepObject tmpztStepStamp(state->dataGlobal->KindOfSim,
                                                   Envrn,
                                                   state->dataGlobal->DayOfSim,
@@ -487,7 +487,7 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
         HourofDay = hr;
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
-                Real64 const minutesPerHour(60.0);
+                Real64 constexpr minutesPerHour(60.0);
                 ZoneTimestepObject tmpztStepStamp(state->dataGlobal->KindOfSim,
                                                   Envrn,
                                                   state->dataGlobal->DayOfSim,

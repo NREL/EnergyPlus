@@ -63,32 +63,135 @@ enum class LoopFlowStatus
 };
 
 // Parameters for scheme types
-// Used in TYPE(OperationData)%OpSchemeType
-// As in PlantLoop(:)%OpScheme(:)%OpSchemeType
+// Used in TYPE(OperationData)%Type
+// As in PlantLoop(:)%OpScheme(:)%Type
 // Also in PlantLoop()LoopSide()Branch()Comp()%CurOpSchemeType
 // this may be changed later...
-enum OpSchemeType
+enum class OpScheme
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
-    UnknownStatusOpSchemeType = -2,
-    NoControlOpSchemeType = -1,         // Scheme Type placeholder for items such as pipes
-    HeatingRBOpSchemeType = 1,          // Scheme Type for Heating Load Range Based Operation
-    CoolingRBOpSchemeType = 2,          // Scheme Type for Cooling  Load Range Based Operation
-    WetBulbRBOpSchemeType = 3,          // Scheme Type for Wet bulb range based Operation
-    DryBulbRBOpSchemeType = 4,          // Scheme Type for Dry bulb range based Operation
-    DewPointRBOpSchemeType = 5,         // Scheme Type for Dewpoint range based Operation
-    RelHumRBOpSchemeType = 6,           // Scheme Type for relative humidity range based Operation
-    DryBulbTDBOpSchemeType = 7,         // Scheme Type for relative humidity range based Operation
-    WetBulbTDBOpSchemeType = 8,         // Scheme Type for Wet bulb range based Operation
-    DewPointTDBOpSchemeType = 9,        // Scheme Type for Wet bulb range based Operation
-    CompSetPtBasedSchemeType = 10,      // Temp Based Control
-    UncontrolledOpSchemeType = 11,      // Scheme Type for Uncontrolled Operation
-    EMSOpSchemeType = 12,               // Scheme Type for EMS based operation user Define scheme
-    PumpOpSchemeType = 13,              // Not really an OpScheme, just a placeholder
-    DemandOpSchemeType = 14,            // Placeholder for demand side equipment such as coils
-    FreeRejectionOpSchemeType = 15,     // Scheme Type for waterside economizers and the like
-    WSEconOpSchemeType = 16,            // Scheme Type for waterside economizers and the like
-    ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
+    Unassigned = -1,
+    NoControl,            // Scheme Type placeholder for items such as pipes
+    HeatingRB,            // Scheme Type for Heating Load Range Based Operation
+    CoolingRB,            // Scheme Type for Cooling  Load Range Based Operation
+    WetBulbRB,            // Scheme Type for Wet bulb range based Operation
+    DryBulbRB,            // Scheme Type for Dry bulb range based Operation
+    DewPointRB,           // Scheme Type for Dew point range based Operation
+    RelHumRB,             // Scheme Type for relative humidity range based Operation
+    DryBulbTDB,           // Scheme Type for dry bulb temp range based Operation
+    WetBulbTDB,           // Scheme Type for wet bulb temp based Operation
+    DewPointTDB,          // Scheme Type for dew point temp based Operation
+    CompSetPtBased,       // Temp Based Control
+    Uncontrolled,         // Scheme Type for Uncontrolled Operation
+    EMS,                  // Scheme Type for EMS based operation user Define scheme
+    Pump,                 // Not really an OpScheme, just a placeholder
+    Demand,               // Placeholder for demand side equipment such as coils
+    FreeRejection,        // Scheme Type for waterside economizers and the like
+    WSEcon,               // Scheme Type for waterside economizers and the like
+    ThermalEnergyStorage, // Scheme Type for Simplified Thermal Energy Storage operation
+    Num
+};
+
+enum class PlantEquipmentType
+{
+    Invalid = -1,
+    Boiler_Simple,
+    Boiler_Steam,
+    Chiller_Absorption,          // older BLAST absorption chiller
+    Chiller_Indirect_Absorption, // revised absorption chiller
+    Chiller_CombTurbine,
+    Chiller_ConstCOP,
+    Chiller_DFAbsorption,
+    Chiller_Electric, // basic BLAST Chiller
+    Chiller_ElectricEIR,
+    Chiller_ElectricReformEIR,
+    Chiller_EngineDriven,
+    CoolingTower_SingleSpd,
+    CoolingTower_TwoSpd,
+    CoolingTower_VarSpd,
+    Generator_FCExhaust,
+    HeatPumpWtrHeaterPumped,
+    HPWaterEFCooling,
+    HPWaterEFHeating,
+    HPWaterPECooling,
+    HPWaterPEHeating,
+    Pipe,
+    PipeSteam,
+    PipeExterior,
+    PipeInterior,
+    PipeUnderground,
+    PurchChilledWater,
+    PurchHotWater,
+    TS_IceDetailed,
+    TS_IceSimple,
+    ValveTempering,
+    WtrHeaterMixed,
+    WtrHeaterStratified,
+    PumpVariableSpeed,
+    PumpConstantSpeed,
+    PumpCondensate,
+    PumpBankVariableSpeed,
+    PumpBankConstantSpeed,
+    WaterUseConnection,
+    CoilWaterCooling,             // demand side component
+    CoilWaterDetailedFlatCooling, // demand side component
+    CoilWaterSimpleHeating,       // demand side component
+    CoilSteamAirHeating,          // demand side component
+    SolarCollectorFlatPlate,      // demand side component
+    PlantLoadProfile,             // demand side component
+    GrndHtExchgSystem,
+    GrndHtExchgSurface,
+    GrndHtExchgPond,
+    Generator_MicroTurbine, // newer FSEC turbine
+    Generator_ICEngine,
+    Generator_CTurbine, // older BLAST turbine
+    Generator_MicroCHP,
+    Generator_FCStackCooler,
+    FluidCooler_SingleSpd,
+    FluidCooler_TwoSpd,
+    EvapFluidCooler_SingleSpd,
+    EvapFluidCooler_TwoSpd,
+    ChilledWaterTankMixed,
+    ChilledWaterTankStratified,
+    PVTSolarCollectorFlatPlate,
+    Baseboard_Conv_Water,
+    Baseboard_Rad_Conv_Steam,
+    Baseboard_Rad_Conv_Water,
+    LowTempRadiant_VarFlow,
+    LowTempRadiant_ConstFlow,
+    CooledBeamAirTerminal,
+    CoilWAHPHeatingEquationFit,
+    CoilWAHPCoolingEquationFit,
+    CoilWAHPHeatingParamEst,
+    CoilWAHPCoolingParamEst,
+    RefrigSystemWaterCondenser,
+    RefrigerationWaterCoolRack,
+    MultiSpeedHeatPumpRecovery,
+    Chiller_ExhFiredAbsorption,
+    PipingSystemPipeCircuit,
+    SolarCollectorICS,
+    CoilVSWAHPHeatingEquationFit,
+    CoilVSWAHPCoolingEquationFit,
+    PlantComponentUserDefined,
+    CoilUserDefined,
+    ZoneHVACAirUserDefined,
+    AirTerminalUserDefined,
+    HeatPumpVRF,
+    GrndHtExchgHorizTrench,
+    FluidToFluidPlantHtExchg,
+    WaterSource,
+    CentralGroundSourceHeatPump,
+    UnitarySysRecovery,
+    PackagedTESCoolingCoil,
+    CoolingTower_VarSpdMerkel,
+    SwimmingPool_Indoor,
+    GrndHtExchgSlinky,
+    HeatPumpWtrHeaterWrapped,
+    FourPipeBeamAirTerminal,
+    CoolingPanel_Simple,
+    HeatPumpEIRCooling,
+    HeatPumpEIRHeating,
+    Num
 };
 
 // Parameters for component character wrt how load gets met (or not)
@@ -106,99 +209,126 @@ enum class HowMet
     NUM
 };
 
-enum class iLoadingScheme
+enum class LoadingScheme
 {
-    Unassigned,
+    Unassigned = -1,
     Optimal,              // Optimal Load Distribution Scheme
     Sequential,           // Sequential Load Distribution Scheme
     Uniform,              // Uniform Load Distribution Scheme
     UniformPLR,           // Uniform PLR Load Distribution Scheme
     SequentialUniformPLR, // Sequential Uniform PLR Load Distribution Scheme
+    Num
 };
 
 enum class FlowMode
 {
-    Unassigned,
+    Unassigned = -1,
     Constant,
     NotModulated,
     LeavingSetpointModulated,
+    Num
 };
 
 enum class CondenserType
 {
-    Unassigned,
+    Unassigned = -1,
     AirCooled,
     WaterCooled,
     EvapCooled,
+    Num
 };
 
+constexpr std::array<std::string_view, static_cast<int>(CondenserType::Num)> CondenserTypeNamesUC{"AIRCOOLED", "WATERCOOLED", "EVAPORATIVELYCOOLED"};
+
 // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
-enum class iCriteriaType
+enum class CriteriaType
 {
+    Unassigned = -1,
     MassFlowRate,
     Temperature,
     HeatTransferRate,
+    Num
 };
 
-enum class iFreeCoolControlMode
+enum class FreeCoolControlMode
 {
-    Unassigned,
+    Unassigned = -1,
     WetBulb, // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
     DryBulb, // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
     Loop,    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
+    Num
 };
 
-enum class iLoopDemandCalcScheme
+enum class LoopDemandCalcScheme
 {
-    Unassigned,
+    Unassigned = -1,
     SingleSetPoint,       // Uses a single temp setpoint to calculate loop demand
     DualSetPointDeadBand, // Uses a dual temp setpoint with a deadband between the high
+    Num
 };
 
-enum class iCommonPipeType
+enum class CommonPipeType
 {
+    Unassigned = -1,
     No,
     Single,
     TwoWay,
+    Num
 };
 
-enum class iFlowLock
+enum class FlowLock
 {
+    Unassigned = -1,
     PumpQuery, // Used to ask the pumps for their min/max avail based on no constraints
     Unlocked,  // components request flow
     Locked,    // components take their inlet flow
+    Num
 };
 
-enum class iPressureCall
+enum class PressureCall
 {
+    Unassigned = -1,
     Init,
     Calc,
     Update,
+    Num
 };
 
-enum class iPressSimType
+enum class PressSimType
 {
+    Unassigned = -1,
     NoPressure,          // Nothing for that particular loop
     PumpPowerCorrection, // Only updating the pump power
     FlowCorrection,      // Update pump flow rate based on pump curve
     FlowSimulation,      // Full pressure network simulation
+    Num
 };
 
-enum class iCtrlType
+constexpr std::array<std::string_view, static_cast<int>(PressSimType::Num)> PressureSimTypeNamesUC{
+    "NONE",
+    "PUMPPOWERCORRECTION",
+    "LOOPFLOWCORRECTION",
+    "PRESSURESIMULATION",
+};
+
+enum class CtrlType
 {
-    Unassigned,
+    Unassigned = -1,
     HeatingOp, // Constant for Heating Operation
     CoolingOp, // Constant for Cooling Operation
     DualOp,    // Constant for Cooling or Heating Operation
+    Num
 };
 
 // branch loop type for absorption chillerheater models
 enum class BrLoopType
 {
+    Unassigned = -1,
     Chiller,
     Heater,
     Condenser,
-    NoMatch
+    NoMatch,
+    Num
 };
 
 constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> HowMetTypeNamesUC = {"DEMANDSLOAD",

@@ -177,7 +177,7 @@ void GasAbsorberSpecs::simulate(
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                                DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                                 this->CondReturnNodeNum,
                                                                 this->CondSupplyNodeNum,
                                                                 this->TowerLoad,
@@ -842,7 +842,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_DFAbsorption,
+                                            DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                             this->CWLoopNum,
                                             this->CWLoopSideNum,
                                             this->CWBranchNum,
@@ -859,7 +859,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_DFAbsorption,
+                                            DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                             this->HWLoopNum,
                                             this->HWLoopSideNum,
                                             this->HWBranchNum,
@@ -877,7 +877,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
     if (this->isWaterCooled) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                 this->CDLoopNum,
                                                 this->CDLoopSideNum,
                                                 this->CDBranchNum,
@@ -891,14 +891,24 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         if (errFlag) {
             ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_DFAbsorption, true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->HWLoopNum, this->HWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_DFAbsorption, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSideNum,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->HWLoopNum,
+                                                      this->HWLoopSideNum,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+                                                      true);
     }
 
     PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_Chiller_DFAbsorption, true);
+        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
 
     // check if outlet node of chilled water side has a setpoint.
     if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -1576,9 +1586,9 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     // Commenting this could be cause of diffs - lCondWaterMassFlowRate = Node(lCondReturnNodeNum).MassFlowRate;
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPointHi;
         } else {
             assert(false);
@@ -1681,7 +1691,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
         LoopSideNum = this->CWLoopSideNum;
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock);
-            if (SELECT_CASE_var == DataPlant::iFlowLock::Unlocked) { // mass flow rates may be changed by loop components
+            if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
                 this->PossibleSubcooling = false;
                 lCoolingLoad = std::abs(MyLoad);
                 if (ChillDeltaTemp != 0.0) {
@@ -1705,7 +1715,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                    this->DeltaTempCoolErrCount);
                 }
                 lChillSupplyTemp = ChillSupplySetPointTemp;
-            } else if (SELECT_CASE_var == DataPlant::iFlowLock::Locked) { // mass flow rates may not be changed by loop components
+            } else if (SELECT_CASE_var == DataPlant::FlowLock::Locked) { // mass flow rates may not be changed by loop components
                 lChillWaterMassFlowRate = state.dataLoopNodes->Node(lChillReturnNodeNum).MassFlowRate;
                 if (this->PossibleSubcooling) {
                     lCoolingLoad = std::abs(MyLoad);
@@ -1937,9 +1947,9 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     lHotWaterMassFlowRate = state.dataLoopNodes->Node(lHeatReturnNodeNum).MassFlowRate;
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             HeatSupplySetPointTemp = state.dataLoopNodes->Node(lHeatSupplyNodeNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             HeatSupplySetPointTemp = state.dataLoopNodes->Node(lHeatSupplyNodeNum).TempSetPointLo;
         } else {
             assert(false);
@@ -1971,7 +1981,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
         //    supply temperature
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock);
-            if (SELECT_CASE_var == DataPlant::iFlowLock::Unlocked) { // mass flow rates may be changed by loop components
+            if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
                 lHeatingLoad = std::abs(MyLoad);
                 if (HeatDeltaTemp != 0) {
                     lHotWaterMassFlowRate = std::abs(lHeatingLoad / (Cp_HW * HeatDeltaTemp));
@@ -1992,7 +2002,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
                                                    this->DeltaTempHeatErrCount);
                 }
                 lHotWaterSupplyTemp = HeatSupplySetPointTemp;
-            } else if (SELECT_CASE_var == DataPlant::iFlowLock::Locked) { // mass flow rates may not be changed by loop components
+            } else if (SELECT_CASE_var == DataPlant::FlowLock::Locked) { // mass flow rates may not be changed by loop components
                 lHotWaterSupplyTemp = HeatSupplySetPointTemp;
                 lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
             }

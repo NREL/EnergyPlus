@@ -1468,8 +1468,8 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation between max and min outputs
 
-        int const MaxIter(50);    // maximum number of iterations
-        Real64 const MinPLF(0.0); // minimum part load factor allowed
+        int constexpr MaxIter(50);    // maximum number of iterations
+        Real64 constexpr MinPLF(0.0); // minimum part load factor allowed
 
         Real64 FullOutput;   // unit full output [W]
         Real64 NoCoolOutput; // output when no active cooling [W]

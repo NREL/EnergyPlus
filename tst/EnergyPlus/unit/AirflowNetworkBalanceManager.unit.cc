@@ -4502,7 +4502,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).SurfaceName, "WEST WALL ATTIC");
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).ViewFactor, 0.02052);
 
-    Real64 const tol = 0.01;
+    Real64 constexpr tol = 0.01;
 
     // Outside convection coefficients
     // Calculate convection resistance given a convection coefficient
@@ -4534,7 +4534,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 {
 
-    Real64 const tol = 0.00001;
+    Real64 constexpr tol = 0.00001;
 
     EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -30), 0.02212, tol);
     EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -20), 0.02212, tol);
@@ -4549,7 +4549,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
 {
 
-    Real64 const tol = 0.000001;
+    Real64 constexpr tol = 0.000001;
 
     EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-30), 1.635e-5, tol);
     EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-20), 1.635e-5, tol);
@@ -4564,7 +4564,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
 {
 
-    Real64 const tol = 0.000001;
+    Real64 constexpr tol = 0.000001;
 
     EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -30, 0.001, 101000), 1.169e-5, tol);
     EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -20, 0.001, 101000), 1.169e-5, tol);
@@ -4579,7 +4579,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
 {
 
-    Real64 const tol = 0.000001;
+    Real64 constexpr tol = 0.000001;
 
     EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -30, 0.001, 101000), 1.578e-5, tol);
     EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -20, 0.001, 101000), 1.578e-5, tol);
@@ -4594,7 +4594,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 {
 
-    Real64 const tol = 0.0001;
+    Real64 constexpr tol = 0.0001;
 
     EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -30, 0.001, 101000), 0.7362, tol);
     EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -20, 0.001, 101000), 0.7362, tol);
