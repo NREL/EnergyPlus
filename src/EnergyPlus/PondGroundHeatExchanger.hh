@@ -119,11 +119,13 @@ namespace PondGroundHeatExchanger {
         {
         }
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
 
@@ -146,13 +148,15 @@ namespace PondGroundHeatExchanger {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetPondGroundHeatExchanger(EnergyPlusData &state);
 
 } // namespace PondGroundHeatExchanger
 
-struct PondGroundHeatExchangerData : BaseGlobalStruct {
+struct PondGroundHeatExchangerData : BaseGlobalStruct
+{
 
     bool GetInputFlag = true;
     int NumOfPondGHEs = 0;

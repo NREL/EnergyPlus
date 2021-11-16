@@ -29,11 +29,16 @@ macro(CREATE_SRC_GROUPS SRC)
 endmacro()
 
 # Create test targets
-macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES)
+macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES USE_PCH)
   if(BUILD_TESTING)
 
     add_executable(${BASE_NAME}_tests ${SRC})
     target_link_libraries(${BASE_NAME}_tests PRIVATE project_options project_warnings)
+
+    if(USE_PCH)
+      target_link_libraries(${BASE_NAME}_tests PRIVATE cpp_pch_files)
+    endif()
+
     if(ENABLE_GTEST_DEBUG_MODE)
       target_compile_definitions(${BASE_NAME}_tests PRIVATE ENABLE_GTEST_DEBUG_MODE)
     endif()
@@ -155,7 +160,7 @@ function(ADD_SIMULATION_TEST)
     add_test(
       NAME "regression.${IDF_NAME}"
       COMMAND
-        ${CMAKE_COMMAND} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE} -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
+        ${CMAKE_COMMAND} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DPYTHON_EXECUTABLE=${Python_EXECUTABLE} -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
         -DREGRESSION_SCRIPT_PATH=${REGRESSION_SCRIPT_PATH} -DREGRESSION_BASELINE_PATH=${REGRESSION_BASELINE_PATH}
         -DREGRESSION_BASELINE_SHA=${REGRESSION_BASELINE_SHA} -DCOMMIT_SHA=${COMMIT_SHA} -DDEVICE_ID=${DEVICE_ID} -P
         ${PROJECT_SOURCE_DIR}/cmake/RunRegression.cmake)
@@ -164,6 +169,19 @@ function(ADD_SIMULATION_TEST)
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES DEPENDS "${TEST_CATEGORY}.${IDF_NAME}")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  endif()
+
+  if(ENABLE_REVERSE_DD_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL))
+    set(TEST_FILE_FOLDER "testfiles")
+    set(ENERGYPLUS_FLAGS "-D -r")
+    add_test(
+            NAME "reverseDD.${IDF_NAME}"
+            COMMAND
+            ${CMAKE_COMMAND} -DSOURCE_DIR=${PROJECT_SOURCE_DIR} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DPYTHON_EXECUTABLE=${Python_EXECUTABLE} -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
+            -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE} -DENERGYPLUS_FLAGS=${ENERGYPLUS_FLAGS} -DBUILD_FORTRAN=${BUILD_FORTRAN} -DTEST_FILE_FOLDER=${TEST_FILE_FOLDER} -P
+            ${PROJECT_SOURCE_DIR}/cmake/RunReverseDD.cmake)
+    set_tests_properties("reverseDD.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success;Test Passed")
+    set_tests_properties("reverseDD.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
 endfunction()

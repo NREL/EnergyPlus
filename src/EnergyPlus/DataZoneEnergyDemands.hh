@@ -62,16 +62,16 @@ namespace DataZoneEnergyDemands {
     struct ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
     {
         // Members
-        Real64 RemainingOutputRequired;       // The load each equipment sees as what is remaining with load fractions applied
-        Real64 UnadjRemainingOutputRequired;  // The total unadjusted load remaining to be met
+        Real64 RemainingOutputRequired;      // The load each equipment sees as what is remaining with load fractions applied
+        Real64 UnadjRemainingOutputRequired; // The total unadjusted load remaining to be met
         Real64 TotalOutputRequired;
-        Real64 OutputRequiredToHeatingSP;  // Load required to meet heating setpoint (>0 is a heating load)
-        Real64 OutputRequiredToCoolingSP;  // Load required to meet cooling setpoint (<0 is a cooling load)
-        Real64 RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load)
-        Real64 RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load)
+        Real64 OutputRequiredToHeatingSP;       // Load required to meet heating setpoint (>0 is a heating load)
+        Real64 OutputRequiredToCoolingSP;       // Load required to meet cooling setpoint (<0 is a cooling load)
+        Real64 RemainingOutputReqToHeatSP;      // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load)
+        Real64 RemainingOutputReqToCoolSP;      // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load)
         Real64 UnadjRemainingOutputReqToHeatSP; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load)
         Real64 UnadjRemainingOutputReqToCoolSP; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load)
-        int NumZoneEquipment;              // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
+        int NumZoneEquipment;                   // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
         Array1D<Real64> SequencedOutputRequired;
         Array1D<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
         Array1D<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
@@ -82,8 +82,9 @@ namespace DataZoneEnergyDemands {
 
         // Default Constructor
         ZoneSystemDemandData()
-            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHeatingSP(0.0), OutputRequiredToCoolingSP(0.0),
-              RemainingOutputReqToHeatSP(0.0), RemainingOutputReqToCoolSP(0.0), UnadjRemainingOutputReqToHeatSP(0.0), UnadjRemainingOutputReqToCoolSP(0.0), NumZoneEquipment(0), SupplyAirAdjustFactor(1.0), StageNum(0)
+            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHeatingSP(0.0),
+              OutputRequiredToCoolingSP(0.0), RemainingOutputReqToHeatSP(0.0), RemainingOutputReqToCoolSP(0.0), UnadjRemainingOutputReqToHeatSP(0.0),
+              UnadjRemainingOutputReqToCoolSP(0.0), NumZoneEquipment(0), SupplyAirAdjustFactor(1.0), StageNum(0)
         {
         }
     };
@@ -92,7 +93,7 @@ namespace DataZoneEnergyDemands {
     {
         // Members
         Real64 RemainingOutputRequired;
-        Real64 UnadjRemainingOutputRequired;  // The total unadjusted load remaining to be met
+        Real64 UnadjRemainingOutputRequired; // The total unadjusted load remaining to be met
         Real64 TotalOutputRequired;
         Real64 OutputRequiredToHumidifyingSP;   // Load required to meet humidifying setpoint (>0 = a humidify load)
         Real64 OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)
@@ -100,7 +101,7 @@ namespace DataZoneEnergyDemands {
         // (>0 is a humidify load)
         Real64 RemainingOutputReqToDehumidSP; // Remaining load required to meet dehumidifying setpoint with load fractions applied
         // (<0 is a dehumidify load)
-        Real64 UnadjRemainingOutputReqToHumidSP;     // Remaining unadjusted load required to meet humidifying setpoint
+        Real64 UnadjRemainingOutputReqToHumidSP; // Remaining unadjusted load required to meet humidifying setpoint
         // (>0 is a humidify load)
         Real64 UnadjRemainingOutputReqToDehumidSP; // Remaining unadjusted load required to meet dehumidifying setpoint
         // (<0 is a dehumidify load)
@@ -111,18 +112,20 @@ namespace DataZoneEnergyDemands {
 
         // Default Constructor
         ZoneSystemMoistureDemand()
-            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHumidifyingSP(0.0), OutputRequiredToDehumidifyingSP(0.0),
-              RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), UnadjRemainingOutputReqToHumidSP(0.0), UnadjRemainingOutputReqToDehumidSP(0.0), NumZoneEquipment(0)
+            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHumidifyingSP(0.0),
+              OutputRequiredToDehumidifyingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0),
+              UnadjRemainingOutputReqToHumidSP(0.0), UnadjRemainingOutputReqToDehumidSP(0.0), NumZoneEquipment(0)
         {
         }
     };
 
 } // namespace DataZoneEnergyDemands
 
-struct DataZoneEnergyDemandsData : BaseGlobalStruct {
+struct DataZoneEnergyDemandsData : BaseGlobalStruct
+{
 
-    Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband before any heating / cooling done
-    Array1D_bool Setback; // true if zone temperature has increased from previous setting
+    Array1D_bool DeadBandOrSetback;    // true if zone temperature is in the thermostat deadband before any heating / cooling done
+    Array1D_bool Setback;              // true if zone temperature has increased from previous setting
     Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment in a zone is simulated
     Array1D<DataZoneEnergyDemands::ZoneSystemDemandData> ZoneSysEnergyDemand;
     Array1D<DataZoneEnergyDemands::ZoneSystemMoistureDemand> ZoneSysMoistureDemand;

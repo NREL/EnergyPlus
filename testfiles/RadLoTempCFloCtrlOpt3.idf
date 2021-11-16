@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,6;
 
@@ -127,7 +127,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    ,                        !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -360,7 +362,7 @@
     EXTWALL80,               !- Name
     A1 - 1 IN STUCCO,        !- Outside Layer
     C4 - 4 IN COMMON BRICK,  !- Layer 2
-    INS - EXPANDED EXT POLYSTYRENE R12 2 IN, !- Layer 3
+    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 3
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
   Construction,
@@ -436,13 +438,17 @@
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-  Construction:InternalSource,
-    Slab Floor with Radiant, !- Name
-    3,                       !- Source Present After Layer Number
+  ConstructionProperty:InternalHeatSource,
+    Floor Source,            !- Name
+    Slab Floor with Radiant, !- Construction Name
+    3,                       !- Thermal Source Present After Layer Number
     3,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  Construction,
+    Slab Floor with Radiant, !- Name
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
@@ -700,6 +706,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -731,6 +738,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -747,6 +755,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -763,6 +772,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -779,6 +789,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -795,6 +806,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -811,6 +823,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -827,6 +840,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -843,6 +857,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -859,6 +874,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -875,6 +891,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -891,6 +908,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -907,6 +925,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -923,6 +942,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -939,6 +959,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -955,6 +976,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -971,6 +993,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -987,6 +1010,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1003,6 +1027,7 @@
     Floor,                   !- Surface Type
     Slab Floor with Radiant, !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1019,6 +1044,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1896,22 +1922,15 @@
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name
+    West Zone Radiant Floor Design,  !- Design Object
     RadiantSysAvailSched,    !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanRadiantTemperature,    !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
-    0.0002,                 !- Rated Flow Rate {m3/s}
+    0.0002,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
@@ -1924,80 +1943,99 @@
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
-    Off,                     !- Condensation Control Type
-    1.0,                     !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
-    East Zone Radiant Floor, !- Name
-    RadiantSysAvailSched,    !- Availability Schedule Name
-    East Zone,               !- Zone Name
-    Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    West Zone Radiant Floor Design,  !- Name
     ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     0.016,                   !- Hydronic Tubing Outside Diameter {m}
-    400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    OutdoorDryBulbTemperature,  !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
-    0.0001,                !- Rated Flow Rate {m3/s}
+    MeanRadiantTemperature,  !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    Off,                     !- Condensation Control Type
+    1.0;                     !- Condensation Control Dewpoint Offset {C}
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
+    East Zone Radiant Floor, !- Name
+    East Zone Radiant Floor Design,  !- Design Object
+    RadiantSysAvailSched,    !- Availability Schedule Name
+    East Zone,               !- Zone Name
+    Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
+    400.0,                   !- Hydronic Tubing Length {m}
+    0.0001,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
     RadHeatLowWaterTemp,     !- Heating Low Water Temperature Schedule Name
-    RadHeatHighControlTemp2,  !- Heating High Control Temperature Schedule Name
-    RadHeatLowControlTemp2,   !- Heating Low Control Temperature Schedule Name
+    RadHeatHighControlTemp2, !- Heating High Control Temperature Schedule Name
+    RadHeatLowControlTemp2,  !- Heating Low Control Temperature Schedule Name
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     RadCoolHighWaterTemp,    !- Cooling High Water Temperature Schedule Name
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
-    RadCoolHighControlTemp2,  !- Cooling High Control Temperature Schedule Name
-    RadCoolLowControlTemp2,   !- Cooling Low Control Temperature Schedule Name
-    Off,                     !- Condensation Control Type
-    0.0,                     !- Condensation Control Dewpoint Offset {C}
+    RadCoolHighControlTemp2, !- Cooling High Control Temperature Schedule Name
+    RadCoolLowControlTemp2,  !- Cooling Low Control Temperature Schedule Name
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
-    North Zone Radiant Floor,!- Name
-    RadiantSysAvailSched,    !- Availability Schedule Name
-    North Zone,              !- Zone Name
-    Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    East Zone Radiant Floor Design,  !- Name
     ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     0.016,                   !- Hydronic Tubing Outside Diameter {m}
-    400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    OutdoorWetBulbTemperature, !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
-    0.0001,                !- Rated Flow Rate {m3/s}
+    OutdoorDryBulbTemperature,  !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    Off,                     !- Condensation Control Type
+    0.0;                     !- Condensation Control Dewpoint Offset {C}
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
+    North Zone Radiant Floor,!- Name
+    North Zone Radiant Floor Design,  !- Design Object
+    RadiantSysAvailSched,    !- Availability Schedule Name
+    North Zone,              !- Zone Name
+    Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
+    400.0,                   !- Hydronic Tubing Length {m}
+    0.0001,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
     RadHeatLowWaterTemp,     !- Heating Low Water Temperature Schedule Name
-    RadHeatHighControlTemp2,  !- Heating High Control Temperature Schedule Name
-    RadHeatLowControlTemp2,   !- Heating Low Control Temperature Schedule Name
+    RadHeatHighControlTemp2, !- Heating High Control Temperature Schedule Name
+    RadHeatLowControlTemp2,  !- Heating Low Control Temperature Schedule Name
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     RadCoolHighWaterTemp,    !- Cooling High Water Temperature Schedule Name
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
-    RadCoolHighControlTemp3,  !- Cooling High Control Temperature Schedule Name
-    RadCoolLowControlTemp3,   !- Cooling Low Control Temperature Schedule Name
-    Off,                     !- Condensation Control Type
-    0.0,                     !- Condensation Control Dewpoint Offset {C}
+    RadCoolHighControlTemp3, !- Cooling High Control Temperature Schedule Name
+    RadCoolLowControlTemp3,  !- Cooling Low Control Temperature Schedule Name
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    North Zone Radiant Floor Design,  !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
+    OutdoorWetBulbTemperature,  !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    Off,                     !- Condensation Control Type
+    0.0;                     !- Condensation Control Dewpoint Offset {C}
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
@@ -2164,7 +2202,7 @@
     Until: 18:00,0.50,       !- Field 9
     Until: 24:00,5.00E-002,  !- Field 11
     For: Sunday Saturday Holiday WinterDesignDay CustomDay1 CustomDay2, !- Field 13
-    Until: 24:00,5.00E-002;  !- Field 14    
+    Until: 24:00,5.00E-002;  !- Field 14
 
   Schedule:Compact,
     ON PEAK,                 !- Name
@@ -2232,12 +2270,12 @@
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,21.00,      !- Field 3
-    Through: 10/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,11.00,      !- Field 3
-    Through: 12/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,21.00;      !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,11.00,      !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,21.00;      !- Field 11
 
   Schedule:Compact,
     RADHEATLOWCONTROLTEMP,   !- Name
@@ -2245,49 +2283,49 @@
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,5.00,       !- Field 3
-    Through: 10/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,15.00,      !- Field 3
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,5.00;       !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,15.00,      !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,5.00;       !- Field 11
 
   Schedule:Compact,
-    RADHEATHIGHCONTROLTEMP2,  !- Name
+    RADHEATHIGHCONTROLTEMP2, !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 7:00,10.0,
-    Until: 17:00,15.0,
-    Until: 24:00,10.0,
-    Through: 10/31,
-    For: Alldays,
-    Until: 24:00,9.0,
-    Through: 12/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 7:00,20.0,
-    Until: 17:00,25.0,
-    Until: 24:00,20.0;
+    Until: 7:00,10.0,        !- Field 3
+    Until: 17:00,15.0,       !- Field 5
+    Until: 24:00,10.0,       !- Field 7
+    Through: 10/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,9.0,        !- Field 11
+    Through: 12/31,          !- Field 13
+    For: Alldays,            !- Field 14
+    Until: 7:00,20.0,        !- Field 15
+    Until: 17:00,25.0,       !- Field 17
+    Until: 24:00,20.0;       !- Field 19
 
   Schedule:Compact,
-    RADHEATLOWCONTROLTEMP2,   !- Name
+    RADHEATLOWCONTROLTEMP2,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 7:00,5.0,
-    Until: 17:00,10.0,
-    Until: 24:00,5.0,
-    Through: 10/31,
-    For: Alldays,
-    Until: 24:00,3.0,
-    Through: 12/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 7:00,15.0,
-    Until: 17:00,20.0,
-    Until: 24:00,15.0;
+    Until: 7:00,5.0,         !- Field 3
+    Until: 17:00,10.0,       !- Field 5
+    Until: 24:00,5.0,        !- Field 7
+    Through: 10/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,3.0,        !- Field 11
+    Through: 12/31,          !- Field 13
+    For: Alldays,            !- Field 14
+    Until: 7:00,15.0,        !- Field 15
+    Until: 17:00,20.0,       !- Field 17
+    Until: 24:00,15.0;       !- Field 19
 
   Schedule:Compact,
-    RADCOOLHIGHWATERTEMP,   !- Name
+    RADCOOLHIGHWATERTEMP,    !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
@@ -2298,20 +2336,20 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,7.00;      !- Field 3
+    Until: 24:00,7.00;       !- Field 3
 
   Schedule:Compact,
     RADCOOLHIGHCONTROLTEMP,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
-    Through: 4/30,          !- Field 1
+    Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,32.00,      !- Field 3
-    Through: 10/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,22.00,      !- Field 3
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,32.00;      !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,22.00,      !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,32.00;      !- Field 11
 
   Schedule:Compact,
     RADCOOLLOWCONTROLTEMP,   !- Name
@@ -2319,71 +2357,70 @@
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,30.00,      !- Field 3
-    Through: 10/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,20.00,      !- Field 3
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,30.00;      !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,20.00,      !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,30.00;      !- Field 11
 
   Schedule:Compact,
-    RADCOOLHIGHCONTROLTEMP2,  !- Name
+    RADCOOLHIGHCONTROLTEMP2, !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,40.0,
-    Through: 10/31,
-    For: Alldays,
-    Until: 7:00,24.0,
-    Until: 17:00,20.0,
-    Until: 24:00,24.0,
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,40.0;      !- Field 3
+    Until: 24:00,40.0,       !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 7:00,24.0,        !- Field 7
+    Until: 17:00,20.0,       !- Field 9
+    Until: 24:00,24.0,       !- Field 11
+    Through: 12/31,          !- Field 13
+    For: Alldays,            !- Field 14
+    Until: 24:00,40.0;       !- Field 15
 
   Schedule:Compact,
-    RADCOOLLOWCONTROLTEMP2,   !- Name
+    RADCOOLLOWCONTROLTEMP2,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,36.0,
-    Through: 10/31,
-    For: Alldays,
-    Until: 7:00,20.0,
-    Until: 17:00,16.0,
-    Until: 24:00,20.0,
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,36.0;      !- Field 3
+    Until: 24:00,36.0,       !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 7:00,20.0,        !- Field 7
+    Until: 17:00,16.0,       !- Field 9
+    Until: 24:00,20.0,       !- Field 11
+    Through: 12/31,          !- Field 13
+    For: Alldays,            !- Field 14
+    Until: 24:00,36.0;       !- Field 15
 
   Schedule:Compact,
-    RADCOOLHIGHCONTROLTEMP3,  !- Name
+    RADCOOLHIGHCONTROLTEMP3, !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,40.0,
-    Through: 10/31,
-    For: Alldays,
-    Until: 7:00,18.0,
-    Until: 17:00,12.0,
-    Until: 24:00,18.0,
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,40.0;      !- Field 3
+    Until: 24:00,40.0,       !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 7:00,18.0,        !- Field 7
+    Until: 17:00,12.0,       !- Field 9
+    Until: 24:00,18.0,       !- Field 11
+    Through: 12/31,          !- Field 13
+    For: Alldays,            !- Field 14
+    Until: 24:00,40.0;       !- Field 15
 
   Schedule:Compact,
-    RADCOOLLOWCONTROLTEMP3,   !- Name
+    RADCOOLLOWCONTROLTEMP3,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 4/30,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,36.0,
-    Through: 10/31,
-    For: Alldays,
-    Until: 7:00,16.0,
-    Until: 17:00,10.0,
-    Until: 24:00,16.0,
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,36.0;      !- Field 3
-
+    Until: 24:00,36.0,       !- Field 3
+    Through: 10/31,          !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 7:00,16.0,        !- Field 7
+    Until: 17:00,10.0,       !- Field 9
+    Until: 24:00,16.0,       !- Field 11
+    Through: 12/31,          !- Field 13
+    For: Alldays,            !- Field 14
+    Until: 24:00,36.0;       !- Field 15
 

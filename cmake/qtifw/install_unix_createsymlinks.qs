@@ -32,7 +32,7 @@ function Component()
                                      "UNDOEXECUTE", "rm", linktarget + "/ExpandObjects");
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PostProcess/HVAC-Diagram", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/HVAC-Diagram");
-      component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/ParametricPreProcessor/ParametricPreprocessor", linktarget,
+      component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/ParametricPreprocessor/ParametricPreprocessor", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/ParametricPreprocessor");
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PostProcess/ReadVarsESO", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/ReadVarsESO");

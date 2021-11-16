@@ -121,14 +121,13 @@ namespace ZoneDehumidifier {
         ZoneDehumidifierParams()
             : UnitType_Num(0), SchedPtr(0), RatedWaterRemoval(0.0), RatedEnergyFactor(0.0), RatedAirVolFlow(0.0), RatedAirMassFlow(0.0),
               MinInletAirTemp(0.0), MaxInletAirTemp(0.0), InletAirMassFlow(0.0), OutletAirEnthalpy(0.0), OutletAirHumRat(0.0),
-              OffCycleParasiticLoad(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterRemovalCurveIndex(0),
-              WaterRemovalCurveErrorCount(0), WaterRemovalCurveErrorIndex(0), EnergyFactorCurveIndex(0),
-              EnergyFactorCurveErrorCount(0), EnergyFactorCurveErrorIndex(0), PartLoadCurveIndex(0), LowPLFErrorCount(0),
-              LowPLFErrorIndex(0), HighPLFErrorCount(0), HighPLFErrorIndex(0), HighRTFErrorCount(0), HighRTFErrorIndex(0), PLFPLRErrorCount(0),
-              PLFPLRErrorIndex(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
-              SensHeatingRate(0.0), SensHeatingEnergy(0.0), WaterRemovalRate(0.0), WaterRemoved(0.0), ElecPower(0.0), ElecConsumption(0.0),
-              DehumidPLR(0.0), DehumidRTF(0.0), DehumidCondVolFlowRate(0.0), DehumidCondVol(0.0), OutletAirTemp(0.0), OffCycleParasiticElecPower(0.0),
-              OffCycleParasiticElecCons(0.0)
+              OffCycleParasiticLoad(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterRemovalCurveIndex(0), WaterRemovalCurveErrorCount(0),
+              WaterRemovalCurveErrorIndex(0), EnergyFactorCurveIndex(0), EnergyFactorCurveErrorCount(0), EnergyFactorCurveErrorIndex(0),
+              PartLoadCurveIndex(0), LowPLFErrorCount(0), LowPLFErrorIndex(0), HighPLFErrorCount(0), HighPLFErrorIndex(0), HighRTFErrorCount(0),
+              HighRTFErrorIndex(0), PLFPLRErrorCount(0), PLFPLRErrorIndex(0), CondensateCollectMode(1001), CondensateTankID(0),
+              CondensateTankSupplyARRID(0), SensHeatingRate(0.0), SensHeatingEnergy(0.0), WaterRemovalRate(0.0), WaterRemoved(0.0), ElecPower(0.0),
+              ElecConsumption(0.0), DehumidPLR(0.0), DehumidRTF(0.0), DehumidCondVolFlowRate(0.0), DehumidCondVol(0.0), OutletAirTemp(0.0),
+              OffCycleParasiticElecPower(0.0), OffCycleParasiticElecCons(0.0)
         {
         }
     };
@@ -165,37 +164,43 @@ namespace ZoneDehumidifier {
 
 } // namespace ZoneDehumidifier
 
-    struct ZoneDehumidifierData : BaseGlobalStruct {
+struct ZoneDehumidifierData : BaseGlobalStruct
+{
 
-        int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
-        bool GetInputFlag; // Set to FALSE after first time input is "gotten"
-        Array1D_bool CheckEquipName;
+    int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
+    bool GetInputFlag;    // Set to FALSE after first time input is "gotten"
+    Array1D_bool CheckEquipName;
 
-        // Unit type index
-        int ZoneDehumidUnit; // 1 is the index for ZoneHVAC:Dehumidifier:DX
+    // Unit type index
+    int ZoneDehumidUnit; // 1 is the index for ZoneHVAC:Dehumidifier:DX
 
-        // Water Systems
-        int CondensateDiscarded; // Default mode where water is "lost"
-        int CondensateToTank;    // Collect coil condensate from air and store in water storage tank
+    // Water Systems
+    int CondensateDiscarded; // Default mode where water is "lost"
+    int CondensateToTank;    // Collect coil condensate from air and store in water storage tank
 
-        Array1D<ZoneDehumidifier::ZoneDehumidifierParams> ZoneDehumid;
+    Array1D<ZoneDehumidifier::ZoneDehumidifierParams> ZoneDehumid;
 
-        bool MyOneTimeFlag = true;             // initialization flag
-        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    bool MyOneTimeFlag = true;             // initialization flag
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
-        void clear_state() override
-        {
-            this->NumDehumidifiers = 0;
-            this->GetInputFlag = true;
-            this->CheckEquipName.deallocate();
-            this->ZoneDehumid.deallocate();
-            this->MyOneTimeFlag = true;
-            this->ZoneEquipmentListChecked = false;
-        }
-        // Default Constructor
-        ZoneDehumidifierData() : NumDehumidifiers(0), GetInputFlag(true), ZoneDehumidUnit(1),
-                                 CondensateDiscarded(1001), CondensateToTank(1002) {}
-    };
+    Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+
+    void clear_state() override
+    {
+        this->NumDehumidifiers = 0;
+        this->GetInputFlag = true;
+        this->CheckEquipName.deallocate();
+        this->ZoneDehumid.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.deallocate();
+    }
+
+    // Default Constructor
+    ZoneDehumidifierData() : NumDehumidifiers(0), GetInputFlag(true), ZoneDehumidUnit(1), CondensateDiscarded(1001), CondensateToTank(1002)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -658,7 +658,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowGreaterThanMax)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // Should have reset the min to 99% of the the max
-    EXPECT_NEAR(state->dataPumps->PumpEquip(1).MinVolFlowRate, 0.001*0.99, 0.00001);
+    EXPECT_NEAR(state->dataPumps->PumpEquip(1).MinVolFlowRate, 0.001 * 0.99, 0.00001);
 }
 
 } // namespace EnergyPlus

@@ -48,8 +48,8 @@
 #ifndef PlantTopologyBranch_hh_INCLUDED
 #define PlantTopologyBranch_hh_INCLUDED
 
-#include <EnergyPlus/Plant/Component.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/Plant/Component.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -76,18 +76,19 @@ namespace DataPlant {
         Array1D<CompData> Comp;      // Component type list
         bool HasPressureComponents;
         Real64 PressureDrop;
-        DataBranchAirLoopPlant::PressureCurveType PressureCurveType;  // Either none, pressure curve, or generic curve
-        int PressureCurveIndex; // Curve: index for pressure drop calculations
+        DataBranchAirLoopPlant::PressureCurveType PressureCurveType; // Either none, pressure curve, or generic curve
+        int PressureCurveIndex;                                      // Curve: index for pressure drop calculations
         Real64 PressureEffectiveK;
         bool disableOverrideForCSBranchPumping;
         int lastComponentSimulated;
 
         // Default Constructor
         BranchData()
-            : ControlType(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false), ConstantSpeedBranchMassFlow(0.0), BranchLevel(0),
-              FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0), IsBypass(false), PumpIndex(0), PumpSizFac(1.0),
-              EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false), PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned),
-              PressureCurveIndex(0), PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)
+            : ControlType(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
+              ConstantSpeedBranchMassFlow(0.0), BranchLevel(0), FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0),
+              IsBypass(false), PumpIndex(0), PumpSizFac(1.0), EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false),
+              PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0),
+              PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)
         {
         }
 
@@ -101,7 +102,7 @@ namespace DataPlant {
             return load;
         }
 
-        Real64 DetermineBranchFlowRequest();
+        Real64 DetermineBranchFlowRequest(EnergyPlusData &state);
     };
 
 } // namespace DataPlant

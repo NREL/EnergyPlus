@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -183,20 +182,21 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     int VBMatNum(0);
     for (int i = 1; i <= 4; i++) {
-        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
-    EXPECT_EQ(1, DataHeatBalance::TotBlindsEQL);
-    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
+    EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::MaterialGroup::BlindEquivalentLayer));
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
     int EQLNum = 0;
     InitEquivalentLayerWindowCalculations(*state);
     EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
-    EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, state->dataWindowEquivalentLayer->lscVBNOBM);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(state->dataWindowEquivLayer->CFS(EQLNum).VBLayerPtr).CNTRL,
+              state->dataWindowEquivalentLayer->lscVBNOBM);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
@@ -337,6 +337,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -368,6 +369,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -384,6 +386,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -400,6 +403,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -416,6 +420,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -432,6 +437,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -530,28 +536,28 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     state->dataGlobal->CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get window surface index
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
+        if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // get equivalent layer window optical properties
-    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::SolarArrays::BEAM, AbsSolBeam);
     // check that the slat angle control type is set to MaximizeSolar
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBPROF);
     // check the slat angle
-    EXPECT_NEAR(-71.0772, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(-71.0772, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
-    DaylightingManager::ProfileAngle(SurfNum, state->dataEnvrn->SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
-    EXPECT_NEAR(-DataGlobalConstants::RadToDeg * ProfAngVer, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+    EXPECT_NEAR(-DataGlobalConstants::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
@@ -692,6 +698,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -723,6 +730,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -739,6 +747,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -755,6 +764,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -771,6 +781,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -787,6 +798,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -885,31 +897,31 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     state->dataGlobal->CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get equivalent layer window surface index
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
+        if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // calc window optical property
-    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::SolarArrays::BEAM, AbsSolBeam);
     // check VB slat angle for BlockBeamSolar slat angle control
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
     // check the VB slat angle
-    EXPECT_NEAR(18.9228, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(18.9228, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
-    DaylightingManager::ProfileAngle(SurfNum, state->dataEnvrn->SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
-    EXPECT_NEAR(90.0 - DataGlobalConstants::RadToDeg * ProfAngVer, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+    EXPECT_NEAR(90.0 - DataGlobalConstants::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // get the slat angle from profile angle
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobalConstants::RadToDeg * ProfAngVer);
-    EXPECT_NEAR(SlateAngleBlockBeamSolar, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
+    EXPECT_NEAR(SlateAngleBlockBeamSolar, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
@@ -933,12 +945,12 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotMaterials);
-    EXPECT_EQ(state->dataMaterial->Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
+    EXPECT_EQ(1, state->dataHeatBal->TotMaterials);
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
-    EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
+    EXPECT_EQ(1, state->dataWindowEquivLayer->TotWinEquivLayerConstructs);
     EXPECT_TRUE(state->dataConstruction->Construct(1).TypeIsWindow);
     EXPECT_TRUE(state->dataConstruction->Construct(1).WindowTypeEQL);
     EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
@@ -1077,6 +1089,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1093,6 +1106,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1109,6 +1123,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1125,6 +1140,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1141,6 +1157,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1157,6 +1174,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1252,17 +1270,19 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     H(2) = HcIn;
 
     // check the window air gap vent type: vented to outdoor
-    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENout);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENout);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 308.610, 0.001);
     EXPECT_NEAR(T(2), 306.231, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 313.886, 0.001);
     EXPECT_NEAR(T(2), 310.559, 0.001);
 }
@@ -1399,6 +1419,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1415,6 +1436,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1431,6 +1453,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1447,6 +1470,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1463,6 +1487,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1479,6 +1504,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1574,17 +1600,19 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     H(2) = HcIn;
 
     // check the window air gap vent type: vented to outdoor
-    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENin);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENin);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 307.054, 0.001);
     EXPECT_NEAR(T(2), 304.197, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(
+        *state, state->dataWindowEquivLayer->CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 314.666, 0.001);
     EXPECT_NEAR(T(2), 311.282, 0.001);
 }
@@ -1721,6 +1749,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1737,6 +1766,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1753,6 +1783,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1769,6 +1800,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1785,6 +1817,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1801,6 +1834,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1943,21 +1977,21 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     int VBMatNum(0);
     int ConstrNum(0);
 
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
+        if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
     }
     // get venetian blind material index
-    for (int i = 1; i <= DataHeatBalance::TotMaterials; i++) {
-        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // get equivalent layer window contruction index
-    for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
+    for (int ConstrPtr = 1; ConstrPtr <= state->dataHeatBal->TotConstructs; ++ConstrPtr) {
         if (state->dataConstruction->Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;
         }
@@ -1967,12 +2001,12 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
 
     EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
-    EXPECT_EQ(CFS(EQLNum).NL, 3);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).NL, 3);
     // check optical and thermal property of the VB layer (Inside Layer)
-    EXPECT_EQ(CFS(EQLNum).L(3).Name, "WMTEUQL_BLND_KINDV_RF80_T02_A18_RB45");
-    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.TAUL, 0.0);
-    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
-    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).Name, "WMTEUQL_BLND_KINDV_RF80_T02_A18_RB45");
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).LWP_MAT.TAUL, 0.0);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
+    EXPECT_EQ(state->dataWindowEquivLayer->CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
     // check inside face effective emissivity
     EXPECT_NEAR(state->dataConstruction->Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
     // for fixed slate angle the emissivity remains the same

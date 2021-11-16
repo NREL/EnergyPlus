@@ -67,7 +67,7 @@ namespace WindowAC {
     {
         // Members
         // input data
-        std::string Name; // name of unit
+        std::string Name;      // name of unit
         int UnitType;          // type of unit
         std::string Sched;     // availability schedule
         int SchedPtr;          // index to schedule
@@ -149,7 +149,8 @@ namespace WindowAC {
 
     // Functions
 
-    void SimWindowAC(EnergyPlusData &state, std::string const &CompName,   // name of the window AC unit
+    void SimWindowAC(EnergyPlusData &state,
+                     std::string_view CompName,     // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -159,7 +160,8 @@ namespace WindowAC {
 
     void GetWindowAC(EnergyPlusData &state);
 
-    void InitWindowAC(EnergyPlusData &state, int const WindACNum,          // number of the current window AC unit being simulated
+    void InitWindowAC(EnergyPlusData &state,
+                      int const WindACNum,          // number of the current window AC unit being simulated
                       Real64 &QZnReq,               // zone load (modified as needed) (W)
                       int const ZoneNum,            // index to zone
                       bool const FirstHVACIteration // TRUE when first HVAC iteration
@@ -167,7 +169,8 @@ namespace WindowAC {
 
     void SizeWindowAC(EnergyPlusData &state, int const WindACNum);
 
-    void SimCyclingWindowAC(EnergyPlusData &state, int const WindACNum,           // number of the current window AC unit being simulated
+    void SimCyclingWindowAC(EnergyPlusData &state,
+                            int const WindACNum,           // number of the current window AC unit being simulated
                             int const ZoneNum,             // number of zone being served !unused1208
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
@@ -177,7 +180,8 @@ namespace WindowAC {
 
     void ReportWindowAC(EnergyPlusData &state, int const WindACNum); // number of the current AC unit being simulated
 
-    void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
+    void CalcWindowACOutput(EnergyPlusData &state,
+                            int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                             int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                             Real64 const PartLoadFrac,     // unit part load fraction
@@ -185,7 +189,8 @@ namespace WindowAC {
                             Real64 &LoadMet                // load met by unit (watts)
     );
 
-    void ControlCycWindACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
+    void ControlCycWindACOutput(EnergyPlusData &state,
+                                int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                 int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
@@ -203,54 +208,57 @@ namespace WindowAC {
 
 } // namespace WindowAC
 
-    struct WindowACData : BaseGlobalStruct {
+struct WindowACData : BaseGlobalStruct
+{
 
-        // MODULE PARAMETER DEFINITIONS
-        int const WindowAC_UnitType;
-        std::string const cWindowAC_UnitType;
-        Array1D_string const cWindowAC_UnitTypes;
+    // MODULE PARAMETER DEFINITIONS
+    int const WindowAC_UnitType;
+    std::string const cWindowAC_UnitType;
+    Array1D_string const cWindowAC_UnitTypes;
 
-        // Compressor operation
-        int const On;  // normal compressor operation
-        int const Off; // signal DXCoil that compressor shouldn't run
+    // Compressor operation
+    int const On;  // normal compressor operation
+    int const Off; // signal DXCoil that compressor shouldn't run
 
-        bool MyOneTimeFlag;
-        bool ZoneEquipmentListChecked;
+    bool MyOneTimeFlag;
+    bool ZoneEquipmentListChecked;
 
-        int NumWindAC;
-        int NumWindACCyc;
-        Array1D_bool MySizeFlag;
-        bool GetWindowACInputFlag; // First time, input is "gotten"
-        bool CoolingLoad;         // defines a cooling load
-        Array1D_bool CheckEquipName;
-        // Object Data
-        Array1D<WindowAC::WindACData> WindAC;
-        Array1D<WindowAC::WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
+    int NumWindAC;
+    int NumWindACCyc;
+    Array1D_bool MySizeFlag;
+    bool GetWindowACInputFlag; // First time, input is "gotten"
+    bool CoolingLoad;          // defines a cooling load
+    Array1D_bool CheckEquipName;
+    // Object Data
+    Array1D<WindowAC::WindACData> WindAC;
+    Array1D<WindowAC::WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
 
+    Array1D_bool MyEnvrnFlag;  // one time initialization flag
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
-        void clear_state() override
-        {
-            this->NumWindAC = 0;
-            this->NumWindACCyc = 0;
-            this->GetWindowACInputFlag = true;
-            this->CoolingLoad = false;
-            this->MyOneTimeFlag = true;
-            this->ZoneEquipmentListChecked = false;
-            this->MySizeFlag.deallocate();
-            this->CheckEquipName.deallocate();
-            this->WindAC.deallocate();
-            this->WindACNumericFields.deallocate();
-        }
+    void clear_state() override
+    {
+        this->NumWindAC = 0;
+        this->NumWindACCyc = 0;
+        this->GetWindowACInputFlag = true;
+        this->CoolingLoad = false;
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->WindAC.deallocate();
+        this->WindACNumericFields.deallocate();
+        this->MyEnvrnFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+    }
 
-        // Default Constructor
-        WindowACData()
-            : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"),
-              cWindowAC_UnitTypes(1, cWindowAC_UnitType), On(1), Off(0), MyOneTimeFlag(true),
-              ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true),
-              CoolingLoad(false)
-        {
-        }
-    };
+    // Default Constructor
+    WindowACData()
+        : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), cWindowAC_UnitTypes(1, cWindowAC_UnitType), On(1), Off(0),
+          MyOneTimeFlag(true), ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true), CoolingLoad(false)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

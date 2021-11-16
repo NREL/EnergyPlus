@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
     state->dataRuntimeLang->ErlExpression.allocate(1);
     auto &erlExpression = state->dataRuntimeLang->ErlExpression(1);
-    erlExpression.Operator = DataRuntimeLanguage::FuncExp;
+    erlExpression.Operator = DataRuntimeLanguage::ErlFunc::Exp;
     erlExpression.NumOperands = 1;
     erlExpression.Operand.allocate(1);
 
@@ -113,31 +113,27 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
 TEST_F(EnergyPlusFixture, TestOutOfRangeAlphaFields)
 {
-    std::string const idf_objects = delimited_string({
-        "EnergyManagementSystem:Sensor,",
-        "  EMSSensor,",
-        "  *,",
-        "  Electricity:Facility;",
-        "EnergyManagementSystem:Program,",
-        "  DummyProgram,",
-        "  SET N = EMSSensor;",
-        "EnergyManagementSystem:ProgramCallingManager,",
-        "  DummyManager,",
-        "  BeginTimestepBeforePredictor,",
-        "  DummyProgram;",
-        "EnergyManagementSystem:MeteredOutputVariable,",
-        "  MyLongMeteredOutputVariable,",
-        "  EMSSensor,",
-        "  ZoneTimeStep,",
-        "  ,",
-        "  Electricity,",
-        "  Building,",
-        "  ExteriorEquipment,",
-        "  Transformer,",
-        "  J;"
-    });
+    std::string const idf_objects = delimited_string({"EnergyManagementSystem:Sensor,",
+                                                      "  EMSSensor,",
+                                                      "  *,",
+                                                      "  Electricity:Facility;",
+                                                      "EnergyManagementSystem:Program,",
+                                                      "  DummyProgram,",
+                                                      "  SET N = EMSSensor;",
+                                                      "EnergyManagementSystem:ProgramCallingManager,",
+                                                      "  DummyManager,",
+                                                      "  BeginTimestepBeforePredictor,",
+                                                      "  DummyProgram;",
+                                                      "EnergyManagementSystem:MeteredOutputVariable,",
+                                                      "  MyLongMeteredOutputVariable,",
+                                                      "  EMSSensor,",
+                                                      "  ZoneTimeStep,",
+                                                      "  ,",
+                                                      "  Electricity,",
+                                                      "  Building,",
+                                                      "  ExteriorEquipment,",
+                                                      "  Transformer,",
+                                                      "  J;"});
     ASSERT_TRUE(process_idf(idf_objects));
     RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(*state);
-
-
 }

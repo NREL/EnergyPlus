@@ -56,144 +56,130 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/IOFiles.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::RootFinder {
 
-namespace RootFinder {
+// Using/Aliasing
+using DataRootFinder::PointType;
+using DataRootFinder::RootFinderDataType;
 
-    // Using/Aliasing
-    using DataRootFinder::PointType;
-    using DataRootFinder::RootFinderDataType;
+void SetupRootFinder(EnergyPlusData &state,
+                     RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                     DataRootFinder::Slope SlopeType,    // Either iSlopeIncreasing or iSlopeDecreasing
+                     DataRootFinder::iMethod MethodType, // Any of the iMethod<name> code but iMethodNone
+                     Real64 TolX,                        // Relative tolerance for X variables
+                     Real64 ATolX,                       // Absolute tolerance for X variables
+                     Real64 ATolY                        // Absolute tolerance for Y variables
+);
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
+void ResetRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                     Real64 XMin,                        // Minimum X value allowed
+                     Real64 XMax                         // Maximum X value allowed
+);
 
-    // DERIVED TYPE DEFINITIONS
-    // na
+void InitializeRootFinder(EnergyPlusData &state,
+                          RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                          Real64 XMin,                        // Minimum X value allowed
+                          Real64 XMax                         // Maximum X value allowed
+);
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
+void IterateRootFinder(EnergyPlusData &state,
+                       RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                       Real64 X,                           // X value of current iterate
+                       Real64 Y,                           // Y value of current iterate
+                       bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
+);
 
-    // SUBROUTINE SPECIFICATIONS FOR THE MODULE
+DataRootFinder::iStatus CheckInternalConsistency(EnergyPlusData &state,
+                                                 RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
-    // For a decreasing function,  MinPoint%Y > MaxPoint%Y
+bool CheckRootFinderCandidate(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
+                              Real64 X                                  // X value for current iterate
+);
 
-    // Functions
+bool CheckMinMaxRange(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
+                      Real64 X                                  // X value for current iterate
+);
 
-    void SetupRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                         int const SlopeType,                // Either iSlopeIncreasing or iSlopeDecreasing
-                         int const MethodType,               // Any of the iMethod<name> code but iMethodNone
-                         Real64 const TolX,                  // Relative tolerance for X variables
-                         Real64 const ATolX,                 // Absolute tolerance for X variables
-                         Real64 const ATolY                  // Absolute tolerance for Y variables
-    );
+bool CheckLowerUpperBracket(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
+                            Real64 X                                  // X value for current iterate
+);
 
-    void ResetRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                         Real64 const XMin,                  // Minimum X value allowed
-                         Real64 const XMax                   // Maximum X value allowed
-    );
+bool CheckSlope(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
-    void InitializeRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                              Real64 const XMin,                  // Minimum X value allowed
-                              Real64 const XMax                   // Maximum X value allowed
-    );
+bool CheckNonSingularity(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
-    void IterateRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                           Real64 const X,                     // X value of current iterate
-                           Real64 const Y,                     // Y value of current iterate
-                           bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
-    );
+bool CheckMinConstraint(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
-    int CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+bool CheckMaxConstraint(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
-    bool CheckRootFinderCandidate(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                  Real64 const X                            // X value for current iterate
-    );
+bool CheckRootFinderConvergence(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
+                                Real64 Y                                  // Y value for current iterate
+);
 
-    bool CheckMinMaxRange(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                          Real64 const X                            // X value for current iterate
-    );
+bool CheckBracketRoundOff(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
 
-    bool CheckLowerUpperBracket(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                            // X value for current iterate
-    );
+void UpdateMinMax(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                  Real64 X,                           // X value for current iterate
+                  Real64 Y                            // Y value for current iterate, F(X)=Y
+);
 
-    bool CheckSlope(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+void UpdateBracket(EnergyPlusData &state,
+                   RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                   Real64 X,                           // X value for current iterate
+                   Real64 Y                            // Y value for current iterate, F(X)=Y
+);
 
-    bool CheckNonSingularity(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+void UpdateHistory(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                   Real64 X,                           // X value for current iterate
+                   Real64 Y                            // Y value for current iterate, F(X)=Y
+);
 
-    bool CheckMinConstraint(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+void UpdateRootFinder(EnergyPlusData &state,
+                      RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+                      Real64 X,                           // X value for current iterate
+                      Real64 Y                            // Y value for current iterate, F(X)=Y
+);
 
-    bool CheckMaxConstraint(EnergyPlusData &state, RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+void SortHistory(int N,                      // Number of points to sort in history array
+                 Array1D<PointType> &History // Array of PointType variables. At least N of them
+);
 
-    bool CheckRootFinderConvergence(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                    Real64 const Y                            // Y value for current iterate
-    );
+void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    bool CheckBracketRoundOff(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
+bool BracketRoot(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
+                 Real64 &XNext                             // Next value
+);
 
-    void UpdateMinMax(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                      Real64 const X,                     // X value for current iterate
-                      Real64 const Y                      // Y value for current iterate, F(X)=Y
-    );
+Real64 BisectionMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    void UpdateBracket(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                       Real64 const X,                     // X value for current iterate
-                       Real64 const Y                      // Y value for current iterate, F(X)=Y
-    );
+Real64 FalsePositionMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    void UpdateHistory(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                       Real64 const X,                     // X value for current iterate
-                       Real64 const Y                      // Y value for current iterate, F(X)=Y
-    );
+Real64 SecantMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    void UpdateRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                          Real64 const X,                     // X value for current iterate
-                          Real64 const Y                      // Y value for current iterate, F(X)=Y
-    );
+bool SecantFormula(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
+                   Real64 &XNext                             // Result from Secant formula if possible to compute
+);
 
-    void SortHistory(int const N,                // Number of points to sort in history array
-                     Array1D<PointType> &History // Array of PointType variables. At least N of them
-    );
+Real64 BrentMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData); // Data used by root finding algorithm
+void WriteRootFinderTraceHeader(InputOutputFile &TraceFileUnit); // Unit for trace file
 
-    bool BracketRoot(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                     Real64 &XNext                             // Next value
-    );
+void WriteRootFinderTrace(InputOutputFile &TraceFile,              // Unit for trace file
+                          RootFinderDataType const &RootFinderData // Data used by root finding algorithm
+);
 
-    Real64 BisectionMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
+void WritePoint(InputOutputFile &TraceFile, // Unit for trace file
+                PointType const &PointData, // Point data structure
+                bool ShowXValue);
 
-    Real64 FalsePositionMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
+void DebugRootFinder(InputOutputFile &DebugFile,              // File unit where to write debugging info
+                     RootFinderDataType const &RootFinderData // Data used by root finding algorithm
+);
 
-    Real64 SecantMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
+void WriteRootFinderStatus(InputOutputFile &File,                   // File unit where to write the status description
+                           RootFinderDataType const &RootFinderData // Data used by root finding algorithm
+);
 
-    bool SecantFormula(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                       Real64 &XNext                             // Result from Secant formula if possible to compute
-    );
-
-    Real64 BrentMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
-
-    void WriteRootFinderTraceHeader(InputOutputFile &TraceFileUnit); // Unit for trace file
-
-    void WriteRootFinderTrace(InputOutputFile &TraceFile,                 // Unit for trace file
-                              RootFinderDataType const &RootFinderData // Data used by root finding algorithm
-    );
-
-    void WritePoint(InputOutputFile &TraceFile,    // Unit for trace file
-                    PointType const &PointData, // Point data structure
-                    bool const ShowXValue);
-
-    void DebugRootFinder(InputOutputFile &DebugFile,                   // File unit where to write debugging info
-                         RootFinderDataType const &RootFinderData // Data used by root finding algorithm
-    );
-
-    void WriteRootFinderStatus(InputOutputFile &File,                      // File unit where to write the status description
-                               RootFinderDataType const &RootFinderData // Data used by root finding algorithm
-    );
-
-} // namespace RootFinder
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::RootFinder
 
 #endif

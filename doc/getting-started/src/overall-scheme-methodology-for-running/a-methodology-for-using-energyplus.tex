@@ -21,7 +21,7 @@ Some preliminary steps will facilitate the construction of your input file. Ener
   Obtain sufficient \emph{central plant} information to allow specification and scheduling of the boilers, chillers and other plant equipment.
 \end{itemize}
 
-\subsection{*Step 2: ``*Zone" the Building}\label{step-2-zone-the-building}
+\subsection{\emph{Step 2}: ``Zone" the Building}\label{step-2-zone-the-building}
 
 A building ``surface'' is the fundamental element in the building model. In the general sense, there are two types of ``surfaces'' in EnergyPlus. These are:
 
@@ -31,15 +31,15 @@ A building ``surface'' is the fundamental element in the building model. In the 
 
 The first rule of building modeling is, ``\emph{Always define a surface as a heat storage surface unless it must be defined as a heat transfer surface}''. Any surface, which is expected to separate spaces of significantly different temperatures, must be defined as a \emph{heat transfer surface.} Thus, exterior surfaces, such as outside walls, roofs and floors, are \emph{heat transfer surfaces}. Interior surfaces (partitions) are \emph{heat storage surfaces} if they separate spaces maintained at the same temperature and \emph{heat transfer surfaces} if they separate spaces maintained at different temperatures. A discussion of how to define heat transfer and heat storage surfaces will occur in later steps. In order to correctly ``zone'' the building it is necessary only to distinguish between the two.
 
-A ``zone'' is a \emph{thermal,} not a \emph{geometric,} concept. A ``zone'' is an air volume at a uniform temperature plus all the heat transfer and heat storage surfaces bounding or inside of that air volume. EnergyPlus calculates the energy required to maintain each zone at a specified temperature for each hour of the day. Since EnergyPlus performs a zone heat balance, the first step in preparing a building description is to break the building into zones. The objective of this exercise is to define as \emph{few} zones as possible without significantly compromising the integrity of the simulation.
-
-Although defining building zones is somewhat of an art, a few general rules will keep the new simulation user out of trouble. Consider the following figure, which shows the floor plan of an Adult Education Center.
-
 \begin{figure}[hbtp] % fig 12
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image012.png}
 \caption{Adult Education Center \protect \label{fig:adult-education-center}}
 \end{figure}
+
+A ``zone'' is a \emph{thermal}, not a \emph{geometric}, concept. A ``zone'' is an air volume at a uniform temperature plus all the heat transfer and heat storage surfaces bounding or inside of that air volume. EnergyPlus calculates the energy required to maintain each zone at a specified temperature for each hour of the day. Since EnergyPlus performs a zone heat balance, the first step in preparing a building description is to break the building into zones. The objective of this exercise is to define as \emph{few} zones as possible without significantly compromising the integrity of the simulation.
+
+Although defining building zones is somewhat of an art, a few general rules will keep the new simulation user out of trouble. Consider Figure~\ref{fig:adult-education-center} which shows the floor plan of an Adult Education Center.
 
 The question is, ``How many \emph{thermal} zones should be used to model this building?''~ The inexperienced building modeler may be tempted to define each room in the building as a zone, but the thermal zone is defined as a volume of air at a uniform temperature. The general rule then is to \emph{use the number of fan systems (and radiant systems) not the number of rooms to determine the number of zones in the building.} The minimum number of zones in a general simulation model will usually be equal to the number of systems serving the building. The collection of heat transfer and heat storage surfaces defined within each zone will include all surfaces bounding or inside of the space conditioned by the system.
 
@@ -81,19 +81,19 @@ System Number & System Name & CFM & m/s & Zone Served \tabularnewline
 \bottomrule
 \end{longtable}
 
+Take note of Zone 1, Zone 2, Zone 4, and Zone 7 in Figure~\ref{fig:thermal-zones-in-the-education-center}. The two important zoning concepts can be demonstrated with the zoning to reinforce the idea of a thermal zone and encourage the use of simplified models.
+
 \begin{figure}[hbtp] % fig 14
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image014.png}
 \caption{Thermal Zones in the Education Center \protect \label{fig:thermal-zones-in-the-education-center}}
 \end{figure}
 
-Take note of Zone 1, Zone 2, Zone 4, and Zone 7. The two important zoning concepts can be demonstrated with the zoning to reinforce the idea of a thermal zone and encourage the use of simplified models.
-
 1.~~ Notice that Zones 4 and 7 include two rooms that are not adjacent to one another but are served by the same system. Because the air temperature in the two spaces is maintained at the same uniform temperature, the two spaces, though separated spatially, may be defined as a single zone. For our purposes, we will define them as separate zones.
 
 2.~~ Notice that Zone 1 and Zone 2 are served by the same fan system and could be defined as a single zone with 7650 cfm of conditioned air supplied to the space. The space was split into two zones because the designer expected higher solar loads on the South and West sides of the wing and wanted to examine the \emph{distribution} as well as the \emph{magnitude} of the load in the space.
 
-\subsection{\emph{Step 3:} Prepare to Construct the Building Model}\label{step-3-prepare-to-construct-the-building-model}
+\subsection{\emph{Step 3}: Prepare to Construct the Building Model}\label{step-3-prepare-to-construct-the-building-model}
 
 Working from blueprints or sketches and following the guidelines in Step 2, the building zones were determined. It is recommended that the engineer sketch the building with its zones. Surface dimensions should be included in the sketch. Additional geometric and surface information is required before an input file describing the building can be constructed. Specifically the building model must:
 
@@ -114,7 +114,7 @@ The surfaces of the building can be described in any order; grouping surfaces by
 The details of inputting surfaces are described in the Input/Output Reference document. The allowable surface types are shown in the following table:
 
 % table 3
-\begin{longtable}[c]{p{1.61in}p{4.38in}}
+\begin{longtable}[c]{p{1.91in}p{4.08in}}
 \caption{Surface types and categorization \label{table:surface-types-and-categorization}} \tabularnewline
 \toprule 
 Surface Type & Applicability \tabularnewline
@@ -445,7 +445,7 @@ The column headings in the previous table have the following meanings:
 
 \textbf{Area:}~ The area of subsurfaces (windows), roofs, floors.
 
-\subsection{Step 4: Compile Internal Space Gain Data}\label{step-4-compile-internal-space-gain-data}
+\subsection{\emph{Step 4}: Compile Internal Space Gain Data}\label{step-4-compile-internal-space-gain-data}
 
 People, lights, equipment, outside air infiltration and ventilation all constitute ``internal gains'' for the thermal zone. These gains are described to EnergyPlus as a \emph{design or} \emph{peak} level with a \emph{schedule} that specifies a fraction of the peak for each hour. The peak level is calculated by the user. Table~\ref{table:internal-gain-data}. Internal Gain Data shows the internal loads for a single zone model of Ft. Monmouth and the schedule named to specify the hourly load.
 

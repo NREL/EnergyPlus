@@ -8,7 +8,9 @@
 #include <vector>
 
 #include "util/test.h"
+#include "util/flags.h"
 #include "util/logging.h"
+#include "util/malloc_counter.h"
 #include "util/strutil.h"
 #include "re2/prog.h"
 #include "re2/re2.h"
@@ -18,11 +20,25 @@
 
 static const bool UsingMallocCounter = false;
 
-DEFINE_int32(size, 8, "log2(number of DFA nodes)");
-DEFINE_int32(repeat, 2, "Repetition count.");
-DEFINE_int32(threads, 4, "number of threads");
+DEFINE_FLAG(int, size, 8, "log2(number of DFA nodes)");
+DEFINE_FLAG(int, repeat, 2, "Repetition count.");
+DEFINE_FLAG(int, threads, 4, "number of threads");
 
 namespace re2 {
+
+static int state_cache_resets = 0;
+static int search_failures = 0;
+
+struct SetHooks {
+  SetHooks() {
+    hooks::SetDFAStateCacheResetHook([](const hooks::DFAStateCacheReset&) {
+      ++state_cache_resets;
+    });
+    hooks::SetDFASearchFailureHook([](const hooks::DFASearchFailure&) {
+      ++search_failures;
+    });
+  }
+} set_hooks;
 
 // Check that multithreaded access to DFA class works.
 
@@ -34,7 +50,7 @@ static void DoBuild(Prog* prog) {
 TEST(Multithreaded, BuildEntireDFA) {
   // Create regexp with 2^FLAGS_size states in DFA.
   std::string s = "a";
-  for (int i = 0; i < FLAGS_size; i++)
+  for (int i = 0; i < GetFlag(FLAGS_size); i++)
     s += "[ab]";
   s += "b";
   Regexp* re = Regexp::Parse(s, Regexp::LikePerl, NULL);
@@ -52,14 +68,14 @@ TEST(Multithreaded, BuildEntireDFA) {
   }
 
   // Build the DFA simultaneously in a bunch of threads.
-  for (int i = 0; i < FLAGS_repeat; i++) {
+  for (int i = 0; i < GetFlag(FLAGS_repeat); i++) {
     Prog* prog = re->CompileToProg(0);
     ASSERT_TRUE(prog != NULL);
 
     std::vector<std::thread> threads;
-    for (int j = 0; j < FLAGS_threads; j++)
+    for (int j = 0; j < GetFlag(FLAGS_threads); j++)
       threads.emplace_back(DoBuild, prog);
-    for (int j = 0; j < FLAGS_threads; j++)
+    for (int j = 0; j < GetFlag(FLAGS_threads); j++)
       threads[j].join();
 
     // One more compile, to make sure everything is okay.
@@ -106,44 +122,6 @@ TEST(SingleThreaded, BuildEntireDFA) {
   re->Decref();
 }
 
-// Generates and returns a string over binary alphabet {0,1} that contains
-// all possible binary sequences of length n as subsequences.  The obvious
-// brute force method would generate a string of length n * 2^n, but this
-// generates a string of length n + 2^n - 1 called a De Bruijn cycle.
-// See Knuth, The Art of Computer Programming, Vol 2, Exercise 3.2.2 #17.
-// Such a string is useful for testing a DFA.  If you have a DFA
-// where distinct last n bytes implies distinct states, then running on a
-// DeBruijn string causes the DFA to need to create a new state at every
-// position in the input, never reusing any states until it gets to the
-// end of the string.  This is the worst possible case for DFA execution.
-static std::string DeBruijnString(int n) {
-  CHECK_LT(n, static_cast<int>(8*sizeof(int)));
-  CHECK_GT(n, 0);
-
-  std::vector<bool> did(size_t{1}<<n);
-  for (int i = 0; i < 1<<n; i++)
-    did[i] = false;
-
-  std::string s;
-  for (int i = 0; i < n-1; i++)
-    s.append("0");
-  int bits = 0;
-  int mask = (1<<n) - 1;
-  for (int i = 0; i < (1<<n); i++) {
-    bits <<= 1;
-    bits &= mask;
-    if (!did[bits|1]) {
-      bits |= 1;
-      s.append("1");
-    } else {
-      s.append("0");
-    }
-    CHECK(!did[bits]);
-    did[bits] = true;
-  }
-  return s;
-}
-
 // Test that the DFA gets the right result even if it runs
 // out of memory during a search.  The regular expression
 // 0[01]{n}$ matches a binary string of 0s and 1s only if
@@ -165,7 +143,9 @@ TEST(SingleThreaded, SearchDFA) {
   // NFA implementation instead.  (The DFA loses its speed advantage
   // if it can't get a good cache hit rate.)
   // Tell the DFA to trudge along instead.
-  Prog::TEST_dfa_should_bail_when_slow(false);
+  Prog::TESTING_ONLY_set_dfa_should_bail_when_slow(false);
+  state_cache_resets = 0;
+  search_failures = 0;
 
   // Choice of n is mostly arbitrary, except that:
   //   * making n too big makes the test run for too long.
@@ -214,7 +194,9 @@ TEST(SingleThreaded, SearchDFA) {
   re->Decref();
 
   // Reset to original behaviour.
-  Prog::TEST_dfa_should_bail_when_slow(true);
+  Prog::TESTING_ONLY_set_dfa_should_bail_when_slow(true);
+  ASSERT_GT(state_cache_resets, 0);
+  ASSERT_EQ(search_failures, 0);
 }
 
 // Helper function: searches for match, which should match,
@@ -236,7 +218,9 @@ static void DoSearch(Prog* prog, const StringPiece& match,
 }
 
 TEST(Multithreaded, SearchDFA) {
-  Prog::TEST_dfa_should_bail_when_slow(false);
+  Prog::TESTING_ONLY_set_dfa_should_bail_when_slow(false);
+  state_cache_resets = 0;
+  search_failures = 0;
 
   // Same as single-threaded test above.
   const int n = 18;
@@ -259,14 +243,14 @@ TEST(Multithreaded, SearchDFA) {
 
   // Run the search simultaneously in a bunch of threads.
   // Reuse same flags for Multithreaded.BuildDFA above.
-  for (int i = 0; i < FLAGS_repeat; i++) {
+  for (int i = 0; i < GetFlag(FLAGS_repeat); i++) {
     Prog* prog = re->CompileToProg(1<<n);
     ASSERT_TRUE(prog != NULL);
 
     std::vector<std::thread> threads;
-    for (int j = 0; j < FLAGS_threads; j++)
+    for (int j = 0; j < GetFlag(FLAGS_threads); j++)
       threads.emplace_back(DoSearch, prog, match, no_match);
-    for (int j = 0; j < FLAGS_threads; j++)
+    for (int j = 0; j < GetFlag(FLAGS_threads); j++)
       threads[j].join();
 
     delete prog;
@@ -275,7 +259,9 @@ TEST(Multithreaded, SearchDFA) {
   re->Decref();
 
   // Reset to original behaviour.
-  Prog::TEST_dfa_should_bail_when_slow(true);
+  Prog::TESTING_ONLY_set_dfa_should_bail_when_slow(true);
+  ASSERT_GT(state_cache_resets, 0);
+  ASSERT_EQ(search_failures, 0);
 }
 
 struct ReverseTest {

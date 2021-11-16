@@ -72,7 +72,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SurfaceGeometry;
-using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 
 TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
@@ -87,6 +86,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
         "    Floor,                   !- Surface Type",
         "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
         "    T3-RF1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -160,37 +160,36 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
 
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound); // read project control data
-    EXPECT_FALSE(ErrorsFound);          // expect no errors
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
     ErrorsFound = false;
     GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
     ErrorsFound = false;
     GetConstructData(*state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
     ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
-    EXPECT_FALSE(ErrorsFound);   // expect no errors
-
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
     SetSurfaceOutBulbTempAt(*state);
-    EXPECT_EQ("T3-RF1 - FLOOR:N", Surface(1).Name);
-    EXPECT_GT(Surface(1).Centroid.z, 20000.0);    // this condition is fatal
-    EXPECT_LT(Surface(1).OutDryBulbTemp, -100.0); // this condition is fatal
-    EXPECT_LT(Surface(1).OutWetBulbTemp, -100.0); // this condition is fatal
+    EXPECT_EQ("T3-RF1 - FLOOR:N", state->dataSurface->Surface(1).Name);
+    EXPECT_GT(state->dataSurface->Surface(1).Centroid.z, 20000.0); // this condition is fatal
+    EXPECT_LT(state->dataSurface->SurfOutDryBulbTemp(1), -100.0);  // this condition is fatal
+    EXPECT_LT(state->dataSurface->SurfOutWetBulbTemp(1), -100.0);  // this condition is fatal
 }
 
 TEST_F(EnergyPlusFixture, SurfaceTest_Plane)
@@ -253,7 +252,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
@@ -262,7 +262,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 1, 0), Vector(1, 1, 1), Vector(0, 0, 1)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
@@ -271,31 +272,33 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 1), Vector(0, 1, 1)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0 / s.SinTilt );
+        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0 / s.SinTilt);
 
-        s.Vertex = { Vector(0, 0, 0), Vector(0, 1, 0), Vector(0, 1, 1), Vector(0, 0, 1) };
+        s.Vertex = {Vector(0, 0, 0), Vector(0, 1, 0), Vector(0, 1, 1), Vector(0, 0, 1)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
 
-        s.Vertex = { Vector(1, -1, 0), Vector(1, -1, -1), Vector(0, 0, -1), Vector(0, 0, 0) };
+        s.Vertex = {Vector(1, -1, 0), Vector(1, -1, -1), Vector(0, 0, -1), Vector(0, 0, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
-
     }
 }
 
@@ -308,7 +311,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 0, 1)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
@@ -317,7 +321,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(1, 0, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
@@ -335,7 +340,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(0.5, 0, 1), Vector(0.5, 0, 0.5), Vector(1, 0, 0.5), Vector(1, 0, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
@@ -344,11 +350,69 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(1, 0, 1), Vector(1, 0, 0.5), Vector(0.5, 0, 0.5), Vector(0.5, 0, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-        Vectors::DetermineAzimuthAndTilt(s.Vertex,s.Vertex.size(),s.Azimuth,s.Tilt,s.lcsx,s.lcsy,s.lcsz,s.GrossArea,s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
         s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
     }
+}
+
+TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
+{
+    int numSurfs = state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(numSurfs);
+    state->dataSurface->SurfTAirRef.dimension(numSurfs, 0);
+    state->dataSurface->SurfIntConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->SurfExtConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->SurfWinStormWinConstr.dimension(numSurfs, 0);
+    state->dataSurface->SurfMaterialMovInsulExt.dimension(numSurfs, 0);
+    state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs, 0);
+    state->dataSurface->SurfSchedMovInsulExt.dimension(numSurfs, 0);
+    state->dataSurface->SurfSchedMovInsulInt.dimension(numSurfs, 0);
+    state->dataSurface->SurfExternalShadingSchInd.dimension(numSurfs, 0);
+    state->dataSurface->SurfSurroundingSurfacesNum.dimension(numSurfs, 0);
+    state->dataSurface->SurfLinkedOutAirNode.dimension(numSurfs, 0);
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 1);
+    EXPECT_EQ(state->dataSurface->Surface(1).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(2).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(3).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(4).RepresentativeCalcSurfNum, 1);
+
+    state->dataSurface->RepresentativeSurfaceMap.clear();
+
+    state->dataSurface->Surface(1).Area = 20.0;
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(3).Azimuth = 180.04;
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 2);
+    EXPECT_EQ(state->dataSurface->Surface(1).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(2).RepresentativeCalcSurfNum, 2);
+    EXPECT_EQ(state->dataSurface->Surface(3).RepresentativeCalcSurfNum, 2);
+    EXPECT_EQ(state->dataSurface->Surface(4).RepresentativeCalcSurfNum, 1);
+
+    state->dataSurface->RepresentativeSurfaceMap.clear();
+
+    state->dataSurface->Surface(3).Azimuth = 180.05;
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 3);
+    EXPECT_EQ(state->dataSurface->Surface(1).RepresentativeCalcSurfNum, 1);
+    EXPECT_EQ(state->dataSurface->Surface(2).RepresentativeCalcSurfNum, 2);
+    EXPECT_EQ(state->dataSurface->Surface(3).RepresentativeCalcSurfNum, 3);
+    EXPECT_EQ(state->dataSurface->Surface(4).RepresentativeCalcSurfNum, 1);
 }

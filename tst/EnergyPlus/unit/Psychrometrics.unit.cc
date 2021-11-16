@@ -59,7 +59,7 @@ using namespace EnergyPlus::Psychrometrics;
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: TEMP. IS FROM  20 C  TO   40 C
     Real64 H = 7.5223e4 - 1.78637e4;
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: general
     Real64 PB = 101325.0;
@@ -222,7 +222,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
         "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
     });
-    Psychrometrics::iPsyErrIndex(5) = 0;
+    state->dataPsychrometrics->iPsyErrIndex[static_cast<int>(PsychrometricFunction::WFnTdpPb)] = 0;
+
     W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
     EXPECT_NEAR(20.07942181, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string1, true));
@@ -274,7 +275,7 @@ inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAi
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: analytical PsyCpAirFnW is independent of temperature
     Real64 W = 0.0080;
@@ -345,7 +346,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: dry cooling process test, delta enthalpy vs cpair times delta T
     Real64 W1 = 0.0030;
@@ -390,29 +391,28 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test when wet bulb temperature is below zero
-    Real64 TDB = 1; // C
+    Real64 TDB = 1;   // C
     Real64 W = 0.002; // Kg.water/Kg.dryair
     Real64 Pb = 101325.0;
     Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
     Real64 expected_result = -2.200; // expected result from psychrometrics chart
     EXPECT_NEAR(result, expected_result, 0.001);
-
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: heating process, constant humidity ratio
     Real64 W1 = 0.0030;
     Real64 W2 = 0.0030;
-    Real64 CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    Real64 CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    Real64 CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    Real64 CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     Real64 CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check heating results
@@ -423,13 +423,75 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     // Test 2: cooling Processes, dehumidified air
     W1 = 0.010;
     W2 = 0.008;
-    CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check cooling results
     EXPECT_DOUBLE_EQ(CpAirIn, 1.00484e3 + W1 * 1.85895e3);
     EXPECT_DOUBLE_EQ(CpAirOut, 1.00484e3 + W2 * 1.85895e3);
     EXPECT_DOUBLE_EQ(CpAir_result, CpAir_average);
+}
+TEST_F(EnergyPlusFixture, Psychrometrics_Interpolation_Sample_Test)
+{
+    // Verify sample data for interpolation.
+    // The sample data were extracted from the original psychrometric function PsyTsatFnPb every 64 Pa in the range of 64 Pa to 105,664 Pa.
+    // The sample data for saturated temperature from tsat_fn_pb_tsat were compared to the results from the original psychrometric function.
+    InitializePsychRoutines(*state);
+    Real64 tsat_psy;
+    Real64 error = 0.0;
+    int i;
+    for (i = 1; i < 1651; ++i) {
+        int tsat_fn_pb_pressure = i * 64; // sample bin size =64 Pa; sample size =1651 (continous)
+        tsat_psy = PsyTsatFnPb(*state, tsat_fn_pb_pressure);
+        error = max(abs(tsat_psy - tsat_fn_pb_y[i]), error);
+    }
+
+    // check error
+    EXPECT_LE(error, 1E-7);
+}
+TEST_F(EnergyPlusFixture, Psychrometrics_CSpline_Test)
+{
+    // compare the results of Tsat between CSpline interpolation and original psychrometric function for PsychTsatFnPb
+    InitializePsychRoutines(*state);
+    Real64 tsat_psy;
+    Real64 tsat_cspline;
+    Real64 Press_test;
+    Real64 Press_test_smallchange;
+    Real64 error = 0.0;
+    int i;
+    for (i = 0; i <= 700; i++) { // Press =50,000 ~ 120,000 Pascal
+        state->dataPsychrometrics->useInterpolationPsychTsatFnPb = false;
+        Press_test = 50000 + i * 100;
+        tsat_psy = PsyTsatFnPb_raw(*state, Press_test); // Tsat from original psychrometric function for PsychTsatFnPb
+
+        state->dataPsychrometrics->useInterpolationPsychTsatFnPb = true; // change to cspline
+        Press_test_smallchange = Press_test + 1e-60;
+        tsat_cspline = PsyTsatFnPb_raw(*state, Press_test_smallchange); // Tsat from cspline interpolation
+        error = max(abs(tsat_psy - tsat_cspline), error);
+    }
+    // check error
+    EXPECT_LE(error, 1E-5);
+}
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
+{
+    // Test for #8599
+    InitializePsychRoutines(*state);
+
+    state->dataGlobal->WarmupFlag = true;
+
+    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp used to have a discontinuity in Psat around 0.0°C that makes the calculation
+    // blow up. Before: PsyPsatFnTemp(-0.0001) = 611.1485382610978 PsyPsatFnTemp(+0.0001) = 611.2173076397495
+    //                  diff  = 0.06876937865172295
+    Real64 TDB = 1.4333333333333331;  // C
+    Real64 W = 0.0031902374172088472; // Kg.water/Kg.dryair
+    Real64 Pb = 101400.00000000001;
+
+    Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
+    Real64 expected_result = -0.1027; // expected result from psychrometrics chart
+    EXPECT_NEAR(result, expected_result, 0.001);
+
+    EXPECT_FALSE(has_err_output());
 }

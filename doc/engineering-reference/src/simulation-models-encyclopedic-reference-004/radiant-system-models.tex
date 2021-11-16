@@ -420,19 +420,51 @@ Other similarities between the two solution methods are evident.~ It is interest
 
 One distinct advantage of the State Space method presented in the previous section over the Laplace Transform method is that it can be adapted to more than one dimension.  In fact, as long as one can apply a network of nodes to a problem, the State Space method can be adapted to it.  For EnergyPlus, the biggest implication is that conduction through a construction can be expanded from one-dimensional in nature to two-dimensional.  This is particularly important in a hydronic radiant system where the presence of water tubes is clearly more than one-dimensional.
 
-The modeling of two-dimensional conduction in Construction:InternalSource based surfaces in EnergyPlus is thus possible by expanding the network of nodes shown in the above examples in the direction perpendicular to the main direction of heat transfer.  Essentially, when a user requests the two-dimensional solution for a Construction:InternalSource surface, the network of nodes is expanded perpendicular to the direction of heat transfer.  While this is not an overly complex process, here are some rules and limitations to the application of two-dimensional solutions in EnergyPlus:
+The modeling of two-dimensional conduction used when
+ConstructionPoperty:InternalHeatSource objects are attached to surfaces is thus
+possible by expanding the network of nodes shown in the above examples in the
+direction perpendicular to the main direction of heat transfer.  Essentially,
+when a user requests the two-dimensional solution for a
+ConstructioniProperty:InternalHeatSource surface, the network of nodes is
+expanded perpendicular to the direction of heat transfer.  While this is not
+an overly complex process, here are some rules and limitations to the
+application of two-dimensional solutions in EnergyPlus:
 
 \begin{itemize}
 \item
 Even though the solution internal to the surface is two-dimensional, in order to work within the confines of the standard EnergyPlus heat balance, the boundary condition at both the inside and outside face of the surface is that the temperature across the surface is the same at all points or that the surfaces are still isothermal.  The point of this is so that once the conduction transfer functions are calculated that the the surface heat balance formulations remain the same as any other surface that is using a one-dimensional assumption in EnergyPlus.
 \item
-The domain being modeled for a two-dimensional approach goes from one face of the surface to the other face as a one-dimensional model.  In the second dimension, perpendicular to the main direction of heat transfer, the domain goes from the line that goes through the tubing to the line of symmetry at the mid-point between adjacent tubing.  The perpendicular distance for this domain is given by the tubing spacing user input in the Construction:InternalSource object.  This tubing spacing is halved to determine the perpendicular distance for the solution domain.
+The domain being modeled for a two-dimensional approach goes from one face of
+the surface to the other face as a one-dimensional model.  In the second
+dimension, perpendicular to the main direction of heat transfer, the domain
+goes from the line that goes through the tubing to the line of symmetry at the
+mid-point between adjacent tubing.  The perpendicular distance for this domain
+is given by the tubing spacing user input in the
+ConstructionProperty:InternalHeatSource object.  This tubing spacing is halved
+to determine the perpendicular distance for the solution domain.
 \item
 While the number of nodes used for each layer of a construction is determined by the thermo-physical properties of the material for the layer to maintain solution stability, the number of nodes in the perpendicular direction is fixed for all layers of the construction.  Currently in EnergyPlus, the number of nodes in the perpendicular direction is fixed at 7.  This number was chosen as a result of testing with an evaluation version of one of the precedessor programs of EnergyPlus.  This number of nodes was a balance between accuracy requirements and solution speed.  Because the speed of the process required to calculate conduction transfer functions increases greatly as the number of nodes used in the model increases, increasing the number of nodes in the perpendicular direction too much will result in an unacceptible increase in the time required to calculate the conduction transfer functions.
 \item
-The heat source or sink is applied evenly over the entire node where the user defines the location of the source through the Construction:InternalSource input.  For calculating the conduction transfer functions, the model ignores the presence of the tubing and fluid and simply assumes that the entire layer consists of the appropriate material as defined by the Construction:InternalSource input.  The radiant model does take into account heat transfer between the material and the fluid being circulated through the system.
+The heat source or sink is applied evenly over the entire node where the user
+defines the location of the source through the
+ConstructionProperty:InternalHeatSource input.  For calculating the conduction
+transfer functions, the model ignores the presence of the tubing and fluid and
+simply assumes that the entire layer consists of the appropriate material as
+defined by the Construction:InternalSource input.  The radiant model does take
+into account heat transfer between the material and the fluid being circulated
+through the system.
 \item
-The location of the heat source and the calculation of an additional point that can be used for controlling the slab (see next section) are defined by input provided in the Construction:InternalSource input.  The location of the tubing where heat is added or subtracted from the slab is always defined at one side of the solution domain.  The location of the additional user temperature request is controlled by both the fields for the location of the user temperature request (between two layers) and the perpendicular direction for this temperature.  This temperature can then be used for controlling a radiant system.  (See section on \textbf{\hyperref[low-temperature-radiant-system-controls]{Low Temperature Radiant System Controls}} for more information about controlling a radiant system.
+The location of the heat source and the calculation of an additional point that
+can be used for controlling the slab (see next section) are defined by input
+provided in the ConstructionPropery:InternalHeatSource input.  The location of
+the tubing where heat is added or subtracted from the slab is always defined at
+one side of the solution domain.  The location of the additional user
+temperature request is controlled by both the fields for the location of the
+user temperature request (between two layers) and the perpendicular direction
+for this temperature.  This temperature can then be used for controlling a
+radiant system.  (See section on
+\textbf{\hyperref[low-temperature-radiant-system-controls]{Low Temperature Radiant System Controls}}
+for more information about controlling a radiant system.
 \end{itemize}
 
 These assumptions are applied to a low temperature radiant system within EnergyPlus and their impact can be seen in the next three diagrams.  First, one can see the symmetry inherent in a low temperature radiant system in Figure~\ref{fig:cross-section-of-a-low-temperature-radiant-system-with-planes-of-symmetry} below.
@@ -552,7 +584,24 @@ The controls for variable flow low temperature radiant systems within EnergyPlus
 
 The controlling temperature can be the mean air temperature, the mean radiant temperature, the operative temperature of the zone, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the surface inside face temperature, or the surface interior temperature.  The choice of controlling temperature is left to the user's discretion and set by input as described in the Input Output Reference.  For radiant system controls, the operative temperature is calculated as the average of MAT and MRT.  The surface inside face temperature is the temperature of the surface in which the radiant system is embedded at the inside face (the side facing the zone being conditioned).
 
-When the user opts to control the radiant system on the surface interior temperature, this temperature is inside the slab itself, and its location is defined using input that describes the construction of the slab (Construction:InternalSource--see the Input Output Reference for more details).  Note that this user defined temperature still must be at the interface between two layers, but this is easy to overcome by splitting any material into two separate layers.  When the user elects to perform a two-dimensional solution, an additional input parameter in the Construction:InternalSource object allows the user to chose the location of the user requested temperature in the direction perpendicular to the main direction of heat transfer.  This location can be in-line with the hydronic tubing, at the mid-point between two adjacent pipes, or at any node/point in between.  Due to the State Space method and a fixed number of nodes in the direction (currently seven), the user's decimal input for location between one side of the solution domain and the other is converted to a specific node.  However, this does allow the user quite a bit of flexibility in the solution and also defining a point on the interior of a radiant system that can be used for controlling a radiant system.
+When the user opts to control the radiant system on the surface interior
+temperature, this temperature is inside the slab itself, and its location is
+defined using input that describes the construction of the slab
+(ConstructionProperty:InternalHeatSource--see the Input Output Reference for
+more details).  Note that this user defined temperature still must be at the
+interface between two layers, but this is easy to overcome by splitting any
+material into two separate layers.  When the user elects to perform a
+two-dimensional solution, an additional input parameter in the
+ConstructionProperty:InternalHeatSource object allows the user to chose the
+location of the user requested temperature in the direction perpendicular to
+the main direction of heat transfer.  This location can be in-line with the
+hydronic tubing, at the mid-point between two adjacent pipes, or at any
+node/point in between.  Due to the State Space method and a fixed number of
+nodes in the direction (currently seven), the user's decimal input for location
+between one side of the solution domain and the other is converted to a
+specific node.  However, this does allow the user quite a bit of flexibility in
+the solution and also defining a point on the interior of a radiant system that
+can be used for controlling a radiant system.
 
 Since flow rate is varied in a variable flow radiant system, there is no explicit control on the inlet water temperature or mixing to achieve some inlet water temperature in a hydronic system.~ However, the user does have the ability to specify on an hourly basis through a schedule the temperature of the water that would be supplied to the radiant system.  Graphical descriptions of the controls for the low temperature radiant system model in EnergyPlus are shown in Figure~\ref{fig:variable-flow-low-temperature-radiant-system} for a hydronic system.~ In a system that uses electric resistance heating, the power or heat addition to the system varies in a manner similar to mass flow rate variation shown in Figure~\ref{fig:variable-flow-low-temperature-radiant-system}.
 

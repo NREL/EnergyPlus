@@ -1,50 +1,56 @@
 #ifndef NUSSELTNUMBER_H
 #define NUSSELTNUMBER_H
 
-namespace Tarcog {
-	class CNusseltNumberStrategy {
-	public:
-		virtual double calculate( double const t_Tilt, double const t_Ra, double const t_Asp );
-	protected:
-    virtual ~CNusseltNumberStrategy() = default;
-		double pos( double const t_Value );
-	};
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        class CNusseltNumberStrategy
+        {
+        public:
+            virtual double calculate(double t_Tilt, double t_Ra, double t_Asp);
 
-	class CNusseltNumber0To60 : public CNusseltNumberStrategy {
-	public:
-		virtual ~CNusseltNumber0To60() = default;
-		double calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) override;
-	};
+        protected:
+            double pos(double t_Value) const;
+        };
 
-	class CNusseltNumber60 : public CNusseltNumberStrategy {
-	public:
-		virtual ~CNusseltNumber60() = default;
-		double calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) override;
-	};
+        class CNusseltNumber0To60 : public CNusseltNumberStrategy
+        {
+        public:
+            double calculate(double t_Tilt, double t_Ra, double t_Asp) override;
+        };
 
-	class CNusseltNumber60To90 : public CNusseltNumberStrategy {
-	public:
-		virtual ~CNusseltNumber60To90() = default;
-		double calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) override;
-	};
+        class CNusseltNumber60 : public CNusseltNumberStrategy
+        {
+        public:
+            double calculate(double t_Tilt, double t_Ra, double t_Asp) override;
+        };
 
-	class CNusseltNumber90to180 : public CNusseltNumberStrategy {
-	public:
-		virtual ~CNusseltNumber90to180() = default;
-		double calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) override;
-	};
+        class CNusseltNumber60To90 : public CNusseltNumberStrategy
+        {
+        public:
+            double calculate(double t_Tilt, double t_Ra, double t_Asp) override;
+        };
 
-	class CNusseltNumber90 : public CNusseltNumberStrategy {
-	public:
-		virtual ~CNusseltNumber90() = default;
-		double calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) override;
-	};
+        class CNusseltNumber90to180 : public CNusseltNumberStrategy
+        {
+        public:
+            double calculate(double t_Tilt, double t_Ra, double t_Asp) override;
+        };
 
-	class CNusseltNumber {
-	public:
-		double calculate( double const t_Tilt, double const t_Ra, double const t_Asp );
-	};
-}
+        class CNusseltNumber90 : public CNusseltNumberStrategy
+        {
+        public:
+            double calculate(double t_Tilt, double t_Ra, double t_Asp) override;
+        };
+
+        class CNusseltNumber
+        {
+        public:
+            double calculate(double t_Tilt, double t_Ra, double t_Asp) const;
+        };
+    }   // namespace ISO15099
+}   // namespace Tarcog
 
 
 #endif

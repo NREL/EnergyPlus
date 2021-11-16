@@ -385,7 +385,7 @@ Next we describe Steps 1 and 3 in more detail.
 
 \subsubsection{Step 1}\label{step-1}
 
-Subroutine \emph{HcUCSDDV} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{TempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\). This calculation is appropriate for situations with low air velocity.
+Subroutine \emph{HcUCSDDV} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{SurfTempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\). This calculation is appropriate for situations with low air velocity.
 
 For surfaces that bound 2 subzones, the subroutine calculates h\(_{c}\) for each subzone and then averages them, weighting by the amount of surface in each subzone.
 
@@ -857,7 +857,7 @@ Next we describe Steps 1 and 2 in more detail.
 
 \subsubsection{Step 1}\label{step-1-1}
 
-Subroutine \emph{HcUCSDUF} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{TempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\) . This calculation is appropriate for situations with low air velocity.
+Subroutine \emph{HcUCSDUF} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{SurfTempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\) . This calculation is appropriate for situations with low air velocity.
 
 For surfaces that bound 2 subzones, the subroutine calculates h\(_{c}\) for each subzone and then averages them, weighting by the amount of surface in each subzone.
 
@@ -1160,7 +1160,7 @@ Next we describe Steps 1 and 3 in more detail.
 
 \subsubsection{Step 1}\label{step-1-2}
 
-Subroutine \emph{HcUCSDUF} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{TempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\) . This calculation is appropriate for situations with low air velocity.
+Subroutine \emph{HcUCSDUF} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{SurfTempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\) . This calculation is appropriate for situations with low air velocity.
 
 For surfaces that bound 2 subzones, the subroutine calculates h\(_{c}\) for each subzone and then averages them, weighting by the amount of surface in each subzone.
 

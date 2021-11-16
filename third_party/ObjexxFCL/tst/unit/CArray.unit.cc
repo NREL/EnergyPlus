@@ -42,12 +42,12 @@ TEST( CArrayTest, Construction )
 
 	{ // Copy constructor and assignment template
 		CArray_int v( 10u, 22 );
-		CArray_float f( v );
-		EXPECT_EQ( CArray_float( 10u, 22.0f ), f );
+		CArray<float> f( v );
+		EXPECT_EQ( CArray<float>( 10u, 22.0f ), f );
 		v += 1;
 		EXPECT_EQ( CArray_int( 10u, 23 ), v );
 		f = v;
-		EXPECT_EQ( CArray_float( 10u, 23.0f ), f );
+		EXPECT_EQ( CArray<float>( 10u, 23.0f ), f );
 	}
 
 	{ // Size constructor

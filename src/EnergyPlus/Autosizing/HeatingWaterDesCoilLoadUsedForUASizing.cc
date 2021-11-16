@@ -81,7 +81,7 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                                                                state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 this->autoSizedValue = this->dataWaterFlowUsedForSizing * this->dataWaterCoilSizHeatDeltaT * Cp * rho;
-                coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
             } else if ((this->termUnitPIU || this->termUnitIU) && (this->curTermUnitSizingNum > 0)) {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
@@ -107,7 +107,7 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                                                                state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 this->autoSizedValue = this->dataWaterFlowUsedForSizing * this->dataWaterCoilSizHeatDeltaT * Cp * rho;
-                coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
             } else {
                 if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
                     DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * state.dataEnvrn->StdRhoAir;
@@ -170,6 +170,9 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                                            (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
                 }
             } else {
+                if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                    this->dataFracOfAutosizedHeatingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedHeatingCapacity;
+                }
                 if (this->dataDesicRegCoil) {
                     this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
@@ -181,24 +184,24 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
         }
     }
     // heating coil can't have negative capacity
-    this->autoSizedValue = std::max(0.0, this->autoSizedValue);
+    this->autoSizedValue = std::max(0.0, this->autoSizedValue) * this->dataHeatSizeRatio * this->dataFracOfAutosizedHeatingCapacity;
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "water_heating_design_coil_load_for_ua_sizing";
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject && this->curSysNum <= this->numPrimaryAirSys) {
-        coilSelectionReportObj->setCoilHeatingCapacity(state,
-                                                       this->compName,
-                                                       this->compType,
-                                                       this->autoSizedValue,
-                                                       this->wasAutoSized,
-                                                       this->curSysNum,
-                                                       this->curZoneEqNum,
-                                                       this->curOASysNum,
-                                                       FanCoolLoad,
-                                                       TotCapTempModFac,
-                                                       DXFlowPerCapMinRatio,
-                                                       DXFlowPerCapMaxRatio);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,
+                                                                                   this->compName,
+                                                                                   this->compType,
+                                                                                   this->autoSizedValue,
+                                                                                   this->wasAutoSized,
+                                                                                   this->curSysNum,
+                                                                                   this->curZoneEqNum,
+                                                                                   this->curOASysNum,
+                                                                                   FanCoolLoad,
+                                                                                   TotCapTempModFac,
+                                                                                   DXFlowPerCapMinRatio,
+                                                                                   DXFlowPerCapMaxRatio);
     }
     return this->autoSizedValue;
 }

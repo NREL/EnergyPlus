@@ -65,52 +65,52 @@ using namespace EnergyPlus::Fans;
 
 TEST_F(EnergyPlusFixture, Fans_FanSizing)
 {
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
     state->dataFans->NumFans = 1;
-    Fan.allocate(state->dataFans->NumFans);
-    FanNumericFields.allocate(state->dataFans->NumFans);
-    FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(3);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(3);
 
     int FanNum = 1;
-    Fan(FanNum).FanName = "Test Fan";
-    Fan(FanNum).FanType = "Fan:OnOff";
-    Fan(FanNum).FanType_Num = FanType_SimpleOnOff;
-    Fan(FanNum).MaxAirFlowRate = AutoSize;
-    Fan(FanNum).DeltaPress = 500.0;
-    Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
+    state->dataFans->Fan(FanNum).FanName = "Test Fan";
+    state->dataFans->Fan(FanNum).FanType = "Fan:OnOff";
+    state->dataFans->Fan(FanNum).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = AutoSize;
+    state->dataFans->Fan(FanNum).DeltaPress = 500.0;
+    state->dataFans->Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
 
     state->dataEnvrn->StdRhoAir = 1.2;
 
-    FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
+    state->dataFans->FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
 
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
 
     // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-    DataNonZoneNonAirloopValue = 1.00635;
+    state->dataSize->DataNonZoneNonAirloopValue = 1.00635;
     SizeFan(*state, FanNum);
-    EXPECT_DOUBLE_EQ(1.00635, Fan(FanNum).MaxAirFlowRate);
-    DataNonZoneNonAirloopValue = 0.0;
-    EXPECT_NEAR(1.0371, Fan(FanNum).DesignPointFEI, 0.0001);
+    EXPECT_DOUBLE_EQ(1.00635, state->dataFans->Fan(FanNum).MaxAirFlowRate);
+    state->dataSize->DataNonZoneNonAirloopValue = 0.0;
+    EXPECT_NEAR(1.0371, state->dataFans->Fan(FanNum).DesignPointFEI, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 {
 
     state->dataFans->NumFans = 1;
-    Fans::Fan.allocate(state->dataFans->NumFans);
-    Fans::FanNumericFields.allocate(state->dataFans->NumFans);
-    Fans::FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
     // set standard air density
     state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     int FanNum(1);
-    FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
-    FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
-    auto &thisFan(Fans::Fan(FanNum));
+    state->dataFans->FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
+    state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
+    auto &thisFan(state->dataFans->Fan(FanNum));
     thisFan.FanName = "Test Fan";
     thisFan.FanType = "Fan:ConstantVolume";
     thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
@@ -148,16 +148,16 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 {
 
     state->dataFans->NumFans = 1;
-    Fans::Fan.allocate(state->dataFans->NumFans);
-    Fans::FanNumericFields.allocate(state->dataFans->NumFans);
-    Fans::FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
     // set standard air density
     state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     int FanNum(1);
-    FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
-    FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
-    auto &thisFan(Fans::Fan(FanNum));
+    state->dataFans->FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
+    state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
+    auto &thisFan(state->dataFans->Fan(FanNum));
     thisFan.FanName = "Test Fan";
     thisFan.FanType = "Fan:OnOff";
     thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
@@ -195,16 +195,16 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
 {
 
     state->dataFans->NumFans = 1;
-    Fans::Fan.allocate(state->dataFans->NumFans);
-    Fans::FanNumericFields.allocate(state->dataFans->NumFans);
-    Fans::FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields.allocate(state->dataFans->NumFans);
+    state->dataFans->FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
     // set standard air density
     state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     int FanNum(1);
-    FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
-    FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
-    auto &thisFan(Fans::Fan(FanNum));
+    state->dataFans->FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
+    state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
+    auto &thisFan(state->dataFans->Fan(FanNum));
     thisFan.FanName = "Test Fan";
     thisFan.FanType = "Fan:VariableVolume";
     thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleVAV;

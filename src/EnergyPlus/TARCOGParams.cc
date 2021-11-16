@@ -50,52 +50,17 @@
 
 namespace EnergyPlus::TARCOGParams {
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   June/22/2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+// MODULE INFORMATION:
+//       AUTHOR         Simon Vidanovic
+//       DATE WRITTEN   June/22/2010
+//       MODIFIED       na
+//       RE-ENGINEERED  na
 
-    //  Revision: 6.0.36  (June/22/2010)
-    //   - Initial setup, extracted from TARCOG.fi
-    //   - Moved Standards and MaxGas into GasParams module (gasses project)
+//  Revision: 6.0.36  (June/22/2010)
+//   - Initial setup, extracted from TARCOG.fi
+//   - Moved Standards and MaxGas into GasParams module (gasses project)
 
-    // PURPOSE OF THIS MODULE:
-    // Module which contains common TARCOG parameters and constants
+// PURPOSE OF THIS MODULE:
+// Module which contains common TARCOG parameters and constants
 
-    //  Layer types:
-    int const SPECULAR(0);
-    int const VENETBLIND_HORIZ(1);
-    int const WOVSHADE(2);
-    int const PERFORATED(3);
-    int const DIFFSHADE(4);
-    int const BSDF(5);
-    int const VENETBLIND_VERT(6);
-
-    int const MinLayType(0);
-    int const MaxLayType(6);
-
-    //  Thermal models:
-    int const THERM_MOD_ISO15099(0);
-    int const THERM_MOD_SCW(1);
-    int const THERM_MOD_CSM(2);
-
-    int const YES_SupportPillar(1);
-
-    // Deflection parameters
-    int const NO_DEFLECTION_CALCULATION(0);
-    int const DEFLECTION_CALC_TEMPERATURE(1);
-    int const DEFLECTION_CALC_GAP_WIDTHS(2);
-
-    // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
-    // will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
-    // values would produce enough precision
-    int const mmax(5); // top m value for which "deflection sum" will be calculated
-    int const nmax(5); // top n value for which "deflection sum" will be calculated
-
-    //  CalcForcedVentilation flag:
-    //  0 = Skip forced ventilation calc
-    //  1 = Allow forced ventilation calc
-    int const CalcForcedVentilation(0);
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::TARCOGParams

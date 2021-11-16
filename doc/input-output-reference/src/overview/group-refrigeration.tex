@@ -945,7 +945,7 @@ A unique user-assigned name for an instance of a CaseAndWalkInList. Any referenc
 
 \paragraph{Field: Case or WalkIn or Air Chiller \textless{}x\textgreater{} Name}\label{field-case-or-walkin-or-air-chiller-x-name}
 
-Identifies a particular refrigerated case or walk-in. The name will be validated against the~ Refrigeration Case, Refrigeration WalkIn, and Air Chiller names (ref: \hyperref[refrigerationcase]{Refrigeration:Case},~ \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}) in the input file. Up to 20 are provided in the IDD; this object is extensible.
+Identifies a particular refrigerated case or walk-in. The name will be validated against the~ Refrigeration Case, Refrigeration WalkIn, and Air Chiller names (ref: \hyperref[refrigerationcase]{Refrigeration:Case},~ \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}) in the input file. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 The following is an example input for a CaseAndWalkInList.
 
@@ -1055,7 +1055,7 @@ The floor area in square meters. This value is required and has no default value
 
 The floor themal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3154. (This corresponds to R18 in Archaic American Insulation Units.~ To convert other R-values to thermal transmittance, divide 5.678 by the R-value.~ For example, R15 is 0.3785 W/m\(^{2}\)-K and R5 is 1.136 W/m\(^{2}\)-K.)
 
-\textbf{\emph{THE REMAINING 12 FIELDS FOR THE WALK-IN COOLER MUST BE REPEATED FOR EACH ZONE WHICH IS IN CONTACT WITH A WALK-IN WALL, CEILING, OR DOOR. The IDD includes fields for 3 zones, but can be extended by repeating the last 12 values in the object.}}
+\textbf{\emph{THE REMAINING 12 FIELDS FOR THE WALK-IN COOLER MUST BE REPEATED FOR EACH ZONE WHICH IS IN CONTACT WITH A WALK-IN WALL, CEILING, OR DOOR.  This object is extensible, so additional fields of this type can be added to the end of this object by repeating the last 12 fields in the object.}}
 
 \subsubsection{Field: Zone \textless{}x\textgreater{} Name}\label{field-zone-x-name}
 
@@ -2345,7 +2345,7 @@ This is the fraction of the time step when the compressor ran to meet the load.~
 
 \subsection{Refrigeration:CompressorList}\label{refrigerationcompressorlist}
 
-This object provides a list of all the compressors included within a single refrigeration system (Ref: \hyperref[refrigerationsystem]{Refrigeration:System}). Each list must contain at least one compressor. The order in which the individual compressors are listed here will be the order in which the compressors are dispatched to meet the system load.~ That is, at very low loads, only compressor \#1 will be operating.~ As the load increases, the first two compressors will be operating, and so on. This list is extensible.
+This object provides a list of all the compressors included within a single refrigeration system (Ref: \hyperref[refrigerationsystem]{Refrigeration:System}). Each list must contain at least one compressor. The order in which the individual compressors are listed here will be the order in which the compressors are dispatched to meet the system load.~ That is, at very low loads, only compressor \#1 will be operating.~ As the load increases, the first two compressors will be operating, and so on.
 
 \subsubsection{Inputs}\label{inputs-6-020}
 
@@ -2355,7 +2355,7 @@ A unique user-assigned name for an instance of a compressor list. Any reference 
 
 \paragraph{Field: Refrigeration Compressor \textless{}x\textgreater{} Name}\label{field-refrigeration-compressor-x-name}
 
-Identifies a particular compressor that works in conjunction with the other compressors on this list to provides cooling to a single refrigeration system. The name will be validated against the compressor names (ref: \hyperref[refrigerationcompressor]{Refrigeration:Compressor}) in the input file. Up to 20 are available in the IDD; this object is extensible.
+Identifies a particular compressor that works in conjunction with the other compressors on this list to provides cooling to a single refrigeration system. The name will be validated against the compressor names (ref: \hyperref[refrigerationcompressor]{Refrigeration:Compressor}) in the input file.  This object is extensible, so additional fields of this type can be added to the end of this object.
 
 The following is an example input for a compressor list.
 
@@ -3478,11 +3478,9 @@ A refrigeration system may provide cooling to other, secondary, systems through 
 
 A unique user-assigned name for an instance of a refrigeration transfer load list. Any reference to this list by another object will use this name. In particular, the primary refrigeration system absorbing the heat from all the loads listed here will use this name to reference those loads.
 
-\paragraph{Field: Cascade Condenser Name or Secondary System Name}\label{field-cascade-condenser-name-or-secondary-system-name}
+\paragraph{Field: Cascade Condenser Name or Secondary System \textless{}x\textgreater{} Name}\label{field-cascade-condenser-name-or-secondary-system-name}
 
-Identifies a cascade condenser or secondary loop that is cooled, along with the other transfer loads listed here, by a single system. The name will be validated against the \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem} and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade} names in the input file (the name will also be compared against all the other condenser names, but an error will be issued if it refers to any type of condenser other than a cascade condenser).
-
-The list is extensible; ten fields are provided in the IDD.
+Identifies a cascade condenser or secondary loop that is cooled, along with the other transfer loads listed here, by a single system. The name will be validated against the \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem} and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade} names in the input file (the name will also be compared against all the other condenser names, but an error will be issued if it refers to any type of condenser other than a cascade condenser).  This object is extensible, so additional fields of this type can be added to the end of this object.
 
 The following is an example input for a transfer load list.
 

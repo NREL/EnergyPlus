@@ -68,9 +68,6 @@
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
-using DataHeatBalFanSys::ZT;
-using DataHeatBalFanSys::ZoneAirHumRat;
-using DataLoopNode::Node;
 using Psychrometrics::InitializePsychRoutines;
 using Psychrometrics::PsyHFnTdbW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -156,51 +153,62 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
-    Node.allocate(2);
-    ZT.allocate(1);
-    ZoneAirHumRat.allocate(1);
-    ZT(1) = 10.0;
-    ZoneAirHumRat(1) = 0.003;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZT(1) = 10.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
-    Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
-    InitializePsychRoutines();
+    state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    InitializePsychRoutines(*state);
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(-5000.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
     EXPECT_DOUBLE_EQ(1.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSHR);
 
     //// set up arguments
-    Real64 const EvapAirMassFlow = 1.2;
-    Real64 const TotalHeatRemovalRate = 5500.0;
-    Real64 const PartLoadRatio = 1.0;
-    Real64 const SecCoilRatedSHR = 1.0;
-    Real64 const EvapInletDryBulb = 10.0;
-    Real64 const EvapInletHumRat = 0.003;
-    Real64 const EvapInletWetBulb = 4.5;
-    Real64 const EvapInletEnthalpy = 17607.0;
-    Real64 const CondInletDryBulb = 20.0;
-    Real64 const SecCoilFlowFraction = 1.0;
-    int const SecCoilSHRFT = 0;
-    int const SecCoilSHRFF = 0;
+    Real64 constexpr EvapAirMassFlow = 1.2;
+    Real64 constexpr TotalHeatRemovalRate = 5500.0;
+    Real64 constexpr PartLoadRatio = 1.0;
+    Real64 constexpr SecCoilRatedSHR = 1.0;
+    Real64 constexpr EvapInletDryBulb = 10.0;
+    Real64 constexpr EvapInletHumRat = 0.003;
+    Real64 constexpr EvapInletWetBulb = 4.5;
+    Real64 constexpr EvapInletEnthalpy = 17607.0;
+    Real64 constexpr CondInletDryBulb = 20.0;
+    Real64 constexpr SecCoilFlowFraction = 1.0;
+    int constexpr SecCoilSHRFT = 0;
+    int constexpr SecCoilSHRFF = 0;
 
     // output variable
     Real64 SHRTest;
 
     // make the call
-    SHRTest =
-        CalcSecondaryDXCoilsSHR(*state, DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat,
-                                EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
+    SHRTest = CalcSecondaryDXCoilsSHR(*state,
+                                      DXCoilNum,
+                                      EvapAirMassFlow,
+                                      TotalHeatRemovalRate,
+                                      PartLoadRatio,
+                                      SecCoilRatedSHR,
+                                      EvapInletDryBulb,
+                                      EvapInletHumRat,
+                                      EvapInletWetBulb,
+                                      EvapInletEnthalpy,
+                                      CondInletDryBulb,
+                                      SecCoilFlowFraction,
+                                      SecCoilSHRFT,
+                                      SecCoilSHRFF);
 
     EXPECT_DOUBLE_EQ(1.0, SHRTest);
 
     // cleanup
     state->dataDXCoils->DXCoil.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
 }
 TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 {
@@ -227,11 +235,11 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate = 0.0;
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
-    Node.allocate(2);
-    ZT.allocate(1);
-    ZoneAirHumRat.allocate(1);
-    ZT(1) = 10.0;
-    ZoneAirHumRat(1) = 0.003;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZT(1) = 10.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(1) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(2) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT(1) = 0;
@@ -248,8 +256,8 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataDXCoils->DXCoil(DXCoilNum).AirInNode = 2;
-    Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
-    InitializePsychRoutines();
+    state->dataLoopNodes->Node(state->dataDXCoils->DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
+    InitializePsychRoutines(*state);
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(-5000.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
@@ -261,5 +269,5 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT.deallocate();
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFF.deallocate();
     state->dataDXCoils->DXCoil.deallocate();
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
 }

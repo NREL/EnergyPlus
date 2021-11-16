@@ -64,7 +64,13 @@ struct EnergyPlusData;
 namespace EarthTube {
 
     // Parameters for Ventilation
-    enum class EarthTubeVentilation {Unassigned, Natural, Intake, Exhaust};
+    enum class EarthTubeVentilation
+    {
+        Unassigned,
+        Natural,
+        Intake,
+        Exhaust
+    };
 
     struct EarthTubeData
     {
@@ -103,10 +109,11 @@ namespace EarthTube {
 
         // Default Constructor
         EarthTubeData()
-            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), MinTemperature(0.0), MaxTemperature(0.0), DelTemperature(0.0), FanType(EarthTubeVentilation::Unassigned), FanPressure(0.0),
-              FanEfficiency(0.0), FanPower(0.0), GroundTempz1z2t(0.0), InsideAirTemp(0.0), AirTemp(0.0), HumRat(0.0), WetBulbTemp(0.0), r1(0.0),
-              r2(0.0), r3(0.0), PipeLength(0.0), PipeThermCond(0.0), z(0.0), SoilThermDiff(0.0), SoilThermCond(0.0), AverSoilSurTemp(0.0),
-              ApmlSoilSurTemp(0.0), SoilSurPhaseConst(0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0)
+            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), MinTemperature(0.0), MaxTemperature(0.0), DelTemperature(0.0),
+              FanType(EarthTubeVentilation::Unassigned), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), GroundTempz1z2t(0.0),
+              InsideAirTemp(0.0), AirTemp(0.0), HumRat(0.0), WetBulbTemp(0.0), r1(0.0), r2(0.0), r3(0.0), PipeLength(0.0), PipeThermCond(0.0), z(0.0),
+              SoilThermDiff(0.0), SoilThermCond(0.0), AverSoilSurTemp(0.0), ApmlSoilSurTemp(0.0), SoilSurPhaseConst(0), ConstantTermCoef(0.0),
+              TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0)
         {
         }
     };
@@ -147,8 +154,8 @@ namespace EarthTube {
     void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const &ZoneName,  // name of zone for error reporting
-                                std::string const &FieldName, // name of earth tube in input
+                                std::string const &ZoneName, // name of zone for error reporting
+                                std::string_view FieldName,  // name of earth tube in input
                                 bool &ErrorsFound            // Found a problem
     );
 
@@ -163,11 +170,12 @@ namespace EarthTube {
 
 } // namespace EarthTube
 
-struct EarthTubeData : BaseGlobalStruct {
+struct EarthTubeData : BaseGlobalStruct
+{
     int TotEarthTube = 0; // Total EarthTube Statements in input
     bool GetInputFlag = true;
-    Array1D<EarthTube::EarthTubeData> EarthTubeSys;
-    Array1D<EarthTube::EarthTubeZoneReportVars> ZnRptET;
+    EPVector<EarthTube::EarthTubeData> EarthTubeSys;
+    EPVector<EarthTube::EarthTubeZoneReportVars> ZnRptET;
 
     void clear_state() override
     {

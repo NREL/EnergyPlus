@@ -64,7 +64,8 @@ namespace DataBranchAirLoopPlant {
     constexpr Real64 MassFlowTolerance(0.000000001); // minimum significant mass flow rate (kg/s)
 
     // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
-    enum class PressureCurveType {
+    enum class PressureCurveType
+    {
         Unassigned = -2,
         Error = -1,
         None = 0,
@@ -110,9 +111,10 @@ namespace DataBranchAirLoopPlant {
         {
         }
     };
-}
+} // namespace DataBranchAirLoopPlant
 
-struct DataBranchAirLoopPlantData : BaseGlobalStruct {
+struct DataBranchAirLoopPlantData : BaseGlobalStruct
+{
 
     int NumPressureCurves = 0;
     Array1D<DataBranchAirLoopPlant::PlantPressureCurveData> PressureCurve;

@@ -160,3 +160,5 @@ if error_count > 0:
 else:
     print("Python API Test: Errors were NOT caught during dew point calculation, bad!")
     sys.exit(1)
+
+print("EnergyPlus Version: " + str(api.functional.ep_version()))

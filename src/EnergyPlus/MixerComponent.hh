@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -96,7 +97,7 @@ namespace MixerComponent {
 
     // Functions
 
-    void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
+    void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -140,7 +141,8 @@ namespace MixerComponent {
 
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
-    void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
+    void GetZoneMixerIndex(
+        EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
     int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
@@ -149,7 +151,8 @@ namespace MixerComponent {
 
 } // namespace MixerComponent
 
-struct MixerComponentData : BaseGlobalStruct {
+struct MixerComponentData : BaseGlobalStruct
+{
 
     int NumMixers = 0;
     int LoopInletNode = 0;
@@ -157,7 +160,7 @@ struct MixerComponentData : BaseGlobalStruct {
     bool SimAirMixerInputFlag = true;
     bool GetZoneMixerIndexInputFlag = true;
     Array1D_bool CheckEquipName;
-    Array1D<MixerComponent::MixerConditions> MixerCond;
+    EPVector<MixerComponent::MixerConditions> MixerCond;
 
     void clear_state() override
     {

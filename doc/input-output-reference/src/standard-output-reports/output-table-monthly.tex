@@ -12,10 +12,6 @@ The Name field allows the user to give the output table a label that is shown in
 
 The Digits After Decimal field is a numeric value that indicates how many digits after the decimal point should be shown on the table of values.
 
-\paragraph{Field Set: Variable or Meter and Aggregation Type}\label{field-set-variable-or-meter-and-aggregation-type}
-
-The VariableOrMeterName field and the AggregationType field may be repeated for each column desired in the monthly report. These two fields define each column of the report. The IDD object has been set up to allow up to 25 columns. This object is extensible, so the number of columns may be increased by editing the IDD file and adding the desired number of fields at the end of the object.
-
 \paragraph{Field: Variable or Meter \textless{}\#\textgreater{} Name}\label{field-variable-or-meter-name-000}
 
 The remainder of this input object consists of pairs of fields that can be repeatedVariable Or Meter Name fields contain the name of a variable (see \hyperref[outputvariable]{Output:Variable} and eplusout.rdd), meter (see \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} and eplusout.mdd), or schedule. This value is shown on a monthly basis using the aggregation method specified. If the selected name is used for both a variable or a meter and a schedule name, the variable or meter will be used.
@@ -56,7 +52,7 @@ The advanced aggregation types are described below. These aggregation types rely
 
 \textbf{MinimumDuringHoursShown} - Reports the minimum value and the time that the minimum value occurred but only during the hours reported with the previous ``hours-`` aggregation type. When the minimum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the minimum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.
 
-An example of this object follows.
+The VariableOrMeterName and AggregationType fields may be repeated for each column desired in the monthly report. These two fields define each column of the report.  These fields are extensible, so additional pairs of these fields can be added to the end of this object.  An example of this object follows.
 
 \begin{lstlisting}
 

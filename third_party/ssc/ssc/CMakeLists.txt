@@ -157,7 +157,7 @@ endif(MSVC)
 #
 #####################################################################################################################
 
-add_library(ssc SHARED ${SSC_SRC})
+add_library(ssc STATIC ${SSC_SRC})
 set_target_properties(ssc
     PROPERTIES
     PREFIX ""
@@ -183,17 +183,17 @@ else()
     set_source_files_properties(${SRC_UNUSED_VARS} PROPERTIES COMPILE_FLAGS -Wno-unused-variable)
 endif()
 
-# dltest executable for checking ssc library
-if(UNIX AND NOT SAMAPI_EXPORT)
-	add_executable(dltest ../build_resources/dltest.c)
-	if (NOT APPLE)
-		target_link_libraries(dltest -ldl -Wl,--no-as-needed)
-	endif()
-	add_custom_command(
-		TARGET ssc
-		POST_BUILD
-		COMMAND dltest $<TARGET_FILE:ssc>)
-endif()
+## # dltest executable for checking ssc library
+## if(UNIX AND NOT SAMAPI_EXPORT)
+## 	add_executable(dltest ../build_resources/dltest.c)
+## 	if (NOT APPLE)
+## 		target_link_libraries(dltest -ldl -Wl,--no-as-needed)
+## 	endif()
+## 	add_custom_command(
+## 		TARGET ssc
+## 		POST_BUILD
+## 		COMMAND dltest $<TARGET_FILE:ssc>)
+## endif()
 
 # libssc for PySAM
 if(UNIX)

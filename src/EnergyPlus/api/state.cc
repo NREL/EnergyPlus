@@ -47,25 +47,25 @@
 
 #include <EnergyPlus/api/state.h>
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/StateManagement.hh>
 
-EnergyPlusState stateNew() {
+EnergyPlusState stateNew()
+{
     auto *state = new EnergyPlus::EnergyPlusData;
     return reinterpret_cast<EnergyPlusState>(state);
 }
 
-void stateReset(EnergyPlusState state) {
+void stateReset(EnergyPlusState state)
+{
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::clearAllStates(*this_state);
-    // also clear out the input processor since the clearAllStates does not do that.
-    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
+    this_state->clear_state();
 }
 
-void stateDelete(EnergyPlusState state) {
+void stateDelete(EnergyPlusState state)
+{
     delete reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
 }

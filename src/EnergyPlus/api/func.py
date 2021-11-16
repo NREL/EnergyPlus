@@ -592,6 +592,8 @@ class Functional:
         self.py_error_callback_type = CFUNCTYPE(c_void_p, c_int, c_char_p)
         self.api.registerErrorCallback.argtypes = [c_void_p, self.py_error_callback_type]
         self.api.registerErrorCallback.restype = c_void_p
+        self.api.energyPlusVersion.argtypes = []
+        self.api.energyPlusVersion.restype = c_char_p
 
     def initialize(self, state: c_void_p) -> None:
         if not self.initialized and not self.plugin_mode:

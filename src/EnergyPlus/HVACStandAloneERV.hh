@@ -140,31 +140,33 @@ namespace HVACStandAloneERV {
         }
     };
 
-    void SimStandAloneERV(EnergyPlusData &state, std::string const &CompName,   // name of the Stand Alone ERV unit
-                          int const ZoneNum,             // number of zone being served unused1208
-                          bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                          Real64 &SensLoadMet,           // net sensible load supplied by the ERV unit to the zone (W)
-                          Real64 &LatLoadMet,            // net latent load supplied by ERV unit to the zone (kg/s),
-                          int &CompIndex                 // pointer to correct component
+    void SimStandAloneERV(EnergyPlusData &state,
+                          std::string_view CompName, // name of the Stand Alone ERV unit
+                          int ZoneNum,               // number of zone being served unused1208
+                          bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system timestep
+                          Real64 &SensLoadMet,       // net sensible load supplied by the ERV unit to the zone (W)
+                          Real64 &LatLoadMet,        // net latent load supplied by ERV unit to the zone (kg/s),
+                          int &CompIndex             // pointer to correct component
     );
 
     void GetStandAloneERV(EnergyPlusData &state);
 
-    void InitStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
-                           int const ZoneNum,            // number of zone being served unused1208
-                           bool const FirstHVACIteration // TRUE if first HVAC iteration
+    void InitStandAloneERV(EnergyPlusData &state,
+                           int StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
+                           int ZoneNum,            // number of zone being served unused1208
+                           bool FirstHVACIteration // TRUE if first HVAC iteration
     );
 
-    void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum);
+    void SizeStandAloneERV(EnergyPlusData &state, int StandAloneERVNum);
 
     void CalcStandAloneERV(EnergyPlusData &state,
-                           int const StandAloneERVNum,    // Unit index in ERV data structure
-                           bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                           Real64 &SensLoadMet,           // sensible zone load met by unit (W)
-                           Real64 &LatentMassLoadMet      // latent zone load met by unit (kg/s), dehumid = negative
+                           int StandAloneERVNum,     // Unit index in ERV data structure
+                           bool FirstHVACIteration,  // flag for 1st HVAC iteration in the time step
+                           Real64 &SensLoadMet,      // sensible zone load met by unit (W)
+                           Real64 &LatentMassLoadMet // latent zone load met by unit (kg/s), dehumid = negative
     );
 
-    void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum); // number of the current Stand Alone ERV being simulated
+    void ReportStandAloneERV(EnergyPlusData &state, int StandAloneERVNum); // number of the current Stand Alone ERV being simulated
 
     //        End of Reporting subroutines for the Module
 
@@ -176,35 +178,45 @@ namespace HVACStandAloneERV {
                                 bool &ErrorsFound               // set to true if problem
     );
 
-    int GetSupplyAirInletNode(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    int GetSupplyAirInletNode(EnergyPlusData &state,
+                              std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                               std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                               bool &ErrorsFound               // set to true if problem
     );
 
-    int GetExhaustAirInletNode(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    int GetExhaustAirInletNode(EnergyPlusData &state,
+                               std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                bool &ErrorsFound               // set to true if problem
     );
 
-    int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum);
+    int GetStandAloneERVOutAirNode(EnergyPlusData &state, int StandAloneERVNum);
 
-    int GetStandAloneERVZoneInletAirNode(EnergyPlusData &state, int const StandAloneERVNum);
+    int GetStandAloneERVZoneInletAirNode(EnergyPlusData &state, int StandAloneERVNum);
 
-    int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERVNum);
+    int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int StandAloneERVNum);
+
+    bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int NodeNumber);
 
 } // namespace HVACStandAloneERV
 
-struct HVACStandAloneERVData : BaseGlobalStruct {
+struct HVACStandAloneERVData : BaseGlobalStruct
+{
 
     int NumStandAloneERVs = 0;
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     bool GetERVInputFlag = true;
-    Array1D<HVACStandAloneERV::StandAloneERVData> StandAloneERV;
+    EPVector<HVACStandAloneERV::StandAloneERVData> StandAloneERV;
     std::unordered_set<std::string> HeatExchangerUniqueNames;
     std::unordered_set<std::string> SupplyAirFanUniqueNames;
     std::unordered_set<std::string> ExhaustAirFanUniqueNames;
     std::unordered_set<std::string> ControllerUniqueNames;
+    Array1D_bool MySizeFlag_InitStandAloneERV;
+    bool MyOneTimeFlag = true;
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyZoneEqFlag;             // used to set up zone equipment availability managers
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state() override
     {
@@ -217,6 +229,11 @@ struct HVACStandAloneERVData : BaseGlobalStruct {
         SupplyAirFanUniqueNames.clear();
         ExhaustAirFanUniqueNames.clear();
         ControllerUniqueNames.clear();
+        MySizeFlag_InitStandAloneERV.deallocate();
+        MyOneTimeFlag = true;
+        MyEnvrnFlag.deallocate();
+        MyZoneEqFlag.deallocate();
+        ZoneEquipmentListChecked = false;
     }
 };
 

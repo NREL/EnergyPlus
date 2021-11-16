@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType));
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -130,17 +130,17 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, PairingCompanionCoils)
@@ -153,11 +153,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // a successful try
         coil1->name = "name1";
         coil1->companionCoilName = "name2";
-        coil1->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->EIRHPType = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+        coil2->EIRHPType = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state);
         EXPECT_EQ(coil2, coil1->companionHeatPumpCoil);
@@ -168,11 +168,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // but what if we can't find a companion!
         coil1->name = "name1";
         coil1->companionCoilName = "name6";
-        coil1->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->EIRHPType = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+        coil2->EIRHPType = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state), std::runtime_error);
     }
@@ -181,11 +181,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // or what if we find a companion but it's the same coil type
         coil1->name = "name1";
         coil1->companionCoilName = "name2";
-        coil1->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->EIRHPType = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil2->EIRHPType = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state), std::runtime_error);
     }
@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -228,15 +228,15 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType));
     EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
@@ -266,7 +266,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -276,15 +276,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
     EXPECT_NEAR(1, thisCoolingPLHP->sizingFactor, 0.001);
 }
 
@@ -355,7 +355,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -365,15 +365,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CatchErrorsOnBadCurves)
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, CatchErrorsOnBadCurves)
                                                       "  dummyCurveC;"});
     ASSERT_TRUE(process_idf(idf_objects));
     // call the factory with a valid name to trigger reading inputs, it should throw for the bad curves
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, Initialization)
@@ -435,7 +435,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -443,13 +443,13 @@ TEST_F(EnergyPlusFixture, Initialization)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -483,20 +483,20 @@ TEST_F(EnergyPlusFixture, Initialization)
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // validate that plant sizing went ok
-    Real64 const flowTol = 0.001;
-    Real64 const rho = 999.89; // easy to edit here if the expected density gets adjusted in E+
+    Real64 constexpr flowTol = 0.001;
+    Real64 constexpr rho = 999.89; // easy to edit here if the expected density gets adjusted in E+
     Real64 const expectedLoadSideMassFlow = rho * thisCoolingPLHP->loadSideDesignVolFlowRate;
     Real64 const expectedSourceSideMassFlow = rho * thisCoolingPLHP->sourceSideDesignVolFlowRate;
     EXPECT_NEAR(expectedLoadSideMassFlow, thisCoolingPLHP->loadSideDesignMassFlowRate, flowTol);
     EXPECT_NEAR(expectedSourceSideMassFlow, thisCoolingPLHP->sourceSideDesignMassFlowRate, flowTol);
-    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMin, flowTol);
-    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail, flowTol);
-    EXPECT_NEAR(expectedLoadSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMax, flowTol);
-    EXPECT_NEAR(expectedLoadSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
-    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMin, flowTol);
-    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail, flowTol);
-    EXPECT_NEAR(expectedSourceSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMax, flowTol);
-    EXPECT_NEAR(expectedSourceSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
+    EXPECT_NEAR(0.0, state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMin, flowTol);
+    EXPECT_NEAR(0.0, state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail, flowTol);
+    EXPECT_NEAR(expectedLoadSideMassFlow, state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMax, flowTol);
+    EXPECT_NEAR(expectedLoadSideMassFlow, state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
+    EXPECT_NEAR(0.0, state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMin, flowTol);
+    EXPECT_NEAR(0.0, state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail, flowTol);
+    EXPECT_NEAR(expectedSourceSideMassFlow, state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMax, flowTol);
+    EXPECT_NEAR(expectedSourceSideMassFlow, state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
 }
 
 TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource)
@@ -542,7 +542,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -577,24 +577,24 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-    Real64 const plantSizingLoadVolFlow = 0.01;
-    Real64 const plantSizingLoadDeltaT = 1.0;
+    Real64 constexpr plantSizingLoadVolFlow = 0.01;
+    Real64 constexpr plantSizingLoadDeltaT = 1.0;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.010;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.010;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.030;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -631,10 +631,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     //   This works out to a multiplier of 2 on the source flow rate.  With the same deltaT on the design of the source
     //   loop, the flow rate must be twice as high.
     // The source side has a slightly different set of thermal properties so the expected flow is scaled by those.
-    Real64 const expectedLoadCp = 4197.93;
-    Real64 const expectedLoadRho = 999.898;
-    Real64 const expectedSourceCp = 4185.0;
-    Real64 const expectedSourceRho = 983.2;
+    Real64 constexpr expectedLoadCp = 4197.93;
+    Real64 constexpr expectedLoadRho = 999.898;
+    Real64 constexpr expectedSourceCp = 4185.0;
+    Real64 constexpr expectedSourceRho = 983.2;
     Real64 const expectedLoadFlow = plantSizingLoadVolFlow;
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     Real64 const baseExpectedSourceFlow = plantSizingLoadVolFlow * 2.0;
@@ -666,7 +666,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->loadSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.0;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideWSHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -729,7 +729,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -766,21 +766,21 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.020;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.020;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.030;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -866,7 +866,7 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -906,10 +906,10 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -979,7 +979,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1015,8 +1015,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1068,7 +1068,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1104,8 +1104,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1171,10 +1171,10 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1191,25 +1191,25 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
-    DataLoopNode::Node.allocate(5);
+    state->dataLoopNodes->Node.allocate(5);
     PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
 
     // set up the plant setpoint conditions and test for single setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
-    DataLoopNode::Node(5).TempSetPoint = 2.718;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
+    state->dataLoopNodes->Node(5).TempSetPoint = 2.718;
     EXPECT_NEAR(3.141, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
     EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
 
     // test for dual setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
-    DataLoopNode::Node(5).TempSetPointHi = 5.436;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
+    state->dataLoopNodes->Node(5).TempSetPointHi = 5.436;
     EXPECT_NEAR(6.282, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
     EXPECT_NEAR(5.436, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
 }
 
@@ -1249,7 +1249,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1257,13 +1257,13 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1289,57 +1289,57 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
     EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
     EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on both sides
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
@@ -1376,7 +1376,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
@@ -1386,7 +1386,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(2).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(2).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
@@ -1399,13 +1399,13 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     auto &PLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
     auto &extraPLHPPlantSupplySideComp = state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1);
     auto &extraPLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantSupplySideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    PLHPPlantDemandSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    extraPLHPPlantSupplySideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    extraPLHPPlantDemandSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantSupplySideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    PLHPPlantDemandSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    extraPLHPPlantSupplySideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    extraPLHPPlantDemandSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
     EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
 
@@ -1494,14 +1494,14 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1509,14 +1509,14 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
     PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1564,13 +1564,13 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
         firstHVAC = true;
         curLoad = -800;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisCoolingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingPLHP->loadSideOutletTemp, 0.001);
@@ -1583,13 +1583,13 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
         curLoad = -1200;
         Real64 availableCapacity = 950.0;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisCoolingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
@@ -1628,14 +1628,14 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1643,13 +1643,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1673,11 +1673,11 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         bool firstHVAC = true;
         Real64 curLoad = -900;
         bool runFlag = true; // plant actually shouldn't do this but the component can be smart enough to handle it
-        Real64 const specifiedLoadSetpoint = 45;
-        Real64 const loadInletTemp = 46;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        Real64 constexpr specifiedLoadSetpoint = 45;
+        Real64 constexpr loadInletTemp = 46;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(loadInletTemp, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -1689,13 +1689,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         bool firstHVAC = true;
         Real64 curLoad = 800;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -1708,13 +1708,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         Real64 curLoad = 1200;
         Real64 availableCapacity = 950.0;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -1794,7 +1794,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1805,7 +1805,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType));
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -1813,17 +1813,17 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
@@ -1857,20 +1857,20 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1910,13 +1910,13 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
         firstHVAC = true;
         curLoad = -800;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisCoolingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingPLHP->loadSideOutletTemp, 0.001);
@@ -1929,13 +1929,13 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
         curLoad = -1200;
         Real64 availableCapacity = 950.0;
         runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4183;
-        Real64 const specifiedLoadSetpoint = 15;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4183;
+        Real64 constexpr specifiedLoadSetpoint = 15;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisCoolingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
@@ -1974,20 +1974,20 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2009,11 +2009,11 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         bool firstHVAC = true;
         Real64 curLoad = -900;
         bool runFlag = true; // plant actually shouldn't do this but the component can be smart enough to handle it
-        Real64 const specifiedLoadSetpoint = 45;
-        Real64 const loadInletTemp = 46;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        Real64 constexpr specifiedLoadSetpoint = 45;
+        Real64 constexpr loadInletTemp = 46;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(loadInletTemp, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -2025,13 +2025,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         bool firstHVAC = true;
         Real64 curLoad = 800;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -2044,13 +2044,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         Real64 curLoad = 1200;
         Real64 availableCapacity = 950.0;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -2062,13 +2062,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         bool firstHVAC = true;
         Real64 curLoad = 0.0;
         bool runFlag = true;
-        Real64 const expectedLoadMassFlowRate = 0.09999;
-        Real64 const expectedCp = 4180;
-        Real64 const specifiedLoadSetpoint = 45;
+        Real64 constexpr expectedLoadMassFlowRate = 0.09999;
+        Real64 constexpr expectedCp = 4180;
+        Real64 constexpr specifiedLoadSetpoint = 45;
         Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
-        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
-        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(45.0, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -2103,7 +2103,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2113,15 +2113,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, ClearState)
@@ -2151,7 +2151,7 @@ TEST_F(EnergyPlusFixture, ClearState)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
     EXPECT_EQ(state->dataEIRPlantLoopHeatPump->heatPumps.size(), 1u);
 
     // test that vector is cleared
@@ -2195,13 +2195,13 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2225,47 +2225,47 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 
     // call with run flag ON, flow locked at zero on both sides
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
-    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
@@ -2315,7 +2315,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2341,24 +2341,24 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
 
-    Real64 const plantSizingLoadVolFlow = 0.01;
-    Real64 const plantSizingLoadDeltaT = 1.0;
+    Real64 constexpr plantSizingLoadVolFlow = 0.01;
+    Real64 constexpr plantSizingLoadDeltaT = 1.0;
 
-    Real64 const plantSizingSrcDeltaT = 10.0;
+    Real64 constexpr plantSizingSrcDeltaT = 10.0;
 
-    Real64 const COP = 1;
+    Real64 constexpr COP = 1;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.01;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.03;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop1supplyComponent2.Name = thisCoolingPLHP->name;
@@ -2413,7 +2413,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->loadSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.0;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideASHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -2479,7 +2479,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2505,20 +2505,20 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
 
-    Real64 const plantSizingLoadVolFlow = 0.01;
-    Real64 const plantSizingLoadDeltaT = 1.0;
+    Real64 constexpr plantSizingLoadVolFlow = 0.01;
+    Real64 constexpr plantSizingLoadDeltaT = 1.0;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.01;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.03;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop1supplyComponent2.Name = thisCoolingPLHP->name;
@@ -2654,7 +2654,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -2663,10 +2663,10 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
 
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2683,24 +2683,24 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
-    DataLoopNode::Node.allocate(5);
+    state->dataLoopNodes->Node.allocate(5);
     PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
 
     // set up the plant setpoint conditions and test for single setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
-    DataLoopNode::Node(5).TempSetPoint = 2.718;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
+    state->dataLoopNodes->Node(5).TempSetPoint = 2.718;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
 
     // test for dual setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
-    DataLoopNode::Node(5).TempSetPointHi = 5.436;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
+    state->dataLoopNodes->Node(5).TempSetPointHi = 5.436;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
 
-    DataHVACGlobals::TimeStepSys = 60;
+    state->dataHVACGlobal->TimeStepSys = 60;
 
     Real64 curLoad = -10000;
 
@@ -2745,14 +2745,14 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -2760,13 +2760,13 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2790,26 +2790,27 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
     std::string NameOfComp = thisCoolingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
-    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
+    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
-    Array1D_string Groups(NumVariables);                      // Groups for each variable
-    Array1D_string Names(NumVariables);                       // Variable Names for each variable
+    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
+    Array1D_string Groups(NumVariables);                             // Groups for each variable
+    Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
         ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
     }
 
-    GetMeteredVariables(*state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    GetMeteredVariables(
+        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_EQ(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "COOLING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
@@ -2845,14 +2846,14 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -2860,13 +2861,13 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2890,30 +2891,110 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
     std::string NameOfComp = thisHeatingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
-    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
+    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
-    Array1D_string Groups(NumVariables);                      // Groups for each variable
-    Array1D_string Names(NumVariables);                       // Variable Names for each variable
+    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
+    Array1D_string Groups(NumVariables);                             // Groups for each variable
+    Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
         ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
     }
 
-    GetMeteredVariables(*state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    GetMeteredVariables(
+        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_EQ(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "HEATING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
 
-#pragma clang diagnostic pop
-#pragma clang diagnostic pop
+TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
 
+    // set up the plant loops
+    // first the load side
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.010;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+
+    // call for all initialization
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
+
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+
+    // assign the plant sizing data
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+
+    // call with run flag ON, flow locked at nonzero both
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    thisCoolingPLHP->running = true;
+    thisCoolingPLHP->sizeLoadSide(*state);
+    thisCoolingPLHP->sizeSrcSideASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_TRUE(thisCoolingPLHP->running);
+}
+
+#pragma clang diagnostic pop
+#pragma clang diagnostic pop

@@ -50,6 +50,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <memory>
 #include <unordered_set>
 
 #include <ObjexxFCL/Array1S.hh>
@@ -71,6 +72,8 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include <fmt/os.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -102,25 +105,27 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
-std::unique_ptr<InputProcessor> inputProcessor = nullptr;
-
-InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new IdfParser())), data(std::unique_ptr<DataStorage>(new DataStorage()))
+InputProcessor::InputProcessor() : idf_parser(std::make_unique<IdfParser>()), data(std::make_unique<DataStorage>())
 {
     auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
-    schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
+    schema = json::from_cbor(embeddedEpJSONSchema);
 
     const json &loc = schema["properties"];
     caseInsensitiveObjectMap.reserve(loc.size());
     for (auto it = loc.begin(); it != loc.end(); ++it) {
         caseInsensitiveObjectMap.emplace(convertToUpper(it.key()), it.key());
     }
-
-    validation = std::unique_ptr<Validation>(new Validation(&schema));
+    idf_parser = std::make_unique<IdfParser>();
+    data = std::make_unique<DataStorage>();
+    epJSON = json::object();
+    //    objectCacheMap.clear();
+    //    unusedInputs.clear();
+    validation = std::make_unique<Validation>(&schema);
 }
 
 std::unique_ptr<InputProcessor> InputProcessor::factory()
 {
-    auto ret = std::unique_ptr<InputProcessor>(new InputProcessor());
+    auto ret = std::make_unique<InputProcessor>();
     return ret;
 }
 
@@ -178,16 +183,14 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 
 // Functions
 
-void InputProcessor::clear_state()
-{
-    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-    data = std::unique_ptr<DataStorage>(new DataStorage());
-    epJSON = json::object();
-    objectCacheMap.clear();
-    unusedInputs.clear();
-
-    validation = std::unique_ptr<Validation>(new Validation(&schema));
-}
+// void InputProcessor::clear_state() {
+//    idf_parser = std::make_unique<IdfParser>();
+//    data = std::make_unique<DataStorage>();
+//    epJSON = json::object();
+//    objectCacheMap.clear();
+//    unusedInputs.clear();
+//    validation = std::make_unique<Validation>(&schema);
+//}
 
 std::vector<std::string> const &InputProcessor::validationErrors()
 {
@@ -252,43 +255,14 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput(EnergyPlusData &state)
 {
-    std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
-    if (!input_stream.is_open()) {
-        ShowFatalError(state, "Input file path " + DataStringGlobals::inputFileName + " not found");
+    if (!FileSystem::fileExists(state.dataStrGlobals->inputFilePath)) {
+        ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFilePath.string() + " not found");
         return;
     }
 
-    // For some reason this does not work properly on Windows. This will be faster so should investigate in future.
-    // std::ifstream::pos_type size = input_stream.tellg();
-    // char *memblock = new char[(size_t) size + 1];
-    // input_stream.seekg(0, std::ios::beg);
-    // input_stream.read(memblock, size);
-    // memblock[size] = '\0';
-    // input_stream.close();
-    // std::string input_file = memblock;
-    // delete[] memblock;
-
-    // Potential C approach to reading file
-    // std::vector<char> v;
-    // if (FILE *fp = fopen("filename", "r"))
-    // {
-    //  char buf[1024];
-    //  while (size_t len = fread(buf, 1, sizeof(buf), fp))
-    //      v.insert(v.end(), buf, buf + len);
-    //  fclose(fp);
-    // }
-
     try {
         if (!state.dataGlobal->isEpJSON) {
-            std::string input_file;
-            std::string line;
-            while (std::getline(input_stream, line)) {
-                input_file.append(line + '\n');
-            }
-            if (input_file.empty()) {
-                ShowFatalError(state, "Failed to read input file: " + DataStringGlobals::inputFileName);
-                return;
-            }
+            auto input_file = FileSystem::readFile(state.dataStrGlobals->inputFilePath);
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
@@ -296,23 +270,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
             if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
                 cleanEPJSON(epJSONClean);
-                input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
-                // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
-                std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
-                FileSystem::makeNativePath(convertedIDF);
-                std::ofstream convertedFS(convertedIDF, std::ofstream::out);
-                convertedFS << input_file << std::endl;
+                fs::path convertedIDF = FileSystem::makeNativePath(
+                    FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
+                FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
             }
-        } else if (state.dataGlobal->isCBOR) {
-            epJSON = json::from_cbor(input_stream);
-        } else if (state.dataGlobal->isMsgPack) {
-            epJSON = json::from_msgpack(input_stream);
-        } else if (state.dataGlobal->isUBJSON) {
-            epJSON = json::from_ubjson(input_stream);
-        } else if (state.dataGlobal->isBSON) {
-            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_stream);
+            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath);
         }
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());
@@ -322,18 +285,18 @@ void InputProcessor::processInput(EnergyPlusData &state)
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors(state);
     bool versionMatch = checkVersionMatch(state);
+    bool unsupportedFound = checkForUnsupportedObjects(state);
 
-    if (!is_valid || hasErrors) {
+    if (!is_valid || hasErrors || unsupportedFound) {
         ShowFatalError(state, "Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
-            std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
-            FileSystem::makeNativePath(convertedEpJSON);
-            std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
-            convertedFS << encoded << std::endl;
+            fs::path convertedEpJSON = FileSystem::makeNativePath(
+                FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
+            FileSystem::writeFile<FileSystem::FileTypes::IDF>(convertedEpJSON, encoded);
         } else {
             ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }
@@ -346,12 +309,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
     int MaxNumeric = 0;
     getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
 
-    DataIPShortCuts::cAlphaFieldNames.allocate(MaxAlpha);
-    DataIPShortCuts::cAlphaArgs.allocate(MaxAlpha);
-    DataIPShortCuts::lAlphaFieldBlanks.dimension(MaxAlpha, false);
-    DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
-    DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
-    DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+    state.dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state.dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state.dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state.dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state.dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state.dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     reportIDFRecordsStats(state);
 }
@@ -362,7 +325,7 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
-            std::string v = version["version_identifier"];
+            std::string v = version["version_identifier"].get<std::string>();
             if (v.empty()) {
                 ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
@@ -381,6 +344,121 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
         }
     }
     return true;
+}
+
+bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
+{
+    bool errorsFound = false;
+    static constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                             "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                             "HVACTemplate:Zone:BaseboardHeat",
+                                                                             "HVACTemplate:Zone:FanCoil",
+                                                                             "HVACTemplate:Zone:PTAC",
+                                                                             "HVACTemplate:Zone:PTHP",
+                                                                             "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                             "HVACTemplate:Zone:VRF",
+                                                                             "HVACTemplate:Zone:Unitary",
+                                                                             "HVACTemplate:Zone:VAV",
+                                                                             "HVACTemplate:Zone:VAV:FanPowered",
+                                                                             "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                             "HVACTemplate:Zone:ConstantVolume",
+                                                                             "HVACTemplate:Zone:DualDuct",
+                                                                             "HVACTemplate:System:VRF",
+                                                                             "HVACTemplate:System:Unitary",
+                                                                             "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                             "HVACTemplate:System:UnitarySystem",
+                                                                             "HVACTemplate:System:VAV",
+                                                                             "HVACTemplate:System:PackagedVAV",
+                                                                             "HVACTemplate:System:ConstantVolume",
+                                                                             "HVACTemplate:System:DualDuct",
+                                                                             "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                             "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                             "HVACTemplate:Plant:Chiller",
+                                                                             "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                             "HVACTemplate:Plant:Tower",
+                                                                             "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                             "HVACTemplate:Plant:HotWaterLoop",
+                                                                             "HVACTemplate:Plant:Boiler",
+                                                                             "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                             "HVACTemplate:Plant:MixedWaterLoop"};
+
+    // For EnergyPlus, there is no option to convert or allow these objects
+    bool objectFound = false;
+    std::string objectType;
+    for (size_t count = 0; count < hvacTemplateObjects.size(); ++count) {
+        objectType = hvacTemplateObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        ShowSevereError(state, "HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
+        ShowContinueError(state, "You must run the ExpandObjects program on this input.");
+        errorsFound = true;
+    }
+
+    static constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                         "GroundHeatTransfer:Slab:Materials",
+                                                                         "GroundHeatTransfer:Slab:MatlProps",
+                                                                         "GroundHeatTransfer:Slab:BoundConds",
+                                                                         "GroundHeatTransfer:Slab:BldgProps",
+                                                                         "GroundHeatTransfer:Slab:Insulation",
+                                                                         "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                         "GroundHeatTransfer:Slab:AutoGrid",
+                                                                         "GroundHeatTransfer:Slab:ManualGrid",
+                                                                         "GroundHeatTransfer:Slab:XFACE",
+                                                                         "GroundHeatTransfer:Slab:YFACE",
+                                                                         "GroundHeatTransfer:Slab:ZFACE",
+                                                                         "GroundHeatTransfer:Basement:SimParameters",
+                                                                         "GroundHeatTransfer:Basement:MatlProps",
+                                                                         "GroundHeatTransfer:Basement:Insulation",
+                                                                         "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                         "GroundHeatTransfer:Basement:BldgData",
+                                                                         "GroundHeatTransfer:Basement:Interior",
+                                                                         "GroundHeatTransfer:Basement:ComBldg",
+                                                                         "GroundHeatTransfer:Basement:EquivSlab",
+                                                                         "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                         "GroundHeatTransfer:Basement:AutoGrid",
+                                                                         "GroundHeatTransfer:Basement:ManualGrid",
+                                                                         "GroundHeatTransfer:Basement:XFACE",
+                                                                         "GroundHeatTransfer:Basement:YFACE",
+                                                                         "GroundHeatTransfer:Basement:ZFACE"};
+
+    objectFound = false;
+    for (size_t count = 0; count < groundHTObjects.size(); ++count) {
+        objectType = groundHTObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        ShowSevereError(state, "GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.");
+        ShowContinueError(state, "You must run the ExpandObjects program on this input.");
+        errorsFound = true;
+    }
+
+    static constexpr std::array<std::string_view, 4> parametricObjects = {
+        "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
+
+    objectFound = false;
+    for (size_t count = 0; count < parametricObjects.size(); ++count) {
+        objectType = parametricObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        ShowSevereError(state, "Parametric:* objects found. These objects are not supported directly by EnergyPlus.");
+        ShowContinueError(state, "You must run the ParametricPreprocesor program on this input.");
+        errorsFound = true;
+    }
+    return errorsFound;
 }
 
 bool InputProcessor::processErrors(EnergyPlusData &state)
@@ -495,7 +573,7 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
         auto const &default_val = find_default.value();
         if (default_val.is_string() && !default_val.get<std::string>().empty()) {
             // autosize and autocalculate
-            default_value = -99999;
+            default_value = DataGlobalConstants::AutoCalculate;
         } else if (default_val.is_number_integer()) {
             default_value = default_val.get<std::int64_t>();
         } else {
@@ -542,6 +620,117 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a string.
+    // If the field is not present in ep_object then return its default if there is one, or return an empty string
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    std::string value;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_string()) {
+            auto valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
+            value = valuePair.first;
+            isDefaulted = valuePair.second;
+        } else {
+            assert(false); // String value requested but field type is numeric
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = "";
+        }
+    }
+    return value;
+}
+
+Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a Real64.
+    // If the field value is a string, then assum autosize and return DataGlobalConstants::AutoCalculate(-99999).
+    // If the field is not present in ep_object then return its default if there is one, or return 0.0
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    Real64 value = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = field_value.get<double>();
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(value, schema_field_obj);
+            } else {
+                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
+    // If the field value is a string, then assume autosize or autocalulate and return DataGlobalConstants::AutoCalculate(-99999).
+    // If the field is not present in ep_object then return its default if there is one, or return 0
+
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    int value = 0;
+    Real64 defaultValue = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = nint(field_value.get<double>());
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(defaultValue, schema_field_obj);
+            } else {
+                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(defaultValue, schema_field_obj);
+        if (isDefaulted) {
+            value = nint(defaultValue);
+        } else {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
+{
+    auto const &schema_properties = schema.at("properties");
+    const json &object_schema = schema_properties.at(objectWord);
+    assert(!object_schema.empty()); // If this fails, the object type does not exist in the schema
+
+    auto const &schema_obj_props = getPatternProperties(state, object_schema);
+    return schema_obj_props;
+}
+
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
 {
     std::pair<std::string, bool> output;
@@ -563,20 +752,23 @@ const json &InputProcessor::getObjectInstances(std::string const &ObjType)
     return epJSON.find(ObjType).value();
 }
 
-InputProcessor::MaxFields InputProcessor::findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd)
+InputProcessor::MaxFields InputProcessor::findMaxFields(
+    EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields)
 {
     InputProcessor::MaxFields maxFields;
     if (!state.dataGlobal->isEpJSON) {
         auto found_idf_max_fields = ep_object.find("idf_max_fields");
         if (found_idf_max_fields != ep_object.end()) {
-            maxFields.max_fields = *found_idf_max_fields;
+            maxFields.max_fields = found_idf_max_fields->get<size_t>();
         }
         auto found_idf_max_extensible_fields = ep_object.find("idf_max_extensible_fields");
         if (found_idf_max_extensible_fields != ep_object.end()) {
-            maxFields.max_extensible_fields = *found_idf_max_extensible_fields;
+            maxFields.max_extensible_fields = found_idf_max_extensible_fields->get<size_t>();
         }
     } else {
         auto const &legacy_idd_fields = legacy_idd["fields"];
+        // start with at least min_fields as the number of fields
+        maxFields.max_fields = min_fields;
         for (auto const &field : ep_object.items()) {
             auto const &field_key = field.key();
             if (field_key == extension_key) continue;
@@ -670,7 +862,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
                 if (is_empty) {
                     findDefault(Numbers(numeric_index), schema_field_obj);
                 } else {
-                    Numbers(numeric_index) = -99999; // autosize and autocalculate
+                    Numbers(numeric_index) = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
                 }
                 if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
             }
@@ -691,13 +883,13 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
         }
     }
     if (field_type == "a") {
-        if (within_max_fields) NumAlphas++;
+        if (within_max_fields) NumAlphas = alpha_index;
         if (is_AlphaFieldNames) {
             AlphaFieldNames()(alpha_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
         alpha_index++;
     } else if (field_type == "n") {
-        if (within_max_fields) NumNumbers++;
+        if (within_max_fields) NumNumbers = numeric_index;
         if (is_NumericFieldNames) {
             NumericFieldNames()(numeric_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
@@ -764,6 +956,11 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     auto const &legacy_idd_fields = legacy_idd["fields"];
     auto const &schema_name_field = epJSON_schema_it_val.find("name");
     auto const has_idd_name_field = schema_name_field != epJSON_schema_it_val.end();
+    auto const &found_min_fields = epJSON_schema_it_val.find("min_fields");
+    size_t min_fields = 0;
+    if (found_min_fields != epJSON_schema_it_val.end()) {
+        min_fields = found_min_fields.value().get<size_t>();
+    }
 
     auto key = legacy_idd.find("extension");
     std::string extension_key;
@@ -777,7 +974,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
 
     int alpha_index = 1;
     int numeric_index = 1;
-    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd);
+    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd, min_fields);
 
     Alphas = "";
     Numbers = 0;
@@ -800,7 +997,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     }
 
     for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
-        std::string const &field = legacy_idd_fields[i];
+        std::string const &field = legacy_idd_fields[i].get<std::string>();
         auto const &field_info = legacy_idd_field_info.find(field);
         auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
@@ -855,7 +1052,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
             for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                 auto const &epJSON_extension_obj = it.value();
                 for (size_t i = 0; i < legacy_idd_extensibles.size(); i++, extensible_count++) {
-                    std::string const &field_name = legacy_idd_extensibles[i];
+                    std::string const &field_name = legacy_idd_extensibles[i].get<std::string>();
                     auto const &field_info = legacy_idd_field_info.find(field_name);
                     auto const &field_info_val = field_info.value();
 
@@ -914,7 +1111,7 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Objec
 
     // get list of saved object numbers from idf processing
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        int objNum = it.value()["idf_order"];
+        int objNum = it.value()["idf_order"].get<int>();
         idfObjNums.emplace_back(objNum);
     }
 
@@ -957,7 +1154,7 @@ int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Obje
 
     // get list of saved object numbers from idf processing
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        int objNum = it.value()["idf_order"];
+        int objNum = it.value()["idf_order"].get<int>();
         idfObjNums.emplace_back(objNum);
     }
 
@@ -1039,7 +1236,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value().get<std::string>()) == upperObjName)) {
             found = true;
             break;
         }
@@ -1278,18 +1475,18 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     // Traverses the IDF Records looking at each field vs object definition for defaults and autosize.
 
     // Reset the globals
-    DataOutputs::iNumberOfRecords = 0;             // Number of IDF Records
-    DataOutputs::iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
-    DataOutputs::iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
-    DataOutputs::iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
-    DataOutputs::iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
-    DataOutputs::iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
-    DataOutputs::iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
+    state.dataOutput->iNumberOfRecords = 0;             // Number of IDF Records
+    state.dataOutput->iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
+    state.dataOutput->iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
+    state.dataOutput->iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
+    state.dataOutput->iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
+    state.dataOutput->iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
+    state.dataOutput->iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
 
     auto const &schema_properties = schema.at("properties");
 
     // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
-    auto processField = [](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
+    auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) {
         bool hasDefault = false;
         bool canBeAutosized = false;
         bool canBeAutocalculated = false;
@@ -1300,7 +1497,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
 
         auto const &default_it = schema_field_obj.find("default");
         if (default_it != schema_field_obj.end()) {
-            ++DataOutputs::iTotalFieldsWithDefaults;
+            ++state.dataOutput->iTotalFieldsWithDefaults;
             hasDefault = true;
             auto const &default_val = default_it.value();
             if (default_val.is_string()) {
@@ -1313,14 +1510,14 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             for (auto const &anyOf : anyOf_it.value()) {
                 auto const &enum_it = anyOf.find("enum");
                 if (enum_it != anyOf.end()) {
-                    for (auto const &e: enum_it.value()) {
+                    for (auto const &e : enum_it.value()) {
                         if (e.is_string()) {
                             auto const &enumVal = e.get<std::string>();
                             if (enumVal == "Autosize") {
-                                ++DataOutputs::iTotalAutoSizableFields;
+                                ++state.dataOutput->iTotalAutoSizableFields;
                                 canBeAutosized = true;
                             } else if (enumVal == "Autocalculate") {
-                                ++DataOutputs::iTotalAutoCalculatableFields;
+                                ++state.dataOutput->iTotalAutoCalculatableFields;
                                 canBeAutocalculated = true;
                             }
                         }
@@ -1341,23 +1538,21 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
                 // * if "AutoSize" is entered for an autosizable field, the result is "Autosize"
                 // * if "AutoSize" is entered for an autocalculatable field, the result is "Autocalculate"
                 if (canBeAutosized && (val == "Autosize")) {
-                    ++DataOutputs::iNumberOfAutoSizedFields;
+                    ++state.dataOutput->iNumberOfAutoSizedFields;
                 } else if (canBeAutocalculated && (val == "Autocalculate")) {
-                    ++DataOutputs::iNumberOfAutoCalcedFields;
+                    ++state.dataOutput->iNumberOfAutoCalcedFields;
                 }
             }
         } else if (hasDefault) {
             // Not found: was defaulted
-            ++DataOutputs::iNumberOfDefaultedFields;
+            ++state.dataOutput->iNumberOfDefaultedFields;
             if (canBeAutosized && (defaultValue == "Autosize")) {
-                ++DataOutputs::iNumberOfAutoSizedFields;
+                ++state.dataOutput->iNumberOfAutoSizedFields;
             } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
-                ++DataOutputs::iNumberOfAutoCalcedFields;
+                ++state.dataOutput->iNumberOfAutoCalcedFields;
             }
         }
     };
-
-
 
     // Loop on all objectTypes
     for (auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter) {
@@ -1382,24 +1577,24 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             extension_key = key.value().get<std::string>();
         }
 
-        for (auto const &ep_object: objects) {
+        for (auto const &ep_object : objects) {
 
             // Count number of objects
-            ++DataOutputs::iNumberOfRecords;
+            ++state.dataOutput->iNumberOfRecords;
 
             // Loop on all regular fields
             for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
 
-                std::string const &field = legacy_idd_fields[i];
+                std::string const &field = legacy_idd_fields[i].get<std::string>();
 
                 // This is weird, but some objects like Building have a Name default... and it's not in the patternProperties
                 if (has_idd_name_field && field == "name") {
                     auto const &name_iter = schema_name_field.value();
                     if (name_iter.find("default") != name_iter.end()) {
-                        ++DataOutputs::iTotalFieldsWithDefaults;
+                        ++state.dataOutput->iTotalFieldsWithDefaults;
                         auto it = ep_object.find(field);
                         if (it == ep_object.end()) {
-                            ++DataOutputs::iNumberOfDefaultedFields;
+                            ++state.dataOutput->iNumberOfDefaultedFields;
                         }
                     }
                     continue;
@@ -1422,7 +1617,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
                     for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                         auto const &epJSON_extension_obj = it.value();
                         for (size_t i = 0; i < legacy_idd_extensibles.size(); ++i) {
-                            std::string const &field = legacy_idd_extensibles[i];
+                            std::string const &field = legacy_idd_extensibles[i].get<std::string>();
                             auto const &schema_extension_field_obj = schema_extension_fields[field];
 
                             processField(field, epJSON_extension_obj, schema_extension_field_obj);
@@ -1432,7 +1627,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             } // End extensible fields
 
         } // End loop on each object of a given objectType
-    } // End loop on all objectTypes
+    }     // End loop on all objectTypes
 }
 
 void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
@@ -1455,8 +1650,8 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
         ShowWarningError(state, "The following lines are \"Unused Objects\".  These objects are in the input");
         ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
         if (!state.dataGlobal->DisplayAllWarnings) {
-            ShowContinueError(state,
-                " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
+            ShowContinueError(
+                state, " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
         } else {
             ShowContinueError(state, " Each unused object is shown.");
         }
@@ -1558,62 +1753,68 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     int CountM;
     std::string Multiples;
 
-    DataIPShortCuts::cCurrentModuleObject = "Output:PreprocessorMessage";
-    NumPrePM = getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+    state.dataIPShortCut->cCurrentModuleObject = "Output:PreprocessorMessage";
+    NumPrePM = getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
     if (NumPrePM > 0) {
-        getObjectDefMaxArgs(state, DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
-        DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
+        getObjectDefMaxArgs(state, state.dataIPShortCut->cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state.dataIPShortCut->cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
             getObjectItem(state,
-                          DataIPShortCuts::cCurrentModuleObject,
+                          state.dataIPShortCut->cCurrentModuleObject,
                           CountP,
-                          DataIPShortCuts::cAlphaArgs,
+                          state.dataIPShortCut->cAlphaArgs,
                           NumAlphas,
-                          DataIPShortCuts::rNumericArgs,
+                          state.dataIPShortCut->rNumericArgs,
                           NumNumbers,
                           IOStat,
-                          DataIPShortCuts::lNumericFieldBlanks,
-                          DataIPShortCuts::lAlphaFieldBlanks,
-                          DataIPShortCuts::cAlphaFieldNames,
-                          DataIPShortCuts::cNumericFieldNames);
-            if (DataIPShortCuts::cAlphaArgs(1).empty()) DataIPShortCuts::cAlphaArgs(1) = "Unknown";
+                          state.dataIPShortCut->lNumericFieldBlanks,
+                          state.dataIPShortCut->lAlphaFieldBlanks,
+                          state.dataIPShortCut->cAlphaFieldNames,
+                          state.dataIPShortCut->cNumericFieldNames);
+            if (state.dataIPShortCut->cAlphaArgs(1).empty()) state.dataIPShortCut->cAlphaArgs(1) = "Unknown";
             if (NumAlphas > 3) {
                 Multiples = "s";
             } else {
                 Multiples = BlankString;
             }
-            if (DataIPShortCuts::cAlphaArgs(2).empty()) DataIPShortCuts::cAlphaArgs(2) = "Unknown";
+            if (state.dataIPShortCut->cAlphaArgs(2).empty()) state.dataIPShortCut->cAlphaArgs(2) = "Unknown";
             {
-                auto const errorType(uppercased(DataIPShortCuts::cAlphaArgs(2)));
+                auto const errorType(uppercased(state.dataIPShortCut->cAlphaArgs(2)));
                 if (errorType == "INFORMATION") {
-                    ShowMessage(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                "\" has the following Information message" + Multiples + ':');
+                    ShowMessage(state,
+                                state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\" has the following Information message" + Multiples + ':');
                 } else if (errorType == "WARNING") {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                     "\" has the following Warning condition" + Multiples + ':');
+                    ShowWarningError(state,
+                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                         "\" has the following Warning condition" + Multiples + ':');
                 } else if (errorType == "SEVERE") {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                    "\" has the following Severe condition" + Multiples + ':');
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        "\" has the following Severe condition" + Multiples + ':');
                 } else if (errorType == "FATAL") {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                    "\" has the following Fatal condition" + Multiples + ':');
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        "\" has the following Fatal condition" + Multiples + ':');
                     PreP_Fatal = true;
                 } else {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has the following " +
-                                    DataIPShortCuts::cAlphaArgs(2) + " condition" + Multiples + ':');
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        "\" has the following " + state.dataIPShortCut->cAlphaArgs(2) + " condition" + Multiples + ':');
                 }
             }
             CountM = 3;
             if (CountM > NumAlphas) {
-                ShowContinueError(state, DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs(1) +
-                                  " audit trail or error file for possible reasons.");
+                ShowContinueError(state,
+                                  state.dataIPShortCut->cCurrentModuleObject + " was blank.  Check " + state.dataIPShortCut->cAlphaArgs(1) +
+                                      " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
-                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
-                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
+                if (len(state.dataIPShortCut->cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaArgs(CountM) + state.dataIPShortCut->cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {
-                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM));
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaArgs(CountM));
                     ++CountM;
                 }
             }
@@ -1661,8 +1862,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string extension_key;
-    DataOutputs::OutputVariablesForSimulation.reserve(1024);
-    DataOutputs::MaxConsideredOutputVariables = 10000;
+    state.dataOutput->OutputVariablesForSimulation.reserve(1024);
+    state.dataOutput->MaxConsideredOutputVariables = 10000;
 
     // Output Variable
     auto epJSON_objects = epJSON.find(OutputVariable);
@@ -1672,9 +1873,9 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             auto it = fields.find("key_value");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(state, it.value(), fields.at("variable_name"));
+                addRecordToOutputVariableStructure(state, it.value().get<std::string>(), fields.at("variable_name").get<std::string>());
             } else {
-                addRecordToOutputVariableStructure(state, "*", fields.at("variable_name"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("variable_name").get<std::string>());
             }
         }
     }
@@ -1692,9 +1893,10 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(state, it.value(), extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(
+                        state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
                 } else {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name").get<std::string>());
                 }
             }
         }
@@ -1713,9 +1915,10 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(state, it.value(), extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(
+                        state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
                 } else {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name").get<std::string>());
                 }
             }
         }
@@ -1728,9 +1931,10 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             auto it = fields.find("output_variable_or_output_meter_index_key_name");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(state, it.value(), fields.at("output_variable_or_output_meter_name"));
+                addRecordToOutputVariableStructure(
+                    state, it.value().get<std::string>(), fields.at("output_variable_or_output_meter_name").get<std::string>());
             } else {
-                addRecordToOutputVariableStructure(state, "*", fields.at("output_variable_or_output_meter_name"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("output_variable_or_output_meter_name").get<std::string>());
             }
         }
     }
@@ -1743,7 +1947,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
         }
     }
 
-    for (auto const & requestedVar : state.dataOutputProcessor->apiVarRequests) {
+    for (auto const &requestedVar : state.dataOutputProcessor->apiVarRequests) {
         addRecordToOutputVariableStructure(state, requestedVar.varKey, requestedVar.varName);
     }
 
@@ -1753,9 +1957,9 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             if (!obj.key().empty()) {
-                addRecordToOutputVariableStructure(state, obj.key(), fields.at("key_value"));
+                addRecordToOutputVariableStructure(state, obj.key(), fields.at("key_value").get<std::string>());
             } else {
-                addRecordToOutputVariableStructure(state, "*", fields.at("key_value"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("key_value").get<std::string>());
             }
         }
     }
@@ -1772,7 +1976,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_name").get<std::string>());
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }
@@ -1792,7 +1996,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                    addRecordToOutputVariableStructure(
+                        state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name").get<std::string>());
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }
@@ -1812,7 +2017,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
+                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name").get<std::string>());
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
@@ -1933,9 +2138,9 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
         addRecordToOutputVariableStructure(state, "*", "COOLING TOWER MASS FLOW RATE");
 
     } else if (reportName == "BOILERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");  // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");         // on meter
         addRecordToOutputVariableStructure(state, "*", "BOILER NATURALGAS CONSUMPTION"); // on meter
-        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");  // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");         // on meter
         addRecordToOutputVariableStructure(state, "*", "BOILER HEATING RATE");
         addRecordToOutputVariableStructure(state, "*", "BOILER NATURALGAS CONSUMPTION RATE");
         addRecordToOutputVariableStructure(state, "*", "BOILER INLET TEMPERATURE");
@@ -1945,7 +2150,7 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
 
     } else if (reportName == "DXREPORTMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
-        addRecordToOutputVariableStructure(state, "*", "COOLING COIL ELECTRICITY ENERGY");      // on meter
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL ELECTRICITY ENERGY");   // on meter
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL SENSIBLE COOLING ENERGY");
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL LATENT COOLING ENERGY");
         addRecordToOutputVariableStructure(state, "*", "COOLING COIL CRANKCASE HEATER ELECTRICITY ENERGY");
@@ -2206,8 +2411,8 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
 
     std::string const VarName(VariableName.substr(0, vnameLen));
 
-    auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
-    if (found == DataOutputs::OutputVariablesForSimulation.end()) {
+    auto const found = state.dataOutput->OutputVariablesForSimulation.find(VarName);
+    if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
         std::unordered_map<std::string,
                            DataOutputs::OutputReportingVariables,
                            UtilityRoutines::case_insensitive_hasher,
@@ -2215,11 +2420,11 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
             data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
-        DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));
+        state.dataOutput->OutputVariablesForSimulation.emplace(VarName, std::move(data));
     } else {
         found->second.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
     }
-    DataOutputs::NumConsideredOutputVariables++;
+    state.dataOutput->NumConsideredOutputVariables++;
 }
 
 } // namespace EnergyPlus

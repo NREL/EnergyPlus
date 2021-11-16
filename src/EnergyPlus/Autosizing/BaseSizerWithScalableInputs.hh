@@ -58,7 +58,8 @@ namespace EnergyPlus {
 
 struct EnergyPlusData;
 
-struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
+struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
+{
 
     bool zoneCoolingOnlyFan = false;
     bool zoneHeatingOnlyFan = false;
@@ -87,15 +88,16 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
     Real64 unitaryHeatCap = 0.0;
 
     int zoneHVACSizingIndex = 0;
-    Array1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
+    EPVector<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
 
     void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
-                            std::string const &_compName,
+                            std::string_view const _compType,
+                            std::string_view const _compName,
                             bool const &_printWarningFlag,
-                            std::string const &_callingRoutine) override;
+                            std::string_view const _callingRoutine) override;
 
-    void clearState() {
+    void clearState()
+    {
         BaseSizerWithFanHeatInputs::clearState();
         zoneCoolingOnlyFan = false;
         zoneHeatingOnlyFan = false;
@@ -125,14 +127,13 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
     }
 
     void setHVACSizingIndexData(int const index);
-
 };
 
-struct BaseSizerWithScalableInputsData : BaseGlobalStruct {
+struct BaseSizerWithScalableInputsData : BaseGlobalStruct
+{
 
     void clear_state() override
     {
-
     }
 };
 

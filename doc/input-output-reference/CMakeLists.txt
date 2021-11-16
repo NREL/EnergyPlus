@@ -65,7 +65,6 @@ set(INCLUDED_TEX
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-equipment.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-water-heaters.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-condenser-equipment.tex
-    ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-air-distribution.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-airflow-network.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-zone-equipment.tex
@@ -80,6 +79,7 @@ set(INCLUDED_TEX
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-non-zone-equipment.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-solar-collectors.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-pumps.tex
+    ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-heating-and-cooling-coils.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-fans.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-humidifiers-and-dehumidifiers.tex
@@ -118,6 +118,7 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ACStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/AirLoopComponentMatrix.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ChangeoverBypassVAV-ReturnPlenumOrMixer.png
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/CoilSystemWater_HeatRecovery.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithACStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithDCStorageBussDiagram.png

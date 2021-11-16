@@ -86,9 +86,6 @@ namespace MatrixDataManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const TwoDimensional(2);
-
-    int NumMats; // number of matracies in input file
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -101,10 +98,14 @@ namespace MatrixDataManager {
     // PUBLIC GetMatrixName
 
     // Object Data
-    Array1D<MatrixDataStruct> MatData;
 
-    // Functions
-
+// MSVC was complaining that it detected a divide by zero in the Row = (El - 1) / NumCols + 1 line, indicating it thought NumCols was zero
+// the compiler should never have been able to identify that, as NumCols is based directly on rNumericArgs, which is based on input values
+// Apparently, interaction between the high level optimizer that does flow-graph transformations and backend that emits warnings can cause
+// false positives.  The warning simply needs to be muted.  Placing the pragma at the statement itself was not sufficient for muting, so I
+// placed the pragma out here at this level and it worked.  Note that this warning was only showing up on release builds, not debug builds
+#pragma warning(push)
+#pragma warning(disable : 4723)
     void GetMatrixInput(EnergyPlusData &state)
     {
 
@@ -117,72 +118,72 @@ namespace MatrixDataManager {
         // PURPOSE OF THIS SUBROUTINE:
         // get input for Matrix objects
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumTwoDimMatrix;            // count of Matrix:TwoDimension objects
-        int MatIndex;                   // do loop counter
-        int MatNum;                     // index management
-        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-        int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int NumTwoDimMatrix;     // count of Matrix:TwoDimension objects
+        int MatIndex;            // do loop counter
+        int MatNum;              // index management
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int IOStatus;            // Used in GetObjectItem
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumRows;
         int NumCols;
         int NumElements;
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
-        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumTwoDimMatrix = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        NumMats = NumTwoDimMatrix;
+        state.dataMatrixDataManager->NumMats = NumTwoDimMatrix;
 
-        MatData.allocate(NumMats);
+        state.dataMatrixDataManager->MatData.allocate(state.dataMatrixDataManager->NumMats);
 
         MatNum = 0;
         for (MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          MatIndex,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          lNumericFieldBlanks,
-                                          _,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     MatIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ++MatNum;
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            MatData(MatNum).Name = cAlphaArgs(1);
-            NumRows = std::floor(rNumericArgs(1));
-            NumCols = std::floor(rNumericArgs(2));
+            state.dataMatrixDataManager->MatData(MatNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            NumRows = std::floor(state.dataIPShortCut->rNumericArgs(1));
+            NumCols = std::floor(state.dataIPShortCut->rNumericArgs(2));
             NumElements = NumRows * NumCols;
 
             // test
             if (NumElements < 1) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Check " + cNumericFieldNames(1) + " and " + cNumericFieldNames(2) +
-                                  " total number of elements in matrix must be 1 or more");
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state,
+                                  "Check " + state.dataIPShortCut->cNumericFieldNames(1) + " and " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                      " total number of elements in matrix must be 1 or more");
                 ErrorsFound = true;
             }
             if ((NumNumbers - 2) < NumElements) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Check input, total number of elements does not agree with " + cNumericFieldNames(1) + " and " +
-                                  cNumericFieldNames(2));
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state,
+                                  "Check input, total number of elements does not agree with " + state.dataIPShortCut->cNumericFieldNames(1) +
+                                      " and " + state.dataIPShortCut->cNumericFieldNames(2));
                 ErrorsFound = true;
             }
-            MatData(MatNum).MatrixType = TwoDimensional;
+            state.dataMatrixDataManager->MatData(MatNum).MatrixType = TwoDimensional;
             // Note With change to row-major arrays the "row" and "col" usage here is transposed
-            auto &matrix(MatData(MatNum).Mat2D);
+            auto &matrix(state.dataMatrixDataManager->MatData(MatNum).Mat2D);
             matrix.allocate(NumCols, NumRows); // This is standard order for a NumRows X NumCols matrix
             Array2<Real64>::size_type l(0);
             for (int ElementNum = 1; ElementNum <= NumElements; ++ElementNum, l += matrix.size()) {
                 int const RowIndex = (ElementNum - 1) / NumCols + 1;
                 int const ColIndex = mod((ElementNum - 1), NumCols) + 1;
-                matrix(ColIndex, RowIndex) = rNumericArgs(ElementNum + 2); // Matrix is read in row-by-row
+                matrix(ColIndex, RowIndex) = state.dataIPShortCut->rNumericArgs(ElementNum + 2); // Matrix is read in row-by-row
             }
         }
 
@@ -190,6 +191,7 @@ namespace MatrixDataManager {
             ShowFatalError(state, "GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination.");
         }
     }
+#pragma warning(pop)
 
     int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName)
     {
@@ -211,15 +213,15 @@ namespace MatrixDataManager {
         int MatrixIndexPtr; // Function result
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
+        auto &GetMatrixInputFlag = state.dataUtilityRoutines->GetMatrixInputFlag;
 
-        if (GetInputFlag) {
+        if (GetMatrixInputFlag) {
             GetMatrixInput(state);
-            GetInputFlag = false;
+            GetMatrixInputFlag = false;
         }
 
-        if (NumMats > 0) {
-            MatrixIndexPtr = UtilityRoutines::FindItemInList(MatrixName, MatData);
+        if (state.dataMatrixDataManager->NumMats > 0) {
+            MatrixIndexPtr = UtilityRoutines::FindItemInList(MatrixName, state.dataMatrixDataManager->MatData);
         } else {
             MatrixIndexPtr = 0;
         }
@@ -227,7 +229,8 @@ namespace MatrixDataManager {
         return MatrixIndexPtr;
     }
 
-    void Get2DMatrix(int const Idx, // pointer index to location in MatData
+    void Get2DMatrix(EnergyPlusData &state,
+                     int const Idx, // pointer index to location in MatData
                      Array2S<Real64> Mat2D)
     {
 
@@ -241,13 +244,14 @@ namespace MatrixDataManager {
         // pass matrix to calling routine
 
         if (Idx > 0) { // protect hard crash
-            Mat2D = MatData(Idx).Mat2D;
+            Mat2D = state.dataMatrixDataManager->MatData(Idx).Mat2D;
         } else {
             // do nothing (?) throw dev error
         }
     }
 
-    void Get2DMatrixDimensions(int const Idx, // pointer index to location in MatData
+    void Get2DMatrixDimensions(EnergyPlusData &state,
+                               int const Idx, // pointer index to location in MatData
                                int &NumRows,
                                int &NumCols)
     {
@@ -262,8 +266,8 @@ namespace MatrixDataManager {
         // <description>
 
         if (Idx > 0) {
-            NumRows = MatData(Idx).Mat2D.isize(2);
-            NumCols = MatData(Idx).Mat2D.isize(1);
+            NumRows = state.dataMatrixDataManager->MatData(Idx).Mat2D.isize(2);
+            NumCols = state.dataMatrixDataManager->MatData(Idx).Mat2D.isize(1);
         } else {
             // do nothing (?) throw dev error?
         }

@@ -51,7 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
@@ -72,11 +72,12 @@ namespace SimulationManager {
 
     void CheckForRequestedReporting(EnergyPlusData &state);
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName);
+    std::unique_ptr<std::ostream>
+    OpenStreamFile(EnergyPlusData &state, const fs::path &fileName, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc));
+
+    std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath);
 
     void OpenOutputFiles(EnergyPlusData &state);
-
-    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles(EnergyPlusData &state);
 
@@ -94,19 +95,20 @@ namespace SimulationManager {
 
 } // namespace SimulationManager
 
-struct SimulationManagerData : BaseGlobalStruct {
+struct SimulationManagerData : BaseGlobalStruct
+{
     bool RunPeriodsInInput = false;
     bool RunControlInInput = false;
     bool PreP_Fatal = false;
     bool WarningOut = true;
-    void clear_state() override {
+    void clear_state() override
+    {
         this->RunPeriodsInInput = false;
         this->RunControlInInput = false;
         this->PreP_Fatal = false;
         this->WarningOut = true;
     }
 };
-
 
 void Resimulate(EnergyPlusData &state,
                 bool &ResimExt, // Flag to resimulate the exterior energy use simulation

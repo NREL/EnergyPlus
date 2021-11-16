@@ -15,60 +15,10 @@
 #include <ObjexxFCL/char.functions.hh>
 
 // C++ Headers
-#include <cctype>
-#include <istream>
 #include <ostream>
+#include <istream>
 
 namespace ObjexxFCL {
-
-	// Has any Character of a Cstring?
-	bool
-	Cstring::has_any_of( Cstring const & s ) const
-	{
-		size_type const s_len( s.length() );
-		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
-			for ( size_type j = 0; j < s_len; ++j ) {
-				if ( str_[ i ] == s.str_[ j ] ) return true;
-			}
-		}
-		return false; // No matches
-	}
-
-	// Has any Character of a cstring?
-	bool
-	Cstring::has_any_of( char const * const s ) const
-	{
-		size_type const s_len( std::strlen( s ) );
-		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
-			for ( size_type j = 0; j < s_len; ++j ) {
-				if ( str_[ i ] == s[ j ] ) return true;
-			}
-		}
-		return false; // No matches
-	}
-
-	// Has any Character of a std::string?
-	bool
-	Cstring::has_any_of( std::string const & s ) const
-	{
-		size_type const s_len( s.length() );
-		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
-			for ( size_type j = 0; j < s_len; ++j ) {
-				if ( str_[ i ] == s[ j ] ) return true;
-			}
-		}
-		return false; // No matches
-	}
-
-	// Has a Character?
-	bool
-	Cstring::has_any_of( char const c ) const
-	{
-		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
-			if ( str_[ i ] == c ) return true;
-		}
-		return false; // No matches
-	}
 
 	// Has a Character?
 	bool
@@ -86,17 +36,6 @@ namespace ObjexxFCL {
 	{
 		for ( size_type i = std::strlen( str_ ); i > 0; --i ) {
 			if ( str_[ i - 1 ] != ' ' ) return i;
-		}
-		return 0;
-	}
-
-	// Length Whitespace-Trimmed
-	Cstring::size_type
-	Cstring::len_trim_whitespace() const
-	{
-		for ( size_type i = std::strlen( str_ ); i > 0; --i ) {
-			char const c( str_[ i - 1 ] );
-			if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\0' ) ) return i;
 		}
 		return 0;
 	}

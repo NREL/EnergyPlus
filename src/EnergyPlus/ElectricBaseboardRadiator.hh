@@ -63,30 +63,6 @@ struct EnergyPlusData;
 
 namespace ElectricBaseboardRadiator {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const BaseboardRadiator_Electric;
-    extern std::string const cCMO_BBRadiator_Electric;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumElecBaseboards;
-    extern Array1D<Real64> QBBElecRadSource;     // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QBBElecRadSrcAvg;     // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
-    extern Array1D<Real64> LastQBBElecRadSrc;  // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Types
-
     struct ElecBaseboardParams
     {
         // Members
@@ -141,14 +117,8 @@ namespace ElectricBaseboardRadiator {
         }
     };
 
-    // Object Data
-    extern Array1D<ElecBaseboardParams> ElecBaseboard;
-    extern Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
-
-    // Functions
-    void clear_state();
-
-    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state,
+                          std::string const &EquipName,
                           int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -180,17 +150,51 @@ namespace ElectricBaseboardRadiator {
 
     void DistributeBBElecRadGains(EnergyPlusData &state);
 
-    void ReportElectricBaseboard(int const BaseboardNum);
+    void ReportElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
 } // namespace ElectricBaseboardRadiator
 
-struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
+struct ElectricBaseboardRadiatorData : BaseGlobalStruct
+{
+    std::string const cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:RadiantConvective:Electric";
 
+    // Object Data
+    int NumElecBaseboards = 0;
+    Array1D<Real64> QBBElecRadSource;     // Need to keep the last value in case we are still iterating
+    Array1D<Real64> QBBElecRadSrcAvg;     // Need to keep the last value in case we are still iterating
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    // Record keeping variables used to calculate QBBRadSrcAvg locally
+    Array1D<Real64> LastQBBElecRadSrc;  // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+    Array1D<ElectricBaseboardRadiator::ElecBaseboardParams> ElecBaseboard;
+    Array1D<ElectricBaseboardRadiator::ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
+    bool GetInputFlag = true; // One time get input flag
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+
+    Array1D_bool MyEnvrnFlag;
     void clear_state() override
     {
-
+        this->MyEnvrnFlag.clear();
+        this->NumElecBaseboards = 0;
+        this->GetInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->QBBElecRadSource.clear();     // Need to keep the last value in case we are still iterating
+        this->QBBElecRadSrcAvg.clear();     // Need to keep the last value in case we are still iterating
+        this->ZeroSourceSumHATsurf.clear(); // Equal to the SumHATsurf for all the walls in a zone with no source
+        this->LastQBBElecRadSrc.clear();    // Need to keep the last value in case we are still iterating
+        this->LastSysTimeElapsed.clear();   // Need to keep the last value in case we are still iterating
+        this->LastTimeStepSys.clear();      // Need to keep the last value in case we are still iterating
+        this->MySizeFlag.clear();
+        this->CheckEquipName.clear();
+        this->ElecBaseboard.clear();
+        this->ElecBaseboardNumericFields.clear();
     }
 };
 

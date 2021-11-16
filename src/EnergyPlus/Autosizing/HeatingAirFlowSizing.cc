@@ -82,9 +82,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                                    this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
                                                    this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow);
                     } else {
-                        if (DataSizing::ZoneCoolingOnlyFan) {
+                        if (state.dataSize->ZoneCoolingOnlyFan) {
                             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
-                        } else if (DataSizing::ZoneHeatingOnlyFan) {
+                        } else if (state.dataSize->ZoneHeatingOnlyFan) {
                             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
                         } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                             this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
@@ -99,9 +99,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         }
                     }
                 } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedCoolingAirflow) {
-                    if (DataSizing::ZoneCoolingOnlyFan) {
+                    if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
-                    } else if (DataSizing::ZoneHeatingOnlyFan) {
+                    } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
@@ -117,9 +117,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                     }
                 } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingAirflow) {
-                    if (DataSizing::ZoneCoolingOnlyFan) {
+                    if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
-                    } else if (DataSizing::ZoneHeatingOnlyFan) {
+                    } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
@@ -135,9 +135,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                     }
                 } else if (SELECT_CASE_var == DataSizing::FlowPerCoolingCapacity) {
-                    if (DataSizing::ZoneCoolingOnlyFan) {
+                    if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
-                    } else if (DataSizing::ZoneHeatingOnlyFan) {
+                    } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
@@ -151,9 +151,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                     }
                 } else if (SELECT_CASE_var == DataSizing::FlowPerHeatingCapacity) {
-                    if (DataSizing::ZoneCoolingOnlyFan) {
+                    if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
-                    } else if (DataSizing::ZoneHeatingOnlyFan) {
+                    } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
@@ -167,7 +167,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                     }
                 } else {
-                    if (DataSizing::ZoneCoolingOnlyFan) {
+                    if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
+                        this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
+                    } else if (state.dataSize->ZoneCoolingOnlyFan) { // probably shouldn't be here
                         this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
                     } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
                         this->autoSizedValue = this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow;
@@ -175,8 +177,6 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
                     } else if (this->zoneHeatingOnlyFan) {
                         this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-                    } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                        this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
                     } else {
                         this->autoSizedValue =
                             max(this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow, this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
@@ -195,8 +195,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         // Parent object sets heating flow rate
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).HeatingAirVolFlow;
                     } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                        this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                                               state.dataEnvrn->StdRhoAir;
+                        this->autoSizedValue =
+                            this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / state.dataEnvrn->StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                     }
@@ -273,7 +273,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s
-        coilSelectionReportObj->setCoilAirFlow(state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(
+            state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
     }
     if (this->isFanReportObject) {
         //  fill fan peak day and time here

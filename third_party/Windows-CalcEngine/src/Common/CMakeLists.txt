@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.5)
 
 set( target_name FenestrationCommon )
 
 # first include header files of this project itself
 
 # make sure to connect to header files of common variables
-# include_directories( src ${PROJECT_SOURCE_DIR}/Common/src )
+# include_directories( src ${CMAKE_SOURCE_DIR}/Common/src )
 
 # collect all source files and add them to the SOURCES list
 file( GLOB SOURCES_CPP "src/*.cpp" )
@@ -24,7 +24,7 @@ install(TARGETS ${target_name}
 
 if( BUILD_WCE_TESTING )
   include_directories( include )
-  file( GLOB all_test_src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" tst/*.cpp )
+  file( GLOB all_test_src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" tst/units/*.cpp )
   set( test_src ${all_test_src} )
   CREATE_TEST_TARGETS_WCE( ${target_name} "${test_src}" "" )
 endif ()

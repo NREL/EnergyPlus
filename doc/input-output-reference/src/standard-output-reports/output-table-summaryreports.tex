@@ -172,6 +172,27 @@ The Outdoor Air Summary report (key: OutdoorAirSummary) produces a report that i
   Minimum Outside Air During Occupied Hours table shows for each zone the average and nominal number of occupants, the zone volume, the minimum air change rate based on mechanical ventilation, infiltration and simple ventilation during occupied hours.
 \end{itemize}
 
+\paragraph{Outdoor Air Details}\label{outdoor-air-details}
+
+The Outdoor Air Details report (key: OutdoorAirDetails) produces a report that includes the following tables. For descriptions of each column, see the Output Details and Examples document.
+
+\begin{itemize}
+\item
+  Mechanical Ventilation Parameters by Zone table shows for each zone the average and nominal number of occupants, the zone volume and area, the design outdoor air flow rate \(V_{oz}\) and the minimum dynamic target ventilation flow rate \(V_{oz-dyn-min}\).
+\item
+  Total Outdoor Air by Zone table shows for each zone the total mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), infiltration, total ventilation plus infiltration, dynamic target ventilation \(V_{oz-dyn}\), the time when total ventilation is below, at, or above \(V_{oz-dyn}\), and the time ventilation is provided when the zone is unoccupied.
+\item
+  Average Outdoor Air During Occupancy by Zone - Flow Rates table shows for each zone the average flow rates when the zone is occupied for mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), infiltration, total ventilation plus infiltration, dynamic target ventilation \(V_{oz-dyn}\) and the time when total ventilation is below, at, or above \(V_{oz-dyn}\).
+\item
+  Total Outdoor Air by AirLoop table shows for each airloop the total mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), sum of the zone dynamic target ventilation \(V_{oz-dyn}\), the time when total ventilation is below, at, or above \(V_{oz-dyn}\), and the time ventilation is provided when all zones are unoccupied.
+\item
+  Average Outdoor Air During Occupancy by AirLoop table shows for each airloop the average flow rates when any zone on the airloop is occupied for mechanical ventilation, natural ventilation, total ventilation (mechanical plus natural), sum of the zone dynamic target ventilation \(V_{oz-dyn}\), and the time when total ventilation is below, at, or above \(V_{oz-dyn}\).
+\item
+  Outdoor Air Controller Limiting Factors by AirLoop table shows for each airloop the time when any zone on the airloop is occupied and various limiting factors control the mechanical ventilation flow rate: no limiting factor, economizer operation, demand controlled ventilation, exhaust flow, high humidity economizer control, night ventilation, limits and scheduled limits, demand limiting, and energy management system override.
+\item
+  Average Outdoor Air for Limiting Factors During Occupancy table shows for each airloop the average mechanical ventilation flow rates when any zone on the airloop is occupied and various limiting factors control the mechanical ventilation flow rate: no limiting factor, economizer operation, demand controlled ventilation, exhaust flow, high humidity economizer control, night ventilation, limits and scheduled limits, demand limiting, and energy management system override.
+\end{itemize}
+
 \paragraph{System Summary}\label{system-summary}
 
 The System Summary Report (key: SystemSummary) produces a report that includes the following tables:
@@ -376,7 +397,11 @@ If the time of the peak load for each Zone for cooling exactly matches the time 
 
 \paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
 
-The Standard 62.1 Summary (key: Standard62.1Summary) produces a report that is consistent with many of the outputs needed when doing calculations consistent with ASHRAE Standard 62.1-2010. The report is generated when sizing calculations are specified. The abbreviations used in the report are consistent with the abbreviations used in Appendix A4 of the Standard. The following tables are part of the report:
+The Standard 62.1 Summary (key: Standard62.1Summary) produces a report that is consistent with many of the outputs needed when doing calculations consistent with ASHRAE Standard 62.1-2010.
+
+\textbf{Note: The report is only generated when sizing calculations are specified.}: in \hyperref[simulationcontrol]{SimulationControl}, ``Do Zone Sizing'' or ``Do System Sizing'' must be set to ``Yes''.
+
+The abbreviations used in the report are consistent with the abbreviations used in Appendix A4 of the Standard. The following tables are part of the report:
 
 \begin{itemize}
 \item

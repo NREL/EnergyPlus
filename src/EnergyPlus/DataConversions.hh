@@ -55,18 +55,18 @@ namespace EnergyPlus {
 
 namespace DataConversions {
 
-    constexpr Real64 CFC(4.1868);               // Specific Heat:  BTU/(LB*R) * CFC = KJ/(KG*K)
+    constexpr Real64 CFC(4.1868); // Specific Heat:  BTU/(LB*R) * CFC = KJ/(KG*K)
     //  above is listed in July 1976 publication as "International Table"
-    constexpr Real64 CFL(0.3048);               // Length:         FT * CFL = M
-    constexpr Real64 CFM(0.45359237);           // Mass:           LB * CFM = KG
-    constexpr Real64 CFA(CFL *CFL);             // Area:           FT**2 * CFA = M**2
-    constexpr Real64 CFT(5.0 / 9.0);            // Temperature:    R * CFT = K
-    constexpr Real64 CFV(CFA *CFL);             // Volume:         FT**3 * CFV = M**3
-    constexpr Real64 CFE(CFC *CFM *CFT / 3.6);  // Energy:         BTU * CFE = W-HR
-    constexpr Real64 CFD(CFM / CFV);            // Density:        LB/FT**3 * CFD = KG/M**3
-    constexpr Real64 CFK(CFE / (CFL * CFT));    // Conductivity:   BTU/(HR*FT*R) * CFK = W/(M*K)
-    constexpr Real64 CFMF(CFM / 3600.0);        // Mass Flow:      LB/HR * CFMF = KG/SEC
-    constexpr Real64 CFU(CFK / CFL);            // U-Value:        BTU/(HR*FT**2*R) * CFU = W/(M**2*K)
+    constexpr Real64 CFL(0.3048);              // Length:         FT * CFL = M
+    constexpr Real64 CFM(0.45359237);          // Mass:           LB * CFM = KG
+    constexpr Real64 CFA(CFL *CFL);            // Area:           FT**2 * CFA = M**2
+    constexpr Real64 CFT(5.0 / 9.0);           // Temperature:    R * CFT = K
+    constexpr Real64 CFV(CFA *CFL);            // Volume:         FT**3 * CFV = M**3
+    constexpr Real64 CFE(CFC *CFM *CFT / 3.6); // Energy:         BTU * CFE = W-HR
+    constexpr Real64 CFD(CFM / CFV);           // Density:        LB/FT**3 * CFD = KG/M**3
+    constexpr Real64 CFK(CFE / (CFL * CFT));   // Conductivity:   BTU/(HR*FT*R) * CFK = W/(M*K)
+    constexpr Real64 CFMF(CFM / 3600.0);       // Mass Flow:      LB/HR * CFMF = KG/SEC
+    constexpr Real64 CFU(CFK / CFL);           // U-Value:        BTU/(HR*FT**2*R) * CFU = W/(M**2*K)
     // Note:  R-Value = 1/U-Value
 
 } // namespace DataConversions

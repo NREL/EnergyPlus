@@ -372,32 +372,6 @@ associated( Reference< T > const & r1, Reference< T > const & r2 )
 	return r1.associated( r2 );
 }
 
-// Associated?
-template< typename T >
-inline
-bool
-ASSOCIATED( Reference< T > const & r )
-{
-	return r.associated();
-}
-
-// Associated with a Given Value?
-template< typename T >
-inline
-bool
-ASSOCIATED( Reference< T > const & r, T const & val )
-{
-	return r.associated( val );
-}
-
-// Associated with a the Same Value?
-template< typename T >
-inline
-bool
-ASSOCIATED( Reference< T > const & r1, Reference< T > const & r2 )
-{
-	return r1.associated( r2 );
-}
 
 // Nullify
 template< typename T >
@@ -415,40 +389,6 @@ void
 NULLIFY( Reference< T > & r )
 {
 	r.nullify();
-}
-
-// Null Pointer
-inline
-Reference< void * >
-null_ptr()
-{
-	return Reference< void * >();
-}
-
-// Null Pointer
-inline
-Reference< void * >
-NULL_PTR()
-{
-	return Reference< void * >();
-}
-
-// Null Pointer of a Reference Type
-template< typename T >
-inline
-Reference< T >
-null_ptr( Reference< T > const & )
-{
-	return Reference< T >();
-}
-
-// Null Pointer of a Reference Type
-template< typename T >
-inline
-Reference< T >
-NULL_PTR( Reference< T > const & )
-{
-	return Reference< T >();
 }
 
 template< typename T >

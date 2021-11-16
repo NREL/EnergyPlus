@@ -60,11 +60,12 @@ struct EnergyPlusData;
 
 namespace ZoneContaminantPredictorCorrector {
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                     int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                                     bool const ShortenTimeStepSys,
-                                     bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                                     Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
+    void
+    ManageZoneContaminanUpdates(EnergyPlusData &state,
+                                DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                                bool const ShortenTimeStepSys,
+                                bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                                Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
     void GetZoneContaminanInputs(EnergyPlusData &state);
@@ -85,7 +86,8 @@ namespace ZoneContaminantPredictorCorrector {
 
     void RevertZoneTimestepHistories(EnergyPlusData &state);
 
-    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
+    void InverseModelCO2(EnergyPlusData &state,
+                         int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
@@ -101,41 +103,45 @@ namespace ZoneContaminantPredictorCorrector {
 
 } // namespace ZoneContaminantPredictorCorrector
 
-    struct ZoneContaminantPredictorCorrectorData : BaseGlobalStruct {
+struct ZoneContaminantPredictorCorrectorData : BaseGlobalStruct
+{
 
-        bool GetZoneAirContamInputFlag; // True when need to get input
-        int TotGCGenConstant;           // Number of constant generic contaminant sources and sinks
-        int TotGCGenPDriven;            // Number of pressure driven generic contaminant sources and sinks
-        int TotGCGenCutoff;             // Number of cutoff model generic contaminant sources and sinks
-        int TotGCGenDecay;              // Number of decay model generic contaminant sources and sinks
-        int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
-        int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
-        int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
-        bool MyOneTimeFlag = true;
-        bool MyEnvrnFlag = true;
-        bool MyDayFlag = true;
-        bool MyConfigOneTimeFlag = true;
+    bool GetZoneAirContamInputFlag; // True when need to get input
+    int TotGCGenConstant;           // Number of constant generic contaminant sources and sinks
+    int TotGCGenPDriven;            // Number of pressure driven generic contaminant sources and sinks
+    int TotGCGenCutoff;             // Number of cutoff model generic contaminant sources and sinks
+    int TotGCGenDecay;              // Number of decay model generic contaminant sources and sinks
+    int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
+    int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
+    int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
+    bool MyOneTimeFlag = true;
+    bool MyEnvrnFlag = true;
+    bool MyDayFlag = true;
+    bool MyConfigOneTimeFlag = true;
 
-        void clear_state() override
-        {
-            this->GetZoneAirContamInputFlag = true;
-            this->TotGCGenConstant = 0;
-            this->TotGCGenPDriven = 0;
-            this->TotGCGenCutoff = 0;
-            this->TotGCGenDecay = 0;
-            this->TotGCBLDiff = 0;
-            this->TotGCDVS = 0;
-            this->TotGCDRS = 0;
-            this->MyOneTimeFlag = true;
-            this->MyEnvrnFlag = true;
-            this->MyDayFlag = true;
-            this->MyConfigOneTimeFlag = true;
-        }
+    void clear_state() override
+    {
+        this->GetZoneAirContamInputFlag = true;
+        this->TotGCGenConstant = 0;
+        this->TotGCGenPDriven = 0;
+        this->TotGCGenCutoff = 0;
+        this->TotGCGenDecay = 0;
+        this->TotGCBLDiff = 0;
+        this->TotGCDVS = 0;
+        this->TotGCDRS = 0;
+        this->MyOneTimeFlag = true;
+        this->MyEnvrnFlag = true;
+        this->MyDayFlag = true;
+        this->MyConfigOneTimeFlag = true;
+    }
 
-        // Default Constructor
-        ZoneContaminantPredictorCorrectorData() : GetZoneAirContamInputFlag(true), TotGCGenConstant(0), TotGCGenPDriven(0),
-                                                  TotGCGenCutoff(0), TotGCGenDecay(0), TotGCBLDiff(0), TotGCDVS(0), TotGCDRS(0) {}
-    };
+    // Default Constructor
+    ZoneContaminantPredictorCorrectorData()
+        : GetZoneAirContamInputFlag(true), TotGCGenConstant(0), TotGCGenPDriven(0), TotGCGenCutoff(0), TotGCGenDecay(0), TotGCBLDiff(0), TotGCDVS(0),
+          TotGCDRS(0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -40,10 +40,8 @@ private: // Friend
 public: // Types
 
 	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
 	typedef  typename Super::Traits  Traits;
 	typedef  typename Super::IR  IR;
-	typedef  typename Super::Initializer  Initializer;
 
 	// STL Style
 	typedef  typename Super::value_type  value_type;
@@ -114,24 +112,20 @@ public: // Creation
 
 	// Copy Constructor
 	Array1D( Array1D const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
+	 Super( a )
 	{}
 
 	// Move Constructor
-	Array1D( Array1D && a ) NOEXCEPT :
-	 Super( std::move( a ) ),
-	 initializer_( a.initializer_ )
+	Array1D( Array1D && a ) noexcept :
+	 Super( std::move( a ) )
 	{
-		a.initializer_.clear();
 	}
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
 	Array1D( Array1D< U > const & a ) :
-	 Super( a ),
-	 initializer_( a.initializer_ )
+	 Super( a )
 	{}
 
 	// Super Constructor Template
@@ -167,13 +161,6 @@ public: // Creation
 		}
 	}
 
-	// Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	explicit
-	Array1D( Sticky< S > const & s ) :
-	 initializer_( s )
-	{}
-
 	// IndexRange Constructor
 	explicit
 	Array1D( IR const & I ) :
@@ -184,46 +171,15 @@ public: // Creation
 
 	// IndexRange + Initializer Value Constructor
 	Array1D( IR const & I, T const & t ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( t );
 	}
 
-	// IndexRange + Sticky Initializer Value Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, U const & u ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		setup_real();
-		initialize( s );
-		assign( u );
-	}
-
 	// IndexRange + Initializer Function Constructor
 	Array1D( IR const & I, InitializerFunction const & fxn ) :
-	 Super( I, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( fxn );
-	}
-
-	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
-	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, InitializerFunction const & fxn ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
+	 Super( I, InitializerSentinel{} )
 	{
 		setup_real();
 		initialize( fxn );
@@ -237,57 +193,21 @@ public: // Creation
 		setup_real();
 	}
 
-	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, std::initializer_list< U > const l ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( size_ == l.size() );
-		setup_real();
-		initialize( s );
-		std::copy( l.begin(), l.end(), data_ );
-	}
-
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array1< U > const & a ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
 		initialize( a );
 	}
 
-	// IndexRange + Sticky Initializer Value + Super Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( IR const & I, Sticky< S > const & s, Array1< U > const & a ) :
-	 Super( I, InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		initialize( s );
-		assign( a );
-	}
 
 	// IndexRange + Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array1S< U > const & a ) :
-	 Super( I, InitializerSentinel() )
-	{
-		assert( conformable( a ) );
-		setup_real();
-		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			initialize( l, a( i ) );
-		}
-	}
-
-	// IndexRange + MArray Constructor Template
-	template< class A, typename M >
-	Array1D( IR const & I, MArray1< A, M > const & a ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -300,7 +220,7 @@ public: // Creation
 	// Super + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( Array1< U > const & a, IR const & I ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( conformable( a ) );
 		setup_real();
@@ -310,7 +230,7 @@ public: // Creation
 	// IndexRange + Base Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( IR const & I, Array< U > const & a ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -320,7 +240,7 @@ public: // Creation
 	// Base + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	Array1D( Array< U > const & a, IR const & I ) :
-	 Super( I, InitializerSentinel() )
+	 Super( I, InitializerSentinel{} )
 	{
 		assert( size_ == a.size() );
 		setup_real();
@@ -363,28 +283,17 @@ public: // Creation
 	// Initializer List Index Range + Initializer Value Constructor Template
 	template< typename U >
 	Array1D( std::initializer_list< U > const l, T const & t ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		setup_real();
 		initialize( t );
 	}
 
-	// Initializer List Index Range + Sticky Initializer Value Constructor Template
-	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
-	Array1D( std::initializer_list< U > const l, Sticky< S > const & s ) :
-	 Super( IR( l ), InitializerSentinel() ),
-	 initializer_( s )
-	{
-		assert( l.size() == 2 );
-		setup_real();
-		initialize( s );
-	}
-
 	// Initializer List Index Range + Initializer Function Constructor Template
 	template< typename U >
 	Array1D( std::initializer_list< U > const l, InitializerFunction const & fxn ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		setup_real();
@@ -394,7 +303,7 @@ public: // Creation
 	// Initializer List Index Range + Super Constructor Template
 	template< typename U, typename V, class = typename std::enable_if< std::is_constructible< T, V >::value >::type >
 	Array1D( std::initializer_list< U > const l, Array1< V > const & a ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		assert( conformable( a ) );
@@ -405,7 +314,7 @@ public: // Creation
 	// Initializer List Index Range + Base Constructor Template
 	template< typename U, typename V, class = typename std::enable_if< std::is_constructible< T, V >::value >::type >
 	Array1D( std::initializer_list< U > const l, Array< V > const & a ) :
-	 Super( IR( l ), InitializerSentinel() )
+	 Super( IR( l ), InitializerSentinel{} )
 	{
 		assert( l.size() == 2 );
 		assert( size_ == a.size() );
@@ -515,24 +424,6 @@ public: // Creation
 		return Array1D( a.isize(), t );
 	}
 
-	// MArray Shape Named Constructor Template
-	template< class A, typename M >
-	static
-	Array1D
-	shape( MArray1< A, M > const & a )
-	{
-		return Array1D( a.isize() );
-	}
-
-	// MArray Shape + Initializer Value Named Constructor Template
-	template< class A, typename M >
-	static
-	Array1D
-	shape( MArray1< A, M > const & a, T const & t )
-	{
-		return Array1D( a.isize(), t );
-	}
-
 	// One-Based Copy Named Constructor Template
 	template< typename U >
 	static
@@ -551,15 +442,6 @@ public: // Creation
 		return Array1D( a.isize(), a );
 	}
 
-	// One-Based MArray Named Constructor Template
-	template< class A, typename M >
-	static
-	Array1D
-	one_based( MArray1< A, M > const & a )
-	{
-		return Array1D( a.isize(), a );
-	}
-
 	// Initializer List One-Based Named Constructor Template
 	template< typename U >
 	static
@@ -571,27 +453,18 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~Array1D()
-	{}
+	~Array1D() = default;
 
 private: // Creation
 
 	// IndexRange Raw Constructor
 	explicit
-	Array1D( IR const & I, InitializerSentinel const & initialized ) :
+	Array1D( IR const & I, InitializerSentinel initialized ) :
 	 Super( I, initialized )
 	{
 		setup_real();
 	}
 
-	// IndexRange Raw Initializer Constructor
-	explicit
-	Array1D( IR const & I, Initializer const & initializer ) :
-	 Super( I, InitializerSentinel() )
-	{
-		setup_real();
-		initialize( initializer );
-	}
 
 public: // Assignment: Array
 
@@ -611,7 +484,7 @@ public: // Assignment: Array
 
 	// Move Assignment
 	Array1D &
-	operator =( Array1D && a ) NOEXCEPT
+	operator =( Array1D && a ) noexcept
 	{
 		if ( conformable( a ) ) {
 			Base::conformable_move( a );
@@ -654,15 +527,6 @@ public: // Assignment: Array
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1D &
 	operator =( Array1S< U > const & a )
-	{
-		Super::operator =( a );
-		return *this;
-	}
-
-	// MArray Assignment Template
-	template< class A, typename M >
-	Array1D &
-	operator =( MArray1< A, M > const & a )
 	{
 		Super::operator =( a );
 		return *this;
@@ -789,42 +653,6 @@ public: // Assignment: Array
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	Array1D &
 	operator /=( Array1S< U > const & a )
-	{
-		Super::operator /=( a );
-		return *this;
-	}
-
-	// += MArray Template
-	template< class A, typename M >
-	Array1D &
-	operator +=( MArray1< A, M > const & a )
-	{
-		Super::operator +=( a );
-		return *this;
-	}
-
-	// -= MArray Template
-	template< class A, typename M >
-	Array1D &
-	operator -=( MArray1< A, M > const & a )
-	{
-		Super::operator -=( a );
-		return *this;
-	}
-
-	// *= MArray Template
-	template< class A, typename M >
-	Array1D &
-	operator *=( MArray1< A, M > const & a )
-	{
-		Super::operator *=( a );
-		return *this;
-	}
-
-	// /= MArray Template
-	template< class A, typename M >
-	Array1D &
-	operator /=( MArray1< A, M > const & a )
 	{
 		Super::operator /=( a );
 		return *this;
@@ -1046,170 +874,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-public: // Assignment: Array: Logical
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Array1< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Array1< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Array1S< U > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Slice Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Array1S< U > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= MArray Template
-	template< class A, typename M >
-	Array1D &
-	and_equals( MArray1< A, M > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= MArray Template
-	template< class A, typename M >
-	Array1D &
-	or_equals( MArray1< A, M > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( std::initializer_list< U > const l )
-	{
-		Super::and_equals( l );
-		return *this;
-	}
-
-	// ||= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( std::initializer_list< U > const l )
-	{
-		Super::or_equals( l );
-		return *this;
-	}
-
-	// &&= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( std::array< U, s > const & a )
-	{
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( std::array< U, s > const & a )
-	{
-		Super::or_equals( a );
-		return *this;
-	}
-
-	// &&= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( std::vector< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( std::vector< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Vector2< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Vector2< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Vector3< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Vector3< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
-	// &&= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	and_equals( Vector4< U > const & v )
-	{
-		Super::and_equals( v );
-		return *this;
-	}
-
-	// ||= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Array1D &
-	or_equals( Vector4< U > const & v )
-	{
-		Super::or_equals( v );
-		return *this;
-	}
-
 public: // Assignment: Value
 
 	// = Value
@@ -1252,33 +916,6 @@ public: // Assignment: Value
 		return *this;
 	}
 
-public: // Subscript
-
-	// Const Tail Starting at array( i )
-	Tail const
-	a( int const i ) const
-	{
-		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), size_ - ( i - shift_ ) );
-	}
-
-	// Tail Starting at array( i )
-	Tail
-	a( int const i )
-	{
-		assert( contains( i ) );
-		return Tail( sdata_ + i, size_ - ( i - shift_ ) );
-	}
-
-public: // Predicate
-
-	// Initializer Active?
-	bool
-	initializer_active() const
-	{
-		return initializer_.active();
-	}
-
 public: // Modifier
 
 	// Clear
@@ -1286,7 +923,6 @@ public: // Modifier
 	clear()
 	{
 		Super::clear();
-		initializer_.clear();
 		return *this;
 	}
 
@@ -1375,22 +1011,15 @@ public: // Modifier
 		} else if ( I.size() <= capacity_ ) { // Use existing capacity
 			size_type const new_size( I.size() );
 			if ( new_size > size_ ) { // Initialize new tail elements
-				if ( initializer_.active() ) { // Sticky initialize
-					T const fill( initializer_() );
-					for ( size_type i = size_; i < new_size; ++i ) {
-						new ( data_ + i ) T( fill );
-					}
-				} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-					T const fill( Traits::initial_array_value() );
+				T const fill( Traits::initial_array_value() );
 #endif
-					for ( size_type i = size_; i < new_size; ++i ) {
+				for ( size_type i = size_; i < new_size; ++i ) {
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-						new ( data_ + i ) T( fill );
+					new ( data_ + i ) T( fill );
 #else
-						new ( data_ + i ) T;
+					new ( data_ + i ) T;
 #endif
-					}
 				}
 			}
 			std::ptrdiff_t const off( I_.l() - I.l() );
@@ -1413,7 +1042,7 @@ public: // Modifier
 			size_ = new_size;
 			return *this;
 		} else { // Allocate new space
-			Array1D o( I, InitializerSentinel() );
+			Array1D o( I, InitializerSentinel{} );
 			auto const l_( l() );
 			auto const I_l_( I.l() );
 			auto const l_max_( std::max( l_, I_l_ ) );
@@ -1421,22 +1050,15 @@ public: // Modifier
 			auto const I_u_( I.u() );
 			auto const u_min_( std::min( u_, I_u_ ) );
 			if ( I_l_ < l_ ) { // Initialize new lower elements
-				if ( initializer_.active() ) { // Sticky initialize
-					T const fill( initializer_() );
-					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) {
-						new ( &o( i ) ) T( fill );
-					}
-				} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-					T const fill( Traits::initial_array_value() );
+				T const fill( Traits::initial_array_value() );
 #endif
-					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) {
+				for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) {
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-						new ( &o( i ) ) T( fill );
+					new ( &o( i ) ) T( fill );
 #else
-						new ( &o( i ) ) T;
+					new ( &o( i ) ) T;
 #endif
-					}
 				}
 			}
 			if ( l_max_ <= u_min_ ) { // Ranges overlap
@@ -1445,22 +1067,15 @@ public: // Modifier
 				}
 			}
 			if ( u_ < I_u_ ) { // Initialize new upper elements
-				if ( initializer_.active() ) { // Sticky initialize
-					T const fill( initializer_() );
-					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) {
-						new ( &o( i ) ) T( fill );
-					}
-				} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-					T const fill( Traits::initial_array_value() );
+				T const fill( Traits::initial_array_value() );
 #endif
-					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) {
+				for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) {
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-						new ( &o( i ) ) T( fill );
+					new ( &o( i ) ) T( fill );
 #else
-						new ( &o( i ) ) T;
+					new ( &o( i ) ) T;
 #endif
-					}
 				}
 			}
 			swap1( o );
@@ -1507,7 +1122,7 @@ public: // Modifier
 			size_ = new_size;
 			return *this;
 		} else { // Allocate new space
-			Array1D o( I, InitializerSentinel() );
+			Array1D o( I, InitializerSentinel{} );
 			auto const l_( l() );
 			auto const I_l_( I.l() );
 			auto const l_max_( std::max( l_, I_l_ ) );
@@ -1555,7 +1170,7 @@ public: // Modifier
 	append( T const & t )
 	{
 		if ( capacity_ == size_ ) { // Grow by 1
-			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel() );
+			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel{} );
 			for ( int i = l(), e = u(); i <= e; ++i ) {
 				new ( &o( i ) ) T( move_if( operator ()( i ) ) );
 			}
@@ -1575,7 +1190,7 @@ public: // Modifier
 	append( T && t )
 	{
 		if ( capacity_ == size_ ) { // Grow by 1
-			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel() );
+			Array1D o( IndexRange( l(), u() + 1 ), InitializerSentinel{} );
 			for ( int i = l(), e = u(); i <= e; ++i ) {
 				new ( &o( i ) ) T( std::move( operator ()( i ) ) );
 			}
@@ -1589,30 +1204,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Set Initializer Value
-	Array1D &
-	initializer( T const & t )
-	{
-		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Sticky Value
-	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
-	Array1D &
-	initializer( Sticky< S > const & s )
-	{
-		initializer_ = s;
-		return *this;
-	}
-
-	// Clear Initializer
-	Array1D &
-	initializer_clear()
-	{
-		initializer_.clear();
-		return *this;
-	}
 
 	// Swap
 	Array1D &
@@ -1620,7 +1211,6 @@ public: // Modifier
 	{
 		using std::swap;
 		swap1( v );
-		swap( initializer_, v.initializer_ );
 		return *this;
 	}
 
@@ -1778,14 +1368,6 @@ public: // std::vector-like API
 		return *this;
 	}
 
-	// Shrink Capacity to Size
-	Array1D &
-	shrink_to_fit()
-	{
-		Base::shrink_capacity();
-		return *this;
-	}
-
 protected: // Functions
 
 	// Dimension by IndexRange
@@ -1799,20 +1381,13 @@ protected: // Functions
 	void
 	initialize()
 	{
-		if ( initializer_.active() ) { // Sticky initialize
-			T const fill( initializer_() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T( fill );
-			}
-		} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
+		std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
 #else
-			for ( size_type i = 0; i < size_; ++i ) {
+		for ( size_type i = 0; i < size_; ++i ) {
 				new ( data_ + i ) T;
 			}
 #endif
-		}
 	}
 
 	// Initialize by Function
@@ -1827,16 +1402,9 @@ protected: // Functions
 	void
 	assign()
 	{
-		if ( initializer_.active() ) { // Sticky initialize
-			T const fill( initializer_() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = fill;
-			}
-		} else { // Default initialize
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::fill_n( data_, size_, Traits::initial_array_value() );
+		std::fill_n( data_, size_, Traits::initial_array_value() );
 #endif
-		}
 	}
 
 private: // Functions
@@ -1888,10 +1456,6 @@ private: // Functions
 		if ( size_real( I ) ) initialize();
 		fxn( *this );
 	}
-
-private: // Data
-
-	Initializer initializer_; // Array initializer
 
 }; // Array1D
 
@@ -2460,506 +2024,6 @@ operator >=( T const & t, Array1S< T > const & b )
 	return ( b <= t );
 }
 
-// Comparison: Elemental: MArray
-
-// MArray == MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) == b( i ) );
-	}
-	return r;
-}
-
-// MArray != MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) != b( i ) );
-	}
-	return r;
-}
-
-// MArray < MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) < b( i ) );
-	}
-	return r;
-}
-
-// MArray <= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) <= b( i ) );
-	}
-	return r;
-}
-
-// MArray > MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) > b( i ) );
-	}
-	return r;
-}
-
-// MArray >= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) >= b( i ) );
-	}
-	return r;
-}
-
-// MArray == Array
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	BArray::size_type l( 0u );
-	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
-		r( i ) = ( a( i ) == b[ l ] );
-	}
-	return r;
-}
-
-// MArray != Array
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	BArray::size_type l( 0u );
-	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
-		r( i ) = ( a( i ) != b[ l ] );
-	}
-	return r;
-}
-
-// MArray < Array
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	BArray::size_type l( 0u );
-	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
-		r( i ) = ( a( i ) < b[ l ] );
-	}
-	return r;
-}
-
-// MArray <= Array
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	BArray::size_type l( 0u );
-	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
-		r( i ) = ( a( i ) <= b[ l ] );
-	}
-	return r;
-}
-
-// MArray > Array
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	BArray::size_type l( 0u );
-	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
-		r( i ) = ( a( i ) > b[ l ] );
-	}
-	return r;
-}
-
-// MArray >= Array
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	BArray::size_type l( 0u );
-	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
-		r( i ) = ( a( i ) >= b[ l ] );
-	}
-	return r;
-}
-
-// Array == MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b == a );
-}
-
-// Array != MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b != a );
-}
-
-// Array < MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b > a );
-}
-
-// Array <= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b >= a );
-}
-
-// Array > MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b < a );
-}
-
-// Array >= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b <= a );
-}
-
-// MArray == Slice
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( MArray1< A, T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) == b( i ) );
-	}
-	return r;
-}
-
-// MArray != Slice
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( MArray1< A, T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) != b( i ) );
-	}
-	return r;
-}
-
-// MArray < Slice
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( MArray1< A, T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) < b( i ) );
-	}
-	return r;
-}
-
-// MArray <= Slice
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( MArray1< A, T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) <= b( i ) );
-	}
-	return r;
-}
-
-// MArray > Slice
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( MArray1< A, T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) > b( i ) );
-	}
-	return r;
-}
-
-// MArray >= Slice
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( MArray1< A, T > const & a, Array1S< T > const & b )
-{
-	assert( conformable( a, b ) );
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) >= b( i ) );
-	}
-	return r;
-}
-
-// Slice == MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( Array1S< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b == a );
-}
-
-// Slice != MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( Array1S< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b != a );
-}
-
-// Slice < MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( Array1S< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b > a );
-}
-
-// Slice <= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( Array1S< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b >= a );
-}
-
-// Slice > MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( Array1S< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b < a );
-}
-
-// Slice >= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( Array1S< T > const & a, MArray1< A, T > const & b )
-{
-	return ( b <= a );
-}
-
-// MArray == Value
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) == t );
-	}
-	return r;
-}
-
-// MArray != Value
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) != t );
-	}
-	return r;
-}
-
-// MArray < Value
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) < t );
-	}
-	return r;
-}
-
-// MArray <= Value
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) <= t );
-	}
-	return r;
-}
-
-// MArray > Value
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) > t );
-	}
-	return r;
-}
-
-// MArray >= Value
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	for ( int i = 1, e = r.u(); i <= e; ++i ) {
-		r( i ) = ( a( i ) >= t );
-	}
-	return r;
-}
-
-// Value == MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator ==( T const & t, MArray1< A, T > const & b )
-{
-	return ( b == t );
-}
-
-// Value != MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator !=( T const & t, MArray1< A, T > const & b )
-{
-	return ( b != t );
-}
-
-// Value < MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <( T const & t, MArray1< A, T > const & b )
-{
-	return ( b > t );
-}
-
-// Value <= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator <=( T const & t, MArray1< A, T > const & b )
-{
-	return ( b >= t );
-}
-
-// Value > MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >( T const & t, MArray1< A, T > const & b )
-{
-	return ( b < t );
-}
-
-// Value >= MArray
-template< class A, typename T >
-inline
-Array1D< bool >
-operator >=( T const & t, MArray1< A, T > const & b )
-{
-	return ( b <= t );
-}
-
 // Generator
 
 // -Array
@@ -3107,27 +2171,6 @@ operator /( T const & t, Array1< T > const & a )
 	return r;
 }
 
-// Array && Array
-template< typename T >
-inline
-Array1D< T >
-operator &&( Array1< T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Array || Array
-template< typename T >
-inline
-Array1D< T >
-operator ||( Array1< T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
 
 // Generator: Slice
 
@@ -3364,284 +2407,6 @@ operator /( T const & t, Array1S< T > const & a )
 	return r;
 }
 
-// Slice && Slice
-template< typename T >
-inline
-Array1D< T >
-operator &&( Array1S< T > const & a, Array1S< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// Slice || Slice
-template< typename T >
-inline
-Array1D< T >
-operator ||( Array1S< T > const & a, Array1S< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
-
-// Generator: MArray
-
-// -MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator -( MArray1< A, T > const & a )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= T( -1 );
-	return r;
-}
-
-// MArray + MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator +( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r += b;
-	return r;
-}
-
-// MArray - MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator -( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r -= b;
-	return r;
-}
-
-// MArray * MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator *( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= b;
-	return r;
-}
-
-// MArray / MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator /( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r /= b;
-	return r;
-}
-
-// MArray + Array
-template< class A, typename T >
-inline
-Array1D< T >
-operator +( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r += b;
-	return r;
-}
-
-// MArray - Array
-template< class A, typename T >
-inline
-Array1D< T >
-operator -( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r -= b;
-	return r;
-}
-
-// MArray * Array
-template< class A, typename T >
-inline
-Array1D< T >
-operator *( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= b;
-	return r;
-}
-
-// MArray / Array
-template< class A, typename T >
-inline
-Array1D< T >
-operator /( MArray1< A, T > const & a, Array1< T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r /= b;
-	return r;
-}
-
-// Array + MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator +( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r += b;
-	return r;
-}
-
-// Array - MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator -( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r -= b;
-	return r;
-}
-
-// Array * MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator *( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= b;
-	return r;
-}
-
-// Array / MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator /( Array1< T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r /= b;
-	return r;
-}
-
-// MArray + Value
-template< class A, typename T >
-inline
-Array1D< T >
-operator +( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r += t;
-	return r;
-}
-
-// Value + MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator +( T const & t, MArray1< A, T > const & a )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r += t;
-	return r;
-}
-
-// MArray - Value
-template< class A, typename T >
-inline
-Array1D< T >
-operator -( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r -= t;
-	return r;
-}
-
-// Value - MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator -( T const & t, MArray1< A, T > const & a )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= T( -1 );
-	r += t;
-	return r;
-}
-
-// MArray * Value
-template< class A, typename T >
-inline
-Array1D< T >
-operator *( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= t;
-	return r;
-}
-
-// Value * MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator *( T const & t, MArray1< A, T > const & a )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r *= t;
-	return r;
-}
-
-// MArray / Value
-template< class A, typename T >
-inline
-Array1D< T >
-operator /( MArray1< A, T > const & a, T const & t )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r /= t;
-	return r;
-}
-
-// Value / MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator /( T const & t, MArray1< A, T > const & a )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.invert();
-	r *= t;
-	return r;
-}
-
-// MArray && MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator &&( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.and_equals( b );
-	return r;
-}
-
-// MArray || MArray
-template< class A, typename T >
-inline
-Array1D< T >
-operator ||( MArray1< A, T > const & a, MArray1< A, T > const & b )
-{
-	Array1D< T > r( Array1D< T >::one_based( a ) );
-	r.or_equals( b );
-	return r;
-}
 
 // Cross Product of 3-Tuples
 template< typename T >
@@ -3737,134 +2502,6 @@ Array1D< T >
 cross_product( Array1S< T > const & a, Array1S< T > const & b )
 {
 	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1< T > const & a, Array1< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1S< T > const & a, Array1< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1< T > const & a, Array1S< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-cross3( Array1S< T > const & a, Array1S< T > const & b )
-{
-	return cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross( Array1< T > const & a, Vector3< T > const & b )
-{
-	assert( a.size() == 3u );
-	Array1D< T > c( 3 );
-	c[ 0 ] = ( a[ 1 ] * b.z ) - ( a[ 2 ] * b.y );
-	c[ 1 ] = ( a[ 2 ] * b.x ) - ( a[ 0 ] * b.z );
-	c[ 2 ] = ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross( Vector3< T > const & a, Array1< T > const & b )
-{
-	assert( b.size() == 3u );
-	Array1D< T > c( 3 );
-	c[ 0 ] = ( a.y * b[ 2 ] ) - ( a.z * b[ 1 ] );
-	c[ 1 ] = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
-	c[ 2 ] = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross3( Array1< T > const & a, Vector3< T > const & b )
-{
-	return Array_cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Array1D< T >
-Array_cross3( Vector3< T > const & a, Array1< T > const & b )
-{
-	return Array_cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross( Array1< T > const & a, Vector3< T > const & b )
-{
-	assert( a.size() == 3u );
-	Vector3< T > c;
-	c.x = ( a[ 1 ] * b.z ) - ( a[ 2 ] * b.y );
-	c.y = ( a[ 2 ] * b.x ) - ( a[ 0 ] * b.z );
-	c.z = ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross( Vector3< T > const & a, Array1< T > const & b )
-{
-	assert( b.size() == 3u );
-	Vector3< T > c;
-	c.x = ( a.y * b[ 2 ] ) - ( a.z * b[ 1 ] );
-	c.y = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
-	c.z = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
-	return c;
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross3( Array1< T > const & a, Vector3< T > const & b )
-{
-	return Vector_cross( a, b );
-}
-
-// Cross Product of 3-Tuples
-template< typename T >
-inline
-Vector3< T >
-Vector_cross3( Vector3< T > const & a, Array1< T > const & b )
-{
-	return Vector_cross( a, b );
 }
 
 } // ObjexxFCL

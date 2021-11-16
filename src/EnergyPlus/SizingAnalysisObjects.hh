@@ -146,15 +146,15 @@ class SizingLoggerFramework
 public:
     std::vector<SizingLog> logObjs;
 
-    int SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage);
+    int SetupVariableSizingLog(EnergyPlusData &state, Real64 &rVariable, int stepsInAverage);
 
-    ZoneTimestepObject PrepareZoneTimestepStamp(EnergyPlusData& state);
+    ZoneTimestepObject PrepareZoneTimestepStamp(EnergyPlusData &state);
 
-    void UpdateSizingLogValuesZoneStep(EnergyPlusData& state);
+    void UpdateSizingLogValuesZoneStep(EnergyPlusData &state);
 
-    void UpdateSizingLogValuesSystemStep(EnergyPlusData& state);
+    void UpdateSizingLogValuesSystemStep(EnergyPlusData &state);
 
-    void SetupSizingLogsNewEnvironment(EnergyPlusData& state);
+    void SetupSizingLogsNewEnvironment(EnergyPlusData &state);
 
     void IncrementSizingPeriodSet();
 
@@ -186,7 +186,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(EnergyPlusData &state, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

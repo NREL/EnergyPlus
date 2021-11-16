@@ -70,15 +70,15 @@ This field is similar to the field of the same name in the \hyperref[utilitycost
 
 This field indicates what logic should be used to activate the individual DemandManagers in the list. \textbf{Sequential} treats the list of DemandManagers as a sequential priority list, i.e., the first DemandManager in the list is activated first, then the second, etc., until the demand falls below the limit. \textbf{All} activates all demand managers to achieve the maximum demand reduction.
 
-\paragraph{Field: Demand Manager Type 1}\label{field-demand-manager-type-1}
+\paragraph{Field: Demand Manager \textless{}\#\textgreater{} Type}\label{field-demand-manager-type-1}
 
 The key word defining the type of DemandManager.
 
-\paragraph{Field: Demand Manager Name 1}\label{field-demand-manager-name-1}
+\paragraph{Field: Demand Manager \textless{}\#\textgreater{} Name}\label{field-demand-manager-name-1}
 
 The name of a DemandManager object defined elsewhere in the input file.
 
-DemandManagers are listed by pairs of data items: \emph{Demand Manager Type} and \emph{Demand Manager Name}. Ten managers are accommodated  in the list by default. The IDD specification, however, is extensible and additional pairs may be added by directly editing the IDD.
+DemandManagers are listed by pairs of data items: \emph{Demand Manager Type} and \emph{Demand Manager Name}. This object is extensible, so additional pairs of these last two fields can be added to the end of this object.
 
 An example IDF showing how this object is used is provided below:
 
@@ -218,11 +218,9 @@ This field specifies which loads are selected to be limited. The \textbf{All} op
 
 If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
 
-\paragraph{Field: Exterior Lights 1-10 Name}\label{field-exterior-lights-1-10-name}
+\paragraph{Field: Exterior Lights \textless{}\#\textgreater{} Name}\label{field-exterior-lights-1-10-name}
 
-The names of \hyperref[exteriorlights]{Exterior:Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
-
-Ten objects are accommodated  in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+The names of \hyperref[exteriorlights]{Exterior:Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
 
 An example IDF showing how this object is used is provided below:
 
@@ -282,11 +280,9 @@ This field specifies which loads are selected to be limited. The \textbf{All} op
 
 If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
 
-\paragraph{Field: Lights 1-10 Name}\label{field-lights-1-10-name}
+\paragraph{Field: Lights \textless{}\#\textgreater{} Name}\label{field-lights-1-10-name}
 
-The names of \hyperref[lights-000]{Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
-
-Ten objects are accommodated  in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+The names of \hyperref[lights-000]{Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
 
 If a global lights statement is used (Ref: \hyperref[lights-000]{Lights}), then only that name need be entered and the demand limiting will be applied to all the zones for that lighting. If only one of a set of zones from a global lights statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of \hyperref[lights-000]{Lights} Global Object\textgreater{}.
 
@@ -352,11 +348,9 @@ This field specifies which loads are selected to be limited. The \textbf{All} op
 
 If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
 
-\paragraph{Field: Electric Equipment 1-10 Name}\label{field-electric-equipment-1-10-name}
+\paragraph{Field: Electric Equipment \textless{}\#\textgreater{} Name}\label{field-electric-equipment-1-10-name}
 
-The names of \hyperref[electricequipment]{ElectricEquipment} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
-
-Ten objects are accommodated  in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+The names of \hyperref[electricequipment]{ElectricEquipment} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
 
 If a global Electric Equipment statement is used (Ref: \hyperref[electricequipment]{ElectricEquipment}), then only that name need be entered and the demand limiting will be applied to all the zones for that equipment. If only one of a set of zones from a global electric equipment statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of \hyperref[electricequipment]{ElectricEquipment} Global Object\textgreater{}.
 
@@ -422,11 +416,9 @@ This field specifies which loads are selected to be limited. The \textbf{All} op
 
 If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
 
-\paragraph{Field: Thermostat 1-10 Name}\label{field-thermostat-1-10-name}
+\paragraph{Field: Thermostat \textless{}\#\textgreater{} Name}\label{field-thermostat-1-10-name}
 
-The names of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
-
-Ten objects are accommodated  in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+The names of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
 
 If a global thermostat statement is used (Ref: \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}), then only that name need be entered and the demand limiting will be applied to all the zones for that thermostatic control. If only one of a set of zones from a global thermostat statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of Thermostat Global Object\textgreater{}.
 
@@ -495,9 +487,9 @@ This field specifies which loads (ventilation rates) are selected to be limited.
 
 If the \textbf{RotateOne} of \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minues{]} between rotations.
 
-\subsubsection{Field: Controller Outdoor Air 1-10 Name}\label{field-controller-outdoor-air-1-10-name}
+\subsubsection{Field: Controller Outdoor Air \textless{}\#\textgreater{} Name}\label{field-controller-outdoor-air-x-name}
 
-The names of \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+The names of \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default.  This field is extensible, so additional fields of this type can be added to the end of this object.
 
 An example IDF showing how this object is used is provided below:
 

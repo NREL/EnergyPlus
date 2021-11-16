@@ -79,7 +79,8 @@ namespace RoomAirModelAirflowNetwork {
         void InitRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void CalcRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ThisRoomAirNode); // index number for the specified zone and room air node
+        void CalcRoomAirModelAirflowNetwork(EnergyPlusData &state,
+                                            int const ThisRoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
         void UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state); // index number for the specified zone
@@ -94,17 +95,17 @@ namespace RoomAirModelAirflowNetwork {
 
         //*****************************************************************************************
 
-        void CalcSurfaceMoistureSums(EnergyPlusData &state, int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &SurfMask);
+        void CalcSurfaceMoistureSums(
+            EnergyPlusData &state, int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &SurfMask);
     };
 
     // Object data
-    extern Array1D<RAFNData> RAFN;
-
-    void clear_state();
 
     void SimRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum, int const RoomAirNode); // index number for the specified zone and node
+    void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state,
+                                                  int const ZoneNum,
+                                                  int const RoomAirNode); // index number for the specified zone and node
 
     //*****************************************************************************************
 
@@ -112,10 +113,19 @@ namespace RoomAirModelAirflowNetwork {
 
 struct RoomAirModelAirflowNetworkData : BaseGlobalStruct
 {
+    bool InitRoomAirModelAirflowNetworkOneTimeFlag = true;
+    bool InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
+    bool InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+    bool LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
+    Array1D<RoomAirModelAirflowNetwork::RAFNData> RAFN;
 
     void clear_state() override
     {
-
+        this->InitRoomAirModelAirflowNetworkOneTimeFlag = true;
+        this->InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
+        this->InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+        this->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
+        this->RAFN.clear();
     }
 };
 

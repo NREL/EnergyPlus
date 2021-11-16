@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.4;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -294,6 +294,7 @@
     Floor,                   !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -310,6 +311,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -326,6 +328,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -342,6 +345,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -358,6 +362,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -374,6 +379,7 @@
     Roof,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -390,6 +396,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -406,6 +413,7 @@
     Roof,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -422,6 +430,7 @@
     Wall,                    !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -438,6 +447,7 @@
     Wall,                    !- Surface Type
     Interior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone1,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -454,6 +464,7 @@
     Floor,                   !- Surface Type
     Exterior,                !- Construction Name
     Zone1,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

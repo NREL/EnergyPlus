@@ -13,16 +13,14 @@ As of version 9.3, a proper API has been developed, which builds on a number of 
  \item The EnergyPlus unit test structure, which has, as a side-effect, enabled the ability to ``reset'' the state of a simulation, and re-run another, in the same memory space.
 \end{itemize}
 
-As of version 9.4, the API has been improved, as well as the ability to more reliably ``reset'' the simulation state.
-After 9.3 was released and users began toying with the API usage, it was revealed that many (most?) files would not actually run well during series runs of EnergyPlus via API in the same thread because the simulation state was not fully ``cleared''.
-Although the simulation state is still not guaranteed to be fully cleared, we are now seeing greater than 95\% pass rate on our example files when running them serially multiple times.
-This situation will make it much more suited for integrating into workflows as the Python thread does not have to be destroyed to get a clean EnergyPlus state for the next run.
-Work is continuing to get the state of the simulation completely managed, and will be completed prior to the next release, ensuring this situation continues improving.
+Release history notes:
 
-Note that the effort to improve the simulation state for the API resulted in a break in many API functions.
-It was expected that in this first release of the API, issues would be identified that would cause breaks in the API.
-Moving forward, it is not expected that API endpoints will change, at least not often.
-As the API gains more adoption, EnergyPlus may adopt a more semantic versioning approach where the API is only broken in major version number changes.
+\begin{itemize}
+    \item Version 9.3 included the first version of the modern API in EnergyPlus.
+    \item As of version 9.4, the API was improved with the ability to more reliably ``reset'' the simulation state.  This caused some breaking changes in the API, which are expected to be very rare moving forward.
+    \item Then as of version 9.5, EnergyPlus became thread-safe.  By refactoring 17,000 global and static variables in the program, the state object now holds the entire state of the program, and threads will not cross-talk.
+    \item With the release of EnergyPlus 9.6, another major enhancement was made that allowed API clients to execute input files that included Python Plugins. The original implementation had a limitation that kept the two from working together, but this was remedied so that interfaces that call the API can simultaneously execute files with Python Plugins.
+\end{itemize}
 
 Interface developers that have been building on top of EnergyPlus have primarily interacted with the simulation in the traditional manner.
 The interface would create an input file in a directory, copy in weather data and any other supporting data, and then kick off a simulation in that directory.
@@ -90,7 +88,7 @@ Once an instance is available, the user will call methods on that instance.
 To interact with the refrigerant property data, the user will also create a refrigerant class and access data through methods.
 For psychrometrics, in C the function calls do not need to create an instance, however, in Python, a small class captures the psychrometric functions for organization.
 
-While some of the functionality in these property routines are stateless from the perspective of the EnergyPlus simulation engine, an instance of the EnergyPlus ``state'' class is required to be passed in.
+While some functionality in these property routines are stateless from the perspective of the EnergyPlus simulation engine, an instance of the EnergyPlus ``state'' class is required to be passed in.
 
 An example of exercising the functional API in C is listed here:
 

@@ -37,6 +37,7 @@ set_default_compile_options(splinter)
 if(MSVC)
     set_additional_compile_options(splinter "/W2 /wd4267 /wd4244")
 endif(MSVC)
+set_no_warnings(splinter)
 
 
 #####################################################################################################################

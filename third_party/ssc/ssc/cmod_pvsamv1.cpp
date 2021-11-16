@@ -969,10 +969,10 @@ void cm_pvsamv1::exec()
     {
         if (Subarrays[nn]->tiltEqualLatitude)
             Subarrays[nn]->tiltDegrees = fabs(Irradiance->weatherHeader.lat);
-        if (Subarrays[nn]->trackMode == irrad::SINGLE_AXIS && Subarrays[nn]->tiltDegrees > 0)
-            log(util::format("Subarray %d has one-axis tracking with a tilt angle of %f degrees. Large one-axis tracking arrays typically have a tilt angle of zero.", nn + 1, Subarrays[nn]->tiltDegrees), SSC_WARNING);
-        if (Subarrays[nn]->Module->isBifacial && (Subarrays[nn]->trackMode != irrad::FIXED_TILT))
-            log(util::format("Subarray %d uses tracking  with bifacial modules. The bifacial model is designed for fixed arrays and may not produce reliable results for tracking arrays.", nn + 1), SSC_WARNING);
+        if (Subarrays[nn]->trackMode == irrad::SINGLE_AXIS && Subarrays[nn]->tiltDegrees > 0 && !Subarrays[nn]->Module->isBifacial)
+            log(util::format("Subarray %d has one-axis tracking with a tilt angle of %f degrees. SAM can simulate one-axis tracking with non-zero tilt angles, but large one-axis tracking arrays typically have a tilt angle of zero. This message is a reminder in case you forgot to set the tilt angle to zero.", nn + 1, Subarrays[nn]->tiltDegrees), SSC_WARNING);
+        if (Subarrays[nn]->Module->isBifacial && Subarrays[nn]->trackMode == irrad::SINGLE_AXIS && Subarrays[nn]->tiltDegrees > 0)
+            log(util::format("Subarray %d uses bifacial modules with one-axis tracking and a tilt angle of %f degrees. The bifacial model is designed for one-axis tracking with a tilt angle of zero and may not produce reliable results for non-zero tilt angles.", nn + 1, Subarrays[nn]->tiltDegrees), SSC_WARNING);
     }
 
     // check for snow model with non-annual simulations: because snow model coefficients need to know the timestep, and we don't know timestep if non-annual
@@ -2134,7 +2134,6 @@ void cm_pvsamv1::exec()
                 dcPowerNetPerMppt_kW[m] = PVSystem->p_dcPowerNetPerMppt[m][idx] * util::watt_to_kilowatt;
             }
 
-            double power_before_battery = 0.0;
 			//run AC power calculation
 			if (en_batt && (batt_topology == ChargeController::DC_CONNECTED)) // DC-connected battery
 			{

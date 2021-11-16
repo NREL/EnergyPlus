@@ -533,6 +533,7 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/engineering-reference/media/IdealLoadsSchematic.png
     ${PROJECT_SOURCE_DIR}/engineering-reference/media/humidex_chart.jpg
     ${PROJECT_SOURCE_DIR}/engineering-reference/media/heat_index_chart.png
-    ${PROJECT_SOURCE_DIR}/engineering-reference/media/heatemission.png)
+    ${PROJECT_SOURCE_DIR}/engineering-reference/media/heatemission.png
+    ${PROJECT_SOURCE_DIR}/engineering-reference/media/ankle_draft.png)
 
 create_doc_target("engineering-reference" "EngineeringReference")

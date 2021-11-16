@@ -96,12 +96,12 @@ namespace MoistureBalanceEMPDManager {
 
     void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                                  int SurfNum,
-                                 Real64 TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
+                                 Real64 SurfTempIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 TempZone,   // Zone temperature at current time step.
-                                 Real64 &TempSat    // Satutared surface temperature.
+                                 Real64 &TempSat    // Saturated surface temperature.
     );
 
-    void UpdateMoistureBalanceEMPD(int SurfNum); // Surface number
+    void UpdateMoistureBalanceEMPD(EnergyPlusData &state, int SurfNum); // Surface number
 
     void ReportMoistureBalanceEMPD(EnergyPlusData &state);
 
@@ -111,13 +111,17 @@ struct MoistureBalanceEMPDManagerData : BaseGlobalStruct
 {
 
     // Array of structs that hold the empd report vars data, one for each surface.
-    Array1D<MoistureBalanceEMPDManager::EMPDReportVarsData> EMPDReportVars;
+    EPVector<MoistureBalanceEMPDManager::EMPDReportVarsData> EMPDReportVars;
     bool InitEnvrnFlag = true;
+    int ErrCount = 0;
+    bool OneTimeFlag = true;
 
     void clear_state() override
     {
         this->EMPDReportVars.deallocate();
         this->InitEnvrnFlag = true;
+        this->ErrCount = 0;
+        this->OneTimeFlag = true;
     }
 };
 

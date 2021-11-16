@@ -48,8 +48,8 @@
 #ifndef EnergyPlusAPIDataTransfer_h_INCLUDED
 #define EnergyPlusAPIDataTransfer_h_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
@@ -74,7 +74,7 @@ extern "C" {
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark A future version of this will more intelligently return available data in a structured format in memory.
 /// \return A char * pointing to a CSV formatted string.  This allocates a new char *, and calling clients must free this when done with it!
-ENERGYPLUSLIB_API char * listAllAPIDataCSV(EnergyPlusState state);
+ENERGYPLUSLIB_API char *listAllAPIDataCSV(EnergyPlusState state);
 /// \brief Provides a user-facing check for whether API data is ready to be accessed
 /// \details Many parts of a simulation need to be set up to complete a run.
 ///          At the early stages of a simulation, most data has not been allocated and set up.
@@ -103,7 +103,7 @@ ENERGYPLUSLIB_API void resetErrorFlag(EnergyPlusState state);
 /// \param[in] surfName Surface name as defined in the input file, such as "ZN001:Surf001"
 /// \param[in] matName Material name as defined in the input file, such as "GypsumBoardLayer"
 /// \remark This function should only be called after condFDReady returns successfully.
-ENERGYPLUSLIB_API int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char* surfName, const char* matName);
+ENERGYPLUSLIB_API int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName);
 /// \brief Marks a variable as requested in a simulation
 /// \details To optimize memory and cpu usage, the simulation ignores variables not requested in the IDF.
 ///          This function allows marking variables as used even if they are not in the input file.
@@ -111,7 +111,7 @@ ENERGYPLUSLIB_API int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, con
 /// \param[in] type Variable Type, such as "System Node Mass Flow Rate", or "Site Outdoor Air DryBulb Temperature"
 /// \param[in] key Variable Key, such as "Node 32", or "Environment"
 /// \remark This function should be called prior to executing each simulation, as the internal array is cleared when clearing the state of each run.
-ENERGYPLUSLIB_API void requestVariable(EnergyPlusState state, const char* type, const char* key);
+ENERGYPLUSLIB_API void requestVariable(EnergyPlusState state, const char *type, const char *key);
 /// \brief Gets a handle to a variable
 /// \details Looks up a handle to a variable within a running simulation.
 ///          Variables are identified by a key and type.
@@ -125,7 +125,7 @@ ENERGYPLUSLIB_API void requestVariable(EnergyPlusState state, const char* type, 
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
 /// \see requestVariable
-ENERGYPLUSLIB_API int getVariableHandle(EnergyPlusState state, const char* type, const char* key);
+ENERGYPLUSLIB_API int getVariableHandle(EnergyPlusState state, const char *type, const char *key);
 /// \brief Gets the current value of a variable
 /// \details This function uses the integer handle of a variable and retrieves the current value of the variable.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
@@ -145,7 +145,7 @@ ENERGYPLUSLIB_API Real64 getVariableValue(EnergyPlusState state, int handle);
 /// \return The integer handle to a meter, or -1 if the meter was not found
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int getMeterHandle(EnergyPlusState state, const char* meterName);
+ENERGYPLUSLIB_API int getMeterHandle(EnergyPlusState state, const char *meterName);
 /// \brief Gets the current value of a meter
 /// \details Looks up the value of an existing meter within a running simulation.  Caution: This function currently returns the instantaneous value
 ///          of a meter, not the cumulative value.  This will change in a future version of the API.
@@ -170,7 +170,7 @@ ENERGYPLUSLIB_API Real64 getMeterValue(EnergyPlusState state, int handle);
 /// \return The integer handle to an actuator, or -1 if the actuator was not found
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int getActuatorHandle(EnergyPlusState state, const char* componentType, const char* controlType, const char* uniqueKey);
+ENERGYPLUSLIB_API int getActuatorHandle(EnergyPlusState state, const char *componentType, const char *controlType, const char *uniqueKey);
 /// \brief Resets an actuator so EnergyPlus will calculate the value as normal
 /// \details When an actuator value is set using `setActuatorValue`, a flag is set so the actuated value will not be
 ///          overridden.  If the user desires to revert back and let EnergyPlus calculate the actuated value, this
@@ -230,7 +230,7 @@ ENERGYPLUSLIB_API Real64 getActuatorValue(EnergyPlusState state, int handle);
 /// \return The integer handle to an independent variable, or -1 if the variable was not found
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int getInternalVariableHandle(EnergyPlusState state, const char* type, const char* key);
+ENERGYPLUSLIB_API int getInternalVariableHandle(EnergyPlusState state, const char *type, const char *key);
 /// \brief Gets the current value of an internal variable
 /// \details This function uses the integer handle of a variable and retrieves the static value of the variable.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
@@ -252,7 +252,7 @@ ENERGYPLUSLIB_API Real64 getInternalVariableValue(EnergyPlusState state, int han
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(EnergyPlusState state, const char* name);
+ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name);
 /// \brief Gets the current value of a Python Plugin "Global" variable
 /// \details When using Python Plugins, the value of the shared "global" variables can change at any time.
 ///          This function returns the current value of the variable.
@@ -290,7 +290,7 @@ ENERGYPLUSLIB_API void setPluginGlobalVariableValue(EnergyPlusState state, int h
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int getPluginTrendVariableHandle(EnergyPlusState state, const char* name);
+ENERGYPLUSLIB_API int getPluginTrendVariableHandle(EnergyPlusState state, const char *name);
 /// \brief Gets the current value of a Python Plugin "Trend" variable at a specific history point
 /// \details When using Python Plugins, the value of the "trend" variable can be retrieved from previous timesteps, up
 ///          to the number of history terms defined in the input file.
@@ -461,10 +461,9 @@ ENERGYPLUSLIB_API int zoneTimeStepNum(EnergyPlusState state);
 ENERGYPLUSLIB_API Real64 systemTimeStep(EnergyPlusState state);
 
 /// \brief Returns the holiday index for the current day of the simulation
-/// \details Days in the simulation year can be regular days, in which case this returns zero, or integers 1-N based on holiday definitions in the input.
-/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
-/// \see apiDataFullyReady
+/// \details Days in the simulation year can be regular days, in which case this returns zero, or integers 1-N based on holiday definitions in the
+/// input. \param[in] state An active EnergyPlusState instance created with `stateNew`. \remark The behavior of this function is not well-defined
+/// until the `apiDataFullyReady` function returns true. \see apiDataFullyReady
 ENERGYPLUSLIB_API int holidayIndex(EnergyPlusState state);
 
 /// \brief Returns 0 if the sun is down, or 1 if the sun is up
@@ -523,7 +522,7 @@ ENERGYPLUSLIB_API int currentEnvironmentNum(EnergyPlusState state);
 /// \param[in] constructionName The name of the construction to be looked up.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int getConstructionHandle(EnergyPlusState state, const char* constructionName);
+ENERGYPLUSLIB_API int getConstructionHandle(EnergyPlusState state, const char *constructionName);
 
 /// \brief Returns a simple sum of the time part of the date/time function
 /// \details Could be used in random seeding.
@@ -796,6 +795,13 @@ ENERGYPLUSLIB_API Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState state, int 
 /// \see apiDataFullyReady
 /// \see apiErrorFlag
 ENERGYPLUSLIB_API Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the cumulative simulation time from the start of the environment, in hours
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 currentSimTime(EnergyPlusState state);
 
 #ifdef __cplusplus
 }

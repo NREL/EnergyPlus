@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -69,7 +70,7 @@ namespace BaseboardRadiator {
         std::string EquipID;
         std::string Schedule;
         int SchedPtr;
-        int EquipType;
+        DataPlant::PlantEquipmentType EquipType;
         int ZonePtr;
         int WaterInletNode;
         int WaterOutletNode;
@@ -110,12 +111,12 @@ namespace BaseboardRadiator {
 
         // Default Constructor
         BaseboardParams()
-            : SchedPtr(0), EquipType(0), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0), ControlCompTypeNum(0), CompErrIndex(0), UA(0.0),
-              WaterMassFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterMassFlowRateMax(0.0), Offset(0.0), AirMassFlowRate(0.0), DesAirMassFlowRate(0.0),
-              WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0),
-              AirOutletTemp(0.0), Power(0.0), Energy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0),
-              BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true), SetLoopIndexFlag(true), MyEnvrnFlag(true)
+            : SchedPtr(0), EquipType(DataPlant::PlantEquipmentType::Invalid), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0),
+              ControlCompTypeNum(0), CompErrIndex(0), UA(0.0), WaterMassFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterMassFlowRateMax(0.0),
+              Offset(0.0), AirMassFlowRate(0.0), DesAirMassFlowRate(0.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0),
+              WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0), Energy(0.0), LoopNum(0),
+              LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
+              HeatingCapMethod(0), ScaledHeatingCapacity(0.0), MySizeFlag(true), CheckEquipName(true), SetLoopIndexFlag(true), MyEnvrnFlag(true)
         {
         }
     };
@@ -129,7 +130,8 @@ namespace BaseboardRadiator {
         BaseboardParamsNumericFieldData() = default;
     };
 
-    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimBaseboard(EnergyPlusData &state,
+                      std::string const &EquipName,
                       int ActualZoneNum,
                       int ControlledZoneNum,
                       bool FirstHVACIteration,
@@ -147,29 +149,30 @@ namespace BaseboardRadiator {
     void UpdateBaseboard(EnergyPlusData &state, int &BaseboardNum);
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 UA,           // UA of coil
-                                 Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                 Real64 UA,                       // UA of coil
+                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
     );
 
 } // namespace BaseboardRadiator
 
-    struct BaseboardRadiatorData : BaseGlobalStruct {
+struct BaseboardRadiatorData : BaseGlobalStruct
+{
 
-        int NumBaseboards = 0;
-        bool getInputFlag = true;
-        bool ZoneEquipmentListChecked = false;
-        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
-        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+    int NumBaseboards = 0;
+    bool getInputFlag = true;
+    bool ZoneEquipmentListChecked = false;
+    Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+    Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
 
-        void clear_state() override
-        {
-            this->NumBaseboards = 0;
-            this->getInputFlag = true;
-            this->ZoneEquipmentListChecked = false;
-            this->Baseboard.deallocate();
-            this->BaseboardParamsNumericFields.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->NumBaseboards = 0;
+        this->getInputFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->Baseboard.deallocate();
+        this->BaseboardParamsNumericFields.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -92,8 +92,12 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     // Clean up memory
     // free(xmlPat); // Done above
     free(tmp);
+#ifdef _MSC_VER
+    // https://man7.org/linux/man-pages/man3/basename.3.html
+    // Both dirname() and basename() return pointers to null-terminated strings.  (Do not pass these pointers to free(3).)
     free(filNam);
     free(ext);
+#endif
     return 0;
 }
 

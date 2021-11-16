@@ -74,33 +74,34 @@ namespace WaterManager {
 
     void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
-    void SetupTankSupplyComponent(EnergyPlusData &state, std::string const &CompName,
-                                  std::string const &CompType,
-                                  std::string const &TankName,
+    void SetupTankSupplyComponent(EnergyPlusData &state,
+                                  std::string_view CompName,
+                                  std::string_view CompType,
+                                  std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
     void InternalSetupTankSupplyComponent(EnergyPlusData &state,
-                                          std::string const &CompName,
-                                          std::string const &CompType,
-                                          std::string const &TankName,
+                                          std::string_view CompName,
+                                          std::string_view CompType,
+                                          std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterSupplyIndex);
 
     void SetupTankDemandComponent(EnergyPlusData &state,
-                                  std::string const &CompName,
-                                  std::string const &CompType,
-                                  std::string const &TankName,
+                                  std::string_view CompName,
+                                  std::string_view const CompType,
+                                  std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterDemandIndex);
 
     void InternalSetupTankDemandComponent(EnergyPlusData &state,
-                                          std::string const &CompName,
-                                          std::string const &CompType,
-                                          std::string const &TankName,
+                                          std::string_view CompName,
+                                          std::string_view const CompType,
+                                          std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterDemandIndex);
@@ -113,31 +114,32 @@ namespace WaterManager {
 
 } // namespace WaterManager
 
-    struct WaterManagerData : BaseGlobalStruct {
+struct WaterManagerData : BaseGlobalStruct
+{
 
-        bool MyOneTimeFlag;
-        bool GetInputFlag; // First time, input is "gotten"
-        bool MyEnvrnFlag;   // flag for init once at start of environment
-        bool MyWarmupFlag; // flag for init after warmup complete
-        bool MyTankDemandCheckFlag;
-        Real64 overflowTwater = 0.0;
+    bool MyOneTimeFlag;
+    bool GetInputFlag; // First time, input is "gotten"
+    bool MyEnvrnFlag;  // flag for init once at start of environment
+    bool MyWarmupFlag; // flag for init after warmup complete
+    bool MyTankDemandCheckFlag;
+    Real64 overflowTwater = 0.0;
 
-        void clear_state() override
-        {
-            this->MyOneTimeFlag = true;
-            this->GetInputFlag = true;
-            this->MyEnvrnFlag = true;
-            this->MyWarmupFlag = false;
-            this->MyTankDemandCheckFlag = true;
-            this->overflowTwater = 0.0;
-        }
+    void clear_state() override
+    {
+        this->MyOneTimeFlag = true;
+        this->GetInputFlag = true;
+        this->MyEnvrnFlag = true;
+        this->MyWarmupFlag = false;
+        this->MyTankDemandCheckFlag = true;
+        this->overflowTwater = 0.0;
+    }
 
-        // Default Constructor
-        WaterManagerData()
-            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true), overflowTwater(0.0)
-        {
-        }
-    };
+    // Default Constructor
+    WaterManagerData()
+        : MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true), overflowTwater(0.0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

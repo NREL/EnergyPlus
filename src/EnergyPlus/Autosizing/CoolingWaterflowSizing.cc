@@ -161,15 +161,19 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
-        coilSelectionReportObj->setCoilWaterFlowPltSizNum(
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizCoolNum, this->dataWaterLoopNum);
-        coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, CoilDesWaterDeltaT);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, CoilDesWaterDeltaT);
         if (this->dataDesInletWaterTemp > 0.0) {
-            coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, this->dataDesInletWaterTemp);
-            coilSelectionReportObj->setCoilLvgWaterTemp(state, this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(
+                state, this->compName, this->compType, this->dataDesInletWaterTemp);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
+                state, this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
         } else {
-            coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp);
-            coilSelectionReportObj->setCoilLvgWaterTemp(state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp + CoilDesWaterDeltaT);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(
+                state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
+                state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp + CoilDesWaterDeltaT);
         }
     }
     return this->autoSizedValue;

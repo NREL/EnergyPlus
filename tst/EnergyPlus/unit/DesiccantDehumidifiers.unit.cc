@@ -83,7 +83,6 @@ using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterCoils;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
@@ -578,6 +577,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -594,6 +594,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -610,6 +611,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -626,6 +628,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -642,6 +645,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    ROOF,                    !- Surface Type",
         "    ROOF-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -658,6 +662,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -674,6 +679,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -690,6 +696,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -706,6 +713,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -722,6 +730,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -738,6 +747,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -754,6 +764,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -770,6 +781,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -786,6 +798,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB21,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -802,6 +815,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB41,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -818,6 +832,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB51,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -834,6 +849,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -850,6 +866,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -866,6 +883,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -882,6 +900,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB12,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -898,6 +917,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB32,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -914,6 +934,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB52,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -930,6 +951,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -946,6 +968,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -962,6 +985,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -978,6 +1002,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB23,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -994,6 +1019,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB43,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1010,6 +1036,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB53,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1026,6 +1053,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1042,6 +1070,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1058,6 +1087,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1074,6 +1104,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB14,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1090,6 +1121,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB34,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1106,6 +1138,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB54,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1122,6 +1155,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1138,6 +1172,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1154,6 +1189,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB15,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1170,6 +1206,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB25,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1186,6 +1223,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB35,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1202,6 +1240,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB45,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2191,8 +2230,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Node,",
         "    Main Cooling Coil 1 Condenser Node,  !- Name",
@@ -2814,38 +2852,41 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
     state->dataGlobal->SysSizingCalc = true;
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
+        state->dataSurface->SurfActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+    }
     SizingManager::ManageSizing(*state);
 
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 1;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 1;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ("OA DESICCANT SYSTEM", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("OA DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ("OA DESICCANT SYSTEM", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("OA DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
-    RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatRetTemp;
-    RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow * state->dataEnvrn->StdRhoAir;
+    RegCoilDesInletTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatRetTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
-    for (loop = 1; loop <= NumHeatingCoils; ++loop) {
-        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
-    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
+    EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
@@ -3029,6 +3070,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -3045,6 +3087,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -3061,6 +3104,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -3077,6 +3121,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -3093,6 +3138,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3109,6 +3155,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -3642,8 +3689,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Desiccant DXSystem OA System,  !- Name",
         "    Desiccant DXSystem OA System Controllers,  !- Controller List Name",
-        "    Desiccant DXSystem OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Desiccant Outdoor Air Avail List;  !- Availability Manager List Name",
+        "    Desiccant DXSystem OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -3994,7 +4040,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
@@ -4003,29 +4049,29 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     state->dataGlobal->SysSizingCalc = true;
     SizingManager::ManageSizing(*state);
 
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 0;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
-    RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
-    RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    RegCoilDesInletTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
-    for (loop = 1; loop <= NumHeatingCoils; ++loop) {
-        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
-    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
+    EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
@@ -4209,6 +4255,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -4225,6 +4272,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -4241,6 +4289,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -4257,6 +4306,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -4273,6 +4323,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -4289,6 +4340,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -4822,8 +4874,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Desiccant DXSystem OA System,  !- Name",
         "    Desiccant DXSystem OA System Controllers,  !- Controller List Name",
-        "    Desiccant DXSystem OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Desiccant Outdoor Air Avail List;  !- Availability Manager List Name",
+        "    Desiccant DXSystem OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -5412,7 +5463,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
@@ -5421,30 +5472,30 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     state->dataGlobal->SysSizingCalc = true;
     SizingManager::ManageSizing(*state);
 
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 0;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ(1, NumGenericDesicDehums);
-    EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
-    EXPECT_EQ("COIL:HEATING:WATER", DesicDehum(DesicDehumNum).RegenCoilType);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumGenericDesicDehums);
+    EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ("COIL:HEATING:WATER", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilType);
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     // set design parameters and calculate HW coil design capacity
     RegCoilDesInletTemp = 8.5;
-    DataSizing::FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp = RegCoilDesInletTemp;
-    RegCoilDesOutletTemp = DesiccantDehumidifiers::DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow = 1.07;
-    RegCoilInletAirMassFlowRate = state->dataEnvrn->StdRhoAir * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = RegCoilDesInletTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.07;
+    RegCoilInletAirMassFlowRate = state->dataEnvrn->StdRhoAir * state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     // simulate to determine HW coil design capacity
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
     for (loop = 1; loop <= state->dataWaterCoils->NumWaterCoils; ++loop) {
-        if (state->dataWaterCoils->WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+        if (state->dataWaterCoils->WaterCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
@@ -5635,6 +5686,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -5651,6 +5703,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -5667,6 +5720,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -5683,6 +5737,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -5699,6 +5754,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5715,6 +5771,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6248,8 +6305,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Desiccant DXSystem OA System,  !- Name",
         "    Desiccant DXSystem OA System Controllers,  !- Controller List Name",
-        "    Desiccant DXSystem OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Desiccant Outdoor Air Avail List;  !- Availability Manager List Name",
+        "    Desiccant DXSystem OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -6655,7 +6711,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
@@ -6664,32 +6720,32 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     state->dataGlobal->SysSizingCalc = true;
     SizingManager::ManageSizing(*state);
 
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 0;
 
     GetDesiccantDehumidifierInput(*state);
-    EXPECT_EQ(1, NumDesicDehums);
-    EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
-    EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
+    EXPECT_EQ(1, state->dataDesiccantDehumidifiers->NumDesicDehums);
+    EXPECT_EQ("DESICCANT 1", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name);
+    EXPECT_EQ("DESICCANT REGEN COIL", state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName);
 
-    EXPECT_EQ(DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
 
-    EXPECT_EQ(DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, 1);
+    EXPECT_TRUE(compare_enums(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, Selection::Yes));
 
-    CompName = DesicDehum(DesicDehumNum).Name;
-    CompIndex = NumGenericDesicDehums;
+    CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
+    CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;
     SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
-    RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
-    RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    RegCoilDesInletTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp;
+    RegCoilDesOutletTemp = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenSetPointTemp;
+    RegCoilInletAirMassFlowRate = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
-    for (loop = 1; loop <= NumHeatingCoils; ++loop) {
-        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state->dataHeatingCoils->NumHeatingCoils; ++loop) {
+        if (state->dataHeatingCoils->HeatingCoil(loop).Name == state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
-    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
+    EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 }
 } // namespace EnergyPlus

@@ -68,22 +68,21 @@ namespace OutsideEnergySources {
     {
 
         // Members
-        std::string Name;                // user identifier
-        Real64 NomCap = 0.0;             // design nominal capacity of district service
-        bool NomCapWasAutoSized = false; // ture if Nominal Capacity was autosize on input
-        int CapFractionSchedNum = 0;     // capacity modifier schedule number
-        int InletNodeNum = 0;            // Node number on the inlet side of the plant
-        int OutletNodeNum = 0;           // Node number on the inlet side of the plant
-        Real64 EnergyTransfer = 0.0;     // cooling energy provided in time step
-        Real64 EnergyRate = 0.0;         // cooling power
-        int EnergyType = 0;              // flag for district heating OR cooling
+        std::string Name;                                                                 // user identifier
+        Real64 NomCap = 0.0;                                                              // design nominal capacity of district service
+        bool NomCapWasAutoSized = false;                                                  // ture if Nominal Capacity was autosize on input
+        int CapFractionSchedNum = 0;                                                      // capacity modifier schedule number
+        int InletNodeNum = 0;                                                             // Node number on the inlet side of the plant
+        int OutletNodeNum = 0;                                                            // Node number on the inlet side of the plant
+        Real64 EnergyTransfer = 0.0;                                                      // cooling energy provided in time step
+        Real64 EnergyRate = 0.0;                                                          // cooling power
+        DataPlant::PlantEquipmentType EnergyType{DataPlant::PlantEquipmentType::Invalid}; // flag for district heating OR cooling
         // loop topology variables
         int LoopNum = 0;
         int LoopSideNum = 0;
         int BranchNum = 0;
         int CompNum = 0;
         // flags
-        bool OneTimeInitFlag = true;
         bool BeginEnvrnInitFlag = true;
         bool CheckEquipName = true;
         Real64 MassFlowRate = 0.0;
@@ -94,7 +93,7 @@ namespace OutsideEnergySources {
 
         virtual ~OutsideEnergySourceSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string_view objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
@@ -112,6 +111,10 @@ namespace OutsideEnergySources {
         void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
 
         void size(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetOutsideEnergySourcesInput(EnergyPlusData &state);

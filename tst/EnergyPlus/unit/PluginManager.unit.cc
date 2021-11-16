@@ -58,7 +58,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, TestTrendVariable)
 {
 
-// this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
+    // this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
 
     // create a plugin manager instance
     EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(*state);
@@ -92,6 +92,5 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(*state, trendVarIndex, 1), 0.001);
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(*state, trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
-
 }
 } // namespace EnergyPlus

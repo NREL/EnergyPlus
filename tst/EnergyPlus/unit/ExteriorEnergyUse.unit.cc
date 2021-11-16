@@ -60,7 +60,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ExteriorEnergyUse;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
@@ -73,8 +72,10 @@ TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
     state->dataExteriorEnergyUse->ExteriorEquipment.allocate(state->dataExteriorEnergyUse->NumExteriorEqs);
     state->dataExteriorEnergyUse->ExteriorEquipment(1).DesignLevel = 1000.0;
     state->dataExteriorEnergyUse->ExteriorEquipment(2).DesignLevel = 0.0;
-    state->dataExteriorEnergyUse->ExteriorEquipment(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    state->dataExteriorEnergyUse->ExteriorEquipment(2).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataExteriorEnergyUse->ExteriorEquipment(1).SchedPtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataExteriorEnergyUse->ExteriorEquipment(2).SchedPtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
     ReportExteriorEnergyUse(*state);
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorEquipment(1).Power);

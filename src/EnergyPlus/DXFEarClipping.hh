@@ -73,7 +73,6 @@ namespace DXFEarClipping {
 
     // Module variable declarations:
     // na
-    extern bool trackit;
     // Subroutine specifications for module <module_name>:
 
     // Functions
@@ -86,10 +85,10 @@ namespace DXFEarClipping {
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
-                    Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
-                    Real64 const surftilt,       // surface tilt angle
-                    std::string const &surfname, // surface name (for error messages)
-                    DataSurfaces::SurfaceClass surfclass          // surface class
+                    Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
+                    Real64 const surftilt,               // surface tilt angle
+                    std::string const &surfname,         // surface name (for error messages)
+                    DataSurfaces::SurfaceClass surfclass // surface class
     );
 
     Real64 angle_2dvector(Real64 const xa, // vertex coordinate
@@ -138,11 +137,16 @@ namespace DXFEarClipping {
 
 } // namespace DXFEarClipping
 
-struct DXFEarClippingData : BaseGlobalStruct {
+struct DXFEarClippingData : BaseGlobalStruct
+{
+
+    bool trackit = false;
+    int errcount = 0;
 
     void clear_state() override
     {
-
+        this->trackit = false;
+        this->errcount = 0;
     }
 };
 

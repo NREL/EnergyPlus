@@ -63,28 +63,6 @@ struct EnergyPlusData;
 
 namespace DataSurfaceLists {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumOfSurfaceLists;        // Number of surface lists in the user input file
-    extern int NumOfSurfListVentSlab;    // Number of surface lists in the user input file
-    extern bool SurfaceListInputsFilled; // Set to TRUE after first pass through air loop
-
-    //  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
-
     // Types
 
     struct SurfaceListData
@@ -123,14 +101,6 @@ namespace DataSurfaceLists {
         }
     };
 
-    // Object Data
-    extern Array1D<SurfaceListData> SurfList;
-    extern Array1D<SlabListData> SlabList;
-
-    // Functions
-
-    void clear_state();
-
     void GetSurfaceListsInputs(EnergyPlusData &state);
 
     int GetNumberOfSurfaceLists(EnergyPlusData &state);
@@ -141,9 +111,19 @@ namespace DataSurfaceLists {
 
 struct SurfaceListsData : BaseGlobalStruct
 {
+    int NumOfSurfaceLists = 0;            // Number of surface lists in the user input file
+    int NumOfSurfListVentSlab = 0;        // Number of surface lists in the user input file
+    bool SurfaceListInputsFilled = false; // Set to TRUE after first pass through air loop
+    Array1D<DataSurfaceLists::SurfaceListData> SurfList;
+    Array1D<DataSurfaceLists::SlabListData> SlabList;
+
     void clear_state() override
     {
-
+        this->NumOfSurfaceLists = 0;
+        this->NumOfSurfListVentSlab = 0;
+        this->SurfaceListInputsFilled = false;
+        this->SurfList.deallocate();
+        this->SlabList.deallocate();
     }
 };
 

@@ -81,7 +81,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::SurfaceGeometry;
 
-using namespace ObjexxFCL;
 // using DataVectorTypes::Vector;
 
 TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
@@ -494,6 +493,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -547,6 +547,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -563,6 +564,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -579,6 +581,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -595,6 +598,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -611,6 +615,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -805,11 +810,11 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound); // read project control data
-    EXPECT_FALSE(ErrorsFound);          // expect no errors
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
     ErrorsFound = false;
     GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
     ErrorsFound = false;
     GetFrameAndDividerData(*state, ErrorsFound);
@@ -819,11 +824,11 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     ErrorsFound = false;
     GetConstructData(*state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
     ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     ErrorsFound = false;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
@@ -848,12 +853,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(2), 5); // air gap
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(3), 4); // glass, inner layer
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
 
-    EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
+    EXPECT_FALSE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
-    EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
+    EXPECT_FALSE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
 
     GetEMSInput(*state);
     // check if EMS actuator is not setup because there is no blind/shade layer
@@ -882,9 +887,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
-    EXPECT_TRUE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
+    EXPECT_TRUE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
-    SurfWinMovableSlats(windowSurfNum) = true;
+    state->dataSurface->SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators(*state);
     EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);
@@ -911,20 +916,19 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicula
     userInputValue = -0.25;
     expectedReturnValue = 0.0;
     actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(*state, userInputValue);
-    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+    EXPECT_EQ(actualReturnValue, expectedReturnValue);
 
     // Test 2: User value is greater than unity--should be reset to 1.0
     userInputValue = 1.23456;
     expectedReturnValue = 1.0;
     actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(*state, userInputValue);
-    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+    EXPECT_EQ(actualReturnValue, expectedReturnValue);
 
     // Test 3: User value is valid (between 0 and 1)--returned value should be equal to user input
     userInputValue = 0.234567;
     expectedReturnValue = 0.234567;
     actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(*state, userInputValue);
-    EXPECT_EQ(actualReturnValue,expectedReturnValue);
-
+    EXPECT_EQ(actualReturnValue, expectedReturnValue);
 }
 
 TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
@@ -948,8 +952,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     expectedNodeNumberAtSource = 0;
     expectedNodeNumberAtUserSpecifiedLocation = 0;
     thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
-    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+    EXPECT_EQ(expectedNodeNumberAtSource, thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation, thisConstruct.NodeUserTemp);
 
     // Test 2: Construction with Internal Source but 1-D
     thisConstruct.SourceSinkPresent = true;
@@ -959,8 +963,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     expectedNodeNumberAtSource = 11;
     expectedNodeNumberAtUserSpecifiedLocation = 18;
     thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
-    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+    EXPECT_EQ(expectedNodeNumberAtSource, thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation, thisConstruct.NodeUserTemp);
 
     // Test 3a: Construction with Internal Source using 2-D Solution
     //          First sub-test--user location in line with source
@@ -971,8 +975,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     expectedNodeNumberAtSource = 41;
     expectedNodeNumberAtUserSpecifiedLocation = 69;
     thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
-    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+    EXPECT_EQ(expectedNodeNumberAtSource, thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation, thisConstruct.NodeUserTemp);
 
     // Test 3b: Construction with Internal Source using 2-D Solution
     //          First sub-test--user location at mid-point between tubes
@@ -983,7 +987,112 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     expectedNodeNumberAtSource = 69;
     expectedNodeNumberAtUserSpecifiedLocation = 104;
     thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
-    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+    EXPECT_EQ(expectedNodeNumberAtSource, thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation, thisConstruct.NodeUserTemp);
+}
 
+TEST_F(EnergyPlusFixture, DataHeatBalance_AssignReverseConstructionNumberTest)
+{
+    int ConstrNum;
+    int expectedResultRevConstrNum;
+    int functionResultRevConstrNum;
+    bool ErrorsFound = false;
+
+    state->dataHeatBal->TotConstructs = 2;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    state->dataConstruction->LayerPoint.allocate(Construction::MaxLayersInConstruct);
+
+    auto &thisConstruct(state->dataConstruction->Construct(1));
+    auto &otherConstruct(state->dataConstruction->Construct(2));
+
+    // Test: For an interzone surface that uses the zone as the other side, a new
+    //       interzone surface for that zone has to be created.  That interzone has
+    //       to have the reversed construction.  If that reversed construction is
+    //       not used for any defined surface, the variable IsUsed is false.  However,
+    //       since it now is being used, IsUsed has to be set to true.  Prior to
+    //       work on Defect #8919, when using CondFD and a zone other side condition
+    //       for an interzone surface (implied or E+ internally created other side)
+    //       for a construction that was reversed in the input file but not used
+    //       for other defined surfaces, IsUsed was set to false and this construction
+    //       was then skipped in the CondFD routine that calculates the number of
+    //       nodes.  This led to a hard crash.  This test simply makes sure that
+    //       IsUsed is set to true when the reversed construction already exists.
+    ConstrNum = 1;
+    thisConstruct.IsUsed = true;
+    thisConstruct.TotLayers = 2;
+    thisConstruct.LayerPoint.allocate(Construction::MaxLayersInConstruct);
+    thisConstruct.LayerPoint = 0;
+    thisConstruct.LayerPoint(1) = 10;
+    thisConstruct.LayerPoint(2) = 12;
+    otherConstruct.IsUsed = false;
+    otherConstruct.TotLayers = 2;
+    otherConstruct.LayerPoint.allocate(Construction::MaxLayersInConstruct);
+    otherConstruct.LayerPoint = 0;
+    otherConstruct.LayerPoint(1) = 12;
+    otherConstruct.LayerPoint(2) = 10;
+    expectedResultRevConstrNum = 2;
+
+    functionResultRevConstrNum = AssignReverseConstructionNumber(*state, ConstrNum, ErrorsFound);
+    EXPECT_EQ(expectedResultRevConstrNum, functionResultRevConstrNum);
+    EXPECT_TRUE(otherConstruct.IsUsed);
+    EXPECT_FALSE(ErrorsFound);
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_setThicknessPerpendicularTest)
+{
+
+    Real64 userInputValue;
+    Real64 expectedReturnValue;
+    Real64 actualReturnValue;
+
+    state->dataConstruction->Construct.allocate(1);
+    auto &thisConstruct(state->dataConstruction->Construct(1));
+    thisConstruct.Name = "TestThisConstruction";
+
+    std::string const error_string1 =
+        delimited_string({"   ** Warning ** ConstructionProperty:InternalHeatSource has a tube spacing that is less than 2 mm.  This is not allowed.",
+                          "   **   ~~~   ** Construction=TestThisConstruction has this problem.  The tube spacing has been reset to 0.15m (~6 "
+                          "inches) for this construction.",
+                          "   **   ~~~   ** As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing."});
+    std::string const error_string2 = delimited_string(
+        {"   ** Warning ** ConstructionProperty:InternalHeatSource has a tube spacing that is less than 1 cm (0.4 inch).",
+         "   **   ~~~   ** Construction=TestThisConstruction has this concern.  Please check this construction to make sure it is correct.",
+         "   **   ~~~   ** As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing."});
+    std::string const error_string3 = delimited_string(
+        {"   ** Warning ** ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches).",
+         "   **   ~~~   ** Construction=TestThisConstruction has this concern.  Please check this construction to make sure it is correct.",
+         "   **   ~~~   ** As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing."});
+
+    // Test 1: User value is less than zero--should be reset to "default" value (warning messages produced)
+    userInputValue = -0.01;
+    expectedReturnValue = 0.075;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
+    // Test 2: User value is greater than zero but still too small--should be reset to the "default" value (warning messages produced)
+    userInputValue = 0.0001;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
+    // Test 3: User value is greater than minimum allowed but smaller than "typical"--no resetting (warning messages produced)
+    userInputValue = 0.008;
+    expectedReturnValue = 0.004;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
+
+    // Test 4: User value is great than a typical range--no resetting (warning message produced)
+    userInputValue = 2.0;
+    expectedReturnValue = 1.0;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string3, true));
+
+    // Test 5: User value is within the typical range--no resetting, no warning messages
+    userInputValue = 0.2;
+    expectedReturnValue = 0.1;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
 }

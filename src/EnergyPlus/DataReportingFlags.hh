@@ -57,36 +57,30 @@
 
 namespace EnergyPlus {
 
-namespace DataReportingFlags {
+struct ReportFlagData : BaseGlobalStruct
+{
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumOfWarmupDays; // reinitialized for each environment.
-    extern std::string cWarmupDay;
-    extern bool DisplayPerfSimulationFlag;        // True when "Performing Simulation" should be displayed
-    extern bool DoWeatherInitReporting;           // Init reporting -- items that go onto OutputFileInits
-    extern bool PrintEndDataDictionary;           // Flag for printing "End of Data Dictionary" on output files
-    extern bool MakeMirroredDetachedShading;      // True (default) when Detached Shading Surfaces should be "mirrored"
-    extern bool MakeMirroredAttachedShading;      // True (default) when Attached Shading Surfaces should be "mirrored"
-    extern bool DebugOutput;
-    extern bool EvenDuringWarmup;
-
-    // Functions
-    void clear_state();
-
-} // namespace DataReportingFlags
-
-struct ReportFlagData : BaseGlobalStruct {
+    int NumOfWarmupDays = 0; // reinitialized for each environment.
+    std::string cWarmupDay;
+    bool DisplayPerfSimulationFlag = false;  // True when "Performing Simulation" should be displayed
+    bool DoWeatherInitReporting = false;     // Init reporting -- items that go onto OutputFileInits (eio)
+    bool PrintEndDataDictionary = false;     // Flag for printing "End of Data Dictionary" on output files
+    bool MakeMirroredDetachedShading = true; // True (default) when Detached Shading Surfaces should be "mirrored"
+    bool MakeMirroredAttachedShading = true; // True (default) when Attached Shading Surfaces should be "mirrored"
+    bool DebugOutput = false;
+    bool EvenDuringWarmup = false;
 
     void clear_state() override
     {
-
+        this->NumOfWarmupDays = 0;
+        this->cWarmupDay.clear();
+        this->DisplayPerfSimulationFlag = false;
+        this->DoWeatherInitReporting = false;
+        this->PrintEndDataDictionary = false;
+        this->MakeMirroredDetachedShading = true;
+        this->MakeMirroredAttachedShading = true;
+        this->DebugOutput = false;
+        this->EvenDuringWarmup = false;
     }
 };
 

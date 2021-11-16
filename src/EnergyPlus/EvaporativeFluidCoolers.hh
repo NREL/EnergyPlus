@@ -67,8 +67,6 @@ namespace EvaporativeFluidCoolers {
     extern std::string const cEvapFluidCooler_SingleSpeed;
     extern std::string const cEvapFluidCooler_TwoSpeed;
 
-    extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
-
     enum struct EvapLoss
     {
         ByUserFactor,
@@ -106,7 +104,7 @@ namespace EvaporativeFluidCoolers {
         // Members
         std::string Name;                // User identifier
         std::string EvapFluidCoolerType; // Type of evaporative fluid cooler
-        int TypeOf_Num;
+        DataPlant::PlantEquipmentType Type;
         std::string PerformanceInputMethod;
         PIM PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
@@ -225,13 +223,14 @@ namespace EvaporativeFluidCoolers {
 
         // Default Constructor
         EvapFluidCoolerSpecs()
-            : TypeOf_Num(0), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
-              DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
-              HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedEvapFluidCoolerUA(0.0),
-              HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
-              LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0), LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0),
-              LowSpeedEvapFluidCoolerUA(0.0), LowSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedEvapFluidCoolerUASizingFactor(0.0),
-              DesignEnteringWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0), EvapFluidCoolerMassFlowRateMultiplier(0.0),
+            : Type(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true),
+              DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0),
+              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
+              HighSpeedEvapFluidCoolerUA(0.0), HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
+              LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
+              LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0), LowSpeedEvapFluidCoolerUA(0.0),
+              LowSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedEvapFluidCoolerUASizingFactor(0.0), DesignEnteringWaterTemp(0.0),
+              DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0), EvapFluidCoolerMassFlowRateMultiplier(0.0),
               HeatRejectCapNomCapSizingRatio(0.0), HighSpeedStandardDesignCapacity(0.0), LowSpeedStandardDesignCapacity(0.0),
               LowSpeedStandardDesignCapacitySizingFactor(0.0), HighSpeedUserSpecifiedDesignCapacity(0.0), LowSpeedUserSpecifiedDesignCapacity(0.0),
               LowSpeedUserSpecifiedDesignCapacitySizingFactor(0.0), Concentration(0.0), FluidIndex(0), SizFac(0.0), WaterInletNodeNum(0),
@@ -250,7 +249,7 @@ namespace EvaporativeFluidCoolers {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         void setupOutputVars(EnergyPlusData &state);
 
@@ -258,7 +257,11 @@ namespace EvaporativeFluidCoolers {
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void InitEvapFluidCooler(EnergyPlusData &state);
 
@@ -268,33 +271,41 @@ namespace EvaporativeFluidCoolers {
 
         void UpdateEvapFluidCooler(EnergyPlusData &state);
 
-        void ReportEvapFluidCooler(bool RunFlag);
+        void ReportEvapFluidCooler(EnergyPlusData &state, bool RunFlag);
 
         void CalcSingleSpeedEvapFluidCooler(EnergyPlusData &state);
 
         void CalcTwoSpeedEvapFluidCooler(EnergyPlusData &state);
 
-        Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, Array1D<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, std::array<Real64, 4> const &Par);
 
         void SimSimpleEvapFluidCooler(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
     void GetEvapFluidCoolerInput(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace EvaporativeFluidCoolers
 
-struct EvaporativeFluidCoolersData : BaseGlobalStruct {
+struct EvaporativeFluidCoolersData : BaseGlobalStruct
+{
+
+    bool GetEvapFluidCoolerInputFlag = true;
+    int NumSimpleEvapFluidCoolers = 0;                                            // Number of similar evaporative fluid coolers
+    Array1D<EvaporativeFluidCoolers::EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
+    std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
 
     void clear_state() override
     {
-
+        GetEvapFluidCoolerInputFlag = true;
+        NumSimpleEvapFluidCoolers = 0;
+        SimpleEvapFluidCooler.clear();
+        UniqueSimpleEvapFluidCoolerNames.clear();
     }
 };
 

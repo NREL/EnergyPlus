@@ -61,12 +61,12 @@ namespace DataHeatBalance {
 } // namespace EnergyPlus
 
 namespace Tarcog {
-
-class CBaseIGULayer;
-class CEnvironment;
-class CIGU;
-class CSingleSystem;
-
+namespace ISO15099 {
+    class CBaseIGULayer;
+    class CEnvironment;
+    class CIGU;
+    class CSingleSystem;
+} // namespace ISO15099
 } // namespace Tarcog
 
 namespace Gases {
@@ -103,12 +103,12 @@ namespace WindowManager {
     public:
         CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int const t_SurfNum);
 
-        std::shared_ptr<Tarcog::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
+        std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
-        std::shared_ptr<Tarcog::CEnvironment> getIndoor(EnergyPlusData &state) const;
-        std::shared_ptr<Tarcog::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
-        std::shared_ptr<Tarcog::CIGU> getIGU();
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoor(EnergyPlusData &state) const;
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
+        Tarcog::ISO15099::CIGU getIGU() const;
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from
@@ -132,19 +132,21 @@ namespace WindowManager {
 
         int getNumOfLayers(EnergyPlusData &state) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(DataSurfaces::SurfaceData const &surface,
-                                                             Material::MaterialProperties const &material,
-                                                             int const t_Index,
-                                                             int const t_SurfNum);
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
+                                                                       DataSurfaces::SurfaceData const &surface,
+                                                                       Material::MaterialProperties const &material,
+                                                                       int const t_Index,
+                                                                       int const t_SurfNum);
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state,
+                                                                            Material::MaterialProperties const &material) const;
 
-        std::shared_ptr<Gases::CGas> getGas(Material::MaterialProperties const &material) const;
-        std::shared_ptr<Gases::CGas> getAir() const;
+        Gases::CGas getGas(Material::MaterialProperties const &material) const;
+        static Gases::CGas getAir();
         Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
     };
 } // namespace WindowManager

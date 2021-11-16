@@ -85,7 +85,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,4;
 
@@ -289,8 +289,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 1 Avail List;!- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 
@@ -796,6 +795,99 @@
     For: AllDays,            !- Field 2
     Until: 24:00,0.0;        !- Field 3
 
+  Curve:QuadLinear,
+    TotCoolCapCurve,         !- Name
+    -9.149069561,            !- Coefficient1 Constant
+    10.87814026,             !- Coefficient2 w
+    -1.718780157,            !- Coefficient3 x
+    0.746414818,             !- Coefficient4 y
+    0.0,                     !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+    CoolPowCurve,            !- Name
+    -3.205409884,            !- Coefficient1 Constant
+    -0.976409399,            !- Coefficient2 w
+    3.97892546,              !- Coefficient3 x
+    0.938181818,             !- Coefficient4 y
+    0.0,                     !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+    HeatCapCurve,            !- Name
+    -1.361311959,            !- Coefficient1 Constant
+    -2.471798046,            !- Coefficient2 w
+    4.173164514,             !- Coefficient3 x
+    0.640757401,             !- Coefficient4 y
+    0.0,                     !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+    HeatPowCurve,            !- Name
+    -2.176941116,            !- Coefficient1 Constant
+    0.832114286,             !- Coefficient2 w
+    1.570743399,             !- Coefficient3 x
+    0.690793651,             !- Coefficient4 y
+    0.0,                     !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
+
+  Curve:QuintLinear,
+    CoolSensCapCurve,        !- Name
+    -5.462690012,            !- Coefficient1 Constant
+    17.95968138,             !- Coefficient2 v
+    -11.87818402,            !- Coefficient3 w
+    -0.980163419,            !- Coefficient4 x
+    0.767285761,             !- Coefficient5 y
+    0.0,                     !- Coefficient6 z
+    -100,                    !- Minimum Value of v
+    100,                     !- Maximum Value of v
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
+
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     Sys 1 Heat Pump Cooling Mode,  !- Name
     Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
@@ -807,22 +899,9 @@
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     5.12,                    !- Gross Rated Cooling COP {W/W}
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -836,16 +915,8 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
     4.75,                    !- Gross Rated Heating COP {W/W}
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
 
   Fan:OnOff,
     Zone 1 Fan,              !- Name
@@ -1382,6 +1453,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1398,6 +1470,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1414,6 +1487,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1430,6 +1504,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1446,6 +1521,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1462,6 +1538,7 @@
     Roof,                    !- Surface Type
     ROOF19,                  !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

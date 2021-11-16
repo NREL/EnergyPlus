@@ -50,7 +50,6 @@
 
 #include <EnergyPlus/api/EnergyPlusAPI.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -73,7 +72,7 @@ extern "C" {
 /// \see stateNew
 /// \see stateReset
 /// \see stateDelete
-typedef void * EnergyPlusState;
+typedef void *EnergyPlusState;
 
 /// \brief Creates a new simulation state instance and returns it for the client to store while running simulations
 /// \details This function creates a new instance that is used in running simulations from the API.  The state created

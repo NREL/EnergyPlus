@@ -55,7 +55,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -107,7 +109,7 @@ namespace UnitVentilator {
         std::string HCoilName;    // name of heating coil
         std::string HCoilTypeCh;  // type of heating coil character string (same as type on idf file).
         int HCoil_Index;
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HeatingCoilType;
         int HCoil_FluidIndex;
         std::string HCoilSchedName; // availability schedule for the heating coil
         int HCoilSchedPtr;          // index to schedule
@@ -133,7 +135,7 @@ namespace UnitVentilator {
         int CCoil_Index;
         std::string CCoilPlantName; // name of cooling coil for plant
         std::string CCoilPlantType; // type of cooling coil for plant
-        int CCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType CoolingCoilType;
         int CCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
@@ -181,11 +183,12 @@ namespace UnitVentilator {
             : SchedPtr(0), AirInNode(0), AirOutNode(0), FanOutletNode(0), FanType_Num(0), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
               OpMode(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0),
               MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
-              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0), HCoil_PlantTypeNum(0),
-              HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0),
-              MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0),
-              HotCoilOutNodeNum(0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), CCoilPresent(false),
-              CCoil_Index(0), CCoil_PlantTypeNum(0), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
+              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
+              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
+              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
+              HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
+              CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
               ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
               TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),
@@ -206,7 +209,8 @@ namespace UnitVentilator {
         }
     };
 
-    void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimUnitVentilator(EnergyPlusData &state,
+                           std::string_view CompName,     // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -215,28 +219,32 @@ namespace UnitVentilator {
 
     void GetUnitVentilatorInput(EnergyPlusData &state);
 
-    void InitUnitVentilator(EnergyPlusData &state, int const UnitVentNum,         // index for the current unit ventilator
+    void InitUnitVentilator(EnergyPlusData &state,
+                            int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const ZoneNum              // number of zone being served
     );
 
     void SizeUnitVentilator(EnergyPlusData &state, int const UnitVentNum);
 
-    void CalcUnitVentilator(EnergyPlusData &state, int &UnitVentNum,              // number of the current fan coil unit being simulated
+    void CalcUnitVentilator(EnergyPlusData &state,
+                            int &UnitVentNum,              // number of the current fan coil unit being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitVentilatorComponents(EnergyPlusData &state, int const UnitVentNum,                  // Unit index in unit ventilator array
+    void CalcUnitVentilatorComponents(EnergyPlusData &state,
+                                      int const UnitVentNum,                  // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,          // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                        // load met by unit (watts)
                                       Optional_int_const OpMode = _,          // Fan Type
                                       Optional<Real64 const> PartLoadFrac = _ // Part Load Ratio of coil and fan
     );
 
-    void SimUnitVentOAMixer(EnergyPlusData &state, int const UnitVentNum, // Unit index in unit ventilator array
+    void SimUnitVentOAMixer(EnergyPlusData &state,
+                            int const UnitVentNum, // Unit index in unit ventilator array
                             int const FanOpMode    // unit ventilator fan operating mode
     );
 
@@ -257,52 +265,35 @@ namespace UnitVentilator {
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
+    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state,
+                                      Real64 const PartLoadRatio, // Coil Part Load Ratio
                                       Array1D<Real64> const &Par  // Function parameters
     );
 
-    Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state, int const UnitVentNum,        // Unit Ventilator index number
-                                                      Real64 const MinOAFrac,       // Minimum Outside Air Fraction
-                                                      Real64 const MassFlowRate,    // Design Outside Air Mass Flow Rate
-                                                      Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
-                                                      Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
-                                                      Real64 const Toutdoor         // Outdoor Air Temperature
+    Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
+                                                      int const UnitVentNum,     // Unit Ventilator index number
+                                                      Real64 const MinOAFrac,    // Minimum Outside Air Fraction
+                                                      Real64 const MassFlowRate, // Design Outside Air Mass Flow Rate
+                                                      Real64 const MaxOAFrac,    // Maximum Outside Air Fraction
+                                                      Real64 const Tinlet,       // Inlet Temperature to Unit or Zone Temperature
+                                                      Real64 const Toutdoor      // Outdoor Air Temperature
     );
 
-    void CalcMdotCCoilCycFan(EnergyPlusData &state, Real64 &mdot,                  // mass flow rate
-                             Real64 &QCoilReq,              // Remaining cooling coil load
-                             Real64 const QZnReq,           // Zone load to setpoint
-                               int const UnitVentNum,       // Unit Ventilator index
-                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    void CalcMdotCCoilCycFan(EnergyPlusData &state,
+                             Real64 &mdot,              // mass flow rate
+                             Real64 &QCoilReq,          // Remaining cooling coil load
+                             Real64 const QZnReq,       // Zone load to setpoint
+                             int const UnitVentNum,     // Unit Ventilator index
+                             Real64 const PartLoadRatio // Part load ratio for unit ventilator
     );
 
 } // namespace UnitVentilator
 
-struct UnitVentilatorsData : BaseGlobalStruct {
+struct UnitVentilatorsData : BaseGlobalStruct
+{
 
-
-    // Currrent Module Unit type
+    // Current Module Unit type
     std::string const cMO_UnitVentilator = "ZoneHVAC:UnitVentilator";
-
-    // Parameters for outside air control types:
-    int const Heating_ElectricCoilType = 1;
-    int const Heating_GasCoilType = 2;
-    int const Heating_WaterCoilType = 3;
-    int const Heating_SteamCoilType = 4;
-    int const Cooling_CoilWaterCooling = 1;
-    int const Cooling_CoilDetailedCooling = 2;
-    int const Cooling_CoilHXAssisted = 3;
-    // OA operation modes
-    int const VariablePercent = 1;
-    int const FixedTemperature = 2;
-    int const FixedOAControl = 3;
-    // coil operation
-    int const On = 1;  // normal coil operation
-    int const Off = 0; // signal coil shouldn't run
-    int const NoneOption = 0;
-    int const BothOption = 1;
-    int const HeatingOption = 2;
-    int const CoolingOption = 3;
 
     bool HCoilOn = false;        // TRUE if the heating coil  = gas or electric especially) should be running
     int NumOfUnitVents = 0;      // Number of unit ventilators in the input file
@@ -312,25 +303,44 @@ struct UnitVentilatorsData : BaseGlobalStruct {
     bool GetUnitVentilatorInputFlag = true; // First time, input is "gotten"
     Array1D_bool CheckEquipName;
 
-    Array1D<UnitVentilator::UnitVentilatorData> UnitVent;
-    Array1D<UnitVentilator::UnitVentNumericFieldData> UnitVentNumericFields;
+    EPVector<UnitVentilator::UnitVentilatorData> UnitVent;
+    EPVector<UnitVentilator::UnitVentNumericFieldData> UnitVentNumericFields;
 
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag;
+
+    int RefrigIndex = 0;
+    int DummyWaterIndex = 1;
+
+    int ATMixOutNode = 0;   // outlet node of ATM Mixer
+    int ATMixerPriNode = 0; // primary air node of ATM Mixer
+    int ZoneNode = 0;       // zone node
+
     void clear_state() override
     {
-        HCoilOn = false;
-        NumOfUnitVents = 0;
-        OAMassFlowRate = 0.0;
-        QZnReq = 0.0;
-        GetUnitVentilatorInputFlag = true;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        UnitVent.deallocate();
-        UnitVentNumericFields.deallocate();
-        MyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
+        this->HCoilOn = false;
+        this->NumOfUnitVents = 0;
+        this->OAMassFlowRate = 0.0;
+        this->QZnReq = 0.0;
+        this->GetUnitVentilatorInputFlag = true;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->UnitVent.deallocate();
+        this->UnitVentNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->RefrigIndex = 0;
+        this->DummyWaterIndex = 1;
+        this->ATMixOutNode = 0;
+        this->ATMixerPriNode = 0;
+        this->ZoneNode = 0;
     }
 
     // Default Constructor

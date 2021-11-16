@@ -14,3 +14,10 @@ surfaces in the same zone. This affects table outputs, eio, shd, wrl, and dxf.
 
 See [8370](https://github.com/NREL/EnergyPlus/pull/8370)
 
+### SQLite output file units conversion options for tabular data
+
+The SQLiite output file now reports Tabular Data with a separate unit conversion setting in Output:SQLite. In previous versions this setting is by default the same as the OutputControl:Table:Styles. Now, the units for SQLite tabular data could be independently set to JtoKWH, JtoMJ, JtoGJ, InchPound, or still using the OutputControl:Table:Styles default. The affected records could differ in both the numerical values and the corrponding units strings. 
+
+See the updates in the Input Output Reference documentation and [8474] (https://github.com/NREL/EnergyPlus/pull/8474)
+
+

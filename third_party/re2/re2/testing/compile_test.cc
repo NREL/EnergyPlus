@@ -109,6 +109,20 @@ static Test tests[] = {
   { "[[-`]",
     "3. byte [5b-60] 0 -> 4\n"
     "4. match! 0\n" },
+  // Issue 310
+  { "(?:|a)*",
+    "3+ nop -> 7\n"
+    "4. nop -> 9\n"
+    "5+ nop -> 7\n"
+    "6. nop -> 9\n"
+    "7+ nop -> 5\n"
+    "8. byte [61-61] 0 -> 5\n"
+    "9. match! 0\n" },
+  { "(?:|a)+",
+    "3+ nop -> 5\n"
+    "4. byte [61-61] 0 -> 5\n"
+    "5+ nop -> 3\n"
+    "6. match! 0\n" },
 };
 
 TEST(TestRegexpCompileToProg, Simple) {
@@ -147,10 +161,19 @@ static void DumpByteMap(StringPiece pattern, Regexp::ParseFlags flags,
   Regexp* re = Regexp::Parse(pattern, flags, NULL);
   EXPECT_TRUE(re != NULL);
 
-  Prog* prog = re->CompileToProg(0);
-  EXPECT_TRUE(prog != NULL);
-  *bytemap = prog->DumpByteMap();
-  delete prog;
+  {
+    Prog* prog = re->CompileToProg(0);
+    EXPECT_TRUE(prog != NULL);
+    *bytemap = prog->DumpByteMap();
+    delete prog;
+  }
+
+  {
+    Prog* prog = re->CompileToReverseProg(0);
+    EXPECT_TRUE(prog != NULL);
+    EXPECT_EQ(*bytemap, prog->DumpByteMap());
+    delete prog;
+  }
 
   re->Decref();
 }
@@ -213,16 +236,11 @@ TEST(TestCompile, UTF8Ranges) {
   EXPECT_EQ("[00-09] -> 0\n"
             "[0a-0a] -> 1\n"
             "[0b-7f] -> 0\n"
-            "[80-8f] -> 2\n"
-            "[90-9f] -> 3\n"
-            "[a0-bf] -> 4\n"
+            "[80-bf] -> 2\n"
             "[c0-c1] -> 1\n"
-            "[c2-df] -> 5\n"
-            "[e0-e0] -> 6\n"
-            "[e1-ef] -> 7\n"
-            "[f0-f0] -> 8\n"
-            "[f1-f3] -> 9\n"
-            "[f4-f4] -> 10\n"
+            "[c2-df] -> 3\n"
+            "[e0-ef] -> 4\n"
+            "[f0-f4] -> 5\n"
             "[f5-ff] -> 1\n",
             bytemap);
 }
@@ -232,7 +250,7 @@ TEST(TestCompile, InsufficientMemory) {
       "^(?P<name1>[^\\s]+)\\s+(?P<name2>[^\\s]+)\\s+(?P<name3>.+)$",
       Regexp::LikePerl, NULL);
   EXPECT_TRUE(re != NULL);
-  Prog* prog = re->CompileToProg(920);
+  Prog* prog = re->CompileToProg(850);
   // If the memory budget has been exhausted, compilation should fail
   // and return NULL instead of trying to do anything with NoMatch().
   EXPECT_TRUE(prog == NULL);
@@ -299,20 +317,22 @@ TEST(TestCompile, Bug26705922) {
             "8. byte [f0-f0] 0 -> 7\n",
             reverse);
 
-  Dump("[\\x{80}-\\x{10FFFF}]", Regexp::LikePerl, NULL, &reverse);
-  EXPECT_EQ("3. byte [80-bf] 0 -> 4\n"
-            "4+ byte [c2-df] 0 -> 7\n"
-            "5+ byte [a0-bf] 1 -> 8\n"
-            "6. byte [80-bf] 0 -> 9\n"
+  Dump("[\\x{80}-\\x{10FFFF}]", Regexp::LikePerl, &forward, &reverse);
+  EXPECT_EQ("3+ byte [c2-df] 0 -> 6\n"
+            "4+ byte [e0-ef] 0 -> 8\n"
+            "5. byte [f0-f4] 0 -> 9\n"
+            "6. byte [80-bf] 0 -> 7\n"
             "7. match! 0\n"
-            "8. byte [e0-e0] 0 -> 7\n"
-            "9+ byte [e1-ef] 0 -> 7\n"
-            "10+ byte [90-bf] 1 -> 13\n"
-            "11+ byte [80-bf] 1 -> 14\n"
-            "12. byte [80-8f] 0 -> 15\n"
-            "13. byte [f0-f0] 0 -> 7\n"
-            "14. byte [f1-f3] 0 -> 7\n"
-            "15. byte [f4-f4] 0 -> 7\n",
+            "8. byte [80-bf] 0 -> 6\n"
+            "9. byte [80-bf] 0 -> 8\n",
+            forward);
+  EXPECT_EQ("3. byte [80-bf] 0 -> 4\n"
+            "4+ byte [c2-df] 0 -> 6\n"
+            "5. byte [80-bf] 0 -> 7\n"
+            "6. match! 0\n"
+            "7+ byte [e0-ef] 0 -> 6\n"
+            "8. byte [80-bf] 0 -> 9\n"
+            "9. byte [f0-f4] 0 -> 6\n",
             reverse);
 }
 
@@ -332,27 +352,37 @@ TEST(TestCompile, Bug35237384) {
             forward);
 
   Dump("(a*|b*)*{3,}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
-  EXPECT_EQ("3+ nop -> 6\n"
-            "4+ nop -> 8\n"
-            "5. nop -> 21\n"
-            "6+ byte [61-61] 1 -> 6\n"
-            "7. nop -> 3\n"
-            "8+ byte [62-62] 1 -> 8\n"
-            "9. nop -> 3\n"
-            "10+ byte [61-61] 1 -> 10\n"
-            "11. nop -> 21\n"
-            "12+ byte [62-62] 1 -> 12\n"
-            "13. nop -> 21\n"
-            "14+ byte [61-61] 1 -> 14\n"
-            "15. nop -> 18\n"
-            "16+ byte [62-62] 1 -> 16\n"
-            "17. nop -> 18\n"
-            "18+ nop -> 14\n"
-            "19+ nop -> 16\n"
-            "20. match! 0\n"
-            "21+ nop -> 10\n"
-            "22+ nop -> 12\n"
-            "23. nop -> 18\n",
+  EXPECT_EQ("3+ nop -> 28\n"
+            "4. nop -> 30\n"
+            "5+ byte [61-61] 1 -> 5\n"
+            "6. nop -> 32\n"
+            "7+ byte [61-61] 1 -> 7\n"
+            "8. nop -> 26\n"
+            "9+ byte [61-61] 1 -> 9\n"
+            "10. nop -> 20\n"
+            "11+ byte [62-62] 1 -> 11\n"
+            "12. nop -> 20\n"
+            "13+ byte [62-62] 1 -> 13\n"
+            "14. nop -> 26\n"
+            "15+ byte [62-62] 1 -> 15\n"
+            "16. nop -> 32\n"
+            "17+ nop -> 9\n"
+            "18. nop -> 11\n"
+            "19. match! 0\n"
+            "20+ nop -> 17\n"
+            "21. nop -> 19\n"
+            "22+ nop -> 7\n"
+            "23. nop -> 13\n"
+            "24+ nop -> 17\n"
+            "25. nop -> 19\n"
+            "26+ nop -> 22\n"
+            "27. nop -> 24\n"
+            "28+ nop -> 5\n"
+            "29. nop -> 15\n"
+            "30+ nop -> 22\n"
+            "31. nop -> 24\n"
+            "32+ nop -> 28\n"
+            "33. nop -> 30\n",
       forward);
 
   Dump("((|S.+)+|(|S.+)+|){2}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);

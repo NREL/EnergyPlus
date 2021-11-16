@@ -25,7 +25,6 @@
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
-#include <array>
 #include <string>
 
 #ifdef _MSC_VER
@@ -47,7 +46,6 @@ TEST( Array2Test, ConstructDefault )
 	EXPECT_EQ( 0, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR(), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR(), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 
 	Array2D_int const C1;
 	EXPECT_EQ( 0u, C1.size() );
@@ -59,7 +57,6 @@ TEST( Array2Test, ConstructDefault )
 	EXPECT_EQ( 0, C1.u2() );
 	EXPECT_EQ( Array2D_int::IR(), C1.I1() );
 	EXPECT_EQ( Array2D_int::IR(), C1.I2() );
-	EXPECT_FALSE( C1.initializer_active() );
 }
 
 TEST( Array2Test, ConstructCopy )
@@ -75,7 +72,6 @@ TEST( Array2Test, ConstructCopy )
 	EXPECT_EQ( A1.u2(), A2.u2() );
 	EXPECT_EQ( A1.I1(), A2.I1() );
 	EXPECT_EQ( A1.I2(), A2.I2() );
-	EXPECT_EQ( A1.initializer_active(), A2.initializer_active() );
 	EXPECT_TRUE( conformable( A1, A2 ) );
 	EXPECT_TRUE( equal_dimensions( A1, A2 ) );
 	EXPECT_TRUE( eq( A1, A2 ) );
@@ -91,7 +87,6 @@ TEST( Array2Test, ConstructCopy )
 	EXPECT_EQ( C1.u1(), C2.u1() );
 	EXPECT_EQ( C1.I1(), C2.I1() );
 	EXPECT_EQ( C1.I2(), C2.I2() );
-	EXPECT_EQ( C1.initializer_active(), C2.initializer_active() );
 	EXPECT_TRUE( eq( C1, C2 ) );
 }
 
@@ -114,7 +109,6 @@ TEST( Array2Test, ConstructOtherData )
 	EXPECT_EQ( A1.u2(), A2.u2() );
 	EXPECT_EQ( A1.I1(), A2.I1() );
 	EXPECT_EQ( A1.I2(), A2.I2() );
-	EXPECT_EQ( A1.initializer_active(), A2.initializer_active() );
 	EXPECT_TRUE( conformable( A1, A2 ) );
 	EXPECT_TRUE( equal_dimensions( A1, A2 ) );
 	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
@@ -124,25 +118,6 @@ TEST( Array2Test, ConstructOtherData )
 		}
 	}
 
-	// No way to avoid dependency on value constructor
-	Array2D_double const C1( 2, 3, sticky( 3.1459 ) );
-	Array2D_int const C2( C1 );
-	EXPECT_EQ( C1.size(), C2.size() );
-	EXPECT_EQ( C1.size1(), C2.size1() );
-	EXPECT_EQ( C1.size2(), C2.size2() );
-	EXPECT_EQ( C1.I1(), C2.I1() );
-	EXPECT_EQ( C1.I2(), C2.I2() );
-	EXPECT_EQ( C1.l1(), C2.l1() );
-	EXPECT_EQ( C1.l2(), C2.l2() );
-	EXPECT_EQ( C1.u1(), C2.u1() );
-	EXPECT_EQ( C1.u2(), C2.u2() );
-	EXPECT_TRUE( C1.initializer_active() );
-	EXPECT_TRUE( C2.initializer_active() );
-	EXPECT_TRUE( conformable( C1, C2 ) );
-	EXPECT_TRUE( equal_dimensions( C1, C2 ) );
-	for ( int i1 = C2.l1(); i1 <= C2.u1(); ++i1 )
-		for ( int i2 = C2.l2(); i2 <= C2.u2(); ++i2 )
-			EXPECT_DOUBLE_EQ( 3.0, double( C2( i1, i2 ) ) );
 }
 
 TEST( Array2Test, ConstructArgument )
@@ -159,7 +134,6 @@ TEST( Array2Test, ConstructArgument )
 	EXPECT_EQ( A2.u1(), A3.u1() );
 	EXPECT_EQ( A2.l2(), A3.l2() );
 	EXPECT_EQ( A2.u2(), A3.u2() );
-	EXPECT_EQ( A2.initializer_active(), A3.initializer_active() );
 	EXPECT_TRUE( conformable( A1, A3 ) );
 	EXPECT_TRUE( equal_dimensions( A1, A3 ) );
 	EXPECT_TRUE( eq( A2, A3 ) );
@@ -174,7 +148,6 @@ TEST( Array2Test, ConstructArgument )
 	EXPECT_EQ( C2.l2(), C3.l2() );
 	EXPECT_EQ( C2.u1(), C3.u1() );
 	EXPECT_EQ( C2.u2(), C3.u2() );
-	EXPECT_EQ( C2.initializer_active(), C3.initializer_active() );
 	EXPECT_TRUE( conformable( C1, C3 ) );
 	EXPECT_TRUE( equal_dimensions( C1, C3 ) );
 	EXPECT_TRUE( eq( C2, C3 ) );
@@ -220,38 +193,6 @@ TEST( Array2Test, ConstructArgument )
 	EXPECT_TRUE( eq( F2, 31459 ) );
 }
 
-TEST( Array2Test, ConstructSticky )
-{
-	Array2D_int A1( Sticky_int( 31459 ) );
-	EXPECT_EQ( 0u, A1.size() );
-	EXPECT_EQ( 0u, A1.size1() );
-	EXPECT_EQ( 0u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 0, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 0, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR(), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR(), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	A1.dimension( 2, 2 );
-	EXPECT_EQ( 31459, A1( 1, 1 ) );
-	EXPECT_EQ( 31459, A1( 1, 2 ) );
-	EXPECT_EQ( 31459, A1( 2, 1 ) );
-	EXPECT_EQ( 31459, A1( 2, 2 ) );
-
-	Array2D_int const C1( Sticky_int( 31459 ) ); // Not a useful array: Can never hold anything
-	EXPECT_EQ( 0u, C1.size() );
-	EXPECT_EQ( 0u, C1.size1() );
-	EXPECT_EQ( 0u, C1.size2() );
-	EXPECT_EQ( 1, C1.l1() );
-	EXPECT_EQ( 1, C1.l2() );
-	EXPECT_EQ( 0, C1.u1() );
-	EXPECT_EQ( 0, C1.u2() );
-	EXPECT_EQ( Array2D_int::IR(), C1.I1() );
-	EXPECT_EQ( Array2D_int::IR(), C1.I2() );
-	EXPECT_TRUE( C1.initializer_active() );
-}
-
 TEST( Array2Test, ConstructIndexes )
 {
 	Array2D_int A1( 8, 10 );
@@ -264,7 +205,6 @@ TEST( Array2Test, ConstructIndexes )
 	EXPECT_EQ( 10, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 8 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 10 ), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 
 	Array2D_int const C1( 8, 10 );
 	EXPECT_EQ( 80u, C1.size() );
@@ -276,7 +216,6 @@ TEST( Array2Test, ConstructIndexes )
 	EXPECT_EQ( 10, C1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 8 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 10 ), A1.I2() );
-	EXPECT_FALSE( C1.initializer_active() );
 }
 
 TEST( Array2Test, ConstructIndexRange )
@@ -292,7 +231,6 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_EQ( 7, A11.u2() );
 	EXPECT_EQ( Array2D_int::IR( 2, 5 ), A11.I1() );
 	EXPECT_EQ( Array2D_int::IR( 3, 7 ), A11.I2() );
-	EXPECT_FALSE( A11.initializer_active() );
 
 	// Explicit index range, negative bounds
 	Array2D_int A12( IR( -5, -2 ), IR( -7, -3 ) );
@@ -305,7 +243,6 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_EQ( -3, A12.u2() );
 	EXPECT_EQ( Array2D_int::IR( -5, -2 ), A12.I1() );
 	EXPECT_EQ( Array2D_int::IR( -7, -3 ), A12.I2() );
-	EXPECT_FALSE( A12.initializer_active() );
 
 	// Explicit index range, bounds that cross zero
 	Array2D_int A13( IR( -3, 3 ), IR( -2, 2 ) );
@@ -318,7 +255,6 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_EQ( 2, A13.u2() );
 	EXPECT_EQ( Array2D_int::IR( -3, 3 ), A13.I1() );
 	EXPECT_EQ( Array2D_int::IR( -2, 2 ), A13.I2() );
-	EXPECT_FALSE( A13.initializer_active() );
 
 	// Index range initializer list, positive bounds
 	Array2D_int A21( { 2, 5 }, { 3, 7 } );
@@ -331,7 +267,6 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_EQ( 7, A21.u2() );
 	EXPECT_EQ( Array2D_int::IR( 2, 5 ), A21.I1() );
 	EXPECT_EQ( Array2D_int::IR( 3, 7 ), A21.I2() );
-	EXPECT_FALSE( A21.initializer_active() );
 
 	// Index range initializer list, negative bounds
 	Array2D_int A22( { -5, -2 }, { -7, -3 } );
@@ -344,7 +279,6 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_EQ( -3, A22.u2() );
 	EXPECT_EQ( Array2D_int::IR( -5, -2 ), A22.I1() );
 	EXPECT_EQ( Array2D_int::IR( -7, -3 ), A22.I2() );
-	EXPECT_FALSE( A22.initializer_active() );
 
 	// Index range initializer list, bounds that cross zero
 	Array2D_int A23( { -3, 3 }, { -2, 2 } );
@@ -357,7 +291,6 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_EQ( 2, A23.u2() );
 	EXPECT_EQ( Array2D_int::IR( -3, 3 ), A23.I1() );
 	EXPECT_EQ( Array2D_int::IR( -2, 2 ), A23.I2() );
-	EXPECT_FALSE( A23.initializer_active() );
 }
 
 TEST( Array2Test, ConstructIndexesInitializerValue )
@@ -372,7 +305,6 @@ TEST( Array2Test, ConstructIndexesInitializerValue )
 	EXPECT_EQ( 10, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 8 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 10 ), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
 		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
 			EXPECT_EQ( 31459, A1( i1, i2 ) );
@@ -389,7 +321,6 @@ TEST( Array2Test, ConstructIndexesInitializerValue )
 	EXPECT_EQ( 10, C1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 8 ), C1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 10 ), C1.I2() );
-	EXPECT_FALSE( C1.initializer_active() );
 	for ( int i1 = C1.l1(); i1 <= C1.u1(); ++i1 ) {
 		for ( int i2 = C1.l2(); i2 <= C1.u2(); ++i2 ) {
 			EXPECT_EQ( 31459, C1( i1, i2 ) );
@@ -410,7 +341,6 @@ TEST( Array2Test, ConstructIndexRangeInitializerValue )
 	EXPECT_EQ( 7, A11.u2() );
 	EXPECT_EQ( Array2D_int::IR( 2, 5 ), A11.I1() );
 	EXPECT_EQ( Array2D_int::IR( 3, 7 ), A11.I2() );
-	EXPECT_FALSE( A11.initializer_active() );
 	for ( int i1 = A11.l1(); i1 <= A11.u1(); ++i1 ) {
 		for ( int i2 = A11.l2(); i2 <= A11.u2(); ++i2 ) {
 			EXPECT_EQ( 31459, A11( i1, i2 ) );
@@ -428,7 +358,6 @@ TEST( Array2Test, ConstructIndexRangeInitializerValue )
 	EXPECT_EQ( 2, A12.u2() );
 	EXPECT_EQ( Array2D_int::IR( -3, 3 ), A12.I1() );
 	EXPECT_EQ( Array2D_int::IR( -2, 2 ), A12.I2() );
-	EXPECT_FALSE( A12.initializer_active() );
 	for ( int i1 = A12.l1(); i1 <= A12.u1(); ++i1 ) {
 		for ( int i2 = A12.l2(); i2 <= A12.u2(); ++i2 ) {
 			EXPECT_EQ( -31459, A12( i1, i2 ) );
@@ -446,7 +375,6 @@ TEST( Array2Test, ConstructIndexRangeInitializerValue )
 	EXPECT_EQ( 7, A21.u2() );
 	EXPECT_EQ( Array2D_int::IR( 2, 5 ), A21.I1() );
 	EXPECT_EQ( Array2D_int::IR( 3, 7 ), A21.I2() );
-	EXPECT_FALSE( A21.initializer_active() );
 	for ( int i1 = A21.l1(); i1 <= A21.u1(); ++i1 ) {
 		for ( int i2 = A21.l2(); i2 <= A21.u2(); ++i2 ) {
 			EXPECT_EQ( 2718, A21( i1, i2 ) );
@@ -464,170 +392,9 @@ TEST( Array2Test, ConstructIndexRangeInitializerValue )
 	EXPECT_EQ( 2, A22.u2() );
 	EXPECT_EQ( Array2D_int::IR( -3, 3 ), A22.I1() );
 	EXPECT_EQ( Array2D_int::IR( -2, 2 ), A22.I2() );
-	EXPECT_FALSE( A22.initializer_active() );
 	for ( int i1 = A22.l1(); i1 <= A22.u1(); ++i1 ) {
 		for ( int i2 = A22.l2(); i2 <= A22.u2(); ++i2 ) {
 			EXPECT_EQ( -2718, A22( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ConstructIndexesSticky )
-{
-	Array2D_int A1( 2, 3, Sticky_int( 31459 ), 2718 );
-	EXPECT_EQ( 6u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 3u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 3, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( 2718, A1( i1, i2 ) );
-		}
-	}
-	A1.dimension( 2, 2 );
-	EXPECT_EQ( 31459, A1( 1, 1 ) );
-	EXPECT_EQ( 31459, A1( 1, 2 ) );
-	EXPECT_EQ( 31459, A1( 2, 1 ) );
-	EXPECT_EQ( 31459, A1( 2, 2 ) );
-
-	Array2D_int const C1( 2, 3, Sticky_int( 31459 ), 2718 );
-	EXPECT_EQ( 6u, C1.size() );
-	EXPECT_EQ( 2u, C1.size1() );
-	EXPECT_EQ( 3u, C1.size2() );
-	EXPECT_EQ( 1, C1.l1() );
-	EXPECT_EQ( 2, C1.u1() );
-	EXPECT_EQ( 1, C1.l2() );
-	EXPECT_EQ( 3, C1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), C1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), C1.I2() );
-	EXPECT_TRUE( C1.initializer_active() );
-	for ( int i1 = C1.l1(); i1 <= C1.u1(); ++i1 ) {
-		for ( int i2 = C1.l2(); i2 <= C1.u2(); ++i2 ) {
-			EXPECT_EQ( 2718, C1( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ConstructIndexRangeSticky )
-{
-	Array2D_int A1( { 1, 2 }, { 1, 3 }, make_Sticky( 31459 ) );
-	EXPECT_EQ( 6u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 3u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 3, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	EXPECT_EQ( 31459, A1( 1, 1) );
-	EXPECT_EQ( 31459, A1( 1, 2 ) );
-	EXPECT_EQ( 31459, A1( 1, 3 ) );
-	EXPECT_EQ( 31459, A1( 2, 1 ) );
-	EXPECT_EQ( 31459, A1( 2, 2 ) );
-	EXPECT_EQ( 31459, A1( 2, 3 ) );
-	A1.dimension( 2, 2 );
-	EXPECT_EQ( 31459, A1( 1, 1 ) );
-	EXPECT_EQ( 31459, A1( 1, 2 ) );
-	EXPECT_EQ( 31459, A1( 2, 1 ) );
-	EXPECT_EQ( 31459, A1( 2, 2 ) );
-
-	Array2D_int const C1( { 1, 2 }, { 1, 3 }, make_Sticky( 31459 ), 2718 );
-	EXPECT_EQ( 6u, C1.size() );
-	EXPECT_EQ( 2u, C1.size1() );
-	EXPECT_EQ( 3u, C1.size2() );
-	EXPECT_EQ( 1, C1.l1() );
-	EXPECT_EQ( 2, C1.u1() );
-	EXPECT_EQ( 1, C1.l2() );
-	EXPECT_EQ( 3, C1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), C1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), C1.I2() );
-	EXPECT_TRUE( C1.initializer_active() );
-	EXPECT_EQ( 2718, C1( 1, 1) );
-	EXPECT_EQ( 2718, C1( 1, 2 ) );
-	EXPECT_EQ( 2718, C1( 1, 3 ) );
-	EXPECT_EQ( 2718, C1( 2, 1 ) );
-	EXPECT_EQ( 2718, C1( 2, 2 ) );
-	EXPECT_EQ( 2718, C1( 2, 3 ) );
-}
-
-TEST( Array2Test, ConstructIndexesStickyInitializerValue )
-{
-	Array2D_int A1( 2, 3, Sticky_int( 31459 ), 2718 );
-	EXPECT_EQ( 6u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 3u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 3, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( 2718, A1( i1, i2 ) );
-		}
-	}
-
-	Array2D_int const C1( 2, 3, Sticky_int( 31459 ), 2718 );
-	EXPECT_EQ( 6u, C1.size() );
-	EXPECT_EQ( 2u, C1.size1() );
-	EXPECT_EQ( 3u, C1.size2() );
-	EXPECT_EQ( 1, C1.l1() );
-	EXPECT_EQ( 2, C1.u1() );
-	EXPECT_EQ( 1, C1.l2() );
-	EXPECT_EQ( 3, C1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), C1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), C1.I2() );
-	EXPECT_TRUE( C1.initializer_active() );
-	for ( int i1 = C1.l1(); i1 <= C1.u1(); ++i1 ) {
-		for ( int i2 = C1.l2(); i2 <= C1.u2(); ++i2 ) {
-			EXPECT_EQ( 2718, C1( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ConstructIndexRangeStickyInitializerValue )
-{
-	Array2D_int A1( { 1, 2 }, { 1, 3 }, Sticky_int( 31459 ), 2718 );
-	EXPECT_EQ( 6u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 3u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 3, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( 2718, A1( i1, i2 ) );
-		}
-	}
-
-	Array2D_int const C1( { 1, 2 }, { 1, 3 }, Sticky_int( 31459 ), 2718 );
-	EXPECT_EQ( 6u, C1.size() );
-	EXPECT_EQ( 2u, C1.size1() );
-	EXPECT_EQ( 3u, C1.size2() );
-	EXPECT_EQ( 1, C1.l1() );
-	EXPECT_EQ( 2, C1.u1() );
-	EXPECT_EQ( 1, C1.l2() );
-	EXPECT_EQ( 3, C1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), C1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), C1.I2() );
-	EXPECT_TRUE( C1.initializer_active() );
-	for ( int i1 = C1.l1(); i1 <= C1.u1(); ++i1 ) {
-		for ( int i2 = C1.l2(); i2 <= C1.u2(); ++i2 ) {
-			EXPECT_EQ( 2718, C1( i1, i2 ) );
 		}
 	}
 }
@@ -650,30 +417,17 @@ static void initializer_function_double( Array2D_double & A )
 	}
 }
 
-static void initializer_function_string( Array2D_string & A )
-{
-	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
-		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
-			A( i1, i2 ) = string_of( i1 ) + "," + string_of( i2 );
-		}
-	}
-}
-
 TEST( Array2Test, ConstructIndexesInitializerFunction )
 {
 	Array2D_int A1( 2, 3, initializer_function_int );
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, { 11, 12, 13, 21, 22, 23 } ), A1 ) );
 	Array2D_double A2( 2, 3, initializer_function_double );
 	EXPECT_TRUE( eq( Array2D_double( 2, 3, { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } ), A2 ) );
-	Array2D_string A3( 2, 3, initializer_function_string );
-	EXPECT_TRUE( eq( Array2D_string( 2, 3, { "1,1", "1,2", "1,3", "2,1", "2,2", "2,3" } ), A3 ) );
 
 	Array2D_int const C1( 2, 3, initializer_function_int );
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, { 11, 12, 13, 21, 22, 23 } ), C1 ) );
 	Array2D_double const C2( 2, 3, initializer_function_double );
 	EXPECT_TRUE( eq( Array2D_double( 2, 3, { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } ), C2 ) );
-	Array2D_string const C3( 2, 3, initializer_function_string );
-	EXPECT_TRUE( eq( Array2D_string( 2, 3, { "1,1", "1,2", "1,3", "2,1", "2,2", "2,3" } ), C3 ) );
 }
 
 TEST( Array2Test, ConstructIndexRangeInitializerFunction )
@@ -682,15 +436,11 @@ TEST( Array2Test, ConstructIndexRangeInitializerFunction )
 	EXPECT_TRUE( eq( Array2D_int( { 0, 1 }, { -1, 1 }, { -1, 0, 1, 9, 10, 11 } ), A1 ) );
 	Array2D_double A2( { 0, 1 }, { -1, 1 }, initializer_function_double );
 	EXPECT_TRUE( eq( Array2D_double( { 0, 1 }, { -1, 1 }, { -0.1, 0.0, 0.1, 0.9, 1.0, 1.1 } ), A2 ) );
-	Array2D_string A3( { 0, 1 }, { -1, 1 }, initializer_function_string );
-	EXPECT_TRUE( eq( Array2D_string( { 0, 1 }, { -1, 1 }, { "0,-1", "0,0", "0,1", "1,-1", "1,0", "1,1" } ), A3 ) );
 
 	Array2D_int const C1( { 0, 1 }, { -1, 1 }, initializer_function_int );
 	EXPECT_TRUE( eq( Array2D_int( { 0, 1 }, { -1, 1 }, { -1, 0, 1, 9, 10, 11 } ), C1 ) );
 	Array2D_double const C2( { 0, 1 }, { -1, 1 }, initializer_function_double );
 	EXPECT_TRUE( eq( Array2D_double( { 0, 1 }, { -1, 1 }, { -0.1, 0.0, 0.1, 0.9, 1.0, 1.1 } ), C2 ) );
-	Array2D_string const C3( { 0, 1 }, { -1, 1 }, initializer_function_string );
-	EXPECT_TRUE( eq( Array2D_string( { 0, 1 }, { -1, 1 }, { "0,-1", "0,0", "0,1", "1,-1", "1,0", "1,1" } ), C3 ) );
 }
 
 TEST( Array2Test, ConstructIndexesInitializerList )
@@ -705,14 +455,13 @@ TEST( Array2Test, ConstructIndexesInitializerList )
 	EXPECT_EQ( 3, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
 		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
 			EXPECT_EQ( i1 * 10 + i2, A1( i1, i2 ) );
 		}
 	}
 
-	Array2D_uint A2( 2, 3, { 11u, 12u, 13u, 21u, 22u, 23u } );
+	Array2D<unsigned int> A2( 2, 3, { 11u, 12u, 13u, 21u, 22u, 23u } );
 	EXPECT_EQ( 6u, A2.size() );
 	EXPECT_EQ( 2u, A2.size1() );
 	EXPECT_EQ( 3u, A2.size2() );
@@ -722,7 +471,6 @@ TEST( Array2Test, ConstructIndexesInitializerList )
 	EXPECT_EQ( 3, A2.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A2.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A2.I2() );
-	EXPECT_FALSE( A2.initializer_active() );
 	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
 		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
 			EXPECT_EQ( unsigned( i1 * 10 + i2 ), A2( i1, i2 ) );
@@ -739,7 +487,6 @@ TEST( Array2Test, ConstructIndexesInitializerList )
 	EXPECT_EQ( 3, A3.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A3.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A3.I2() );
-	EXPECT_FALSE( A3.initializer_active() );
 	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
 		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
 			EXPECT_DOUBLE_EQ( i1 + i2 * 0.1, A3( i1, i2 ) );
@@ -756,7 +503,6 @@ TEST( Array2Test, ConstructIndexesInitializerList )
 	EXPECT_EQ( 3, A4.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A4.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A4.I2() );
-	EXPECT_FALSE( A4.initializer_active() );
 	char const * chars[] = { "", "1", "2", "3" };
 	for ( int i1 = A4.l1(); i1 <= A4.u1(); ++i1 ) {
 		for ( int i2 = A4.l2(); i2 <= A4.u2(); ++i2 ) {
@@ -778,7 +524,6 @@ TEST( Array2Test, ConstructIndexRangeInitializerList )
 	EXPECT_EQ( 1, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 0, 1 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( -1, 1 ), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
 		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
 			EXPECT_EQ( i1 * 10 + i2, A1( i1, i2 ) );
@@ -795,171 +540,12 @@ TEST( Array2Test, ConstructIndexRangeInitializerList )
 	EXPECT_EQ( 1, A2.u2() );
 	EXPECT_EQ( Array2D_int::IR( 0, 1 ), A2.I1() );
 	EXPECT_EQ( Array2D_int::IR( -1, 1 ), A2.I2() );
-	EXPECT_FALSE( A2.initializer_active() );
 	char const * chars1[] = { "0", "1" };
 	char const * chars2[] = { "-1", "0", "1" };
 	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
 		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
 			std::string c1( chars1[ i1 ] ), c2( chars2[ i2 + 1 ] );
 			EXPECT_EQ( c1 + "," + c2, A2( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ConstructIndexesStickyInitializerList )
-{
-	Array2D_int A1( 2, 3, Sticky_int( 31459 ), { 11, 12, 13, 21, 22, 23 } );
-	EXPECT_EQ( 6u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 3u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 3, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( i1 * 10 + i2, A1( i1, i2 ) );
-		}
-	}
-	A1.dimension( 2, 2 );
-	EXPECT_EQ( 31459, A1( 1, 1 ) );
-	EXPECT_EQ( 31459, A1( 1, 2 ) );
-	EXPECT_EQ( 31459, A1( 2, 1 ) );
-	EXPECT_EQ( 31459, A1( 2, 2 ) );
-
-	Array2D_uint A2( 2, 3, Sticky_uint( 31459u ), { 11u, 12u, 13u, 21u, 22u, 23u } );
-	EXPECT_EQ( 6u, A2.size() );
-	EXPECT_EQ( 2u, A2.size1() );
-	EXPECT_EQ( 3u, A2.size2() );
-	EXPECT_EQ( 1, A2.l1() );
-	EXPECT_EQ( 2, A2.u1() );
-	EXPECT_EQ( 1, A2.l2() );
-	EXPECT_EQ( 3, A2.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A2.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A2.I2() );
-	EXPECT_TRUE( A2.initializer_active() );
-	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
-			EXPECT_EQ( unsigned( i1 * 10 + i2 ), A2( i1, i2 ) );
-		}
-	}
-
-	Array2D_double A3( 2, 3, Sticky_double( 3.1459 ), { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } );
-	EXPECT_EQ( 6u, A3.size() );
-	EXPECT_EQ( 2u, A3.size1() );
-	EXPECT_EQ( 3u, A3.size2() );
-	EXPECT_EQ( 1, A3.l1() );
-	EXPECT_EQ( 2, A3.u1() );
-	EXPECT_EQ( 1, A3.l2() );
-	EXPECT_EQ( 3, A3.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A3.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A3.I2() );
-	EXPECT_TRUE( A3.initializer_active() );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_DOUBLE_EQ( i1 + i2 * 0.1, A3( i1, i2 ) );
-		}
-	}
-
-	//Note The sticky argument must be at least as long as the longest argument in the initializer list, or those arguments end up truncated
-	Array2D_string A4( 2, 3, Sticky_string( "X,X" ), { "1,1", "1,2", "1,3", "2,1", "2,2", "2,3" } );
-	EXPECT_EQ( 6u, A4.size() );
-	EXPECT_EQ( 2u, A4.size1() );
-	EXPECT_EQ( 3u, A4.size2() );
-	EXPECT_EQ( 1, A4.l1() );
-	EXPECT_EQ( 2, A4.u1() );
-	EXPECT_EQ( 1, A4.l2() );
-	EXPECT_EQ( 3, A4.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A4.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A4.I2() );
-	EXPECT_TRUE( A4.initializer_active() );
-	char const * chars[] = { "", "1", "2", "3" };
-	for ( int i1 = A4.l1(); i1 <= A4.u1(); ++i1 ) {
-		for ( int i2 = A4.l2(); i2 <= A4.u2(); ++i2 ) {
-			std::string c1( chars[ i1 ] ), c2( chars[ i2 ] );
-			EXPECT_EQ( c1 + "," + c2, A4( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ConstructIndexRangeStickyInitializerList )
-{
-	Array2D_int A1( { 1, 2 }, { 1, 3 }, Sticky_int( 31459 ), { 11, 12, 13, 21, 22, 23 } );
-	EXPECT_EQ( 6u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 3u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 3, A1.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A1.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_TRUE( A1.initializer_active() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( i1 * 10 + i2, A1( i1, i2 ) );
-		}
-	}
-	A1.dimension( 2, 2 );
-	EXPECT_EQ( 31459, A1( 1, 1 ) );
-	EXPECT_EQ( 31459, A1( 1, 2 ) );
-	EXPECT_EQ( 31459, A1( 2, 1 ) );
-	EXPECT_EQ( 31459, A1( 2, 2 ) );
-
-	Array2D_uint A2( { 1, 2 }, { 1, 3 }, Sticky_uint( 31459u ), { 11u, 12u, 13u, 21u, 22u, 23u } );
-	EXPECT_EQ( 6u, A2.size() );
-	EXPECT_EQ( 2u, A2.size1() );
-	EXPECT_EQ( 3u, A2.size2() );
-	EXPECT_EQ( 1, A2.l1() );
-	EXPECT_EQ( 2, A2.u1() );
-	EXPECT_EQ( 1, A2.l2() );
-	EXPECT_EQ( 3, A2.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A2.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A2.I2() );
-	EXPECT_TRUE( A2.initializer_active() );
-	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
-			EXPECT_EQ( unsigned( i1 * 10 + i2 ), A2( i1, i2 ) );
-		}
-	}
-
-	Array2D_double A3( { 1, 2 }, { 1, 3 }, Sticky_double( 3.1459 ), { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } );
-	EXPECT_EQ( 6u, A3.size() );
-	EXPECT_EQ( 2u, A3.size1() );
-	EXPECT_EQ( 3u, A3.size2() );
-	EXPECT_EQ( 1, A3.l1() );
-	EXPECT_EQ( 2, A3.u1() );
-	EXPECT_EQ( 1, A3.l2() );
-	EXPECT_EQ( 3, A3.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A3.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A3.I2() );
-	EXPECT_TRUE( A3.initializer_active() );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_DOUBLE_EQ( i1 + i2 * 0.1, A3( i1, i2 ) );
-		}
-	}
-
-	//Note The sticky argument must be at least as long as the longest argument in the initializer list, or those arguments end up truncated
-	Array2D_string A4( { 1, 2 }, { 1, 3 }, Sticky_string( "X,X" ), { "1,1", "1,2", "1,3", "2,1", "2,2", "2,3" } );
-	EXPECT_EQ( 6u, A4.size() );
-	EXPECT_EQ( 2u, A4.size1() );
-	EXPECT_EQ( 3u, A4.size2() );
-	EXPECT_EQ( 1, A4.l1() );
-	EXPECT_EQ( 2, A4.u1() );
-	EXPECT_EQ( 1, A4.l2() );
-	EXPECT_EQ( 3, A4.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A4.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A4.I2() );
-	EXPECT_TRUE( A4.initializer_active() );
-	char const * chars[] = { "", "1", "2", "3" };
-	for ( int i1 = A4.l1(); i1 <= A4.u1(); ++i1 ) {
-		for ( int i2 = A4.l2(); i2 <= A4.u2(); ++i2 ) {
-			std::string c1( chars[ i1 ] ), c2( chars[ i2 ] );
-			EXPECT_EQ( c1 + "," + c2, A4( i1, i2 ) );
 		}
 	}
 }
@@ -978,7 +564,6 @@ TEST( Array2Test, ConstructRange )
 	EXPECT_EQ( 3, A2.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A2.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A2.I2() );
-	EXPECT_FALSE( A2.initializer_active() );
 	// Values remain uninitialized
 
 	Array2D_int A3( Array2D_int::range( A1, 31459 ) );
@@ -991,40 +576,6 @@ TEST( Array2Test, ConstructRange )
 	EXPECT_EQ( 3, A3.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A3.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A3.I2() );
-	EXPECT_FALSE( A3.initializer_active() );
-	for ( int i1 = 1; i1 <= 2; ++i1 )
-		for ( int i2 = 1; i2 <= 3; ++i2 )
-			EXPECT_EQ( 31459, A3( i1, i2 ) );
-}
-
-TEST( Array2Test, ConstructShape )
-{
-	Array2D_int A1( 2, 3 );
-
-	Array2D_int A2( Array2D_int::shape( A1 ) );
-	EXPECT_EQ( 6u, A2.size() );
-	EXPECT_EQ( 2u, A2.size1() );
-	EXPECT_EQ( 3u, A2.size2() );
-	EXPECT_EQ( 1, A2.l1() );
-	EXPECT_EQ( 2, A2.u1() );
-	EXPECT_EQ( 1, A2.l2() );
-	EXPECT_EQ( 3, A2.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A2.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A2.I2() );
-	EXPECT_FALSE( A2.initializer_active() );
-	// Values remain uninitialized
-
-	Array2D_int A3( Array2D_int::shape( A1, 31459 ) );
-	EXPECT_EQ( 6u, A3.size() );
-	EXPECT_EQ( 2u, A3.size1() );
-	EXPECT_EQ( 3u, A3.size2() );
-	EXPECT_EQ( 1, A3.l1() );
-	EXPECT_EQ( 2, A3.u1() );
-	EXPECT_EQ( 1, A3.l2() );
-	EXPECT_EQ( 3, A3.u2() );
-	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A3.I1() );
-	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A3.I2() );
-	EXPECT_FALSE( A3.initializer_active() );
 	for ( int i1 = 1; i1 <= 2; ++i1 )
 		for ( int i2 = 1; i2 <= 3; ++i2 )
 			EXPECT_EQ( 31459, A3( i1, i2 ) );
@@ -1043,7 +594,6 @@ TEST( Array2Test, ConstructOneBased )
 	EXPECT_EQ( 3, A2.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 2 ), A2.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A2.I2() );
-	EXPECT_FALSE( A2.initializer_active() );
 	// Values remain uninitialized
 }
 
@@ -1059,7 +609,6 @@ TEST( Array2Test, ConstructDiag )
 	EXPECT_EQ( 3, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 )
 		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 )
 			EXPECT_EQ( ( i1 == i2 ) ? 31459 : 0, A1( i1, i2 ) );
@@ -1077,7 +626,6 @@ TEST( Array2Test, ConstructIdentity )
 	EXPECT_EQ( 3, A1.u2() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I1() );
 	EXPECT_EQ( Array2D_int::IR( 1, 3 ), A1.I2() );
-	EXPECT_FALSE( A1.initializer_active() );
 	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 )
 		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 )
 			EXPECT_EQ( ( i1 == i2 ) ? 1 : 0, A1( i1, i2 ) );
@@ -1210,12 +758,6 @@ TEST( Array2Test, AssignmentArithmetic )
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
 	A1 *= A2;
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, 110 ), A1 ) );
-	A1 /= A2;
-	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
-	A1 *= 33;
-	EXPECT_TRUE( eq( Array2D_int( 2, 3, 363 ), A1 ) );
-	A1 /= 33;
-	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
 }
 
 TEST( Array2Test, AssignmentArithmeticArgument )
@@ -1234,12 +776,6 @@ TEST( Array2Test, AssignmentArithmeticArgument )
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
 	A1 *= A3;
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, 110 ), A1 ) );
-	A1 /= A3;
-	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
-	A1 *= 33;
-	EXPECT_TRUE( eq( Array2D_int( 2, 3, 363 ), A1 ) );
-	A1 /= 33;
-	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
 }
 
 TEST( Array2Test, RangeBasedFor )
@@ -1249,27 +785,6 @@ TEST( Array2Test, RangeBasedFor )
 	for ( auto const e : A ) {
 		EXPECT_EQ( ++v, e );
 	}
-}
-
-TEST( Array2Test, SubscriptTail )
-{
-	Array2D_double A1( 2, 3, { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } );
-	ArrayTail_double A2( A1.a( 1, 3 ) ); // Tail of last 4 values
-	EXPECT_EQ( 4u, A2.size() );
-	Array2A_double A3( A2 );
-	EXPECT_EQ( 4u, A3.size() );
-	EXPECT_EQ( 4u, A3.size1() );
-	EXPECT_EQ( 1u, A3.size2() );
-	EXPECT_TRUE( eq( Array2D_double( 4, 1, { 1.3, 2.1, 2.2, 2.3 } ), A3 ) );
-
-	Array2D_double const C1( 2, 3, { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } );
-	ArrayTail_double const C2( C1.a( 1, 3 ) ); // Tail of last 4 values
-	EXPECT_EQ( 4u, C2.size() );
-	Array2A_double const C3( C2 );
-	EXPECT_EQ( 4u, C3.size() );
-	EXPECT_EQ( 4u, C3.size1() );
-	EXPECT_EQ( 1u, C3.size2() );
-	EXPECT_TRUE( eq( Array2D_double( 4, 1, { 1.3, 2.1, 2.2, 2.3 } ), C3 ) );
 }
 
 TEST( Array2Test, SubscriptIndex )
@@ -1324,94 +839,43 @@ TEST( Array2Test, Predicates )
 	Array2D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.capacity_bounded() );
-	EXPECT_FALSE( A1.capacity_unbounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
-	EXPECT_FALSE( A1.size_unbounded() );
 	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE( A1.is_default() );
-	EXPECT_TRUE( A1.is_zero() );
-	EXPECT_TRUE( A1.is_uniform() );
-	EXPECT_TRUE( A1.is_uniform( 0 ) );
 
 	Array2D_int A2( 2, 3 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.contiguous() );
-	EXPECT_TRUE( A2.capacity_bounded() );
-	EXPECT_FALSE( A2.capacity_unbounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE( A2.capacity_bounded() );
-	EXPECT_FALSE( A2.capacity_unbounded() );
 	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 
 	Array2D_int A3( 2, 3, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.contiguous() );
-	EXPECT_TRUE( A3.capacity_bounded() );
-	EXPECT_FALSE( A3.capacity_unbounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE( A3.capacity_bounded() );
-	EXPECT_FALSE( A3.capacity_unbounded() );
 	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
-	EXPECT_FALSE( A3.is_default() );
-	EXPECT_FALSE( A3.is_zero() );
-	EXPECT_TRUE( A3.is_uniform() );
-	EXPECT_TRUE( A3.is_uniform( 31459 ) );
 
 	Array2D_int A4( 2, 3, { 11, 12, 13, 21, 22, 23 } );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.contiguous() );
-	EXPECT_TRUE( A4.capacity_bounded() );
-	EXPECT_FALSE( A4.capacity_unbounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE( A4.capacity_bounded() );
-	EXPECT_FALSE( A4.capacity_unbounded() );
 	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
-	EXPECT_FALSE( A4.is_default() );
-	EXPECT_FALSE( A4.is_zero() );
-	EXPECT_FALSE( A4.is_uniform() );
-	EXPECT_FALSE( A4.is_uniform( 0 ) );
-	EXPECT_FALSE( A4.is_uniform( 11 ) );
 }
 
 TEST( Array2Test, PredicateComparisonsValues )
 {
 	Array2D_int A1;
 	EXPECT_TRUE( eq( A1, 0 ) && eq( 0, A1 ) ); // Empty array is considered to equal any scalar (no values don't equal the scalar)
-	EXPECT_FALSE( ne( A1, 0 ) || ne( 0, A1 ) );
-	EXPECT_FALSE( lt( A1, 0 ) || lt( 0, A1 ) );
-	EXPECT_TRUE( le( A1, 0 ) && le( 0, A1 ) );
-	EXPECT_FALSE( gt( A1, 0 ) || gt( 0, A1 ) );
-	EXPECT_TRUE( ge( A1, 0 ) && ge( 0, A1 ) );
 
 	Array2D_int A2( 2, 3, 31459 );
 	EXPECT_TRUE( eq( A2, 31459 ) && eq( 31459, A1 ) );
-	EXPECT_FALSE( ne( A2, 31459 ) || ne( 31459, A2 ) );
-	EXPECT_TRUE( lt( A2, 31460 ) && lt( 31458, A2 ) );
-	EXPECT_TRUE( le( A2, 31459 ) && le( 31459, A2 ) );
-	EXPECT_TRUE( le( A2, 31460 ) && le( 31458, A2 ) );
-	EXPECT_TRUE( gt( A2, 31458 ) && gt( 31460, A2 ) );
-	EXPECT_TRUE( ge( A2, 31459 ) && ge( 31459, A2 ) );
-	EXPECT_TRUE( ge( A2, 31458 ) && ge( 31460, A2 ) );
 
 	Array2D_int A3( 2, 3, { 11, 12, 13, 21, 22, 23 } );
 	EXPECT_FALSE( eq( A3, 11 ) || eq( 23, A3 ) );
-	EXPECT_TRUE( ne( A3, 11 ) && ne( 23, A3 ) );
-	EXPECT_TRUE( lt( A3, 24 ) && lt( 10, A3 ) );
-	EXPECT_FALSE( lt( A3, 23 ) || lt( 11, A3 ) );
-	EXPECT_TRUE( le( A3, 23 ) && le( 11, A3 ) );
-	EXPECT_TRUE( gt( A3, 10 ) && gt( 24, A3 ) );
-	EXPECT_FALSE( gt( A3, 11 ) || gt( 23, A3 ) );
-	EXPECT_TRUE( ge( A3, 11 ) && ge( 23, A3 ) );
 }
 
 TEST( Array2Test, PredicateComparisonArrays )
@@ -1420,50 +884,20 @@ TEST( Array2Test, PredicateComparisonArrays )
 
 	Array2D_int A1;
 	EXPECT_TRUE( eq( A1, A1 ) );
-	EXPECT_FALSE( ne( A1, A1 ) );
-	EXPECT_FALSE( lt( A1, A1 ) );
-	EXPECT_TRUE( le( A1, A1 ) );
-	EXPECT_FALSE( gt( A1, A1 ) );
-	EXPECT_TRUE( ge( A1, A1 ) );
 
 	Array2D_int A2( 2, 3, 20 );
 	EXPECT_TRUE( eq( A2, A2 ) );
-	EXPECT_FALSE( ne( A2, A2 ) );
-	EXPECT_FALSE( lt( A2, A2 ) );
-	EXPECT_TRUE( le( A2, A2 ) );
-	EXPECT_FALSE( gt( A2, A2 ) );
-	EXPECT_TRUE( ge( A2, A2 ) );
 
 	Array2D_int A3( 2, 3, { 11, 12, 13, 21, 22, 23 } );
 	EXPECT_TRUE( eq( A3, A3 ) );
-	EXPECT_FALSE( ne( A3, A3 ) );
-	EXPECT_FALSE( lt( A3, A3 ) );
-	EXPECT_TRUE( le( A3, A3 ) );
-	EXPECT_FALSE( gt( A3, A3 ) );
-	EXPECT_TRUE( ge( A3, A3 ) );
 
 	EXPECT_FALSE( eq( A2, A3 ) || eq( A3, A2 ) );
-	EXPECT_TRUE( ne( A2, A3 ) && ne( A3, A2 ) );
-	EXPECT_FALSE( lt( A2, A3 ) || lt( A3, A2 ) );
-	EXPECT_FALSE( le( A2, A3 ) || le( A3, A2 ) );
-	EXPECT_FALSE( gt( A2, A3 ) || gt( A3, A2 ) );
-	EXPECT_FALSE( ge( A2, A3 ) || ge( A3, A2 ) );
 
 	Array2D_int A4( 2, 3, { 11, 12, 12, 21, 21, 22 } );
 	EXPECT_FALSE( eq( A3, A4 ) || eq( A4, A3 ) );
-	EXPECT_TRUE( ne( A3, A4 ) && ne( A4, A3 ) );
-	EXPECT_FALSE( lt( A3, A4 ) );
-	EXPECT_FALSE( lt( A4, A3 ) );
-	EXPECT_FALSE( le( A3, A4 ) );
-	EXPECT_TRUE( le( A4, A3 ) );
-	EXPECT_FALSE( gt( A3, A4 ) );
-	EXPECT_FALSE( gt( A4, A3 ) );
-	EXPECT_TRUE( ge( A3, A4 ) );
-	EXPECT_FALSE( ge( A4, A3 ) );
 
 	Array2D_int A5( 2, 3, { 11, 12, 14, 21, 23, 24 } );
 	EXPECT_FALSE( eq( A3, A4 ) || eq( A4, A3 ) );
-	EXPECT_TRUE( ne( A3, A4 ) && ne( A4, A3 ) );
 }
 
 TEST( Array2Test, PredicateContains )
@@ -1633,27 +1067,6 @@ TEST( Array2DTest, PredicateSymmetric )
 	EXPECT_TRUE( A7.symmetric() );
 }
 
-TEST( Array2Test, PredicateInitializerActive )
-{
-	Array2D_int A1;
-	EXPECT_FALSE( A1.initializer_active() );
-
-	Array2D_int A2( 2, 3 );
-	EXPECT_FALSE( A2.initializer_active() );
-
-	Array2D_int A3( 2, 3, 31459 );
-	EXPECT_FALSE( A3.initializer_active() );
-
-	Array2D_int A3i( 2, 3, sticky( 31459 ) );
-	EXPECT_TRUE( A3i.initializer_active() );
-
-	Array2D_int A4( 2, 3, { 11, 12, 13, 21, 22, 23 } );
-	EXPECT_FALSE( A4.initializer_active() );
-
-	Array2D_int A5( 2, 3, initializer_function_int );
-	EXPECT_FALSE( A5.initializer_active() );
-}
-
 TEST( Array2Test, Inspectors )
 {
 	Array2D_int const C1;
@@ -1724,7 +1137,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 0, A1.u1() );
 	EXPECT_EQ( 1, A1.l2() );
 	EXPECT_EQ( 0, A1.u2() );
-	EXPECT_FALSE( A1.initializer_active() );
 	A1.clear();
 	EXPECT_EQ( 0u, A1.size() );
 	EXPECT_EQ( 0u, A1.size1() );
@@ -1733,7 +1145,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 0, A1.u1() );
 	EXPECT_EQ( 1, A1.l2() );
 	EXPECT_EQ( 0, A1.u2() );
-	EXPECT_FALSE( A1.initializer_active() );
 
 	// Resets the size, indexes and initializer of an uninitialized array
 	Array2D_int A2( { 2, 3 }, { 2, 4 } );
@@ -1744,7 +1155,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 3, A2.u1() );
 	EXPECT_EQ( 2, A2.l2() );
 	EXPECT_EQ( 4, A2.u2() );
-	EXPECT_FALSE( A2.initializer_active() );
 	A2.clear();
 	EXPECT_EQ( 0u, A2.size() );
 	EXPECT_EQ( 0u, A2.size1() );
@@ -1753,7 +1163,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 0, A2.u1() );
 	EXPECT_EQ( 1, A2.l2() );
 	EXPECT_EQ( 0, A2.u2() );
-	EXPECT_FALSE( A2.initializer_active() );
 	EXPECT_EQ( nullptr, A2.data() );
 	EXPECT_EQ( nullptr, A2.data_beg() );
 	EXPECT_EQ( nullptr, A2.data_end() );
@@ -1767,7 +1176,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 2, A3.u1() );
 	EXPECT_EQ( 1, A3.l2() );
 	EXPECT_EQ( 3, A3.u2() );
-	EXPECT_FALSE( A3.initializer_active() );
 	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
 		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
 			EXPECT_EQ( 31459, A3( i1, i2 ) );
@@ -1781,89 +1189,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_EQ( 0, A3.u1() );
 	EXPECT_EQ( 1, A3.l2() );
 	EXPECT_EQ( 0, A3.u2() );
-	EXPECT_FALSE( A3.initializer_active() );
-}
-
-TEST( Array2Test, ModifierZero )
-{
-	// Changes nothing about an empty array
-	Array2D_int A1;
-	A1.zero();
-	EXPECT_TRUE( eq( Array2D_int(), A1 ) );
-
-	// Initializes an uninitialized array with actual dimensions
-	Array2D_int A2( 2, 3 );
-	A2.zero();
-	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
-			EXPECT_EQ( 0, A2( i1, i2 ) );
-		}
-	}
-
-	// Zeroes out an array with contents
-	Array2D_int A3( 2, 3, 31459 );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_EQ( 31459, A3( i1, i2 ) );
-		}
-	}
-	A3.zero();
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_EQ( 0, A3( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ModifierToZero )
-{
-	// Changes nothing about an empty array
-	Array2D_int A1;
-	A1.to_zero();
-	EXPECT_TRUE( eq( Array2D_int(), A1 ) );
-
-	// Initializes an uninitialized array with actual dimensions
-	Array2D_int A2( 2, 3 );
-	A2.to_zero();
-	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
-			EXPECT_EQ( 0, A2( i1, i2 ) );
-		}
-	}
-
-	// Zeroes out an array with contents
-	Array2D_int A3( 2, 3, 31459 );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_EQ( 31459, A3( i1, i2 ) );
-		}
-	}
-	A3.to_zero();
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			EXPECT_EQ( 0, A3( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, ModifierInvert )
-{
-	// Changes nothing about an empty array
-	Array2D_double A1;
-	A1.invert();
-	EXPECT_TRUE( eq( Array2D_double(), A1 ) );
-
-	// Illegal to call on an uninitialized array
-
-	// Inverts values of an initialized array
-	Array2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01, 0.001 } );
-	A2.invert();
-	EXPECT_TRUE( eq( Array2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0, 1000.0 } ), A2 ) );
-
-	// Inverts values of an initialized array
-	Array2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01, -0.001 } );
-	A3.invert();
-	EXPECT_TRUE( eq( Array2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0, -1000.0 } ), A3 ) );
 }
 
 TEST( Array2Test, ModifierAllocateDeallocate )
@@ -2024,20 +1349,6 @@ TEST( Array2Test, DimensionIndexRange )
 		}
 	}
 
-	// 1:3, 1:4 -> 2:4, 2:5 := 2:3, 2:4
-	Array2D_int A4( 3, 4, Sticky_int( 31459 ) ); // Sticky initializer is reapplied after dimension call
-	A4.dimension( { 2, 4 }, { 2, 5 } );
-	EXPECT_EQ( 3u, A4.size1() );
-	EXPECT_EQ( 4u, A4.size2() );
-	EXPECT_EQ( 2, A4.l1() );
-	EXPECT_EQ( 4, A4.u1() );
-	EXPECT_EQ( 2, A4.l2() );
-	EXPECT_EQ( 5, A4.u2() );
-	for ( int i1 = A4.l1(); i1 <= A4.u1(); ++i1 ) {
-		for ( int i2 = A4.l2(); i2 <= A4.u2(); ++i2 ) {
-			EXPECT_EQ( 31459, A4( i1, i2 ) );
-		}
-	}
 }
 
 TEST( Array2Test, DimensionArrays )
@@ -2094,169 +1405,6 @@ TEST( Array2Test, DimensionArrays )
 	}
 }
 
-TEST( Array2Test, RedimensionIndexRange )
-{
-	Array2D_int A1( 2, 5, { 11, 12, 13, 14, 15, 21, 22, 23, 24, 25 } );
-	Array2D_int A2( A1 );
-	Array2D_int A3( A1 );
-
-	EXPECT_EQ( 10u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 5u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 5, A1.u2() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( i1 * 10 + i2, A1( i1, i2 ) );
-		}
-	}
-
-	// 1:2, 1:5 -> 2:3, 3:7 := 2:2, 3:5
-	A2.redimension( { 2, 3 }, { 3, 7 } );
-	EXPECT_EQ( 10u, A2.size() );
-	EXPECT_EQ( 2u, A2.size1() );
-	EXPECT_EQ( 5u, A2.size2() );
-	EXPECT_EQ( 2, A2.l1() );
-	EXPECT_EQ( 3, A2.u1() );
-	EXPECT_EQ( 3, A2.l2() );
-	EXPECT_EQ( 7, A2.u2() );
-	// Values for previous range are now uninitialized
-	for ( int i1 = A2.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( i1 * 10 + i2, A2( i1, i2 ) );
-		}
-	}
-
-	// 1:2, 1:5 -> 2:3, 3:7 := 2:2, 3:5
-	A3.redimension( { 2, 3 }, { 3, 7 }, 31459 );
-	EXPECT_EQ( 10u, A3.size() );
-	EXPECT_EQ( 2u, A3.size1() );
-	EXPECT_EQ( 5u, A3.size2() );
-	EXPECT_EQ( 2, A3.l1() );
-	EXPECT_EQ( 3, A3.u1() );
-	EXPECT_EQ( 3, A3.l2() );
-	EXPECT_EQ( 7, A3.u2() );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			if ( ( i1 >= A3.l1() && i1 <= A1.u1() ) && ( i2 >= A3.l2() && i2 <= A1.u2() ) )
-				EXPECT_EQ( i1 * 10 + i2, A3( i1, i2 ) );
-			else
-				EXPECT_EQ( 31459, A3( i1, i2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, RedimensionArrays )
-{
-	Array2D_int A1( 2, 5, { 11, 12, 13, 14, 15, 21, 22, 23, 24, 25 } );
-	Array2D_int A2( A1 );
-	Array2D_int A3( A1 );
-	Array2D_int A4( A1 );
-
-	EXPECT_EQ( 10u, A1.size() );
-	EXPECT_EQ( 2u, A1.size1() );
-	EXPECT_EQ( 5u, A1.size2() );
-	EXPECT_EQ( 1, A1.l1() );
-	EXPECT_EQ( 2, A1.u1() );
-	EXPECT_EQ( 1, A1.l2() );
-	EXPECT_EQ( 5, A1.u2() );
-	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A1.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( i1 * 10 + i2, A1( i1, i2 ) );
-		}
-	}
-
-	A2.redimension( Array2D_int( { 2, 3 }, { 3, 7 } ) );
-	EXPECT_EQ( 10u, A2.size() );
-	EXPECT_EQ( 2u, A2.size1() );
-	EXPECT_EQ( 5u, A2.size2() );
-	EXPECT_EQ( 2, A2.l1() );
-	EXPECT_EQ( 3, A2.u1() );
-	EXPECT_EQ( 3, A2.l2() );
-	EXPECT_EQ( 7, A2.u2() );
-	// Values for previous range are now uninitialized
-	for ( int i1 = A2.l1(); i1 <= A1.u1(); ++i1 ) {
-		for ( int i2 = A2.l2(); i2 <= A1.u2(); ++i2 ) {
-			EXPECT_EQ( i1 * 10 + i2, A2( i1, i2 ) );
-		}
-	}
-
-	A3.redimension( Array2D_int( { 2, 3 }, { 3, 7 } ), 31459 );
-	EXPECT_EQ( 10u, A3.size() );
-	EXPECT_EQ( 2u, A3.size1() );
-	EXPECT_EQ( 5u, A3.size2() );
-	EXPECT_EQ( 2, A3.l1() );
-	EXPECT_EQ( 3, A3.u1() );
-	EXPECT_EQ( 3, A3.l2() );
-	EXPECT_EQ( 7, A3.u2() );
-	for ( int i1 = A3.l1(); i1 <= A3.u1(); ++i1 ) {
-		for ( int i2 = A3.l2(); i2 <= A3.u2(); ++i2 ) {
-			if ( ( i1 >= A3.l1() && i1 <= A1.u1() ) && ( i2 >= A3.l2() && i2 <= A1.u2() ) )
-				EXPECT_EQ( i1 * 10 + i2, A3( i1, i2 ) );
-			else
-				EXPECT_EQ( 31459, A3( i1, i2 ) );
-		}
-	}
-
-	A4.redimension( Array2D_int( { 2, 3 }, { 3, 7 } ) ); // "New" elements are uninitialized
-	EXPECT_EQ( 10u, A4.size() );
-	EXPECT_EQ( 2u, A4.size1() );
-	EXPECT_EQ( 5u, A4.size2() );
-	EXPECT_EQ( 2, A4.l1() );
-	EXPECT_EQ( 3, A4.u1() );
-	EXPECT_EQ( 3, A4.l2() );
-	EXPECT_EQ( 7, A4.u2() );
-	for ( int i1 = A4.l1(); i1 <= A4.u1(); ++i1 ) {
-		for ( int i2 = A4.l2(); i2 <= A4.u2(); ++i2 ) {
-			if ( ( i1 >= A4.l1() && i1 <= A1.u1() ) && ( i2 >= A4.l2() && i2 <= A1.u2() ) )
-				EXPECT_EQ( i1 * 10 + i2, A4( i1, i2 ) );
-			else
-				EXPECT_EQ( ( i1 - 1 ) * 10 + ( i2 - 2 ), A1( i1 - 1, i2 - 2 ) );
-		}
-	}
-}
-
-TEST( Array2Test, Initializer )
-{
-	Array2D_int A1( 2, 3 );
-	EXPECT_FALSE( A1.initializer_active() );
-	A1.initializer( 31459 );
-	EXPECT_TRUE( A1.initializer_active() );
-
-	Array2D_int A2( 2, 3, { 11, 12, 13, 21, 22, 23 } );
-	EXPECT_FALSE( A2.initializer_active() );
-	A2.initializer( 31459 );
-	EXPECT_TRUE( A2.initializer_active() );
-	A2.dimension( 3, 3 );
-	EXPECT_TRUE( eq( A2, Array2D_int( 3, 3, 31459 ) ) );
-
-	Array2D_int A3( 2, 3, sticky( 42 ) );
-	EXPECT_TRUE( A3.initializer_active() );
-	EXPECT_TRUE( eq( A3, Array2D_int( 2, 3, 42 ) ) );
-
-	Array2D_int Ai( 2, 3 );
-	initializer_function_int( Ai );
-
-	Array2D_int A4( 2, 3, initializer_function_int );
-	EXPECT_FALSE( A4.initializer_active() );
-	EXPECT_TRUE( eq( A4, Ai ) );
-}
-
-TEST( Array2Test, InitializerClear )
-{
-	Array2D_int A1( 2, 3 );
-	EXPECT_FALSE( A1.initializer_active() );
-	A1.initializer_clear();
-	EXPECT_FALSE( A1.initializer_active() );
-
-	Array2D_int A2( 2, 3, sticky( 31459 ) );
-	EXPECT_TRUE( A2.initializer_active() );
-	A2.initializer_clear();
-	EXPECT_FALSE( A2.initializer_active() );
-}
-
 TEST( Array2Test, Swap )
 {
 	Array2D_int A1( 2, 3, { 11, 12, 13, 21, 22, 23 } );
@@ -2297,19 +1445,7 @@ TEST( Array2Test, Diagonals )
 		EXPECT_EQ( 0, A( -1, 3 ) );
 		EXPECT_EQ( 0, A(  0, 3 ) );
 	}
-	{
-		Array2D_int A( 3, 3, { 11, 12, 13, 21, 22, 23, 31, 32, 33 } );
-		A.set_diagonal( 9 );
-		EXPECT_EQ( 9, A( 1, 1 ) );
-		EXPECT_EQ( 9, A( 2, 2 ) );
-		EXPECT_EQ( 9, A( 3, 3 ) );
-		EXPECT_EQ( 12, A( 1, 2 ) );
-		EXPECT_EQ( 13, A( 1, 3 ) );
-		EXPECT_EQ( 21, A( 2, 1 ) );
-		EXPECT_EQ( 23, A( 2, 3 ) );
-		EXPECT_EQ( 31, A( 3, 1 ) );
-		EXPECT_EQ( 32, A( 3, 2 ) );
-	}
+
 }
 
 TEST( Array2Test, Transpose )
@@ -2390,71 +1526,11 @@ TEST( Array2Test, Transpose )
 	}
 }
 
-TEST( Array2Test, FunctionAbs )
-{
-	Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
-	Array2D_int const E( 2, 2, { 11, 12, 21, 22 } );
-	EXPECT_TRUE( eq( E, abs( A ) ) );
-}
-
 TEST( Array2Test, FunctionNegation )
 {
 	Array2D_bool const A( 3, 1, { true, false, true } );
 	Array2D_bool const E( 3, 1, { false, true, false } );
 	EXPECT_TRUE( eq( E, !A ) );
-}
-
-TEST( Array2Test, FunctionBitNot )
-{
-	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const E( 2, 1, { 254, 127 } );
-	EXPECT_TRUE( eq( E, bit_not( A ) ) );
-}
-
-TEST( Array2Test, FunctionBitAnd )
-{
-	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const B( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const Z( 2, 1, { 0, 0 } );
-	Array2D< uint8_t > const O( 2, 1, { 255, 255 } );
-	EXPECT_TRUE( eq( A, bit_and( A, B ) ) );
-	EXPECT_TRUE( eq( Z, bit_and( A, Z ) ) );
-	EXPECT_TRUE( eq( A, bit_and( A, O ) ) );
-
-	Array2D< uint8_t > const I( 2, 1, { 0xF0, 0xAB } );
-	Array2D< uint8_t > const J( 2, 1, { 0xAB, 0xF0 } );
-	Array2D< uint8_t > const K( 2, 1, { 0xA0u, 0xA0u } );
-	EXPECT_TRUE( eq( K, bit_and( I, J ) ) );
-}
-
-TEST( Array2Test, FunctionBitOr )
-{
-	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const B( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const Z( 2, 1, { 0, 0 } );
-	Array2D< uint8_t > const O( 2, 1, { 255, 255 } );
-	EXPECT_TRUE( eq( A, bit_or( A, B ) ) );
-	EXPECT_TRUE( eq( A, bit_or( A, Z ) ) );
-	EXPECT_TRUE( eq( O, bit_or( A, O ) ) );
-
-	Array2D< uint8_t > const I( 2, 1, { 0xF0, 0xAB } );
-	Array2D< uint8_t > const J( 2, 1, { 0xAB, 0xF0 } );
-	Array2D< uint8_t > const K( 2, 1, { 0xFBu, 0xFBu } );
-	EXPECT_TRUE( eq( K, bit_or( I, J ) ) );
-}
-
-TEST( Array2Test, FunctionBitXor )
-{
-	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const B( 2, 1, { 1, 128 } );
-	Array2D< uint8_t > const Z( 2, 1, { 0, 0 } );
-	EXPECT_TRUE( eq( Z, bit_xor( A, B ) ) );
-	EXPECT_TRUE( eq( A, bit_xor( A, Z ) ) );
-
-	Array2D< uint8_t > const I( 2, 1, { 0xF0, 0xFF } );
-	Array2D< uint8_t > const J( 2, 1, { 0xFF, 0xF0 } );
-	Array2D< uint8_t > const K( 2, 1, { 0x0Fu, 0x0Fu } );
-	EXPECT_TRUE( eq( K, bit_xor( I, J ) ) );
 }
 
 TEST( Array2Test, FunctionPow )
@@ -2495,15 +1571,6 @@ TEST( Array2Test, FunctionCount )
 	EXPECT_TRUE( eq( C2, count( A, 2 ) ) );
 }
 
-TEST( Array2Test, FunctionUnpack )
-{
-	Array1D_int const a( 2, { 1, 2 } );
-	Array2D_bool const mask( 2, 2, { true, false, false, true } );
-	EXPECT_TRUE( eq( Array2D_int( 2, 2, { 1, 42, 42, 2 } ), unpack( a, mask, 42 ) ) );
-	Array2D_int const f( 2, 2, { 11, 21, 12, 22 } );
-	EXPECT_TRUE( eq( Array2D_int( 2, 2, { 1, 21, 12, 2 } ), unpack( a, mask, f ) ) );
-}
-
 TEST( Array2Test, FunctionSum )
 {
 	Array2D_int A( 2, 2, { 11, 12, 21, 22 } );
@@ -2512,189 +1579,4 @@ TEST( Array2Test, FunctionSum )
 	EXPECT_EQ( 66, sum( A ) );
 	EXPECT_TRUE( eq( S1, sum( A, 1 ) ) );
 	EXPECT_TRUE( eq( S2, sum( A, 2 ) ) );
-}
-
-TEST( Array2Test, FunctionProduct )
-{
-	Array2D_int A( 2, 2, { 11, 12, 21, 22 } );
-	Array1D_int P1( 2, { 231, 264 } );
-	Array1D_int P2( 2, { 132, 462 } );
-	EXPECT_EQ( 60984, product( A ) );
-	EXPECT_TRUE( eq( P1, product( A, 1 ) ) );
-	EXPECT_TRUE( eq( P2, product( A, 2 ) ) );
-}
-
-TEST( Array2Test, FunctionMinMaxLoc )
-{
-	{
-		Array2D_int const A( 4, 4, reshape( {
-		  4,  9,  8, -8,
-		  2,  1, -1,  5,
-		  9,  4, -1,  9,
-		 -7,  5,  7, -3
-		}, std::array< int, 2 >{ { 4, 4 } } ) );
-
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( A ) ) );
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( A ) ) ); // First max encountered in row-major order
-
-		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1 ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1, 4u ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( A, 2 ) ) ); // Min of rows
-
-		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1 ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1, 4u ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( A, 2 ) ) ); // Max of rows
-	}
-	{
-		Array2D_int const A( 4, 4, reshape( {
-		 -9,  9,  8, -8,
-		  2,  1, -1,  5,
-		  9,  4, -1,  9,
-		 -7,  5,  7, -3
-		}, std::array< int, 2 >{ { 4, 4 } } ) );
-
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), minloc( A ) ) );
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( A ) ) ); // First max encountered in row-major order
-
-		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( A, 1 ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( A, 1, 4u ) ) ); // Min of cols // Test large array method
-		EXPECT_TRUE( eq( Array1D_int( { 1, 3, 3, 1 } ), minloc( A, 2 ) ) ); // Min of rows
-
-		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1 ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1, 4u ) ) ); // Max of cols // Test large array method
-		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( A, 2 ) ) ); // Max of rows
-	}
-	{
-		Array2D_int const A( 4, 4, reshape( {
-		  9,  9,  8, -8,
-		  2,  1, -1,  5,
-		  9,  4, -1,  9,
-		 -7,  5,  7, -3
-		}, std::array< int, 2 >{ { 4, 4 } } ) );
-
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( A ) ) );
-		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), maxloc( A ) ) ); // First max encountered in row-major order
-
-		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1 ) ) ); // Min of cols
-		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1, 4u ) ) ); // Min of cols // Test large array method
-		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( A, 2 ) ) ); // Min of rows
-
-		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( A, 1 ) ) ); // Max of cols
-		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( A, 1, 4u ) ) ); // Max of cols // Test large array method
-		EXPECT_TRUE( eq( Array1D_int( { 1, 4, 1, 3 } ), maxloc( A, 2 ) ) ); // Max of rows
-	}
-}
-
-TEST( Array2Test, FunctionMatmul12 )
-{
-	Array1D_int A( 3 );
-	Array2D_int B( 3, 2 );
-	A( 1 ) = 4;
-	A( 2 ) = 3;
-	A( 3 ) = 5;
-	B( 1, 1 ) = 7;
-	B( 1, 2 ) = 2;
-	B( 2, 1 ) = 5;
-	B( 2, 2 ) = 0;
-	B( 3, 1 ) = 4;
-	B( 3, 2 ) = 6;
-	Array1D_int R( 2 );
-	R( 1 ) = 63;
-	R( 2 ) = 38;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-}
-
-TEST( Array2Test, FunctionMatmul21 )
-{
-	Array2D_int A( 2, 3 );
-	Array1D_int B( 3 );
-	A( 1, 1 ) = 4;
-	A( 1, 2 ) = 3;
-	A( 1, 3 ) = 5;
-	A( 2, 1 ) = 9;
-	A( 2, 2 ) = 2;
-	A( 2, 3 ) = 8;
-	B( 1 ) = 7;
-	B( 2 ) = 5;
-	B( 3 ) = 4;
-	Array1D_int R( 2 );
-	R( 1 ) = 63;
-	R( 2 ) = 105;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-}
-
-TEST( Array2Test, FunctionMatmul22 )
-{
-	Array2D_int A( 2, 3 );
-	Array2D_int B( 3, 2 );
-	A( 1, 1 ) = 4;
-	A( 1, 2 ) = 3;
-	A( 1, 3 ) = 5;
-	A( 2, 1 ) = 9;
-	A( 2, 2 ) = 2;
-	A( 2, 3 ) = 8;
-	B( 1, 1 ) = 7;
-	B( 1, 2 ) = 2;
-	B( 2, 1 ) = 5;
-	B( 2, 2 ) = 0;
-	B( 3, 1 ) = 4;
-	B( 3, 2 ) = 6;
-	Array2D_int R( 2, 2 );
-	R( 1, 1 ) = 63;
-	R( 1, 2 ) = 38;
-	R( 2, 1 ) = 105;
-	R( 2, 2 ) = 66;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-	Array2D_int BT( transposed( B ) );
-	EXPECT_TRUE( eq( R, matmul_T( A, BT ) ) );
-}
-
-TEST( Array2Test, FunctionMerge )
-{
-	{
-		Array2D_int const a( 2, 2, 1 );
-		Array2D_int const b( 2, 2, 2 );
-		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
-		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
-	}
-
-	{
-		Array2D_int const a( 2, 2, 1 );
-		int const b( 2 );
-		Array2D_int const B( 2, 2, 2 );
-		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
-		EXPECT_TRUE( eq( B, merge( a, b, false ) ) );
-	}
-
-	{
-		int const a( 1 );
-		Array2D_int const b( 2, 2, 2 );
-		Array2D_int const A( 2, 2, 1 );
-		EXPECT_TRUE( eq( A, merge( a, b, true ) ) );
-		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
-	}
-
-	{
-		Array2D_int const a( 2, 2, 1 );
-		Array2D_int const b( 2, 2, 2 );
-		Array2D_bool const mask( 2, 2, { true, false, false, true } );
-		Array2D_int const m( 2, 2, { 1, 2, 2, 1 } );
-		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
-	}
-
-	{
-		Array2D_int const a( 2, 2, 1 );
-		int const b( 2 );
-		Array2D_bool const mask( 2, 2, { true, false, false, true } );
-		Array2D_int const m( 2, 2, { 1, 2, 2, 1 } );
-		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
-	}
-
-	{
-		int const a( 1 );
-		Array2D_int const b( 2, 2, 2 );
-		Array2D_bool const mask( 2, 2, { true, false, false, true } );
-		Array2D_int const m( 2, 2, { 1, 2, 2, 1 } );
-		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
-	}
 }

@@ -62,26 +62,16 @@ struct EnergyPlusData;
 
 namespace HVACManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int HVACManageIteration; // counts iterations to enforce maximum iteration limit
-    extern int RepIterAir;
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
     // and zone equipment simulations
 
     // Functions
-    void clear_state();
-
     void ManageHVAC(EnergyPlusData &state);
 
     void SimHVAC(EnergyPlusData &state);
 
-    void SimSelectedEquipment(EnergyPlusData &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(EnergyPlusData &state,
+                              bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -97,9 +87,9 @@ namespace HVACManager {
 
     void ResetHVACControl(EnergyPlusData &state);
 
-    void ResetNodeData();
+    void ResetNodeData(EnergyPlusData &state);
 
-    void UpdateZoneListAndGroupLoads();
+    void UpdateZoneListAndGroupLoads(EnergyPlusData &state);
 
     void ReportAirHeatBalance(EnergyPlusData &state);
 
@@ -111,11 +101,47 @@ namespace HVACManager {
 
 } // namespace HVACManager
 
-struct HVACManagerData : BaseGlobalStruct {
+struct HVACManagerData : BaseGlobalStruct
+{
+
+    int HVACManageIteration = 0; // counts iterations to enforce maximum iteration limit
+    int RepIterAir = 0;
+    bool SimHVACIterSetup = false;
+    bool TriggerGetAFN = true;
+    bool ReportAirHeatBalanceFirstTimeFlag = true;
+    bool MyOneTimeFlag = true;
+    bool PrintedWarmup = false;
+    bool MyEnvrnFlag = true;
+    bool DebugNamesReported = false;
+    bool MySetPointInit = true;
+    bool MyEnvrnFlag2 = true;
+    bool FlowMaxAvailAlreadyReset = false;
+    bool FlowResolutionNeeded = false;
+    int ErrCount = 0; // Number of times that the maximum iterations was exceeded
+    int MaxErrCount = 0;
+    std::string ErrEnvironmentName;
+    Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
+    Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
 
     void clear_state() override
     {
-
+        HVACManageIteration = 0;
+        RepIterAir = 0;
+        SimHVACIterSetup = false;
+        TriggerGetAFN = true;
+        ReportAirHeatBalanceFirstTimeFlag = true;
+        MyOneTimeFlag = true;
+        PrintedWarmup = false;
+        MyEnvrnFlag = true;
+        DebugNamesReported = false;
+        MySetPointInit = true;
+        MyEnvrnFlag2 = true;
+        FlowMaxAvailAlreadyReset = false;
+        FlowResolutionNeeded = false;
+        this->ErrCount = 0;
+        this->MaxErrCount = 0;
+        this->MixSenLoad.clear();
+        this->MixLatLoad.clear();
     }
 };
 

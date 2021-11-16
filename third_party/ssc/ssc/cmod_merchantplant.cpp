@@ -566,25 +566,25 @@ static var_info _cm_vtab_merchantplant[] = {
 	{ SSC_OUTPUT,       SSC_NUMBER,     "npv_thermal_value",                        "Present value of thermal value",              "$",                   "", "Metrics", "*", "", "" },
 	// Additional lifetime outputs for data tables and plotting.
 		// calculated revenue
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_energy_market_generated_revenue", "Energy market generated revenue", "$", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services1_generated_revenue", "Ancillary services 1 generated revenue", "$", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services2_generated_revenue", "Ancillary services 2 generated revenue", "$", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services3_generated_revenue", "Ancillary services 3 generated revenue", "$", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services4_generated_revenue", "Ancillary services 4 generated revenue", "$", "", "", "*", "", "" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_energy_market_generated_revenue", "Energy market generated revenue", "$", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services1_generated_revenue", "Ancillary services 1 generated revenue", "$", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services2_generated_revenue", "Ancillary services 2 generated revenue", "$", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services3_generated_revenue", "Ancillary services 3 generated revenue", "$", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services4_generated_revenue", "Ancillary services 4 generated revenue", "$", "", "", "*", "", "GROUP=LIFETIME_MP" },
 		// cleared capacity user input
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_energy_market_cleared_capacity", "Energy market cleared capacity", "MW", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services1_cleared_capacity", "Ancillary services 1 cleared capacity", "MW", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services2_cleared_capacity", "Ancillary services 2 cleared capacity", "MW", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services3_cleared_capacity", "Ancillary services 3 cleared capacity", "MW", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services4_cleared_capacity", "Ancillary services 4 cleared capacity", "MW", "", "", "*", "", "" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_energy_market_cleared_capacity", "Energy market cleared capacity", "MW", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services1_cleared_capacity", "Ancillary services 1 cleared capacity", "MW", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services2_cleared_capacity", "Ancillary services 2 cleared capacity", "MW", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services3_cleared_capacity", "Ancillary services 3 cleared capacity", "MW", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services4_cleared_capacity", "Ancillary services 4 cleared capacity", "MW", "", "", "*", "", "GROUP=LIFETIME_MP" },
 		// price user input
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_energy_market_price", "Energy market price", "$/MWh", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services1_price", "Ancillary services 1 generated price", "$/MWh", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services2_price", "Ancillary services 2 generated price", "$/MWh", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services3_price", "Ancillary services 3 generated price", "$/MWh", "", "", "*", "", "" },
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services4_price", "Ancillary services 4 generated price", "$/MWh", "", "", "*", "", "" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_energy_market_price", "Energy market price", "$/MWh", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services1_price", "Ancillary services 1 generated price", "$/MWh", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services2_price", "Ancillary services 2 generated price", "$/MWh", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services3_price", "Ancillary services 3 generated price", "$/MWh", "", "", "*", "", "GROUP=LIFETIME_MP" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_ancillary_services4_price", "Ancillary services 4 generated price", "$/MWh", "", "", "*", "", "GROUP=LIFETIME_MP" },
 		// sum of all cleared capacities
-	{ SSC_OUTPUT, SSC_ARRAY, "mp_total_cleared_capacity", "Total cleared capacity", "MW", "", "", "*", "", "" },
+	{ SSC_OUTPUT, SSC_ARRAY, "mp_total_cleared_capacity", "Total cleared capacity", "MW", "", "", "*", "", "GROUP=LIFETIME_MP" },
 
 
 

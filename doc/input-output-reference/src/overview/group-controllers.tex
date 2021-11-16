@@ -351,6 +351,8 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
 \item
   HVAC,Average,Air System Outdoor Air High Humidity Control Status {[]}
 \item
+  HVAC,Average,Air System Outdoor Air Limiting Factor {[]}
+\item
   HVAC,Average,Air System Outdoor Air Flow Fraction {[]}
 \item
   HVAC,Average,Air System Outdoor Air Minimum Flow Fraction {[]}
@@ -390,6 +392,23 @@ Reports the outdoor air mixer's mixed air node temperature at minimum outdoor ai
 
 Reports the average operating status of the controller's high humidity control over the reporting interval. The high humidity control status is set to 1 when the controller determines that a zone high humidity condition exists \emph{according to the settings specified in the controller}. This variable is set to 0 if conditions disable high humidity control operation or High Humidity Control is specified as No.
 
+\paragraph{Air System Outdoor Air Limiting Factor {[]}}\label{air-system-outdoor-air-limiting-factor}
+
+Reports the average current limiting factor controlling the outdoor air flow rate as one of the following integer values. This variable is used to produce the Outdoor Air Details summary report subtables for Outdoor Air Controller Limiting Factors by AirLoop and Average Outdoor Air for Limiting Factors During Occupancy. Given the nature of this output, it is most useful at the detailed (HVAC timestep) reporting frequency. Averages over time may not be meaningful.
+\begin{description}
+  \item[0 = No Limiting Factor] None of the other limiting factors is active.
+  \item[1 = Limits and Scheduled Limits] Fixed limits such as Controller:OutdoorAir Minimum Outdoor Air Flow Rate, Maximum Outdoor Air Flow Rate, Minimum Fraction of Outdoor Air Schedule Name, Maximum Fraction of Outdoor Air Schedule Name.
+  \item[2 = Economizer] Economizer is active and sets the flow greater than the minimum outdoor air fraction.
+  \item[3 = Exhaust Flow] Outdoor air flow rate equals the total zone exhaust flow rate.
+  \item[4 = Mixed Air Flow] Outdoor air flow rate is limited by the current mixed air flow rate.
+  \item[5 = High Humidity] Controller:OutdoorAir High Humidity Control.
+  \item[6 = Demand Controlled Ventilation] Controller:MechanicalVentilation requested more than the minimum outdoor air fraction.
+  \item[7 = Night Ventilation] AvailabilityManager:NightVentilation is active.
+  \item[8 = Demand Limiting] DemandManager:Ventilation has reduced the outdoor air flow rate.
+  \item[9 = Energy Management System] An EnergyManagementSyste:Actuator has overridden the outdoor air flow rate.
+\end{description}
+
+
 \paragraph{Air System Outdoor Air Flow Fraction {[]}}\label{air-system-outdoor-air-flow-fraction}
 
 Reports the average actual outdoor air fraction for the outdoor air controller over the reporting interval.
@@ -428,7 +447,7 @@ This object is used in conjunction with an outdoor air controller (Ref. \hyperre
 
 Ventilation standards provide guidance on appropriate levels of outdoor ventilation air required for acceptable indoor air quality. The Ventilation Rate Procedure (VRP) of ASHRAE Standard 62.1-2007/2010 (\href{http://www.ashrae.org}{www.ashrae.org}) requires outdoor ventilation rates to be determined based on the floor area of each occupied zone plus the number of people in each zone and considers the zone air distribution effectiveness and system ventilation efficiency. The outdoor air ventilation rate can be reset dynamically as operating conditions change (e.g., variations in occupancy). The Controller:MechanicalVentilation object implements the VRP for calculating these outdoor air ventilation requirements and resetting them based on varying occupancy levels and zone diversification. This is particularly useful for large air distribution systems that serve a number of different zone types with varying occupancy levels. This object can also be used to model the Indoor Air Quality Procedure (IAQP) as defined in Standard 62.1
 
-The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
+The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible.
 
 \subsubsection{Inputs}\label{inputs-2-007}
 
@@ -446,7 +465,7 @@ This field indicates whether the air loop is capable of doing demand controlled 
 
 \paragraph{Field: System Outdoor Air Method}\label{field-system-outdoor-air-method}
 
-The method used to calculate the system minimum outdoor air flow. Several choices are allowed: \textbf{ZoneSum}, \textbf{VentilationRateProcedure,} \textbf{IndoorAirQualityProcedure, ProportionalControlBasedOnOccupancySchedule,} \textbf{ProportionalControlBasedOnDesignOccupancy,} \textbf{ProportionalControlBasedOnDesignOARate,} and \textbf{IndoorAirQualityProcedureGenericContaminant}. ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the \hyperref[zonecontrolcontaminantcontroller]{ZoneControl:ContaminantController} object. Appendix A of the ASHRAE 62.1-2010 user's manual discusses another method for implementing CO\(_{2}\)-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO\(_{2}\) signal range and has two choices to calculate occupancy-based outdoor air rate. The ProportionalControlBasedOnOccupancySchedule choice uses the real occupancy at the current time step to calculate outdoor air rate, while the ProportionalControlBasedOnDesignOccupancy uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage. The ProportionalControlBasedOnDesignOARate uses design outdoor air flow rate to calculate demand outdoor air flow rate. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the \hyperref[zonecontrolcontaminantcontroller]{ZoneControl:ContaminantController} object.
+The method used to calculate the system minimum outdoor air flow. Several choices are allowed: \textbf{ZoneSum}, \textbf{Standard62.1VentilationRateProcedure}, \textbf{Standard62.1VentilationRateProcedureWithLimit}, \textbf{IndoorAirQualityProcedure}, \textbf{ProportionalControlBasedOnOccupancySchedule}, \textbf{ProportionalControlBasedOnDesignOccupancy}, \textbf{ProportionalControlBasedOnDesignOARate}, and \textbf{IndoorAirQualityProcedureGenericContaminant}. ZoneSum sums the outdoor air flows across all zones served by the system. Standard62.1VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. Standard62.1VentilationRateProcedureWithLimit is similar to Standard62.1VentilationRateProcedure, the only difference between the two methods is that Standard62.1VentilationRateProcedureWithLimit doesn't allow the system outdoor air flow to be larger than the design value. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the \hyperref[zonecontrolcontaminantcontroller]{ZoneControl:ContaminantController} object. Appendix A of the ASHRAE 62.1-2010 user's manual discusses another method for implementing CO\(_{2}\)-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO\(_{2}\) signal range and has two choices to calculate occupancy-based outdoor air rate. The ProportionalControlBasedOnOccupancySchedule choice uses the real occupancy at the current time step to calculate outdoor air rate, while the ProportionalControlBasedOnDesignOccupancy uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage. The ProportionalControlBasedOnDesignOARate uses design outdoor air flow rate to calculate demand outdoor air flow rate. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the \hyperref[zonecontrolcontaminantcontroller]{ZoneControl:ContaminantController} object.
 
 Note: When System Outdoor Air Method = IndoorAirQualityProcedure or IndoorAirQualityProcedureGenericContaminant is specified, only the Zone \textless{}x\textgreater{} Name fields are used. The other field inputs described below are not used.
 
@@ -464,7 +483,7 @@ The zone name or zone list to apply the ventilation rates specified in the \hype
 
 \paragraph{Field: Design Specification Outdoor Air Object Name \textless{}x\textgreater{}}\label{field-design-specification-outdoor-air-object-name-x}
 
-The name of the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object, defining the amount of outdoor air, that applies to the zone or zone list. If this field is blank, the corresponding \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object for the zone will come from the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object referenced by the \hyperref[sizingzone]{Sizing:Zone} object for the same zone. If no such zone match is found, default values from the IDD will be used for the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which is 0.0094 m3/s-person.
+The name of the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} or \hyperref[designspecificationoutdoorairspacelist]{DesignSpecification:OutdoorAir:SpaceList} object, defining the amount of outdoor air, that applies to the zone or zone list. If this field is blank, the corresponding \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object for the zone will come from the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object referenced by the \hyperref[sizingzone]{Sizing:Zone} object for the same zone. If no such zone match is found, default values from the IDD will be used for the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which is 0.0094 m3/s-person.
 
 If an Outdoor Air Schedule Name is specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object, the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calculations.
 
@@ -490,7 +509,7 @@ An example input for this object is shown below:
 Controller:MechanicalVentilation,
   VentObject,                             !- Name
   VentSchedule,                         !- Availability Schedule Name
-  VentilationRateProcedure, !- System Outdoor Air Method
+  Standard62.1VentilationRateProcedure, !- System Outdoor Air Method
   1.0,                                           !- Zone Maximum Outdoor Air Fraction
   Resistive Zone,                     !- Zone 1 Name
   DSOA1,                                       !- Design Specification Outdoor Air Object Name 1

@@ -49,8 +49,8 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -60,39 +60,11 @@ struct EnergyPlusData;
 
 namespace DisplacementVentMgr {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
+    void ManageUCSDDVModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    void InitUCSDDV(EnergyPlusData &state, int ZoneNum);
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Real64 HAT_MX;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
-    extern Real64 HA_MX;                   // HA_MX Convection Coefficient times Area for the upper subzone
-    extern Real64 HAT_OC;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
-    extern Real64 HA_OC;                   // HA_OC Convection Coefficient times Area for the lower subzone
-    extern Real64 HAT_FLOOR;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
-    extern Real64 HA_FLOOR;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
-    extern Real64 HeightFloorSubzoneTop;   // Assumed thickness of floor subzone
-    extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
-    extern Real64 HeightIntMass;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
-    extern Real64 HeightIntMassDefault;    // Default height of internal mass surfaces
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    void clear_state();
-
-    void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
-
-    //**************************************************************************************************
-
-    void InitUCSDDV(EnergyPlusData &state, int const ZoneNum);
-
-    //**************************************************************************************************
-
-    void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
-
-    //**************************************************************************************************
+    void HcUCSDDV(EnergyPlusData &state, int ZoneNum, Real64 FractionHeight);
 
     Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
                                                Real64 HAT_floor,
@@ -104,15 +76,78 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum); // Which Zonenum
+    void CalcUCSDDV(EnergyPlusData &state, int ZoneNum); // Which Zonenum
+
+    static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+        DataHeatBalance::IntGainType::People,
+        DataHeatBalance::IntGainType::WaterHeaterMixed,
+        DataHeatBalance::IntGainType::WaterHeaterStratified,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+        DataHeatBalance::IntGainType::ElectricEquipment,
+        DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+        DataHeatBalance::IntGainType::GasEquipment,
+        DataHeatBalance::IntGainType::HotWaterEquipment,
+        DataHeatBalance::IntGainType::SteamEquipment,
+        DataHeatBalance::IntGainType::OtherEquipment,
+        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+        DataHeatBalance::IntGainType::GeneratorFuelCell,
+        DataHeatBalance::IntGainType::WaterUseEquipment,
+        DataHeatBalance::IntGainType::GeneratorMicroCHP,
+        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+        DataHeatBalance::IntGainType::PipeIndoor,
+        DataHeatBalance::IntGainType::RefrigerationCase,
+        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+        DataHeatBalance::IntGainType::RefrigerationWalkIn};
+
+    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                             DataHeatBalance::IntGainType::Lights};
 
 } // namespace DisplacementVentMgr
 
-struct DisplacementVentMgrData : BaseGlobalStruct {
+struct DisplacementVentMgrData : BaseGlobalStruct
+{
+    Real64 HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
+    Real64 HA_MX = 0.0;                   // HA_MX Convection Coefficient times Area for the upper subzone
+    Real64 HAT_OC = 0.0;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
+    Real64 HA_OC = 0.0;                   // HA_OC Convection Coefficient times Area for the lower subzone
+    Real64 HAT_FLOOR = 0.0;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
+    Real64 HA_FLOOR = 0.0;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
+    Real64 HeightFloorSubzoneTop = 0.2;   // Assumed thickness of floor subzone
+    Real64 ThickOccupiedSubzoneMin = 0.2; // Minimum thickness of occupied subzone
+    Real64 HeightIntMass = 0.0;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
+    Real64 HeightIntMassDefault = 2.0;    // Default height of internal mass surfaces
+    bool InitUCSDDVMyOneTimeFlag = true;
+    Array1D_bool MyEnvrnFlag;
+    Real64 TempDepCoef = 0.0; // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+    Real64 TempIndCoef = 0.0; // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
 
     void clear_state() override
     {
-
+        this->HAT_MX = 0.0;
+        this->HA_MX = 0.0;
+        this->HAT_OC = 0.0;
+        this->HA_OC = 0.0;
+        this->HAT_FLOOR = 0.0;
+        this->HA_FLOOR = 0.0;
+        this->HeightFloorSubzoneTop = 0.2;
+        this->ThickOccupiedSubzoneMin = 0.2;
+        this->HeightIntMass = 0.0;
+        this->HeightIntMassDefault = 2.0;
+        this->InitUCSDDVMyOneTimeFlag = true;
+        this->MyEnvrnFlag.clear();
+        this->TempDepCoef = 0.0;
+        this->TempIndCoef = 0.0;
     }
 };
 

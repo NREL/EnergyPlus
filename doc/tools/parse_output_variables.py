@@ -98,9 +98,9 @@ def do_initial_line_trimming(working_line):
     working_line = working_line.strip()
     # cut the call to SetupOutputVariable off
     sov_index = working_line.index("SetupOutputVariable")
-    working_line = working_line[sov_index + 21:]
+    working_line = working_line[sov_index + 20:]
     # cut the last 3 characters off
-    working_line = working_line[:-3]
+    working_line = working_line[:-2]
     return working_line
 
 
@@ -219,7 +219,7 @@ def main():
             if len(matches) > 0:
                 print("File %s contains commented SetupOutputVariable calls; output may be flawed" % file_name)
 
-            p = re.compile('SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
+            p = re.compile('SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
             matches = p.findall(file_contents)
 
             for match in matches:
@@ -237,21 +237,22 @@ def main():
                 arguments = get_arguments_based_on_comma_locations(working_line, comma_locations)
 
                 # parse out data from the variable name first
-                variable_name, variable_units = process_variable_name_and_units(arguments[0])
+                variable_name = arguments[1]
+                variable_units = arguments[2]
 
                 try:
 
                     # the second can be taken as-is
-                    actual_variable = arguments[1]
+                    actual_variable = arguments[3]
 
                     # the third should be processed for quotes
-                    index_type_key = arguments[2]
+                    index_type_key = arguments[4]
 
                     # same for the fourth
-                    variable_type_key = arguments[3]
+                    variable_type_key = arguments[5]
 
                     # same for the fifth I guess
-                    keyed_value = arguments[4]
+                    keyed_value = arguments[6]
 
                 except:
 

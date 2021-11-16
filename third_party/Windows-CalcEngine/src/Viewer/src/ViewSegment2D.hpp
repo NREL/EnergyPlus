@@ -6,50 +6,61 @@
 
 #include "Segment2D.hpp"
 
-namespace Viewer {
+namespace Viewer
+{
+    enum class Shadowing
+    {
+        No = 0,
+        Partial,
+        Total
+    };
 
-	enum class Shadowing { No = 0, Partial, Total };
+    enum class PointPosition
+    {
+        Visible,
+        Invisible,
+        OnLine
+    };
 
-	enum class PointPosition { Visible, Invisible, OnLine };
+    class CViewSegment2D : public CSegment2D, public std::enable_shared_from_this<CViewSegment2D>
+    {
+    public:
+        CViewSegment2D(std::shared_ptr<const CPoint2D> const & t_StartPoint,
+                       std::shared_ptr<const CPoint2D> const & t_EndPoint);
 
-	class CViewSegment2D : public CSegment2D, public std::enable_shared_from_this< CViewSegment2D > {
-	public:
-		CViewSegment2D( std::shared_ptr< const CPoint2D > const & t_StartPoint,
-		                std::shared_ptr< const CPoint2D > const & t_EndPoint );
+        std::shared_ptr<const CViewSegment2D> getNormal();
 
-		std::shared_ptr< const CViewSegment2D > getNormal();
+        bool operator==(CViewSegment2D const & rhs) const;
+        bool operator!=(CViewSegment2D const & rhs) const;
 
-		bool operator==( CViewSegment2D const& rhs ) const;
-		bool operator!=( CViewSegment2D const& rhs ) const;
+        // Calculates view factor coefficient. It needs to be divided by segment length to get real
+        // view factor.
+        double viewFactorCoefficient(CSegment2D const & t_Segment) const;
 
-		// Calculates view factor coefficient. It needs to be divided by segment length to get real view factor.
-		double viewFactorCoefficient( CSegment2D const& t_Segment ) const;
+        // Self shadowing between two segments
+        Shadowing selfShadowing(CViewSegment2D const & t_Segment) const;
 
-		// Self shadowing between two segments
-		Shadowing selfShadowing( CViewSegment2D const& t_Segment ) const;
+        // To determine position from the perspective of the segment
+        PointPosition position(CPoint2D const & t_Point) const;
 
-		// To determine position from the perspective of the segment
-		PointPosition position( CPoint2D const& t_Point ) const;
+        // Divide segment into number of subsegments
+        std::shared_ptr<std::vector<std::shared_ptr<CViewSegment2D>>>
+          subSegments(const size_t numSegments) const;
 
-		// Divide segment into number of subsegments
-		std::shared_ptr< std::vector< std::shared_ptr< CViewSegment2D > > >
-		subSegments( const size_t numSegments ) const;
+        // Translates segment for given coordinates
+        std::shared_ptr<CViewSegment2D> translate(const double t_x, const double t_y);
 
-		// Translates segment for given coordinates
-		std::shared_ptr< CViewSegment2D > translate( const double t_x, const double t_y );
+    private:
+        // How much segment is self shadowed (No, Partial, Total)
+        Shadowing isInSelfShadow(CViewSegment2D const & t_Segment) const;
 
-	private:
-		// How much segment is self shadowed (No, Partial, Total)
-		Shadowing isInSelfShadow( CViewSegment2D const& t_Segment ) const;
+        void calculateNormal();
 
-		void calculateNormal();
+        // Normal to the segment
+        std::shared_ptr<CViewSegment2D> m_Normal;
+        bool m_NormalCalculated;
+    };
 
-		// Normal to the segment
-		std::shared_ptr< CViewSegment2D > m_Normal;
-		bool m_NormalCalculated;
-
-	};
-
-}
+}   // namespace Viewer
 
 #endif

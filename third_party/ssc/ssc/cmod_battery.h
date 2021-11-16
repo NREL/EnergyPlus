@@ -53,6 +53,7 @@ struct batt_variables
 	int batt_meter_position;
 	int batt_target_choice;
 	int batt_loss_choice;
+	int batt_life_model;
 	int batt_calendar_choice;
 
 	ssc_number_t *pcharge = 0;

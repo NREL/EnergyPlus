@@ -60,15 +60,17 @@ struct EnergyPlusData;
 namespace UFADManager {
 
     void ManageUCSDUFModels(EnergyPlusData &state,
-                            int const ZoneNum,      // index number for the specified zone
+                            int const ZoneNum,                                 // index number for the specified zone
                             DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void InitUCSDUF(EnergyPlusData &state, int const ZoneNum,
+    void InitUCSDUF(EnergyPlusData &state,
+                    int const ZoneNum,
                     DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void SizeUCSDUF(EnergyPlusData &state, int const ZoneNum,
+    void SizeUCSDUF(EnergyPlusData &state,
+                    int const ZoneNum,
                     DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
@@ -80,7 +82,8 @@ namespace UFADManager {
 
 } // namespace UFADManager
 
-struct UFADManagerData : BaseGlobalStruct {
+struct UFADManagerData : BaseGlobalStruct
+{
 
     Real64 HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
     Real64 HAT_MXWin = 0.0;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
@@ -98,10 +101,12 @@ struct UFADManagerData : BaseGlobalStruct {
     Real64 HeightIntMassDefault = 2.0;    // Default height of internal mass surfaces
 
     bool MyOneTimeFlag = true;
+    Array1D_bool MySizeFlag;
 
     void clear_state() override
     {
-        MyOneTimeFlag = true;
+        this->MyOneTimeFlag = true;
+        this->MySizeFlag.deallocate();
     }
 
     // Default Constructor

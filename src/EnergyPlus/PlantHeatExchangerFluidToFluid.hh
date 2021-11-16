@@ -163,7 +163,7 @@ namespace PlantHeatExchangerFluidToFluid {
         PlantConnectionStruct SupplySideLoop;
         std::string HeatTransferMeteringEndUse;
         std::string ComponentUserName; // user name for control-associated  component
-        int ComponentTypeOfNum;
+        DataPlant::PlantEquipmentType ComponentType;
         PlantLocatorStruct OtherCompSupplySideLoop;
         PlantLocatorStruct OtherCompDemandSideLoop;
         Real64 SizingFactor;
@@ -183,9 +183,10 @@ namespace PlantHeatExchangerFluidToFluid {
         HeatExchangerStruct()
             : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
               SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
-              MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
-              OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
-              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+              MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
+              HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
@@ -193,9 +194,14 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void setupOutputVars(EnergyPlusData &state);
 
@@ -213,17 +219,20 @@ namespace PlantHeatExchangerFluidToFluid {
                                       Real64 DmdSideMassFlowRate,
                                       Array1D<Real64> const &Par // Par(1) = HX index number
         );
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetFluidHeatExchangerInput(EnergyPlusData &state);
 
 } // namespace PlantHeatExchangerFluidToFluid
 
-struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct {
+struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct
+{
 
     int NumberOfPlantFluidHXs = 0;
     bool GetInput = true;
-    Array1D<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
+    EPVector<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
 
     void clear_state() override
     {

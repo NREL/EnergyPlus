@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,4;
 
@@ -271,6 +271,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -287,6 +288,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -303,6 +305,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -319,6 +322,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -335,6 +339,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -351,6 +356,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -363,6 +369,10 @@
     15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+
+  Output:Variable,*,Site Total Sky Cover,hourly;
+
+  Output:Variable,*,Site Opaque Sky Cover,hourly;
 
   Output:Variable,*,Site Daylight Saving Time Status,daily;
 

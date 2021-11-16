@@ -53,6 +53,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import sys
+if not hasattr(sys, 'argv'):
+    sys.argv = ['']
+
 from typing import List
 
 from pyenergyplus.api import EnergyPlusAPI
