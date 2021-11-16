@@ -64,7 +64,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::VentilatedSlab;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
@@ -88,8 +87,8 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     int OutletNode = 2;
     state->dataVentilatedSlab->VentSlab(Item).FanOutletNode = FanOutletNode;
     state->dataVentilatedSlab->VentSlab(Item).RadInNode = OutletNode;
-    Node.allocate(2);
-    Node(OutletNode).MassFlowRate = 0.5;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(OutletNode).MassFlowRate = 0.5;
 
     // Calcs being tested
     //	VentSlab( Item ).HeatCoilPower = max( 0.0, QUnitOut );
@@ -100,10 +99,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     //	PowerMet = QUnitOut;
 
     // Sensible Heating
-    Node(FanOutletNode).Temp = 15.0;
-    Node(FanOutletNode).HumRat = 0.003;
-    Node(OutletNode).Temp = 20.0;
-    Node(OutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(FanOutletNode).Temp = 15.0;
+    state->dataLoopNodes->Node(FanOutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(OutletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.003;
     CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower > 0.0);
@@ -114,10 +113,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(PowerMet > 0.0);
 
     // Sensible Cooling
-    Node(FanOutletNode).Temp = 25.0;
-    Node(FanOutletNode).HumRat = 0.003;
-    Node(OutletNode).Temp = 20.0;
-    Node(OutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(FanOutletNode).Temp = 25.0;
+    state->dataLoopNodes->Node(FanOutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(OutletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.003;
     CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
@@ -128,10 +127,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(PowerMet < 0.0);
 
     // Sensible and Latent Cooling
-    Node(FanOutletNode).Temp = 25.0;
-    Node(FanOutletNode).HumRat = 0.008;
-    Node(OutletNode).Temp = 20.0;
-    Node(OutletNode).HumRat = 0.003;
+    state->dataLoopNodes->Node(FanOutletNode).Temp = 25.0;
+    state->dataLoopNodes->Node(FanOutletNode).HumRat = 0.008;
+    state->dataLoopNodes->Node(OutletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(OutletNode).HumRat = 0.003;
     CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
@@ -140,7 +139,6 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower > 0.0);
     EXPECT_TRUE(LatOutputProvided < 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
-
 }
 
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
@@ -874,6 +872,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -890,6 +889,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -906,6 +906,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -922,6 +923,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -938,6 +940,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    ROOF,                    !- Surface Type",
         "    ROOF-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -954,6 +957,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    reverseceiling with Radiant,  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -970,6 +974,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    reverseCeiling with Radiant,  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -986,6 +991,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    reverseCeiling with Radiant,  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1002,6 +1008,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    reverseCeiling with Radiant,  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1018,6 +1025,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    reverseceiling with Radiant,  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1034,6 +1042,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1050,6 +1059,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    CEILING,                 !- Surface Type",
         "    ceiling with Radiant,    !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1066,6 +1076,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-1,                 !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1082,6 +1093,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB21,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1098,6 +1110,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB41,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1114,6 +1127,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB51,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1130,6 +1144,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1146,6 +1161,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    CEILING,                 !- Surface Type",
         "    Ceiling with Radiant,    !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1162,6 +1178,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    Floor with radiant,      !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1178,6 +1195,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB12,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1194,6 +1212,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB32,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1210,6 +1229,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB52,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1226,6 +1246,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1242,6 +1263,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    CEILING,                 !- Surface Type",
         "    Ceiling with Radiant,    !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1258,6 +1280,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-1,                 !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1274,6 +1297,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB23,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1290,6 +1314,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB43,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1306,6 +1331,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB53,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1322,6 +1348,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1338,6 +1365,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    CEILING,                 !- Surface Type",
         "    Ceiling with Radiant,    !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1354,6 +1382,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-1,                 !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1370,6 +1399,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB14,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1386,6 +1416,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB34,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1402,6 +1433,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB54,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1418,6 +1450,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    CEILING,                 !- Surface Type",
         "    ceiling with Radiant,    !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1434,6 +1467,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-1,                 !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1450,6 +1484,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB15,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1466,6 +1501,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB25,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1482,6 +1518,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB35,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1498,6 +1535,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB45,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2306,11 +2344,11 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedule data
+    ProcessScheduleInput(*state);               // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data

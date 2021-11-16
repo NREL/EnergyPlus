@@ -161,10 +161,13 @@ public:
 
 
 		//Storing each column of the tidal_resource_matrix and tidal_power_curve as vectors:
-        double tidal_resource_start_velocity, tidal_power_start_velocity, tidal_resource_end_velocity, tidal_power_end_velocity = 0;
+        double tidal_resource_start_velocity = 0;
+        double tidal_power_start_velocity = 0;
+        double tidal_resource_end_velocity = 0;
+        double tidal_power_end_velocity = 0;
         double min_velocity, max_velocity = 0;
         min_velocity = tidal_resource_matrix.at(0, 0);
-        max_velocity = tidal_resource_matrix.at(number_rows - 1, 0);
+        max_velocity = tidal_resource_matrix.at(size_t(number_rows) - 1, 0);
 
 		for (int i = 0; i < number_rows; i++) {
             size_t n = i;

@@ -29,6 +29,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lib_battery.h"
 #include "lib_battery_capacity_test.h"
 #include "lib_battery_lifetime_test.h"
+#include "lib_battery_lifetime_nmc.h"
 
 static void compareState(thermal_state tested_state, thermal_state expected_state, const std::string& msg){
     double tol = 0.02;
@@ -109,9 +110,7 @@ public:
 struct battery_state_test{
     capacity_state capacity;
     double batt_voltage;
-    double q_lifetime;
-    cycle_state cycle;
-    calendar_state cal;
+    lifetime_state lifetime;
     thermal_state thermal;
 
     size_t last_idx;
@@ -125,18 +124,20 @@ static void compareState(std::unique_ptr<battery_t>&model, const battery_state_t
 
     double tol = 0.01;
     auto lifetime_tested = tested_state.lifetime;
-    auto cal_expected = expected_state.cal;
-    EXPECT_NEAR(lifetime_tested->calendar->day_age_of_battery, cal_expected.day_age_of_battery, tol) << msg;
+    auto lifetime_expected = expected_state.lifetime;
+    EXPECT_NEAR(lifetime_tested->day_age_of_battery, lifetime_expected.day_age_of_battery, tol) << msg;
+    EXPECT_NEAR(lifetime_tested->range, lifetime_expected.range, tol) << msg;
+    EXPECT_NEAR(lifetime_tested->average_range, lifetime_expected.average_range, tol) << msg;
+    EXPECT_NEAR(lifetime_tested->n_cycles, lifetime_expected.n_cycles, tol) << msg;
+
+    auto cal_expected = *lifetime_expected.calendar;
     EXPECT_NEAR(lifetime_tested->calendar->q_relative_calendar, cal_expected.q_relative_calendar, tol) << msg;
     EXPECT_NEAR(lifetime_tested->calendar->dq_relative_calendar_old, cal_expected.dq_relative_calendar_old, tol) << msg;
 
-    auto cyc_expected = expected_state.cycle;
+    auto cyc_expected = *lifetime_expected.cycle;
     EXPECT_NEAR(lifetime_tested->cycle->q_relative_cycle, cyc_expected.q_relative_cycle, tol) << msg;
     EXPECT_NEAR(lifetime_tested->cycle->rainflow_Xlt, cyc_expected.rainflow_Xlt, tol) << msg;
     EXPECT_NEAR(lifetime_tested->cycle->rainflow_Ylt, cyc_expected.rainflow_Ylt, tol) << msg;
-    EXPECT_NEAR(lifetime_tested->cycle->range, cyc_expected.range, tol) << msg;
-    EXPECT_NEAR(lifetime_tested->cycle->average_range, cyc_expected.average_range, tol) << msg;
-    EXPECT_NEAR(lifetime_tested->cycle->n_cycles, cyc_expected.n_cycles, tol) << msg;
     EXPECT_NEAR(lifetime_tested->cycle->rainflow_jlt, cyc_expected.rainflow_jlt, tol) << msg;
 
     compareState(*tested_state.thermal, expected_state.thermal, msg);
@@ -259,13 +260,13 @@ public:
         capacityModel = new capacity_lithium_ion_t(q, SOC_init, SOC_max, SOC_min, dtHour);
         voltageModel = new voltage_dynamic_t(n_series, n_strings, Vnom_default, Vfull, Vexp, Vnom, Qfull, Qexp, Qnom,
                                              C_rate, resistance, dtHour);
-        lifetimeModel = new lifetime_t(cycleLifeMatrix, dtHour, 1.02, 2.66e-3, -7280, 930);
-        thermalModel = new thermal_t(1.0, mass, surface_area, resistance, Cp, h, capacityVsTemperature, T_room);
+        lifetimeModel = new lifetime_calendar_cycle_t(cycleLifeMatrix, dtHour, 1.02, 2.66e-3, -7280, 930);
+        thermalModel = new thermal_t(dtHour, mass, surface_area, resistance, Cp, h, capacityVsTemperature, T_room);
         lossModel = new losses_t(monthlyLosses, monthlyLosses, monthlyLosses);
         batteryModel = std::unique_ptr<battery_t>(new battery_t(dtHour, chemistry, capacityModel, voltageModel, lifetimeModel, thermalModel, lossModel));
     }
 
-    void TearDown(){
+    void TearDown() override {
         // batteryModel takes ownership of component models
     }
 

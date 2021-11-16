@@ -67,39 +67,28 @@ namespace HighTempRadiantSystem {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern std::string const cGas;
-    extern std::string const cNaturalGas;
-    extern std::string const cElectric;
-    extern std::string const cElectricity;
-    extern int const Gas;
-    extern int const Electric;
-    extern std::string const cMATControl;         // Control for using mean air temperature
-    extern std::string const cMRTControl;         // Control for using mean radiant temperature
-    extern std::string const cOperativeControl;   // Control for using operative temperature
-    extern std::string const cMATSPControl;       // Control for to MAT setpoint
-    extern std::string const cMRTSPControl;       // Control for to MRT setpoint
-    extern std::string const cOperativeSPControl; // Control for operative temperature setpoint
-    extern int const MATControl;
-    extern int const MRTControl;
-    extern int const OperativeControl;
-    extern int const MATSPControl;
-    extern int const MRTSPControl;
-    extern int const OperativeSPControl;
+
+    enum class RadHeaterType
+    {
+        Unassigned,
+        Gas,
+        Electric
+    };
+
+    enum class RadControlType : int
+    {
+        Unassigned = 0,
+        MATControl = 1001,
+        MRTControl = 1002,
+        OperativeControl = 1003,
+        MATSPControl = 1004,
+        MRTSPControl = 1005,
+        OperativeSPControl = 1006
+    };
 
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables...
-    extern int NumOfHighTempRadSys;              // Number of hydronic low tempererature radiant systems
-    extern Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QHTRadSrcAvg locally
-    extern Array1D<Real64> LastQHTRadSrc;      // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
 
@@ -109,20 +98,20 @@ namespace HighTempRadiantSystem {
     {
         // Members
         // Input data
-        std::string Name;       // name of hydronic radiant system
-        std::string SchedName;  // availability schedule
-        int SchedPtr;           // index to schedule
-        std::string ZoneName;   // Name of zone the system is serving
-        int ZonePtr;            // Point to this zone in the Zone derived type
-        int HeaterType;         // Type of heater (gas or electric)
-        Real64 MaxPowerCapac;   // Maximum capacity of the radiant heater in Watts
-        Real64 CombustionEffic; // Combustion efficiency (only valid for a gas heater)
-        Real64 FracRadiant;     // Fraction of heater power that is given off as radiant heat
-        Real64 FracLatent;      // Fraction of heater power that is given off as latent heat
-        Real64 FracLost;        // Fraction of heater power that is lost to the outside environment
-        Real64 FracConvect;     // Fraction of heater power that is given off as convective heat
+        std::string Name;         // name of hydronic radiant system
+        std::string SchedName;    // availability schedule
+        int SchedPtr;             // index to schedule
+        std::string ZoneName;     // Name of zone the system is serving
+        int ZonePtr;              // Point to this zone in the Zone derived type
+        RadHeaterType HeaterType; // Type of heater (gas or electric)
+        Real64 MaxPowerCapac;     // Maximum capacity of the radiant heater in Watts
+        Real64 CombustionEffic;   // Combustion efficiency (only valid for a gas heater)
+        Real64 FracRadiant;       // Fraction of heater power that is given off as radiant heat
+        Real64 FracLatent;        // Fraction of heater power that is given off as latent heat
+        Real64 FracLost;          // Fraction of heater power that is lost to the outside environment
+        Real64 FracConvect;       // Fraction of heater power that is given off as convective heat
         // (by definition this is 1 minus the sum of all other fractions)
-        int ControlType;                   // Control type for the system (MAT, MRT, or op temp)
+        RadControlType ControlType;        // Control type for the system (MAT, MRT, or op temp)
         Real64 ThrottlRange;               // Throttling range for heating [C]
         std::string SetptSched;            // Schedule name for the zone setpoint temperature
         int SetptSchedPtr;                 // Schedule index for the zone setpoint temperature
@@ -146,9 +135,10 @@ namespace HighTempRadiantSystem {
 
         // Default Constructor
         HighTempRadiantSystemData()
-            : SchedPtr(0), ZonePtr(0), HeaterType(0), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0), FracLatent(0.0), FracLost(0.0),
-              FracConvect(0.0), ControlType(0), ThrottlRange(0.0), SetptSchedPtr(0), FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0),
-              ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0), HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+            : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Unassigned), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
+              FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Unassigned), ThrottlRange(0.0), SetptSchedPtr(0),
+              FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
+              HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
     };
@@ -164,21 +154,18 @@ namespace HighTempRadiantSystem {
         }
     };
 
-    // Object Data
-    extern Array1D<HighTempRadiantSystemData> HighTempRadSys;
-    extern Array1D<HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
-
     // Functions
-    void clear_state();
 
-    void SimHighTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
+    void SimHighTempRadiantSystem(EnergyPlusData &state,
+                                  std::string_view CompName,     // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex);
 
     void GetHighTempRadiantSystem(EnergyPlusData &state, bool &ErrorsFound); // Error flag if problems encountered on reading user input
 
-    void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitHighTempRadiantSystem(EnergyPlusData &state,
+                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
     );
 
@@ -186,7 +173,8 @@ namespace HighTempRadiantSystem {
 
     void CalcHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum); // name of the low temperature radiant system
 
-    void CalcHighTempRadiantSystemSP(EnergyPlusData &state, bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+    void CalcHighTempRadiantSystemSP(EnergyPlusData &state,
+                                     bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
                                      int const RadSysNum            // name of the low temperature radiant system
     );
 
@@ -199,18 +187,56 @@ namespace HighTempRadiantSystem {
 
     void DistributeHTRadGains(EnergyPlusData &state);
 
-    void
-    ReportHighTempRadiantSystem(EnergyPlusData &state, int RadSysNum); // Index for the low temperature radiant system under consideration within the derived types
+    void ReportHighTempRadiantSystem(EnergyPlusData &state,
+                                     int RadSysNum); // Index for the low temperature radiant system under consideration within the derived types
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
 } // namespace HighTempRadiantSystem
 
-struct HighTempRadiantSystemData : BaseGlobalStruct {
+struct HighTempRadiantSystemData : BaseGlobalStruct
+{
+
+    // Standard, run-of-the-mill variables...
+    int NumOfHighTempRadSys = 0;          // Number of hydronic low tempererature radiant systems
+    Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
+    Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    // Record keeping variables used to calculate QHTRadSrcAvg locally
+    Array1D<Real64> LastQHTRadSrc;      // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+
+    // Object Data
+    Array1D<HighTempRadiantSystem::HighTempRadiantSystemData> HighTempRadSys;
+    Array1D<HighTempRadiantSystem::HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
+
+    bool GetInputFlag = true;
+    bool firstTime = true; // For one-time initializations
+    bool MyEnvrnFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state() override
     {
+        NumOfHighTempRadSys = 0;
+        QHTRadSource.clear();
+        QHTRadSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQHTRadSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        MySizeFlag.clear();
+        CheckEquipName.clear();
 
+        HighTempRadSys.clear();
+        HighTempRadSysNumericFields.clear();
+
+        GetInputFlag = true;
+        firstTime = true;
+        MyEnvrnFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 };
 

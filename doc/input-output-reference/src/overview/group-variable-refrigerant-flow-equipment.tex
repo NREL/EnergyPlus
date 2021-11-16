@@ -72,15 +72,15 @@ This numeric field defines the total cooling capacity (sensible + latent) of the
 
 \paragraph{Field: Gross Rated Cooling COP}\label{field-gross-rated-cooling-cop-001}
 
-This numeric field defines the cooling coefficient of performance at rated conditions. The cooling coefficient of performance includes compressor power and condenser fan power. This COP value does not account for impacts due to the supply air fan. The nominal heat pump cooling COP must be greater than 0. If this field is left blank, a default coefficient of performance of 3.3 is assumed.
+This numeric field defines the cooling coefficient of performance (COP) at rated conditions. The cooling COP includes compressor power and condenser fan power. This COP value does not account for impacts due to the supply air fan. The nominal heat pump cooling COP must be greater than 0. If this field is left blank, a default COP of 3.3 is assumed.
 
-\paragraph{Field: Minimum Outdoor Temperature in Cooling Mode}\label{field-minimum-outdoor-temperature-in-cooling-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Cooling Mode}\label{field-minimum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
-This numeric field defines the minimum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+This numeric field defines the minimum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
 
-\paragraph{Field: Maximum Outdoor Temperature in Cooling Mode}\label{field-maximum-outdoor-temperature-in-cooling-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Cooling Mode}\label{field-maximum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
-This numeric field defines the maximum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
 
 \paragraph{Field: Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name}\label{field-cooling-capacity-ratio-modifier-function-of-low-temperature-curve-name}
 
@@ -132,15 +132,15 @@ This numeric field defines the ratio of gross heating to gross cooling capacity.
 
 \paragraph{Field: Gross Rated Heating COP}\label{field-gross-rated-heating-cop-001}
 
-This numeric field defines the heating coefficient of performance at rated conditions. The heating coefficient of performance includes compressor power and condenser fan power. This gross COP value does NOT account for~ the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a coefficient of performance of 3.4 is assumed.
+This numeric field defines the heating coefficient of performance (COP) at rated conditions. The heating COP includes compressor power and condenser fan power. This gross COP value does NOT account for impacts due to the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a COP of 3.4 is assumed.
 
-\paragraph{Field: Minimum Outdoor Temperature in Heating Mode}\label{field-minimum-outdoor-temperature-in-heating-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Heating Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heating-mode-000}
 
-This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
 
-\paragraph{Field: Maximum Outdoor Temperature in Heating Mode}\label{field-maximum-outdoor-temperature-in-heating-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Heating Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heating-mode-000}
 
-This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC. This default temperature will likely disable water-cooled equipment and a more reasonable value should be entered.  Check manufacturers specifications.
 
 \paragraph{Field: Heating Capacity Ratio Modifier Function of Low Temperature Curve Name}\label{field-heating-capacity-ratio-modifier-function-of-low-temperature-curve-name}
 
@@ -348,13 +348,13 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 This alpha field determines the type of fuel that this variable refrigerant flow system uses.~ This field has seven choices: Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, and OtherFuel2. The default is Electricity. The use of alternate fuel types assumes an engine drives the variable speed compression system and also accounts for condenser air flow (i.e., a fan attached to the engine provides air flow through the outdoor condenser.
 
-\paragraph{Field: Minimum Outdoor Temperature in Heat Recovery Mode}\label{field-minimum-outdoor-temperature-in-heat-recovery-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Heat Recovery Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heat-recovery-mode-000}
 
-This numeric field defines the minimum outdoor dry-bulb temperature allowed for heat recovery operation. Below this temperature, heat recovery is disabled. This input must be greater than the larger of the minimum outdoor temperature in cooling or heating mode. If this field is left blank, the default value is the higher of the Minimum Outdoor Temperature in Cooling Mode or Minimum Outdoor Temperature in Heating Mode inputs. This system may still operate in cooling or heating only mode when outdoor temperatures are below the minimum outdoor temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
+This numeric field defines the minimum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heat recovery is disabled. This input must be greater than the larger of the minimum condenser inlet node temperature in cooling or heating mode. If this field is left blank, the default value is the higher of the Minimum Condenser Inlet Node Temperature in Cooling Mode or Minimum Condenser Inlet Node Temperature in Heating Mode inputs. This system may still operate in cooling or heating only mode when source inlet temperatures are below the minimum condenser inlet node temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
 
-\paragraph{Field: Maximum Outdoor Temperature in Heat Recovery Mode}\label{field-maximum-outdoor-temperature-in-heat-recovery-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Heat Recovery Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heat-recovery-mode-000}
 
-This numeric field defines the maximum outdoor dry-bulb temperature allowed for heat recovery operation. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum outdoor temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Outdoor Temperature in Cooling Mode or Maximum Outdoor Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when outdoor temperatures are above the maximum outdoor temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
+This numeric field defines the maximum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum condenser inlet node temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Condenser Inlet Node Temperature in Cooling Mode or Maximum Condenser Inlet Node Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when source inlet temperatures are above the maximum condenser inlet node temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
 
 \paragraph{Field: Heat Recovery Cooling Capacity Modifier Curve Name}\label{field-heat-recovery-cooling-capacity-modifier-curve-name}
 
@@ -412,8 +412,8 @@ AirConditioner:VariableRefrigerantFlow,
     VRFCondAvailSched,    !- Availability Schedule Name
     autosize,             !- Gross Rated Total Cooling Capacity {W}
     3.16038,              !- Gross Rated Cooling COP {W}
-    -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
-    43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
+    -5,                   !- Minimum Condenser Inlet Node Temperature in Cooling Mode {C}
+    43,                   !- Maximum Condenser Inlet Node Temperature in Cooling Mode {C}
     VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
     VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -427,8 +427,8 @@ AirConditioner:VariableRefrigerantFlow,
     autosize,             !- Gross Rated Heating Capacity {W}
     ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
     3.40909,              !- Gross Rated Heating COP
-    -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
-    15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
+    -20,                  !- Minimum Condenser Inlet Node Temperature in Heating Mode {C}
+    15.5,                 !- Maximum Condenser Inlet Node Temperature in Heating Mode {C}
     VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
     VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -475,8 +475,8 @@ AirConditioner:VariableRefrigerantFlow,
     ,                     !- Basin Heater Set Point Temperature (C)
     ,                     !- Basin Heater Operating Schedule Name
     ,                     !- Fuel Type
-    ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-    ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+    ,                     !- Minimum Condenser Inlet Node Temperature in Heat Recovery Mode (C)
+    ,                     !- Maximum Condenser Inlet Node Temperature in Heat Recovery Mode (C)
     ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
     ,                     !- Initial Heat Recovery Cooling Capacity Fraction
     ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
@@ -638,15 +638,15 @@ This output field is the heating mode electricity consumption of the variable re
 
 \paragraph{\texorpdfstring{VRF Heat Pump Cooling COP{[]}}{VRF Heat Pump Cooling COP}}\label{vrf-heat-pump-cooling-cop}
 
-This is the operating cooling coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Cooling Rate and Variable Refrigerant Flow Heat Pump Cooling Electric Consumption Rate output variables. Crankcase heater (usually 0 in cooling mode), evaporative condenser water pump, and defrost (usually 0 in cooling mode) consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in cooling mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+This is the operating cooling coefficient of performance (COP) for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Cooling Rate and Variable Refrigerant Flow Heat Pump Cooling Electric Consumption Rate output variables. Crankcase heater (usually 0 in cooling mode), evaporative condenser water pump, and defrost (usually 0 in cooling mode) consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in cooling mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
 \paragraph{\texorpdfstring{VRF Heat Pump Heating COP{[]}}{VRF Heat Pump Heating COP}}\label{vrf-heat-pump-heating-cop}
 
-This is the operating heating coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Heating Rate and Variable Refrigerant Flow Heat Pump Heating Electric Consumption Rate output variables. Crankcase heater, evaporative condenser water pump (usually 0 in heating mode), and defrost consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in heating mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+This is the operating heating coefficient of performance (COP) for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Heating Rate and Variable Refrigerant Flow Heat Pump Heating Electric Consumption Rate output variables. Crankcase heater, evaporative condenser water pump (usually 0 in heating mode), and defrost consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in heating mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
 \paragraph{\texorpdfstring{VRF Heat Pump COP{[]}}{VRF Heat Pump COP}}\label{vrf-heat-pump-cop}
 
-This is the operating coefficient of performance for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+This is the operating coefficient of performance (COP) for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
 \paragraph{VRF Heat Pump Defrost Electricity Rate {[}W{]}}\label{vrf-heat-pump-defrost-electric-power-w}
 
@@ -1672,7 +1672,7 @@ This alpha field specifies the name of the zone terminal unit list. This name mu
 
 \paragraph{Field: Zone Terminal Unit Name \textless{}x\textgreater{}}\label{field-zone-terminal-unit-name-x}
 
-This alpha field defines the name of the zone terminal unit used in a variable refrigerant air conditioner. The zone terminal unit must be connected to a zone using the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The terminal unit air inlet node is the same name as a zone exhaust node. The terminal unit air outlet node is the same name as a zone inlet node. The IDD is supplied with 20 fields for this.~ The object is extensible and you can change the IDD by adding more fields or, if you are using text editor for your input file, just add to the list of names.
+This alpha field defines the name of the zone terminal unit used in a variable refrigerant air conditioner. The zone terminal unit must be connected to a zone using the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The terminal unit air inlet node is the same name as a zone exhaust node. The terminal unit air outlet node is the same name as a zone inlet node.  This object is extensible, so additional fields of this type can be added to the end of this object.
 
 Following is an example input for a ZoneTerminalUnitList object.
 

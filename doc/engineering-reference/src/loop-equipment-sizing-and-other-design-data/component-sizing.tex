@@ -534,6 +534,12 @@ Where \emph{D\(_{tube,outside}\)} is the tube outside diameter.
 \emph{Depth\(_{coil}\)} = \emph{Depth\(_{tube\, spacing}\)} * \emph{N\(_{tube\, rows}\)}
 \end{equation}
 
+
+\subsection{CoilSystem:Cooling:Water}\label{coilsystemcoolingwater}
+
+The sizing of water cooling coil components wrapped in this coil system is done in function \textit{SizeWaterCoil} of module \textit{WaterCoils}. See component sizing sections for \textit{Coil:Cooling:Water} and \textit{Coil:Cooling:Water:DetailedGeometry}.
+
+
 \subsection{Coil:Cooling:WaterToAirHeatPump:EquationFit Sizing}\label{coilcoolingwatertoairheatpumpequationfit-sizing}
 
 The sizing is done in subroutine \emph{SizeHVACWaterToAir}.
@@ -2734,7 +2740,11 @@ c\(_{p,c}\) is specific heat of chilled water at reference condition (5\(^{\circ
 TubeLength = \frac{{TotalSurfaceArea}}{{TubeSpacing}}
 \end{equation}
 
-Note that tube spacing is determined by the Tube Spacing field of the Construction:InternalSource input used to define the radiant surface(s) of this system.  If the user has entered a spacing that is less than 0.01m or more than 1.0m, the sizing calculation will assume that the spacing is equal to 0.15m.
+Note that tube spacing is determined by the Tube Spacing field of the
+ConstructionProperty:InternalHeatSource input used to define the radiant
+surface(s) of this system.  If the user has entered a spacing that is less
+than 0.01m or more than 1.0m, the sizing calculation will assume that the
+spacing is equal to 0.15m.
 
 \subsubsection{ZoneHVAC:LowTemperatureRadiant:ConstantFlow}\label{zonehvaclowtemperatureradiantconstantflow}
 

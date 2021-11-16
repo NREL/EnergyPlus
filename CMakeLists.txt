@@ -5,9 +5,11 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
+
 project(EnergyPlus)
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.17)
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
@@ -23,6 +25,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
+
+add_library(cpp_pch_files INTERFACE)
+option(ENABLE_PCH "Enable Precompiled Headers" ON)
+if(ENABLE_PCH)
+  # This sets a global PCH parameter, each project will build its own PCH, which is a good idea if any #define's change
+  #
+  # consider breaking this out per project as necessary
+  target_precompile_headers(
+    cpp_pch_files
+    INTERFACE
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/Data/EnergyPlusData.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array.functions.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
+    )
+endif()
 
 add_library(project_fp_options INTERFACE)
 
@@ -59,11 +76,14 @@ endif()
 
 option(BUILD_PACKAGE "Build package" OFF)
 option(BUILD_TESTING "Build testing targets" OFF)
+option(BUILD_OBJEXXFCL_TESTING "Build ObjexxFCL testing targets" OFF)
 option(BUILD_FORTRAN "Build Fortran stuff" OFF)
 option(USE_PSYCHROMETRICS_CACHING "Use psychrometrics cashing routines" ON)
 option(USE_GLYCOL_CACHING "Use glycol cashing routines" ON)
 option(USE_PSYCH_STATS "Compute psychrometric stats" OFF)
 option(USE_PSYCH_ERRORS "Report psychrometric errors " ON)
+
+mark_as_advanced(BUILD_OBJEXXFCL_TESTING)
 
 #######################################################################
 
@@ -134,10 +154,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
-find_package(PythonInterp 3.6 REQUIRED)
+# If LINK_WITH_PYTHON, also request the Development (libs) at the same time, to ensure consistent version between interpreter and Development
+if(LINK_WITH_PYTHON)
+  find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+else()
+  find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
+endif()
 
 if(BUILD_TESTING)
   option(ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF)
+  option(ENABLE_REVERSE_DD_TESTING "Enable Reverse Design Day Tests" OFF)
   option(BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF)
   if(ENABLE_REGRESSION_TESTING)
     if(CMAKE_CL_64)
@@ -212,6 +238,7 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/re2)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/doj)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/nlohmann)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/fast_float)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/valijson)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/)
 target_include_directories(project_options SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/third_party/SQLite/)
@@ -227,6 +254,9 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/ssc)
+set(SAM_SKIP_TOOLS ON FORCE)
+set(SAM_SKIP_TESTS ON FORCE)
+set(SAMAPI_EXPORT OFF FORCE)
 if(OPENGL_FOUND)
   target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/penumbra/include)
 endif()
@@ -236,6 +266,9 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
+
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6/include)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING
@@ -247,7 +280,7 @@ endif()
 add_subdirectory(idd)
 
 execute_process(
-  COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
+  COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
   TIMEOUT 30
   RESULT_VARIABLE generate_epJSON_schema_result)
 if(${generate_epJSON_schema_result} MATCHES ".*timeout.*")
@@ -303,6 +336,8 @@ add_subdirectory(src/ConvertInputFormat)
 
 if(BUILD_FORTRAN)
   include(CMakeAddFortranSubdirectory)
+  # Define a top-level target `fortran_project_options`
+  include(cmake/Fortran.cmake)
   cmake_add_fortran_subdirectory(
     src/ExpandObjects
     PROJECT ExpandObjects
@@ -318,9 +353,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V9-3-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-4-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 9-3-0 to 9-4-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "idd/V9-5-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-6-0-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables 9-5-0 to 9-6-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement

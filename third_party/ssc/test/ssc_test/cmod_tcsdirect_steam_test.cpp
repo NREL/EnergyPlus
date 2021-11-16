@@ -1,419 +1,221 @@
 #include <gtest/gtest.h>
+#include "tcsdirect_steam_defaults.h"
+#include "csp_common_test.h"
+#include "vs_google_test_explorer_namespace.h"
 
-#include "cmod_tcsdirect_steam_test.h"
-#include "../tcs_test/tcsdirect_steam_cases.h"
-#include "../input_cases/weather_inputs.h"
 
-/// Test tcsdirect_steam with all defaults and the single owner financial model
-TEST_F(CMTcsDirectSteam, DirectSteam_Default_SingleOwner_cmod_tcsdirect_steam) {
+namespace csp_tower {}
+using namespace csp_tower;
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcsdirect_steam_daggett_default(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 263818768.982372, 263818768.982372 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-		
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 30.078699, 30.078699 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 296640437.816735, 296640437.816735 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 2634.894072, 2634.894072 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 92.641187, 92.641187 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413000, 3.413000 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-		
-		ssc_number_t annual_total_water_use;
-		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-		EXPECT_NEAR(annual_total_water_use, 55716.172107, 55716.172107 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+//========Tests===================================================================================
+NAMESPACE_TEST(csp_tower, SteamTowerCmod, Default_NoFinancial)
+{
+    ssc_data_t defaults = tcsdirect_steam_defaults();
+    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+    int errors = steam_tower.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 263809742, kErrorToleranceLo);
+        EXPECT_NEAR(steam_tower.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 30.08, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 296630582, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 2635, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 92.64, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 55716, kErrorToleranceLo);
+    }
 }
 
-/// Test tcsdirect_steam with alternative condenser type: Evaporative
-/// Rest default configurations with respect to the single owner financial model
-TEST_F(CMTcsDirectSteam, DirectSteam_Evap_Condenser_SingleOwner_cmod_tcsdirect_steam) {
+// Alternative condenser type : Evaporative
+NAMESPACE_TEST(csp_tower, SteamTowerCmod, EvaporativeCondenser_NoFinancial)
+{
+    ssc_data_t defaults = tcsdirect_steam_defaults();
+    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+    steam_tower.SetInput("ct", 1);
+    steam_tower.SetInput("eta_ref", 0.404);
+    steam_tower.SetInput("startup_frac", 0.5);
+    steam_tower.SetInput("P_cond_min", 2);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcsdirect_steam_daggett_evap_condenser(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 280986033.690457, 280986033.690457 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 32.035986, 32.035986 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 307636143.733944, 307636143.733944 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 2806.352396, 2806.352396 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 95.142849, 95.142849 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413000, 3.413000 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-		
-		ssc_number_t annual_total_water_use;
-		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-		EXPECT_NEAR(annual_total_water_use, 893438.592909, 893438.592909 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-
-	}
+    int errors = steam_tower.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 280975356, kErrorToleranceLo);
+        EXPECT_NEAR(steam_tower.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 32.03, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 307624737, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 2806, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 95.14, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 893431, kErrorToleranceLo);
+    }
 }
 
-/// Test tcsdirect_steam with alternative condenser type: Hybrid
-/// Rest default configurations with respect to the single owner financial model
-TEST_F(CMTcsDirectSteam, DirectSteam_Hybrid_Condenser_SingleOwner_cmod_tcsdirect_steam) {
+// Alternative condenser type : Hybrid
+NAMESPACE_TEST(csp_tower, SteamTowerCmod, HybridCondenser_NoFinancial)
+{
+    ssc_data_t defaults = tcsdirect_steam_defaults();
+    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+    steam_tower.SetInput("ct", 3);
+    steam_tower.SetInput("eta_ref", 0.404);
+    steam_tower.SetInput("startup_frac", 0.5);
+    steam_tower.SetInput("P_cond_min", 2);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcsdirect_steam_daggett_hybrid_condenser(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 268125210.231106, 268125210.231106 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 30.569689, 30.569689 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 304076894.573157, 304076894.573157 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 2677.904721, 2677.904721 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 91.850813, 91.850813 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413000, 3.413000 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_total_water_use;
-		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-		EXPECT_NEAR(annual_total_water_use, 55716.584942, 55716.584942 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-
-	}
+    int errors = steam_tower.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 268116066, kErrorToleranceLo);
+        EXPECT_NEAR(steam_tower.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 30.57, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 304066728, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 2678, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 91.85, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 55716, kErrorToleranceLo);
+    }
 }
 
-/// Test tcsdirect_steam with alternative fossil dispatch mode: Supplemental mode
-/// Rest default configurations with respect to the single owner financial model
-//TEST_F(CMTcsDirectSteam, DirectSteam_Fossil_Supplemental_SingleOwner_cmod_tcsdirect_steam) {
+//// Fossil dispatch
+//NAMESPACE_TEST(csp_tower, SteamTowerCmod, FossilDispatch_NoFinancial)
+//{
+//    ssc_data_t defaults = tcsdirect_steam_defaults();
+//    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+//    steam_tower.SetInput("fossil_mode", 2);
+//    steam_tower.SetInput("eta_ref", 0.404);
+//    steam_tower.SetInput("startup_frac", 0.5);
+//    steam_tower.SetInput("P_cond_min", 2);
 //
-//	ssc_data_t data = ssc_data_create();
-//	int test_errors = tcsdirect_steam_daggett_fossil_dispatch_supplemental(data);
-//
-//	EXPECT_FALSE(test_errors);
-//	if (!test_errors)
-//	{
-//		ssc_number_t annual_energy;
-//		ssc_data_get_number(data, "annual_energy", &annual_energy);
-//		EXPECT_NEAR(annual_energy, 268125210.231106, 268125210.231106 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_fuel_usage;
-//		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-//		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t capacity_factor;
-//		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-//		EXPECT_NEAR(capacity_factor, 30.569689, 30.569689 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_W_cycle_gross;
-//		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-//		EXPECT_NEAR(annual_W_cycle_gross, 304076894.573157, 304076894.573157 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t kwh_per_kw;
-//		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-//		EXPECT_NEAR(kwh_per_kw, 2677.904721, 2677.904721 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t conversion_factor;
-//		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-//		EXPECT_NEAR(conversion_factor, 91.850813, 91.850813 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t system_heat_rate;
-//		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-//		EXPECT_NEAR(system_heat_rate, 3.413000, 3.413000 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_total_water_use;
-//		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-//		EXPECT_NEAR(annual_total_water_use, 55716.584942, 55716.584942 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//
-//	}
+//    int errors = steam_tower.RunModule();
+//    EXPECT_FALSE(errors);
+//    if (!errors) {
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_fuel_usage"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 571408807, kErrorToleranceLo);
+//    }
 //}
-
-/// Test tcsdirect_steam with alternative Direct Steam Receiver material: T91 Steel
-/// Rest default configurations with respect to the single owner financial model
-//TEST_F(CMTcsDirectSteam, DirectSteam_Direct_Steam_Receiver_SingleOwner_cmod_tcsdirect_steam) {
 //
-//	ssc_data_t data = ssc_data_create();
-//	int test_errors = tcsdirect_steam_daggett_direct_steam_receiver(data);
+//// Receiver material : T91 Steel
+//NAMESPACE_TEST(csp_tower, SteamTowerCmod, ReceiverT91Steel_NoFinancial)
+//{
+//    ssc_data_t defaults = tcsdirect_steam_defaults();
+//    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+//    steam_tower.SetInput("mat_boiler", 28);
+//    steam_tower.SetInput("mat_sh", 28);
+//    steam_tower.SetInput("mat_rh", 28);
+//    steam_tower.SetInput("eta_ref", 0.404);
+//    steam_tower.SetInput("startup_frac", 0.5);
+//    steam_tower.SetInput("P_cond_min", 2);
 //
-//	EXPECT_FALSE(test_errors);
-//	if (!test_errors)
-//	{
-//		ssc_number_t annual_energy;
-//		ssc_data_get_number(data, "annual_energy", &annual_energy);
-//		EXPECT_NEAR(annual_energy, 2.68312e8, 2.68312e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_fuel_usage;
-//		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-//		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t capacity_factor;
-//		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-//		EXPECT_NEAR(capacity_factor, 30.591, 30.591 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_W_cycle_gross;
-//		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-//		EXPECT_NEAR(annual_W_cycle_gross, 3.01568e8, 3.01568e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t kwh_per_kw;
-//		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-//		EXPECT_NEAR(kwh_per_kw, 2679.77, 2679.77 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t conversion_factor;
-//		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-//		EXPECT_NEAR(conversion_factor, 92.6794, 92.6794 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t system_heat_rate;
-//		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-//		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_total_water_use;
-//		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-//		EXPECT_NEAR(annual_total_water_use, 55574.5, 55574.5 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//
-//	}
+//    int errors = steam_tower.RunModule();
+//    EXPECT_FALSE(errors);
+//    if (!errors) {
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_fuel_usage"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 571408807, kErrorToleranceLo);
+//    }
 //}
-
-/// Test tcsdirect_steam with alternative flow pattern: 1
-/// Rest default configurations with respect to the single owner financial model
-//TEST_F(CMTcsDirectSteam, DirectSteam_Flow_Pattern_SingleOwner_cmod_tcsdirect_steam) {
 //
-//	ssc_data_t data = ssc_data_create();
-//	int test_errors = tcsdirect_steam_daggett_flow_pattern(data);
+//// Alternative receiver flow pattern
+//NAMESPACE_TEST(csp_tower, SteamTowerCmod, FlowPattern1_NoFinancial)
+//{
+//    ssc_data_t defaults = tcsdirect_steam_defaults();
+//    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+//    steam_tower.SetInput("flowtype", 1);
+//    steam_tower.SetInput("eta_ref", 0.404);
+//    steam_tower.SetInput("startup_frac", 0.5);
+//    steam_tower.SetInput("P_cond_min", 2);
 //
-//	EXPECT_FALSE(test_errors);
-//	if (!test_errors)
-//	{
-//		ssc_number_t annual_energy;
-//		ssc_data_get_number(data, "annual_energy", &annual_energy);
-//		EXPECT_NEAR(annual_energy, 2.67815e8, 2.67815e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_fuel_usage;
-//		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-//		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t capacity_factor;
-//		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-//		EXPECT_NEAR(capacity_factor, 30.5343, 30.5343 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_W_cycle_gross;
-//		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-//		EXPECT_NEAR(annual_W_cycle_gross, 3.01038e8, 3.01038e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t kwh_per_kw;
-//		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-//		EXPECT_NEAR(kwh_per_kw, 2674.81, 2674.81 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t conversion_factor;
-//		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-//		EXPECT_NEAR(conversion_factor, 92.6707, 92.6707 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t system_heat_rate;
-//		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-//		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_total_water_use;
-//		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-//		EXPECT_NEAR(annual_total_water_use, 55540.2, 55540.2 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//
-//	}
+//    int errors = steam_tower.RunModule();
+//    EXPECT_FALSE(errors);
+//    if (!errors) {
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_fuel_usage"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 571408807, kErrorToleranceLo);
+//    }
 //}
-
-/// Test tcsdirect_steam with alternative Heliostat focusing method: Flat
-/// Rest default configurations with respect to the single owner financial model
-//TEST_F(CMTcsDirectSteam, DirectSteam_Heliostat_Focusing_SingleOwner_cmod_tcsdirect_steam) {
 //
-//	ssc_data_t data = ssc_data_create();
-//	int test_errors = tcsdirect_steam_daggett_focusing_method(data);
+//// Alternative heliostat focusing method: Flat
+//NAMESPACE_TEST(csp_tower, SteamTowerCmod, HeliostatFlatFocusing_NoFinancial)
+//{
+//    ssc_data_t defaults = tcsdirect_steam_defaults();
+//    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+//    steam_tower.SetInput("focus_type", 0);
+//    steam_tower.SetInput("eta_ref", 0.404);
+//    steam_tower.SetInput("startup_frac", 0.5);
+//    steam_tower.SetInput("P_cond_min", 2);
 //
-//	EXPECT_FALSE(test_errors);
-//	if (!test_errors)
-//	{
-//		ssc_number_t annual_energy;
-//		ssc_data_get_number(data, "annual_energy", &annual_energy);
-//		EXPECT_NEAR(annual_energy, 2.68027e8, 2.68027e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_fuel_usage;
-//		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-//		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t capacity_factor;
-//		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-//		EXPECT_NEAR(capacity_factor, 30.5585, 30.5585 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_W_cycle_gross;
-//		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-//		EXPECT_NEAR(annual_W_cycle_gross, 3.01252e8, 3.01252e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t kwh_per_kw;
-//		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-//		EXPECT_NEAR(kwh_per_kw, 2676.92, 2676.92 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t conversion_factor;
-//		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-//		EXPECT_NEAR(conversion_factor, 92.678, 92.678 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t system_heat_rate;
-//		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-//		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_total_water_use;
-//		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-//		EXPECT_NEAR(annual_total_water_use, 55547.3, 55547.3 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//
-//	}
+//    int errors = steam_tower.RunModule();
+//    EXPECT_FALSE(errors);
+//    if (!errors) {
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_fuel_usage"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 571408807, kErrorToleranceLo);
+//    }
 //}
-
-/// Test tcsdirect_steam with alternative Heliostat canting method: Equinox
-/// Rest default configurations with respect to the single owner financial model
-//TEST_F(CMTcsDirectSteam, DirectSteam_Heliostat_Canting_SingleOwner_cmod_tcsdirect_steam) {
-//
-//	ssc_data_t data = ssc_data_create();
-//	int test_errors = tcsdirect_steam_daggett_canting_method(data);
-//
-//	EXPECT_FALSE(test_errors);
-//	if (!test_errors)
-//	{
-//		ssc_number_t annual_energy;
-//		ssc_data_get_number(data, "annual_energy", &annual_energy);
-//		EXPECT_NEAR(annual_energy, 2.68848e8, 2.68848e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_fuel_usage;
-//		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-//		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t capacity_factor;
-//		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-//		EXPECT_NEAR(capacity_factor, 30.6521, 30.6521 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_W_cycle_gross;
-//		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-//		EXPECT_NEAR(annual_W_cycle_gross, 3.02142e8, 3.02142e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t kwh_per_kw;
-//		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-//		EXPECT_NEAR(kwh_per_kw, 2685.12, 2685.12 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t conversion_factor;
-//		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-//		EXPECT_NEAR(conversion_factor, 92.6883, 92.6883 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t system_heat_rate;
-//		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-//		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_total_water_use;
-//		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-//		EXPECT_NEAR(annual_total_water_use, 55606.8, 55606.8 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
 //
 //
-//	}
+//// Alternative heliostat canting method: Equinox
+//NAMESPACE_TEST(csp_tower, SteamTowerCmod, HeliostatEquinoxCanting_NoFinancial)
+//{
+//    ssc_data_t defaults = tcsdirect_steam_defaults();
+//    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+//    steam_tower.SetInput("cant_type", 2);
+//    steam_tower.SetInput("eta_ref", 0.404);
+//    steam_tower.SetInput("startup_frac", 0.5);
+//    steam_tower.SetInput("P_cond_min", 2);
+//
+//    int errors = steam_tower.RunModule();
+//    EXPECT_FALSE(errors);
+//    if (!errors) {
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_fuel_usage"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 571408807, kErrorToleranceLo);
+//    }
 //}
-
-/// Test tcsdirect_steam with alternative location: Tucson, AZ
-/// Rest default configurations with respect to the single owner financial model
-//TEST_F(CMTcsDirectSteam, DirectSteam_Location_Tucson_AZ_SingleOwner_cmod_tcsdirect_steam) {
 //
-//	ssc_data_t data = ssc_data_create();
-//	int test_errors = tcsdirect_steam_daggett_tucson_AZ(data);
+//// Phoenix, AZ
+//NAMESPACE_TEST(csp_tower, SteamTowerCmod, Phoeniz_NoFinancial)
+//{
+//    ssc_data_t defaults = tcsdirect_steam_defaults();
+//    CmodUnderTest steam_tower = CmodUnderTest("tcsdirect_steam", defaults);
+//    char solar_resource_path_tucson[512];
+//    int n2 = sprintf(solar_resource_path_tucson, "%s/test/input_cases/directsteam_data/tucson_az_32.116521_-110.933042_psmv3_60_tmy.csv", std::getenv("SSCDIR"));
+//    steam_tower.SetInput("solar_resource_file", solar_resource_path_tucson);
 //
-//	EXPECT_FALSE(test_errors);
-//	if (!test_errors)
-//	{
-//		ssc_number_t annual_energy;
-//		ssc_data_get_number(data, "annual_energy", &annual_energy);
-//		EXPECT_NEAR(annual_energy, 2.55075e8, 2.55075e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_fuel_usage;
-//		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-//		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t capacity_factor;
-//		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-//		EXPECT_NEAR(capacity_factor, 29.0817, 29.0817 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_W_cycle_gross;
-//		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-//		EXPECT_NEAR(annual_W_cycle_gross, 2.87524e8, 2.87524e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t kwh_per_kw;
-//		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-//		EXPECT_NEAR(kwh_per_kw, 2547.56, 2547.56 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t conversion_factor;
-//		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-//		EXPECT_NEAR(conversion_factor, 92.4107, 92.4107 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t system_heat_rate;
-//		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-//		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//		ssc_number_t annual_total_water_use;
-//		ssc_data_get_number(data, "annual_total_water_use", &annual_total_water_use);
-//		EXPECT_NEAR(annual_total_water_use, 54685.3, 54685.3 * m_error_tolerance_hi) << "Annual Total Water Use";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-//
-//
-//	}
+//    int errors = steam_tower.RunModule();
+//    EXPECT_FALSE(errors);
+//    if (!errors) {
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_energy"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_fuel_usage"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("capacity_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_W_cycle_gross"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("kwh_per_kw"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("conversion_factor"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("system_heat_rate"), 571408807, kErrorToleranceLo);
+//        EXPECT_NEAR_FRAC(steam_tower.GetOutput("annual_total_water_use"), 571408807, kErrorToleranceLo);
+//    }
 //}
-
-

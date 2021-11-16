@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::PlantUtilities;
-using namespace ObjexxFCL;
 using namespace DataSizing;
 
 TEST_F(EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1)
@@ -70,22 +69,22 @@ TEST_F(EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1)
     // first call just puts first value in array
     int TestNodeNum1 = 123;
     Real64 TestFlowRate1 = 45.6;
-    SaveNumPlantComps = 0;
-    RegisterPlantCompDesignFlow(TestNodeNum1, TestFlowRate1);
-    EXPECT_EQ(TestNodeNum1, CompDesWaterFlow(1).SupNode);
-    EXPECT_EQ(TestFlowRate1, CompDesWaterFlow(1).DesVolFlowRate);
+    state->dataSize->SaveNumPlantComps = 0;
+    RegisterPlantCompDesignFlow(*state, TestNodeNum1, TestFlowRate1);
+    EXPECT_EQ(TestNodeNum1, state->dataSize->CompDesWaterFlow(1).SupNode);
+    EXPECT_EQ(TestFlowRate1, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
 
     // second call searches array and since node not found adds an entry to array
     int TestNodeNum2 = 234;
     Real64 TestFlowRate2 = 56.7;
-    RegisterPlantCompDesignFlow(TestNodeNum2, TestFlowRate2);
-    EXPECT_EQ(TestNodeNum2, CompDesWaterFlow(2).SupNode);
-    EXPECT_EQ(TestFlowRate2, CompDesWaterFlow(2).DesVolFlowRate);
+    RegisterPlantCompDesignFlow(*state, TestNodeNum2, TestFlowRate2);
+    EXPECT_EQ(TestNodeNum2, state->dataSize->CompDesWaterFlow(2).SupNode);
+    EXPECT_EQ(TestFlowRate2, state->dataSize->CompDesWaterFlow(2).DesVolFlowRate);
 
     // third call searches array and since node was found adds an entry to array
     Real64 TestFlowRate3 = 67.8;
-    RegisterPlantCompDesignFlow(TestNodeNum1, TestFlowRate3);
-    EXPECT_EQ(TestFlowRate3, CompDesWaterFlow(1).DesVolFlowRate);
+    RegisterPlantCompDesignFlow(*state, TestNodeNum1, TestFlowRate3);
+    EXPECT_EQ(TestFlowRate3, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
@@ -103,7 +102,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // if the component's ON flag is false, then it should return zero flow request no matter the other values
     thisComponent.ON = false;
 
-    thisComponent.CurOpSchemeType = DataPlant::HeatingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -115,7 +114,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -127,7 +126,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -139,7 +138,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::UncontrolledOpSchemeType; // NOT meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -154,7 +153,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // if the component's ON flag is true, then it needs to make decisions
     thisComponent.ON = true;
 
-    thisComponent.CurOpSchemeType = DataPlant::HeatingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -166,7 +165,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -178,7 +177,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -190,7 +189,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::UncontrolledOpSchemeType; // NOT meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -222,30 +221,30 @@ TEST_F(EnergyPlusFixture, TestAnyPlantSplitterMixerLacksContinuity)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(1) = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(2) = 2;
 
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
 
     // case 1: inlet flow and outlet flow match up
-    DataLoopNode::Node(1).MassFlowRate = 3.0;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
-    DataLoopNode::Node(3).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 2.0;
     EXPECT_FALSE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 
     // case 2: inlet flow > outlet flow
-    DataLoopNode::Node(1).MassFlowRate = 4.0;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
-    DataLoopNode::Node(3).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 4.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 2.0;
     EXPECT_TRUE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 
     // case 3: inlet flow < outlet flow
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
-    DataLoopNode::Node(2).MassFlowRate = 2.0;
-    DataLoopNode::Node(3).MassFlowRate = 3.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 2.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 3.0;
     EXPECT_TRUE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 
     // case 4: all zero flow
-    DataLoopNode::Node(1).MassFlowRate = 0.0;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
-    DataLoopNode::Node(3).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.0;
     EXPECT_FALSE(PlantUtilities::AnyPlantSplitterMixerLacksContinuity(*state));
 }
 
@@ -267,20 +266,44 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
 
     // the first time we call each criteria check, we should just get an index back and it should trigger the connected loop
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex1, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::MassFlowRate, criteriaValue1);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex1,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::MassFlowRate,
+                                                criteriaValue1);
     EXPECT_EQ(1, criteriaCheckIndex1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex2, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::Temperature, criteriaValue2);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex2,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::Temperature,
+                                                criteriaValue2);
     EXPECT_EQ(2, criteriaCheckIndex2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex3, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::HeatTransferRate, criteriaValue3);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex3,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::HeatTransferRate,
+                                                criteriaValue3);
     EXPECT_EQ(3, criteriaCheckIndex3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -289,55 +312,127 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     // call it with a nonzero value here, and it should trigger the sim flag
     criteriaValue1 = 2.718;
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex1, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::MassFlowRate, criteriaValue1);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex1,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::MassFlowRate,
+                                                criteriaValue1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
     criteriaValue2 = 2.718;
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex2, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::Temperature, criteriaValue2);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex2,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::Temperature,
+                                                criteriaValue2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
     criteriaValue3 = 2.718;
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex3, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::HeatTransferRate, criteriaValue3);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex3,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::HeatTransferRate,
+                                                criteriaValue3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
     // call it with the same nonzero value here, and it should *not* trigger the sim flag
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex1, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::MassFlowRate, criteriaValue1);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex1,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::MassFlowRate,
+                                                criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex2, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::Temperature, criteriaValue2);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex2,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::Temperature,
+                                                criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex3, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::HeatTransferRate, criteriaValue3);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex3,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::HeatTransferRate,
+                                                criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     // call it with a tiny (within tolerance) change and it should still not trigger it
     criteriaValue1 += DataPlant::CriteriaDelta_MassFlowRate / 2.0;
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex1, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::MassFlowRate, criteriaValue1);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex1,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::MassFlowRate,
+                                                criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     criteriaValue2 += DataPlant::CriteriaDelta_Temperature / 2.0;
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex2, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::Temperature, criteriaValue2);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex2,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::Temperature,
+                                                criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     criteriaValue3 += DataPlant::CriteriaDelta_HeatTransferRate / 2.0;
     connectedLoopSide.SimLoopSideNeeded = false;
-    PlantUtilities::PullCompInterconnectTrigger(*state, thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum, criteriaCheckIndex3, connectedLoopNum,
-                                                connectedLoopSideNum, DataPlant::iCriteriaType::HeatTransferRate, criteriaValue3);
+    PlantUtilities::PullCompInterconnectTrigger(*state,
+                                                thisLoopNum,
+                                                thisLoopSideNum,
+                                                thisBranchNum,
+                                                thisCompNum,
+                                                criteriaCheckIndex3,
+                                                connectedLoopNum,
+                                                connectedLoopSideNum,
+                                                DataPlant::CriteriaType::HeatTransferRate,
+                                                criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 }
 
@@ -364,13 +459,13 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     // That function is nice because it is very tightly contained, so we don't have to set up a lot of global state
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
-    auto &inNode = DataLoopNode::Node(1);
-    auto &outNode = DataLoopNode::Node(2);
-    Real64 const roomTemp = 25.0;
-    Real64 const nonZeroFlow = 3.14;
+    auto &inNode = state->dataLoopNodes->Node(1);
+    auto &outNode = state->dataLoopNodes->Node(2);
+    Real64 constexpr roomTemp = 25.0;
+    Real64 constexpr nonZeroFlow = 3.14;
 
     // History terms should be allocated to 5 zeros
     EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory.size());
@@ -437,13 +532,14 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
 }
 
-TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
+TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
+{
 
     // test out some stuff on the scan plant loops function, for now just verifying errFlag is passed by reference
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
@@ -451,14 +547,15 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "comp_name";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Simple;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 0;  // just skip the supply side search
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Simple;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 0; // just skip the supply side search
 
     int loopNum = 0, loopSideNum = 0, branchNum = 0, compNum = 0;
     bool errorFlag = false;
 
     // test simple searching first
-    PlantUtilities::ScanPlantLoopsForObject(*state, "comp_name", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+    PlantUtilities::ScanPlantLoopsForObject(
+        *state, "comp_name", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_EQ(1, loopNum);
     EXPECT_EQ(1, loopSideNum);
     EXPECT_EQ(1, branchNum);
@@ -466,7 +563,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
     EXPECT_FALSE(errorFlag);
 
     // then test to make sure errorFlag is passed by reference
-    PlantUtilities::ScanPlantLoopsForObject(*state, "comp_name_not_here", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+    PlantUtilities::ScanPlantLoopsForObject(
+        *state, "comp_name_not_here", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_TRUE(errorFlag);
-
 }

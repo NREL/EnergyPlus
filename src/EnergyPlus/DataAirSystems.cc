@@ -104,7 +104,7 @@ namespace DataAirSystems {
             break;
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
-            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
+            fanDesHeatLoad = state.dataHVACFan->fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
             break;
         }
         case DataAirSystems::fanModelTypeNotYetSet: {

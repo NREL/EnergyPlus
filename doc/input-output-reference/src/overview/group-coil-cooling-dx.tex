@@ -628,24 +628,42 @@ Following is an example input for a single cooling DX coil with 3 operation mode
 Following are the list of possible output variables from this coil model:
 
 \begin{itemize}
-\item
-  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Total Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Latent Cooling Rate {[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Electricity Rate {[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Electricity Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Runtime Fraction {[]}
+\item HVAC, Average, Cooling Coil Total Cooling Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Total Cooling Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Sensible Cooling Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Sensible Cooling Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Latent Cooling Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Latent Cooling Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Electricity Rate{[}W{]}
+\item HVAC, Sum, Cooling Coil Electricity Energy {[}J{]}
+\item HVAC, Average, Cooling Coil <Fuel> Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil <Fuel> Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Runtime Fraction {[]}
+\item HVAC, Average, Cooling Coil Crankcase Heater Electricity Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Crankcase Heater Electricity Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Air Mass Flow Rate {[}kg/s{]}
+\item HVAC, Average, Cooling Coil Air Inlet Temperature {[}C{]}
+\item HVAC, Average, Cooling Coil Air Inlet Humidity Ratio {[}kgWater/kgDryAir{]}
+\item HVAC, Average, Cooling Coil Air Outlet Temperature {[}C{]}
+\item HVAC, Average, Cooling Coil Air Outlet Humidity Ratio {[}kgWater/kgDryAir{]}
+\item HVAC, Average, Cooling Coil Part Load Ratio {[]}
+\item HVAC, Average, Cooling Coil Upper Speed Level {[]}
+\item HVAC, Average, Cooling Coil Neighboring Speed Levels Ratio {[]}
+\item HVAC, Average, Cooling Coil Condenser Inlet Temperature {[}C{]}
+\item HVAC, Average, Cooling Coil Dehumidification Mode {[]}
+\item HVAC, Average, Cooling Coil Waste Heat Power {[}W{]}
+\item HVAC, Sum, Cooling Coil Waste Heat Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Basin Heater Electricity Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Basin Heater Electricity Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}
+\item HVAC, Sum, Cooling Coil Condensate Volume {[}m3{]}
+\item HVAC, Average, Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Evaporative Condenser Pump Electricity Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Evaporative Condenser Water Volume Flow Rate {[}m3/s{]}
+\item HVAC, Sum, Cooling Coil Evaporative Condenser Mains Supply Water Volume {[}m3{]}
+\item HVAC, Sum, Cooling Coil Evaporative Condenser Water Volume {[}m3{]}
+\item HVAC, Average, Secondary Coil Heat Rejection Rate {[}W{]}
+\item HVAC, Sum, Secondary Coil Heat Rejection Energy {[}J{]}
 \item
   HVAC,Average,SubcoolReheat Cooling Coil Operation Mode {[]}
 \item
@@ -658,38 +676,147 @@ Following are the list of possible output variables from this coil model:
 
 \paragraph{Cooling Coil Total Cooling Rate {[}W{]}}
 
-This field is the total (sensible and latent) cooling rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+Total (sensible and latent) cooling rate output of the DX coil in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
 \paragraph{Cooling Coil Total Cooling Energy {[}J{]}}
 
-This is the total (sensible plus latent) cooling output of the DX coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (Ref. Output:Meter objects).
+Total (sensible and latent) cooling output of the DX coil in Joules over the timestep being reported. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (Ref. Output:Meter objects).
 
 \paragraph{Cooling Coil Sensible Cooling Rate {[}W{]}}
 
-This output is the moist air sensible cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+Sensible cooling rate output of the DX coil in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
 \paragraph{Cooling Coil Sensible Cooling Energy {[}J{]}}
 
-This is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+Sensible cooling output of the DX coil in Joules for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
 
 \paragraph{Cooling Coil Latent Cooling Rate {[}W{]}}
 
-This is the latent cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+Latent cooling rate output of the DX coil in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
 \paragraph{Cooling Coil Latent Cooling Energy {[}J{]}}
 
-This is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+Latent cooling output of the DX coil in Joules for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
 
 \paragraph{Cooling Coil Electricity Rate {[}W{]}}
 
-This output is the electricity consumption rate of the DX coil compressor and condenser fan(s) in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+Electricity consumption rate of the DX coil compressor and condenser fan(s) in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
 \paragraph{Cooling Coil Electricity Energy {[}J{]}}
 
-This is the electricity consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+Electricity consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electric, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil <Fuel> Power {[}W{]}}
+
+Fuel consumption rate of the DX coil compressor and condenser fan(s) in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil <Fuel> Energy {[}J{]}}
+
+Fuel consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type associated with the <Fuel> type, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
 \paragraph{Cooling Coil Runtime Fraction {[]}}
 
+Runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Crankcase Heater Electricity Rate {[}W{]}}
+
+Electricity consumption rate of the DX coil compressor crankcase heater in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Crankcase Heater Electricity Energy {[}J{]}}
+
+Electricity consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Air Mass Flow Rate {[}kg/s{]}}
+
+Air mass flow rate through the DX coil in kg/s. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Air Inlet Temperature {[}C{]}}
+
+Inlet air temperature of the DX coil in degrees Celsius. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Air Inlet Humidity Ratio {[}kgWater/kgDryAir{]}}
+
+Inlet air humidity ratio of the DX coil in kgWater/kgDryAir. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Air Outlet Temperature {[}C{]}}
+
+Outlet air temperature of the DX coil in degrees Celsius. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Air Outlet Humidity Ratio {[}kgWater/kgDryAir{]}}
+
+Outlet air humidity ratio of the DX coil in kgWater/kgDryAir. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Part Load Ratio {[]}}
+
+Ratio of the part-load capacity to steady-state capacity of the DX coil. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Upper Speed Level {[]}}
+
+The upper speed level of the DX coil. Used for interpolating performance between two neighboring speed levels. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Neighboring Speed Levels Ratio {[]}}
+
+The average speed ratio of the DX coil. Used for interpolating performances between two neighboring speed levels. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Condenser Inlet Temperature {[C]}}
+
+Inlet temperature of the DX coil condenser in degrees Celsius. This value can represent the outdoor air dry-bulb temperature, wet-bulb temperature, or somewhere in between from the weather data being used, depending on the value used in the input field Evaporative Condenser Effectiveness. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Dehumidification Mode {[]}}
+
+Dehumidification mode of the DX coil. A value of 0 indicates normal mode (extra dehumidification not active). A value of 1 indicates dehumidification mode 1 is active. Note that this is an averaged variable, so fractional values are likely to be reported for reporting frequencies longer than “detailed”.
+
+\paragraph{Cooling Coil Waste Heat Power {[}W{]}}
+
+The fraction of power input to the DX coil that is available as recoverable waste heat at full load and rated conditions for a specific speed in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Waste Heat Energy {[}J{]}}
+
+The fraction of energy input to the DX coil that is available as recoverable waste heat at full load and rated conditions for a specific speed in Joules. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
+
+\paragraph{Cooling Coil Basin Heater Electricity Rate {[}W{]}}
+
+The electric power input to the DX coil basin electric heater in Watts. Only available for evaporatively cooled condensers. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Basin Heater Electricity Energy {[}J{]}}
+
+The electric energy input to the DX coil basin electric heater in Joules. Only available for evaporatively cooled condensers. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}}
+
+The flow rate of condensate water collected from the DX coil. Only available if a condensate water collection tank is specified. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Condensate Volume {[}m3{]}}
+
+The volume of condensate water collected from the DX coil. Only available if a condensate water collection tank is specified. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = OnSiteWater, End Use Key = Condensate, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}}
+
+The electricity consumption rate of the evaporative condenser water pump in Watts. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Evaporative Condenser Pump Electricity Energy {[}J{]}}
+
+The electricity consumption rate of the evaporative condenser water pump in Joules. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electric, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Evaporative Condenser Water Volume Flow Rate {[}m3/s{]}}
+
+The flow rate of water used to evaporatively cool the DX coil condenser coil inlet air in cubic meters per second. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Cooling Coil Evaporative Condenser Water Volume {[}m3{]}}
+
+The amount of water used to evaporatively cool the DX coil condenser coil inlet air, in cubic meters. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Water, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Cooling Coil Evaporative Condenser Mains Supply Water Volume {[}m3{]}}
+
+The amount of water used to evaporatively cool the DX coil condenser coil inlet air, in cubic meters. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = MainsWater, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
+
+\paragraph{Secondary Coil Heat Rejection Rate {[}W{]}}
+
+The sensible heat rejected to a zone by a secondary DX coil (condenser) in Watts. This is sum of the total cooling rate of a DX cooling coil and cooling electric power of the primary DX coil. This heat is applied as an internal gain to the secondary zone where the condenser is installed. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+
+\paragraph{Secondary Coil Heat Rejection Energy {[}J{]}}
+
+The sensible heat energy rejected to a zone by a secondary DX coil (condenser) in Joules. This is sum of the total cooling energy of a DX cooling coil and cooling electric energy of the primary DX coil. This heat is applied as an internal gain to the secondary zone where the condenser is installed. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported.
 
 \paragraph{SubcoolReheat Cooling Coil Operation Mode {[]}}\label{subcoolreheat-cooling-coil-operation-mode}

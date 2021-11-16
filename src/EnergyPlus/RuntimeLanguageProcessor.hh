@@ -66,84 +66,40 @@ struct EnergyPlusData;
 namespace RuntimeLanguageProcessor {
 
     // Using/Aliasing
+    using DataRuntimeLanguage::ErlFunc;
     using DataRuntimeLanguage::ErlValueType;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const MaxErrors;
+    int constexpr MaxErrors(20);
 
-    // token type parameters for Erl code parsing
-    extern int const TokenNumber;     // matches the ValueNumber
-    extern int const TokenVariable;   // matches the ValueVariable
-    extern int const TokenExpression; // matches the ValueExpression
-    extern int const TokenOperator;   // includes basic operators and built-in functions.
+    enum class Token
+    {
+        Invalid = -1,
+        Unassigned = 0,
+        Number = 1,           // matches the ValueNumber
+        Variable = 4,         // matches the ValueVariable
+        Expression = 5,       // matches the ValueExpression
+        Operator = 7,         // includes basic operators and built-in functions.
+        Parenthesis = 9,      // parenthesis token
+        ParenthesisLeft = 10, // indicates left side parenthesis found in parsing
+        ParenthesisRight = 11 // indicates right side parenthesis found in parsing
 
-    extern int const TokenParenthesis; // parenthesis token
-
-    extern int const ParenthesisLeft;  // indicates left side parenthesis found in parsing
-    extern int const ParenthesisRight; // indicates right side parenthesis found in parsing
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern bool GetInput;
-    extern bool InitializeOnce;
-    extern bool MyEnvrnFlag;
-
-    // index pointer references to dynamic built-in variables
-    extern int NullVariableNum;
-    extern int FalseVariableNum;
-    extern int TrueVariableNum;
-    extern int OffVariableNum;
-    extern int OnVariableNum;
-    extern int PiVariableNum;
-    extern Array1D_int CurveIndexVariableNums;
-    extern Array1D_int ConstructionIndexVariableNums;
-    extern int YearVariableNum;
-    extern int MonthVariableNum;
-    extern int DayOfMonthVariableNum;
-    extern int DayOfWeekVariableNum;
-    extern int DayOfYearVariableNum;
-    extern int HourVariableNum;
-    extern int TimeStepsPerHourVariableNum;
-    extern int TimeStepNumVariableNum;
-    extern int MinuteVariableNum;
-    extern int HolidayVariableNum;
-    extern int DSTVariableNum;
-    extern int CurrentTimeVariableNum;
-    extern int SunIsUpVariableNum;
-    extern int IsRainingVariableNum;
-    extern int SystemTimeStepVariableNum;
-    extern int ZoneTimeStepVariableNum;
-    extern int CurrentEnvironmentPeriodNum;
-    extern int ActualDateAndTimeNum;
-    extern int ActualTimeNum;
-    extern int WarmUpFlagNum;
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Types
+    };
 
     struct TokenType
     {
         // Members
         // structure for token information for parsing Erl code
-        int Type;           // token type, eg. TokenNumber
+        Token Type;         // token type, eg. TokenNumber
         Real64 Number;      // May want to store all literals as a variable?
         std::string String; // Serves double duty, also saves string version of token for easy debugging
-        int Operator;       // indentifies operator or function 1..64
+        ErlFunc Operator;   // indentifies operator or function 1..64
         int Variable;       // points to a variable in ErlVariable structure
-        int Parenthesis;    // identifes if token is left or right parenthesis
+        Token Parenthesis;  // identifes if token is left or right parenthesis
         int Expression;     // points to an expression in ErlExpression structure
         std::string Error;  // holds token processing error message content
 
         // Default Constructor
-        TokenType() : Type(0), Number(0.0), Operator(0), Variable(0), Parenthesis(0), Expression(0)
+        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(ErlFunc::Unassigned), Variable(0), Parenthesis(Token::Unassigned), Expression(0)
         {
         }
     };
@@ -161,60 +117,55 @@ namespace RuntimeLanguageProcessor {
         }
     };
 
-    // Object Data
-    extern Array1D<RuntimeReportVarType> RuntimeReportVar;
-
-    // Functions
-    void clear_state();
-
     void InitializeRuntimeLanguage(EnergyPlusData &state);
 
     void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state);
 
-    void ParseStack(EnergyPlusData &state, int const StackNum);
+    void ParseStack(EnergyPlusData &state, int StackNum);
 
     int AddInstruction(EnergyPlusData &state,
-                       int const StackNum,
-                       int const LineNum,
+                       int StackNum,
+                       int LineNum,
                        DataRuntimeLanguage::ErlKeywordParam Keyword,
                        Optional_int_const Argument1 = _, // Erl variable index
                        Optional_int_const Argument2 = _);
 
     void AddError(EnergyPlusData &state,
-                  int const StackNum,      // index pointer to location in ErlStack structure
-                  int const LineNum,       // Erl program line number
+                  int StackNum,            // index pointer to location in ErlStack structure
+                  int LineNum,             // Erl program line number
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum);
+    ErlValueType EvaluateStack(EnergyPlusData &state, int StackNum);
 
-    void
-    WriteTrace(EnergyPlusData &state, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
-
-    //******************************************************************************************
-
-    //  Expression Processor
-
-    //******************************************************************************************
+    void WriteTrace(EnergyPlusData &state, int StackNum, int InstructionNum, ErlValueType const &ReturnValue, bool seriousErrorFound);
 
     void ParseExpression(EnergyPlusData &state,
                          std::string const &InString, // String of expression text written in the Runtime Language
-                         int const StackNum,          // Parent StackNum??
+                         int StackNum,                // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int NumTokensIN, int StackNum, std::string const &ParsingString);
 
     int NewExpression(EnergyPlusData &state);
 
-    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+                              ErlFunc FunctionCode,
+                              Real64 Operand1,
+                              Real64 Operand2,
+                              Array2D<Real64> &TodayTomorrowWeatherSource,
+                              ErlValueType &ReturnVal);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+                              ErlFunc FunctionCode,
+                              Real64 Operand1,
+                              Real64 Operand2,
+                              Array2D_bool &TodayTomorrowWeatherSource,
+                              ErlValueType &ReturnVal);
 
     int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
 
@@ -224,7 +175,7 @@ namespace RuntimeLanguageProcessor {
 
     void ReportRuntimeLanguage(EnergyPlusData &state);
 
-    ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
+    ErlValueType SetErlValueNumber(Real64 Number, Optional<ErlValueType const> OrigValue = _);
 
     ErlValueType StringValue(std::string const &String);
 
@@ -232,31 +183,108 @@ namespace RuntimeLanguageProcessor {
 
     int FindEMSVariable(EnergyPlusData &state,
                         std::string const &VariableName, // variable name in Erl
-                        int const StackNum);
+                        int StackNum);
 
-    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
+    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int StackNum, Optional<ErlValueType const> Value = _);
 
     void SetupPossibleOperators(EnergyPlusData &state);
 
     void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
-                                         int const varNum,  // The variable index to be written during run time
-                                         Real64 const value // The real time value of the vairable to be set
+                                         int varNum,  // The variable index to be written during run time
+                                         Real64 value // The real time value of the vairable to be set
     );
 
     void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
-                                                int const varNum,                 // The variable index to be written during run time
+                                                int varNum,                       // The variable index to be written during run time
                                                 ErlValueType const &initialValue, // The initial value
-                                                bool const setToNull              // Flag, if true, value will be initialized to Null
+                                                bool setToNull                    // Flag, if true, value will be initialized to Null
     );
 
-    bool isExternalInterfaceErlVariable(EnergyPlusData &state, int const varNum); // The variable index to be written during run time
+    bool isExternalInterfaceErlVariable(EnergyPlusData &state, int varNum); // The variable index to be written during run time
 
 } // namespace RuntimeLanguageProcessor
 
-struct RuntimeLanguageProcessorData : BaseGlobalStruct {
+struct RuntimeLanguageProcessorData : BaseGlobalStruct
+{
+    bool AlreadyDidOnce = false;
+    bool GetInput = true;
+    bool InitializeOnce = true;
+    bool MyEnvrnFlag = true;
+    int NullVariableNum = 0;
+    int FalseVariableNum = 0;
+    int TrueVariableNum = 0;
+    int OffVariableNum = 0;
+    int OnVariableNum = 0;
+    int PiVariableNum = 0;
+    Array1D_int CurveIndexVariableNums;
+    Array1D_int ConstructionIndexVariableNums;
+    int YearVariableNum = 0;
+    int MonthVariableNum = 0;
+    int DayOfMonthVariableNum = 0;
+    int DayOfWeekVariableNum = 0;
+    int DayOfYearVariableNum = 0;
+    int HourVariableNum = 0;
+    int TimeStepsPerHourVariableNum = 0;
+    int TimeStepNumVariableNum = 0;
+    int MinuteVariableNum = 0;
+    int HolidayVariableNum = 0;
+    int DSTVariableNum = 0;
+    int CurrentTimeVariableNum = 0;
+    int SunIsUpVariableNum = 0;
+    int IsRainingVariableNum = 0;
+    int SystemTimeStepVariableNum = 0;
+    int ZoneTimeStepVariableNum = 0;
+    int CurrentEnvironmentPeriodNum = 0;
+    int ActualDateAndTimeNum = 0;
+    int ActualTimeNum = 0;
+    int WarmUpFlagNum = 0;
+    Array1D<RuntimeLanguageProcessor::RuntimeReportVarType> RuntimeReportVar;
+    std::unordered_map<std::string, std::string> ErlStackUniqueNames;
+    std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
+    bool WriteTraceMyOneTimeFlag = false;
+    Array1D<RuntimeLanguageProcessor::TokenType> Token;
+    Array1D<RuntimeLanguageProcessor::TokenType> PEToken;
 
-    void clear_state() override {
-
+    void clear_state() override
+    {
+        this->AlreadyDidOnce = false;
+        this->GetInput = true;
+        this->InitializeOnce = true;
+        this->MyEnvrnFlag = true;
+        this->NullVariableNum = 0;
+        this->FalseVariableNum = 0;
+        this->TrueVariableNum = 0;
+        this->OffVariableNum = 0;
+        this->OnVariableNum = 0;
+        this->PiVariableNum = 0;
+        this->CurveIndexVariableNums.clear();
+        this->ConstructionIndexVariableNums.clear();
+        this->YearVariableNum = 0;
+        this->MonthVariableNum = 0;
+        this->DayOfMonthVariableNum = 0;
+        this->DayOfWeekVariableNum = 0;
+        this->DayOfYearVariableNum = 0;
+        this->HourVariableNum = 0;
+        this->TimeStepsPerHourVariableNum = 0;
+        this->TimeStepNumVariableNum = 0;
+        this->MinuteVariableNum = 0;
+        this->HolidayVariableNum = 0;
+        this->DSTVariableNum = 0;
+        this->CurrentTimeVariableNum = 0;
+        this->SunIsUpVariableNum = 0;
+        this->IsRainingVariableNum = 0;
+        this->SystemTimeStepVariableNum = 0;
+        this->ZoneTimeStepVariableNum = 0;
+        this->CurrentEnvironmentPeriodNum = 0;
+        this->ActualDateAndTimeNum = 0;
+        this->ActualTimeNum = 0;
+        this->WarmUpFlagNum = 0;
+        this->RuntimeReportVar.clear();
+        this->ErlStackUniqueNames.clear();
+        this->RuntimeReportVarUniqueNames.clear();
+        this->WriteTraceMyOneTimeFlag = false;
+        this->PEToken.clear();
+        this->Token.clear();
     }
 };
 

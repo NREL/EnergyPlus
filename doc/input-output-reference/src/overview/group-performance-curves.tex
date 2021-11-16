@@ -138,7 +138,7 @@ The minimum allowable value of w. Values of w less than the minimum will be repl
 
 \paragraph{Field: Maximum Value of w}\label{field-maximum-value-of-w}
 
-The maximum allowable value of w. Values of z greater than the maximum will be replaced by the maximum.
+The maximum allowable value of w. Values of w greater than the maximum will be replaced by the maximum.
 
 \paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-1}
 
@@ -146,7 +146,7 @@ The minimum allowable value of x. Values of x less than the minimum will be repl
 
 \paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-1}
 
-The maximum allowable value of x. Values of z greater than the maximum will be replaced by the maximum.
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
 
 \paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y}
 
@@ -154,7 +154,7 @@ The minimum allowable value of y. Values of y less than the minimum will be repl
 
 \paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y}
 
-The maximum allowable value of y. Values of z greater than the maximum will be replaced by the maximum.
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
 
 \paragraph{Field: Minimum Value of z}\label{field-minimum-value-of-z}
 
@@ -305,6 +305,213 @@ CURVE:QUADLINEAR,
   8. E-8,              ! Maximum Value of z
   0.,                  ! Minimum Curve Output
   32.;                 ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:QuintLinear}\label{curvequintlinear}
+
+Input consists of the curve name, the six coefficients, and maximum and minimum values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is represented by this curve:
+
+\subsubsection{Inputs}\label{inputs-2-050}
+
+\paragraph{y = C1 + C2 * v + C3 * w + C4 * x + C5 * y + C6 * z}\label{y-c1-c2-v-c3-w-c4-x-c5-y-c6-z}
+
+\paragraph{Field: Name}\label{field-name-2-046}
+
+A user assigned unique name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-11}
+
+The constant coefficient (C1) in the equation.
+
+\paragraph{Field: Coefficient2 v}\label{field-coefficient2-v}
+
+The coefficient (C2) in the equation.
+
+\paragraph{Field: Coefficient3 w}\label{field-coefficient3-w}
+
+The coefficient (C3) in the equation.
+
+\paragraph{Field: Coefficient4 x}\label{field-coefficient4-x}
+
+The coefficient (C4) in the equation.
+
+\paragraph{Field: Coefficient5 y}\label{field-coefficient5-y-2}
+
+The coefficient (C5) in the equation.
+
+\paragraph{Field: Coefficient6 z}\label{field-coefficient6-z}
+
+The coefficient (C6) in the equation.
+
+\paragraph{Field: Minimum Value of v}\label{field-minimum-value-of-v}
+
+The minimum allowable value of v. Values of v less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of v}\label{field-maximum-value-of-v}
+
+The maximum allowable value of v. Values of v greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of w}\label{field-minimum-value-of-w-1}
+
+The minimum allowable value of w. Values of w less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of w}\label{field-maximum-value-of-w-1}
+
+The maximum allowable value of w. Values of w greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-18}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-19}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y-7}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y-7}
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of z}\label{field-minimum-value-of-z-3}
+
+The minimum allowable value of z. Values of z less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of z}\label{field-maximum-value-of-z-3}
+
+The maximum allowable value of z. Values of z greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for v}\label{field-input-unit-type-for-v}
+
+This field is used to indicate the kind of units that may be associated with the v values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of v and Maximum Value of v. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for w}\label{field-input-unit-type-for-w-1}
+
+This field is used to indicate the kind of units that may be associated with the w values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of w and Maximum Value of w. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-18}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of x and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for y}\label{field-input-unit-type-for-y-7}
+
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of y and Maximum Value of y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for z}\label{field-input-unit-type-for-z-3}
+
+This field is used to indicate the kind of units that may be associated with the z values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of z and Maximum Value of z. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+Below are an example inputs for QuintLinear Curves.
+
+\begin{lstlisting}
+
+CURVE:QUINTLINEAR,
+  CoolSensCapCurve,        ! Curve Name
+  -5.462690012,            ! CoefficientC1
+  17.95968138,             ! CoefficientC2
+  -11.87818402,            ! CoefficientC3
+  -0.980163419,            ! CoefficientC4
+  0.767285761,             ! CoefficientC5
+  0.0,                     ! CoefficientC6
+  -100,                    ! Minimum Value of v
+  100,                     ! Maximum Value of v
+  -100,                    ! Minimum Value of w
+  100,                     ! Maximum Value of w
+  -100,                    ! Minimum Value of x
+  100,                     ! Maximum Value of x
+  0,                       ! Minimum Value of y
+  100,                     ! Maximum Value of y
+  0,                       ! Minimum Value of z
+  100,                     ! Maximum Value of z
+  0,                       ! Minimum Curve Output
+  38;                      ! Maximum Curve Output
 \end{lstlisting}
 
 \subsection{Curve:Quadratic}\label{curvequadratic}

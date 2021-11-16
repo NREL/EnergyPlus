@@ -11,88 +11,105 @@
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 
-namespace MultiLayerOptics {
+namespace MultiLayerOptics
+{
+    CMultiPaneSampleData::CMultiPaneSampleData() : CSpectralSampleData()
+    {}
 
-	CMultiPaneSampleData::CMultiPaneSampleData() : CSpectralSampleData() {
+    std::vector<double> CMultiPaneSampleData::getWavelengths() const
+    {
+        CCommonWavelengths aWavelengths;
 
-	}
+        for(auto it = m_MeasuredSamples.begin(); it < m_MeasuredSamples.end(); ++it)
+        {
+            aWavelengths.addWavelength((*it)->getWavelengths());
+        }
 
-	std::vector< double > CMultiPaneSampleData::getWavelengths() const {
-		CCommonWavelengths aWavelengths;
+        // wavelengths will be combined into common one and no extrapolation will be done
+        return aWavelengths.getCombinedWavelengths(Combine::Interpolate);
+    }
 
-		for ( auto it = m_MeasuredSamples.begin(); it < m_MeasuredSamples.end(); ++it ) {
-			aWavelengths.addWavelength( ( *it )->getWavelengths() );
-		}
+    size_t CMultiPaneSampleData::numberOfLayers() const
+    {
+        return m_MeasuredSamples.size();
+    }
 
-		// wavelengths will be combined into common one and no extrapolation will be done
-		return aWavelengths.getCombinedWavelengths( Combine::Interpolate );
-	}
+    void CMultiPaneSampleData::addSample(const std::shared_ptr<CSpectralSampleData> & t_Sample)
+    {
+        m_MeasuredSamples.push_back(t_Sample);
+    }
 
-	size_t CMultiPaneSampleData::numberOfLayers() const {
-		return m_MeasuredSamples.size();
-	}
+    void CMultiPaneSampleData::calculateProperties()
+    {
+        if(!m_absCalculated)
+        {
+            calculateEquivalentProperties();
+            m_absCalculated = true;
+        }
+    }
 
-	void CMultiPaneSampleData::addSample( const std::shared_ptr< CSpectralSampleData >& t_Sample ) {
-		m_MeasuredSamples.push_back( t_Sample );
-	}
+    CSeries CMultiPaneSampleData::getLayerAbsorptances(size_t const Index)
+    {
+        calculateProperties();
+        if((Index - 1) > m_LayerAbsorptances.size())
+        {
+            throw std::runtime_error("Index out of range. ");
+        }
+        return m_LayerAbsorptances[Index - 1];
+    }
 
-	void CMultiPaneSampleData::calculateProperties() {
-		if ( !m_absCalculated ) {
-			calculateEquivalentProperties();
-			m_absCalculated = true;
-		}
-	}
+    // Interpolate current sample data to new wavelengths set
+    void CMultiPaneSampleData::interpolate(const std::vector<double> & t_Wavelengths)
+    {
+        std::vector<std::shared_ptr<CSpectralSampleData>>::iterator it;
+        for(it = m_MeasuredSamples.begin(); it < m_MeasuredSamples.end(); ++it)
+        {
+            (*it)->interpolate(t_Wavelengths);
+        }
 
-	std::shared_ptr< CSeries > CMultiPaneSampleData::getLayerAbsorptances( size_t const Index ) {
-		calculateProperties();
-		if ( ( Index - 1 ) > m_LayerAbsorptances.size() ) {
-			throw std::runtime_error( "Index out of range. " );
-		}
-		return m_LayerAbsorptances[ Index - 1 ];
-	}
+        CSpectralSampleData::interpolate(t_Wavelengths);
+    }
 
-	// Interpolate current sample data to new wavelengths set
-	void CMultiPaneSampleData::interpolate( const std::vector< double >& t_Wavelengths ) {
-		std::vector< std::shared_ptr< CSpectralSampleData > >::iterator it;
-		for ( it = m_MeasuredSamples.begin(); it < m_MeasuredSamples.end(); ++it ) {
-			( *it )->interpolate( t_Wavelengths );
-		}
+    void CMultiPaneSampleData::calculateEquivalentProperties()
+    {
+        std::vector<double> wavelengths = getWavelengths();
+        interpolate(wavelengths);
 
-		CSpectralSampleData::interpolate( t_Wavelengths );
-	}
+        assert(m_MeasuredSamples.size() != 0);
 
-	void CMultiPaneSampleData::calculateEquivalentProperties() {
-		std::vector< double > wavelengths = getWavelengths();
-		interpolate( wavelengths );
+        CSeries Tf = m_MeasuredSamples[0]->properties(Property ::T, Side::Front);
+        CSeries Tb = m_MeasuredSamples[0]->properties(Property ::T, Side::Back);
+        CSeries Rf = m_MeasuredSamples[0]->properties(Property::R, Side::Front);
+        CSeries Rb = m_MeasuredSamples[0]->properties(Property::R, Side::Back);
+        CEquivalentLayerSingleComponentMW aEqivalentLayer(Tf, Tb, Rf, Rb);
+        CAbsorptancesMultiPane aAbsorptances(Tf, Rf, Rb);
 
-		assert( m_MeasuredSamples.size() != 0 );
+        std::vector<std::shared_ptr<CSpectralSampleData>>::iterator it;
+        for(it = next(m_MeasuredSamples.begin()); it < m_MeasuredSamples.end(); ++it)
+        {
+            aEqivalentLayer.addLayer((*it)->properties(Property ::T, Side::Front),
+                                     (*it)->properties(Property::T, Side::Back),
+                                     (*it)->properties(Property ::R, Side::Front),
+                                     (*it)->properties(Property ::R, Side::Back));
+            aAbsorptances.addLayer((*it)->properties(Property ::T, Side::Front),
+                                   (*it)->properties(Property ::R, Side::Front),
+                                   (*it)->properties(Property ::R, Side::Back));
+        }
 
-		std::shared_ptr< CSeries > T = m_MeasuredSamples[ 0 ]->properties( SampleData::T );
-		std::shared_ptr< CSeries > Rf = m_MeasuredSamples[ 0 ]->properties( SampleData::Rf );
-		std::shared_ptr< CSeries > Rb = m_MeasuredSamples[ 0 ]->properties( SampleData::Rb );
-		CEquivalentLayerSingleComponentMW aEqivalentLayer( T, T, Rf, Rb );
-		CAbsorptancesMultiPane aAbsorptances( T, Rf, Rb );
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_Property[std::make_pair(prop, side)] = aEqivalentLayer.getProperties(prop, side);
+            }
+        }
 
-		std::vector< std::shared_ptr< CSpectralSampleData > >::iterator it;
-		for ( it = next( m_MeasuredSamples.begin() ); it < m_MeasuredSamples.end(); ++it ) {
-			aEqivalentLayer.addLayer( ( *it )->properties( SampleData::T ), ( *it )->properties( SampleData::T ),
-			                          ( *it )->properties( SampleData::Rf ), ( *it )->properties( SampleData::Rb ) );
-			aAbsorptances.addLayer( ( *it )->properties( SampleData::T ),
-			                        ( *it )->properties( SampleData::Rf ), ( *it )->properties( SampleData::Rb ) );
-		}
+        m_LayerAbsorptances.clear();
+        size_t size = aAbsorptances.numOfLayers();
+        for(size_t i = 0; i < size; ++i)
+        {
+            m_LayerAbsorptances.push_back(aAbsorptances.Abs(i));
+        }
+    }
 
-		m_Transmittances = aEqivalentLayer.getProperties( Property::T, Side::Front );
-		m_ReflectancesFront = aEqivalentLayer.getProperties( Property::R, Side::Front );
-		m_ReflectancesBack = aEqivalentLayer.getProperties( Property::R, Side::Back );
-		m_AbsorptancesFront = aEqivalentLayer.getProperties( Property::Abs, Side::Front );
-		m_AbsorptancesBack = aEqivalentLayer.getProperties( Property::Abs, Side::Back );
-
-		m_LayerAbsorptances.clear();
-		size_t size = aAbsorptances.numOfLayers();
-		for ( size_t i = 0; i < size; ++i ) {
-			m_LayerAbsorptances.push_back( aAbsorptances.Abs( i ) );
-		}
-
-	}
-
-}
+}   // namespace MultiLayerOptics

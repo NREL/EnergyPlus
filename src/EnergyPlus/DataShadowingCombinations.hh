@@ -59,16 +59,6 @@ namespace EnergyPlus {
 
 namespace DataShadowingCombinations {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Types
-
     struct ShadowingCombinations
     {
         // Members
@@ -86,16 +76,16 @@ namespace DataShadowingCombinations {
         }
     };
 
-    // Object Data
-    extern Array1D<ShadowingCombinations> ShadowComb;
-
 } // namespace DataShadowingCombinations
 
-struct ShadowCombData : BaseGlobalStruct {
+struct ShadowCombData : BaseGlobalStruct
+{
+
+    Array1D<DataShadowingCombinations::ShadowingCombinations> ShadowComb;
 
     void clear_state() override
     {
-
+        this->ShadowComb.deallocate();
     }
 };
 

@@ -14,7 +14,6 @@
 #include <ObjexxFCL/time.hh>
 
 // C++ Headers
-#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cmath>
@@ -133,52 +132,6 @@ CLOCK()
 
 // System Clock
 void
-SYSTEM_CLOCK_64(
- Optional< std::int64_t > count,
- Optional< std::int64_t > count_rate,
- Optional< std::int64_t > count_max
-)
-{
-	using std::chrono::system_clock;
-	system_clock::time_point const now( system_clock::now() );
-	if ( count.present() ) count = now.time_since_epoch().count();
-	if ( count_rate.present() ) count_rate = system_clock::period::den / system_clock::period::num;
-	if ( count_max.present() ) count_max = system_clock::duration::max().count();
-}
-
-// System Clock
-void
-SYSTEM_CLOCK_32(
- Optional< std::int32_t > count,
- Optional< std::int32_t > count_rate,
- Optional< std::int32_t > count_max
-)
-{
-	using std::chrono::system_clock;
-	system_clock::time_point const now( system_clock::now() );
-	std::int64_t count_64( now.time_since_epoch().count() );
-	std::int64_t count_rate_64( system_clock::period::den / system_clock::period::num );
-	std::int64_t count_max_64( system_clock::duration::max().count() );
-	std::int64_t mult( count_rate_64 / std::numeric_limits< std::int32_t >::max() );
-	if ( mult > 0 ) { // Scale rate down
-		mult = static_cast< std::int64_t >( std::pow( 10.0, std::ceil( std::log10( double( mult ) ) ) ) );
-		count_64 /= mult;
-		count_rate_64 /= mult;
-		count_max_64 /= mult;
-	}
-	mult = count_max_64 / std::numeric_limits< std::int32_t >::max();
-	if ( mult > 0 ) { // Scale range down
-		mult = static_cast< std::int64_t >( std::pow( 10.0, std::ceil( std::log10( double( mult ) ) ) ) );
-		count_max_64 /= mult;
-		count_64 %= count_max_64;
-	}
-	if ( count.present() ) count = count_64;
-	if ( count_rate.present() ) count_rate = count_rate_64;
-	if ( count_max.present() ) count_max = count_max_64;
-}
-
-// System Clock
-void
 SYSTEM_CLOCK(
  Optional< std::int32_t > count,
  Optional< std::int32_t > count_rate,
@@ -208,49 +161,11 @@ SYSTEM_CLOCK(
 	if ( count_max.present() ) count_max = count_max_64;
 }
 
-// System Clock
-void
-SYSTEM_CLOCK_16(
- Optional< std::int16_t > count,
- Optional< std::int16_t > count_rate,
- Optional< std::int16_t > count_max
-)
-{
-	using std::chrono::system_clock;
-	system_clock::time_point const now( system_clock::now() );
-	std::int64_t count_64( now.time_since_epoch().count() );
-	std::int64_t count_rate_64( system_clock::period::den / system_clock::period::num );
-	std::int64_t count_max_64( system_clock::duration::max().count() );
-	std::int64_t mult( count_rate_64 / std::numeric_limits< std::int16_t >::max() );
-	if ( mult > 0 ) { // Scale rate down
-		mult = static_cast< std::int64_t >( std::pow( 10.0, std::ceil( std::log10( double( mult ) ) ) ) );
-		count_64 /= mult;
-		count_rate_64 /= mult;
-		count_max_64 /= mult;
-	}
-	mult = count_max_64 / std::numeric_limits< std::int16_t >::max();
-	if ( mult > 0 ) { // Scale range down
-		mult = static_cast< std::int64_t >( std::pow( 10.0, std::ceil( std::log10( double( mult ) ) ) ) );
-		count_max_64 /= mult;
-		count_64 %= count_max_64;
-	}
-	if ( count.present() ) count = count_64;
-	if ( count_rate.present() ) count_rate = count_rate_64;
-	if ( count_max.present() ) count_max = count_max_64;
-}
-
 // Process CPU Time (s)
 void
 CPU_TIME( double & time )
 {
 	time = double( std::clock() ) / CLOCKS_PER_SEC;
-}
-
-// Process CPU Time (us)
-void
-CLOCKX( double & time )
-{
-	time = 1.0e6 * double( std::clock() ) / CLOCKS_PER_SEC;
 }
 
 // Current Date: DD, MM, YYYY
@@ -386,20 +301,6 @@ jdate()
 	std::int16_t const year( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << year << setw( 3 ) << day;
-	return s.str();
-}
-
-// Current Julian Date String: YYYYDDD
-std::string
-JDATE4()
-{
-	using std::setw;
-	std::time_t const current_time( std::time( NULL ) );
-	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_yday + 1 ); // Day of year: 1-366
-	std::int16_t const year( timeinfo->tm_year + 1900 ); // Year
-	std::stringstream s;
-	s << std::setfill( '0' ) << setw( 4 ) << year << setw( 3 ) << day;
 	return s.str();
 }
 

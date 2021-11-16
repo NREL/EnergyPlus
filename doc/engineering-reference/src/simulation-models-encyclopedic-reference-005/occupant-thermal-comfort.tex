@@ -1163,6 +1163,68 @@ When the angle factor option is requested, the radiant temperature is the mean v
 
 If all surfaces have the same emissivity that is close to unity, the emissivities in the above equation can be ignored.  However, since this is not always the case, the emissivity terms must be included in the above equation.  In addition, the temperatures to the fourth power in the above equation could be simplified to linear temperatures when the temperatures of the surfaces are fairly close.  However, as these temperatures get further apart, this linear approximation becomes increasingly poor.  As a result, since there is no guarantee that inside face surface temperatures will be close, the fourth order temperature terms are used to calculate the radiant temperature.
 
+\subsection{ASHRAE 55 Elevated Air Speed Cooling Effect Model}\label{elevated-air-speed-ce-model}
+
+ASHRAE Standard 55-2017 Section 5.3 requires that the Elevated Air Speed Comfort Zone Method be used when average air speed \(v_{a}\) is greater than 0.10 m/s. The method provides cooling credit for elevated air velocity in the space. The method can be used to evaluate passive cooling technologies such as natural ventilation, ceiling fan, and portable fan.
+
+\subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-4}
+
+The Pierce Two-Node Standard Effective Temperature (SET) model is used to account for the cooling effect of air speeds greater than the 0.10 m/s. Specifically, for a given set of environmental and personal variables, including an elevated average air speed, an average air temperature \(t_{a}\), and a mean radiant temperature \(t_{r}\), the SET is first calculated. Then the average air speed \(v_{a}\) is replaced by still air (0.1 m/s), and the average air temperature and radiant temperature are adjusted according to the cooling effect (CE). The CE of the elevated air speed is the value that, when subtracted equally from both the average air temperature and the mean radiant temperature, yields the same SET under still air as in the first SET calculation under elevated air speed.
+
+The following is a formal description of this process. To define the CE, we assert that it satisfies the following:
+
+\begin{equation}
+SET(t_{a}, t_{r}, v_{elev}, *) = SET(t_{a} - CE, t_{r} - CE, v_{still}, *) 
+\end{equation}
+
+where \(t_{a}\) is the average air temperature, \(t_{r}\) is the mean radiant temperature, \(v_{elev}\) is the elevated average air speed, such that \(v_{elev} > 0.1 m/s\) , \(v_{still}\) is the elevated average air speed (\(v_{still} = 0.1 m/s\)). The other parameters (indoor air humidity, clothing, metabolic rate) that stay the same are denoted by “*”.
+
+It should be noted that \(v_{elev}\) is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor. It can be calculate using the function below.
+
+\begin{equation}
+v_{elev} = max(v_{measured}, v_{measured} + 0.3 * (met - 1))
+\end{equation}
+
+where \(met\) is the metabolic rate in [met].
+
+The Cooling Effect adjusted PMV/PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). The following are equations to calculate the adjusted PMV and PPD.
+
+\begin{equation}
+PMV_{adj} = PMV(t_{a} - CE, t_{r} - CE, v_{still}, *)
+\end{equation}
+
+\begin{equation}
+PPD_{adj} = 100 - 95 * exp(-0.03353 * {PMV_{adj}}^4 - 0.2179 * {PMV_{adj}}^2)
+\end{equation}
+
+\subsection{ASHRAE 55 Ankle Draft Risk Model}\label{ankle-draft-risk-model}
+
+Draft is unwanted local cooling of the body caused by air movement. It is most prevalent when the whole-body thermal sensation is cool (below neutral). Draft sensation depends on air speed, air temperature, activity, and clothing. Sensitivity to draft is greatest where the skin is not covered by clothing, especially the head region comprising the head, neck, and shoulders and the leg region comprising the ankles, feet, and legs. Draft at the lower leg region may occur in the buildings conditioned by thermally stratified systems, such as displacement ventilation and underfloor air distribution, or with cold-dropping airflow along external walls and/or windows.
+
+\subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-5}
+
+The predicted percentage dissatisfied on draft at ankle level \(PPD_{AD}\) is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m). The following is the equation to calculate \(PPD_{AD}\).
+
+\begin{equation}
+PMV_{vr} = PMV(t_{a}, t_{r}, v_{r}, *)
+\end{equation}
+
+\begin{equation}
+PPD_{ad} = \frac{exp⁡(-2.58 + 3.05 * v_{ankle} - 1.06 * PMV_{vr})}{1 + exp⁡(-2.58 + 3.05 * v_{ankle} - 1.06 * PMV_{vr}} * 100
+\end{equation}
+
+Where \(v_{r}\) is the relative air velocity caused by body movement, and \(v_{ankle}\) is the air speed at 0.1 m above the floor.
+
+This equation is only applicable for \(v_{r} < 0.2 m/s\) . And the subject’s metabolic rate and clothing level should be kept below 1.3 met and 0.7 clo, respectively. PPD at ankle draft will be set to -1.0 if if these conditions are not met.
+
+It should be noted that the metrics only measures the predicted percentage dissatisfied on the sensation of draft. \(PPD_{AD}\) levels at various air speeds and thermal sensations are depicted in Figure~\ref{fig:ankle-draft-ppd}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ankle_draft.png}
+\caption{Ankle Draft PPD Levels \protect \label{fig:ankle-draft-ppd}}
+\end{figure}
+
 \subsection{References}\label{references-1-012}
 
 ASHRAE. 1984. ``High Intensity Infrared Radiant Heating'', 1984 Handbook of Systems and Equipment, American Society of Heating, Refrigerating and Air Conditioning Engineers, Atlanta, GA, Chapter 18.
@@ -1172,6 +1234,8 @@ ASHRAE. 1985. ``Physiological Principles for Comfort and Health,'' 1985 Handbook
 ASHRAE. 1993. ``Physiological Principles and Thermal Comfort'', 1993 ASHRAE Handbook of Fundamentals, American Society of Heating, Refrigerating and Air Conditioning Engineers, Atlanta, GA, Chapter 8.
 
 ASHRAE. 2010. ``Standard 55-2010 -- Thermal Environmental Conditions for Human Occupancy (ANSI approved)'', American Society of Heating, Refrigerating and Air Conditioning Engineers, Atlanta, GA.
+
+ASHRAE. 2017. ``Standard 55-2017 -- Thermal Environmental Conditions for Human Occupancy (ANSI approved)'', American Society of Heating, Refrigerating and Air Conditioning Engineers, Atlanta, GA.
 
 Azer, N.Z., Hsu, S. 1977. ``The prediction of Thermal Sensation from Simple model of Human Physiological Regulatory Response'', ASHRAE Trans., Vol.83, Pt 1.
 
@@ -1200,3 +1264,5 @@ Hsu, S. 1977. ``A Thermoregulatory Model for Heat Acclimation and Some of its Ap
 Int-Hout, D. 1990. ``Thermal Comfort Calculation / A Computer Model'', ASHRAE Trans., Vol.96, Pt 1.
 
 ISO. 1983. ``Determination of the PMV and PPD Indices and Specification of the Conditions for Thermal Comfort'', DIS 7730, Moderate Thermal Environment, 1983.
+
+Liu S., Schiavon S., Kabanshi A., Nazaroff W.W. 2017. \"Predicted percentage dissatisfied with ankle draft\", Indoor Air, Vol.27.

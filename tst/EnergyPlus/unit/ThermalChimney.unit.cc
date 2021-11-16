@@ -84,7 +84,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 {
@@ -522,6 +521,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -538,6 +538,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -554,6 +555,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -570,6 +572,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    ThermalChimney IN,       !- Construction Name",
         "    ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -586,6 +589,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -602,6 +606,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -618,6 +623,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -634,6 +640,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -650,6 +657,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -666,6 +674,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    ThermalChimney OUT,      !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -682,6 +691,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    ThermalChimney OUT,      !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -698,6 +708,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -714,6 +725,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -730,6 +742,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 3,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -746,6 +759,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 3,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -762,6 +776,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 3,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -778,6 +793,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    ThermalChimney IN,       !- Construction Name",
         "    ZONE 3,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn004:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -794,6 +810,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE 3,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn003:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -810,6 +827,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE 3,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -826,6 +844,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -842,6 +861,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -858,6 +878,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    EXTERIOR,                !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -874,6 +895,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    ThermalChimney OUT,      !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn003:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -890,6 +912,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Wall,                    !- Surface Type",
         "    ThermalChimney OUT,      !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -906,6 +929,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn004:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -922,6 +946,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE 4,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1078,20 +1103,18 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool localErrorsFound = false;
     // Read objects
@@ -1113,34 +1136,34 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     SurfaceGeometry::GetSurfaceData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
-    DataHeatBalance::Zone(2).HasWindow = true;
-    DataHeatBalance::Zone(4).HasWindow = true;
-    EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn = 0.1;
-    DataHeatBalSurface::TempSurfIn = 25.00;
-    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
-    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
-    DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MAT = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat = 0.01;
+    state->dataHeatBal->Zone(2).HasWindow = true;
+    state->dataHeatBal->Zone(4).HasWindow = true;
+    state->dataHeatBalSurf->SurfTempIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfHConvInt = 0.1;
+    state->dataHeatBalSurf->SurfTempIn = 25.00;
+    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
+    state->dataHeatBalSurf->SurfTempIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
+    state->dataHeatBalSurf->SurfTempIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
+    state->dataHeatBalSurf->SurfTempIn(surfNum) = 26.99;
+    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
+    state->dataHeatBalSurf->SurfTempIn(surfNum) = 22.99;
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT = 23.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-    DataHeatBalFanSys::MCPThermChim.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS
     ThermalChimney::GetThermalChimney(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
@@ -1151,5 +1174,4 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
     ThermalChimney::CalcThermalChimney(*state);
     EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
-
 }

@@ -48,8 +48,8 @@
 #ifndef ENERGYPLUS_AUTOSIZING_H
 #define ENERGYPLUS_AUTOSIZING_H
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
@@ -64,14 +64,14 @@ extern "C" {
 /// \brief This typedef is a convenient pointer to an internal sizer class.
 /// \details Just one is declared here as any sizer object can fit in it.  An instance can be found by calling any
 ///          sizer***New() function
-ENERGYPLUSLIB_API typedef void * Sizer;
+ENERGYPLUSLIB_API typedef void *Sizer;
 
 /// \brief Gets warning and error messages from the autosizing process.
 /// \details This function returns a char * which points to a string of error messages, or blank if none have been reported.
 ///          This function also clears the message buffer so a subsequent call will get only new messages.
 /// \param[in] sizer An instance of a Sizer class, it works for any sizer type.
 /// \return A char * pointing to a string of error messages, or blank if none have been reported.
-ENERGYPLUSLIB_API char * sizerGetLastErrorMessages(Sizer sizer);
+ENERGYPLUSLIB_API char *sizerGetLastErrorMessages(Sizer sizer);
 
 /// \brief Returns a new reference to a HeatingAirflowUA Sizer class
 /// \details The sizer class allows access to sizer stuff.
@@ -87,13 +87,14 @@ ENERGYPLUSLIB_API Sizer sizerHeatingAirflowUANew();
 /// \see sizerHeatingAirflowUANew
 ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
 /// \brief Defines the different possible zone sizing configurations
-enum HeatingAirflowUAZoneConfigType{
+enum HeatingAirflowUAZoneConfigType
+{
     HeatingAirflowUAZoneTerminal = 0,
     HeatingAirflowUAZoneInductionUnit = 1,
     HeatingAirflowUAZoneFanCoil = 2
 };
 /// \brief Initializes the HeatingAirflowUA sizer class for zone configurations
-/// \details This function allows the sizer to be used for zone sizing calculations, supporting 
+/// \details This function allows the sizer to be used for zone sizing calculations, supporting
 ///          the configurations defined in the `HeatingAirflowUAZoneConfigType` enumeration.
 /// \param[in] state An instance of an EnergyPlusState that must be created with a call to `stateNew`.
 /// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
@@ -110,16 +111,15 @@ enum HeatingAirflowUAZoneConfigType{
 /// \see sizerHeatingAirflowUASize
 /// \see sizerHeatingAirflowUADelete
 /// \see HeatingAirflowUAZoneConfigType
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZone(
-    EnergyPlusState state,
-    Sizer sizer,
-    enum HeatingAirflowUAZoneConfigType zoneConfig,
-    Real64 elevation,
-    Real64 representativeFlowRate,
-    Real64 reheatMultiplier
-);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZone(EnergyPlusState state,
+                                                              Sizer sizer,
+                                                              enum HeatingAirflowUAZoneConfigType zoneConfig,
+                                                              Real64 elevation,
+                                                              Real64 representativeFlowRate,
+                                                              Real64 reheatMultiplier);
 /// \brief Defines the different possible system sizing configurations
-enum HeatingAirflowUASystemConfigType {
+enum HeatingAirflowUASystemConfigType
+{
     HeatingAirflowUASystemConfigTypeOutdoorAir = 0,
     HeatingAirflowUASystemConfigTypeMainDuct = 1,
     HeatingAirflowUASystemConfigTypeCoolingDuct = 2,
@@ -147,15 +147,13 @@ enum HeatingAirflowUASystemConfigType {
 /// \see sizerHeatingAirflowUASize
 /// \see sizerHeatingAirflowUADelete
 /// \see HeatingAirflowUASystemConfigType
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystem(
-    EnergyPlusState state,
-    Sizer sizer,
-    enum HeatingAirflowUASystemConfigType sysConfig,
-    Real64 elevation,
-    Real64 representativeFlowRate,
-    Real64 minFlowRateRatio,
-    int DOAS
-);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystem(EnergyPlusState state,
+                                                                Sizer sizer,
+                                                                enum HeatingAirflowUASystemConfigType sysConfig,
+                                                                Real64 elevation,
+                                                                Real64 representativeFlowRate,
+                                                                Real64 minFlowRateRatio,
+                                                                int DOAS);
 /// \brief Does calculation of the HeatingAirflowUA sizer
 /// \param[in] state An instance of an EnergyPlusState that must be created with a call to `stateNew`.
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
@@ -176,4 +174,4 @@ ENERGYPLUSLIB_API Real64 sizerHeatingAirflowUAValue(Sizer sizer);
 }
 #endif
 
-#endif //ENERGYPLUS_AUTOSIZING_H
+#endif // ENERGYPLUS_AUTOSIZING_H

@@ -82,9 +82,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     state->dataGlobal->NumOfZones = 2;
 
-    DataHeatBalance::Zone.allocate(2);
-    DataHeatBalance::Zone(1).Name = "SOUTH SKIN";
-    DataHeatBalance::Zone(2).Name = "THERMAL ZONE";
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "SOUTH SKIN";
+    state->dataHeatBal->Zone(2).Name = "THERMAL ZONE";
 
     bool ErrorsFound(false);
 
@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataHeatBalance::Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
 }
 
 } // namespace EnergyPlus

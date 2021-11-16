@@ -78,16 +78,15 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         "AirLoopHVAC:OutdoorAirSystem,",
         "OA Sys 1,                !- Name",
         "OA Sys 1 Controllers,    !- Controller List Name",
-        "OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    static std::string const RoutineName("GetBranchInput: ");
+    static constexpr std::string_view RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
-    int NumOfBranches = inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
+    int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -106,9 +105,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         state->dataBranchInputManager->Branch.allocate(NumOfBranches);
         for (auto &e : state->dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -118,11 +117,22 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            inputProcessor->getObjectItem(*state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(
+                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -181,8 +191,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         "AirLoopHVAC:OutdoorAirSystem,",
         "OA Sys 1,                !- Name",
         "OA Sys 1 Controllers,    !- Controller List Name",
-        "OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "Coil:Cooling:Water,",
         "Main Cooling Coil 1,     !- Name",
@@ -241,9 +250,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    static std::string const RoutineName("GetBranchInput: ");
+    static constexpr std::string_view RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
-    int NumOfBranches = inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
+    int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -262,9 +271,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         state->dataBranchInputManager->Branch.allocate(NumOfBranches);
         for (auto &e : state->dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -274,11 +283,22 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            inputProcessor->getObjectItem(*state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(
+                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;

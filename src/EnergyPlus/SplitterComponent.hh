@@ -93,8 +93,12 @@ namespace SplitterComponent {
         }
     };
 
-    void
-    SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
+    void SimAirLoopSplitter(EnergyPlusData &state,
+                            std::string_view CompName,
+                            bool const FirstHVACIteration,
+                            bool const FirstCall,
+                            bool &SplitterInletChanged,
+                            int &CompIndex);
 
     void GetSplitterInput(EnergyPlusData &state);
 
@@ -120,7 +124,8 @@ namespace SplitterComponent {
 
 } // namespace SplitterComponent
 
-struct SplitterComponentData : BaseGlobalStruct {
+struct SplitterComponentData : BaseGlobalStruct
+{
 
     bool GetSplitterInputFlag = true;
     // Public because Used by SimAirServingZones and the Direct Air Unit

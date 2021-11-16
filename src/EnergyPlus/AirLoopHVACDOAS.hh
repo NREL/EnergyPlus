@@ -54,7 +54,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -85,7 +87,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopMixer() = default; // destructor
 
         static void getAirLoopMixer(EnergyPlusData &state);
-        void CalcAirLoopMixer();
+        void CalcAirLoopMixer(EnergyPlusData &state);
     };
 
     struct AirLoopSplitter
@@ -107,7 +109,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopSplitter() = default; // destructor
 
         static void getAirLoopSplitter(EnergyPlusData &state);
-        void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
+        void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);
     };
 
     struct AirLoopDOAS
@@ -136,7 +138,7 @@ namespace AirLoopHVACDOAS {
         int m_FanIndex;
         int m_FanInletNodeNum;
         int m_FanOutletNodeNum;
-        int m_FanTypeNum;
+        SimAirServingZones::CompType m_FanTypeNum;
         int m_HeatCoilNum;
         int m_CoolCoilNum;
         int ConveCount;
@@ -178,10 +180,11 @@ namespace AirLoopHVACDOAS {
             : SumMassFlowRate(0.0), PreheatTemp(-999.0), PrecoolTemp(-999.0), PreheatHumRat(-999.0), PrecoolHumRat(-999.0), SizingMassFlow(0.0),
               SizingCoolOATemp(-999.0), SizingCoolOAHumRat(-999.0), HeatOutTemp(0.0), HeatOutHumRat(0.0), m_AirLoopDOASNum(0), m_OASystemNum(0),
               m_AvailManagerSchedPtr(0), m_AirLoopMixerIndex(-1), m_AirLoopSplitterIndex(-1), NumOfAirLoops(0), m_InletNodeNum(0), m_OutletNodeNum(0),
-              m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(0), m_HeatCoilNum(0), m_CoolCoilNum(0), ConveCount(0),
-              ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false), FanBlowTroughFlag(false),
-              m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0),
-              HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0), MyEnvrnFlag(true)
+              m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(SimAirServingZones::CompType::Unassigned), m_HeatCoilNum(0),
+              m_CoolCoilNum(0), ConveCount(0), ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false),
+              FanBlowTroughFlag(false), m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(0),
+              HWBranchNum(0), HWCompNum(0), HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0),
+              MyEnvrnFlag(true)
 
         {
         }
@@ -207,27 +210,30 @@ namespace AirLoopHVACDOAS {
 
 } // namespace AirLoopHVACDOAS
 
-    struct AirLoopHVACDOASData : BaseGlobalStruct
+struct AirLoopHVACDOASData : BaseGlobalStruct
+{
+    bool GetInputOnceFlag = true;
+    bool getAirLoopMixerInputOnceFlag = true;
+    bool getAirLoopSplitterInputOnceFlag = true;
+    int numAirLoopDOAS = 0;
+    std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+    std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
+    std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+    bool SummerDesignDayFlag = true;
+    bool WinterDesignDayFlag = true;
+    void clear_state() override
     {
-        bool GetInputOnceFlag = true;
-        bool getAirLoopMixerInputOnceFlag = true;
-        bool getAirLoopSplitterInputOnceFlag = true;
-        int numAirLoopDOAS = 0;
-        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
-        std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
-        std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
-
-        void clear_state() override
-        {
-            this->GetInputOnceFlag = true;
-            this->getAirLoopMixerInputOnceFlag = true;
-            this->getAirLoopSplitterInputOnceFlag = true;
-            this->numAirLoopDOAS = 0;
-            this->airloopDOAS.clear();
-            this->airloopMixer.clear();
-            this->airloopSplitter.clear();
-        }
-    };
+        this->GetInputOnceFlag = true;
+        this->getAirLoopMixerInputOnceFlag = true;
+        this->getAirLoopSplitterInputOnceFlag = true;
+        this->numAirLoopDOAS = 0;
+        this->airloopDOAS.clear();
+        this->airloopMixer.clear();
+        this->airloopSplitter.clear();
+        this->SummerDesignDayFlag = true;
+        this->WinterDesignDayFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

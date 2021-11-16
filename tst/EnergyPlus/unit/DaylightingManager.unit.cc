@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -130,38 +131,45 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     bool foundErrors = false;
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    EXPECT_EQ(1, numObjs);
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(1, state->dataDaylightingData->TotRefPoints);
 
-    GetDaylightingControls(*state, numObjs, foundErrors);
+    GetDaylightingControls(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(1, numObjs);
 
-    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
-    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
+    EXPECT_TRUE(
+        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
-    EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
-    EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).LightControlSteps);
-    EXPECT_EQ(1.0, state->dataDaylightingData->ZoneDaylight(1).LightControlProbability);
+    EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
+    EXPECT_EQ(0.2, state->dataDaylightingData->daylightControl(1).MinLightFraction);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).LightControlSteps);
+    EXPECT_EQ(1.0, state->dataDaylightingData->daylightControl(1).LightControlProbability);
 
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).glareRefPtNumber);
-    EXPECT_EQ(180., state->dataDaylightingData->ZoneDaylight(1).ViewAzimuthForGlare);
-    EXPECT_EQ(20., state->dataDaylightingData->ZoneDaylight(1).MaxGlareallowed);
-    EXPECT_EQ(0, state->dataDaylightingData->ZoneDaylight(1).DElightGriddingResolution);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).glareRefPtNumber);
+    EXPECT_EQ(180., state->dataDaylightingData->daylightControl(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., state->dataDaylightingData->daylightControl(1).MaxGlareallowed);
+    EXPECT_EQ(0, state->dataDaylightingData->daylightControl(1).DElightGriddingResolution);
 
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
 
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(1));
-    EXPECT_EQ(1., state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(1));
-    EXPECT_EQ(500., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1));
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).DaylRefPtNum(1));
+    EXPECT_EQ(1., state->dataDaylightingData->daylightControl(1).FracZoneDaylit(1));
+    EXPECT_EQ(500., state->dataDaylightingData->daylightControl(1).IllumSetPoint(1));
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_Test)
@@ -232,46 +240,52 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     bool foundErrors = false;
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
 
-    GetDaylightingControls(*state, numObjs, foundErrors);
+    GetDaylightingControls(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(1, numObjs);
 
-    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
-    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
+    EXPECT_TRUE(
+        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
-    EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
-    EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).LightControlSteps);
-    EXPECT_EQ(1.0, state->dataDaylightingData->ZoneDaylight(1).LightControlProbability);
+    EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
+    EXPECT_EQ(0.2, state->dataDaylightingData->daylightControl(1).MinLightFraction);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).LightControlSteps);
+    EXPECT_EQ(1.0, state->dataDaylightingData->daylightControl(1).LightControlProbability);
 
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).glareRefPtNumber);
-    EXPECT_EQ(180., state->dataDaylightingData->ZoneDaylight(1).ViewAzimuthForGlare);
-    EXPECT_EQ(20., state->dataDaylightingData->ZoneDaylight(1).MaxGlareallowed);
-    EXPECT_EQ(0, state->dataDaylightingData->ZoneDaylight(1).DElightGriddingResolution);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).glareRefPtNumber);
+    EXPECT_EQ(180., state->dataDaylightingData->daylightControl(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., state->dataDaylightingData->daylightControl(1).MaxGlareallowed);
+    EXPECT_EQ(0, state->dataDaylightingData->daylightControl(1).DElightGriddingResolution);
 
-    EXPECT_EQ(3, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
+    EXPECT_EQ(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
 
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(1));
-    EXPECT_EQ(0.35, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(1));
-    EXPECT_EQ(400., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1));
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).DaylRefPtNum(1));
+    EXPECT_EQ(0.35, state->dataDaylightingData->daylightControl(1).FracZoneDaylit(1));
+    EXPECT_EQ(400., state->dataDaylightingData->daylightControl(1).IllumSetPoint(1));
 
-    EXPECT_EQ(2, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(2));
-    EXPECT_EQ(0.4, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(2));
-    EXPECT_EQ(500., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(2));
+    EXPECT_EQ(2, state->dataDaylightingData->daylightControl(1).DaylRefPtNum(2));
+    EXPECT_EQ(0.4, state->dataDaylightingData->daylightControl(1).FracZoneDaylit(2));
+    EXPECT_EQ(500., state->dataDaylightingData->daylightControl(1).IllumSetPoint(2));
 
-    EXPECT_EQ(3, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(3));
-    EXPECT_EQ(0.25, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(3));
-    EXPECT_EQ(450., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(3));
+    EXPECT_EQ(3, state->dataDaylightingData->daylightControl(1).DaylRefPtNum(3));
+    EXPECT_EQ(0.25, state->dataDaylightingData->daylightControl(1).FracZoneDaylit(3));
+    EXPECT_EQ(450., state->dataDaylightingData->daylightControl(1).IllumSetPoint(3));
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
@@ -380,6 +394,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     bool foundErrors = false;
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
     GetInputIlluminanceMap(*state, foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
@@ -387,7 +406,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     EXPECT_EQ(1, state->dataDaylightingData->TotIllumMaps);
 
     EXPECT_EQ("MAP1", state->dataDaylightingData->IllumMap(1).Name);
-    EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).Zone);
+    EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).zoneIndex);
     EXPECT_EQ(0, state->dataDaylightingData->IllumMap(1).Z);
     EXPECT_EQ(0.1, state->dataDaylightingData->IllumMap(1).Xmin);
     EXPECT_EQ(6.0, state->dataDaylightingData->IllumMap(1).Xmax);
@@ -404,14 +423,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
 {
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    state->dataDaylightingData->ZoneDaylight.allocate(3);
-    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->ZoneDaylight(2).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->ZoneDaylight(3).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl.allocate(3);
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(3).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
 
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    state->dataDaylightingData->ZoneDaylight(2).DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
 
     EXPECT_TRUE(doesDayLightingUseDElight(*state));
 }
@@ -474,6 +493,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -490,6 +510,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -507,6 +528,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -523,6 +545,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -539,6 +562,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -555,6 +579,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -646,6 +671,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -662,6 +688,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -679,6 +706,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -695,6 +723,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -711,6 +740,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -727,6 +757,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -809,39 +840,40 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    int constexpr HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->PreviousHour = 1;
@@ -854,35 +886,41 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput(*state);
+    state->dataDaylightingManager->CalcDayltghCoefficients_firstTime = false;
     compare_err_stream("");
     EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
 
-    EXPECT_NEAR(2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 45.;
-
-    GeometryTransformForDaylighting(*state);
-
-    EXPECT_NEAR(3.603, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
-
-    DataHeatBalance::Zone(1).RelNorth = 90.;
+    state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+
+    state->dataHeatBal->Zone(1).RelNorth = 90.;
+
+    GeometryTransformForDaylighting(*state);
+
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
+
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -896,11 +934,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 {
 
-    Surface.allocate(1);
-    Surface(1).Tilt = 90.0;
-    Surface(1).Azimuth = 180.0;
-    int horiz = 1;
-    int vert = 2;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Azimuth = 180.0;
+    DataWindowEquivalentLayer::Orientation horiz = DataWindowEquivalentLayer::Orientation::Horizontal;
+    DataWindowEquivalentLayer::Orientation vert = DataWindowEquivalentLayer::Orientation::Vertical;
     Real64 ProfAng;
     Vector3<Real64> CosDirSun; // Solar direction cosines
 
@@ -908,190 +946,207 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     CosDirSun(2) = 0.470492;
     CosDirSun(3) = 0.003513;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.00747, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
     CosDirSun(1) = 0.92318;
     CosDirSun(2) = 0.36483;
     CosDirSun(3) = 0.12094;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.32010, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(1.94715, ProfAng, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
     state->dataGlobal->NumOfZones = 4;
-    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
-    state->dataDaylightingData->ZoneDaylight(1).Name = "ZD1";
-    state->dataDaylightingData->ZoneDaylight(2).Name = "ZD2";
-    state->dataDaylightingData->ZoneDaylight(3).Name = "ZD3";
-    state->dataDaylightingData->ZoneDaylight(4).Name = "ZD4";
+    state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
+    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl(1).Name = "ZD1";
+    state->dataDaylightingData->daylightControl(2).Name = "ZD2";
+    state->dataDaylightingData->daylightControl(3).Name = "ZD3";
+    state->dataDaylightingData->daylightControl(4).Name = "ZD4";
 
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).DaylightingControlName = "ZD3";
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).DaylightingControlName = "ZD3";
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).DaylightingControlName = "ZD1";
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).DaylightingControlName = "ZD1";
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
 
     AssociateWindowShadingControlWithDaylighting(*state);
 
-    EXPECT_EQ(WindowShadingControl(1).DaylightControlIndex, 3);
-    EXPECT_EQ(WindowShadingControl(2).DaylightControlIndex, 1);
-    EXPECT_EQ(WindowShadingControl(3).DaylightControlIndex, 0);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).DaylightControlIndex, 3);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).DaylightControlIndex, 1);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(3).DaylightControlIndex, 0);
 }
 
 TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
-    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
+    state->dataHeatBal->Zone.allocate(zn);
+    state->dataHeatBal->Zone(zn).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space.allocate(zn);
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
     CreateShadeDeploymentOrder(*state, zn);
 
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
     std::vector<int> compare1;
     compare1.push_back(8);
     compare1.push_back(9);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[0], compare1);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins[0], compare1);
 
     std::vector<int> compare2;
     compare2.push_back(1);
     compare2.push_back(2);
     compare2.push_back(3);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[1], compare2);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins[1], compare2);
 
     std::vector<int> compare3;
     compare3.push_back(4);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[2], compare3);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins[2], compare3);
 
     std::vector<int> compare4;
     compare4.push_back(5);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[3], compare4);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins[3], compare4);
 
     std::vector<int> compare5;
     compare5.push_back(6);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[4], compare5);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins[4], compare5);
 
     std::vector<int> compare6;
     compare6.push_back(7);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[5], compare6);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins[5], compare6);
 }
 
 TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
-    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataGlobal->numSpaces = zn;
+    state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(zn).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataHeatBal->space(zn).solarEnclosureNum = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(*state, zn);
 
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
-    state->dataDaylightingData->ZoneDaylight(zn).TotalDaylRefPoints = 1;
-    state->dataDaylightingData->ZoneDaylight(zn).NumOfDayltgExtWins = 9;
-    state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum.allocate(state->dataDaylightingData->ZoneDaylight(zn).NumOfDayltgExtWins);
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums.allocate(state->dataDaylightingData->ZoneDaylight(zn).NumOfDayltgExtWins);
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(1) = 1;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(2) = 2;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(3) = 3;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(4) = 4;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(5) = 5;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(6) = 6;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(7) = 7;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(8) = 8;
-    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(9) = 9;
+    state->dataDaylightingData->daylightControl(zn).TotalDaylRefPoints = 1;
+    state->dataViewFactor->EnclSolInfo(zn).TotalEnclosureDaylRefPoints = 1;
+
+    state->dataDaylightingData->enclDaylight(zn).NumOfDayltgExtWins = 9;
+    state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum.allocate(state->dataDaylightingData->enclDaylight(zn).NumOfDayltgExtWins);
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums.allocate(state->dataDaylightingData->enclDaylight(zn).NumOfDayltgExtWins);
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(1) = 1;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(2) = 2;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(3) = 3;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(4) = 4;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(5) = 5;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(6) = 6;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(7) = 7;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(8) = 8;
+    state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums(9) = 9;
 
     MapShadeDeploymentOrderToLoopNumber(*state, zn);
 
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(1), 8);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(2), 9);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(3), 1);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(4), 2);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(5), 3);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(6), 4);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(7), 5);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(8), 6);
-    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(9), 7);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(1), 8);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(2), 9);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(3), 1);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(4), 2);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(5), 3);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(6), 4);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(7), 5);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(8), 6);
+    EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum(9), 7);
 }
 TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 {
@@ -1112,6 +1167,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1128,6 +1184,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1145,6 +1202,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1161,6 +1219,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1177,6 +1236,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -1193,6 +1253,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1310,7 +1371,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfTimeStepInHour = 1;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 10;
     state->dataGlobal->PreviousHour = 10;
@@ -1322,25 +1383,25 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     bool foundErrors = false;
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
+    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(*state);
     state->dataDaylightingManager->GILSK = 100.0;
@@ -1350,15 +1411,15 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state->dataEnvrn->SkyClearness = 6.0;
 
     // Set all daylighting factors to zero
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSun = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSunDisk = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSky = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSun = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSky = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSun = 0.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSunDisk = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSun = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSunDisk = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSky = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSun = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSunDisk = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSky = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSun = 0.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSunDisk = 0.0;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 0.0, 0.001);
 
@@ -1366,44 +1427,43 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     int DayltgExtWin = 1;
     int Shaded = 2;
     int Unshaded = 1;
-    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
     EXPECT_GT(IWin, 0);
 
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
     RefPt = 2;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
+    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    SurfWinWindowModelType(IWin) = Window5DetailedModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
+    state->dataSurface->SurfWinWindowModelType(IWin) = Window5DetailedModel;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 5.0, 0.001);
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    SurfWinWindowModelType(IWin) = WindowBSDFModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowBSDFModel;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 }
-
 
 // Test for #7809: Daylighting:Controls has 10 ref points with fraction that do sum exactly to 1,
 // yet with double rounding errors it throws a severe about sum of fraction > 1.0
@@ -1544,8 +1604,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     bool foundErrors = false;
     HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
@@ -1553,39 +1618,41 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(10, state->dataDaylightingData->TotRefPoints);
 
-    DaylightingManager::GetDaylightingControls(*state, numObjs, foundErrors);
+    DaylightingManager::GetDaylightingControls(*state, foundErrors);
     // Used to throw
     //    ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.
     //    **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.00 of the zone.\n
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
 
-    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
-    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
+    EXPECT_TRUE(
+        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
-    EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
-    EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).LightControlSteps);
-    EXPECT_EQ(1.0, state->dataDaylightingData->ZoneDaylight(1).LightControlProbability);
+    EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
+    EXPECT_EQ(0.2, state->dataDaylightingData->daylightControl(1).MinLightFraction);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).LightControlSteps);
+    EXPECT_EQ(1.0, state->dataDaylightingData->daylightControl(1).LightControlProbability);
 
-    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).glareRefPtNumber);
-    EXPECT_EQ(180., state->dataDaylightingData->ZoneDaylight(1).ViewAzimuthForGlare);
-    EXPECT_EQ(20., state->dataDaylightingData->ZoneDaylight(1).MaxGlareallowed);
-    EXPECT_EQ(0, state->dataDaylightingData->ZoneDaylight(1).DElightGriddingResolution);
+    EXPECT_EQ(1, state->dataDaylightingData->daylightControl(1).glareRefPtNumber);
+    EXPECT_EQ(180., state->dataDaylightingData->daylightControl(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., state->dataDaylightingData->daylightControl(1).MaxGlareallowed);
+    EXPECT_EQ(0, state->dataDaylightingData->daylightControl(1).DElightGriddingResolution);
 
-    EXPECT_EQ(10, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
+    EXPECT_EQ(10, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
 
     std::vector<Real64> fractions({0.1053, 0.0936, 0.1213, 0.1018, 0.0893, 0.0842, 0.0882, 0.1026, 0.1134, 0.1003});
     Real64 sum(0.0);
     int i = 1;
-    for (auto frac: fractions) {
+    for (auto frac : fractions) {
         sum += frac;
-        EXPECT_EQ(i, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i));
-        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i), state->dataDaylightingData->DaylRefPt(state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i)).Name);
-        EXPECT_EQ(frac, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(i));
-        EXPECT_EQ(200., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(i));
+        EXPECT_EQ(i, state->dataDaylightingData->daylightControl(1).DaylRefPtNum(i));
+        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i),
+                  state->dataDaylightingData->DaylRefPt(state->dataDaylightingData->daylightControl(1).DaylRefPtNum(i)).Name);
+        EXPECT_EQ(frac, state->dataDaylightingData->daylightControl(1).FracZoneDaylit(i));
+        EXPECT_EQ(200., state->dataDaylightingData->daylightControl(1).IllumSetPoint(i));
         ++i;
     }
 
@@ -1595,7 +1662,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     // Yet, if you are being very litteral, then it's slightly more
     EXPECT_TRUE(sum > 1.0);
     EXPECT_FALSE(sum < 1.0);
-
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotAroundOne)
@@ -1655,8 +1721,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     bool foundErrors = false;
     HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
-    int numObjs = inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
@@ -1664,11 +1735,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(2, state->dataDaylightingData->TotRefPoints);
 
-    DaylightingManager::GetDaylightingControls(*state, numObjs, foundErrors);
+    DaylightingManager::GetDaylightingControls(*state, foundErrors);
 
     std::string const error_string = delimited_string({
-      "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
-      "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
+        "   ** Severe  ** GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is > 1.0.",
+        "   **   ~~~   ** ..discovered in Daylighting:Controls=\"WEST ZONE_DAYLCTRL\", trying to control 1.001 of the zone or space.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(foundErrors);
@@ -1734,6 +1805,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1750,6 +1822,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1767,6 +1840,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1783,6 +1857,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1799,6 +1874,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -1815,6 +1891,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1916,6 +1993,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1932,6 +2010,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1949,6 +2028,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1965,6 +2045,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1981,6 +2062,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -1997,6 +2079,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -2082,39 +2165,43 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    int constexpr HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->PreviousHour = 1;
@@ -2128,39 +2215,58 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
-
-    GetDaylightingParametersInput(*state);
-    compare_err_stream("");
-    EXPECT_EQ(4, state->dataDaylightingData->TotRefPoints);
-
-    EXPECT_NEAR(2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
-
-    DataHeatBalance::Zone(1).RelNorth = 45.;
-
-    GeometryTransformForDaylighting(*state);
-
-    EXPECT_NEAR(3.603, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
-
-    DataHeatBalance::Zone(1).RelNorth = 90.;
-
-    GeometryTransformForDaylighting(*state);
-
-    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
     // reset eio stream
     EXPECT_TRUE(has_eio_output(true));
+    GetDaylightingParametersInput(*state);
+    compare_err_stream("");
+    // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
+    std::string const delim = "\n";
+
+    std::string eiooutput = delimited_string(
+        {
+            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
+            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
+            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
+            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
+            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
+            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
+        },
+        delim);
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true)); // reset eio stream after compare
+    EXPECT_EQ(4, state->dataDaylightingData->TotRefPoints);
+
+    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+
+    state->dataHeatBal->Zone(1).RelNorth = 45.;
+
+    GeometryTransformForDaylighting(*state);
+
+    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+
+    state->dataHeatBal->Zone(1).RelNorth = 90.;
+
+    GeometryTransformForDaylighting(*state);
+
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+
     EXPECT_FALSE(has_dfs_output(true));
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -2170,141 +2276,137 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
     DayltgInteriorIllum(*state, zoneNum);
 
-    // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
-    std::string const delim = "\n";
-
-    std::string const eiooutput = delimited_string({
-        "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
-        "Zone/Window Adjacency Daylighting Counts, WEST ZONE,2,-1",
-        "Zone/Window Adjacency Daylighting Counts, EAST ZONE,2,-1",
-        "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
-        "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
-        "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
-        "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
-        " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-    }, delim);
+    eiooutput = delimited_string(
+        {
+            "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
+            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+        },
+        delim);
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    std::string const dfsoutput = delimited_string({
+    std::string const dfsoutput = delimited_string(
+        {
 
-        "This file contains daylight factors for all exterior windows of daylight zones.",
-        "MonthAndDay,Zone Name,Window Name,Window State",
-        "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky",
-        "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
-        "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "4,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "5,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "6,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "7,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "8,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "9,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "10,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "11,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "12,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "13,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "14,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "15,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "16,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "17,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "18,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "19,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "20,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "21,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
-        "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-    }, delim);
+            "This file contains daylight factors for all exterior windows of daylight zones.",
+            "MonthAndDay,Zone Name,Window Name,Window State",
+            "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight "
+            "Factor for Overcast Sky",
+            "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
+            "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "4,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "5,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "6,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "7,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "8,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "9,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "10,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "11,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "12,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "13,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "14,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "15,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "16,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "17,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "18,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "19,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "20,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "21,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
+            "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+        },
+        delim);
 
     EXPECT_TRUE(compare_dfs_stream(dfsoutput, true));
 }
@@ -2328,6 +2430,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2344,6 +2447,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2360,6 +2464,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2376,6 +2481,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2392,6 +2498,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Daylit Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2408,6 +2515,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Roof,                    !- Surface Type",
         "    CEILING IN ZONE,         !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Daylit Attic Floor,      !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2435,6 +2543,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2451,6 +2560,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2467,6 +2577,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2483,6 +2594,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2499,6 +2611,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Floor,                   !- Surface Type",
         "    CEILING IN ATTIC,        !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Daylit Ceiling,          !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2515,6 +2628,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Roof,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2827,42 +2941,90 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     bool foundErrors = false;
 
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-
+    int constexpr HoursInDay(24);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
+    EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    state->dataConstruction->Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);
     CalcDayltgCoefficients(*state);
 
     std::string const error_string = delimited_string({
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
+        "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be "
+        "modeled through the daylighting device.",
+        "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be "
+        "modeled through the daylighting device.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
+{
+    int MapNum = 1;
+    state->dataDaylightingManager->ReportIllumMap_firstTime = false;
+    state->dataDaylightingData->TotIllumMaps = 1;
+
+    state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
+    state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataDaylightingData->totDaylightingControls = 1;
+    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 3;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
+    state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
+    state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->IllumMap(MapNum).zoneIndex = 1;
+    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
+    state->dataDaylightingData->MapColSep = DataStringGlobals::CharSemicolon;
+    state->dataEnvrn->CurMnDyHr = "JAN012001";
+    state->dataDaylightingManager->SavedMnDy(1) = "JAN01";
+    state->dataGlobal->WarmupFlag = true;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1) = 1.23;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1) = 2.34;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1) = 3.45;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 2) = 4.56;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 2) = 5.67;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 2) = 6.78;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 3) = 7.89;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 3) = 8.90;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 3) = 9.01;
+    state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
+    state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
+
+    std::string expectedResultName = "ThisOne at 23.23m";
+    std::string expectedResultPtsHeader = " RefPt1=(1.23:2.34:3.45), RefPt2=(4.56:5.67:6.78), RefPt3=(7.89:8.90:9.01)";
+
+    DaylightingManager::ReportIllumMap(*state, MapNum);
+
+    EXPECT_EQ(expectedResultName, state->dataDaylightingData->IllumMap(1).Name);
+    EXPECT_EQ(expectedResultPtsHeader, state->dataDaylightingData->IllumMap(MapNum).pointsHeader);
 }

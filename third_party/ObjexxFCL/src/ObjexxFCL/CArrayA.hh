@@ -16,7 +16,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArrayA.fwd.hh>
 #include <ObjexxFCL/AlignedAllocator.hh>
-#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -101,7 +100,7 @@ public: // Creation
 	}
 
 	// Move Constructor
-	CArrayA( CArrayA && a ) NOEXCEPT :
+	CArrayA( CArrayA && a ) noexcept :
 	 size_( a.size_ ),
 	 mem_( a.mem_ ),
 	 data_( a.data_ )
@@ -260,7 +259,7 @@ public: // Assignment
 
 	// Move Assignment
 	CArrayA &
-	operator =( CArrayA && a ) NOEXCEPT
+	operator =( CArrayA && a ) noexcept
 	{
 		assert( this != &a );
 		destroy();

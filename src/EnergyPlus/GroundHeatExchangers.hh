@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -247,7 +248,6 @@ namespace GroundHeatExchangers {
         Real64 inletTemp;      // [degC]
         Real64 aveFluidTemp;   // [degC]
         Real64 QGLHE;          // [W] heat transfer rate
-        bool myFlag;
         bool myEnvrnFlag;
         bool gFunctionsExist;
         Real64 lastQnSubHr;
@@ -269,9 +269,9 @@ namespace GroundHeatExchangers {
         GLHEBase()
             : available(false), on(false), loopNum(0), loopSideNum(0), branchNum(0), compNum(0), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
               designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
-              aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0),
-              totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
-              updateCurSimTime(true), triggerDesignDayReset(false), needToSetupOutputVars(true)
+              aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0), totalTubeLength(0.0),
+              timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1), updateCurSimTime(true),
+              triggerDesignDayReset(false), needToSetupOutputVars(true)
         {
         }
 
@@ -301,7 +301,7 @@ namespace GroundHeatExchangers {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         virtual Real64 getGFunc(Real64) = 0;
 
@@ -316,6 +316,13 @@ namespace GroundHeatExchangers {
         void setupOutput(EnergyPlusData &state);
     };
 
+    enum class GFuncCalcMethod
+    {
+        Invalid = -1,
+        UniformHeatFlux,
+        UniformBoreholeWallTemp,
+    };
+
     struct GLHEVert : GLHEBase // LCOV_EXCL_LINE
     {
 
@@ -328,6 +335,7 @@ namespace GroundHeatExchangers {
         Real64 bhRadius;    // Radius of borehole {m}
         Real64 bhLength;    // Length of borehole {m}
         Real64 bhUTubeDist; // Distance between u-tube legs {m}
+        GFuncCalcMethod gFuncCalcMethod;
 
         // Parameters for the multipole method
         Real64 theta_1;
@@ -340,7 +348,9 @@ namespace GroundHeatExchangers {
         std::vector<Real64> GFNC_shortTimestep;
         std::vector<Real64> LNTTS_shortTimestep;
 
-        GLHEVert() : bhDiameter(0.0), bhRadius(0.0), bhLength(0.0), bhUTubeDist(0.0), theta_1(0.0), theta_2(0.0), theta_3(0.0), sigma(0.0)
+        GLHEVert()
+            : bhDiameter(0.0), bhRadius(0.0), bhLength(0.0), bhUTubeDist(0.0), gFuncCalcMethod(GFuncCalcMethod::Invalid), theta_1(0.0), theta_2(0.0),
+              theta_3(0.0), sigma(0.0)
         {
         }
 
@@ -352,14 +362,17 @@ namespace GroundHeatExchangers {
 
         Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
 
-        Real64
-        doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
 
         void calcShortTimestepGFunctions(EnergyPlusData &state);
 
         void calcLongTimestepGFunctions(EnergyPlusData &state);
 
         void calcGFunctions(EnergyPlusData &state) override;
+
+        void calcUniformHeatFluxGFunctions(EnergyPlusData &state);
+
+        void calcUniformBHWallTempGFunctions(EnergyPlusData &state);
 
         Real64 calcHXResistance(EnergyPlusData &state) override;
 
@@ -392,6 +405,12 @@ namespace GroundHeatExchangers {
         void combineShortAndLongTimestepGFunctions();
 
         void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
+
+        void setupTimeVectors();
     };
 
     struct GLHESlinky : GLHEBase // LCOV_EXCL_LINE
@@ -455,16 +474,19 @@ namespace GroundHeatExchangers {
         void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
 
         void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetGroundHeatExchangerInput(EnergyPlusData &state);
 
     std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorObjectFromArray(EnergyPlusData &state,
-                                                                                        std::shared_ptr<GLHEVertArray> const &arrayObjectPtr);
+                                                                                  std::shared_ptr<GLHEVertArray> const &arrayObjectPtr);
 
     std::shared_ptr<GLHEResponseFactors>
-    BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state,
-                                                  std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect);
+    BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect);
 
     void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF);
 

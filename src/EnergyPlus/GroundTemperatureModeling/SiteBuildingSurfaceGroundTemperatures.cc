@@ -65,7 +65,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:BuildingSurface factory
 std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -77,7 +77,6 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     // Reads input and creates instance of Site:GroundTemperature:BuildingSurface object
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
     // Locals
@@ -90,8 +89,9 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     // New shared pointer for this model object
     std::shared_ptr<SiteBuildingSurfaceGroundTemps> thisModel(new SiteBuildingSurfaceGroundTemps());
 
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteBuildingSurfaceGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    std::string const cCurrentModuleObject =
+        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteBuildingSurfaceGroundTemp));
+    int numCurrObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -99,7 +99,8 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
@@ -108,7 +109,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
 
         // Assign the ground temps to the variable
         for (int i = 1; i <= 12; ++i) {
-            thisModel->buildingSurfaceGroundTemps(i) = rNumericArgs(i);
+            thisModel->buildingSurfaceGroundTemps(i) = state.dataIPShortCut->rNumericArgs(i);
             if (thisModel->buildingSurfaceGroundTemps(i) < 15.0 || thisModel->buildingSurfaceGroundTemps(i) > 25.0) genErrorMessage = true;
         }
 
@@ -130,7 +131,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     write_ground_temps(state.files.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
         ShowContinueError(state, "Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");

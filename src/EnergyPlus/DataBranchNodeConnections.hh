@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 
 namespace EnergyPlus {
 
@@ -81,16 +82,16 @@ namespace DataBranchNodeConnections {
     struct NodeConnectionDef
     {
         // Members
-        int NodeNumber;             // Node number of this node connection
-        std::string NodeName;       // Node Name of this node connection
-        std::string ObjectType;     // Object/Component Type of this node connection
-        std::string ObjectName;     // Name of the Object/Component Type of this node connection
-        std::string ConnectionType; // Connection Type (must be valid) for this node connection
-        int FluidStream;            // Fluid Stream for this node connection
-        bool ObjectIsParent;        // Indicator whether the object is a parent or not
+        int NodeNumber;                                // Node number of this node connection
+        std::string NodeName;                          // Node Name of this node connection
+        std::string ObjectType;                        // Object/Component Type of this node connection
+        std::string ObjectName;                        // Name of the Object/Component Type of this node connection
+        std::string ConnectionType;                    // Connection Type (must be valid) for this node connection
+        NodeInputManager::compFluidStream FluidStream; // Fluid Stream for this node connection
+        bool ObjectIsParent;                           // Indicator whether the object is a parent or not
 
         // Default Constructor
-        NodeConnectionDef() : NodeNumber(0), FluidStream(0), ObjectIsParent(false)
+        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::compFluidStream::Unassigned), ObjectIsParent(false)
         {
         }
     };
@@ -126,10 +127,11 @@ namespace DataBranchNodeConnections {
 
 } // namespace DataBranchNodeConnections
 
-struct BranchNodeConnectionsData : BaseGlobalStruct {
+struct BranchNodeConnectionsData : BaseGlobalStruct
+{
 
-    int NumCompSets = 0;                // Number of Component Sets found in branches
-    int NumNodeConnectionErrors = 0;    // Count of node connection errors
+    int NumCompSets = 0;             // Number of Component Sets found in branches
+    int NumNodeConnectionErrors = 0; // Count of node connection errors
     int NumOfNodeConnections = 0;
     int MaxNumOfNodeConnections = 0;
     int NodeConnectionAlloc = 1000;

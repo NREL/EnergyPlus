@@ -36,7 +36,7 @@ void read_battery_state(const battery_state& state, var_table* vt);
 
 class cm_battery_stateful : public compute_module {
 public:
-    double dt_hour;
+    double dt_hr;
     enum MODE {
         CURRENT, POWER
     };

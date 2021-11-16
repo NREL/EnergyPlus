@@ -374,6 +374,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -445,7 +446,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
-    EnergyPlus::createFacilityElectricPowerServiceObject();
+    EnergyPlus::createFacilityElectricPowerServiceObject(*state);
 
     SizingManager::ManageSizing(*state);
 
@@ -476,5 +477,4 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtUserDesAirFlow, "WEST ZONE"));
     EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtDesDay, "WEST ZONE"));
     EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtPkTime, "WEST ZONE"));
-
 }

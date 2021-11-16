@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
@@ -69,6 +68,13 @@ struct EnergyPlusData;
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
 {
+
+    static int constexpr maxYearsToIterate = 10;
+
+    Real64 rhoCp_soil_liq_1;
+    Real64 rhoCP_soil_liq;
+    Real64 rhoCP_soil_transient;
+    Real64 rhoCP_soil_ice;
 
 public:
     Real64 baseConductivity;
@@ -131,7 +137,8 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel>
+    FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName);
 
     void getWeatherData(EnergyPlusData &state);
 
@@ -139,31 +146,31 @@ public:
 
     void developMesh();
 
-    void performSimulation(EnergyPlusData& state);
+    void performSimulation(EnergyPlusData &state);
 
-    void updateSurfaceCellTemperature();
+    void updateSurfaceCellTemperature(EnergyPlusData &state);
 
     void updateGeneralDomainCellTemperature(int const cell);
 
     void updateBottomCellTemperature();
 
-    void initDomain(EnergyPlusData& state);
+    void initDomain(EnergyPlusData &state);
 
-    bool checkFinalTemperatureConvergence();
+    bool checkFinalTemperatureConvergence(EnergyPlusData &state);
 
     bool checkIterationTemperatureConvergence();
 
     void updateIterationTemperatures();
 
-    void updateTimeStepTemperatures();
+    void updateTimeStepTemperatures(EnergyPlusData &state);
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp(EnergyPlusData& state) override;
+    Real64 getGroundTemp(EnergyPlusData &state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
@@ -179,7 +186,6 @@ public:
         surfaceCoverType_shortGrass = 2,
         surfaceCoverType_longGrass = 3
     };
-
 };
 
 } // namespace EnergyPlus

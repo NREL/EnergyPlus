@@ -1137,6 +1137,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      nodiff=.false.
                    END IF
                  END DO
+			
+			 CASE('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.true.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(InArgs(3)).eq.'AIRTERMINAL:SINGLEDUCT:UNCONTROLLED') THEN
+                    OutArgs(3)='AirTerminal:SingleDuct:ConstantVolume:NoReheat'
+                  END IF
+
 
               ! If your original object starts with P, insert the rules here
 

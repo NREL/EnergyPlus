@@ -156,9 +156,12 @@ protected:
     int last_month_init;
     size_t nyears;
 
+    // Load: total net energy from the grid over the month
 	std::vector<double> m_monthly_load_forecast; // Length is 12 * analysis period
+    // gen: total net energy to the grid (generation) over the month
 	std::vector<double> m_monthly_gen_forecast; // Length is 12 * analysis period
-	std::vector<double> m_monthly_peak_forecast; // Length is 12 * analysis period
+    // Avg load: the average gross load (no gen) over the month. Used to establish a floor for peak shaving costs
+	std::vector<double> m_monthly_avg_load_forecast; // Length is 12 * analysis period
 
 
 };

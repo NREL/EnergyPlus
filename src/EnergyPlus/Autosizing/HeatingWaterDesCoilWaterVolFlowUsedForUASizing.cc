@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -80,10 +81,10 @@ Real64 HeatingWaterDesCoilWaterVolFlowUsedForUASizer::size(EnergyPlusData &state
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
-        coilSelectionReportObj->setCoilWaterFlowPltSizNum(
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
         if (this->termUnitSingDuct || this->zoneEqFanCoil || ((this->termUnitPIU || this->termUnitIU) && this->curTermUnitSizingNum > 0)) {
-            coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
         }
     }
     return this->autoSizedValue;

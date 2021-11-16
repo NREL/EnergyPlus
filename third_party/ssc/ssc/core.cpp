@@ -64,12 +64,15 @@ bool compute_module::compute(handler_interface *handler, var_table *data) {
     try { // catch any 'general_error' that can be thrown during precheck, exec, and postcheck
 
         if (!evaluate()) return false;    // This can be enabled when we want automatic updating of interdependent-inputs
-        if (!verify("precheck input", SSC_INPUT)) return false;
+        // if (!verify("precheck input", SSC_INPUT)) return false;
         exec();
-        if (!verify("postcheck output", SSC_OUTPUT)) return false;
+        // if (!verify("postcheck output", SSC_OUTPUT)) return false;
 
     } catch (general_error &e) {
         log(e.err_text, SSC_ERROR, e.time);
+        return false;
+    } catch (std::exception &e) {
+        log("compute fail(" + name + "): " + e.what(), SSC_ERROR, -1);
         return false;
     }
 

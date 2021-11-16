@@ -71,7 +71,7 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, RunPeriod_Defaults)
 {
     RunPeriodData runperiod;
-    EXPECT_EQ(WeatherManager::WeekDay::Sunday, runperiod.startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Sunday, runperiod.startWeekDay));
 
     EXPECT_EQ(1, runperiod.startMonth);
     EXPECT_EQ(1, runperiod.startDay);
@@ -202,42 +202,42 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Monday, state->dataWeatherManager->RunPeriodInput[0].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Monday, state->dataWeatherManager->RunPeriodInput[0].startWeekDay));
     EXPECT_EQ(2016, state->dataWeatherManager->RunPeriodInput[0].startYear);
     EXPECT_EQ(2457448, state->dataWeatherManager->RunPeriodInput[0].startJulianDate);
     EXPECT_EQ(2457451, state->dataWeatherManager->RunPeriodInput[0].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, state->dataWeatherManager->RunPeriodInput[1].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Wednesday, state->dataWeatherManager->RunPeriodInput[1].startWeekDay));
     EXPECT_EQ(2012, state->dataWeatherManager->RunPeriodInput[1].startYear);
     EXPECT_EQ(2455987, state->dataWeatherManager->RunPeriodInput[1].startJulianDate);
     EXPECT_EQ(2455990, state->dataWeatherManager->RunPeriodInput[1].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Thursday, state->dataWeatherManager->RunPeriodInput[2].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Thursday, state->dataWeatherManager->RunPeriodInput[2].startWeekDay));
     EXPECT_EQ(2015, state->dataWeatherManager->RunPeriodInput[2].startYear);
     EXPECT_EQ(2457024, state->dataWeatherManager->RunPeriodInput[2].startJulianDate);
     EXPECT_EQ(2457388, state->dataWeatherManager->RunPeriodInput[2].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Sunday, state->dataWeatherManager->RunPeriodInput[3].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Sunday, state->dataWeatherManager->RunPeriodInput[3].startWeekDay));
     EXPECT_EQ(2017, state->dataWeatherManager->RunPeriodInput[3].startYear);
     EXPECT_EQ(2457755, state->dataWeatherManager->RunPeriodInput[3].startJulianDate);
     EXPECT_EQ(2458119, state->dataWeatherManager->RunPeriodInput[3].endJulianDate);
     // This is the default, check that it works properly
-    std::array<Real64, 12> startDays{ {1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6} };
+    std::array<Real64, 12> startDays{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}};
     for (size_t i = 0; i < 12; ++i) {
         EXPECT_EQ(startDays[i], state->dataWeatherManager->RunPeriodInput[3].monWeekDay[i]);
     }
 
-    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, state->dataWeatherManager->RunPeriodInput[4].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Wednesday, state->dataWeatherManager->RunPeriodInput[4].startWeekDay));
     EXPECT_EQ(2010, state->dataWeatherManager->RunPeriodInput[4].startYear);
     EXPECT_EQ(2455427, state->dataWeatherManager->RunPeriodInput[4].startJulianDate);
     EXPECT_EQ(2455562, state->dataWeatherManager->RunPeriodInput[4].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Saturday, state->dataWeatherManager->RunPeriodInput[5].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Saturday, state->dataWeatherManager->RunPeriodInput[5].startWeekDay));
     EXPECT_EQ(1992, state->dataWeatherManager->RunPeriodInput[5].startYear);
     EXPECT_EQ(2448682, state->dataWeatherManager->RunPeriodInput[5].startJulianDate);
     EXPECT_EQ(2448988, state->dataWeatherManager->RunPeriodInput[5].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Friday, state->dataWeatherManager->RunPeriodInput[6].startWeekDay);
+    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Friday, state->dataWeatherManager->RunPeriodInput[6].startWeekDay));
     EXPECT_EQ(2016, state->dataWeatherManager->RunPeriodInput[6].startYear);
     EXPECT_EQ(2457389, state->dataWeatherManager->RunPeriodInput[6].startJulianDate);
     EXPECT_EQ(2458940, state->dataWeatherManager->RunPeriodInput[6].endJulianDate);
@@ -274,7 +274,8 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
 }
 
 // Test for #6937: this tests that whenever the RunPeriod doesn't have a name, it should be rejected
-TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
+TEST_F(EnergyPlusFixture, RunPeriod_NoName)
+{
 
     // Doesn't have a name, InputProcessor should reject it
     std::string const idf_objects = delimited_string({
@@ -298,10 +299,9 @@ TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
     ASSERT_FALSE(process_idf(idf_objects, false));
 
     std::string const error_string =
-        delimited_string({
-            "   ** Severe  ** <root>[RunPeriod] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: ''.",
-            "   ** Severe  ** <root>[RunPeriod] - Object name is required and cannot be blank or whitespace"
-        });
+        delimited_string({"   ** Severe  ** <root>[RunPeriod] - Object contains a property that could not be validated using 'properties' or "
+                          "'additionalProperties' constraints: ''.",
+                          "   ** Severe  ** <root>[RunPeriod] - Object name is required and cannot be blank or whitespace"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
@@ -338,11 +338,10 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         // This should just issue a warning
         EXPECT_FALSE(ErrorsFound);
 
-        std::string const error_string =
-            delimited_string({"   ** Warning ** RunPeriod: object=JAN, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
+        std::string const error_string = delimited_string(
+            {"   ** Warning ** RunPeriod: object=JAN, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
-
     }
 
     // Case 2: has a name, but starts on 2/29 on a non-leap year.
@@ -373,14 +372,11 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         // This should issue a severe
         EXPECT_TRUE(ErrorsFound);
 
-        std::string const error_string =
-            delimited_string({"   ** Severe  ** RunPeriod: object=NOTLEAP, start year (2005) is not a leap year but the requested start date is 2/29."});
+        std::string const error_string = delimited_string(
+            {"   ** Severe  ** RunPeriod: object=NOTLEAP, start year (2005) is not a leap year but the requested start date is 2/29."});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
-
     }
-
-
 }
 
 // Side issue discovered in #6937: The parsing of SizingPeriod:WeatherFileDays and WeatherFileConditionType references RunPeriod array
@@ -410,35 +406,33 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
         // This should just issue a severe
         EXPECT_TRUE(ErrorsFound);
 
-        std::string const error_string =
-            delimited_string({"   ** Severe  ** SizingPeriod:WeatherFileDays: object=WEATHER FILE SIZING PERIOD Begin Day of Month invalid (Day of Month) [31]"});
+        std::string const error_string = delimited_string(
+            {"   ** Severe  ** SizingPeriod:WeatherFileDays: object=WEATHER FILE SIZING PERIOD Begin Day of Month invalid (Day of Month) [31]"});
 
         EXPECT_TRUE(compare_err_stream(error_string, true));
-
     }
 }
 
 TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
 {
-    std::string const idf_objects = delimited_string({
-        "SimulationControl, NO, NO, NO, YES, YES;",
-        "Timestep,4;",
-        "RunPeriod,",
-        "RP3,                     !- Name",
-        "1,                       !- Begin Month",
-        "1,                       !- Begin Day of Month",
-        "2019,                    !- Begin Year",
-        "12,                      !- End Month",
-        "31,                      !- End Day of Month",
-        ",                        !- End Year",
-        ",                        !- Day of Week for Start Day",
-        "Yes,                     !- Use Weather File Holidays and Special Days",
-        "Yes,                     !- Use Weather File Daylight Saving Period",
-        "No,                      !- Apply Weekend Holiday Rule",
-        "Yes,                     !- Use Weather File Rain Indicators",
-        "Yes;                     !- Use Weather File Snow Indicators",
-        "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;"
-    });
+    std::string const idf_objects =
+        delimited_string({"SimulationControl, NO, NO, NO, YES, YES;",
+                          "Timestep,4;",
+                          "RunPeriod,",
+                          "RP3,                     !- Name",
+                          "1,                       !- Begin Month",
+                          "1,                       !- Begin Day of Month",
+                          "2019,                    !- Begin Year",
+                          "12,                      !- End Month",
+                          "31,                      !- End Day of Month",
+                          ",                        !- End Year",
+                          ",                        !- Day of Week for Start Day",
+                          "Yes,                     !- Use Weather File Holidays and Special Days",
+                          "Yes,                     !- Use Weather File Daylight Saving Period",
+                          "No,                      !- Apply Weekend Holiday Rule",
+                          "Yes,                     !- Use Weather File Rain Indicators",
+                          "Yes;                     !- Use Weather File Snow Indicators",
+                          "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);

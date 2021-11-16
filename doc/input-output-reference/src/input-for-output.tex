@@ -273,11 +273,11 @@ This report content is added to the ``eplusout.edd'' file. It shows information 
 
 \paragraph{Field: Actuator Availability Dictionary Reporting}\label{field-actuator-availability-dictionary-reporting}
 
-This field is used to control the level of output reporting related to the EMS actuators that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible actuators that the EMS could use. (To actually use them requires an \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator} object). Actuator availability dictionary reporting is provided to show the user what actuators are available in a particular building model. Regardless of the level of reporting chosen here, the same set of actuators are actually available. There are three levels to choose from. The ``None'' choice means that no reporting of available actuators is done. The ``NotByUniqueNames'' level means that the output includes only the types of actuators and their control options but not the unique, user-defined names that identify a specific actuator in the model. The ``Verbose'' level means that the output includes all combinations of actuator types, control types, and the unique names of specific actuators. The verbose level provides all the information needed for input in an \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator} input object.
+This field is used to control the level of output reporting related to the EMS actuators that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible actuators that the EMS could use. (To actually use them requires an \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator} object). Actuator availability dictionary reporting is provided to show the user what actuators are available in a particular building model. Regardless of the level of reporting chosen here, the same set of actuators are actually available. There are three levels to choose from. The ``None'' choice means that no reporting of available actuators is done. The ``NotByUniqueKeyNames'' level means that the output includes only the types of actuators and their control options but not the unique, user-defined names that identify a specific actuator in the model. The ``Verbose'' level means that the output includes all combinations of actuator types, control types, and the unique names of specific actuators. The verbose level provides all the information needed for input in an \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator} input object.
 
 \paragraph{Field: Internal Variable Availability Dictionary Reporting}\label{field-internal-variable-availability-dictionary-reporting}
 
-This field is used to control the level of output reporting related to the EMS internal variables that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible internal data sources that the EMS could use. (To actually use them requires an \hyperref[energymanagementsysteminternalvariable]{EnergyManagementSystem:InternalVariable} object). Internal variable availability dictionary reporting is provided to show the user what internal data are available. Regardless of the level of reporting chosen here, the same internal data are available. There are three levels to choose from. The ``None'' choice means that no reporting of available internal data is done. The ``NotByUniqueNames'' level means that the output includes only the types of internal data but not the unique names that identify a specific instances in the model. The ``Verbose'' level means that the output includes all combinations of internal variables and the unique names of specific instances. The verbose level provides all the information needed for an \hyperref[energymanagementsysteminternalvariable]{EnergyManagementSystem:InternalVariable} input object.
+This field is used to control the level of output reporting related to the EMS internal variables that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible internal data sources that the EMS could use. (To actually use them requires an \hyperref[energymanagementsysteminternalvariable]{EnergyManagementSystem:InternalVariable} object). Internal variable availability dictionary reporting is provided to show the user what internal data are available. Regardless of the level of reporting chosen here, the same internal data are available. There are three levels to choose from. The ``None'' choice means that no reporting of available internal data is done. The ``NotByUniqueKeyNames'' level means that the output includes only the types of internal data but not the unique names that identify a specific instances in the model. The ``Verbose'' level means that the output includes all combinations of internal variables and the unique names of specific instances. The verbose level provides all the information needed for an \hyperref[energymanagementsysteminternalvariable]{EnergyManagementSystem:InternalVariable} input object.
 
 \paragraph{Field: EnergyPlus Runtime Language Debug Output Level}\label{field-energyplus-runtime-language-debug-output-level}
 
@@ -427,28 +427,24 @@ The cumulative meter outputs (\hyperref[outputmetercumulative-and-outputmetercum
 
 Meter names applicable for the simulation are shown on the Variable Dictionary Report contained in the \textbf{eplusout.mdd} file described in the Output Details and Examples document.
 
-Meter names are of three forms:
+Meter names are one of six forms:
 
 \begin{itemize}
-\tightlist
 \item
-  \textless{}ResourceType\textgreater{}:\textless{}name\textgreater{}
+  \textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}
+\item
+  \textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}
+\item
+  \textless{}EndUseSubcategory\textgreater{}:\textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}
 \end{itemize}
-
-Or
-
+The following forms apply only for GroupType = Zone or SpaceType:
 \begin{itemize}
-\tightlist
 \item
-  \textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}name\textgreater{}
-\end{itemize}
-
-Or
-
-\begin{itemize}
-\tightlist
+  \textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}:\textless{}name\textgreater{}
 \item
-  \textless{}EndUseSubcategory\textgreater{}:\textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}name\textgreater{}.
+  \textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}:\textless{}name\textgreater{}
+\item
+  \textless{}EndUseSubcategory\textgreater{}:\textless{}EndUseType\textgreater{}:\textless{}ResourceType\textgreater{}:\textless{}GroupType\textgreater{}:\textless{}name\textgreater{}
 \end{itemize}
 
 The user requests reporting by either specifying the full name above (without Units) or a ``wildcard'' representation of that name (to obtain all meters of a type). For example, entering ``Electricity:*'' for the meter name will report on all the Electricity: meters (Electricity:Facility, Electricity:Building, Electricity:Zone:Resistive Zone, Electricity:Zone:East Zone, Electricity:North Zone in the example above). Both the resource types and end-use types are set within the program by the developers. End-use subcategories are user-defined and are an input field for certain objects.
@@ -466,7 +462,7 @@ Output:Meter,Electricity:Facility;
 Output:Meter,Electricity:Building;
 Output:Meter,Electricity:Zone:South Zone;
 Output:Meter,Electricity:Zone:East Zone;
-Output:Meter,Electricity:North Zone;
+Output:Meter,Electricity:SpaceType:Office;
 \end{lstlisting}
 
 From a three zone file that had no HVAC electricity (i.e., had only electric equipment or lighting equipment in an uncontrolled three zone building).
@@ -577,31 +573,32 @@ HeatRecoveryForHeating \tabularnewline
 \bottomrule
 \end{longtable}
 
-Specific meter types are then used for grouping the fuel type meters:
+Specific meter types are then used for grouping the resource type meters:
 
 % table 40
 \begin{longtable}[c]{@{}l@{}}
-\caption{Overall Meter Types \label{table:overall-meter-types}} \tabularnewline
+\caption{Meter Group Types \label{table:overall-meter-types}} \tabularnewline
 \toprule
-Meters \tabularnewline
+Groups \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Overall Meter Types} \tabularnewline
+\caption[]{Meter Group Types} \tabularnewline
 \toprule
-Meters \tabularnewline
+Groups \tabularnewline
 \midrule
 \endhead
 
 Facility \tabularnewline
 Building \tabularnewline
 Zone \tabularnewline
+SpaceType \tabularnewline
 HVAC \tabularnewline
 Plant \tabularnewline
 \bottomrule
 \end{longtable}
 
-Facility meters contain all the energy of a fuel type. Building meters contain the sum of each zone's energy. HVAC meters contain the energy from the air and zone HVAC system components. Plant meters contain the energy from the plant equipment.
+Facility meters contain all the energy of a fuel type. Building meters contain the sum of each zone's energy. Zone and SpaceType meters are overlapping components of the Building meters. HVAC meters contain the energy from the air and zone HVAC system components. Plant meters contain the energy from the plant equipment.
 
 Thus, the following relationships should be observed:
 
@@ -610,7 +607,7 @@ Facility = \sum {\left( {Building + HVAC + Plant + Exterior} \right)}
 \end{equation}
 
 \begin{equation}
-Building = \sum\limits_1^{NumberOfZones} {Zone}
+Building = \sum\limits_1^{NumberOfZones} {Zone} = \sum\limits_1^{NumberOfSpaceTypes} {SpaceType}
 \end{equation}
 
 There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always positive, (2) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always positive, and (3) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative.
@@ -2081,10 +2078,89 @@ Output from EnergyPlus can be written to SQLite files for manipulation outside s
 
 Currently, there are limited capabilities for specifying SQLite generation.~ The Simple option will include all of the predefined database tables as well as time series related data.~ Using the SimpleAndTabular choice adds database tables related to the tabular reports that are already output by EnergyPlus in other formats.~ The description for SQLite outputs is described fully in the Output Details document.
 
-And one includes it in the IDF using the following.
+\paragraph{Field: Tabular Unit Conversion}\label{field-tabular-unit-conversion}
 
+This field determines if any unit conversions will be performed for the values in the tabular reports when the Option field is set to SimpleAndTabular. These conversions are only applied to the tabular reports in the SQL file. No conversions are applied to the time series data and predefined database tables generated by the Simple option (see the list in Table \ref{table:tabular_unit_conversion_list}).
+
+This field is optional and, if not specified, defaults to UseOutputControlTableStyle which uses the same unit conversion that appears in the OutputControl:Table:Style object. Five different input options are available:
+
+\begin{itemize}
+\item 
+UseOutputControlTableStyle -- use the same unit conversion as in OutputControl:Table:Style
+\item 
+None -- no conversions performed
+\item 
+JtoKWH -- Joules converted into kWh (1 / 3,600,000)
+\item 
+JtoMJ -- Joules converted into Megajoules (1 / 1,000,000)
+\item
+JtoGJ -- Joules converted into Gigajoules (1 / 1,000,000,000)
+\item 
+InchPound -- convert all annual, monthly, economics and timebins tabular values to common InchPound equivalent
+\end{itemize}
+
+The JtoKWH, JtoMJ and JtoGJ unit conversion input option applies only to the Output:Table:Monthly reports and partially to the ABUPS report. For ABUPS, the JtoKWH option changes the report but the JtoMJ and JtoGJ options do not change the report since it is already in MJ/m2 and GJ. In addition, the JtoKWH option also changes results in the LEED Summary report changing GJ to kWh and MJW/m2 to kWh/m2. The InchPound unit conversion input option applies to all annual, monthly, timebins and economic reports that appear in the SQL file. 
+
+Since the Output:SQLite tabular unit conversion setting act on the Tabular reports only, the other SQLite reporting will not affected by this unit conversion setting. The table below lists the affected SQLite tabular tables. 
+ 
+% table X
+{\scriptsize
+\begin{longtable}[c]{p{4in}p{1in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+% \begin{longtable}[c]{cccccccrr}
+\caption{SQLite Tables Affected by the Tabular Unit Conversions\label{table:tabular_unit_conversion_list}} \tabularnewline
+\toprule
+Table Name & Affected or Not \tabularnewline
+\midrule
+\endfirsthead
+
+TabularData & Yes \tabularnewline
+TabularDatawithString & Yes \tabularnewline
+ComponentSizes & No \tabularnewline
+ConstructionLayers & No \tabularnewline
+Constructions & No  \tabularnewline
+DaylightMapHourlyData & No \tabularnewline
+DaylightMapHourlyReports & No \tabularnewline
+DaylightMaps & No \tabularnewline
+EnvironmentPeriods & No \tabularnewline
+Errors & No \tabularnewline
+Materials & No \tabularnewline
+NominalBaseboardHeaters & No \tabularnewline
+NominalElectricEquipment & No \tabularnewline
+NominalGasEquipment & No \tabularnewline
+NominalHotwaterEquipment & No \tabularnewline
+NominalInfiltration & No \tabularnewline
+NominalLighting & No \tabularnewline
+NominalOtherEquipment & No\tabularnewline
+NominalPeople & No \tabularnewline
+NominalSteamEquipment & No \tabularnewline
+ReportData & No \tabularnewline
+ReportDataDictionary & No \tabularnewline
+ReportExtendedData & No \tabularnewline
+RoomAirModels & No \tabularnewline
+Schedules & No \tabularnewline
+Simulations & No \tabularnewline
+StringTypes & No \tabularnewline
+Strings & No \tabularnewline
+Surfaces & No \tabularnewline
+SystemSizes & No \tabularnewline
+% TabularData & Yes \tabularnewline
+Time & No \tabularnewline
+ZoneGroups & No \tabularnewline
+ZoneInfoZoneLists & No \tabularnewline
+ZoneLists & No \tabularnewline
+ZoneSizes & No \tabularnewline
+Zones & No \tabularnewline
+
+\bottomrule
+\end{longtable}
+}
+
+An example IDF input object follows.
 \begin{lstlisting}
-Output:SQLite, Simple;
+Output:SQLite,
+   SimpleAndTabular,    !- Option Type
+   InchPound;           !- Unit Conversion
 \end{lstlisting}
 
 \subsection{OutputControl:Files}\label{outputcontrolfiles}

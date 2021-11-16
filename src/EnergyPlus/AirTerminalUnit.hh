@@ -119,7 +119,7 @@ protected: // Assignment
     AirTerminalUnit &operator=(AirTerminalUnit &&) = default;
 #endif
 
-public:                                                  // Methods
+public: // Methods
     virtual void simulate(EnergyPlusData &state,
                           bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                           Real64 &NonAirSysOutput        // convective cooling by the beam system [W]

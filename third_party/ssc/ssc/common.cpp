@@ -57,7 +57,7 @@ var_info vtab_battery_replacement_cost[] = {
 { SSC_INPUT, SSC_NUMBER , "battery_per_kWh"                      , "Battery cost"                                                   , "$/kWh"                                  , ""                                      , "BatterySystem"              , "?=0.0"          , ""                      , ""},
 { SSC_INPUT, SSC_NUMBER , "batt_computed_bank_capacity"          , "Battery bank capacity"                                          , "kWh"                                    , ""                                      , "BatterySystem"              , "?=0.0"          , ""                      , ""},
 { SSC_OUTPUT, SSC_ARRAY , "cf_battery_replacement_cost"          , "Battery replacement cost"                                       , "$"                                      , ""                                      , "Cash Flow"            , "*"              , ""                      , ""},
-{ SSC_OUTPUT, SSC_ARRAY , "cf_battery_replacement_cost_schedule" , "Battery replacement cost schedule"                              , "$/kWh"                                  , ""                                      , "Cash Flow"            , "*"              , ""                      , ""},
+{ SSC_OUTPUT, SSC_ARRAY , "cf_battery_replacement_cost_schedule" , "Battery replacement cost schedule"                              , "$"                                  , ""                                      , "Cash Flow"            , "*"              , ""                      , ""},
 var_info_invalid };
 
 var_info vtab_financial_grid[] = {
@@ -1222,19 +1222,27 @@ double shading_factor_calculator::dc_shade_factor()
 //HOWEVER, the year value may vary (i.e., TMY) so only checking month, day, hour, minute timesteps, not actual year vector
 bool weatherdata::check_continuous_single_year(bool leapyear)
 {
+    //first, set up some timestep variables
 	int ts_per_hour = 0; //determine the number of timesteps in each hour
 	if (leapyear)
 		ts_per_hour = (int)(m_nRecords / 8784);
 	else
 		ts_per_hour = (int)(m_nRecords / 8760);
 	double ts_min = 60. / ts_per_hour; //determine the number of minutes of each timestep
+
+    //next, check if the data has leap day (feb 29). need to do this because some tools pass in 8760 data that contains feb 29 and not dec 31
+    bool has_leapday = false;
+    int leapDayNoon = 1429 * ts_per_hour; //look for the index of noon on leap day. noon on leap day is hour 1429 of the year
+    if (this->m_data[leapDayNoon]->month == 2 && this->m_data[leapDayNoon]->day == 29) //check noon on what would be feb 29 if it's in the data
+        has_leapday = true;
+
+    //last, go through each index in order and make sure that the timestamps all correspond to a single, serially complete year with even timesteps
 	int idx = 0; // index to keep track of where we are in the timestamp vectors
-	// now, check that the month, hour, day, and minute vectors are consistent with a single, continuous year with an
-	// even timestep that starts on jan 1 and ends dec 31
 	for (int m = 1; m <= 12; m++)
 	{
 		int daymax = util::days_in_month(m - 1);
-		if (m == 2 && leapyear) daymax = 29; //make sure to account for leap day in Feb
+		if (m == 2 && has_leapday) daymax = 29; //make sure to account for leap day in Feb if it's in the data
+        if (m == 12 && has_leapday && !leapyear) daymax = 30; //if the data is 8760 but has Feb 29, then it won't have Dec 31
 		for (int d = 1; d <= daymax; d++)
 		{
 			for (int h = 0; h < 24; h++)
@@ -1242,8 +1250,11 @@ bool weatherdata::check_continuous_single_year(bool leapyear)
 				double min = this->m_data[idx]->minute;
 				for (int tsph = 0; tsph < ts_per_hour; tsph++)
 				{
-					min += tsph * ts_min;
-					//if any of the month, day, hour, or minute don't line up with what we've calculated, then it doesn't fit our criteria for a continuous year
+                    //first check that the index isn't out of bounds
+                    if (idx > m_nRecords - 1)
+                        return false;
+                    //if any of the month, day, hour, or minute don't line up with what we've calculated, then it doesn't fit our criteria for a continuous year
+                    min += tsph * ts_min;
 					if (this->m_data[idx]->month != m || this->m_data[idx]->day != d || this->m_data[idx]->hour != h
 					    || this->m_data[idx]->minute != min)
 						return false;

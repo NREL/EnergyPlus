@@ -65,7 +65,6 @@ namespace EnergyPlus {
 namespace PlantManager {
     using namespace DataPlant;
     using namespace DataLoopNode;
-    using namespace ObjexxFCL;
     using namespace DataSizing;
     using namespace ScheduleManager;
     using namespace SetPointManager;
@@ -76,7 +75,7 @@ namespace PlantManager {
         state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
         state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 5;
         state->dataPlnt->PlantLoop(1).CirculationTime = 2;
-        state->dataPlnt->PlantLoop(1).FluidType = NodeType_Water;
+        state->dataPlnt->PlantLoop(1).FluidType = DataLoopNode::NodeFluidType::Water;
         state->dataPlnt->PlantLoop(1).FluidIndex = 1;
         SizePlantLoop(*state, 1, true);
         int TestVolume = 600;

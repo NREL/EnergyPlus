@@ -128,16 +128,18 @@ namespace BranchInputManager {
     struct BranchData
     {
         // Members
-        std::string Name;                 // Name for this Branch
-        std::string AssignedLoopName;     // Loop Name for this branch
-        DataBranchAirLoopPlant::PressureCurveType PressureCurveType;            // Integer index of pressure curve type
-        int PressureCurveIndex;           // Integer index of pressure curve
-        int FluidType;                    // Fluid type (see DataLoopNode)
-        int NumOfComponents;              // Number of Components on this Branch
-        Array1D<ComponentData> Component; // Component definitions for each component
+        std::string Name;                                            // Name for this Branch
+        std::string AssignedLoopName;                                // Loop Name for this branch
+        DataBranchAirLoopPlant::PressureCurveType PressureCurveType; // Integer index of pressure curve type
+        int PressureCurveIndex;                                      // Integer index of pressure curve
+        DataLoopNode::NodeFluidType FluidType;                       // Fluid type (see DataLoopNode)
+        int NumOfComponents;                                         // Number of Components on this Branch
+        Array1D<ComponentData> Component;                            // Component definitions for each component
 
         // Default Constructor
-        BranchData() : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
+        BranchData()
+            : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0),
+              FluidType(DataLoopNode::NodeFluidType::blank), NumOfComponents(0)
         {
         }
 
@@ -194,37 +196,38 @@ namespace BranchInputManager {
     int NumBranchesInBranchList(EnergyPlusData &state, std::string const &BranchListName);
 
     void GetBranchData(EnergyPlusData &state,
-                       std::string const &LoopName,         // Loop Name of this Branch
-                       std::string const &BranchName,       // Requested Branch Name
-                       DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of a pressure curve object
-                       int &PressCurveIndex,                // Index of a pressure curve object
-                       int &NumComps,                       // Number of Components on Branch
-                       Array1D_string &CompType,            // Component Type for each item on Branch
-                       Array1D_string &CompName,            // Component Name for each item on Branch
-                       Array1D_string &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
-                       Array1D_int &CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
-                       Array1D_string &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
-                       Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
+                       std::string const &LoopName,                               // Loop Name of this Branch
+                       std::string const &BranchName,                             // Requested Branch Name
+                       DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of a pressure curve object
+                       int &PressCurveIndex,                                      // Index of a pressure curve object
+                       int &NumComps,                                             // Number of Components on Branch
+                       Array1D_string &CompType,                                  // Component Type for each item on Branch
+                       Array1D_string &CompName,                                  // Component Name for each item on Branch
+                       Array1D_string &CompInletNodeNames,                        // Component Inlet Node IDs for each item on Branch
+                       Array1D_int &CompInletNodeNums,                            // Component Inlet Node Numbers for each item on Branch
+                       Array1D_string &CompOutletNodeNames,                       // Component Outlet Node IDs for each item on Branch
+                       Array1D_int &CompOutletNodeNums,                           // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound);
 
     int NumCompsInBranch(EnergyPlusData &state, std::string const &BranchName);
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string const &CompName);
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string_view CompName);
 
     void GetBranchFanTypeName(EnergyPlusData &state,
-                              int BranchNum, std::string &FanType,
+                              int BranchNum,
+                              std::string &FanType,
                               std::string &FanName,
-                              bool &ErrFound               // Set to true if error found, false otherwise
+                              bool &ErrFound // Set to true if error found, false otherwise
     );
 
     void GetInternalBranchData(EnergyPlusData &state,
-                               std::string const &LoopName,         // Loop Name for Branch
-                               std::string const &BranchName,       // Requested Branch Name
-                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of pressure curve object
-                               int &PressCurveIndex,                // Index of pressure curve object
-                               int &NumComps,                       // Number of Components on Branch
-                               Array1D<ComponentData> &BComponents, // Component data returned
-                               bool &ErrorsFound                    // True when Loop Name is already assigned and this not same loop
+                               std::string const &LoopName,                               // Loop Name for Branch
+                               std::string const &BranchName,                             // Requested Branch Name
+                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of pressure curve object
+                               int &PressCurveIndex,                                      // Index of pressure curve object
+                               int &NumComps,                                             // Number of Components on Branch
+                               Array1D<ComponentData> &BComponents,                       // Component data returned
+                               bool &ErrorsFound // True when Loop Name is already assigned and this not same loop
     );
 
     void GetNumSplitterMixerInConntrList(EnergyPlusData &state,
@@ -249,8 +252,8 @@ namespace BranchInputManager {
                       std::string &OutletNodeName,          // Outlet Node ID
                       int &OutletNodeNum,                   // Outlet Node Number
                       int &NumInletNodes,                   // Number of Inlet Nodes
-                      Array1D_string &InletNodeNames,        // Inlet Node IDs
-                      Array1D_int &InletNodeNums,            // Inlet Node Numbers
+                      Array1D_string &InletNodeNames,       // Inlet Node IDs
+                      Array1D_int &InletNodeNums,           // Inlet Node Numbers
                       bool &ErrorsFound,
                       Optional_int_const ConnectorNumber = _, // number of the current item in connector list
                       Optional_int MixerNumber = _            // Mixer number for this specific splitter
@@ -264,8 +267,8 @@ namespace BranchInputManager {
                          std::string &InletNodeName,           // Inlet Node ID
                          int &InletNodeNum,                    // Inlet Node Number
                          int &NumOutletNodes,                  // Number of Outlet Nodes
-                         Array1D_string &OutletNodeNames,       // Outlet Node IDs
-                         Array1D_int &OutletNodeNums,           // Outlet Node Numbers
+                         Array1D_string &OutletNodeNames,      // Outlet Node IDs
+                         Array1D_int &OutletNodeNums,          // Outlet Node Numbers
                          bool &ErrorsFound,
                          Optional_int_const ConnectorNumber = _, // number of the current item in connector list
                          Optional_int SplitterNumber = _         // splitter number for this specific splitter
@@ -282,7 +285,7 @@ namespace BranchInputManager {
     void GetBranchInput(EnergyPlusData &state);
 
     void GetSingleBranchInput(EnergyPlusData &state,
-                              std::string const &RoutineName,
+                              std::string_view const RoutineName,
                               int BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,
@@ -334,58 +337,60 @@ namespace BranchInputManager {
     //==================================================================================
 
     void AuditBranches(EnergyPlusData &state,
-                       bool mustprint,               // true if the warning should be printed.
+                       bool mustprint,                     // true if the warning should be printed.
                        Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
-    void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound);              // ErrFound is a return value, true or false
+    void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound); // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
 
-    struct BranchInputManagerData : BaseGlobalStruct
+struct BranchInputManagerData : BaseGlobalStruct
+{
+    int NumOfBranchLists = 0;    // Number of Branch Lists found in IDF
+    int NumOfBranches = 0;       // Number of Branches found in IDF
+    int NumOfConnectorLists = 0; // Number of Connector Lists found in IDF
+    int NumSplitters = 0;        // Number of Splitters found in IDF
+    int NumMixers = 0;           // Number of Mixers found in IDF
+
+    bool GetBranchInputFlag = true;        // Flag used to retrieve Input
+    bool GetBranchListInputFlag = true;    // Flag used to retrieve Input
+    bool GetSplitterInputFlag = true;      // Flag used to retrieve Input
+    bool GetMixerInputFlag = true;         // Flag used to retrieve Input
+    bool GetConnectorListInputFlag = true; // Flag used to retrieve Input
+    bool InvalidBranchDefinitions = false;
+    bool GetBranchInputOneTimeFlag = true;
+
+    Array1D<BranchInputManager::BranchListData> BranchList;    // Branch List data for each Branch List
+    Array1D<BranchInputManager::BranchData> Branch;            // Branch Data for each Branch
+    Array1D<BranchInputManager::ConnectorData> ConnectorLists; // Connector List data for each Connector List
+    Array1D<BranchInputManager::SplitterData> Splitters;       // Splitter Data for each Splitter
+    Array1D<BranchInputManager::MixerData> Mixers;             // Mixer Data for each Mixer
+    Array1D<BranchInputManager::ComponentData> BComponents;    // Component data to be returned
+
+    void clear_state() override
     {
-        int NumOfBranchLists = 0;                                   // Number of Branch Lists found in IDF
-        int NumOfBranches = 0;                                      // Number of Branches found in IDF
-        int NumOfConnectorLists = 0;                                // Number of Connector Lists found in IDF
-        int NumSplitters = 0;                                       // Number of Splitters found in IDF
-        int NumMixers = 0;                                          // Number of Mixers found in IDF
-
-        bool GetBranchInputFlag = true;                             // Flag used to retrieve Input
-        bool GetBranchListInputFlag = true;                         // Flag used to retrieve Input
-        bool GetSplitterInputFlag = true;                           // Flag used to retrieve Input
-        bool GetMixerInputFlag = true;                              // Flag used to retrieve Input
-        bool GetConnectorListInputFlag = true;                      // Flag used to retrieve Input
-        bool InvalidBranchDefinitions = false;
-        bool GetBranchInputOneTimeFlag = true;
-
-        Array1D<BranchInputManager::BranchListData> BranchList;     // Branch List data for each Branch List
-        Array1D<BranchInputManager::BranchData> Branch;             // Branch Data for each Branch
-        Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
-        Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
-        Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
-
-        void clear_state() override
-        {
-            this->NumOfBranchLists = 0;
-            this->NumOfBranches = 0;
-            this->NumOfConnectorLists = 0;
-            this->NumSplitters = 0;
-            this->NumMixers = 0;
-            this->GetBranchInputFlag = true;
-            this->GetBranchListInputFlag = true;
-            this->GetSplitterInputFlag = true;
-            this->GetMixerInputFlag = true;
-            this->GetConnectorListInputFlag = true;
-            this->InvalidBranchDefinitions = false;
-            this->GetBranchInputOneTimeFlag = true;
-            this->BranchList.deallocate();
-            this->Branch.deallocate();
-            this->ConnectorLists.deallocate();
-            this->Splitters.deallocate();
-            this->Mixers.deallocate();
-        }
-    };
+        this->NumOfBranchLists = 0;
+        this->NumOfBranches = 0;
+        this->NumOfConnectorLists = 0;
+        this->NumSplitters = 0;
+        this->NumMixers = 0;
+        this->GetBranchInputFlag = true;
+        this->GetBranchListInputFlag = true;
+        this->GetSplitterInputFlag = true;
+        this->GetMixerInputFlag = true;
+        this->GetConnectorListInputFlag = true;
+        this->InvalidBranchDefinitions = false;
+        this->GetBranchInputOneTimeFlag = true;
+        this->BranchList.deallocate();
+        this->Branch.deallocate();
+        this->ConnectorLists.deallocate();
+        this->Splitters.deallocate();
+        this->Mixers.deallocate();
+        this->BComponents.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

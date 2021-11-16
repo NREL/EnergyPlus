@@ -17,32 +17,22 @@ public:
     double m_error_tolerance_lo = 0.1;
 
     void CreateModel(double dt_hour = 1.) {
-        params_str = R"({ "control_mode": 0, "input_current": 1, "chem": 1, "nominal_energy": 10, "nominal_voltage": 500, "qmax_init": 1000.000, "initial_SOC": 50.000, "maximum_SOC": 95.000, "minimum_SOC": 5.000, "dt_hr": 1.000, "leadacid_tn": 0.000, "leadacid_qn": 0.000, "leadacid_q10": 0.000, "leadacid_q20": 0.000, "voltage_choice": 0, "Vnom_default": 3.600, "resistance": 0.000, "Vfull": 4.100, "Vexp": 4.050, "Vnom": 3.400, "Qfull": 2.250, "Qexp": 0.040, "Qnom": 2.000, "C_rate": 0.200, "mass": 507.000, "surface_area": 2.018, "Cp": 1004.000, "h": 20.000, "cap_vs_temp": [ [ -10, 60 ], [ 0, 80 ], [ 25, 1E+2 ], [ 40, 1E+2 ] ], "option": 1, "T_room_init": 20, "cycling_matrix": [ [ 20, 0, 1E+2 ], [ 20, 5E+3, 80 ], [ 20, 1E+4, 60 ], [ 80, 0, 1E+2 ], [ 80, 1E+3, 80 ], [ 80, 2E+3, 60 ] ], "calendar_choice": 1, "calendar_q0": 1.020, "calendar_a": 0.003, "calendar_b": -7280.000, "calendar_c": 930.000, "calendar_matrix": [ [ -3.1E+231 ] ], "loss_choice": 0, "monthly_charge_loss": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], "monthly_discharge_loss": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], "monthly_idle_loss": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], "schedule_loss": [], "replacement_option": 0, "replacement_capacity": 0.000, "replacement_schedule": [], "replacement_schedule_percent": [], "analysis_period": 1, "load_escalation": [0]})";
+        params_str = R"({ "control_mode": 0, "input_current": 1, "chem": 1, "nominal_energy": 10, "nominal_voltage": 500, "qmax_init": 1000.000, "initial_SOC": 50.000, "maximum_SOC": 95.000, "minimum_SOC": 5.000, "dt_hr": 1.000, "leadacid_tn": 0.000, "leadacid_qn": 0.000, "leadacid_q10": 0.000, "leadacid_q20": 0.000, "voltage_choice": 0, "Vnom_default": 3.600, "resistance": 0.000, "Vfull": 4.100, "Vexp": 4.050, "Vnom": 3.400, "Qfull": 2.250, "Qexp": 0.040, "Qnom": 2.000, "C_rate": 0.200, "mass": 507.000, "surface_area": 2.018, "Cp": 1004.000, "h": 20.000, "cap_vs_temp": [ [ -10, 60 ], [ 0, 80 ], [ 25, 1E+2 ], [ 40, 1E+2 ] ], "option": 1, "T_room_init": 20, "life_model": 0, "cycling_matrix": [ [ 20, 0, 1E+2 ], [ 20, 5E+3, 80 ], [ 20, 1E+4, 60 ], [ 80, 0, 1E+2 ], [ 80, 1E+3, 80 ], [ 80, 2E+3, 60 ] ], "calendar_choice": 1, "calendar_q0": 1.020, "calendar_a": 0.003, "calendar_b": -7280.000, "calendar_c": 930.000, "calendar_matrix": [ [ -3.1E+231 ] ], "loss_choice": 0, "monthly_charge_loss": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], "monthly_discharge_loss": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], "monthly_idle_loss": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ], "schedule_loss": [], "replacement_option": 0, "replacement_capacity": 0.000, "replacement_schedule": [], "replacement_schedule_percent": [], "analysis_period": 1, "load_escalation": [0]})";
         data = json_to_ssc_data(params_str.c_str());
         ssc_data_set_number(data, "dt_hr", dt_hour);
         mod = ssc_stateful_module_create("battery_stateful", data);
         EXPECT_TRUE(mod);
     }
 
-    void CreateKokamModel()
+    void CreateKokamModel(double dt_hour = 1.)
     {
-        double dt_hour = 1.0 / 360.0;
         params_str = "{ \"control_mode\": 0, \"input_current\" : 0.0, \"chem\" : 1, \"nominal_energy\" : 0.272, \"nominal_voltage\" : 3.6, "
             "\"initial_SOC\" :0.66, \"maximum_SOC\" : 100.000, \"minimum_SOC\" : 0.000, \"dt_hr\" : 0.002777, \"leadacid_tn\" : 0.000,"
             "\"leadacid_qn\" : 0.000, \"leadacid_q10\" : 0.000, \"leadacid_q20\" : 0.000, \"voltage_choice\" : 0,"
             "\"Vnom_default\" : 3.6, \"resistance\" : 0.001155, \"Vfull\" : 4.200, \"Vexp\" : 3.529, \"Vnom\" : 3.35, \"Qfull\" : 75.56,"
             "\"Qexp\" : 60.75, \"Qnom\" : 73.58, \"C_rate\" : 0.200, \"mass\" : 1.55417, \"surface_area\" : 0.1548, \"Cp\" : 980,"
             "\"h\" : 8.066, \"cap_vs_temp\" : [[ 0,  80.200000000000003 ],[23, 100],[30, 103.09999999999999],[45, 105.40000000000001]], \"T_room_init\" : 23,"
-            "\"cycling_matrix\" : [[ 20,  0,  107 ],[20, 1000,  101],[20, 2000,  98.5],[20, 3000,  96.3],"
-            "[80, 0,  107],[80, 1000,  95.6],[80, 2000,  91.1],[80, 3000,  87.3],"
-            "[100, 0,  107],[100, 1000,  85.1],[100, 2000,  76.3],[100, 3000,  69.1]],"
-            "\"calendar_choice\" : 1, \"calendar_q0\" : 1.03127097 , \"calendar_a\" : 1.35973301e-03,"
-            "\"calendar_b\" : -9.93161754e+03, \"calendar_c\" : 1.65896984e+03, \"calendar_matrix\" : [[-3.1E+231]], \"loss_choice\" : 0,"
-            "\"monthly_charge_loss\" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ,"
-            "\"monthly_discharge_loss\" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ,"
-            "\"monthly_idle_loss\" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] , \"schedule_loss\" : [] , \"replacement_option\" : 0,"
-            "\"replacement_capacity\" : 0.000, \"replacement_schedule\" : [] , \"replacement_schedule_percent\" : [] }";
-        //, \"last_idx\" : 0, \"I\" : 0
+            "\"life_model\": 1}";
 
         data = json_to_ssc_data(params_str.c_str());
         ssc_data_set_number(data, "dt_hr", dt_hour);

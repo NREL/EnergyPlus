@@ -89,15 +89,15 @@ protected:
         state->dataWeatherManager->Environment(2).DesignDayNum = 2;
 
         // setup plant sizing data structure
-        NumPltSizInput = 1;
-        PlantSizData.allocate(NumPltSizInput);
-        PlantSizData(NumPltSizInput).SizingFactorOption = NoSizingFactorMode;
-        PlantSizData(NumPltSizInput).DesVolFlowRate = 0.002;
-        PlantSizData(NumPltSizInput).DeltaT = 10;
-        PlantSizData(NumPltSizInput).ConcurrenceOption = Coincident;
-        PlantSizData(NumPltSizInput).NumTimeStepsInAvg = 1;
-        PlantSizData(NumPltSizInput).PlantLoopName = "Test Plant Loop 1";
-        PlantSizData(NumPltSizInput).LoopType = HeatingLoop;
+        state->dataSize->NumPltSizInput = 1;
+        state->dataSize->PlantSizData.allocate(state->dataSize->NumPltSizInput);
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = NoSizingFactorMode;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).DesVolFlowRate = 0.002;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).DeltaT = 10;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).ConcurrenceOption = Coincident;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 1;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "Test Plant Loop 1";
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).LoopType = HeatingLoop;
 
         // set up a plant loop
         state->dataPlnt->TotNumLoops = 1;
@@ -118,18 +118,19 @@ protected:
         SetPredefinedTables(*state);
 
         // need a node to log mass flow rate from
-        Node.allocate(1);
+        state->dataLoopNodes->Node.allocate(1);
         // OutputProcessor::TimeValue.allocate(2);
         // set up time related
-        SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(*state, "HVAC", TimeStepSys);
+        SetupTimePointers(
+            *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
 
         state->dataGlobal->NumOfTimeStepInHour = 4;
         state->dataWeatherManager->TimeStepFraction = 1.0 / double(state->dataGlobal->NumOfTimeStepInHour);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = &state->dataGlobal->TimeStepZone;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0; // init
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = &TimeStepSys;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = &state->dataHVACGlobal->TimeStepSys;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0;
     }
 
@@ -178,8 +179,8 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
     // now fill with three system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
-    NumOfSysTimeSteps = 3;
-    TimeStepSys = state->dataGlobal->TimeStepZone / NumOfSysTimeSteps;
+    state->dataHVACGlobal->NumOfSysTimeSteps = 3;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -192,15 +193,17 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -216,16 +219,18 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -241,16 +246,19 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
         for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
             state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
             state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-            for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-                for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                 ++state->dataGlobal->TimeStep) {
+                for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                        (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                    Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                    Node(1).Temp = 10.0;
+                    state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                    state->dataLoopNodes->Node(1).Temp = 10.0;
                     state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                     testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
                 }
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
             } // TimeStep loop
         }     // ... End hour loop.
@@ -267,16 +275,19 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
         for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
             state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
             state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-            for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-                for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                 ++state->dataGlobal->TimeStep) {
+                for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                        (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                    Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                    Node(1).Temp = 10.0;
+                    state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                    state->dataLoopNodes->Node(1).Temp = 10.0;
                     state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                     testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
                 }
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
             } // TimeStep loop
         }     // ... End hour loop.
@@ -291,64 +302,76 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
     // check that the data are as expected in the logs
     // first timestep
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[0]
-                              .subSteps[0]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[0]
+                         .subSteps[0]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[0]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[0]
+                         .runningAvgDataValue);
 
     // last timestep of first hour
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[3]
-                              .subSteps[2]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[3]
+                         .subSteps[2]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[3]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[3]
+                         .runningAvgDataValue);
 
     // first timestep of second hour
-    EXPECT_DOUBLE_EQ(0.2, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[7]
-                              .subSteps[0]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.2,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[7]
+                         .subSteps[0]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.2, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[7]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.2,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[7]
+                         .runningAvgDataValue);
 
     // last timestep of first DD, hour = 24
-    EXPECT_DOUBLE_EQ(2.4, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[95]
-                              .subSteps[2]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(2.4,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[95]
+                         .subSteps[2]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(2.4, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[95]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(2.4,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[95]
+                         .runningAvgDataValue);
 
     // first timestep of second DD, hour = 1
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[96]
-                              .subSteps[0]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[96]
+                         .subSteps[0]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[96]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[96]
+                         .runningAvgDataValue);
 
     // first timestep of third sizing state->dataWeatherManager->Environment WeatherFileDays
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[192]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[192]
+                         .runningAvgDataValue);
 
     // first timestep of fourth sizing state->dataWeatherManager->Environment WeatherFileDays
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[576]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[576]
+                         .runningAvgDataValue);
 }
 
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
@@ -372,8 +395,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
     // now fill with three system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
-    NumOfSysTimeSteps = 3;
-    TimeStepSys = state->dataGlobal->TimeStepZone / NumOfSysTimeSteps;
+    state->dataHVACGlobal->NumOfSysTimeSteps = 3;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -385,15 +408,17 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -408,16 +433,18 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -431,54 +458,64 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
     // check that the data are as expected in the logs
     // first timestep
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[0]
-                              .subSteps[0]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[0]
+                         .subSteps[0]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[0]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[0]
+                         .runningAvgDataValue);
 
     // last timestep of first hour
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[3]
-                              .subSteps[2]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[3]
+                         .subSteps[2]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[3]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[3]
+                         .runningAvgDataValue);
 
     // first timestep of second hour
-    EXPECT_DOUBLE_EQ(0.2, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[7]
-                              .subSteps[0]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.2,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[7]
+                         .subSteps[0]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.2, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[7]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.2,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[7]
+                         .runningAvgDataValue);
 
     // last timestep of first DD, hour = 24
-    EXPECT_DOUBLE_EQ(2.4, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[95]
-                              .subSteps[2]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(2.4,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[95]
+                         .subSteps[2]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(2.4, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[95]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(2.4,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[95]
+                         .runningAvgDataValue);
 
     // first timestep of second DD, hour = 1
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[96]
-                              .subSteps[0]
-                              .LogDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[96]
+                         .subSteps[0]
+                         .LogDataValue);
 
-    EXPECT_DOUBLE_EQ(0.1, testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
-                              .ztStepObj[96]
-                              .runningAvgDataValue);
+    EXPECT_DOUBLE_EQ(0.1,
+                     testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
+                         .ztStepObj[96]
+                         .runningAvgDataValue);
 }
 
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
@@ -487,8 +524,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     // to coincident plant sizing with HVAC sizing simulation
     // this test runs 1 system timestep for each zone timestep
 
-    GlobalCoolSizingFactor = 1.0;
-    PlantSizData(NumPltSizInput).SizingFactorOption = GlobalCoolingSizingFactorMode;
+    state->dataSize->GlobalCoolSizingFactor = 1.0;
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = GlobalCoolingSizingFactorMode;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -504,8 +541,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
     // now fill with one system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
-    NumOfSysTimeSteps = 1;
-    TimeStepSys = state->dataGlobal->TimeStepZone / NumOfSysTimeSteps;
+    state->dataHVACGlobal->NumOfSysTimeSteps = 1;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -518,16 +555,18 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
 
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             // E+ doesn't really update zone step data until system steps are done
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -543,16 +582,18 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
 
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -570,9 +611,9 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     // to coincident plant sizing with HVAC sizing simulation
     // this test run varies the system timestep some to test irregular
 
-    PlantSizData(NumPltSizInput).NumTimeStepsInAvg = 2;
-    GlobalHeatSizingFactor = 1.0;
-    PlantSizData(NumPltSizInput).SizingFactorOption = GlobalHeatingSizingFactorMode;
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 2;
+    state->dataSize->GlobalHeatSizingFactor = 1.0;
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = GlobalHeatingSizingFactorMode;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -588,8 +629,8 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
     // now fill with one system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
-    NumOfSysTimeSteps = 1;
-    TimeStepSys = state->dataGlobal->TimeStepZone / NumOfSysTimeSteps;
+    state->dataHVACGlobal->NumOfSysTimeSteps = 1;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -602,19 +643,21 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
 
-            NumOfSysTimeSteps = state->dataGlobal->TimeStep;
-            TimeStepSys = state->dataGlobal->TimeStepZone / NumOfSysTimeSteps;
+            state->dataHVACGlobal->NumOfSysTimeSteps = state->dataGlobal->TimeStep;
+            state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             // E+ doesn't really update zone step data until system steps are done
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -629,19 +672,21 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
-            NumOfSysTimeSteps = state->dataGlobal->TimeStep;
-            TimeStepSys = state->dataGlobal->TimeStepZone / NumOfSysTimeSteps;
+            state->dataHVACGlobal->NumOfSysTimeSteps = state->dataGlobal->TimeStep;
+            state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
-            for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+            for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
-                Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
-                Node(1).Temp = 10.0;
+                state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
+                state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -657,7 +702,6 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet();
 }
 
-
 TEST_F(SQLiteFixture, HVACSizing_Passes_SQL_Output)
 {
     // Test for #8268 - More info in the "Time" table than EnvironmentPeriods
@@ -665,371 +709,371 @@ TEST_F(SQLiteFixture, HVACSizing_Passes_SQL_Output)
     // * a Sizing:Plant object set to "Coincident", and,
     // * the SimulatioNControl "Do HVAC Sizing Simulation for Sizing Periods" set to Yes
 
-    EnergyPlus::sqlite->sqliteBegin();
-    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
 
-      "Timestep,",
-      "  4;                                      !- Number of Timesteps per Hour",
+        "Timestep,",
+        "  4;                                      !- Number of Timesteps per Hour",
 
-      "Site:Location,",
-      "  Chicago Ohare Intl Ap,                  !- Name",
-      "  41.98,                                  !- Latitude {deg}",
-      "  -87.92,                                 !- Longitude {deg}",
-      "  -6,                                     !- Time Zone {hr}",
-      "  201;                                    !- Elevation {m}",
+        "Site:Location,",
+        "  Chicago Ohare Intl Ap,                  !- Name",
+        "  41.98,                                  !- Latitude {deg}",
+        "  -87.92,                                 !- Longitude {deg}",
+        "  -6,                                     !- Time Zone {hr}",
+        "  201;                                    !- Elevation {m}",
 
-      "SizingPeriod:DesignDay,",
-      "  Chicago Ohare Intl Ap Ann Htg 99.6% Condns DB, !- Name",
-      "  1,                                      !- Month",
-      "  21,                                     !- Day of Month",
-      "  WinterDesignDay,                        !- Day Type",
-      "  -20,                                    !- Maximum Dry-Bulb Temperature {C}",
-      "  0,                                      !- Daily Dry-Bulb Temperature Range {deltaC}",
-      "  DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type",
-      "  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-      "  Wetbulb,                                !- Humidity Condition Type",
-      "  -20,                                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-      "  ,                                       !- Humidity Condition Day Schedule Name",
-      "  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-      "  ,                                       !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-      "  ,                                       !- Daily Wet-Bulb Temperature Range {deltaC}",
-      "  98934,                                  !- Barometric Pressure {Pa}",
-      "  4.9,                                    !- Wind Speed {m/s}",
-      "  270,                                    !- Wind Direction {deg}",
-      "  No,                                     !- Rain Indicator",
-      "  No,                                     !- Snow Indicator",
-      "  No,                                     !- Daylight Saving Time Indicator",
-      "  ASHRAEClearSky,                         !- Solar Model Indicator",
-      "  ,                                       !- Beam Solar Day Schedule Name",
-      "  ,                                       !- Diffuse Solar Day Schedule Name",
-      "  ,                                       !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-      "  ,                                       !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-      "  0;                                      !- Sky Clearness",
+        "SizingPeriod:DesignDay,",
+        "  Chicago Ohare Intl Ap Ann Htg 99.6% Condns DB, !- Name",
+        "  1,                                      !- Month",
+        "  21,                                     !- Day of Month",
+        "  WinterDesignDay,                        !- Day Type",
+        "  -20,                                    !- Maximum Dry-Bulb Temperature {C}",
+        "  0,                                      !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "  DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type",
+        "  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "  Wetbulb,                                !- Humidity Condition Type",
+        "  -20,                                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "  ,                                       !- Humidity Condition Day Schedule Name",
+        "  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "  ,                                       !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "  ,                                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "  98934,                                  !- Barometric Pressure {Pa}",
+        "  4.9,                                    !- Wind Speed {m/s}",
+        "  270,                                    !- Wind Direction {deg}",
+        "  No,                                     !- Rain Indicator",
+        "  No,                                     !- Snow Indicator",
+        "  No,                                     !- Daylight Saving Time Indicator",
+        "  ASHRAEClearSky,                         !- Solar Model Indicator",
+        "  ,                                       !- Beam Solar Day Schedule Name",
+        "  ,                                       !- Diffuse Solar Day Schedule Name",
+        "  ,                                       !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "  ,                                       !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "  0;                                      !- Sky Clearness",
 
-      "SimulationControl,",
-      "  Yes,                                    !- Do Zone Sizing Calculation",
-      "  Yes,                                    !- Do System Sizing Calculation",
-      "  Yes,                                    !- Do Plant Sizing Calculation",
-      "  Yes,                                    !- Run Simulation for Sizing Periods",
-      "  No,                                     !- Run Simulation for Weather File Run Periods",
-      "  Yes,                                    !- Do HVAC Sizing Simulation for Sizing Periods",
-      "  2;                                      !- Maximum Number of HVAC Sizing Simulation Passes",
+        "SimulationControl,",
+        "  Yes,                                    !- Do Zone Sizing Calculation",
+        "  Yes,                                    !- Do System Sizing Calculation",
+        "  Yes,                                    !- Do Plant Sizing Calculation",
+        "  Yes,                                    !- Run Simulation for Sizing Periods",
+        "  No,                                     !- Run Simulation for Weather File Run Periods",
+        "  Yes,                                    !- Do HVAC Sizing Simulation for Sizing Periods",
+        "  2;                                      !- Maximum Number of HVAC Sizing Simulation Passes",
 
-      "ScheduleTypeLimits,",
-      "  OnOff,                                  !- Name",
-      "  0,                                      !- Lower Limit Value {BasedOnField A3}",
-      "  1,                                      !- Upper Limit Value {BasedOnField A3}",
-      "  Discrete,                               !- Numeric Type",
-      "  availability;                           !- Unit Type",
-      "",
-      "ScheduleTypeLimits,",
-      "  Temperature,                            !- Name",
-      "  ,                                       !- Lower Limit Value {BasedOnField A3}",
-      "  ,                                       !- Upper Limit Value {BasedOnField A3}",
-      "  Continuous,                             !- Numeric Type",
-      "  temperature;                            !- Unit Type",
+        "ScheduleTypeLimits,",
+        "  OnOff,                                  !- Name",
+        "  0,                                      !- Lower Limit Value {BasedOnField A3}",
+        "  1,                                      !- Upper Limit Value {BasedOnField A3}",
+        "  Discrete,                               !- Numeric Type",
+        "  availability;                           !- Unit Type",
+        "",
+        "ScheduleTypeLimits,",
+        "  Temperature,                            !- Name",
+        "  ,                                       !- Lower Limit Value {BasedOnField A3}",
+        "  ,                                       !- Upper Limit Value {BasedOnField A3}",
+        "  Continuous,                             !- Numeric Type",
+        "  temperature;                            !- Unit Type",
 
-      "ScheduleTypeLimits,",
-      "  Dimensionless,                          !- Name",
-      "  ,                                       !- Lower Limit Value {BasedOnField A3}",
-      "  ,                                       !- Upper Limit Value {BasedOnField A3}",
-      "  Continuous;                             !- Numeric Type",
+        "ScheduleTypeLimits,",
+        "  Dimensionless,                          !- Name",
+        "  ,                                       !- Lower Limit Value {BasedOnField A3}",
+        "  ,                                       !- Upper Limit Value {BasedOnField A3}",
+        "  Continuous;                             !- Numeric Type",
 
-      "Schedule:Constant,",
-      "  Always On Discrete,                     !- Name",
-      "  OnOff,                                  !- Schedule Type Limits Name",
-      "  1;                                      !- Hourly Value",
+        "Schedule:Constant,",
+        "  Always On Discrete,                     !- Name",
+        "  OnOff,                                  !- Schedule Type Limits Name",
+        "  1;                                      !- Hourly Value",
 
-      "Schedule:Constant,",
-      "  Ambient Temp 22C,                       !- Name",
-      "  Temperature,                            !- Schedule Type Limits Name",
-      "  22;                                     !- Hourly Value",
+        "Schedule:Constant,",
+        "  Ambient Temp 22C,                       !- Name",
+        "  Temperature,                            !- Schedule Type Limits Name",
+        "  22;                                     !- Hourly Value",
 
-      "Schedule:Constant,",
-      "  DHW Setpoint Temp 60C,                  !- Name",
-      "  Temperature,                            !- Schedule Type Limits Name",
-      "  60;                                     !- Hourly Value",
+        "Schedule:Constant,",
+        "  DHW Setpoint Temp 60C,                  !- Name",
+        "  Temperature,                            !- Schedule Type Limits Name",
+        "  60;                                     !- Hourly Value",
 
-      "Schedule:Constant,",
-      "  Load Schedule,                          !- Name",
-      "  Dimensionless,                          !- Schedule Type Limits Name",
-      "  8000;                                   !- Hourly Value",
+        "Schedule:Constant,",
+        "  Load Schedule,                          !- Name",
+        "  Dimensionless,                          !- Schedule Type Limits Name",
+        "  8000;                                   !- Hourly Value",
 
-      "PlantLoop,",
-      "  Plant Loop 1,                           !- Name",
-      "  Water,                                  !- Fluid Type",
-      "  ,                                       !- User Defined Fluid Type",
-      "  Plant Loop 1 Operation Schemes,         !- Plant Equipment Operation Scheme Name",
-      "  Node 2,                                 !- Loop Temperature Setpoint Node Name",
-      "  100,                                    !- Maximum Loop Temperature {C}",
-      "  0,                                      !- Minimum Loop Temperature {C}",
-      "  Autosize,                               !- Maximum Loop Flow Rate {m3/s}",
-      "  0,                                      !- Minimum Loop Flow Rate {m3/s}",
-      "  Autocalculate,                          !- Plant Loop Volume {m3}",
-      "  Node 1,                                 !- Plant Side Inlet Node Name",
-      "  Node 2,                                 !- Plant Side Outlet Node Name",
-      "  Plant Loop 1 Supply Branches,           !- Plant Side Branch List Name",
-      "  Plant Loop 1 Supply Connector List,     !- Plant Side Connector List Name",
-      "  Node 4,                                 !- Demand Side Inlet Node Name",
-      "  Node 5,                                 !- Demand Side Outlet Node Name",
-      "  Plant Loop 1 Demand Branches,           !- Demand Side Branch List Name",
-      "  Plant Loop 1 Demand Connector List,     !- Demand Side Connector List Name",
-      "  Optimal,                                !- Load Distribution Scheme",
-      "  ,                                       !- Availability Manager List Name",
-      "  SingleSetpoint,                         !- Plant Loop Demand Calculation Scheme",
-      "  ;                                       !- Common Pipe Simulation",
+        "PlantLoop,",
+        "  Plant Loop 1,                           !- Name",
+        "  Water,                                  !- Fluid Type",
+        "  ,                                       !- User Defined Fluid Type",
+        "  Plant Loop 1 Operation Schemes,         !- Plant Equipment Operation Scheme Name",
+        "  Node 2,                                 !- Loop Temperature Setpoint Node Name",
+        "  100,                                    !- Maximum Loop Temperature {C}",
+        "  0,                                      !- Minimum Loop Temperature {C}",
+        "  Autosize,                               !- Maximum Loop Flow Rate {m3/s}",
+        "  0,                                      !- Minimum Loop Flow Rate {m3/s}",
+        "  Autocalculate,                          !- Plant Loop Volume {m3}",
+        "  Node 1,                                 !- Plant Side Inlet Node Name",
+        "  Node 2,                                 !- Plant Side Outlet Node Name",
+        "  Plant Loop 1 Supply Branches,           !- Plant Side Branch List Name",
+        "  Plant Loop 1 Supply Connector List,     !- Plant Side Connector List Name",
+        "  Node 4,                                 !- Demand Side Inlet Node Name",
+        "  Node 5,                                 !- Demand Side Outlet Node Name",
+        "  Plant Loop 1 Demand Branches,           !- Demand Side Branch List Name",
+        "  Plant Loop 1 Demand Connector List,     !- Demand Side Connector List Name",
+        "  Optimal,                                !- Load Distribution Scheme",
+        "  ,                                       !- Availability Manager List Name",
+        "  SingleSetpoint,                         !- Plant Loop Demand Calculation Scheme",
+        "  ;                                       !- Common Pipe Simulation",
 
-      "SetpointManager:Scheduled,",
-      "  Setpoint Manager Scheduled 1,           !- Name",
-      "  Temperature,                            !- Control Variable",
-      "  DHW Setpoint Temp 60C,                  !- Schedule Name",
-      "  Node 2;                                 !- Setpoint Node or NodeList Name",
+        "SetpointManager:Scheduled,",
+        "  Setpoint Manager Scheduled 1,           !- Name",
+        "  Temperature,                            !- Control Variable",
+        "  DHW Setpoint Temp 60C,                  !- Schedule Name",
+        "  Node 2;                                 !- Setpoint Node or NodeList Name",
 
-      "Sizing:Plant,",
-      "  Plant Loop 1,                           !- Plant or Condenser Loop Name",
-      "  Heating,                                !- Loop Type",
-      "  82,                                     !- Design Loop Exit Temperature {C}",
-      "  11,                                     !- Loop Design Temperature Difference {deltaC}",
-      "  Coincident,                             !- Sizing Option",
-      "  2,                                      !- Zone Timesteps in Averaging Window",
-      "  None;                                   !- Coincident Sizing Factor Mode",
+        "Sizing:Plant,",
+        "  Plant Loop 1,                           !- Plant or Condenser Loop Name",
+        "  Heating,                                !- Loop Type",
+        "  82,                                     !- Design Loop Exit Temperature {C}",
+        "  11,                                     !- Loop Design Temperature Difference {deltaC}",
+        "  Coincident,                             !- Sizing Option",
+        "  2,                                      !- Zone Timesteps in Averaging Window",
+        "  None;                                   !- Coincident Sizing Factor Mode",
 
-      "BranchList,",
-      "  Plant Loop 1 Supply Branches,           !- Name",
-      "  Plant Loop 1 Supply Inlet Branch,       !- Branch Name 1",
-      "  Plant Loop 1 Supply Branch 1,           !- Branch Name 2",
-      "  Plant Loop 1 Supply Outlet Branch;      !- Branch Name 3",
+        "BranchList,",
+        "  Plant Loop 1 Supply Branches,           !- Name",
+        "  Plant Loop 1 Supply Inlet Branch,       !- Branch Name 1",
+        "  Plant Loop 1 Supply Branch 1,           !- Branch Name 2",
+        "  Plant Loop 1 Supply Outlet Branch;      !- Branch Name 3",
 
-      "ConnectorList,",
-      "  Plant Loop 1 Supply Connector List,     !- Name",
-      "  Connector:Splitter,                     !- Connector Object Type 1",
-      "  Plant Loop 1 Supply Splitter,           !- Connector Name 1",
-      "  Connector:Mixer,                        !- Connector Object Type 2",
-      "  Plant Loop 1 Supply Mixer;              !- Connector Name 2",
+        "ConnectorList,",
+        "  Plant Loop 1 Supply Connector List,     !- Name",
+        "  Connector:Splitter,                     !- Connector Object Type 1",
+        "  Plant Loop 1 Supply Splitter,           !- Connector Name 1",
+        "  Connector:Mixer,                        !- Connector Object Type 2",
+        "  Plant Loop 1 Supply Mixer;              !- Connector Name 2",
 
-      "Connector:Splitter,",
-      "  Plant Loop 1 Supply Splitter,           !- Name",
-      "  Plant Loop 1 Supply Inlet Branch,       !- Inlet Branch Name",
-      "  Plant Loop 1 Supply Branch 1;           !- Outlet Branch Name 1",
+        "Connector:Splitter,",
+        "  Plant Loop 1 Supply Splitter,           !- Name",
+        "  Plant Loop 1 Supply Inlet Branch,       !- Inlet Branch Name",
+        "  Plant Loop 1 Supply Branch 1;           !- Outlet Branch Name 1",
 
-      "Connector:Mixer,",
-      "  Plant Loop 1 Supply Mixer,              !- Name",
-      "  Plant Loop 1 Supply Outlet Branch,      !- Outlet Branch Name",
-      "  Plant Loop 1 Supply Branch 1;           !- Inlet Branch Name 1",
+        "Connector:Mixer,",
+        "  Plant Loop 1 Supply Mixer,              !- Name",
+        "  Plant Loop 1 Supply Outlet Branch,      !- Outlet Branch Name",
+        "  Plant Loop 1 Supply Branch 1;           !- Inlet Branch Name 1",
 
-      "Branch,",
-      "  Plant Loop 1 Supply Inlet Branch,       !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  Pump:VariableSpeed,                     !- Component Object Type 1",
-      "  Pump Variable Speed 1,                  !- Component Name 1",
-      "  Node 1,                                 !- Component Inlet Node Name 1",
-      "  Node 7;                                 !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Supply Inlet Branch,       !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  Pump:VariableSpeed,                     !- Component Object Type 1",
+        "  Pump Variable Speed 1,                  !- Component Name 1",
+        "  Node 1,                                 !- Component Inlet Node Name 1",
+        "  Node 7;                                 !- Component Outlet Node Name 1",
 
-      "Pump:VariableSpeed,",
-      "  Pump Variable Speed 1,                  !- Name",
-      "  Node 1,                                 !- Inlet Node Name",
-      "  Node 7,                                 !- Outlet Node Name",
-      "  Autosize,                               !- Design Maximum Flow Rate {m3/s}",
-      "  179352,                                 !- Design Pump Head {Pa}",
-      "  Autosize,                               !- Design Power Consumption {W}",
-      "  0.9,                                    !- Motor Efficiency",
-      "  0,                                      !- Fraction of Motor Inefficiencies to Fluid Stream",
-      "  0,                                      !- Coefficient 1 of the Part Load Performance Curve",
-      "  1,                                      !- Coefficient 2 of the Part Load Performance Curve",
-      "  0,                                      !- Coefficient 3 of the Part Load Performance Curve",
-      "  0,                                      !- Coefficient 4 of the Part Load Performance Curve",
-      "  0,                                      !- Design Minimum Flow Rate {m3/s}",
-      "  Intermittent,                           !- Pump Control Type",
-      "  ,                                       !- Pump Flow Rate Schedule Name",
-      "  ,                                       !- Pump Curve Name",
-      "  ,                                       !- Impeller Diameter {m}",
-      "  ,                                       !- VFD Control Type",
-      "  ,                                       !- Pump RPM Schedule Name",
-      "  ,                                       !- Minimum Pressure Schedule {Pa}",
-      "  ,                                       !- Maximum Pressure Schedule {Pa}",
-      "  ,                                       !- Minimum RPM Schedule {rev/min}",
-      "  ,                                       !- Maximum RPM Schedule {rev/min}",
-      "  ,                                       !- Zone Name",
-      "  0.5,                                    !- Skin Loss Radiative Fraction",
-      "  PowerPerFlowPerPressure,                !- Design Power Sizing Method",
-      "  348701.1,                               !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
-      "  1.282051282,                            !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}",
-      "  0,                                      !- Design Minimum Flow Rate Fraction",
-      "  General;                                !- End-Use Subcategory",
+        "Pump:VariableSpeed,",
+        "  Pump Variable Speed 1,                  !- Name",
+        "  Node 1,                                 !- Inlet Node Name",
+        "  Node 7,                                 !- Outlet Node Name",
+        "  Autosize,                               !- Design Maximum Flow Rate {m3/s}",
+        "  179352,                                 !- Design Pump Head {Pa}",
+        "  Autosize,                               !- Design Power Consumption {W}",
+        "  0.9,                                    !- Motor Efficiency",
+        "  0,                                      !- Fraction of Motor Inefficiencies to Fluid Stream",
+        "  0,                                      !- Coefficient 1 of the Part Load Performance Curve",
+        "  1,                                      !- Coefficient 2 of the Part Load Performance Curve",
+        "  0,                                      !- Coefficient 3 of the Part Load Performance Curve",
+        "  0,                                      !- Coefficient 4 of the Part Load Performance Curve",
+        "  0,                                      !- Design Minimum Flow Rate {m3/s}",
+        "  Intermittent,                           !- Pump Control Type",
+        "  ,                                       !- Pump Flow Rate Schedule Name",
+        "  ,                                       !- Pump Curve Name",
+        "  ,                                       !- Impeller Diameter {m}",
+        "  ,                                       !- VFD Control Type",
+        "  ,                                       !- Pump RPM Schedule Name",
+        "  ,                                       !- Minimum Pressure Schedule {Pa}",
+        "  ,                                       !- Maximum Pressure Schedule {Pa}",
+        "  ,                                       !- Minimum RPM Schedule {rev/min}",
+        "  ,                                       !- Maximum RPM Schedule {rev/min}",
+        "  ,                                       !- Zone Name",
+        "  0.5,                                    !- Skin Loss Radiative Fraction",
+        "  PowerPerFlowPerPressure,                !- Design Power Sizing Method",
+        "  348701.1,                               !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
+        "  1.282051282,                            !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}",
+        "  0,                                      !- Design Minimum Flow Rate Fraction",
+        "  General;                                !- End-Use Subcategory",
 
-      "Branch,",
-      "  Plant Loop 1 Supply Branch 1,           !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  WaterHeater:Mixed,                      !- Component Object Type 1",
-      "  Water Heater Mixed 1,                   !- Component Name 1",
-      "  Node 3,                                 !- Component Inlet Node Name 1",
-      "  Node 8;                                 !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Supply Branch 1,           !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  WaterHeater:Mixed,                      !- Component Object Type 1",
+        "  Water Heater Mixed 1,                   !- Component Name 1",
+        "  Node 3,                                 !- Component Inlet Node Name 1",
+        "  Node 8;                                 !- Component Outlet Node Name 1",
 
-      "WaterHeater:Mixed,",
-      "  Water Heater Mixed 1,                   !- Name",
-      "  0.3785,                                 !- Tank Volume {m3}",
-      "  DHW Setpoint Temp 60C,                  !- Setpoint Temperature Schedule Name",
-      "  2,                                      !- Deadband Temperature Difference {deltaC}",
-      "  82.22,                                  !- Maximum Temperature Limit {C}",
-      "  Cycle,                                  !- Heater Control Type",
-      "  845000,                                 !- Heater Maximum Capacity {W}",
-      "  ,                                       !- Heater Minimum Capacity {W}",
-      "  0,                                      !- Heater Ignition Minimum Flow Rate {m3/s}",
-      "  0,                                      !- Heater Ignition Delay {s}",
-      "  NaturalGas,                             !- Heater Fuel Type",
-      "  0.8,                                    !- Heater Thermal Efficiency",
-      "  ,                                       !- Part Load Factor Curve Name",
-      "  20,                                     !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-      "  NaturalGas,                             !- Off Cycle Parasitic Fuel Type",
-      "  0.8,                                    !- Off Cycle Parasitic Heat Fraction to Tank",
-      "  0,                                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
-      "  NaturalGas,                             !- On Cycle Parasitic Fuel Type",
-      "  0,                                      !- On Cycle Parasitic Heat Fraction to Tank",
-      "  Schedule,                               !- Ambient Temperature Indicator",
-      "  Ambient Temp 22C,                       !- Ambient Temperature Schedule Name",
-      "  ,                                       !- Ambient Temperature Zone Name",
-      "  ,                                       !- Ambient Temperature Outdoor Air Node Name",
-      "  6,                                      !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
-      "  1,                                      !- Off Cycle Loss Fraction to Zone",
-      "  6,                                      !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
-      "  1,                                      !- On Cycle Loss Fraction to Zone",
-      "  ,                                       !- Peak Use Flow Rate {m3/s}",
-      "  ,                                       !- Use Flow Rate Fraction Schedule Name",
-      "  ,                                       !- Cold Water Supply Temperature Schedule Name",
-      "  Node 3,                                 !- Use Side Inlet Node Name",
-      "  Node 8,                                 !- Use Side Outlet Node Name",
-      "  1,                                      !- Use Side Effectiveness",
-      "  ,                                       !- Source Side Inlet Node Name",
-      "  ,                                       !- Source Side Outlet Node Name",
-      "  1,                                      !- Source Side Effectiveness",
-      "  Autosize,                               !- Use Side Design Flow Rate {m3/s}",
-      "  Autosize,                               !- Source Side Design Flow Rate {m3/s}",
-      "  1.5,                                    !- Indirect Water Heating Recovery Time {hr}",
-      "  IndirectHeatPrimarySetpoint,            !- Source Side Flow Control Mode",
-      "  ,                                       !- Indirect Alternate Setpoint Temperature Schedule Name",
-      "  General;                                !- End-Use Subcategory",
+        "WaterHeater:Mixed,",
+        "  Water Heater Mixed 1,                   !- Name",
+        "  0.3785,                                 !- Tank Volume {m3}",
+        "  DHW Setpoint Temp 60C,                  !- Setpoint Temperature Schedule Name",
+        "  2,                                      !- Deadband Temperature Difference {deltaC}",
+        "  82.22,                                  !- Maximum Temperature Limit {C}",
+        "  Cycle,                                  !- Heater Control Type",
+        "  845000,                                 !- Heater Maximum Capacity {W}",
+        "  ,                                       !- Heater Minimum Capacity {W}",
+        "  0,                                      !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "  0,                                      !- Heater Ignition Delay {s}",
+        "  NaturalGas,                             !- Heater Fuel Type",
+        "  0.8,                                    !- Heater Thermal Efficiency",
+        "  ,                                       !- Part Load Factor Curve Name",
+        "  20,                                     !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  NaturalGas,                             !- Off Cycle Parasitic Fuel Type",
+        "  0.8,                                    !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  0,                                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  NaturalGas,                             !- On Cycle Parasitic Fuel Type",
+        "  0,                                      !- On Cycle Parasitic Heat Fraction to Tank",
+        "  Schedule,                               !- Ambient Temperature Indicator",
+        "  Ambient Temp 22C,                       !- Ambient Temperature Schedule Name",
+        "  ,                                       !- Ambient Temperature Zone Name",
+        "  ,                                       !- Ambient Temperature Outdoor Air Node Name",
+        "  6,                                      !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                                      !- Off Cycle Loss Fraction to Zone",
+        "  6,                                      !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                                      !- On Cycle Loss Fraction to Zone",
+        "  ,                                       !- Peak Use Flow Rate {m3/s}",
+        "  ,                                       !- Use Flow Rate Fraction Schedule Name",
+        "  ,                                       !- Cold Water Supply Temperature Schedule Name",
+        "  Node 3,                                 !- Use Side Inlet Node Name",
+        "  Node 8,                                 !- Use Side Outlet Node Name",
+        "  1,                                      !- Use Side Effectiveness",
+        "  ,                                       !- Source Side Inlet Node Name",
+        "  ,                                       !- Source Side Outlet Node Name",
+        "  1,                                      !- Source Side Effectiveness",
+        "  Autosize,                               !- Use Side Design Flow Rate {m3/s}",
+        "  Autosize,                               !- Source Side Design Flow Rate {m3/s}",
+        "  1.5,                                    !- Indirect Water Heating Recovery Time {hr}",
+        "  IndirectHeatPrimarySetpoint,            !- Source Side Flow Control Mode",
+        "  ,                                       !- Indirect Alternate Setpoint Temperature Schedule Name",
+        "  General;                                !- End-Use Subcategory",
 
-      "Branch,",
-      "  Plant Loop 1 Supply Outlet Branch,      !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  Pipe:Adiabatic,                         !- Component Object Type 1",
-      "  Plant Loop 1 Supply Outlet Pipe,        !- Component Name 1",
-      "  Plant Loop 1 Supply Outlet Pipe Node,   !- Component Inlet Node Name 1",
-      "  Node 2;                                 !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Supply Outlet Branch,      !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  Pipe:Adiabatic,                         !- Component Object Type 1",
+        "  Plant Loop 1 Supply Outlet Pipe,        !- Component Name 1",
+        "  Plant Loop 1 Supply Outlet Pipe Node,   !- Component Inlet Node Name 1",
+        "  Node 2;                                 !- Component Outlet Node Name 1",
 
-      "Pipe:Adiabatic,",
-      "  Plant Loop 1 Supply Outlet Pipe,        !- Name",
-      "  Plant Loop 1 Supply Outlet Pipe Node,   !- Inlet Node Name",
-      "  Node 2;                                 !- Outlet Node Name",
+        "Pipe:Adiabatic,",
+        "  Plant Loop 1 Supply Outlet Pipe,        !- Name",
+        "  Plant Loop 1 Supply Outlet Pipe Node,   !- Inlet Node Name",
+        "  Node 2;                                 !- Outlet Node Name",
 
-      "BranchList,",
-      "  Plant Loop 1 Demand Branches,           !- Name",
-      "  Plant Loop 1 Demand Inlet Branch,       !- Branch Name 1",
-      "  Plant Loop 1 Demand Branch 1,           !- Branch Name 2",
-      "  Plant Loop 1 Demand Bypass Branch,      !- Branch Name 3",
-      "  Plant Loop 1 Demand Outlet Branch;      !- Branch Name 4",
+        "BranchList,",
+        "  Plant Loop 1 Demand Branches,           !- Name",
+        "  Plant Loop 1 Demand Inlet Branch,       !- Branch Name 1",
+        "  Plant Loop 1 Demand Branch 1,           !- Branch Name 2",
+        "  Plant Loop 1 Demand Bypass Branch,      !- Branch Name 3",
+        "  Plant Loop 1 Demand Outlet Branch;      !- Branch Name 4",
 
-      "ConnectorList,",
-      "  Plant Loop 1 Demand Connector List,     !- Name",
-      "  Connector:Splitter,                     !- Connector Object Type 1",
-      "  Plant Loop 1 Demand Splitter,           !- Connector Name 1",
-      "  Connector:Mixer,                        !- Connector Object Type 2",
-      "  Plant Loop 1 Demand Mixer;              !- Connector Name 2",
+        "ConnectorList,",
+        "  Plant Loop 1 Demand Connector List,     !- Name",
+        "  Connector:Splitter,                     !- Connector Object Type 1",
+        "  Plant Loop 1 Demand Splitter,           !- Connector Name 1",
+        "  Connector:Mixer,                        !- Connector Object Type 2",
+        "  Plant Loop 1 Demand Mixer;              !- Connector Name 2",
 
-      "Connector:Splitter,",
-      "  Plant Loop 1 Demand Splitter,           !- Name",
-      "  Plant Loop 1 Demand Inlet Branch,       !- Inlet Branch Name",
-      "  Plant Loop 1 Demand Branch 1,           !- Outlet Branch Name 1",
-      "  Plant Loop 1 Demand Bypass Branch;      !- Outlet Branch Name 2",
+        "Connector:Splitter,",
+        "  Plant Loop 1 Demand Splitter,           !- Name",
+        "  Plant Loop 1 Demand Inlet Branch,       !- Inlet Branch Name",
+        "  Plant Loop 1 Demand Branch 1,           !- Outlet Branch Name 1",
+        "  Plant Loop 1 Demand Bypass Branch;      !- Outlet Branch Name 2",
 
-      "Connector:Mixer,",
-      "  Plant Loop 1 Demand Mixer,              !- Name",
-      "  Plant Loop 1 Demand Outlet Branch,      !- Outlet Branch Name",
-      "  Plant Loop 1 Demand Branch 1,           !- Inlet Branch Name 1",
-      "  Plant Loop 1 Demand Bypass Branch;      !- Inlet Branch Name 2",
+        "Connector:Mixer,",
+        "  Plant Loop 1 Demand Mixer,              !- Name",
+        "  Plant Loop 1 Demand Outlet Branch,      !- Outlet Branch Name",
+        "  Plant Loop 1 Demand Branch 1,           !- Inlet Branch Name 1",
+        "  Plant Loop 1 Demand Bypass Branch;      !- Inlet Branch Name 2",
 
-      "Branch,",
-      "  Plant Loop 1 Demand Inlet Branch,       !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  Pipe:Adiabatic,                         !- Component Object Type 1",
-      "  Plant Loop 1 Demand Inlet Pipe,         !- Component Name 1",
-      "  Node 4,                                 !- Component Inlet Node Name 1",
-      "  Plant Loop 1 Demand Inlet Pipe Node;    !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Demand Inlet Branch,       !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  Pipe:Adiabatic,                         !- Component Object Type 1",
+        "  Plant Loop 1 Demand Inlet Pipe,         !- Component Name 1",
+        "  Node 4,                                 !- Component Inlet Node Name 1",
+        "  Plant Loop 1 Demand Inlet Pipe Node;    !- Component Outlet Node Name 1",
 
-      "Pipe:Adiabatic,",
-      "  Plant Loop 1 Demand Inlet Pipe,         !- Name",
-      "  Node 4,                                 !- Inlet Node Name",
-      "  Plant Loop 1 Demand Inlet Pipe Node;    !- Outlet Node Name",
+        "Pipe:Adiabatic,",
+        "  Plant Loop 1 Demand Inlet Pipe,         !- Name",
+        "  Node 4,                                 !- Inlet Node Name",
+        "  Plant Loop 1 Demand Inlet Pipe Node;    !- Outlet Node Name",
 
-      "Branch,",
-      "  Plant Loop 1 Demand Branch 1,           !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  LoadProfile:Plant,                      !- Component Object Type 1",
-      "  Load Profile Plant 1,                   !- Component Name 1",
-      "  Node 6,                                 !- Component Inlet Node Name 1",
-      "  Node 9;                                 !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Demand Branch 1,           !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  LoadProfile:Plant,                      !- Component Object Type 1",
+        "  Load Profile Plant 1,                   !- Component Name 1",
+        "  Node 6,                                 !- Component Inlet Node Name 1",
+        "  Node 9;                                 !- Component Outlet Node Name 1",
 
-      "LoadProfile:Plant,",
-      "  Load Profile Plant 1,                   !- Name",
-      "  Node 6,                                 !- Inlet Node Name",
-      "  Node 9,                                 !- Outlet Node Name",
-      "  Load Schedule,                          !- Load Schedule Name",
-      "  0.002,                                  !- Peak Flow Rate {m3/s}",
-      "  Always On Discrete;                     !- Flow Rate Fraction Schedule Name",
+        "LoadProfile:Plant,",
+        "  Load Profile Plant 1,                   !- Name",
+        "  Node 6,                                 !- Inlet Node Name",
+        "  Node 9,                                 !- Outlet Node Name",
+        "  Load Schedule,                          !- Load Schedule Name",
+        "  0.002,                                  !- Peak Flow Rate {m3/s}",
+        "  Always On Discrete;                     !- Flow Rate Fraction Schedule Name",
 
-      "Branch,",
-      "  Plant Loop 1 Demand Bypass Branch,      !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  Pipe:Adiabatic,                         !- Component Object Type 1",
-      "  Plant Loop 1 Demand Bypass Pipe,        !- Component Name 1",
-      "  Plant Loop 1 Demand Bypass Pipe Inlet Node, !- Component Inlet Node Name 1",
-      "  Plant Loop 1 Demand Bypass Pipe Outlet Node; !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Demand Bypass Branch,      !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  Pipe:Adiabatic,                         !- Component Object Type 1",
+        "  Plant Loop 1 Demand Bypass Pipe,        !- Component Name 1",
+        "  Plant Loop 1 Demand Bypass Pipe Inlet Node, !- Component Inlet Node Name 1",
+        "  Plant Loop 1 Demand Bypass Pipe Outlet Node; !- Component Outlet Node Name 1",
 
-      "Pipe:Adiabatic,",
-      "  Plant Loop 1 Demand Bypass Pipe,        !- Name",
-      "  Plant Loop 1 Demand Bypass Pipe Inlet Node, !- Inlet Node Name",
-      "  Plant Loop 1 Demand Bypass Pipe Outlet Node; !- Outlet Node Name",
+        "Pipe:Adiabatic,",
+        "  Plant Loop 1 Demand Bypass Pipe,        !- Name",
+        "  Plant Loop 1 Demand Bypass Pipe Inlet Node, !- Inlet Node Name",
+        "  Plant Loop 1 Demand Bypass Pipe Outlet Node; !- Outlet Node Name",
 
-      "Branch,",
-      "  Plant Loop 1 Demand Outlet Branch,      !- Name",
-      "  ,                                       !- Pressure Drop Curve Name",
-      "  Pipe:Adiabatic,                         !- Component Object Type 1",
-      "  Plant Loop 1 Demand Outlet Pipe,        !- Component Name 1",
-      "  Plant Loop 1 Demand Outlet Pipe Node,   !- Component Inlet Node Name 1",
-      "  Node 5;                                 !- Component Outlet Node Name 1",
+        "Branch,",
+        "  Plant Loop 1 Demand Outlet Branch,      !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  Pipe:Adiabatic,                         !- Component Object Type 1",
+        "  Plant Loop 1 Demand Outlet Pipe,        !- Component Name 1",
+        "  Plant Loop 1 Demand Outlet Pipe Node,   !- Component Inlet Node Name 1",
+        "  Node 5;                                 !- Component Outlet Node Name 1",
 
-      "Pipe:Adiabatic,",
-      "  Plant Loop 1 Demand Outlet Pipe,        !- Name",
-      "  Plant Loop 1 Demand Outlet Pipe Node,   !- Inlet Node Name",
-      "  Node 5;                                 !- Outlet Node Name",
+        "Pipe:Adiabatic,",
+        "  Plant Loop 1 Demand Outlet Pipe,        !- Name",
+        "  Plant Loop 1 Demand Outlet Pipe Node,   !- Inlet Node Name",
+        "  Node 5;                                 !- Outlet Node Name",
 
-      "PlantEquipmentOperationSchemes,",
-      "  Plant Loop 1 Operation Schemes,         !- Name",
-      "  PlantEquipmentOperation:HeatingLoad,    !- Control Scheme Object Type 1",
-      "  Plant Loop 1 Heating Operation Scheme,  !- Control Scheme Name 1",
-      "  Always On Discrete;                     !- Control Scheme Schedule Name 1",
+        "PlantEquipmentOperationSchemes,",
+        "  Plant Loop 1 Operation Schemes,         !- Name",
+        "  PlantEquipmentOperation:HeatingLoad,    !- Control Scheme Object Type 1",
+        "  Plant Loop 1 Heating Operation Scheme,  !- Control Scheme Name 1",
+        "  Always On Discrete;                     !- Control Scheme Schedule Name 1",
 
-      "PlantEquipmentOperation:HeatingLoad,",
-      "  Plant Loop 1 Heating Operation Scheme,  !- Name",
-      "  0,                                      !- Load Range Lower Limit 1 {W}",
-      "  1000000000,                             !- Load Range Upper Limit 1 {W}",
-      "  Plant Loop 1 Heating Equipment List;    !- Range Equipment List Name 1",
+        "PlantEquipmentOperation:HeatingLoad,",
+        "  Plant Loop 1 Heating Operation Scheme,  !- Name",
+        "  0,                                      !- Load Range Lower Limit 1 {W}",
+        "  1000000000,                             !- Load Range Upper Limit 1 {W}",
+        "  Plant Loop 1 Heating Equipment List;    !- Range Equipment List Name 1",
 
-      "PlantEquipmentList,",
-      "  Plant Loop 1 Heating Equipment List,    !- Name",
-      "  WaterHeater:Mixed,                      !- Equipment Object Type 1",
-      "  Water Heater Mixed 1;                   !- Equipment Name 1",
+        "PlantEquipmentList,",
+        "  Plant Loop 1 Heating Equipment List,    !- Name",
+        "  WaterHeater:Mixed,                      !- Equipment Object Type 1",
+        "  Water Heater Mixed 1;                   !- Equipment Name 1",
 
-      // Obviously need to add the sqlite output since we query it...
-      "Output:SQLite,",
-      "  SimpleAndTabular;                       !- Option Type",
+        // Obviously need to add the sqlite output since we query it...
+        "Output:SQLite,",
+        "  SimpleAndTabular;                       !- Option Type",
 
-      // Need at least one meter for the query below to succeed
-      "Output:Meter,",
-      "  NaturalGas:Facility,                    !- Key Name",
-      "  Timestep;                               !- Reporting Frequency",
+        // Need at least one meter for the query below to succeed
+        "Output:Meter,",
+        "  NaturalGas:Facility,                    !- Key Name",
+        "  Timestep;                               !- Reporting Frequency",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1059,10 +1103,8 @@ TEST_F(SQLiteFixture, HVACSizing_Passes_SQL_Output)
     rowData[0] = "1";
     rowData[1] = "CHICAGO OHARE INTL AP ANN HTG 99.6% CONDNS DB";
 
-    std::vector<std::vector<std::string>> timeData({
-        // Just one row, with a proper name
-        rowData
-    });
+    std::vector<std::vector<std::string>> timeData({// Just one row, with a proper name
+                                                    rowData});
 
     EXPECT_EQ(timeData, periodResults);
 }

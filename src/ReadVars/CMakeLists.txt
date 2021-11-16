@@ -10,37 +10,21 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 
 set(SRC ReadVarsESO.f90)
 
-set(STATIC_EXE FALSE)
-
-if(APPLE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
-  endif()
-elseif(UNIX)
-  set(CMAKE_SKIP_RPATH TRUE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
-  else()
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
-    set(STATIC_EXE TRUE)
-  endif()
-else()
-  set(STATIC_EXE TRUE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    # Set release flags to be empty
-    set(CMAKE_Fortran_FLAGS_RELEASE "")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
-  else()
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
-  endif()
-endif()
-
+set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH true)
+
 add_executable(ReadVarsESO ${SRC})
 set_target_properties(ReadVarsESO PROPERTIES FOLDER Auxiliary)
 
+if(NOT UNIX)  # Need to reinclude it on Windows
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+endif()
+get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)
+message(DEBUG "ReadVars: F_INTERFACE_COMPILE_FLAGS=${F_INTERFACE_COMPILE_FLAGS}")
+target_link_libraries(ReadVarsESO PRIVATE fortran_project_options)
+
 install(TARGETS ReadVarsESO DESTINATION PostProcess)
-if(NOT ${STATIC_EXE})
+if(NOT ${FORTRAN_STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
   install_target_prereqs(ReadVarsESO PostProcess)
 endif()

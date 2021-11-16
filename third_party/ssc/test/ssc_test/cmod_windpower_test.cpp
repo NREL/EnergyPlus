@@ -145,7 +145,6 @@ TEST_F(CMWindPowerIntegration, UsingInterpolatedSubhourly_cmod_windpower) {
 
     EXPECT_TRUE(success) << "Computation 3 should succeed";
 
-    check_annual_energy;
     ssc_data_get_number(data, "annual_energy", &check_annual_energy);
     EXPECT_NEAR(check_annual_energy, hourly_annual_energy, 0.005 * check_annual_energy);
 
@@ -188,7 +187,6 @@ TEST_F(CMWindPowerIntegration, UsingDataArray_cmod_windpower) {
 
     compute();
 
-    annual_energy;
     ssc_data_get_number(data, "annual_energy", &annual_energy);
     EXPECT_NEAR(annual_energy, expectedAnnualEnergy, relErr);
 

@@ -25,7 +25,7 @@ The Python and C API documentation are generated directly from the API sources (
 
 ## Updating ReadTheDocs
 ReadTheDocs will build "latest" and "stable" versions of EnergyPlus commits by default.  
-[`latest`](https://energyplus.readthedocs.io/en/latest/) always points to the latest commit made to the `develop` branch, almost often due to a pull request merge.
+[`latest`](https://energyplus.readthedocs.io/en/latest/) always points to the latest commit made to the `develop` branch, almost always due to a pull request merge.
 [`stable`](https://energyplus.readthedocs.io/en/stable/) always points to the last release tag made to EnergyPlus.
 
 In addition, any number of other versions can be added.  This should be done at each major release of EnergyPlus.

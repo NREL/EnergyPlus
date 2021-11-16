@@ -60,27 +60,16 @@ namespace EnergyPlus {
 
 namespace HVACCooledBeam {
 
-    // Using/Aliasing
+    enum class CooledBeamType
+    {
+        Unassigned = -1,
+        Passive,
+        Active
+    };
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const Passive_Cooled_Beam;
-    extern int const Active_Cooled_Beam;
-    extern Real64 const NomMassFlowPerBeam; // nominal water mass flow rate per beam [kg/s]
-    extern Real64 const MinWaterVel;        // minimum water velocity [m/s]
-    extern Real64 const Coeff2;
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
-
-    // INTEGER :: NumPassiveCB = 0
-    // INTEGER :: NumActiveCB = 0
-    extern int NumCB;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACCooledBeam:
-
-    // Types
+    Real64 constexpr NomMassFlowPerBeam(0.07); // nominal water mass flow rate per beam [kg/s]
+    Real64 constexpr MinWaterVel(0.2);         // minimum water velocity [m/s]
+    Real64 constexpr Coeff2(10000.0);
 
     struct CoolBeamData
     {
@@ -89,8 +78,8 @@ namespace HVACCooledBeam {
         std::string Name;            // name of unit
         std::string UnitType;        // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
         int UnitType_Num;            // index to type of unit = 1 (there's only 1 type so far)
-        std::string CBType;          // type of cooled beam: active | passive
-        int CBType_Num;              // index to type of cooled beam: passive=1; active=2
+        std::string CBTypeString;    // type of cooled beam: active | passive
+        CooledBeamType CBType;       // index to type of cooled beam
         std::string Sched;           // availability schedule
         int SchedPtr;                // index to schedule
         Real64 MaxAirVolFlow;        // m3/s (autosizable)
@@ -135,43 +124,37 @@ namespace HVACCooledBeam {
         int CBLoadReSimIndex;
         int CBMassFlowReSimIndex;
         int CBWaterOutletTempReSimIndex;
-        int CtrlZoneNum;         // control zone index
-        int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
-        int AirLoopNum;          // air loop index that terminal is attached to
-        Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
+        int CtrlZoneNum;           // control zone index
+        int ctrlZoneInNodeIndex;   // which controlled zone inlet node number corresponds with this unit
+        int AirLoopNum;            // air loop index that terminal is attached to
+        Real64 OutdoorAirFlowRate; // zone outdoor air volume flow rate
         bool MyEnvrnFlag;
         bool MySizeFlag;
         bool PlantLoopScanFlag;
 
         // Default Constructor
         CoolBeamData()
-            : UnitType_Num(0), CBType_Num(0), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
+            : UnitType_Num(0), CBType(CooledBeamType::Unassigned), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
               MaxCoolWaterMassFlow(0.0), AirInNode(0), AirOutNode(0), CWInNode(0), CWOutNode(0), ADUNum(0), NumBeams(0.0), BeamLength(0.0),
               DesInletWaterTemp(0.0), DesOutletWaterTemp(0.0), CoilArea(0.0), a(0.0), n1(0.0), n2(0.0), n3(0.0), a0(0.0), K1(0.0), n(0.0), Kin(0.0),
               InDiam(0.0), TWIn(0.0), TWOut(0.0), EnthWaterOut(0.0), BeamFlow(0.0), CoolWaterMassFlow(0.0), BeamCoolingEnergy(0.0),
               BeamCoolingRate(0.0), SupAirCoolingEnergy(0.0), SupAirCoolingRate(0.0), SupAirHeatingEnergy(0.0), SupAirHeatingRate(0.0), CWLoopNum(0),
               CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CBLoadReSimIndex(0), CBMassFlowReSimIndex(0), CBWaterOutletTempReSimIndex(0),
-              CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0), MyEnvrnFlag(true), MySizeFlag(true), PlantLoopScanFlag(true)
+              CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0), MyEnvrnFlag(true), MySizeFlag(true),
+              PlantLoopScanFlag(true)
         {
         }
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<CoolBeamData> CoolBeam;
-
-    // Functions
-
-    void clear_state();
-
     void SimCoolBeam(EnergyPlusData &state,
-                     std::string const &CompName,   // name of the cooled beam unit
-                     bool FirstHVACIteration, // TRUE if first HVAC iteration in time step
-                     int ZoneNum,             // index of zone served by the unit
-                     int ZoneNodeNum,         // zone node number of zone served by the unit
-                     int &CompIndex,                // which cooled beam unit in data structure
-                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
+                     std::string_view CompName, // name of the cooled beam unit
+                     bool FirstHVACIteration,   // TRUE if first HVAC iteration in time step
+                     int ZoneNum,               // index of zone served by the unit
+                     int ZoneNodeNum,           // zone node number of zone served by the unit
+                     int &CompIndex,            // which cooled beam unit in data structure
+                     Real64 &NonAirSysOutput    // convective cooling by the beam system [W]
     );
 
     void GetCoolBeams(EnergyPlusData &state);
@@ -188,15 +171,15 @@ namespace HVACCooledBeam {
                          int ZoneNum,             // number of zone being served
                          int ZoneNodeNum,         // zone node number
                          bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                         Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
+                         Real64 &NonAirSysOutput  // convective cooling by the beam system [W]
     );
 
     void CalcCoolBeam(EnergyPlusData &state,
-                      int CBNum,     // Unit index
-                      int ZoneNode,  // zone node number
-                      Real64 CWFlow, // cold water flow [kg/s]
-                      Real64 &LoadMet,     // load met by unit [W]
-                      Real64 &TWOut        // chilled water outlet temperature [C]
+                      int CBNum,       // Unit index
+                      int ZoneNode,    // zone node number
+                      Real64 CWFlow,   // cold water flow [kg/s]
+                      Real64 &LoadMet, // load met by unit [W]
+                      Real64 &TWOut    // chilled water outlet temperature [C]
     );
 
     Real64 CoolBeamResidual(EnergyPlusData &state,
@@ -209,11 +192,21 @@ namespace HVACCooledBeam {
 
 } // namespace HVACCooledBeam
 
-struct HVACCooledBeamData : BaseGlobalStruct {
+struct HVACCooledBeamData : BaseGlobalStruct
+{
+    Array1D_bool CheckEquipName;
+    int NumCB;
+    Array1D<HVACCooledBeam::CoolBeamData> CoolBeam;
+    bool GetInputFlag = true;              // First time, input is "gotten"
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state() override
     {
-
+        this->CheckEquipName.clear();
+        this->NumCB = 0;
+        this->CoolBeam.clear();
+        this->GetInputFlag = true;
+        this->ZoneEquipmentListChecked = false;
     }
 };
 

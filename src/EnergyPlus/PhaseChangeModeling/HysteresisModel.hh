@@ -71,8 +71,6 @@ namespace HysteresisPhaseChange {
         static const int CRYSTALLIZED = 2;
     };
 
-    extern int numHysteresisModels;
-
     class HysteresisPhaseChange
     {
 
@@ -136,19 +134,22 @@ namespace HysteresisPhaseChange {
         }
     };
 
-    extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
-
     void readAllHysteresisModels(EnergyPlusData &state);
-
-    void clear_state();
 
 } // namespace HysteresisPhaseChange
 
-struct HysteresisPhaseChangeData : BaseGlobalStruct {
+struct HysteresisPhaseChangeData : BaseGlobalStruct
+{
+
+    bool getHysteresisModels = true;
+    int numHysteresisModels = 0;
+    std::vector<HysteresisPhaseChange::HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
     void clear_state() override
     {
-
+        numHysteresisModels = 0;
+        getHysteresisModels = true;
+        hysteresisPhaseChangeModels.clear();
     }
 };
 

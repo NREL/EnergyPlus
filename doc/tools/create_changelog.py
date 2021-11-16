@@ -116,7 +116,7 @@ except CalledProcessError as ex:
     log_full = ''
     pass  # add error handling
 log_full_split = log_full.split('\n')
-log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x and not x.strip().startswith('Revert')]
+log_merge_prs = [x for x in log_full_split if x.strip().startswith('Merge pull request') and not x.strip().startswith('Revert')]
 pr_tokens = [x.split(' ')[7] for x in log_merge_prs]
 pr_numbers = sorted([x[1:] for x in pr_tokens])
 
@@ -133,6 +133,11 @@ for pr_num in pr_numbers:
     # - a user wants to contribute a change to E+, so they create a fork/branch
     # - their operations result in a pull request into their own repo, so the counting starts at #1...
     # we're at like 5000+, so if we just skip anything less than 1000, we'll be good.
+    try:
+        i = int(pr_num)
+    except ValueError:
+        print(f"WARNING: Something wrong with PR number: \"{pr_num}\"")
+        continue
     if int(pr_num) < 1000:
         continue
 

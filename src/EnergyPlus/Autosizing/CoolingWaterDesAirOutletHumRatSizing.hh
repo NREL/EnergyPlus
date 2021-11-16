@@ -62,7 +62,6 @@ struct CoolingWaterDesAirOutletHumRatSizer : BaseSizer
     {
         this->sizingType = AutoSizingType::CoolingWaterDesAirOutletHumRatSizing;
         this->sizingString = "Design Outlet Air Humidity Ratio [kgWater/kgDryAir]";
-
     }
     ~CoolingWaterDesAirOutletHumRatSizer() = default;
 

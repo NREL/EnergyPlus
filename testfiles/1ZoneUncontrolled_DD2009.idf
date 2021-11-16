@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,4;
 
@@ -674,6 +674,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -690,6 +691,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -706,6 +708,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -722,6 +725,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -738,6 +742,7 @@
     Ceiling,                 !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -754,6 +759,7 @@
     Floor,                   !- Surface Type
     Slab,                    !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -798,6 +804,10 @@
   Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;
 
   Output:Variable,*,Site Outdoor Air Barometric Pressure,Timestep;
+
+  Output:Variable,*,Site Total Sky Cover,Timestep;
+
+  Output:Variable,*,Site Opaque Sky Cover,Timestep;
 
   Output:Variable,*,Site Sky Temperature,Timestep;
 

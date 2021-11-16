@@ -62,7 +62,8 @@ struct EnergyPlusData;
 
 namespace ZoneAirLoopEquipmentManager {
 
-    void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(EnergyPlusData &state,
+                                    std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
@@ -77,7 +78,8 @@ namespace ZoneAirLoopEquipmentManager {
 
     void InitZoneAirLoopEquipmentTimeStep(EnergyPlusData &state, int const AirDistUnitNum);
 
-    void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(EnergyPlusData &state,
+                                 int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
@@ -87,25 +89,28 @@ namespace ZoneAirLoopEquipmentManager {
 
 } // namespace ZoneAirLoopEquipmentManager
 
-    struct ZoneAirLoopEquipmentManagerData : BaseGlobalStruct {
-        bool MyOneTimeFlag;
-        bool GetAirDistUnitsFlag;  // If TRUE, Air Distribution Data has not been read in yet
-        bool InitAirDistUnitsFlag; // If TRUE, not all Air Distribution Units have been initialized
-        Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
-        int numADUInitialized;        // Count of ADUs that have been initialized
+struct ZoneAirLoopEquipmentManagerData : BaseGlobalStruct
+{
+    bool MyOneTimeFlag;
+    bool GetAirDistUnitsFlag;  // If TRUE, Air Distribution Data has not been read in yet
+    bool InitAirDistUnitsFlag; // If TRUE, not all Air Distribution Units have been initialized
+    Array1D_bool EachOnceFlag; // If TRUE, Air Distribution unit has not been initialized yet
+    int numADUInitialized;     // Count of ADUs that have been initialized
 
-        void clear_state() override
-        {
-            this->GetAirDistUnitsFlag = true;
-            this->EachOnceFlag.deallocate();
-            this->MyOneTimeFlag = true;
-            this->InitAirDistUnitsFlag = true;
-            this->numADUInitialized = 0;
-        }
+    void clear_state() override
+    {
+        this->GetAirDistUnitsFlag = true;
+        this->EachOnceFlag.deallocate();
+        this->MyOneTimeFlag = true;
+        this->InitAirDistUnitsFlag = true;
+        this->numADUInitialized = 0;
+    }
 
-        // Default Constructor
-        ZoneAirLoopEquipmentManagerData() : MyOneTimeFlag(true), GetAirDistUnitsFlag(true), InitAirDistUnitsFlag(true), numADUInitialized(0) {}
-    };
+    // Default Constructor
+    ZoneAirLoopEquipmentManagerData() : MyOneTimeFlag(true), GetAirDistUnitsFlag(true), InitAirDistUnitsFlag(true), numADUInitialized(0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

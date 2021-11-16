@@ -52,14 +52,14 @@
 
 namespace EnergyPlus {
 
-    struct BasePlantLoopHeatPump : PlantComponent {
+struct BasePlantLoopHeatPump : PlantComponent
+{
 
-        ~BasePlantLoopHeatPump()=default;
+    ~BasePlantLoopHeatPump() = default;
 
-        // void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
+    // void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
+};
 
-    };
+} // namespace EnergyPlus
 
-}
-
-#endif //ENERGYPLUS_WATERTOWATERHEATPUMPS_HH
+#endif // ENERGYPLUS_WATERTOWATERHEATPUMPS_HH

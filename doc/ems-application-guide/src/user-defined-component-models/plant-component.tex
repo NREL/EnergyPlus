@@ -6,7 +6,7 @@ Although the other user-defined component models can also connect to plant, they
 
 The user defined plant component can use up to four different plant loop connections, one optional air connection, a water supply tank, a water collection tank, and an ambient zone for skin losses.
 
-\subsection{Plant Connections}\label{plant-connections-001}
+\subsection{Plant Connections (User Defined)}\label{plant-connections-001}
 
 The user defined plant component can be connected to up to four different plant loops.
 
@@ -79,6 +79,10 @@ For each plant loop connection, there is input required for the nature of the fl
 
 Separate program calling managers are available for each plant loop connection.~ The user defined plant component is called to simulate by the central plant routines (whereas the other user defined components are called by the central HVAC routines).~ The calls to simulate are made for each connection and you may want or need to perform different model calculations depending on which plant loop connection is being simulated at the time.~ There is an Erl program calling manager for initialization, setup, and sizing that needs to be used \emph{for each plant connection} and is only called during the early plant loop initialization phase.~ There is also an Erl program calling manager for the model calculations to perform for each plant connection.
 
+\subsection{Plant Component (Temperature Source)}\label{plant-component-temperature-source}
+
+An actuator called ``PlantComponent:TemperatureSource'' with the control type ``Maximum Mass Flow Rate'' in {[}kg/s{]} is available for controlling the maximum flow rate from a temperature source plant component.
+
 \subsection{Air Connection}\label{air-connection}
 
 An air connection is available that includes both an inlet and an outlet node.~ This can be used for air source or heat rejections. The following EMS internal variables are made available for the inlet node, if it is used, and should be useful inputs to your own custom models:
@@ -119,7 +123,7 @@ The user defined plant component can be connected to an ambient zone and provide
 \item
   An actuator called ``Component Zone Internal Gain'' with the control type ``Sensible Heat Gain Rate,'' in {[}W{]}, is available.~ This can be used for purely convective sensible heat gains (or losses) to a zone.
 \item
-  An actuator called ``Component Zone Internal Gain'' with the control type ``Return Air Heat Gain Rate,'' in {[}W{]}, is available.~ This can be used for purely convective sensible heat gains (or losses) to the return air duct for a zone.
+  An actuator called ``Component Zone Internal Gain'' with the control type ``Return Air Heat Sensible Gain Rate,'' in {[}W{]}, is available.~ This can be used for purely convective sensible heat gains (or losses) to the return air duct for a zone.
 \item
   An actuator called ``Component Zone Internal Gain'' with the control type ``Thermal Radiation Heat Gain Rate,'' in {[}W{]}, is available.~ This can be used for thermal radiation gains (or losses) to a zone.
 \item

@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
+    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS")));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
     EXPECT_EQ(thisBoiler.NomEffic, 0.8);
     EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);
@@ -110,7 +110,6 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
 
     // Additional tests for fuel type input
     EXPECT_EQ(thisBoiler.BoilerFuelTypeForOutputVariable, "NaturalGas");
-
 }
 
 TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
@@ -126,7 +125,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
 
     std::string const idf_objects = delimited_string({
         "  Boiler:Steam,                                                                                            ",
@@ -169,13 +168,13 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Steam;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Steam;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
 
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;
-    DataSizing::PlantSizData(1).DeltaT = 10;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.1;
+    state->dataSize->PlantSizData(1).DeltaT = 10;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
@@ -189,5 +188,5 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     EXPECT_EQ(thisBoiler.BoilerLoad, 1000000);
     EXPECT_NEAR(thisBoiler.FuelUsed, 1562498, 1.0);
     Real64 ExpectedBoilerEff = thisBoiler.BoilerLoad / thisBoiler.FuelUsed;
-    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff,0.01);
+    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff, 0.01);
 }

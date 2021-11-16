@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -56,6 +56,8 @@
 
 # Attempt to automatically change the version number of all idf and imf files in a repo
 # Two arguments: old version number and new version number
+
+# TODO: Change EPJSON files as well
 
 import codecs
 import fnmatch

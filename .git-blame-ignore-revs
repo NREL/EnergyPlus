@@ -449,3 +449,8 @@ deb313430ea9b1cc2c0bb679c376689db32eeb17
 # Specify BinPackArguments: false [energyplus-style-bot, 2018-03-26]
 c8f9fbba47a5425fbb4220285f70d0017f6f65b4
 #    2 files changed, 2 insertions(+)
+
+# Apply clang-format to src/EnergyPlus and tst/EnergyPlus/unit [Edwin Lee, 2021-03-30]
+33b71ed598f37c10e9bfb6492e2a2103ba24e3dd
+# 762 files changed, 397748 insertions(+), 351788 deletions(-)
+

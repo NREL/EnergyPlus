@@ -53,22 +53,22 @@ $c_2$ = 2.04901523,
 
 $c_3$ = 10.14333127,
 
-$c_4$ = .22475541,
+$c_4$ = -0.22475541,
 
-$c_5$ = .00683783,
+$c_5$ = -0.00683783,
 
-$c_6$ = .05481717,
+$c_6$ = -0.05481717,
 
-$c_7$ = .00122874,
+$c_7$ = 0.00122874,
 
-$c_8$ = .00085282,
+$c_8$ = 0.00085282,
 
-$c_9$ = .00000199.
+$c_9$ = -0.00000199.
 
 If the RH is less than 13\% and the temperature is between 80 and 112 °F, then the following adjustment is subtracted from HI:
 
 \begin{equation}  \label{eq:rm-2}
-HI = (13 - R) / 4 * (17 - |T - 95|)^{0.5}
+HI = (13 - R) / 4 * ((17 - |T - 95|) / 17)^{0.5}
 \end{equation}
 
 Otherwise, if the RH is greater than 85\% and the temperature is between 80 and 87 °F, then the following adjustment is added to HI:
@@ -83,7 +83,7 @@ The Rothfusz regression is not appropriate when conditions of temperature and hu
 HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + (R * 0.094))
 \end{equation}
 
-In practice, the simple formula is computed first and the result averaged with the temperature. If this heat index value is 80 °F or higher, the full regression equation along with any adjustment as described above is applied. The Rothfusz regression is not valid for extreme temperature and relative humidity conditions beyond the range of data considered by Steadman.
+In practice, the simple formula is computed first based on the temperature and humidity. If this heat index value is 80 °F or higher, the full regression equation along with any adjustment as described above is applied. The Rothfusz regression is not valid for extreme temperature and relative humidity conditions beyond the range of data considered by Steadman.
 
 The Heat Index Hours (accumulated hours for a space) and Heat Index OccupantHours (accumulated hours for the sum of all occupants in a space) of each level for each zone and the whole building are reported under the Annual Thermal Resilience Report.
 

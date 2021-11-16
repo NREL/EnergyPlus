@@ -1,6 +1,13 @@
 name: Linux Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ develop ]
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    branches: [ develop ]
 
 jobs:
 #  base_build:
@@ -65,9 +72,10 @@ jobs:
                 -DLINK_WITH_PYTHON=OFF \
                 -DUSE_PSYCHROMETRICS_CACHING=OFF \
                 -DUSE_GLYCOL_CACHING=OFF \
-                -OPENGL_REQUIRED=OFF \
-                -USE_PSYCH_STATS=ON \
-                -USE_PSYCH_ERRORS=OFF \
+                -DOPENGL_REQUIRED=OFF \
+                -DUSE_PSYCH_STATS=ON \
+                -DUSE_PSYCH_ERRORS=OFF \
+                -DENABLE_PCH=OFF \
                 ../
 
       - name: Build EnergyPlus

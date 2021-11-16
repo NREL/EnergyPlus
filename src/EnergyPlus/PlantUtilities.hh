@@ -64,9 +64,8 @@ struct EnergyPlusData;
 namespace PlantUtilities {
 
     // Functions
-    void clear_state();
-
-    void InitComponentNodes(Real64 MinCompMdot,
+    void InitComponentNodes(EnergyPlusData &state,
+                            Real64 MinCompMdot,
                             Real64 MaxCompMdot,
                             int InletNode,   // component's inlet node index in node structure
                             int OutletNode,  // component's outlet node index in node structure
@@ -104,55 +103,55 @@ namespace PlantUtilities {
 
     void CheckForRunawayPlantTemps(EnergyPlusData &state, int LoopNum, int LoopSideNum);
 
-    void SetAllFlowLocks(EnergyPlusData &state, DataPlant::iFlowLock Value);
+    void SetAllFlowLocks(EnergyPlusData &state, DataPlant::FlowLock Value);
 
     void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
     void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                     int LoopNum,                           // component's loop index
-                                     int LoopSide,                          // component's loop side number
-                                     int BranchNum,                         // Component's branch number
-                                     int CompNum,                           // Component's comp number
-                                     int &UniqueCriteriaCheckIndex,         // An integer given to this particular check
-                                     int ConnectedLoopNum,                  // Component's interconnected loop number
-                                     int ConnectedLoopSide,                 // Component's interconnected loop side number
-                                     DataPlant::iCriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
-                                     Real64 CriteriaValue                   // The value of the criteria check to evaluate
+                                     int LoopNum,                          // component's loop index
+                                     int LoopSide,                         // component's loop side number
+                                     int BranchNum,                        // Component's branch number
+                                     int CompNum,                          // Component's comp number
+                                     int &UniqueCriteriaCheckIndex,        // An integer given to this particular check
+                                     int ConnectedLoopNum,                 // Component's interconnected loop number
+                                     int ConnectedLoopSide,                // Component's interconnected loop side number
+                                     DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                     Real64 CriteriaValue                  // The value of the criteria check to evaluate
     );
 
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                             int LoopNum,                   // component's loop index
-                                             int LoopSide,                  // component's loop side number
-                                             int TypeOfNum,                 // Component's type index
-                                             int InletNodeNum,              // Component's inlet node pointer
-                                             int OutletNodeNum,             // Component's outlet node pointer
-                                             Real64 ModelCondenserHeatRate, // model's heat rejection rate at condenser (W)
-                                             Real64 ModelInletTemp,         // model's inlet temperature (C)
-                                             Real64 ModelOutletTemp,        // model's outlet temperature (C)
-                                             Real64 ModelMassFlowRate,      // model's condenser water mass flow rate (kg/s)
+                                             int LoopNum,                        // component's loop index
+                                             int LoopSide,                       // component's loop side number
+                                             DataPlant::PlantEquipmentType Type, // Component's type index
+                                             int InletNodeNum,                   // Component's inlet node pointer
+                                             int OutletNodeNum,                  // Component's outlet node pointer
+                                             Real64 ModelCondenserHeatRate,      // model's heat rejection rate at condenser (W)
+                                             Real64 ModelInletTemp,              // model's inlet temperature (C)
+                                             Real64 ModelOutletTemp,             // model's outlet temperature (C)
+                                             Real64 ModelMassFlowRate,           // model's condenser water mass flow rate (kg/s)
                                              bool FirstHVACIteration);
 
     void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
-                                         int LoopNum,                  // component's loop index
-                                         int LoopSide,                 // component's loop side number
-                                         int TypeOfNum,                // Component's type index
-                                         int InletNodeNum,             // Component's inlet node pointer
-                                         int OutletNodeNum,            // Component's outlet node pointer
-                                         Real64 ModelRecoveryHeatRate, // model's heat rejection rate at recovery (W)
-                                         Real64 ModelInletTemp,        // model's inlet temperature (C)
-                                         Real64 ModelOutletTemp,       // model's outlet temperature (C)
-                                         Real64 ModelMassFlowRate,     // model's condenser water mass flow rate (kg/s)
+                                         int LoopNum,                        // component's loop index
+                                         int LoopSide,                       // component's loop side number
+                                         DataPlant::PlantEquipmentType Type, // Component's type index
+                                         int InletNodeNum,                   // Component's inlet node pointer
+                                         int OutletNodeNum,                  // Component's outlet node pointer
+                                         Real64 ModelRecoveryHeatRate,       // model's heat rejection rate at recovery (W)
+                                         Real64 ModelInletTemp,              // model's inlet temperature (C)
+                                         Real64 ModelOutletTemp,             // model's outlet temperature (C)
+                                         Real64 ModelMassFlowRate,           // model's condenser water mass flow rate (kg/s)
                                          bool FirstHVACIteration);
 
     void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
-                                                     int LoopNum,                   // component's loop index
-                                                     int LoopSide,                  // component's loop side number
-                                                     int TypeOfNum,                 // Component's type index
-                                                     int InletNodeNum,              // Component's inlet node pointer
-                                                     int OutletNodeNum,             // Component's outlet node pointer
-                                                     int HeatSourceType,            // Type of fluid in Generator loop
-                                                     Real64 ModelGeneratorHeatRate, // model's generator heat rate (W)
-                                                     Real64 ModelMassFlowRate,      // model's generator mass flow rate (kg/s)
+                                                     int LoopNum,                                // component's loop index
+                                                     int LoopSide,                               // component's loop side number
+                                                     DataPlant::PlantEquipmentType Type,         // Component's type index
+                                                     int InletNodeNum,                           // Component's inlet node pointer
+                                                     int OutletNodeNum,                          // Component's outlet node pointer
+                                                     DataLoopNode::NodeFluidType HeatSourceType, // Type of fluid in Generator loop
+                                                     Real64 ModelGeneratorHeatRate,              // model's generator heat rate (W)
+                                                     Real64 ModelMassFlowRate,                   // model's generator mass flow rate (kg/s)
                                                      bool FirstHVACIteration);
 
     void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
@@ -160,12 +159,13 @@ namespace PlantUtilities {
                                        int Loop1LoopSideNum,
                                        int Loop2Num,
                                        int Loop2LoopSideNum,
-                                       int PlantComponentTypeOfNum,
+                                       DataPlant::PlantEquipmentType ComponentType,
                                        bool Loop1DemandsOnLoop2);
 
     void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int OldIndex, int NewIndex);
 
-    void RegisterPlantCompDesignFlow(int ComponentInletNodeNum, // the component's water inlet node number
+    void RegisterPlantCompDesignFlow(EnergyPlusData &state,
+                                     int ComponentInletNodeNum, // the component's water inlet node number
                                      Real64 DesPlantFlow        // the component's design fluid volume flow rate [m3/s]
     );
 
@@ -176,9 +176,9 @@ namespace PlantUtilities {
                            Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
     );
 
-    Real64 BoundValueToNodeMinMaxAvail(Real64 ValueToBound, int NodeNumToBoundWith);
+    Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 ValueToBound, int NodeNumToBoundWith);
 
-    void TightenNodeMinMaxAvails(int NodeNum, Real64 NewMinAvail, Real64 NewMaxAvail);
+    void TightenNodeMinMaxAvails(EnergyPlusData &state, int NodeNum, Real64 NewMinAvail, Real64 NewMaxAvail);
 
     Real64 BoundValueToWithinTwoValues(Real64 ValueToBound, Real64 LowerBound, Real64 UpperBound);
 
@@ -187,8 +187,8 @@ namespace PlantUtilities {
     void LogPlantConvergencePoints(EnergyPlusData &state, bool FirstHVACIteration);
 
     void ScanPlantLoopsForObject(EnergyPlusData &state,
-                                 std::string const &CompName,
-                                 int CompType,
+                                 std::string_view CompName,
+                                 DataPlant::PlantEquipmentType CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
                                  int &BranchNum,
@@ -201,10 +201,10 @@ namespace PlantUtilities {
                                  Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
-                                  std::string const &CallerName, // really used for error messages
-                                  int NodeNum,                   // index in Node structure of node to be scanned
-                                  int &LoopNum,                  // return value for plant loop
-                                  int &LoopSideNum,              // return value for plant loop side
+                                  std::string_view const CallerName, // really used for error messages
+                                  int NodeNum,                       // index in Node structure of node to be scanned
+                                  int &LoopNum,                      // return value for plant loop
+                                  int &LoopSideNum,                  // return value for plant loop side
                                   int &BranchNum,
                                   Optional_int CompNum = _);
 
@@ -216,7 +216,7 @@ namespace PlantUtilities {
 
     int MyPlantSizingIndex(EnergyPlusData &state,
                            std::string const &CompType,          // component description
-                           std::string const &CompName,          // user name of component
+                           std::string_view CompName,            // user name of component
                            int NodeNumIn,                        // component water inlet node
                            int NodeNumOut,                       // component water outlet node
                            bool &ErrorsFound,                    // set to true if there's an error

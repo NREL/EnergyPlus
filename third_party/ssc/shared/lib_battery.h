@@ -33,7 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lib_util.h"
 #include "lib_battery_capacity.h"
 #include "lib_battery_voltage.h"
-#include "lib_battery_lifetime.h"
+#include "lib_battery_lifetime_calendar_cycle.h"
+#include "lib_battery_lifetime_nmc.h"
 
 /**
 * \class thermal_t
@@ -54,12 +55,14 @@ struct thermal_state {
 };
 
 struct thermal_params {
-    double dt_hour;
+    double dt_hr;
     double mass;                 // [kg]
     double surface_area;         // [m2] - exposed surface area
     double Cp;                   // [J/KgK] - battery specific heat capacity
     double h;                    // [W/m2/K] - general heat transfer coefficient
     double resistance;                    // [Ohm] - internal resistance
+
+    bool en_cap_vs_temp;       // if true, no capacity degradation from temp and do not use cap_vs_temp
     util::matrix_t<double> cap_vs_temp;
 
     enum OPTIONS {
@@ -74,11 +77,19 @@ struct thermal_params {
 
 class thermal_t {
 public:
+    // constructors for capacity as an entry from a cap_vs_temp table
     thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
               const util::matrix_t<double> &c_vs_t, std::vector<double> T_room_C);
 
     thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
               const util::matrix_t<double> &c_vs_t, double T_room_C);
+
+    // constructors for capacity as an analytical function
+    thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
+        double T_room_C);
+
+    thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
+         std::vector<double> T_room_C);
 
     explicit thermal_t(std::shared_ptr<thermal_params> p);
 
@@ -109,6 +120,7 @@ protected:
     std::shared_ptr<thermal_state> state;
 
 private:
+
     void initialize();
 
     friend class battery_t;
@@ -133,7 +145,7 @@ struct losses_state {
 
 struct losses_params {
     enum OPTIONS {
-        MONTHLY, SCHEDULE, VALUE
+        MONTHLY, SCHEDULE
     };
     int loss_choice;
 
@@ -261,7 +273,7 @@ struct battery_params {
         LEAD_ACID, LITHIUM_ION, VANADIUM_REDOX, IRON_FLOW
     };
     int chem;
-    double dt_hour;
+    double dt_hr;
     double nominal_energy;
     double nominal_voltage;
     std::shared_ptr<capacity_params> capacity;
@@ -287,17 +299,15 @@ struct battery_params {
 class battery_t {
 public:
     battery_t(double dt_hr, int chem,
-            capacity_t* capacity_model,
-            voltage_t* voltage_model,
-            lifetime_t* lifetime_model,
-            thermal_t* thermal_model,
-            losses_t* losses_model);
+              capacity_t* capacity_model,
+              voltage_t* voltage_model,
+              lifetime_t* lifetime_model,
+              thermal_t* thermal_model,
+              losses_t* losses_model);
 
     explicit battery_t(std::shared_ptr<battery_params> p);
 
     battery_t(const battery_t &battery);
-
-    battery_t &operator=(const battery_t& rhs);
 
     // replace by capacity
     void setupReplacements(double capacity);
@@ -313,6 +323,9 @@ public:
 
     // Returns the % replacement if on a capacity schedule. Returns 0 for "none" or "calendar"
     double getReplacementPercent();
+
+    // Change the timestep of the battery and its component models
+    void ChangeTimestep(double dt_hr);
 
     // Run all for single time step, updating all component model states and return the dispatched power [kW]
     double run(size_t lifetimeIndex, double &I);

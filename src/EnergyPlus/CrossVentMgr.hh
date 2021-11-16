@@ -71,25 +71,26 @@ namespace CrossVentMgr {
 
 } // namespace CrossVentMgr
 
-    struct CrossVentMgrData : BaseGlobalStruct {
-        Real64 HAT_J = 0.0;             // HAT_J Convection Coefficient times Area times Temperature for Jet subzone
-        Real64 HA_J = 0.0;              // HA_J  Convection Coefficient times Area for Jet subzone
-        Real64 HAT_R = 0.0;             // HAT_R Convection Coefficient times Area times Temperature for Recirculation subzone
-        Real64 HA_R = 0.0;              // HA_J  Convection Coefficient times Area for Recirculation subzone
+struct CrossVentMgrData : BaseGlobalStruct
+{
+    Real64 HAT_J = 0.0; // HAT_J Convection Coefficient times Area times Temperature for Jet subzone
+    Real64 HA_J = 0.0;  // HA_J  Convection Coefficient times Area for Jet subzone
+    Real64 HAT_R = 0.0; // HAT_R Convection Coefficient times Area times Temperature for Recirculation subzone
+    Real64 HA_R = 0.0;  // HA_J  Convection Coefficient times Area for Recirculation subzone
 
-        bool InitUCSDCV_MyOneTimeFlag = true;
-        Array1D_bool InitUCSDCV_MyEnvrnFlag;
+    bool InitUCSDCV_MyOneTimeFlag = true;
+    Array1D_bool InitUCSDCV_MyEnvrnFlag;
 
-        void clear_state() override
-        {
-            this->HAT_J = 0.0;
-            this->HA_J = 0.0;
-            this->HAT_R = 0.0;
-            this->HA_R = 0.0;
-            this->InitUCSDCV_MyOneTimeFlag = true;
-            this->InitUCSDCV_MyEnvrnFlag.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->HAT_J = 0.0;
+        this->HA_J = 0.0;
+        this->HAT_R = 0.0;
+        this->HA_R = 0.0;
+        this->InitUCSDCV_MyOneTimeFlag = true;
+        this->InitUCSDCV_MyEnvrnFlag.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

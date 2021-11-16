@@ -59,7 +59,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
 {
@@ -71,7 +70,7 @@ TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
     }
 
     EXPECT_TRUE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state)); // SimLoopSideNeeded is set to true in default ctor
-    PlantUtilities::SetAllPlantSimFlagsToValue(*state, false);       // Set all SimLoopSideNeeded to false
+    PlantUtilities::SetAllPlantSimFlagsToValue(*state, false);     // Set all SimLoopSideNeeded to false
     EXPECT_FALSE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state));
 }
 
@@ -104,8 +103,8 @@ TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
 
     // specify the node numbers of interest
-    int const nodeNumA = 1;
-    int const nodeNumB = 2;
+    int constexpr nodeNumA = 1;
+    int constexpr nodeNumB = 2;
 
     // first test, expected pass
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;

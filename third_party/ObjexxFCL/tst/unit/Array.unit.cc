@@ -34,8 +34,6 @@ TEST( ArrayTest, DefaultConstruction )
 {
 	Array2D_int A, B;
 	EXPECT_EQ( 0u, A.size() );
-	A.zero(); // Now safe against VC Checked Iterators
-	EXPECT_EQ( 0u, A.size() );
 }
 
 TEST( ArrayTest, Construction2DIndexRangeInitializerList )
@@ -187,75 +185,6 @@ TEST( ArrayTest, Operators2D )
 	EXPECT_TRUE( eq( Array2D_int( 3, 3, 67 ), B ) );
 }
 
-TEST( ArrayTest, Operators6D )
-{
-	Array6D_int A( 3, 3, 3, 3, 3, 3, 33 );
-	Array6A_int B( A );
-	A += B;
-	EXPECT_TRUE( eq( Array6D_int( 3, 3, 3, 3, 3, 3, 66 ), A ) );
-	EXPECT_TRUE( eq( Array6D_int( 3, 3, 3, 3, 3, 3, 66 ), B ) );
-	A += 1;
-	EXPECT_TRUE( eq( Array6D_int( 3, 3, 3, 3, 3, 3, 67 ), A ) );
-	EXPECT_TRUE( eq( Array6D_int( 3, 3, 3, 3, 3, 3, 67 ), B ) );
-}
-
-TEST( ArrayTest, Redimension2D )
-{
-	Array2D_int A( 4, 4, 44 );
-	A.redimension( 5, 5, 55 ); // Redimension by index ranges
-	EXPECT_EQ( IR( 1, 5 ), A.I1() );
-	EXPECT_EQ( IR( 1, 5 ), A.I2() );
-	EXPECT_EQ( 5u, A.size1() );
-	EXPECT_EQ( 5u, A.size2() );
-	EXPECT_EQ( 5u * 5u, A.size() );
-	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
-		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
-			if ( i1 <= 4 && i2 <= 4 ) {
-				EXPECT_EQ( 44, A( i1, i2 ) );
-			} else {
-				EXPECT_EQ( 55, A( i1, i2 ) );
-			}
-		}
-	}
-	Array2D_float B( 6, 6 );
-	A.redimension( B, 66 ); // Redimension by another array
-	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
-		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
-			if ( i1 <= 4 && i2 <= 4 ) {
-				EXPECT_EQ( 44, A( i1, i2 ) );
-			} else if ( i1 <= 5 && i2 <= 5 ) {
-				EXPECT_EQ( 55, A( i1, i2 ) );
-			} else {
-				EXPECT_EQ( 66, A( i1, i2 ) );
-			}
-		}
-	}
-}
-
-TEST( ArrayTest, Redimension3DFill )
-{
-	Array3D_int A( 4, 4, 4, 44 );
-	A.redimension( 5, 5, 5, 55 ); // Redimension by index ranges
-	EXPECT_EQ( IR( 1, 5 ), A.I1() );
-	EXPECT_EQ( IR( 1, 5 ), A.I2() );
-	EXPECT_EQ( IR( 1, 5 ), A.I3() );
-	EXPECT_EQ( 5u, A.size1() );
-	EXPECT_EQ( 5u, A.size2() );
-	EXPECT_EQ( 5u, A.size3() );
-	EXPECT_EQ( 5u * 5u * 5u, A.size() );
-	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
-		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
-			for ( int i3 = A.l3(); i3 <= A.u3(); ++i3 ) {
-				if ( i1 <= 4 && i2 <= 4 && i3 <= 4 ) {
-					EXPECT_EQ( 44, A( i1, i2, i3 ) );
-				} else {
-					EXPECT_EQ( 55, A( i1, i2, i3 ) );
-				}
-			}
-		}
-	}
-}
-
 TEST( ArrayTest, Swap3D )
 {
 	Array3D_int A( 4, 4, 4, 44 );
@@ -278,175 +207,6 @@ TEST( ArrayTest, Pow2D )
 	Array2D_int B( pow( A, 2 ) );
 	Array2D_int S( 3, 3, 144 );
 	EXPECT_TRUE( eq( S, B ) );
-}
-
-TEST( ArrayTest, Cshift2DDim1 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 31, 32, 33, 11, 12, 13, 21, 22, 23 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, cshift( A, 2, 1 ) ) );
-}
-
-TEST( ArrayTest, Cshift2DDim2 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 12, 13, 11, 22, 23, 21, 32, 33, 31 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, cshift( A, -2, 2 ) ) );
-}
-
-TEST( ArrayTest, Cshift2DNonSquareDim2 )
-{
-	Array2D_int A( 3, 2, reshape( { 11, 12, 21, 22, 31, 32 }, std::array< int, 2 >{ { 3, 2 } } ) );
-	Array2D_int B( 3, 2, reshape( { 12, 11, 22, 21, 32, 31 }, std::array< int, 2 >{ { 3, 2 } } ) );
-	EXPECT_TRUE( eq( B, cshift( A, -1, 2 ) ) );
-}
-
-TEST( ArrayTest, Cshift2DDim1Array )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 31, 32, 33, 11, 12, 13, 21, 22, 23 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, cshift( A, Array1D_int( 3, 2 ), 1 ) ) );
-	Array2D_int C( 3, 3, reshape( { 31, 12, 33, 11, 22, 13, 21, 32, 23 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( C, cshift( A, Array1D_int( 3, {2,0,2} ), 1 ) ) ); // Non-uniform shifts
-}
-
-TEST( ArrayTest, Cshift2DDim2Array )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 12, 13, 11, 22, 23, 21, 32, 33, 31 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, cshift( A, Array1D_int( 3, -2 ), 2 ) ) );
-	Array2D_int C( 3, 3, reshape( { 13, 11, 12, 21, 22, 23, 33, 31, 32 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( C, cshift( A, Array1D_int( 3, {2,0,2} ), 2 ) ) ); // Non-uniform shifts
-}
-
-TEST( ArrayTest, Eoshift2DDim1 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 31, 32, 33, 0, 0, 0, 0, 0, 0 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, eoshift( A, 2, 0, 1 ) ) );
-	Array2D_int C( 3, 3, reshape( { 31, 32, 33, 99, 99, 99, 99, 99, 99 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( C, eoshift( A, 2, 99, 1 ) ) );
-}
-
-TEST( ArrayTest, Eoshift2DDim2 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 0, 0, 11, 0, 0, 21, 0, 0, 31 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, eoshift( A, -2, 0, 2 ) ) );
-	Array2D_int C( 3, 3, reshape( { 99, 99, 11, 99, 99, 21, 99, 99, 31 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( C, eoshift( A, -2, 99, 2 ) ) );
-}
-
-TEST( ArrayTest, Eoshift2DDim1Array )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 31, 32, 33, 99, 99, 99, 99, 99, 99 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, eoshift( A, Array1D_int( 3, 2 ), 99, 1 ) ) );
-	Array2D_int C( 3, 3, reshape( { 31, 12, 33, 99, 22, 99, 99, 32, 99 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( C, eoshift( A, Array1D_int( 3, {2,0,2} ), 99, 1 ) ) ); // Non-uniform shifts
-}
-
-TEST( ArrayTest, Eoshift2DDim2Array )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	Array2D_int B( 3, 3, reshape( { 88, 88, 11, 88, 88, 21, 88, 88, 31 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( B, eoshift( A, Array1D_int( 3, -2 ), 88, 2 ) ) );
-	Array2D_int C( 3, 3, reshape( { 13, 88, 88, 21, 22, 23, 33, 88, 88 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( C, eoshift( A, Array1D_int( 3, {2,0,2} ), 88, 2 ) ) ); // Non-uniform shifts
-}
-
-TEST( ArrayTest, Sum2DDim1 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( Array1D_int( 3, { 63, 66, 69 } ), sum( A, 1 ) ) );
-}
-
-TEST( ArrayTest, Sum2DDim2 )
-{
-	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
-	EXPECT_TRUE( eq( Array1D_int( 3, { 36, 66, 96 } ), sum( A, 2 ) ) );
-}
-
-TEST( ArrayTest, Matmul11 )
-{
-	Array1D_int A( 2 );
-	Array1D_int B( 2 );
-	A( 1 ) = 4;
-	A( 2 ) = 3;
-	B( 1 ) = 7;
-	B( 2 ) = 5;
-	Array2D_int R( 2, 2 );
-	R( 1, 1 ) = 28;
-	R( 1, 2 ) = 20;
-	R( 2, 1 ) = 21;
-	R( 2, 2 ) = 15;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-}
-
-TEST( ArrayTest, Matrix2DMultiplication )
-{
-	IR I1( 3 ), I2( 3 );
-
-	Array2D_int A( I1, I2 );
-	for ( int i = A.l1(), ie = A.u1(); i <= ie; ++i ) {
-		for ( int j = A.l2(), je = A.u2(); j <= je; ++j ) {
-			A( i, j ) = i + j * 2;
-		}
-	}
-
-	Array2D_int B( I1, I2 );
-	for ( int i = B.l1(), ie = B.u1(); i <= ie; ++i ) {
-		for ( int j = B.l2(), je = B.u2(); j <= je; ++j ) {
-			B( i, j ) = i * 2 + j * 3;
-		}
-	}
-
-	Array2D_int C( I1, I2 );
-	for ( int i = A.l1(), ie = A.u1(); i <= ie; ++i ) {
-		for ( int j = A.l2(), je = A.u2(), jj = B.l2(); j <= je; ++j, ++jj ) {
-			int sum = 0;
-			for ( int k = A.l2(), ke = A.u2(), kk = B.l1(); k <= ke; ++k, ++kk ) {
-				sum += A( i, k ) * B( kk, jj );
-			}
-			C( i, j ) = sum;
-		}
-	}
-
-	A.right_multiply_by( B );
-	EXPECT_TRUE( eq( C, A ) );
-}
-
-TEST( ArrayTest, Matrix2DMultiplicationTranspose )
-{
-	IR I1( 3 ), I2( 3 );
-
-	Array2D_int A( I1, I2 );
-	for ( int i = A.l1(), ie = A.u1(); i <= ie; ++i ) {
-		for ( int j = A.l2(), je = A.u2(); j <= je; ++j ) {
-			A( i, j ) = i + j * 2;
-		}
-	}
-
-	Array2D_int B( I1, I2 );
-	for ( int i = B.l1(), ie = B.u1(); i <= ie; ++i ) {
-		for ( int j = B.l2(), je = B.u2(); j <= je; ++j ) {
-			B( i, j ) = i * 2 + j * 3;
-		}
-	}
-
-	Array2D_int C( I1, I2 );
-	for ( int i = A.l1(), ie = A.u1(); i <= ie; ++i ) {
-		for ( int j = A.l2(), je = A.u2(), jj = B.l2(); j <= je; ++j, ++jj ) {
-			int sum = 0;
-			for ( int k = A.l2(), ke = A.u2(), kk = B.l1(); k <= ke; ++k, ++kk ) {
-				sum += A( i, k ) * B( jj, kk );
-			}
-			C( i, j ) = sum;
-		}
-	}
-
-	A.right_multiply_by_transpose( B );
-	EXPECT_TRUE( eq( C, A ) );
 }
 
 TEST( ArrayTest, Generation2DValueMinusArray )
@@ -494,7 +254,6 @@ TEST( ArrayTest, EmptyComparisonPredicate )
 	EXPECT_EQ( 1, lbound( a, 1 ) );
 	EXPECT_EQ( 0, ubound( a, 1 ) );
 	EXPECT_TRUE( eq( a, b ) );
-	EXPECT_FALSE( ne( a, b ) );
 }
 
 TEST( ArrayTest, EmptyComparisonElemental )
@@ -531,14 +290,8 @@ TEST( ArrayTest, AnyOp2D )
 TEST( ArrayTest, AllOp2D )
 {
 	Array2D_int const A( 3, 3, { 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
-	EXPECT_FALSE( all_eq( A, 6 ) );
-	EXPECT_FALSE( all_eq( A, 22 ) );
 	EXPECT_TRUE( all_ne( A, 22 ) );
 	EXPECT_FALSE( all_ne( A, 2 ) );
-	EXPECT_FALSE( all_lt( A, 2 ) );
-	EXPECT_FALSE( all_ge( A, 9 ) );
-	EXPECT_TRUE( all_lt( A, 11 ) );
-	EXPECT_TRUE( all_gt( A, 0 ) );
 }
 
 TEST( ArrayTest, CountOp2D )

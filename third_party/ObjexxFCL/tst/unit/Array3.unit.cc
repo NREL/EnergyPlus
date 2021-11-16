@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array3.all.hh>
+#include <ObjexxFCL/Array3.hh>
 #include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
 
@@ -45,7 +45,6 @@ TEST( Array3Test, ConstructDefault )
 	EXPECT_EQ( Array3D_int::IR(), A.I1() );
 	EXPECT_EQ( Array3D_int::IR(), A.I2() );
 	EXPECT_EQ( Array3D_int::IR(), A.I3() );
-	EXPECT_FALSE( A.initializer_active() );
 }
 
 TEST( Array3Test, ConstructCopy )
@@ -65,7 +64,6 @@ TEST( Array3Test, ConstructCopy )
 	EXPECT_EQ( A.I1(), B.I1() );
 	EXPECT_EQ( A.I2(), B.I2() );
 	EXPECT_EQ( A.I3(), B.I3() );
-	EXPECT_EQ( A.initializer_active(), B.initializer_active() );
 	EXPECT_TRUE( conformable( A, B ) );
 	EXPECT_TRUE( equal_dimensions( A, B ) );
 	EXPECT_TRUE( eq( A, B ) );
@@ -73,7 +71,7 @@ TEST( Array3Test, ConstructCopy )
 
 TEST( Array3Test, ConstructOtherData )
 {
-	Array3D_double A( 2, 2, 2 );
+	Array3D<double> A( 2, 2, 2 );
 	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
 		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
 			for ( int i3 = A.l3(); i3 <= A.u3(); ++i3 ) {
@@ -85,7 +83,6 @@ TEST( Array3Test, ConstructOtherData )
 	EXPECT_EQ( A.I1(), B.I1() );
 	EXPECT_EQ( A.I2(), B.I2() );
 	EXPECT_EQ( A.I3(), B.I3() );
-	EXPECT_EQ( A.initializer_active(), B.initializer_active() );
 	EXPECT_TRUE( conformable( A, B ) );
 	EXPECT_TRUE( equal_dimensions( A, B ) );
 	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
@@ -114,7 +111,6 @@ TEST( Array3Test, ConstructIndexes )
 	EXPECT_EQ( Array3D_int::IR( 1, 3 ), A.I1() );
 	EXPECT_EQ( Array3D_int::IR( 1, 3 ), A.I2() );
 	EXPECT_EQ( Array3D_int::IR( 1, 3 ), A.I3() );
-	EXPECT_FALSE( A.initializer_active() );
 }
 
 TEST( Array3Test, RangeBasedFor )
@@ -166,151 +162,41 @@ TEST( Array3Test, Predicates )
 	Array3D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.capacity_bounded() );
-	EXPECT_FALSE( A1.capacity_unbounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
-	EXPECT_FALSE( A1.size_unbounded() );
 	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE( A1.is_default() );
-	EXPECT_TRUE( A1.is_zero() );
-	EXPECT_TRUE( A1.is_uniform() );
-	EXPECT_TRUE( A1.is_uniform( 0 ) );
 
 	Array3D_int A2( 2, 3, 2 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.contiguous() );
-	EXPECT_TRUE( A2.capacity_bounded() );
-	EXPECT_FALSE( A2.capacity_unbounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE( A2.capacity_bounded() );
-	EXPECT_FALSE( A2.capacity_unbounded() );
 	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 
 	Array3D_int A3( 2, 3, 2, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.contiguous() );
-	EXPECT_TRUE( A3.capacity_bounded() );
-	EXPECT_FALSE( A3.capacity_unbounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE( A3.capacity_bounded() );
-	EXPECT_FALSE( A3.capacity_unbounded() );
 	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
-	EXPECT_FALSE( A3.is_default() );
-	EXPECT_FALSE( A3.is_zero() );
-	EXPECT_TRUE( A3.is_uniform() );
-	EXPECT_TRUE( A3.is_uniform( 31459 ) );
 
 	Array3D_int A4( 2, 2, 2, { 111, 112, 121, 122, 211, 212, 221, 222 } );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.contiguous() );
-	EXPECT_TRUE( A4.capacity_bounded() );
-	EXPECT_FALSE( A4.capacity_unbounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE( A4.capacity_bounded() );
-	EXPECT_FALSE( A4.capacity_unbounded() );
 	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
-	EXPECT_FALSE( A4.is_default() );
-	EXPECT_FALSE( A4.is_zero() );
-	EXPECT_FALSE( A4.is_uniform() );
-	EXPECT_FALSE( A4.is_uniform( 0 ) );
-	EXPECT_FALSE( A4.is_uniform( 111 ) );
 }
 
 TEST( Array3Test, PredicateComparisonsValues )
 {
 	Array3D_int A1;
 	EXPECT_TRUE( eq( A1, 0 ) && eq( 0, A1 ) ); // Empty array is considered to equal any scalar (no values don't equal the scalar)
-	EXPECT_FALSE( ne( A1, 0 ) || ne( 0, A1 ) );
-	EXPECT_FALSE( lt( A1, 0 ) || lt( 0, A1 ) );
-	EXPECT_TRUE( le( A1, 0 ) && le( 0, A1 ) );
-	EXPECT_FALSE( gt( A1, 0 ) || gt( 0, A1 ) );
-	EXPECT_TRUE( ge( A1, 0 ) && ge( 0, A1 ) );
 
 	Array3D_int A2( 2, 3, 2, 31459 );
 	EXPECT_TRUE( eq( A2, 31459 ) && eq( 31459, A1 ) );
-	EXPECT_FALSE( ne( A2, 31459 ) || ne( 31459, A2 ) );
-	EXPECT_TRUE( lt( A2, 31460 ) && lt( 31458, A2 ) );
-	EXPECT_TRUE( le( A2, 31459 ) && le( 31459, A2 ) );
-	EXPECT_TRUE( le( A2, 31460 ) && le( 31458, A2 ) );
-	EXPECT_TRUE( gt( A2, 31458 ) && gt( 31460, A2 ) );
-	EXPECT_TRUE( ge( A2, 31459 ) && ge( 31459, A2 ) );
-	EXPECT_TRUE( ge( A2, 31458 ) && ge( 31460, A2 ) );
 
 	Array3D_int A3( 2, 2, 2, { 111, 112, 121, 122, 211, 212, 221, 222 } );
 	EXPECT_FALSE( eq( A3, 11 ) || eq( 23, A3 ) );
-	EXPECT_TRUE( ne( A3, 11 ) && ne( 23, A3 ) );
-	EXPECT_TRUE( lt( A3, 244 ) && lt( 10, A3 ) );
-	EXPECT_FALSE( lt( A3, 211 ) || lt( 111, A3 ) );
-	EXPECT_TRUE( le( A3, 233 ) && le( 111, A3 ) );
-	EXPECT_TRUE( gt( A3, 10 ) && gt( 244, A3 ) );
-	EXPECT_FALSE( gt( A3, 111 ) || gt( 23, A3 ) );
-	EXPECT_TRUE( ge( A3, 11 ) && ge( 233, A3 ) );
-}
-
-TEST( Array3Test, FunctionUnpack )
-{
-	Array1D_int const a( { 1, 2, 3, 4 } );
-	Array3D_bool const mask( 2, 2, 2, { true, false, false, true, true, false, false, true } );
-	EXPECT_TRUE( eq( Array3D_int( 2, 2, 2, { 1, 42, 42, 2, 3, 42, 42, 4 } ), unpack( a, mask, 42 ) ) );
-	Array3D_int const f( 2, 2, 2, { 11, 12, 13, 14, 15, 16, 17, 18 } );
-	EXPECT_TRUE( eq( Array3D_int( 2, 2, 2, { 1, 12, 13, 2, 3, 16, 17, 4 } ), unpack( a, mask, f ) ) );
-}
-
-TEST( Array3Test, FunctionMerge )
-{
-	{
-		Array3D_int const a( 2, 2, 2, 1 );
-		Array3D_int const b( 2, 2, 2, 2 );
-		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
-		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
-	}
-
-	{
-		Array3D_int const a( 2, 2, 2, 1 );
-		int const b( 2 );
-		Array3D_int const B( 2, 2, 2, 2 );
-		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
-		EXPECT_TRUE( eq( B, merge( a, b, false ) ) );
-	}
-
-	{
-		int const a( 1 );
-		Array3D_int const b( 2, 2, 2, 2 );
-		Array3D_int const A( 2, 2, 2, 1 );
-		EXPECT_TRUE( eq( A, merge( a, b, true ) ) );
-		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
-	}
-
-	{
-		Array3D_int const a( 2, 2, 2, 1 );
-		Array3D_int const b( 2, 2, 2, 2 );
-		Array3D_bool const mask( 2, 2, 2, { true, false, false, true, true, false, false, true } );
-		Array3D_int const m( 2, 2, 2, { 1, 2, 2, 1, 1, 2, 2, 1 } );
-		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
-	}
-
-	{
-		Array3D_int const a( 2, 2, 2, 1 );
-		int const b( 2 );
-		Array3D_bool const mask( 2, 2, 2, { true, false, false, true, true, false, false, true } );
-		Array3D_int const m( 2, 2, 2, { 1, 2, 2, 1, 1, 2, 2, 1 } );
-		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
-	}
-
-	{
-		int const a( 1 );
-		Array3D_int const b( 2, 2, 2, 2 );
-		Array3D_bool const mask( 2, 2, 2, { true, false, false, true, true, false, false, true } );
-		Array3D_int const m( 2, 2, 2, { 1, 2, 2, 1, 1, 2, 2, 1 } );
-		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
-	}
 }

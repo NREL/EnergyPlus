@@ -72,10 +72,11 @@ TEST_F(IdfParserFixture, decode)
 
     auto const output = IdfParser::decode(test_object);
 
-    EXPECT_EQ(std::vector<std::vector<std::string>>({{"Version", "8.3"},
-                                                     {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                                      "FullInteriorAndExterior", "25", "6"}}),
-              output);
+    EXPECT_EQ(
+        std::vector<std::vector<std::string>>(
+            {{"Version", "8.3"},
+             {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}}),
+        output);
 }
 
 TEST_F(IdfParserFixture, decode_success)
@@ -96,10 +97,11 @@ TEST_F(IdfParserFixture, decode_success)
 
     auto const output = IdfParser::decode(test_object, success);
 
-    EXPECT_EQ(std::vector<std::vector<std::string>>({{"Version", "8.3"},
-                                                     {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                                      "FullInteriorAndExterior", "25", "6"}}),
-              output);
+    EXPECT_EQ(
+        std::vector<std::vector<std::string>>(
+            {{"Version", "8.3"},
+             {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}}),
+        output);
     EXPECT_TRUE(success);
 }
 
@@ -229,10 +231,11 @@ TEST_F(IdfParserFixture, parse_idf)
 
     auto const output = parse_idf(test_object, index, success);
 
-    EXPECT_EQ(std::vector<std::vector<std::string>>({{"Version", "8.3"},
-                                                     {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                                      "FullInteriorAndExterior", "25", "6"}}),
-              output);
+    EXPECT_EQ(
+        std::vector<std::vector<std::string>>(
+            {{"Version", "8.3"},
+             {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}}),
+        output);
 
     EXPECT_EQ(test_object.size() - 1, index);
     EXPECT_TRUE(success);
@@ -255,9 +258,10 @@ TEST_F(IdfParserFixture, parse_object)
     }));
 
     auto const output_vector = parse_object(test_object, index, success);
-    EXPECT_EQ(std::vector<std::string>({"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
-                                        "FullInteriorAndExterior", "25", "6"}),
-              output_vector);
+    EXPECT_EQ(
+        std::vector<std::string>(
+            {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6"}),
+        output_vector);
 
     EXPECT_EQ(test_object.size() - 1, index);
     EXPECT_TRUE(success);
@@ -386,31 +390,31 @@ TEST_F(IdfParserFixture, look_ahead)
     size_t index = 0;
     IdfParser::Token token = look_ahead(test_input, index);
     EXPECT_EQ(0ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 2;
     token = look_ahead(test_input, index);
     EXPECT_EQ(2ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     index = 3;
     token = look_ahead(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     index = 5;
     token = look_ahead(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 7;
     token = look_ahead(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::NONE, token));
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 TEST_F(IdfParserFixture, next_token)
@@ -420,26 +424,26 @@ TEST_F(IdfParserFixture, next_token)
     std::string const test_input("B , ! t ; `");
     IdfParser::Token token = next_token(test_input, index);
     EXPECT_EQ(1ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     token = next_token(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     token = next_token(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     token = next_token(test_input, index);
     EXPECT_EQ(10ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::NONE, token));
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 } // namespace EnergyPlus

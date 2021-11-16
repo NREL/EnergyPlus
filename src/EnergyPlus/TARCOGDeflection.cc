@@ -57,219 +57,219 @@
 
 namespace EnergyPlus::TARCOGDeflection {
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   October/22/2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-    //  Revision: 7.0.02  (October 22, 2011)
-    //   - Initial setup
+// MODULE INFORMATION:
+//       AUTHOR         Simon Vidanovic
+//       DATE WRITTEN   October/22/2011
+//       MODIFIED       na
+//       RE-ENGINEERED  na
+//  Revision: 7.0.02  (October 22, 2011)
+//   - Initial setup
 
-    // PURPOSE OF THIS MODULE:
-    // A module which contains functions for deflection calculation
+// PURPOSE OF THIS MODULE:
+// A module which contains functions for deflection calculation
 
-    // Using/Aliasing
-    using namespace TARCOGParams;
-    using namespace TARCOGCommon;
+// Using/Aliasing
+using namespace TARCOGParams;
+using namespace TARCOGCommon;
 
-    void PanesDeflection(int const DeflectionStandard,
-                         Real64 const W,
-                         Real64 const H,
-                         int const nlayer,
-                         Real64 const Pa,
-                         Real64 const Pini,
-                         Real64 const Tini,
-                         const Array1D<Real64> &PaneThickness,
-                         const Array1D<Real64> &NonDeflectedGapWidth,
-                         Array1D<Real64> &DeflectedGapWidthMax,
-                         Array1D<Real64> &DeflectedGapWidthMean,
-                         const Array1D<Real64> &PanelTemps,
-                         const Array1D<Real64> &YoungsMod,
-                         const Array1D<Real64> &PoissonsRat,
-                         Array1D<Real64> &LayerDeflection,
-                         int &nperr,
-                         std::string &ErrorMessage)
-    {
-        //***********************************************************************
-        // PanesDeflection - calculates deflection of panes and recalculate gap
-        //                   widths at maximal point of deflection
-        //***********************************************************************
+void PanesDeflection(DeflectionCalculation const DeflectionStandard,
+                     Real64 const W,
+                     Real64 const H,
+                     int const nlayer,
+                     Real64 const Pa,
+                     Real64 const Pini,
+                     Real64 const Tini,
+                     const Array1D<Real64> &PaneThickness,
+                     const Array1D<Real64> &NonDeflectedGapWidth,
+                     Array1D<Real64> &DeflectedGapWidthMax,
+                     Array1D<Real64> &DeflectedGapWidthMean,
+                     const Array1D<Real64> &PanelTemps,
+                     const Array1D<Real64> &YoungsMod,
+                     const Array1D<Real64> &PoissonsRat,
+                     Array1D<Real64> &LayerDeflection,
+                     int &nperr,
+                     std::string &ErrorMessage)
+{
+    //***********************************************************************
+    // PanesDeflection - calculates deflection of panes and recalculate gap
+    //                   widths at maximal point of deflection
+    //***********************************************************************
 
-        // Argument array dimensioning
-        EP_SIZE_CHECK(PaneThickness, maxlay);
-        EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
-        EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
-        EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
-        EP_SIZE_CHECK(PanelTemps, maxlay2);
-        EP_SIZE_CHECK(YoungsMod, maxlay);
-        EP_SIZE_CHECK(PoissonsRat, maxlay);
-        EP_SIZE_CHECK(LayerDeflection, maxlay);
+    // Argument array dimensioning
+    EP_SIZE_CHECK(PaneThickness, maxlay);
+    EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+    EP_SIZE_CHECK(PanelTemps, maxlay2);
+    EP_SIZE_CHECK(YoungsMod, maxlay);
+    EP_SIZE_CHECK(PoissonsRat, maxlay);
+    EP_SIZE_CHECK(LayerDeflection, maxlay);
 
-        // Localy used
-        Array1D<Real64> DCoeff(maxlay);
+    // Localy used
+    Array1D<Real64> DCoeff(maxlay);
 
-        // first calculate D coefficients since that will be necessary for any of selected standards
-        for (int i = 1; i <= nlayer; ++i) {
-            DCoeff(i) = YoungsMod(i) * pow_3(PaneThickness(i)) / (12 * (1 - pow_2(PoissonsRat(i))));
-        }
-        if (DeflectionStandard == DEFLECTION_CALC_TEMPERATURE) {
-            DeflectionTemperatures(nlayer,
-                                   W,
-                                   H,
-                                   Pa,
-                                   Pini,
-                                   Tini,
-                                   NonDeflectedGapWidth,
-                                   DeflectedGapWidthMax,
-                                   DeflectedGapWidthMean,
-                                   PanelTemps,
-                                   DCoeff,
-                                   LayerDeflection,
-                                   nperr,
-                                   ErrorMessage);
-        } else if (DeflectionStandard == DEFLECTION_CALC_GAP_WIDTHS) {
-            DeflectionWidths(nlayer, W, H, DCoeff, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, LayerDeflection);
-        } else {  // including NO_DEFLECTION_CALCULATION
-            return;
+    // first calculate D coefficients since that will be necessary for any of selected standards
+    for (int i = 1; i <= nlayer; ++i) {
+        DCoeff(i) = YoungsMod(i) * pow_3(PaneThickness(i)) / (12 * (1 - pow_2(PoissonsRat(i))));
+    }
+    if (DeflectionStandard == DeflectionCalculation::TEMPERATURE) {
+        DeflectionTemperatures(nlayer,
+                               W,
+                               H,
+                               Pa,
+                               Pini,
+                               Tini,
+                               NonDeflectedGapWidth,
+                               DeflectedGapWidthMax,
+                               DeflectedGapWidthMean,
+                               PanelTemps,
+                               DCoeff,
+                               LayerDeflection,
+                               nperr,
+                               ErrorMessage);
+    } else if (DeflectionStandard == DeflectionCalculation::GAP_WIDTHS) {
+        DeflectionWidths(nlayer, W, H, DCoeff, NonDeflectedGapWidth, DeflectedGapWidthMax, DeflectedGapWidthMean, LayerDeflection);
+    } else { // including NO_DEFLECTION_CALCULATION
+        return;
+    }
+}
+
+void DeflectionTemperatures(int const nlayer,
+                            Real64 const W,
+                            Real64 const H,
+                            Real64 const Pa,
+                            Real64 const Pini,
+                            Real64 const Tini,
+                            const Array1D<Real64> &NonDeflectedGapWidth,
+                            Array1D<Real64> &DeflectedGapWidthMax,
+                            Array1D<Real64> &DeflectedGapWidthMean,
+                            const Array1D<Real64> &PanelTemps,
+                            Array1D<Real64> &DCoeff,
+                            Array1D<Real64> &LayerDeflection,
+                            int &nperr,
+                            std::string &ErrorMessage)
+{
+    //***********************************************************************************************************
+    // DeflectionTemperatures - calculates deflection of panes and recalculate gap
+    //                          widths at maximal point of deflection based on gap pressures and temperatures
+    //***********************************************************************************************************
+
+    // Argument array dimensioning
+    EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+    EP_SIZE_CHECK(PanelTemps, maxlay2);
+    EP_SIZE_CHECK(DCoeff, maxlay);
+    EP_SIZE_CHECK(LayerDeflection, maxlay);
+
+    // Static constants
+    static Real64 const Pi_6(pow_6(DataGlobalConstants::Pi));
+
+    // localy used
+    Array1D<Real64> DPressure(maxlay); // delta pressure at each glazing layer
+    Array1D<Real64> Vini(MaxGap);
+    Array1D<Real64> Vgap(MaxGap);
+    Array1D<Real64> Pgap(MaxGap);
+    Array1D<Real64> Tgap(MaxGap);
+    Real64 MaxLDSum;
+    Real64 MeanLDSum;
+    Real64 Ratio;
+
+    // calculate Vini for each gap
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        Vini(i) = NonDeflectedGapWidth(i) * W * H;
+    } // do i = 1, nlayer
+
+    MaxLDSum = LDSumMax(W, H);
+    MeanLDSum = LDSumMean(W, H);
+    Ratio = MeanLDSum / MaxLDSum;
+
+    // calculate Vgap for each gap
+    Real64 const W_H_Ratio(W * H * Ratio);
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        Vgap(i) = Vini(i) + W_H_Ratio * (LayerDeflection(i) - LayerDeflection(i + 1));
+    } // do i = 1, nlayer
+
+    // calculate Tgap for each gap
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        int const j = 2 * i;
+        Tgap(i) = (PanelTemps(j) + PanelTemps(j + 1)) / 2;
+    } // do i = 1, nlayer
+
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        Pgap(i) = Pini * Vini(i) * Tgap(i) / (Tini * Vgap(i));
+    } // do i = 1, nlayer
+
+    DPressure(1) = Pgap(1) - Pa;
+    if (nlayer > 1) {
+        DPressure(nlayer) = Pa - Pgap(nlayer - 1);
+    }
+
+    for (int i = 2; i <= nlayer - 1; ++i) {
+        DPressure(i) = Pgap(i) - Pgap(i - 1);
+    } // do i = 1, nlayer
+
+    Real64 const deflection_fac(DeflectionRelaxation * MaxLDSum * 16);
+    for (int i = 1; i <= nlayer; ++i) {
+        LayerDeflection(i) += deflection_fac * DPressure(i) / (Pi_6 * DCoeff(i));
+    }
+
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        DeflectedGapWidthMax(i) = NonDeflectedGapWidth(i) + LayerDeflection(i) - LayerDeflection(i + 1);
+        if (DeflectedGapWidthMax(i) < 0.0) {
+            nperr = 2001; // glazing panes collapsed
+            ErrorMessage = "Glazing panes collapsed";
         }
     }
 
-    void DeflectionTemperatures(int const nlayer,
-                                Real64 const W,
-                                Real64 const H,
-                                Real64 const Pa,
-                                Real64 const Pini,
-                                Real64 const Tini,
-                                const Array1D<Real64> &NonDeflectedGapWidth,
-                                Array1D<Real64> &DeflectedGapWidthMax,
-                                Array1D<Real64> &DeflectedGapWidthMean,
-                                const Array1D<Real64> &PanelTemps,
-                                Array1D<Real64> &DCoeff,
-                                Array1D<Real64> &LayerDeflection,
-                                int &nperr,
-                                std::string &ErrorMessage)
-    {
-        //***********************************************************************************************************
-        // DeflectionTemperatures - calculates deflection of panes and recalculate gap
-        //                          widths at maximal point of deflection based on gap pressures and temperatures
-        //***********************************************************************************************************
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        DeflectedGapWidthMean(i) = NonDeflectedGapWidth(i) + Ratio * (DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i));
+    }
+}
 
-        // Argument array dimensioning
-        EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
-        EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
-        EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
-        EP_SIZE_CHECK(PanelTemps, maxlay2);
-        EP_SIZE_CHECK(DCoeff, maxlay);
-        EP_SIZE_CHECK(LayerDeflection, maxlay);
+void DeflectionWidths(int const nlayer,
+                      Real64 const W,
+                      Real64 const H,
+                      Array1D<Real64> &DCoeff,
+                      const Array1D<Real64> &NonDeflectedGapWidth,
+                      const Array1D<Real64> &DeflectedGapWidthMax,
+                      Array1D<Real64> &DeflectedGapWidthMean,
+                      Array1D<Real64> &LayerDeflection)
+{
+    // Argument array dimensioning
+    EP_SIZE_CHECK(DCoeff, maxlay);
+    EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+    EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+    EP_SIZE_CHECK(LayerDeflection, maxlay);
 
-        // Static constants
-        static Real64 const Pi_6(pow_6(DataGlobalConstants::Pi));
-
-        // localy used
-        Array1D<Real64> DPressure(maxlay); // delta pressure at each glazing layer
-        Array1D<Real64> Vini(MaxGap);
-        Array1D<Real64> Vgap(MaxGap);
-        Array1D<Real64> Pgap(MaxGap);
-        Array1D<Real64> Tgap(MaxGap);
-        Real64 MaxLDSum;
-        Real64 MeanLDSum;
-        Real64 Ratio;
-
-        // calculate Vini for each gap
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            Vini(i) = NonDeflectedGapWidth(i) * W * H;
-        } // do i = 1, nlayer
-
-        MaxLDSum = LDSumMax(W, H);
-        MeanLDSum = LDSumMean(W, H);
-        Ratio = MeanLDSum / MaxLDSum;
-
-        // calculate Vgap for each gap
-        Real64 const W_H_Ratio(W * H * Ratio);
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            Vgap(i) = Vini(i) + W_H_Ratio * (LayerDeflection(i) - LayerDeflection(i + 1));
-        } // do i = 1, nlayer
-
-        // calculate Tgap for each gap
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            int const j = 2 * i;
-            Tgap(i) = (PanelTemps(j) + PanelTemps(j + 1)) / 2;
-        } // do i = 1, nlayer
-
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            Pgap(i) = Pini * Vini(i) * Tgap(i) / (Tini * Vgap(i));
-        } // do i = 1, nlayer
-
-        DPressure(1) = Pgap(1) - Pa;
-        if (nlayer > 1) {
-            DPressure(nlayer) = Pa - Pgap(nlayer - 1);
+    Real64 nominator = 0.0;
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        Real64 SumL = 0.0;
+        for (int j = i; j <= nlayer - 1; ++j) {
+            SumL += NonDeflectedGapWidth(j) - DeflectedGapWidthMax(j);
         }
-
-        for (int i = 2; i <= nlayer - 1; ++i) {
-            DPressure(i) = Pgap(i) - Pgap(i - 1);
-        } // do i = 1, nlayer
-
-        Real64 const deflection_fac(DeflectionRelaxation * MaxLDSum * 16);
-        for (int i = 1; i <= nlayer; ++i) {
-            LayerDeflection(i) += deflection_fac * DPressure(i) / (Pi_6 * DCoeff(i));
-        }
-
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            DeflectedGapWidthMax(i) = NonDeflectedGapWidth(i) + LayerDeflection(i) - LayerDeflection(i + 1);
-            if (DeflectedGapWidthMax(i) < 0.0) {
-                nperr = 2001; // glazing panes collapsed
-                ErrorMessage = "Glazing panes collapsed";
-            }
-        }
-
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            DeflectedGapWidthMean(i) = NonDeflectedGapWidth(i) + Ratio * (DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i));
-        }
+        nominator += SumL * DCoeff(i);
     }
 
-    void DeflectionWidths(int const nlayer,
-                          Real64 const W,
-                          Real64 const H,
-                          Array1D<Real64> &DCoeff,
-                          const Array1D<Real64> &NonDeflectedGapWidth,
-                          const Array1D<Real64> &DeflectedGapWidthMax,
-                          Array1D<Real64> &DeflectedGapWidthMean,
-                          Array1D<Real64> &LayerDeflection)
-    {
-        // Argument array dimensioning
-        EP_SIZE_CHECK(DCoeff, maxlay);
-        EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
-        EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
-        EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
-        EP_SIZE_CHECK(LayerDeflection, maxlay);
-
-        Real64 nominator = 0.0;
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            Real64 SumL = 0.0;
-            for (int j = i; j <= nlayer - 1; ++j) {
-                SumL += NonDeflectedGapWidth(j) - DeflectedGapWidthMax(j);
-            }
-            nominator += SumL * DCoeff(i);
-        }
-
-        Real64 denominator = 0.0;
-        for (int i = 1; i <= nlayer; ++i) {
-            denominator += DCoeff(i);
-        }
-
-        LayerDeflection(nlayer) = nominator / denominator;
-
-        for (int i = nlayer - 1; i >= 1; --i) {
-            LayerDeflection(i) = DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i) + LayerDeflection(i + 1);
-        }
-
-        Real64 MaxLDSum = LDSumMax(W, H);
-        Real64 MeanLDSum = LDSumMean(W, H);
-        Real64 Ratio = MeanLDSum / MaxLDSum;
-
-        for (int i = 1; i <= nlayer - 1; ++i) {
-            DeflectedGapWidthMean(i) = NonDeflectedGapWidth(i) + Ratio * (DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i));
-        }
+    Real64 denominator = 0.0;
+    for (int i = 1; i <= nlayer; ++i) {
+        denominator += DCoeff(i);
     }
 
-} // namespace EnergyPlus
+    LayerDeflection(nlayer) = nominator / denominator;
+
+    for (int i = nlayer - 1; i >= 1; --i) {
+        LayerDeflection(i) = DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i) + LayerDeflection(i + 1);
+    }
+
+    Real64 MaxLDSum = LDSumMax(W, H);
+    Real64 MeanLDSum = LDSumMean(W, H);
+    Real64 Ratio = MeanLDSum / MaxLDSum;
+
+    for (int i = 1; i <= nlayer - 1; ++i) {
+        DeflectedGapWidthMean(i) = NonDeflectedGapWidth(i) + Ratio * (DeflectedGapWidthMax(i) - NonDeflectedGapWidth(i));
+    }
+}
+
+} // namespace EnergyPlus::TARCOGDeflection

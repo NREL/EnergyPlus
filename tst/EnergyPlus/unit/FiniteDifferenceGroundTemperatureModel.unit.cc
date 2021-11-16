@@ -69,11 +69,9 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
 
-    using namespace DataIPShortCuts;
-
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -144,11 +142,12 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(*state, 25.0, 30153600), 0.01);
 }
 
-TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather)
+{
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = EnergyPlus::GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -160,121 +159,120 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
     // No Weather file specified, so we expect it to fail
     ASSERT_THROW(thisModel->getWeatherData(*state), std::runtime_error);
 
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
-        "   **   ~~~   ** Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw",
-        "   **  Fatal  ** Simulation halted due to input error in ground temperature model.",
-        "   ...Summary of Errors that led to program termination:",
-        "   ..... Reference severe error count=1",
-        "   ..... Last severe error=Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file."
-    });
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
+         "   **   ~~~   ** Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw",
+         "   **  Fatal  ** Simulation halted due to input error in ground temperature model.",
+         "   ...Summary of Errors that led to program termination:",
+         "   ..... Reference severe error count=1",
+         "   ..... Last severe error=Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather "
+         "file."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }
 
-TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
+{
 
     // I have to actually specify the RunPerod and SizingPeriods because in getWeatherData calls state->dataWeatherManager->GetNextEnvironment
     // I cannot hard set WeatherManager's GetBranchInputOneTimeFlag (in anonymous namespace) to false,
     // so it'll end up calling >state->dataWeatherManager->ReadUserWeatherInput which calls the inputProcessor to set the NumOfEnvrn in particular.
     std::string const idf_objects = delimited_string({
 
-  "Timestep,4;"
+        "Timestep,4;"
 
-  "SimulationControl,",
-  "  Yes,                     !- Do Zone Sizing Calculation",
-  "  Yes,                     !- Do System Sizing Calculation",
-  "  No,                      !- Do Plant Sizing Calculation",
-  "  Yes,                     !- Run Simulation for Sizing Periods",
-  "  No;                      !- Run Simulation for Weather File Run Periods",
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  Yes,                     !- Run Simulation for Sizing Periods",
+        "  No;                      !- Run Simulation for Weather File Run Periods",
 
-  "RunPeriod,",
-  "  January,                 !- Name",
-  "  1,                       !- Begin Month",
-  "  1,                       !- Begin Day of Month",
-  "  ,                        !- Begin Year",
-  "  1,                       !- End Month",
-  "  31,                      !- End Day of Month",
-  "  ,                        !- End Year",
-  "  Tuesday,                 !- Day of Week for Start Day",
-  "  Yes,                     !- Use Weather File Holidays and Special Days",
-  "  Yes,                     !- Use Weather File Daylight Saving Period",
-  "  No,                      !- Apply Weekend Holiday Rule",
-  "  Yes,                     !- Use Weather File Rain Indicators",
-  "  Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  1,                       !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
 
-  "Site:Location,",
-  "  CHICAGO_IL_USA TMY2-94846,  !- Name",
-  "  41.78,                   !- Latitude {deg}",
-  "  -87.75,                  !- Longitude {deg}",
-  "  -6.00,                   !- Time Zone {hr}",
-  "  190.00;                  !- Elevation {m}",
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "  41.78,                   !- Latitude {deg}",
+        "  -87.75,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  190.00;                  !- Elevation {m}",
 
-  "SizingPeriod:DesignDay,",
-  "  CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
-  "  7,                       !- Month",
-  "  21,                      !- Day of Month",
-  "  SummerDesignDay,         !- Day Type",
-  "  31.5,                    !- Maximum Dry-Bulb Temperature {C}",
-  "  10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
-  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
-  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-  "  Wetbulb,                 !- Humidity Condition Type",
-  "  23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-  "  ,                        !- Humidity Condition Day Schedule Name",
-  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-  "  99063.,                  !- Barometric Pressure {Pa}",
-  "  5.3,                     !- Wind Speed {m/s}",
-  "  230,                     !- Wind Direction {deg}",
-  "  No,                      !- Rain Indicator",
-  "  No,                      !- Snow Indicator",
-  "  No,                      !- Daylight Saving Time Indicator",
-  "  ASHRAEClearSky,          !- Solar Model Indicator",
-  "  ,                        !- Beam Solar Day Schedule Name",
-  "  ,                        !- Diffuse Solar Day Schedule Name",
-  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-  "  1.0;                     !- Sky Clearness",
+        "SizingPeriod:DesignDay,",
+        "  CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "  7,                       !- Month",
+        "  21,                      !- Day of Month",
+        "  SummerDesignDay,         !- Day Type",
+        "  31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "  10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "  Wetbulb,                 !- Humidity Condition Type",
+        "  23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "  ,                        !- Humidity Condition Day Schedule Name",
+        "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "  99063.,                  !- Barometric Pressure {Pa}",
+        "  5.3,                     !- Wind Speed {m/s}",
+        "  230,                     !- Wind Direction {deg}",
+        "  No,                      !- Rain Indicator",
+        "  No,                      !- Snow Indicator",
+        "  No,                      !- Daylight Saving Time Indicator",
+        "  ASHRAEClearSky,          !- Solar Model Indicator",
+        "  ,                        !- Beam Solar Day Schedule Name",
+        "  ,                        !- Diffuse Solar Day Schedule Name",
+        "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "  1.0;                     !- Sky Clearness",
 
-  "SizingPeriod:DesignDay,",
-  "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
-  "  1,                       !- Month",
-  "  21,                      !- Day of Month",
-  "  WinterDesignDay,         !- Day Type",
-  "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
-  "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
-  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
-  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-  "  Wetbulb,                 !- Humidity Condition Type",
-  "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-  "  ,                        !- Humidity Condition Day Schedule Name",
-  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-  "  99063.,                  !- Barometric Pressure {Pa}",
-  "  4.9,                     !- Wind Speed {m/s}",
-  "  270,                     !- Wind Direction {deg}",
-  "  No,                      !- Rain Indicator",
-  "  No,                      !- Snow Indicator",
-  "  No,                      !- Daylight Saving Time Indicator",
-  "  ASHRAEClearSky,          !- Solar Model Indicator",
-  "  ,                        !- Beam Solar Day Schedule Name",
-  "  ,                        !- Diffuse Solar Day Schedule Name",
-  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-  "  0.0;                     !- Sky Clearness",
+        "SizingPeriod:DesignDay,",
+        "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "  1,                       !- Month",
+        "  21,                      !- Day of Month",
+        "  WinterDesignDay,         !- Day Type",
+        "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "  Wetbulb,                 !- Humidity Condition Type",
+        "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "  ,                        !- Humidity Condition Day Schedule Name",
+        "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "  99063.,                  !- Barometric Pressure {Pa}",
+        "  4.9,                     !- Wind Speed {m/s}",
+        "  270,                     !- Wind Direction {deg}",
+        "  No,                      !- Rain Indicator",
+        "  No,                      !- Snow Indicator",
+        "  No,                      !- Daylight Saving Time Indicator",
+        "  ASHRAEClearSky,          !- Solar Model Indicator",
+        "  ,                        !- Beam Solar Day Schedule Name",
+        "  ,                        !- Diffuse Solar Day Schedule Name",
+        "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "  0.0;                     !- Sky Clearness",
 
     });
-
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Set an actual weather file to Chicago EPW
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = fs::path(configured_source_directory()) / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
     state->dataGlobal->BeginSimFlag = true;
@@ -282,7 +280,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     EXPECT_EQ(state->dataGlobal->NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
 
     bool ErrorsFound(false);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
@@ -294,7 +292,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = EnergyPlus::GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -320,6 +318,5 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     EXPECT_NEAR(firstDay.relativeHumidity, 0.7083, 0.005);
     EXPECT_NEAR(firstDay.windSpeed, 2.8083, 0.001);
     // Sum of (BeamSolarRad + DifSolarRad)/24
-    EXPECT_NEAR(firstDay.horizontalRadiation, 140, 2);
-
+    EXPECT_NEAR(firstDay.horizontalRadiation, 68, 2);
 }

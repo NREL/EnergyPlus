@@ -66,10 +66,10 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtCoolPeak;
             } else if (this->zoneEqFanCoil) {
                 Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                this->autoSizedValue =
-                    this->setCoolCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                                                              this->zoneEqSizing(this->curZoneEqNum),
-                                                              this->finalZoneSizing(this->curZoneEqNum));
+                this->autoSizedValue = this->setCoolCoilInletTempForZoneEqSizing(
+                    this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->zoneEqSizing(this->curZoneEqNum),
+                    this->finalZoneSizing(this->curZoneEqNum));
             } else {
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInTemp;
             }
@@ -115,7 +115,8 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
                         fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
-                        this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
+                        this->setDataDesAccountForFanHeat(state,
+                                                          false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }
                 this->autoSizedValue += fanDeltaT;
@@ -129,7 +130,8 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
         if (this->curSysNum <= this->numPrimaryAirSys) {
-            coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
+                state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
         }
     }
     return this->autoSizedValue;

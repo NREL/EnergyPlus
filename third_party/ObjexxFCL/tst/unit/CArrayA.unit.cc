@@ -31,8 +31,8 @@ using namespace ObjexxFCL;
 TEST( CArrayATest, Construction )
 {
 	{ // Copy constructor and assignment
-		CArrayA_int v( 10u, 22 );
-		CArrayA_int w( v );
+		CArrayA<int> v( 10u, 22 );
+		CArrayA<int> w( v );
 		EXPECT_EQ( v, w );
 		EXPECT_EQ( w, v );
 		w += 1;
@@ -44,28 +44,28 @@ TEST( CArrayATest, Construction )
 		EXPECT_TRUE( v >= w );
 		EXPECT_FALSE( v < w );
 		EXPECT_FALSE( v > w );
-		CArrayA_int s( v + w );
+		CArrayA<int> s( v + w );
 		EXPECT_EQ( v.size(), s.size() );
 		EXPECT_TRUE( s == 46 );
 	}
 
 	{ // Copy constructor and assignment template
-		CArrayA_int v( 10u, 22 );
-		CArrayA_float f( v ); // May cause conversion warning
-		EXPECT_EQ( CArrayA_float( 10u, 22.0f ), f );
+		CArrayA<int> v( 10u, 22 );
+		CArrayA<float> f( v ); // May cause conversion warning
+		EXPECT_EQ( CArrayA<float>( 10u, 22.0f ), f );
 		v += 1;
-		EXPECT_EQ( CArrayA_int( 10u, 23 ), v );
+		EXPECT_EQ( CArrayA<int>( 10u, 23 ), v );
 		f = v;
-		EXPECT_EQ( CArrayA_float( 10u, 23.0f ), f );
+		EXPECT_EQ( CArrayA<float>( 10u, 23.0f ), f );
 	}
 
 	{ // Size constructor
-		CArrayA_int v( 10 ); // Uninitialized
+		CArrayA<int> v( 10 ); // Uninitialized
 		EXPECT_EQ( 10u, v.size() );
 	}
 
 	{ // Size + value constructor
-		CArrayA_int v( 10u, 22 );
+		CArrayA<int> v( 10u, 22 );
 		EXPECT_EQ( 10u, v.size() );
 		EXPECT_EQ( 22, v[ 0u ] );
 		EXPECT_EQ( 22, v[ 9u ] );
@@ -74,28 +74,28 @@ TEST( CArrayATest, Construction )
 
 TEST( CArrayATest, Assignment )
 {
-	CArrayA_int v( 10u, 22 );
+	CArrayA<int> v( 10u, 22 );
 	v += 2;
-	EXPECT_EQ( CArrayA_int( 10u, 24 ), v );
+	EXPECT_EQ( CArrayA<int>( 10u, 24 ), v );
 	v -= 2;
-	EXPECT_EQ( CArrayA_int( 10u, 22 ), v );
+	EXPECT_EQ( CArrayA<int>( 10u, 22 ), v );
 	v *= 2;
-	EXPECT_EQ( CArrayA_int( 10u, 44 ), v );
+	EXPECT_EQ( CArrayA<int>( 10u, 44 ), v );
 	v /= 2;
-	EXPECT_EQ( CArrayA_int( 10u, 22 ), v );
-	v = CArrayA_int( 20u, 33 );
-	EXPECT_EQ( CArrayA_int( 20u, 33 ), v );
+	EXPECT_EQ( CArrayA<int>( 10u, 22 ), v );
+	v = CArrayA<int>( 20u, 33 );
+	EXPECT_EQ( CArrayA<int>( 20u, 33 ), v );
 	v += v;
-	EXPECT_EQ( CArrayA_int( 20u, 66 ), v );
+	EXPECT_EQ( CArrayA<int>( 20u, 66 ), v );
 	v -= v;
-	EXPECT_EQ( CArrayA_int( 20u, 0 ), v );
+	EXPECT_EQ( CArrayA<int>( 20u, 0 ), v );
 	v = 55;
-	EXPECT_EQ( CArrayA_int( 20u, 55 ), v );
+	EXPECT_EQ( CArrayA<int>( 20u, 55 ), v );
 }
 
 TEST( CArrayATest, Subscripting )
 {
-	CArrayA_int v( 10u, 22 );
+	CArrayA<int> v( 10u, 22 );
 	v[ 3u ] = 33;
 	EXPECT_EQ( 22, v[ 0u ] );
 	EXPECT_EQ( 33, v[ 3u ] );
@@ -107,8 +107,8 @@ TEST( CArrayATest, Subscripting )
 
 TEST( CArrayATest, Functions )
 {
-	CArrayA_int u{ 1, 2, 3 };
-	CArrayA_int v{ 2, 3, 4 };
+	CArrayA<int> u{ 1, 2, 3 };
+	CArrayA<int> v{ 2, 3, 4 };
 	EXPECT_EQ( 14, magnitude_squared( u ) );
 	EXPECT_EQ( 3, distance_squared( u, v ) );
 	EXPECT_EQ( 20, dot( u, v ) );
@@ -116,8 +116,8 @@ TEST( CArrayATest, Functions )
 
 TEST( CArrayATest, Swap )
 {
-	CArrayA_int a( 10u, 22 ), A( a );
-	CArrayA_int b( 8u, 33 ), B( b );
+	CArrayA<int> a( 10u, 22 ), A( a );
+	CArrayA<int> b( 8u, 33 ), B( b );
 	a.swap( b );
 	EXPECT_EQ( B, a );
 	EXPECT_EQ( A, b );

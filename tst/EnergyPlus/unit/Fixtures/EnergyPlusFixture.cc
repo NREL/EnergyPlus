@@ -63,7 +63,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -73,10 +72,10 @@ using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-void EnergyPlusFixture::SetUpTestCase()
-{
-    EnergyPlus::inputProcessor = InputProcessor::factory();
-}
+// void EnergyPlusFixture::SetUpTestCase()
+//{
+//    state->dataInputProcessing->inputProcessor = InputProcessor::factory();
+//}
 
 void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 {
@@ -88,35 +87,37 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
     state.files.debug.open_as_stringstream();
     state.files.mtd.open_as_stringstream();
     state.files.edd.open_as_stringstream();
+    state.files.zsz.open_as_stringstream();
+    state.files.ssz.open_as_stringstream();
 }
 
 void EnergyPlusFixture::SetUp()
 {
+    //    if (this->state) {
+    //        this->state->clear_state();
+    //    } else {
     this->state = new EnergyPlusData;
-    EnergyPlus::clearAllStates(*state);
-    EnergyPlus::inputProcessor->clear_state();
+    //    }
 
     show_message();
 
     openOutputFiles(*state);
 
     this->err_stream = new std::ostringstream;
-    this->json_stream = new std::ostringstream;
 
     state->files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
-    state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
+    m_redirect_cout = std::make_unique<RedirectCout>(m_cout_buffer);
 
     m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
+    m_redirect_cerr = std::make_unique<RedirectCerr>(m_cerr_buffer);
 
     state->dataUtilityRoutines->outputErrorHeader = false;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     FluidProperties::InitializeGlycRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 }
 
 void EnergyPlusFixture::TearDown()
@@ -131,7 +132,7 @@ void EnergyPlusFixture::TearDown()
     state->files.mtr.del();
     state->files.bnd.del();
     state->files.shade.del();
-    clearAllStates(*this->state);
+    //    state->clear_state();
     delete this->state;
 }
 
@@ -152,7 +153,7 @@ std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &
     return compare_text.str();
 }
 
-std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const &filePath)
+std::vector<std::string> EnergyPlusFixture::read_lines_in_file(fs::path const &filePath)
 {
     std::ifstream infile(filePath);
     std::vector<std::string> lines;
@@ -161,15 +162,6 @@ std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const
         lines.push_back(line);
     }
     return lines;
-}
-
-bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
-{
-    auto const stream_str = this->json_stream->str();
-    EXPECT_EQ(expected_string, stream_str);
-    bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->json_stream->str(std::string());
-    return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
@@ -235,13 +227,6 @@ bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, b
     return are_equal;
 }
 
-bool EnergyPlusFixture::has_json_output(bool reset_stream)
-{
-    auto const has_output = this->json_stream->str().size() > 0;
-    if (reset_stream) this->json_stream->str(std::string());
-    return has_output;
-}
-
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
     auto const has_output = !state->files.eso.get_output().empty();
@@ -296,7 +281,7 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
     auto const stream_str = this->err_stream->str();
     bool match_found;
     if (use_regex) {
-        match_found = std::regex_match(stream_str,std::regex(expected_match));
+        match_found = std::regex_match(stream_str, std::regex(expected_match));
     } else {
         match_found = stream_str.find(expected_match) != std::string::npos;
     }
@@ -307,6 +292,7 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
+    auto &inputProcessor = state->dataInputProcessing->inputProcessor;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
     // Add common objects that will trigger a warning if not present
@@ -339,18 +325,22 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     int MaxNumeric = 0;
     inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
 
-    DataIPShortCuts::cAlphaFieldNames.allocate(MaxAlpha);
-    DataIPShortCuts::cAlphaArgs.allocate(MaxAlpha);
-    DataIPShortCuts::lAlphaFieldBlanks.dimension(MaxAlpha, false);
-    DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
-    DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
-    DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state->dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state->dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state->dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
     bool hasErrors = inputProcessor->processErrors(*state);
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
+
+    FluidProperties::GetFluidPropertiesData(*state);
+    state->dataFluidProps->GetInput = false;
+
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;
@@ -360,80 +350,6 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     }
 
     return successful_processing;
-}
-
-bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
-{
-
-    std::unique_ptr<std::istream> idd_stream;
-    if (!idd.empty()) {
-        idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
-    } else {
-        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-        static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
-        static auto file_exists = FileSystem::fileExists(idd_location);
-
-        if (!file_exists) {
-            // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
-            file_exists = FileSystem::fileExists(idd_location);
-        }
-
-        if (!file_exists) {
-            EXPECT_TRUE(file_exists) << "Energy+.schema.epJSON does not exist at search location." << std::endl
-                                     << "epJSON Schema search location: \"" << idd_location << "\"";
-            errors_found = true;
-            return errors_found;
-        }
-
-        idd_stream = std::unique_ptr<std::ifstream>(new std::ifstream(idd_location, std::ios_base::in | std::ios_base::binary));
-    }
-
-    if (!idd_stream->good()) {
-        errors_found = true;
-        return errors_found;
-    }
-
-    inputProcessor->schema = json::parse(*idd_stream);
-
-    return errors_found;
-}
-
-bool EnergyPlusFixture::compare_idf([[maybe_unused]] std::string const &name,
-                                    [[maybe_unused]] int const num_alphas,
-                                    [[maybe_unused]] int const num_numbers,
-                                    [[maybe_unused]] std::vector<std::string> const &alphas,
-                                    [[maybe_unused]] std::vector<bool> const &alphas_blank,
-                                    [[maybe_unused]] std::vector<Real64> const &numbers,
-                                    [[maybe_unused]] std::vector<bool> const &numbers_blank)
-{
-    // using namespace InputProcessor;
-
-    // bool has_error = OverallErrorFlag;
-
-    // EXPECT_FALSE( OverallErrorFlag );
-
-    // auto index = FindItemInSortedList( name, ListOfObjects, NumObjectDefs );
-
-    // EXPECT_GT( index, 0 ) << "Could not find \"" << name << "\". Make sure to run process_idf first.";
-    // if ( index < 1 ) return false;
-
-    // index = iListOfObjects( index );
-    // index = ObjectStartRecord( index );
-
-    // EXPECT_EQ( name, IDFRecords( index ).Name );
-    // if ( name != IDFRecords( index ).Name ) has_error = true;
-    // EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
-    // if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
-    // EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
-    // if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
-    // if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
-    // if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
-    // if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
-    // if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
-
-    // return ! has_error;
-    return false;
 }
 
 } // namespace EnergyPlus

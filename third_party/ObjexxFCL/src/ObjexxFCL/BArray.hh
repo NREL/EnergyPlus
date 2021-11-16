@@ -14,7 +14,6 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/DimensionSlice.hh>
 #include <ObjexxFCL/IndexRange.hh>
 #include <ObjexxFCL/IndexSlice.hh>
@@ -42,40 +41,34 @@ public: // Types
 protected: // Creation
 
 	// Default Constructor
-	BArray()
-	{}
+	constexpr BArray() = default;
 
 	// Copy Constructor
-	BArray( BArray const & )
-	{}
+	constexpr BArray( BArray const & ) = default;
 
 	// Move Constructor
-	BArray( BArray && ) NOEXCEPT
-	{}
+	constexpr BArray( BArray && ) noexcept = default;
 
 public: // Creation
 
 	// Destructor
 	virtual
-	~BArray()
-	{}
+	~BArray() = default;
 
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( BArray const & )
-	{}
+	BArray &
+	operator =( BArray const & ) = default;
 
 	// Move Assignment
-	void
-	operator =( BArray && ) NOEXCEPT
-	{}
+	BArray &
+	operator =( BArray && ) noexcept = default;
 
 public: // Static Data
 
-	static size_type const npos; // Unbounded "size"
-	static size_type const max_size; // Max array size
+	static constexpr size_type const npos = static_cast<size_type>(-1); // Unbounded "size"
+	static constexpr size_type const max_size = static_cast<size_type>(-1) - static_cast<size_type>(1); // Max array size
 
 }; // BArray
 

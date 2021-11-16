@@ -88,14 +88,13 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
@@ -107,16 +106,17 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
-    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", 1, false, errFlag);
-    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", 1, false, errFlag);
-    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", NodeInputManager::compFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
-    std::string const error_string = delimited_string(
-        {"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
-         "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1", "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
+                          "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1",
+                          "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(ErrorsFound); // Node check will fail on Check 11 -- zone node name must be unique
@@ -451,6 +451,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -467,6 +468,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Plenum Zone,              !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -483,6 +485,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -499,6 +502,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -515,6 +519,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -531,6 +536,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -547,6 +553,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -603,6 +610,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -619,6 +627,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -635,6 +644,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -651,6 +661,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -667,6 +678,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -683,6 +695,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -901,10 +914,9 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -949,7 +961,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         "  DCVObject,               !- Name",
         "  AvailSched,              !- Availability Schedule Name",
         "  Yes,                     !- Demand Controlled Ventilation",
-        "  VentilationRateProcedure,!- System Outdoor Air Method",
+        "  Standard62.1VentilationRateProcedure,!- System Outdoor Air Method",
         "  ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}",
         "  Space,  !- Zone 1 Name",
         "  Space DSOA Design OA Spec,  !- Design Specification Outdoor Air Object Name 1",
@@ -1118,7 +1130,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1459,6 +1471,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1475,6 +1488,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Plenum Zone,              !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1491,6 +1505,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1507,6 +1522,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1523,6 +1539,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1539,6 +1556,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1555,6 +1573,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1611,6 +1630,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1627,6 +1647,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1643,6 +1664,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1659,6 +1681,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1675,6 +1698,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1691,6 +1715,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1909,10 +1934,9 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -1957,7 +1981,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         "  DCVObject,               !- Name",
         "  AvailSched,              !- Availability Schedule Name",
         "  Yes,                     !- Demand Controlled Ventilation",
-        "  VentilationRateProcedure,!- System Outdoor Air Method",
+        "  Standard62.1VentilationRateProcedure,!- System Outdoor Air Method",
         "  ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}",
         "  Space,  !- Zone 1 Name",
         "  Space DSOA Design OA Spec,  !- Design Specification Outdoor Air Object Name 1",
@@ -2126,7 +2150,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
     SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;

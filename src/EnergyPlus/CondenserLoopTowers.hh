@@ -58,6 +58,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -67,7 +68,8 @@ struct EnergyPlusData;
 
 namespace CondenserLoopTowers {
 
-    enum class ModelType {
+    enum class ModelType
+    {
         // Empirical Model Type
         Unassigned,
         CoolToolsXFModel,
@@ -76,17 +78,20 @@ namespace CondenserLoopTowers {
         YorkCalcUserDefined
     };
 
-    enum class EvapLoss {
+    enum class EvapLoss
+    {
         UserFactor,
         MoistTheory
     };
 
-    enum class Blowdown {
+    enum class Blowdown
+    {
         Concentration,
         Schedule
     };
 
-    enum class PIM {
+    enum class PIM
+    {
         Unassigned,
         NominalCapacity,
         UFactor
@@ -99,7 +104,8 @@ namespace CondenserLoopTowers {
         FluidBypass
     };
 
-    enum class CellCtrl {
+    enum class CellCtrl
+    {
         Unassigned,
         MinCell,
         MaxCell
@@ -108,9 +114,8 @@ namespace CondenserLoopTowers {
     struct CoolingTower : PlantComponent
     {
         // Members
-        std::string Name;      // User identifier
-        std::string TowerType; // Type of cooling tower
-        int TowerType_Num;
+        std::string Name; // User identifier
+        DataPlant::PlantEquipmentType TowerType;
         PIM PerformanceInputMethod_Num; // Method of entering tower performance: UA and Design Water
         //  Flow Rate, or Nominal Capacity
         std::string ModelCoeffObjectName;         // Cooling Tower:Variable Speed Model Coefficient Object name
@@ -208,10 +213,10 @@ namespace CondenserLoopTowers {
         Real64 MinFracFlowRate; // Minimal fraction of design flow/cell allowable
         Real64 MaxFracFlowRate; // Maximal ratio of design flow/cell allowable
         // begin water system interactions
-        EvapLoss EvapLossMode;          // sets how tower water evaporation is modeled
+        EvapLoss EvapLossMode;     // sets how tower water evaporation is modeled
         Real64 UserEvapLossFactor; // simple model [%/Delt C]
         Real64 DriftLossFraction;
-        Blowdown BlowdownMode;          // sets how tower water blowdown is modeled
+        Blowdown BlowdownMode;     // sets how tower water blowdown is modeled
         Real64 ConcentrationRatio; // ratio of solids in blowdown vs make up water
         int SchedIDBlowdown;       // index "pointer" to schedule of blowdown in [m3/s]
         bool SuppliedByWaterSystem;
@@ -347,9 +352,9 @@ namespace CondenserLoopTowers {
 
         // Default Constructor
         CoolingTower()
-            : TowerType_Num(0), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true), DesignWaterFlowRate(0.0),
-              DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0), DesWaterMassFlowRatePerCell(0.0),
-              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
+            : TowerType(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true),
+              DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0),
+              DesWaterMassFlowRatePerCell(0.0), HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
               DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
               DesignFanPowerPerUnitNomCap(0.0), HighSpeedTowerUA(0.0), HighSpeedTowerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
               LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
@@ -363,25 +368,23 @@ namespace CondenserLoopTowers {
               TowerLowSpeedNomCapSizingFactor(0.0), TowerFreeConvNomCap(0.0), TowerFreeConvNomCapWasAutoSized(false),
               TowerFreeConvNomCapSizingFactor(0.0), SizFac(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
               TowerModelType(ModelType::Unassigned), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0),
-              HighMassFlowErrorCount(0),
-              HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0),
-              SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
-              WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0), SpeedSelected(0),
-              CapacityControl(CapacityCtrlEnum::Unassigned), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Unassigned), NumCellOn(0),
-              MinFracFlowRate(0.0), MaxFracFlowRate(0.0),
-              EvapLossMode(EvapLoss::MoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(Blowdown::Concentration),
-              ConcentrationRatio(0.0), SchedIDBlowdown(0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0),
-              LoopSideNum(0), BranchNum(0), CompNum(0), UAModFuncAirFlowRatioCurvePtr(0), UAModFuncWetBulbDiffCurvePtr(0),
-              UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false), VSMerkelAFRErrorIter(0), VSMerkelAFRErrorIterIndex(0),
-              VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
-              DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
-              FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
-              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), airFlowRateRatio(0.0),
-              WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0),
-              OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0), BasinHeaterPower(0.0),
-              BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0), EvaporationVol(0.0),
-              DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0),
-              TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0), FoundModelCoeff(false), MinInletAirWBTemp(0.0),
+              HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0),
+              SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
+              WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0),
+              SpeedSelected(0), CapacityControl(CapacityCtrlEnum::Unassigned), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Unassigned),
+              NumCellOn(0), MinFracFlowRate(0.0), MaxFracFlowRate(0.0), EvapLossMode(EvapLoss::MoistTheory), UserEvapLossFactor(0.0),
+              DriftLossFraction(0.0), BlowdownMode(Blowdown::Concentration), ConcentrationRatio(0.0), SchedIDBlowdown(0),
+              SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              UAModFuncAirFlowRatioCurvePtr(0), UAModFuncWetBulbDiffCurvePtr(0), UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false),
+              VSMerkelAFRErrorIter(0), VSMerkelAFRErrorIterIndex(0), VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0),
+              DesOutletWaterTemp(0), DesInletAirDBTemp(0), DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false),
+              FaultyCondenserSWTFlag(false), FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false),
+              FaultyTowerFoulingIndex(0), FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0),
+              CurrentEndTimeLast(0.0), airFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0),
+              InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
+              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
+              EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0),
+              TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0), FoundModelCoeff(false), MinInletAirWBTemp(0.0),
               MaxInletAirWBTemp(0.0), MinRangeTemp(0.0), MaxRangeTemp(0.0), MinApproachTemp(0.0), MaxApproachTemp(0.0), MinWaterFlowRatio(0.0),
               MaxWaterFlowRatio(0.0), MaxLiquidToGasRatio(0.0), VSErrorCountFlowFrac(0), VSErrorCountWFRR(0), VSErrorCountIAWB(0), VSErrorCountTR(0),
               VSErrorCountTA(0), ErrIndexFlowFrac(0), ErrIndexWFRR(0), ErrIndexIAWB(0), ErrIndexTR(0), ErrIndexTA(0), ErrIndexLG(0),
@@ -390,9 +393,17 @@ namespace CondenserLoopTowers {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
@@ -421,18 +432,18 @@ namespace CondenserLoopTowers {
         Real64 calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
         Real64 calculateVariableTowerOutletTemp(EnergyPlusData &state,
-                                                Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+                                                Real64 WaterFlowRateRatio,    // current water flow rate ratio (capped if applicable)
                                                 Real64 airFlowRateRatioLocal, // current air flow rate ratio
-                                                Real64 Twb                 // current inlet air wet-bulb temperature (C, capped if applicable)
+                                                Real64 Twb                    // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
         void calculateWaterUsage(EnergyPlusData &state);
 
         Real64 calculateVariableSpeedApproach(EnergyPlusData &state,
-                                              Real64 PctWaterFlow,  // Water flow ratio of cooling tower
+                                              Real64 PctWaterFlow,      // Water flow ratio of cooling tower
                                               Real64 airFlowRatioLocal, // Air flow ratio of cooling tower
-                                              Real64 Twb,           // Inlet air wet-bulb temperature [C]
-                                              Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
+                                              Real64 Twb,               // Inlet air wet-bulb temperature [C]
+                                              Real64 Tr                 // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
         void checkModelBounds(EnergyPlusData &state,
@@ -448,48 +459,49 @@ namespace CondenserLoopTowers {
 
         void update(EnergyPlusData &state);
 
-        void report(bool RunFlag);
+        void report(EnergyPlusData &state, bool RunFlag);
 
         Real64 residualUA(EnergyPlusData &state,
-                          Real64 UA,                 // UA of cooling tower
-                          Array1D<Real64> const &Par // par(1) = design tower load [W]
+                          Real64 UA,                       // UA of cooling tower
+                          std::array<Real64, 6> const &Par // par(1) = design tower load [W]
         );
 
         Real64 residualTa(EnergyPlusData &state,
-                          Real64 FlowRatio,          // water or air flow ratio of cooling tower
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          Real64 FlowRatio,                // water or air flow ratio of cooling tower
+                          std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
         Real64 residualTr(EnergyPlusData &state,
-                          Real64 Trange,             // cooling tower range temperature [C]
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          Real64 Trange,                   // cooling tower range temperature [C]
+                          std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
         Real64 residualMerkelLoad(EnergyPlusData &state,
-                                  Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  Array1D<Real64> const &Par // par(1) = Tower number
+                                  Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                  std::array<Real64, 8> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
     void GetTowerInput(EnergyPlusData &state);
 
 } // namespace CondenserLoopTowers
 
-    struct CondenserLoopTowersData : BaseGlobalStruct {
-        int NumSimpleTowers = 0; // Number of similar towers
-        bool GetInput = true;
-        Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
-        std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
+struct CondenserLoopTowersData : BaseGlobalStruct
+{
+    int NumSimpleTowers = 0; // Number of similar towers
+    bool GetInput = true;
+    Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
+    std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
-        void clear_state() override
-        {
-            this->NumSimpleTowers = 0;
-            this->GetInput = true;
-            this->towers.deallocate();
-            this->UniqueSimpleTowerNames.clear();
-        }
+    void clear_state() override
+    {
+        this->NumSimpleTowers = 0;
+        this->GetInput = true;
+        this->towers.deallocate();
+        this->UniqueSimpleTowerNames.clear();
+    }
 };
 
 } // namespace EnergyPlus

@@ -995,7 +995,7 @@ double atmospheric_refraction_correction(double pressure, double temperature,
                                          double atmos_refract, double e0) //atmospheric refraction correction (degrees)
 {
     double del_e = 0;
-    int SUN_RADIUS = 0.26667;
+    double SUN_RADIUS = 0.26667;
     if (e0 >= -1 * (SUN_RADIUS + atmos_refract))
         del_e = (pressure / 1010.0) * (283.0 / (273.0 + temperature)) *
                 1.02 / (60.0 * tan(DTOR * (e0 + 10.3 / (e0 + 5.11))));
