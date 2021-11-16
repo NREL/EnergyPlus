@@ -91,7 +91,7 @@ namespace DataPlant {
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 
-    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
+    static constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
         "Boiler:HotWater",
         "Boiler:Steam",
         "Chiller:Absorption",
@@ -189,7 +189,7 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating"};
 
-    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
+    static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
         "BOILER:STEAM",
         "CHILLER:ABSORPTION",
@@ -287,7 +287,7 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
         "HEATPUMP:PLANTLOOP:EIR:HEATING"};
 
-    constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
+    static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
@@ -300,16 +300,6 @@ namespace DataPlant {
         LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both};
-
-    extern Array1D<Real64> const ConvergenceHistoryARR;
-
-    // These all are going to be hard coded for now, but when we move to C++20 we will have constexpr methods available to fix this
-    // const Real64 sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
-    // const Real64 square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
-    // const Real64 sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
-    constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
-    constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
-    constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
 
 } // namespace DataPlant
 

@@ -7421,13 +7421,14 @@ Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of 
     Real64 FA; // Intermediate variables
     Real64 FB;
 
-    static Array2D<Real64> const PF(
-        5,
-        7,
-        reshape2<Real64, int>({1.00,  0.492, 0.226, 0.128, 0.081, 0.061, 0.057, 0.123, 0.119, 0.065, 0.043, 0.029,
-                               0.026, 0.023, 0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011, 0.008, 0.008, 0.008,
-                               0.008, 0.008, 0.006, 0.006, 0.0,   0.0,   0.003, 0.003, 0.003, 0.003, 0.003},
-                              {5, 7})); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
+    // Position factor array
+    static constexpr std::array<std::array<Real64, 7>, 5> PF = {{
+        {1.00, 0.492, 0.226, 0.128, 0.081, 0.061, 0.057},
+        {0.123, 0.119, 0.065, 0.043, 0.029, 0.026, 0.023},
+        {0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011},
+        {0.008, 0.008, 0.008, 0.008, 0.008, 0.006, 0.006},
+        {0.0, 0.0, 0.003, 0.003, 0.003, 0.003, 0.003},
+    }};
 
     DayltgGlarePositionFactor = 0.0;
     if (X < 0.0 || X >= 3.0) return DayltgGlarePositionFactor;
@@ -7437,8 +7438,8 @@ Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of 
     IY = 1 + int(2.0 * Y);
     X1 = 0.5 * double(IX - 1);
     Y1 = 0.5 * double(IY - 1);
-    FA = PF(IY, IX) + 2.0 * (X - X1) * (PF(IY, IX + 1) - PF(IY, IX));
-    FB = PF(IY + 1, IX) + 2.0 * (X - X1) * (PF(IY + 1, IX + 1) - PF(IY + 1, IX));
+    FA = PF[IY - 1][IX - 1] + 2.0 * (X - X1) * (PF[IY - 1][IX] - PF[IY - 1][IX - 1]);
+    FB = PF[IY][IX - 1] + 2.0 * (X - X1) * (PF[IY][IX] - PF[IY][IX - 1]);
     DayltgGlarePositionFactor = FA + 2.0 * (Y - Y1) * (FB - FA);
 
     return DayltgGlarePositionFactor;

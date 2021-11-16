@@ -1057,7 +1057,7 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate desired hot and cold water flow rates
 
-        Real64 const EPSILON(1.e-3);
+        Real64 constexpr EPSILON(1.e-3);
 
         if (this->setupMyOutputVars) {
             this->setupOutputVars(state);

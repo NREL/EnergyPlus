@@ -75,7 +75,7 @@ struct UCSDSharedData : BaseGlobalStruct
     Array1D_int PosZ_Window;
     Array1D_int PosZ_Door;
     Array1D_int PosZ_Internal;
-    // Convection coeficients for the various surfaces
+    // Convection coefficients for the various surfaces
     Array1D<Real64> HCeiling;
     Array1D<Real64> HWall;
     Array1D<Real64> HFloor;

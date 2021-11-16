@@ -5719,7 +5719,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr DesignWetBulb(25.56); // tower outdoor air entering wetbulb for design [C]
         int constexpr MaxIte(500);             // Maximum number of iterations for solver
-        Real64 const Acc(1.e-3);               // Accuracy of solver result
+        Real64 constexpr Acc(1.e-3);           // Accuracy of solver result
         static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
