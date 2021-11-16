@@ -195,7 +195,7 @@ namespace UtilityRoutines {
         // If you need case insensitivity use FindItem.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        
+
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
         }
@@ -219,7 +219,7 @@ namespace UtilityRoutines {
         // If you need case insensitivity use FindItem.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        
+
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
         }

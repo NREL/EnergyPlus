@@ -115,10 +115,10 @@ namespace HeatBalanceHAMTManager {
 
         // Default Constructor
         subcell()
-            : matid(-1), sid(-1), layer_id(-1), source_id(-1), Qadds(0.0), Wadds(0.0), density(-1.0), wthermalc(0.0), spech(0.0), htc(-1.0), vtc(-1.0),
-              mu(-1.0), volume(0.0), temp(0.0), tempp1(0.0), tempp2(0.0), wreport(0.0), water(0.0), vp(0.0), vpp1(0.0), vpsat(0.0), rh(0.1),
-              rhp1(0.1), rhp2(0.1), rhp(10.0), dwdphi(-1.0), dw(-1.0), origin(3, 0.0), length(3, 0.0), overlap(6, 0.0), dist(6, 0.0), adjs(6, 0),
-              adjsl(6, 0)
+            : matid(-1), sid(-1), layer_id(-1), source_id(-1), Qadds(0.0), Wadds(0.0), density(-1.0), wthermalc(0.0), spech(0.0), htc(-1.0),
+              vtc(-1.0), mu(-1.0), volume(0.0), temp(0.0), tempp1(0.0), tempp2(0.0), wreport(0.0), water(0.0), vp(0.0), vpp1(0.0), vpsat(0.0),
+              rh(0.1), rhp1(0.1), rhp2(0.1), rhp(10.0), dwdphi(-1.0), dw(-1.0), origin(3, 0.0), length(3, 0.0), overlap(6, 0.0), dist(6, 0.0),
+              adjs(6, 0), adjsl(6, 0)
         {
         }
     };
@@ -130,8 +130,13 @@ namespace HeatBalanceHAMTManager {
         int surface_id; // Surface id
         int layer_id;   // Layer id
 
-        //int SourceType; // (1 = air flow input; 2 = infiltration model (Kuenzel); 3 = multi zone air flow model)
-        enum class Type { UserDefined = 1, StackAndOverPressure, AirflowNetwork};
+        // int SourceType; // (1 = air flow input; 2 = infiltration model (Kuenzel); 3 = multi zone air flow model)
+        enum class Type
+        {
+            UserDefined = 1,
+            StackAndOverPressure,
+            AirflowNetwork
+        };
         Type type;
 
         // SourceType == 1: Air Flow input
@@ -148,11 +153,20 @@ namespace HeatBalanceHAMTManager {
 
         Real64 moist_airflow;
 
-        InternalMoistureSource(int id=-1, int surface_id=-1, int layer_id=-1, Type type=Type::UserDefined, Real64 moist_airflow_input=0.0, Real64 stack_height=0.0,
-            Real64 component_air_permeance=0.0, Real64 mechanical_ventilation_overpressure=0.0, Real64 delta_pressure=0.0, int afn_id=0, Real64 moist_airflow=0.0)
+        InternalMoistureSource(int id = -1,
+                               int surface_id = -1,
+                               int layer_id = -1,
+                               Type type = Type::UserDefined,
+                               Real64 moist_airflow_input = 0.0,
+                               Real64 stack_height = 0.0,
+                               Real64 component_air_permeance = 0.0,
+                               Real64 mechanical_ventilation_overpressure = 0.0,
+                               Real64 delta_pressure = 0.0,
+                               int afn_id = 0,
+                               Real64 moist_airflow = 0.0)
             : id(id), surface_id(surface_id), layer_id(layer_id), type(type), moist_airflow_input(moist_airflow_input), stack_height(stack_height),
-            component_air_permeance(component_air_permeance), mechanical_ventilation_overpressure(mechanical_ventilation_overpressure), delta_pressure(delta_pressure),
-            afn_id(afn_id), moist_airflow(moist_airflow)
+              component_air_permeance(component_air_permeance), mechanical_ventilation_overpressure(mechanical_ventilation_overpressure),
+              delta_pressure(delta_pressure), afn_id(afn_id), moist_airflow(moist_airflow)
         {
         }
     };

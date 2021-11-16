@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 
 #include "../../Data/EnergyPlusData.hh"
 
