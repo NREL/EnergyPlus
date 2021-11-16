@@ -15588,8 +15588,8 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
 
     // Locals
     // subroutine parameter definitions:
-    int constexpr MaxIte(500); // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3);   // Accuracy of solver result
+    int constexpr MaxIte(500);   // Maximum number of iterations for solver
+    Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
     // local variable declaration:
     std::vector<Real64> Par; // Parameter array passed to solver

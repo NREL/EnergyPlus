@@ -74,7 +74,7 @@ namespace UnitHeater {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(HCoilType::Num)> HCoilTypeNamesUC{
+    static constexpr std::array<std::string_view, static_cast<int>(HCoilType::Num)> HCoilTypeNamesUC{
         "COIL:HEATING:ELECTRIC",
         "COIL:HEATING:FUEL",
         "COIL:HEATING:WATER",

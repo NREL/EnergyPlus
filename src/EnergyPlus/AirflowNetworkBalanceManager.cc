@@ -7229,25 +7229,22 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
     using namespace DataSurfaces;
 
     //  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
-    //  index 2 is side ratio (0.25,1.0,4.0),
-    static Array2D<Real64> const CPHighRiseWall(
-        3,
-        12,
-        reshape2<Real64, int>({0.60, 0.54, 0.23,  -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23,  0.54,
-                               0.60, 0.48, 0.04,  -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04,  0.48,
-                               0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44},
-                              {3, 12})); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args
-                                         // are work-around for VC++2013 bug
+    //  index 2 is side ratio (0.25,1.0,4.0)
+    // Surface-averaged wind-pressure coefficient array for walls
+    static constexpr std::array<std::array<Real64, 12>, 3> CPHighRiseWall = {{
+        {0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54},
+        {0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48},
+        {0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44},
+    }};
+
     //  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
-    //  index 2 is side ratio (0.25,0.5,1.0),
-    static Array2D<Real64> const CPHighRiseRoof(
-        3,
-        12,
-        reshape2<Real64, int>({-0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69,
-                               -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52,
-                               -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55},
-                              {3, 12})); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args
-                                         // are work-around for VC++2013 bug
+    //  index 2 is side ratio (0.25,0.5,1.0)
+    // Surface-averaged wind-pressure coefficient array for roof
+    static constexpr std::array<std::array<Real64, 12>, 3> CPHighRiseRoof = {{
+        {-0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69},
+        {-0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52},
+        {-0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55},
+    }};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FacadeNum;         // Facade number
@@ -7390,8 +7387,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
                         ISR = 2;
                         WtSR = (4.0 - SR) / 3.0;
                     }
-                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseWall(ISR, IAng) + (1.0 - WtAng) * CPHighRiseWall(ISR, IAng + 1)) +
-                                           (1.0 - WtSR) * (WtAng * CPHighRiseWall(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseWall(ISR + 1, IAng + 1));
+                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseWall[ISR - 1][IAng - 1] + (1.0 - WtAng) * CPHighRiseWall[ISR - 1][IAng]) +
+                                           (1.0 - WtSR) * (WtAng * CPHighRiseWall[ISR][IAng - 1] + (1.0 - WtAng) * CPHighRiseWall[ISR][IAng]);
                 }
 
                 // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
@@ -7407,8 +7404,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
                         ISR = 2;
                         WtSR = (1.0 - SR) / 0.5;
                     }
-                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
-                                           (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
+                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseRoof[ISR - 1][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR - 1][IAng]) +
+                                           (1.0 - WtSR) * (WtAng * CPHighRiseRoof[ISR][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR][IAng]);
                 }
 
             } // End of wind direction loop
@@ -7474,8 +7471,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             WtAng = 1.0 - DelAng / 30.0;
             // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
             valsByFacade[FacadeNum - 1][windDirNum - 1] =
-                WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
-                (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
+                WtSR * (WtAng * CPHighRiseRoof[ISR - 1][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR - 1][IAng]) +
+                (1.0 - WtSR) * (WtAng * CPHighRiseRoof[ISR][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR][IAng]);
         }
         AirflowNetworkBalanceManager::CalcSingleSidedCps(state,
                                                          valsByFacade); // run the advanced single sided subroutine if at least one zone calls for it

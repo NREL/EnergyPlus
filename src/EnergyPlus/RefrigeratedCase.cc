@@ -215,12 +215,12 @@ Real64 constexpr IcetoVaporEnthalpy(2833000.0);  // J/kg to freeze water vapor t
 Real64 constexpr SpecificHeatIce(2000.0);        // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
 Real64 constexpr CondAirVolExponentDry(1.58);    // exponent for forced air over a cylinder, = 1/.633 per ASHRAE 2005 (page 3.15)
 Real64 constexpr CondAirVolExponentEvap(1.32);   // exponent for evap condenser air vol flow, = 1/.76 per Manske, 1999
-Real64 constexpr EvaporatorAirVolExponent(1.54); // exponent for evapaporator air vol flow, = 1/.65 per Manske, 1999, page 35
+Real64 constexpr EvaporatorAirVolExponent(1.54); // exponent for evaporator air vol flow, = 1/.65 per Manske, 1999, page 35
 Real64 constexpr FanHalfSpeedRatio(0.1768);      // = 1/(2**2.5) for power step for two speed fan
 Real64 constexpr CapFac60Percent(0.60);          // = 60%, load served by half power 2-speed fan
 
-Array1D<Real64> const EuropeanWetCoilFactor(5, {1.35, 1.15, 1.05, 1.01, 1.0});
-Array1D<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
+static constexpr std::array<Real64, 5> EuropeanWetCoilFactor = {1.35, 1.15, 1.05, 1.01, 1.0};
+static constexpr std::array<Real64, 5> EuropeanAirInletTemp = {10.0, 0.0, -18.0, -25.0, -34.0};
 
 void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
 {
@@ -1876,7 +1876,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(1);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[0];
                         WarehouseCoil(CoilID).SCIndex = 1;
                     } else {
                         ShowSevereError(state,
@@ -1903,7 +1903,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(2);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[1];
                         WarehouseCoil(CoilID).SCIndex = 2;
                     } else {
                         ShowSevereError(state,
@@ -1930,7 +1930,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(3);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[2];
                         WarehouseCoil(CoilID).SCIndex = 3;
                     } else {
                         ShowSevereError(state,
@@ -1957,7 +1957,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(4);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[3];
                         WarehouseCoil(CoilID).SCIndex = 4;
                     } else {
                         ShowSevereError(state,
@@ -1984,7 +1984,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(5);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[4];
                         WarehouseCoil(CoilID).SCIndex = 5;
                     } else {
                         ShowSevereError(state,
@@ -15340,15 +15340,15 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
                         if (CoilInletTemp <= -25.0) {
                             SHRCorrection = 1.0;
                         } else if (CoilInletTemp > -25.0 && CoilInletTemp <= 0.0) {
-                            SHRCorrection = (EuropeanWetCoilFactor(2) - EuropeanWetCoilFactor(4)) /
-                                                (EuropeanAirInletTemp(2) - EuropeanAirInletTemp(4)) * (EuropeanAirInletTemp(2) - CoilInletTemp) +
-                                            EuropeanWetCoilFactor(4);
+                            SHRCorrection = (EuropeanWetCoilFactor[1] - EuropeanWetCoilFactor[3]) /
+                                                (EuropeanAirInletTemp[1] - EuropeanAirInletTemp[3]) * (EuropeanAirInletTemp[1] - CoilInletTemp) +
+                                            EuropeanWetCoilFactor[3];
                         } else if (CoilInletTemp > 0.0 && CoilInletTemp <= 5.0) {
-                            SHRCorrection = (EuropeanWetCoilFactor(1) - EuropeanWetCoilFactor(2)) /
-                                                (EuropeanAirInletTemp(1) - EuropeanAirInletTemp(2)) * (EuropeanAirInletTemp(1) - CoilInletTemp) +
-                                            EuropeanWetCoilFactor(2);
+                            SHRCorrection = (EuropeanWetCoilFactor[0] - EuropeanWetCoilFactor[1]) /
+                                                (EuropeanAirInletTemp[0] - EuropeanAirInletTemp[1]) * (EuropeanAirInletTemp[0] - CoilInletTemp) +
+                                            EuropeanWetCoilFactor[1];
                         } else if (CoilInletTemp > 5.0) {
-                            SHRCorrection = EuropeanWetCoilFactor(1);
+                            SHRCorrection = EuropeanWetCoilFactor[0];
                         } // calc correction as a function of coil inlet temperature
                     }
                 }

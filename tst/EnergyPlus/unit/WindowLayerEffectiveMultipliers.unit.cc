@@ -45,8 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::DataVectorTypes::Vector Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -76,13 +74,13 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         Array1D<Real64> Ar_eff(nlayer, 0.0);
         Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-        Array1D<Real64> const Atop(nlayer, 0.1);
-        Array1D<Real64> const Abot(nlayer, 0.1);
-        Array1D<Real64> const Al(nlayer, 0);
-        Array1D<Real64> const Ar(nlayer, 0);
-        Array1D<Real64> const Ah(nlayer, 0.2);
+        static constexpr std::array<Real64, nlayer> Atop = {0.1};
+        static constexpr std::array<Real64, nlayer> Abot = {0.1};
+        static constexpr std::array<Real64, nlayer> Al = {0.0};
+        static constexpr std::array<Real64, nlayer> Ar = {0.0};
+        static constexpr std::array<Real64, nlayer> Ah = {0.2};
         LayerType(1) = TARCOGLayerType::VENETBLIND_HORIZ;
-        Array1D<Real64> const SlatAngle(nlayer, 0);
+        static constexpr std::array<Real64, nlayer> SlatAngle = {0.0};
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
@@ -108,13 +106,13 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         Array1D<Real64> Ar_eff(nlayer, 0.0);
         Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-        Array1D<Real64> const Atop(nlayer, 0.1);
-        Array1D<Real64> const Abot(nlayer, 0.1);
-        Array1D<Real64> const Al(nlayer, 0);
-        Array1D<Real64> const Ar(nlayer, 0);
-        Array1D<Real64> const Ah(nlayer, 0.2);
+        static constexpr std::array<Real64, nlayer> Atop = {0.1};
+        static constexpr std::array<Real64, nlayer> Abot = {0.1};
+        static constexpr std::array<Real64, nlayer> Al = {0.0};
+        static constexpr std::array<Real64, nlayer> Ar = {0.0};
+        static constexpr std::array<Real64, nlayer> Ah = {0.2};
         LayerType(1) = TARCOGLayerType::VENETBLIND_VERT;
-        Array1D<Real64> const SlatAngle(nlayer, 0);
+        static constexpr std::array<Real64, nlayer> SlatAngle = {0.0};
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
@@ -140,13 +138,13 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         Array1D<Real64> Ar_eff(nlayer, 0.0);
         Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-        Array1D<Real64> const Atop(nlayer, 0.1);
-        Array1D<Real64> const Abot(nlayer, 0.1);
-        Array1D<Real64> const Al(nlayer, 0);
-        Array1D<Real64> const Ar(nlayer, 0);
-        Array1D<Real64> const Ah(nlayer, 0.2);
+        static constexpr std::array<Real64, nlayer> Atop = {0.1};
+        static constexpr std::array<Real64, nlayer> Abot = {0.1};
+        static constexpr std::array<Real64, nlayer> Al = {0.0};
+        static constexpr std::array<Real64, nlayer> Ar = {0.0};
+        static constexpr std::array<Real64, nlayer> Ah = {0.2};
         LayerType(1) = TARCOGLayerType::VENETBLIND_HORIZ;
-        Array1D<Real64> const SlatAngle(nlayer, 45);
+        static constexpr std::array<Real64, nlayer> SlatAngle = {45.0};
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
@@ -172,13 +170,13 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         Array1D<Real64> Ar_eff(nlayer, 0.0);
         Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-        Array1D<Real64> const Atop(nlayer, 0.1);
-        Array1D<Real64> const Abot(nlayer, 0.1);
-        Array1D<Real64> const Al(nlayer, 0);
-        Array1D<Real64> const Ar(nlayer, 0);
-        Array1D<Real64> const Ah(nlayer, 0.2);
+        static constexpr std::array<Real64, nlayer> Atop = {0.1};
+        static constexpr std::array<Real64, nlayer> Abot = {0.1};
+        static constexpr std::array<Real64, nlayer> Al = {0.0};
+        static constexpr std::array<Real64, nlayer> Ar = {0.0};
+        static constexpr std::array<Real64, nlayer> Ah = {0.2};
         LayerType(1) = TARCOGLayerType::VENETBLIND_VERT;
-        Array1D<Real64> const SlatAngle(nlayer, 45);
+        static constexpr std::array<Real64, nlayer> SlatAngle = {45.0};
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
@@ -204,13 +202,13 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
         Array1D<Real64> Ar_eff(nlayer, 0.0);
         Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-        Array1D<Real64> const Atop(nlayer, 0.1);
-        Array1D<Real64> const Abot(nlayer, 0.1);
-        Array1D<Real64> const Al(nlayer, 0);
-        Array1D<Real64> const Ar(nlayer, 0);
-        Array1D<Real64> const Ah(nlayer, 0.2);
+        static constexpr std::array<Real64, nlayer> Atop = {0.1};
+        static constexpr std::array<Real64, nlayer> Abot = {0.1};
+        static constexpr std::array<Real64, nlayer> Al = {0.0};
+        static constexpr std::array<Real64, nlayer> Ar = {0.0};
+        static constexpr std::array<Real64, nlayer> Ah = {0.2};
         LayerType(1) = TARCOGLayerType::DIFFSHADE;
-        Array1D<Real64> const SlatAngle(nlayer, 0);
+        static constexpr std::array<Real64, nlayer> SlatAngle = {0.0};
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
