@@ -44,135 +44,30 @@ Currently, the original requester for the feature uses a workaround that uses EM
 
 Based on the existing modules' capabilities and limitations, we proposed to add two new IDF objects to model such a  re-routed and recombined exhaust system configuration, and to allow quick setup and scaling up of such a configure for larger simulation projects.
 
-## Approach A ##
+## Approach ##
+
+### Exhasut System ###
+
+An AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhasut system would then be similar to that of a return path, including objects such as AirLoopHVAC:ZoneMixer. However, it could be different from the return path, in that in general, this exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust fan to be connected to the zone exhaust or plenum exhaust, as part of the exhaust system. Further, beyond the central exhaust fan, there could also be another heat/enthalpy exchanger for the heat recovery purposes. 
 
 The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described: 
 ```
 AirLoopHVAC:ExhaustSystem,
     Central Exhaust,            !- Name
     Exhaust Avail List,         !- Availability Manager List Name
-    Fan:SystemModel,            !- Component 1 Object Type
-    Central Exhaust Fan,        !- Component 1 Name
-    AirLoopHVAC:ExhaustMixer,   !- Component 2 Object Type
-    Exhaust Mixer 1,            !- Component 2 Name
-    Fan:ZoneExhaust,            !- Component 3 Object Type
-    Zone1 Exhaust Fan;          !- Component 3 Name
-```
-
-The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume could not be used with the current object.
-
-The AirLoopHVAC:ExahaustMixer is also to be added as a new object: 
-```
-AirLoopHVAC:ExhaustMixer,
-    Exhaust Mixer 1,                !-Name
-    Central Exhaust Fan Inlet Node, !- Outlet Node Name
-    Zone2 Exhaust Node,             !- Inlet 1 Node Name
-    0.1,                            !- Inlet 1 Design Flow Rate {m3/s}
-    Zone2 Exhaust Flow Schedule,    !- Inlet 1 Flow Fraction Schedule Name
-    Zone1 Exhaust Fan Outlet Node,  !- Inlet 2 Node Name
-    ,                               !- Inlet 2 Design Flow Rate {m3/s}
-    ;                               !- Inlet 2 Flow Fraction Schedule Name
-```
-
-In the example IDF block above, the Inlet 2 Design Flow Rate (m3/s) might not be needed as it is an existing zone exhaust fan. The set up intends to allow some flexibility in the configurations in that one or more of the connect branch to the mixer can be without a branch fan. Further, the exhaust mixer will allow more than 2 inlet branches to be connected to the mixer.
-
-## Approach B ##
-
-The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described: 
-```
-AirLoopHVAC:ExhaustSystem,
-    Central Exhaust,            !- Name
-    Exhaust Avail List,         !- Availability Manager List Name
-    Fan:SystemModel,            !- Component 1 Object Type
-    Central Exhaust Fan,        !- Component 1 Name
-    AirLoopHVAC:Mixer,          !- Component 2 Object Type
-    Exhaust Mixer 1,            !- Component 2 Name
-    AirLoopHVAC:Mixer,          !- Component 3 Object Type
-    Exhaust Mixer 2;            !- Component 3 Name
-```
-
-The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume would not be allowed.
-
-The ZoneHVAC:ExhaustSystem is also to be added as a new object: 
-```
-ZoneHVAC:ExhaustSystem,
-    Zone2 Exhaust System,           !-Name
-    HVACOperationSchd,              !- Availability Schedule Name
-    Zone2 Exhaust Node,             !- Inlet Node Name
-    Exhaust Mixer 1 Inlet Node 2,   !- Outlet Node Name
-    0.1,                            !- Design Flow Rate {m3/s}
-    Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
-    Zone2 Exhaust Fan,              !- Fan Name
-    Scheduled,                      !- Fan Control Type (Scheduled, Passive, FollowSupply, ????)
-    Zone2 Exhaust Fan Flow Sched,   !- Flow Fraction Schedule Name
-    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
-    ,                               !- System Availability Manager Name
-    ,                               !- Minimum Zone Temperature Limit Schedule Name
-    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
-```
-
-## Approach C ##
-
-The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be described.
-AirLoopHVAC:Exhaust System would reference the following components:
-
-* ZoneHVAC:ExhaustSystem - required for every zone that connects to the exhaust system. This can have its own fan or be passive.
-* AirLoopHVAC:Mixer - if there is more than one zone, then a mixer is required.
-* Fan:SystemModel (or Fan:ComponentModel) - a fan is required if any of the ZoneHVAC:ExhaustSystem objects do not have a fan.
-
-```
-AirLoopHVAC:ExhaustSystem,
-    Central Exhaust,            !- Name
-    Exhaust Avail List,         !- Availability Manager List Name
-    ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
-    Zone1 Exhaust System,       !- Component 1 Name
-    ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
-    Zone2 Exhaust System,       !- Component 2 Name
-    AirLoopHVAC:Mixer,          !- Component 3 Object Type
-    Exhaust Mixer;              !- Component 3 Name
+    Fan:ZoneExhaust,            !- Component 1 Object Type
+    Zone1 Exhaust Fan;          !- Component 1 Name
+	ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
+	Zone 2 Exhaust system;      !- Component 2 Name
+    AirLoopHVAC:ExhaustMixer,   !- Component 3 Object Type
+    Exhaust Mixer 1,            !- Component 3 Name
     Fan:SystemModel,            !- Component 4 Object Type
     Central Exhaust Fan,        !- Component 4 Name
 ```
 
-The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume would not be allowed.
+The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume could not be used with the current object.
 
-The ZoneHVAC:ExhaustSystem is also to be added as a new object: 
-```
-ZoneHVAC:ExhaustSystem,
-    Zone2 Exhaust System,           !-Name
-    HVACOperationSchd,              !- Availability Schedule Name
-    Zone2 Exhaust Node,             !- Inlet Node Name
-    Exhaust Mixer Inlet Node 2,     !- Outlet Node Name
-    0.1,                            !- Design Flow Rate {m3/s}
-    Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
-    Zone2 Exhaust Fan,              !- Fan Name
-    Scheduled,                      !- Fan Control Type (Scheduled, Passive, FollowSupply, ????)
-    Zone2 Exhaust Fan Flow Sched,   !- Flow Fraction Schedule Name
-    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
-    ,                               !- System Availability Manager Name
-    ,                               !- Minimum Zone Temperature Limit Schedule Name
-    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
-```
-
-## Approach D ##
-
-In this approach, an AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhasut system would then be similar to that of a return path, including objects such as AirLoopHVAC:ZoneMixer. However, it could be different from the return path, in that in general, this exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust fan to be connected to the zone exhaust or plenum exhaust, as part of the exhaust system. Further, beyond the fan, there could also be another heat/enthalpy exchanger for the heat recovery purposes. 
-
-```
-AirLoopHVAC:ExhaustSystem,
-    Central Exhaust,            !- Name
-    Exhaust Avail List,         !- Availability Manager List Name
-    ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
-    Zone1 Exhaust System,       !- Component 1 Name
-    AirLoopHVAC:ZoneMixer,      !- Component 2 Object Type
-    Exhaust Zone Mixer,         !- Component 2 Name
-    Fan:SystemModel,            !- Component 3 Object Type
-    Central Exhaust Fan;        !- Component 3 Name
-```
-
-This method would expand the usage scenarios of AirLoopHVAC:ZoneMixer object, to allow it to be used in the exhaust system. Originally, the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects to be used with AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
-
-In the current development, we propose to allow an AirLoopHVAC:Mixer to be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust node of a zone, the outlet node a fan:zoneexhaust object, or the exhaust fan outlet of a newly developed ZoneHVAC:ExhaustSystem. 
+### ZoneHVAC:ExhaustSystem ###
 
 The ZoneHVAC:ExhaustSystem is also to be added as a new object, as a more advanced version of fan:zoneexhaust connected to a zone exhaust. It will allow the exhaust system to use the newer fan:systemmodel or fan:componentmodel: 
 ```
@@ -192,27 +87,102 @@ ZoneHVAC:ExhaustSystem,
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
-## Approach E ##
+### ZoneHVAC:ExhaustSystem enforcement choice ###
 
-Another approach to model the central exhaust system is to describe the system in an AirLoopHVAC object. The current AirLoopHVAC logic and required nodes need to be modified in order to make the configuration work. For example, it should allow1 a disconnected the the demand side (especially the inlet) configuration. 
- 
+One piece of important information about each of the indivual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulation. This should be based on either a design (exhaust) flow rate by input or via zone xhaust fan (design flow) inputs. 
+
+One way to deal with the problem is to enforce an implementaton of ZoneHVAC:ExhaustSystem for each connected zone exhaust, making is a required object for for every zone that connects to the AirLoopHVAC:ExhaustSystem. The Zone:ExhaustSystem can either have its own fan (in which the fan will give the information) or be passive. A fan (Fan:SystemModel or Fan:ComponentModel) or design flow rate is required if any of the ZoneHVAC:ExhaustSystem objects do not have a fan.
+
 ```
-AirLoopHVAC,
-    Exhaust System,                    !- Name
-    ,                        !- Controller List Name
-    DOAS Availability Managers,  !- Availability Manager List Name
-    autosize,                !- Design Supply Air Flow Rate {m3/s}
-    DOAS exhaust Branches,   !- Branch List Name
-    ,                        !- Connector List Name
-    central_exhaust_inlet_point,     !- Supply Side Inlet Node Name
-    ,                        !- Demand Side Outlet Node Name
-    ,                        !- Demand Side Inlet Node Names
-    central_exhaust_outlet;  !- Supply Side Outlet Node Names
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust,            !- Name
+    Exhaust Avail List,         !- Availability Manager List Name
+    ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
+    Zone1 Exhaust System,       !- Component 1 Name
+    ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
+    Zone2 Exhaust System,       !- Component 2 Name
+    AirLoopHVAC:Mixer,          !- Component 3 Object Type
+    Exhaust Mixer;              !- Component 3 Name
+    Fan:SystemModel,            !- Component 4 Object Type
+    Central Exhaust Fan,        !- Component 4 Name
 ```
 
-The exhaust system can have two options to specify the exhaust connections. The first one is via the AirLoopHVAC's exhaust path (with needs the added objects in Approaches A-D ). 
+The ZoneHVAC:ExhaustSystem enforcement choice would affect how the mixer should be designed below. In general, if the ZoneHVAC:ExhaustSystem is enforced for each zone, there is no need to add new design flow rate information to a mixer (see the Mixer choice in the next section). Here denote the option of enforcing ZoneHVAC:ExhaustSystem on each connected exhaus as Choice 1; and the option of not enforceing it as Choice 2. 
 
-The second option is to add node-branch-connector descriptions to the current AirLoopHVAC object's branch and/or connectors list, which will be connected from a suitable supply side inlet node or demand side outlet node. The supply side inlet node should be from the starting point of the zone exhaust nodes in this scenario. 
+### Mixer choices ###
+
+#### Choice a: New AirLoopHVAC:ExhaustMixer ###
+
+In this option, a new AirLoopHVAC:ExhaustMixer, which is different from an existing AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer in that it includes the design (exhaust) flow rate , is to be added as a new object: 
+```
+AirLoopHVAC:ExhaustMixer,
+    Exhaust Mixer 1,                !-Name
+    Central Exhaust Fan Inlet Node, !- Outlet Node Name
+    Zone2 Exhaust Node,             !- Inlet 1 Node Name
+    0.1,                            !- Inlet 1 Design Flow Rate {m3/s}
+    Zone2 Exhaust Flow Schedule,    !- Inlet 1 Flow Fraction Schedule Name
+    Zone1 Exhaust Fan Outlet Node,  !- Inlet 2 Node Name
+    ,                               !- Inlet 2 Design Flow Rate {m3/s}
+    ;                               !- Inlet 2 Flow Fraction Schedule Name
+```
+
+In the example IDF block above, the Inlet 2 Design Flow Rate (m3/s) might not be needed as it is an existing zone exhaust fan. The set up intends to allow some flexibility in the configurations in that one or more of the connect branch to the mixer can be without a branch fan. Further, the exhaust mixer will allow more than 2 inlet branches to be connected to the mixer.
+
+#### Choice a: Reuse/Expand existing AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer ####
+
+If the design exhaust flow rate can be obtained someplace else, the existing AirLoopHVAC:Mixer or AirLoopHVAC:ZoneMixer object could be expanded and reused for in the exhaust system. For example, originally the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects to be used with AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
+
+In the current development, this choice would allow an AirLoopHVAC:Mixer to be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust node of a zone, the outlet node a fan:zoneexhaust object, or the exhaust fan outlet of a newly developed ZoneHVAC:ExhaustSystem. 
+
+### Overall design choice combinations ###
+
+Depending on the ZoneHVAC:ExhaustSystem enforcement choice (a and b) and the mixer choice (1 and 2), the overall design choice can be in general the following two combinations: 
+
+#### Option 2a: ####
+Not enforcing ZoneHVAC:ExhaustSystem; but using the new AirLoopHVAC:ExhaustMixer. 
+In this case, what should be included in the parent AirLoopHVAC:ExhaustSystem object should included the ZoneHVAC:ExhaustSystem objects, the mixer, and the central exhaust fan: 
+
+```
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust,            !- Name
+    Exhaust Avail List,         !- Availability Manager List Name
+    Fan:ZoneExhaust,            !- Component 1 Object Type
+    Zone1 Exhaust Fan;          !- Component 1 Name
+	ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
+	Zone 2 Exhaust system;      !- Component 2 Name
+    AirLoopHVAC:ExhaustMixer,   !- Component 3 Object Type
+    Exhaust Mixer 1,            !- Component 3 Name
+    Fan:SystemModel,            !- Component 4 Object Type
+    Central Exhaust Fan,        !- Component 4 Name
+```
+
+#### Option 1b: ####
+Enforcing ZoneHVAC:ExhaustSystem to all exhausts; reusing/expanding current AirLoopHVAC:ZoneMixer.
+
+In this case, what should be included in the parent AirLoopHVAC:ExhaustSystem object should included the ZoneHVAC:Exhaustem objects, the mixers, and the central exhaust fans: 
+```
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust,            !- Name
+    Exhaust Avail List,         !- Availability Manager List Name
+    ZoneHVAC:ExhaustSystem,     !- Component 1 Object Type
+    Zone1 Exhaust System,       !- Component 1 Name
+    ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
+    Zone2 Exhaust System,       !- Component 2 Name
+    AirLoopHVAC:Mixer,          !- Component 3 Object Type
+    Exhaust Mixer;              !- Component 3 Name
+    Fan:SystemModel,            !- Component 4 Object Type
+    Central Exhaust Fan,        !- Component 4 Name
+```
+
+#### Optoiin 1a: ####
+Another possiblity is not to enforce ZoneHVAC:ExhaustSystem to all exhausts; and still reuse/expand current AirLoopHVAC:ZoneMixer. This is similar to 1b, except now that the ZoneHVAC:ExhaustSystem is not enforced for all exhausts. This allows some flexibility and convinience in specifying a mix of some zones exhaust fans and some zones without fancy exhaust fans (passive). In this scenario, the code should check to make sure adquate design flow rate information could be come from some input information (either an input exhaust flow rate or an exhaust fan/system design flow rate specification. 
+
+### Other considerations ###
+
+#### Report considerations ####
+One issue for using the methods above is which Air loop should the exhaust system belongs when it spans across more than one air loops. One general rule would should be tied to an airloop that it connects to; but there should also be a check to let one airloop to have at most one exhaust system. 
+
+#### Other ####
 
 ### IDD changes ###
 
