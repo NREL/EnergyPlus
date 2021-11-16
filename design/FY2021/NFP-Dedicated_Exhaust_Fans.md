@@ -182,7 +182,8 @@ Another possiblity is not to enforce ZoneHVAC:ExhaustSystem to all exhausts; and
 #### Report considerations ####
 One issue for using the methods above is which Air loop should the exhaust system belongs when it spans across more than one air loops. One general rule would should be tied to an airloop that it connects to; but there should also be a check to let one airloop to have at most one exhaust system. 
 
-#### Other ####
+#### ZoneHVAC:ExhaustSystem as Zone Equipment ####
+The newly ZoneHVAC:ExhaustSystem should be considered to be an zone equipment, similar to the existing Fan:ZoneExhaust object. 
 
 ### IDD changes ###
 
@@ -194,12 +195,12 @@ After the AirLoopHVAC:ReturnPath block and before the AirLoopHVAC:ExhaustMixer (
 ```
 AirLoopHVAC:ExhaustSystem,
        \extensible:2 - Just duplicate last two fields and comments (changing numbering, please)
-       \memo Define dedicated exhaust systems that 
-       \memo combines exhausts of multiple AirLoopHVAC systems
+       \memo Define the zone exhaust systems that 
+       \memo can be used for an AirLoopHVAC:ExhaustSystem
   A1 , \field Name
        \required-field
   A2 , \field Availability Schedule Name
-       \note Availability schedule name for this exhaust system. Schedule value > 0 means it is available.
+       \note Availability schedule name for this zone exhaust system. Schedule value > 0 means it is available.
        \note If this field is blank, the exhaust system is always available.      
        \type object-list
        \object-list ScheduleNames
@@ -209,7 +210,6 @@ AirLoopHVAC:ExhaustSystem,
        \type choice
        \key Fan:SystemModel
        \key Fan:ComponentModel
-       \key AirLoopHVAC:ExhaustMixer
        \key Fan:ZoneExhaust
   A4 , \field Component 1 Name
        \required-field
@@ -244,9 +244,63 @@ AirLoopHVAC:ExhaustSystem,
        \object-list FansZoneExhaust
 ```
 
-#### IDD Addition for AirLooopHVAC:ExhaustMixer ####
+#### #### IDD Addition for ZoneHVAC:ExhaustSystem ####
 
-After the AirLoopHVAC:ReturnPath block and the AirLoopHVAC:DedicatedOutdoorAirSystem blocks:
+At the end of the `ZoneHVAC Forced Air Units` group (or another position might be at the end of the `Zone HVAC Air Loop Terminal Units` group):
+
+```
+ZoneHVAC:ExhaustSystem,
+       \memo Define dedicated exhaust systems that 
+       \memo combines exhausts of multiple AirLoopHVAC systems
+  A1 , \field Name
+       \required-field
+  A2 , \field Availability Schedule Name
+       \note Availability schedule name for this exhaust system. Schedule value > 0 means it is available.
+       \note If this field is blank, the exhaust system is always available.      
+       \type object-list
+       \object-list ScheduleNames
+  A3 , \field Inlet Node Name
+       \note Inlet node name for the exhaust system
+  A4 , \field Outlet Node Name
+       \note Outlet node name for the exhaust system
+  A5 , \field Fan Object Type 
+       \note Type of exhaust fan object
+       \note This field could be blank if the exhaust is passive
+       \type choice
+       \key Fan:SystemModel
+       \key Fan:ComponentModel
+  A6 , \field Fan Name
+       \note Name of the exhaust fan object
+       \type object-list
+       \object-list FanNames
+  A7 , \field Fan Control Type
+       \note Control type of the exhaust fan
+       \type choice
+       \key Scheduled
+       \key Passive
+       \key FollowSupply
+  A8 , \field 
+       \note Schedule name of the exhaust flow fraction
+       \type object-list
+       \object-list ScheduleNames
+  A9 , \field Supply Node or NodeList Name
+       \note To be used with FollowSupply control type)
+  A10, \field System Availability Manager Name
+       \type object-list
+       \object-list AvailabilityManagerNames
+  A11, \field Minimum Zone Temperature Limit Schedule Name
+       \note Schedule name of the Minimum Zone Temperature Limit
+       \type object-list
+       \object-list ScheduleNames
+  A12, \field Balanced Exhaust Fraction Schedule Name
+       \note Schedule name of the Balance Exhaust Fraction
+       \type object-list
+       \object-list ScheduleNames
+```
+
+#### IDD Addition for AirLooopHVAC:ExhaustMixer (if using this option) ####
+
+After the newly added after AirLoopHVAC:ExhaustSystem block and before the AirLoopHVAC:DedicatedOutdoorAirSystem blocks:
 ```
 AirLoopHVAC:ExhaustMixer,
        \extensible:3 - Just duplicate last three fields and comments (changing numbering, please)
@@ -478,9 +532,37 @@ NA
 
 ## Designs ##
 
+### SimExhaustAirSystem() ###
+
+A proper simulation entry point for the exhaust system simulation would be after the 
+```
+    CalcZoneLeavingConditions(state, FirstHVACIteration);
+```
+and before the function
+```
+    SimReturnAirPath(state);
+```
+near the end of the `SimZoneEquipment()` function in ZoneEquipmentManager.cc.
+ 
+The new `SimExhaustAirSystem()` should be added here to conduct the AirLoopHVAC:ExhaustSystem simulation. 
+
+There should also be some airloop level calls (or a new function if needed) about the exhasut air system.
+
+### SizeExhaustSystemFan() ###
+
+This function will be added to size the central exhaust system fans. 
+
+### getExhaustSystemInput() ###
+
+A function to process the input fields for the AirLoopHVAC:ExhaustSystem object. It will read input information in the exhaust system set and update internal data for the components (such as the central exhaust fan, zone exhaust fans, and exhaust mixers) being read in.
+
 ### AirLoopHVAC:ExhaustSystem data struct ###
 
 This struct definition and declaration will create a new data struct for the AirLoopHVAC:ExhaustSystem object.
+
+### ZoneHVAC:ExhaustSystem data struct ###
+
+This struct definition and declaration will create a new data struct for the ZoneHVAC:ExhaustSystem object.
 
 ### AirLoopHVAC:ExhaustMixer data struct ###
 
@@ -519,21 +601,13 @@ The proposed code is similar to the current AirLoopHVAC:Mixer. Two additional ve
 
 It is also beneficial to use the factory method for the AirLoopHVAC:ExhaustSystem and the AirLoopHVAC:ExhaustMixer object creation.
 
-### getAirLoopExhaustMixer() ###
+### getAirLoopExhaustMixer() or reuse original ZoneMixer ###
 
 This function will get the input information from the AirLoopHVAC:ExhaustMixer objects processed. Related information input includes 
 
 ### CalcAirLoopExhaustMixer() ###
 
 It is a function to simulate the AirLoopHVAC:ExhaustMixer mixing process. The temperature, humidity, and mass flow rate will be calculated and updated based on the incoming streams' conditions.
-
-### getAirLoopExhaustSystemInput() ###
-
-A function to process the input fields for the AirLoopHVAC:ExhaustSystem object. It will read input information in the exhaust system set and update internal data for the components (such as the central exhaust fan, zone exhaust fans, and exhaust mixers) being read in.
-
-### SimAirLoopExhaustSystem() ###
-
-A function to set up the AirLoopHVAC:ExhaustSystem simulation. This will call the components included in the exhaust system to conduct simulation for each individual components, including the newly added AirLoopHVAC:Mixer object.
 
 ### ReportAirLoopExhaustSystem() ###
 
