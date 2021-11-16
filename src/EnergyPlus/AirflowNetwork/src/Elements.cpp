@@ -1457,7 +1457,7 @@ namespace AirflowNetwork {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const RealMin(1e-37);
+        Real64 constexpr RealMin(1e-37);
         static Real64 const sqrt_1_2(std::sqrt(1.2));
 
         // INTERFACE BLOCK SPECIFICATIONS

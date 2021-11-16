@@ -45,21 +45,36 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/Plant/PlantConvergencePoint.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSurfaceColors.hh>
 
-namespace EnergyPlus::DataPlant {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-// PURPOSE OF THIS MODULE:
-// This data-only module contains the structures for various parts of the Plant and
-// Condenser Loops.
+using namespace EnergyPlus;
 
-// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
+TEST_F(EnergyPlusFixture, TestMatchAndSetColorTextString)
+{
+    // test match "Text"
+    std::string testStr = "Text";
+    int setVal = 1;
+    bool colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
+    ASSERT_TRUE(colorSet);
+    ASSERT_EQ(state->dataSurfColor->DXFcolorno[0], setVal);
 
-Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
+    // test match "DaylightReferencePoint2"
+    testStr = "DaylightReferencePoint2";
+    setVal = 3;
+    colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
+    ASSERT_TRUE(colorSet);
+    ASSERT_EQ(state->dataSurfColor->DXFcolorno[14], setVal);
 
-} // namespace EnergyPlus::DataPlant
+    // test invalid
+    testStr = "Invalid";
+    setVal = 3;
+    colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
+    ASSERT_FALSE(colorSet);
+}

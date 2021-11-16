@@ -80,10 +80,10 @@ namespace PoweredInductionUnits {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNamesUC{
+    static constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNamesUC{
         "COIL:HEATING:FUEL", "COIL:HEATING:ELECTRIC", "COIL:HEATING:WATER", "COIL:HEATING:STEAM"};
 
-    constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNames{
+    static constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNames{
         "Coil:Heating:Fuel", "Coil:Heating:Electric", "Coil:Heating:Water", "Coil:Heating:Steam"};
 
     struct PowIndUnitData
