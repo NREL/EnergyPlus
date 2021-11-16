@@ -150,6 +150,7 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> PhaseChangeTemperatureReverse;
         Array1D<MaterialActuatorData> condMaterialActuators;
         Array1D<MaterialActuatorData> specHeatMaterialActuators;
+        Array1D<MaterialActuatorData> heatSourceFluxMaterialActuators;
         Array1D<Real64> condNodeReport;
         Array1D<Real64> specHeatNodeReport;
 

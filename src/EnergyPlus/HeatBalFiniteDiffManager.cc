@@ -829,6 +829,7 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
             SurfaceFD(Surf).condMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
             SurfaceFD(Surf).specHeatMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+            SurfaceFD(Surf).heatSourceFluxMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
             SurfaceFD(Surf).condNodeReport.allocate(TotNodes + 1);
             SurfaceFD(Surf).specHeatNodeReport.allocate(TotNodes + 1);
 
@@ -860,7 +861,7 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).condNodeReport = 0.0;
             SurfaceFD(Surf).specHeatNodeReport = 0.0;
 
-            // Setup EMS data
+            // Setup EMS data for conductivity and specific heat
             for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
                 // Setup material layer names actuators
                 int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
@@ -868,6 +869,7 @@ namespace HeatBalFiniteDiffManager {
                 std::string actName = fmt::format("{}:{}", state.dataSurface->Surface(Surf).Name, state.dataMaterial->Material(matLay).Name);
                 SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
                 SurfaceFD(Surf).specHeatMaterialActuators(lay).actuatorName = actName;
+                SurfaceFD(Surf).heatSourceFluxMaterialActuators(lay).actuatorName = actName;
             }
         }
 
@@ -901,6 +903,13 @@ namespace HeatBalFiniteDiffManager {
                                              "[J/kg-C]",
                                              SurfaceFD(SurfNum).specHeatMaterialActuators(mat).isActuated,
                                              SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatedValue);
+                EnergyPlus::SetupEMSActuator(state,
+                                             "CondFD Surface Material Layer",
+                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(mat).actuatorName,
+                                             "Heat Flux",
+                                             "[W/m2]",
+                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(mat).isActuated,
+                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(mat).actuatedValue);
             }
 
             TotNodes = ConstructFD(state.dataSurface->Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
@@ -1826,6 +1835,8 @@ namespace HeatBalFiniteDiffManager {
             auto const &specHeatActuator1(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
             auto const &specHeatActuator2(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay + 1));
 
+            auto const &heatFluxActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).heatSourceFluxMaterialActuators(Lay));
+
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
 
@@ -1889,9 +1900,16 @@ namespace HeatBalFiniteDiffManager {
 
                 // Source/Sink Flux Capability ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-                Real64 const QSSFlux((surface.Area > 0.0) && (construct.SourceSinkPresent && Lay == construct.SourceAfterLayer)
-                                         ? (state.dataHeatBalFanSys->QRadSysSource(Surf) + state.dataHeatBalFanSys->QPVSysSource(Surf)) / surface.Area
-                                         : 0.0); // Source/Sink flux value at a layer interface // Includes QPV Source
+                Real64 QSSFlux = 0.0;
+                if ((surface.Area > 0.0) && (construct.SourceSinkPresent && Lay == construct.SourceAfterLayer)) {
+                    // Source/Sink flux value at a layer interface // Includes QPV Source
+                    QSSFlux = (state.dataHeatBalFanSys->QRadSysSource(Surf) + state.dataHeatBalFanSys->QPVSysSource(Surf)) / surface.Area;
+                }
+
+                // Add EMS actuated value
+                if (heatFluxActuator.isActuated) {
+                    QSSFlux += heatFluxActuator.actuatedValue;
+                }
 
                 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
