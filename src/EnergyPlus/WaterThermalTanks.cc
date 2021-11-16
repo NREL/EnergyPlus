@@ -1616,7 +1616,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             }
             break;
         }
-        case CrankcaseHeaterControlTemp::Exterior: {
+        case CrankcaseHeaterControlTemp::Outdoors: {
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                 ShowWarningError(state,
                                  state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
@@ -6524,7 +6524,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                 state.dataHeatBalFanSys->MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
             break;
         }
-        case CrankcaseHeaterControlTemp::Exterior: {
+        case CrankcaseHeaterControlTemp::Outdoors: {
             state.dataHVACGlobal->HPWHCrankcaseDBTemp = state.dataEnvrn->OutDryBulbTemp;
             break;
         }

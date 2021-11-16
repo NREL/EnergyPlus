@@ -94,7 +94,7 @@ namespace WaterThermalTanks {
         Unassigned = -1,
         Schedule, // temperature controlling compressor crankcase heater is scheduled
         Zone,     // temperature controlling compressor crankcase heater is zone air
-        Exterior, // temperature controlling compressor crankcase heater is outdoor air
+        Outdoors, // temperature controlling compressor crankcase heater is outdoor air
         Num
     };
 
