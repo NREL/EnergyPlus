@@ -47,13 +47,14 @@
 
 // C++ Headers
 #include <cmath>
-#include <string>
 #include <iostream>
+#include <string>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh> // for internal moisture source type 3
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -71,7 +72,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>  // for internal moisture source type 3
 
 namespace EnergyPlus {
 
@@ -118,7 +118,7 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::MinSurfaceTempLimitBeforeFatal;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    
+
     void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
     {
 
@@ -260,9 +260,9 @@ namespace HeatBalanceHAMTManager {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject7, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        //inputProcessor->getObjectDefMaxArgs(state, cHAMTObject8, NumParams, NumAlphas, NumNums);
-        //MaxAlphas = max(MaxAlphas, NumAlphas);
-        //MaxNums = max(MaxNums, NumNums);
+        // inputProcessor->getObjectDefMaxArgs(state, cHAMTObject8, NumParams, NumAlphas, NumNums);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // MaxNums = max(MaxNums, NumNums);
 
         ErrorsFound = false;
 
@@ -623,19 +623,17 @@ namespace HeatBalanceHAMTManager {
 
         // Internal Moisture Source
         auto instances = state.dataInputProcessing->inputProcessor->epJSON.find(cHAMTObject8);
-        
 
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int item = 0;
             auto &instancesValue = instances.value();
-            
+
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 std::string construction_name{UtilityRoutines::MakeUPPERCase(std::string(fields.at("construction_name")))};
 
-                int construction_index = UtilityRoutines::FindItemInList(construction_name,
-                                                                         state.dataConstruction->Construct);
+                int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
 
                 if (construction_index == 0) {
                     ShowSevereError(state,
@@ -665,7 +663,8 @@ namespace HeatBalanceHAMTManager {
                     if (found == fields.end()) {
                         ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Air Flow Rate\" is blank");
                         ShowContinueError(state,
-                            "No user defined input for air flow through component found. Internal Moisture Source Type \"UserDefined\" requires this input.");
+                                          "No user defined input for air flow through component found. Internal Moisture Source Type \"UserDefined\" "
+                                          "requires this input.");
                         ErrorsFound = true;
                         continue;
                     } else {
@@ -678,7 +677,8 @@ namespace HeatBalanceHAMTManager {
                     if (found == fields.end()) {
                         ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Stack Height\" is blank");
                         ShowContinueError(state,
-                            "No user defined input for stack height found. Internal Moisture Source Type \"StackAndOverPressure\" requires this input.");
+                                          "No user defined input for stack height found. Internal Moisture Source Type \"StackAndOverPressure\" "
+                                          "requires this input.");
                         ErrorsFound = true;
                         continue;
                     } else {
@@ -689,7 +689,8 @@ namespace HeatBalanceHAMTManager {
                     if (found == fields.end()) {
                         ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Component Air Permeance\" is blank");
                         ShowContinueError(state,
-                            "No user defined input for component air permeance found. Internal Moisture Source Type \"StackAndOverPressure\" requires this input.");
+                                          "No user defined input for component air permeance found. Internal Moisture Source Type "
+                                          "\"StackAndOverPressure\" requires this input.");
                         ErrorsFound = true;
                         continue;
                     } else {
@@ -700,7 +701,8 @@ namespace HeatBalanceHAMTManager {
                     if (found == fields.end()) {
                         ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Mechanical Ventilation Overpressure\" is blank");
                         ShowContinueError(state,
-                            "No user defined input for mechanical ventilation overpressure found. Internal Moisture Source Type \"StackAndOverPressure\" requires this input.");
+                                          "No user defined input for mechanical ventilation overpressure found. Internal Moisture Source Type "
+                                          "\"StackAndOverPressure\" requires this input.");
                         ErrorsFound = true;
                         continue;
                     } else {
@@ -1269,7 +1271,7 @@ namespace HeatBalanceHAMTManager {
                 cells(cid).rhp1 = state.dataMaterial->Material(matid).irh;
                 cells(cid).rhp2 = state.dataMaterial->Material(matid).irh;
 
-                if (cells(cid).source_id!=-1) {
+                if (cells(cid).source_id != -1) {
                     if (sources(cells(cid).source_id).type == InternalMoistureSource::Type::AirflowNetwork) {
                         if (!sources(cells(cid).source_id).afn_id) {
                             if (state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces) {
@@ -1433,18 +1435,21 @@ namespace HeatBalanceHAMTManager {
                     matid = cells(cid).matid;
                     int imsid = cells(cid).source_id;
 
-                    if (sources(imsid).type == InternalMoistureSource::Type::UserDefined) {         // user defined input of the air flow
+                    if (sources(imsid).type == InternalMoistureSource::Type::UserDefined) { // user defined input of the air flow
                         sources(imsid).moist_airflow = sources(imsid).moist_airflow_input;
-                    } else if (sources(imsid).type == InternalMoistureSource::Type::StackAndOverPressure) {  // infiltration model according to Kuenzel, extended with ventilation pressure
+                    } else if (sources(imsid).type ==
+                               InternalMoistureSource::Type::StackAndOverPressure) { // infiltration model according to Kuenzel, extended with
+                                                                                     // ventilation pressure
                         sources(imsid).delta_pressure = cells(Extcell(sid)).density *
-                                                       ((cells(Extcell(sid)).temp - cells(Intcell(sid)).temp) / cells(Intcell(sid)).temp) *
-                                                       DataGlobalConstants::GravityConstant * (sources(imsid).stack_height / 2) - sources(imsid).mechanical_ventilation_overpressure;
+                                                            ((cells(Extcell(sid)).temp - cells(Intcell(sid)).temp) / cells(Intcell(sid)).temp) *
+                                                            DataGlobalConstants::GravityConstant * (sources(imsid).stack_height / 2) -
+                                                        sources(imsid).mechanical_ventilation_overpressure;
                         sources(imsid).moist_airflow = std::abs(sources(imsid).delta_pressure) * (sources(imsid).component_air_permeance) / 3600;
-                    } else if (sources(imsid).type == InternalMoistureSource::Type::AirflowNetwork) {  // air flow through component from multizone airflow network
+                    } else if (sources(imsid).type ==
+                               InternalMoistureSource::Type::AirflowNetwork) { // air flow through component from multizone airflow network
                         if (sources(imsid).afn_id) {
-                            sources(imsid).moist_airflow =
-                                state.dataAirflowNetwork->AirflowNetworkLinkSimu(sources(imsid).afn_id).VolFLOW /
-                                state.dataSurface->Surface(sources(imsid).surface_id).Area;
+                            sources(imsid).moist_airflow = state.dataAirflowNetwork->AirflowNetworkLinkSimu(sources(imsid).afn_id).VolFLOW /
+                                                           state.dataSurface->Surface(sources(imsid).surface_id).Area;
                         } else {
                             sources(imsid).moist_airflow = 0;
                         }
@@ -1452,13 +1457,14 @@ namespace HeatBalanceHAMTManager {
                         sources(imsid).moist_airflow = 0.0;
                     }
 
-
                     if (sources(imsid).moist_airflow >= 0) {
-                        internal_moisture_source = sources(imsid).moist_airflow *
-                                                 (cells(IntConcell(sid)).rh * SatAbsHum(state, cells(IntConcell(sid)).temp) - SatAbsHum(state, cells(cid).temp));
+                        internal_moisture_source =
+                            sources(imsid).moist_airflow *
+                            (cells(IntConcell(sid)).rh * SatAbsHum(state, cells(IntConcell(sid)).temp) - SatAbsHum(state, cells(cid).temp));
                     } else {
-                        internal_moisture_source = -sources(imsid).moist_airflow *
-                                                 (cells(IntConcell(sid)).rh * SatAbsHum(state, cells(IntConcell(sid)).temp) - SatAbsHum(state, cells(cid).temp));
+                        internal_moisture_source =
+                            -sources(imsid).moist_airflow *
+                            (cells(IntConcell(sid)).rh * SatAbsHum(state, cells(IntConcell(sid)).temp) - SatAbsHum(state, cells(cid).temp));
                     }
 
                     if (internal_moisture_source > 0) {
@@ -1674,7 +1680,8 @@ namespace HeatBalanceHAMTManager {
                 // Calculate the RH for the next time step
                 denominator = (phioosum + vpoosum * cells(cid).vpsat + wcap / state.dataHeatBalHAMTMgr->deltat);
                 if (denominator != 0.0) {
-                    cells(cid).rhp1 = (phiorsum + vporsum + cells(cid).Wadds + (wcap * cells(cid).rh) / state.dataHeatBalHAMTMgr->deltat) / denominator;
+                    cells(cid).rhp1 =
+                        (phiorsum + vporsum + cells(cid).Wadds + (wcap * cells(cid).rh) / state.dataHeatBalHAMTMgr->deltat) / denominator;
                 } else {
                     ShowSevereError(state, "CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy.");
                     ShowContinueError(state, "...Problem occurs in Material=\"" + state.dataMaterial->Material(cells(cid).matid).Name + "\".");
