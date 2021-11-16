@@ -63,9 +63,6 @@ struct EnergyPlusData;
 
 namespace StandardRatings {
 
-    // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    extern Array1D<Real64> const IEERWeightingFactor; // EER Weighting factors (IEER)
-
     Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
 
     Real64 constexpr HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)
@@ -92,38 +89,6 @@ namespace StandardRatings {
         Timed,   // defrost cycle is timed
         OnDemand // defrost cycle occurs only when required
     };
-
-    extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
-    // bins for a region
-    extern Array1D<Real64> const StandardDesignHeatingRequirement;
-    // Standardized DHRs from ANSI/AHRI 210/240
-    constexpr std::array<Real64, 6> OutdoorDesignTemperature{2.78, -2.78, -8.33, -15.0, -23.33, -1.11};
-    // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    constexpr std::array<Real64, 18> OutdoorBinTemperature{
-        16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56};
-    // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp;
-
-    // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
-    extern Array1D<Real64> const OutdoorBinTemperatureSEER;
-    // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
-    extern Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp;
-
-    // ANSI/ASHRAE Standard 127-2012 -Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
-    // indoor dry bulb temperatures for tests A, B, C and D and Classes I, II, III, and IV
-    extern Array1D<Real64> const IndoorDBTempClassI2IV;
-    // outdoor dry bulb temperatures for tests A, B, C and D
-    extern Array1D<Real64> const OutdoorDBTempAllClassA2D;
 
     // Functions
 

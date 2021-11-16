@@ -2088,8 +2088,8 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     // METHODOLOGY EMPLOYED:
     // uses E+'s Regula Falsi numerical method
 
-    int constexpr MaxIte(500); // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3);   // Accuracy of solver result
+    int constexpr MaxIte(500);   // Maximum number of iterations for solver
+    Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
     int SolFla;             // Flag of solver
     Array1D<Real64> Par(2); // Parameter array passed to solver

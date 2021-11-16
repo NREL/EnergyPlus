@@ -4299,7 +4299,7 @@ void CoilCompletelyWet(EnergyPlusData &state,
     // (all water and surface temperatures are
     // related to saturated air enthalpies for
     // wet surface heat transfer calculations)
-    Real64 const SmallNo(1.e-9); // smallNo used in place of 0
+    Real64 constexpr SmallNo(1.e-9); // smallNo used in place of 0
     Real64 AirMassFlow;
     Real64 WaterMassFlowRate;
     Real64 Cp;
@@ -4671,7 +4671,7 @@ Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const SmallNo(1.e-9);
+    Real64 constexpr SmallNo(1.e-9);
     int constexpr itmax(12);
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -4796,8 +4796,8 @@ void CoilOutletStreamCondition(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const LargeNo(1.e10);  // value used in place of infinity
-    Real64 const SmallNo(1.e-15); // value used in place of zero
+    Real64 constexpr LargeNo(1.e10);  // value used in place of infinity
+    Real64 constexpr SmallNo(1.e-15); // value used in place of zero
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -4928,7 +4928,7 @@ void WetCoilOutletCondition(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const SmallNo(1.e-9); // SmallNo value used in place of zero
+    Real64 constexpr SmallNo(1.e-9); // SmallNo value used in place of zero
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5802,9 +5802,9 @@ void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Tolerance(1.e-5);             // Relative error tolerance
+    Real64 constexpr Tolerance(1.e-5);         // Relative error tolerance
     Real64 constexpr PerturbSurfAreaFrac(0.1); // Perturbation applied to Surf Fraction to initialize iteration
-    Real64 const SmallNum(1.e-9);              // Small Number
+    Real64 constexpr SmallNum(1.e-9);          // Small Number
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
