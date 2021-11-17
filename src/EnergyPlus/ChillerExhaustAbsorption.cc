@@ -302,7 +302,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     std::string ChillerName;
     bool Okay;
     bool Get_ErrorsFound(false);
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+    auto cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
     int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);

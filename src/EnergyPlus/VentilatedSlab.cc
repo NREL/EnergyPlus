@@ -4802,26 +4802,26 @@ namespace VentilatedSlab {
         Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int constexpr NumOfPropDivisions(13);
         Real64 constexpr MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
-        static Array1D<Real64> const Temps(
-            NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(NumOfPropDivisions,
-                                        {0.0000088,
-                                         0.0000176,
-                                         0.00001781,
-                                         0.00001802,
-                                         0.000018225,
-                                         0.00001843,
-                                         0.00001865,
-                                         0.00001887,
-                                         0.00001908,
-                                         0.00001929,
-                                         0.0000195,
-                                         0.00001971,
-                                         0.00001992}); // Viscosity, in Ns/m2
-        static Array1D<Real64> const Conductivity(
-            NumOfPropDivisions,
-            {0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(NumOfPropDivisions, 0.69); // Prandtl number (dimensionless)
+        static constexpr std::array<Real64, NumOfPropDivisions> Temps = {
+            1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}; // Temperature, in C
+        static constexpr std::array<Real64, NumOfPropDivisions> Mu = {0.0000088,
+                                                                      0.0000176,
+                                                                      0.00001781,
+                                                                      0.00001802,
+                                                                      0.000018225,
+                                                                      0.00001843,
+                                                                      0.00001865,
+                                                                      0.00001887,
+                                                                      0.00001908,
+                                                                      0.00001929,
+                                                                      0.0000195,
+                                                                      0.00001971,
+                                                                      0.00001992}; // Viscosity, in Ns/m2
+
+        static constexpr std::array<Real64, NumOfPropDivisions> Conductivity = {
+            0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435}; // Conductivity, in W/mK
+        static constexpr std::array<Real64, NumOfPropDivisions> Pr = {
+            0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69, 0.69}; // Prandtl number (dimensionless)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
@@ -4836,27 +4836,27 @@ namespace VentilatedSlab {
         Real64 SysAirMassFlow; // Specific heat of air
 
         // First find out where we are in the range of temperatures
-        Index = 1;
-        while (Index <= NumOfPropDivisions) {
-            if (Temperature < Temps(Index)) break; // DO loop
+        Index = 0;
+        while (Index < NumOfPropDivisions) {
+            if (Temperature < Temps[Index]) break; // DO loop
             ++Index;
         }
 
         // Initialize thermal properties of Air
-        if (Index == 1) {
-            MUactual = Mu(Index);
-            Kactual = Conductivity(Index);
-            PRactual = Pr(Index);
-        } else if (Index > NumOfPropDivisions) {
-            Index = NumOfPropDivisions;
-            MUactual = Mu(Index);
-            Kactual = Conductivity(Index);
-            PRactual = Pr(Index);
+        if (Index == 0) {
+            MUactual = Mu[Index];
+            Kactual = Conductivity[Index];
+            PRactual = Pr[Index];
+        } else if (Index > NumOfPropDivisions - 1) {
+            Index = NumOfPropDivisions - 1;
+            MUactual = Mu[Index];
+            Kactual = Conductivity[Index];
+            PRactual = Pr[Index];
         } else {
-            InterpFrac = (Temperature - Temps(Index - 1)) / (Temps(Index) - Temps(Index - 1));
-            MUactual = Mu(Index - 1) + InterpFrac * (Mu(Index) - Mu(Index - 1));
-            Kactual = Conductivity(Index - 1) + InterpFrac * (Conductivity(Index) - Conductivity(Index - 1));
-            PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
+            InterpFrac = (Temperature - Temps[Index - 1]) / (Temps[Index] - Temps[Index - 1]);
+            MUactual = Mu[Index - 1] + InterpFrac * (Mu[Index] - Mu[Index - 1]);
+            Kactual = Conductivity[Index - 1] + InterpFrac * (Conductivity[Index] - Conductivity[Index - 1]);
+            PRactual = Pr[Index - 1] + InterpFrac * (Pr[Index] - Pr[Index - 1]);
         }
         // arguments are glycol name, temperature, and concentration
         CpAppAir = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataVentilatedSlab->VentSlab(Item).RadInNode).HumRat);

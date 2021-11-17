@@ -79,10 +79,10 @@ namespace HeatBalFiniteDiffManager {
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
-                                                                                                           "FullyImplicitFirstOrder"};
-    constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
-                                                                                                           "FULLYIMPLICITFIRSTORDER"};
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
+                                                                                                                  "FullyImplicitFirstOrder"};
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
+                                                                                                                  "FULLYIMPLICITFIRSTORDER"};
 
     struct ConstructionDataFD
     {

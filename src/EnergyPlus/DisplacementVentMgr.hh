@@ -78,7 +78,7 @@ namespace DisplacementVentMgr {
 
     void CalcUCSDDV(EnergyPlusData &state, int ZoneNum); // Which Zonenum
 
-    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+    static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
         DataHeatBalance::IntGainType::People,
         DataHeatBalance::IntGainType::WaterHeaterMixed,
         DataHeatBalance::IntGainType::WaterHeaterStratified,
@@ -110,8 +110,8 @@ namespace DisplacementVentMgr {
         DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
         DataHeatBalance::IntGainType::RefrigerationWalkIn};
 
-    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-                                                                                      DataHeatBalance::IntGainType::Lights};
+    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                             DataHeatBalance::IntGainType::Lights};
 
 } // namespace DisplacementVentMgr
 
