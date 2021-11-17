@@ -375,13 +375,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
             if (!lAlphaBlanks(2)) {
                 if (UtilityRoutines::SameString(AlphArray(2), "SequentialLoad")) {
-                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::SequentialLoading;
+                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::Sequential;
                 } else if (UtilityRoutines::SameString(AlphArray(2), "UniformLoad")) {
-                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::UniformLoading;
+                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::Uniform;
                 } else if (UtilityRoutines::SameString(AlphArray(2), "UniformPLR")) {
-                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLRLoading;
+                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLR;
                 } else if (UtilityRoutines::SameString(AlphArray(2), "SequentialUniformPLR")) {
-                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
+                    thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLR;
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", Invalid choice.");
                     ShowContinueError(state, "..." + cAlphaFields(2) + "=\"" + AlphArray(2) + "\".");
@@ -933,7 +933,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVAC::Unassigned;
+        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Unassigned;
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
@@ -956,7 +956,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    static_cast<AirLoopHVAC>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
+                    static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->SupplyAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
@@ -1003,7 +1003,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVAC::Unassigned;
+        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Unassigned;
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
 
@@ -1026,7 +1026,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    static_cast<AirLoopHVAC>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
+                    static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->ReturnAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
@@ -1368,15 +1368,15 @@ void EquipList::getPrioritiesForInletNode(EnergyPlusData &state,
     }
     // Set MinAirLoopIterationsAfterFirst for equipment that uses sequenced loads, based on zone equip load distribution scheme
     int minIterations = state.dataHVACGlobal->MinAirLoopIterationsAfterFirst;
-    if (this->LoadDistScheme == DataZoneEquipment::LoadDist::SequentialLoading) {
+    if (this->LoadDistScheme == DataZoneEquipment::LoadDist::Sequential) {
         // Sequential needs one extra iterations up to the highest airterminal unit equipment number
         minIterations = max(coolingPriority, heatingPriority, minIterations);
-    } else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::UniformLoading) {
+    } else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::Uniform) {
         // Uniform needs one extra iteration which is the default
-    } else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::UniformPLRLoading) {
+    } else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::UniformPLR) {
         // UniformPLR needs two extra iterations, regardless of unit equipment number
         minIterations = max(2, minIterations);
-    } else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading) {
+    } else if (this->LoadDistScheme == DataZoneEquipment::LoadDist::SequentialUniformPLR) {
         // SequentialUniformPLR needs one extra iterations up to the highest airterminal unit equipment number plus one more
         minIterations = max((coolingPriority + 1), (heatingPriority + 1), minIterations);
     }

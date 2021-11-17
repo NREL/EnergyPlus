@@ -86,20 +86,20 @@ namespace DataZoneEquipment {
         NUM
     };
 
-    enum class AirLoopHVAC
+    enum class AirLoopHVACZone
     {
         Unassigned = -1,
-        ZoneSplitter,
-        ZoneSupplyPlenum,
-        ZoneMixer,
-        ZoneReturnPlenum,
+        Splitter,
+        SupplyPlenum,
+        Mixer,
+        ReturnPlenum,
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNames = {
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACZone::NUM)> AirLoopHVACTypeNames = {
         "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
 
-    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNamesUC = {
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACZone::NUM)> AirLoopHVACTypeNamesUC = {
         "AIRLOOPHVAC:ZONESPLITTER", "AIRLOOPHVAC:SUPPLYPLENUM", "AIRLOOPHVAC:ZONEMIXER", "AIRLOOPHVAC:RETURNPLENUM"};
 
     // Start zone equip objects
@@ -155,9 +155,10 @@ namespace DataZoneEquipment {
 
     enum class LoadDist
     {
-        SequentialLoading,
-        UniformLoading,
-        UniformPLRLoading,
+        Unassigned = -1,
+        Sequential,
+        Uniform,
+        UniformPLR,
         SequentialUniformPLRLoading,
         NUM
     };
@@ -398,7 +399,7 @@ namespace DataZoneEquipment {
         Array1D<EquipmentData> EquipData; // Index of energy output report data
 
         // Default Constructor
-        EquipList() : LoadDistScheme(DataZoneEquipment::LoadDist::SequentialLoading), NumOfEquipTypes(0), NumAvailHeatEquip(0), NumAvailCoolEquip(0)
+        EquipList() : LoadDistScheme(DataZoneEquipment::LoadDist::Sequential), NumOfEquipTypes(0), NumAvailHeatEquip(0), NumAvailCoolEquip(0)
         {
         }
 
@@ -434,7 +435,7 @@ namespace DataZoneEquipment {
         int NumOfComponents;
         int InletNodeNum;
         Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
-        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentTypeEnum;
+        Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
@@ -458,7 +459,7 @@ namespace DataZoneEquipment {
         int NumOfComponents;
         int OutletNodeNum;
         Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
-        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentTypeEnum;
+        Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
 

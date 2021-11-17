@@ -164,7 +164,7 @@ namespace ReturnAirPathManager {
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVAC::Unassigned;
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Unassigned;
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
@@ -187,7 +187,7 @@ namespace ReturnAirPathManager {
                             ShowContinueError(state, "In AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(PathNum).Name);
                             ErrorsFound = true;
                         }
-                        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = static_cast<DataZoneEquipment::AirLoopHVAC>(
+                        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = static_cast<DataZoneEquipment::AirLoopHVACZone>(
                             getEnumerationValue(DataZoneEquipment::AirLoopHVACTypeNames, state.dataIPShortCut->cAlphaArgs(Counter)));
 
                     } else {
@@ -245,7 +245,7 @@ namespace ReturnAirPathManager {
 
         for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
             switch (state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum)) {
-            case DataZoneEquipment::AirLoopHVAC::ZoneMixer: // 'AirLoopHVAC:ZoneMixer'
+            case DataZoneEquipment::AirLoopHVACZone::Mixer: // 'AirLoopHVAC:ZoneMixer'
 
                 if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
                       state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
@@ -256,11 +256,11 @@ namespace ReturnAirPathManager {
 
                 break;
 
-            case DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum: // 'AirLoopHVAC:ReturnPlenum'
+            case DataZoneEquipment::AirLoopHVACZone::ReturnPlenum: // 'AirLoopHVAC:ReturnPlenum'
 
                 SimAirZonePlenum(state,
                                  state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                 DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum,
+                                 DataZoneEquipment::AirLoopHVACZone::ReturnPlenum,
                                  state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                 break;
 

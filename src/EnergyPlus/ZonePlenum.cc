@@ -92,7 +92,7 @@ using Psychrometrics::PsyTdbFnHW;
 
 void SimAirZonePlenum(EnergyPlusData &state,
                       std::string_view CompName,
-                      DataZoneEquipment::AirLoopHVAC const iCompType,
+                      DataZoneEquipment::AirLoopHVACZone const iCompType,
                       int &CompIndex,
                       Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
                       Optional_bool_const FirstCall,          // Autodesk:OPTIONAL Used without PRESENT check
@@ -120,7 +120,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
         state.dataZonePlenum->GetInputFlag = false;
     }
 
-    if (iCompType == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) { // 'AirLoopHVAC:ReturnPlenum'
+    if (iCompType == DataZoneEquipment::AirLoopHVACZone::ReturnPlenum) { // 'AirLoopHVAC:ReturnPlenum'
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
             ZonePlenumNum =
@@ -158,7 +158,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
 
         UpdateAirZoneReturnPlenum(state, ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
 
-    } else if (iCompType == DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
+    } else if (iCompType == DataZoneEquipment::AirLoopHVACZone::SupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
             ZonePlenumNum =

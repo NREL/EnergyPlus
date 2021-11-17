@@ -2402,8 +2402,8 @@ void ConnectReturnNodes(EnergyPlusData &state)
                 }
                 // Loop over components in return path and each component's inlet nodes
                 for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
-                    DataZoneEquipment::AirLoopHVAC compType = thisRetPath.ComponentTypeEnum(compNum);
-                    if (compType == DataZoneEquipment::AirLoopHVAC::ZoneMixer) {
+                    DataZoneEquipment::AirLoopHVACZone compType = thisRetPath.ComponentTypeEnum(compNum);
+                    if (compType == DataZoneEquipment::AirLoopHVACZone::ZoneMixer) {
                         auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisMixer.InletNode(inNode)) {
@@ -2412,7 +2412,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
                                 break; // leave component inlet node loop
                             }
                         }
-                    } else if (compType == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) {
+                    } else if (compType == DataZoneEquipment::AirLoopHVACZone::ZoneReturnPlenum) {
                         auto const &thisPlenum(state.dataZonePlenum->ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisPlenum.InletNode(inNode)) {
