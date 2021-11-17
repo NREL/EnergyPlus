@@ -88,7 +88,7 @@ namespace OutdoorAirUnit {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNames{
+    static constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNames{
         "Coil:Cooling:Water",
         "Coil:Heating:Water",
         "Coil:Heating:Steam",
@@ -104,7 +104,7 @@ namespace OutdoorAirUnit {
         "AirLoopHVAC:UnitarySystem",
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNamesUC{
+    static constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNamesUC{
 
         "COIL:COOLING:WATER",
         "COIL:HEATING:WATER",

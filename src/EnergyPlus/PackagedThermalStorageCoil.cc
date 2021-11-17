@@ -4753,9 +4753,9 @@ void ControlTESIceStorageTankCoil(
     using General::SolveRoot;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int constexpr MaxIte(500);     // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3);       // Accuracy of solver result
-    Real64 const HumRatAcc(1.e-6); // Accuracy of solver result
+    int constexpr MaxIte(500);         // Maximum number of iterations for solver
+    Real64 constexpr Acc(1.e-3);       // Accuracy of solver result
+    Real64 constexpr HumRatAcc(1.e-6); // Accuracy of solver result
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;

@@ -6071,8 +6071,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
     }
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         A1{{
             {ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Zero
@@ -6091,8 +6091,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::A1_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         A2{{
             {ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Positive
              ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Zero
@@ -6111,8 +6111,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::A2_StableHoriz}         // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         A3{{
             {ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Zero
@@ -6131,8 +6131,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::A3_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         B{{
             {ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Zero
@@ -6151,8 +6151,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::B_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         D{{
             {ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Zero
