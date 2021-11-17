@@ -501,7 +501,7 @@ namespace SystemAvailabilityManager {
                                  int &AvailStatus       // System status indicator
     );
 
-    int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName); // name to validate
+    int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
     void ManageHybridVentilation(EnergyPlusData &state);
 
@@ -559,9 +559,6 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
 
     bool BeginOfDayResetFlag = true;
 
-    Array1D_string const cValidSysAvailManagerTypes;
-    Array1D_int const ValidSysAvailManagerTypes;
-
     Array1D_bool ZoneCompNCControlType;
     bool MyOneTimeFlag = true; // One time flag
     bool MyEnvrnFlag = true;
@@ -612,37 +609,6 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
         CurrentEndTime = 0.0;
         CurrentEndTimeLast = 0.0;
         TimeStepSysLast = 0.0;
-    }
-
-    // Default Constructor
-    SystemAvailabilityManagerData()
-        : cValidSysAvailManagerTypes(SystemAvailabilityManager::NumValidSysAvailManagerTypes,
-                                     {"AvailabilityManager:Scheduled",
-                                      "AvailabilityManager:ScheduledOn",
-                                      "AvailabilityManager:ScheduledOff",
-                                      "AvailabilityManager:NightCycle",
-                                      "AvailabilityManager:DifferentialThermostat",
-                                      "AvailabilityManager:HighTemperatureTurnOff",
-                                      "AvailabilityManager:HighTemperatureTurnOn",
-                                      "AvailabilityManager:LowTemperatureTurnOff",
-                                      "AvailabilityManager:LowTemperatureTurnOn",
-                                      "AvailabilityManager:NightVentilation",
-                                      "AvailabilityManager:HybridVentilation",
-                                      "AvailabilityManager:OptimumStart"}),
-          ValidSysAvailManagerTypes(SystemAvailabilityManager::NumValidSysAvailManagerTypes,
-                                    {SystemAvailabilityManager::SysAvailMgr_Scheduled,
-                                     SystemAvailabilityManager::SysAvailMgr_ScheduledOn,
-                                     SystemAvailabilityManager::SysAvailMgr_ScheduledOff,
-                                     SystemAvailabilityManager::SysAvailMgr_NightCycle,
-                                     SystemAvailabilityManager::SysAvailMgr_DiffThermo,
-                                     SystemAvailabilityManager::SysAvailMgr_HiTempTOff,
-                                     SystemAvailabilityManager::SysAvailMgr_HiTempTOn,
-                                     SystemAvailabilityManager::SysAvailMgr_LoTempTOff,
-                                     SystemAvailabilityManager::SysAvailMgr_LoTempTOn,
-                                     SystemAvailabilityManager::SysAvailMgr_NightVent,
-                                     SystemAvailabilityManager::SysAvailMgr_HybridVent,
-                                     SystemAvailabilityManager::SysAvailMgr_OptimumStart})
-    {
     }
 };
 } // namespace EnergyPlus

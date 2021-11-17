@@ -681,7 +681,7 @@ void ValidateMonthDay(EnergyPlusData &state,
     // message when not valid, and sets error flag.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_int const EndMonthDay(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+    static constexpr std::array<int, 12> EndMonthDay = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool InternalError;
@@ -689,7 +689,7 @@ void ValidateMonthDay(EnergyPlusData &state,
     InternalError = false;
     if (Month < 1 || Month > 12) InternalError = true;
     if (!InternalError) {
-        if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
+        if (Day < 1 || Day > EndMonthDay[Month - 1]) InternalError = true;
     }
     if (InternalError) {
         ShowSevereError(state, "Invalid Month Day date format=" + String);
@@ -719,7 +719,7 @@ int OrdinalDay(int const Month,        // Month, 1..12
     int JulianDay;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Array1D_int const EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+    static constexpr std::array<int, 12> EndDayofMonth = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
     // End day numbers of each month (without Leap Year)
 
     if (Month == 1) {
@@ -728,11 +728,11 @@ int OrdinalDay(int const Month,        // Month, 1..12
 
     } else if (Month == 2) {
         //                                       CASE 2: FEBRUARY
-        JulianDay = Day + EndDayofMonth(1);
+        JulianDay = Day + EndDayofMonth[0];
 
     } else if ((Month >= 3) && (Month <= 12)) {
         //                                       CASE 3: REMAINING MONTHS
-        JulianDay = Day + EndDayofMonth(Month - 1) + LeapYearValue;
+        JulianDay = Day + EndDayofMonth[Month - 2] + LeapYearValue;
 
     } else {
         JulianDay = 0;
@@ -756,7 +756,7 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
     // appropriate Month and Day.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_int const EndOfMonth({0, 12}, {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+    static constexpr std::array<int, 13> EndOfMonth = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int WMonth;
@@ -775,10 +775,10 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
             LeapAddPrev = LeapYr;
             LeapAddCur = LeapYr;
         }
-        if (Number > (EndOfMonth(WMonth - 1) + LeapAddPrev) && Number <= (EndOfMonth(WMonth) + LeapAddCur)) break;
+        if (Number > (EndOfMonth[WMonth - 1] + LeapAddPrev) && Number <= (EndOfMonth[WMonth] + LeapAddCur)) break;
     }
     PMonth = WMonth;
-    PDay = Number - (EndOfMonth(WMonth - 1) + LeapAddCur);
+    PDay = Number - (EndOfMonth[WMonth - 1] + LeapAddCur);
 }
 
 bool BetweenDates(int const TestDate,  // Date to test
@@ -902,7 +902,7 @@ Real64 SafeDivide(Real64 const a, Real64 const b)
     Real64 c;
 
     // Locals
-    Real64 const SMALL(1.E-10);
+    Real64 constexpr SMALL(1.E-10);
 
     if (std::abs(b) >= SMALL) {
         c = a / b;
@@ -938,7 +938,7 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     // Linear Correction based on the RegulaFalsi routine in EnergyPlus
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const small(1.e-9);     // Small Number used to approximate zero
+    Real64 constexpr small(1.e-9); // Small Number used to approximate zero
     Real64 constexpr Perturb(0.1); // Perturbation applied to X to initialize iteration
 
     Real64 DY; // Linear fit result
