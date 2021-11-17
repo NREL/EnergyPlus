@@ -238,7 +238,8 @@ enum class CondenserType
     Num
 };
 
-constexpr std::array<std::string_view, static_cast<int>(CondenserType::Num)> CondenserTypeNamesUC{"AIRCOOLED", "WATERCOOLED", "EVAPORATIVELYCOOLED"};
+static constexpr std::array<std::string_view, static_cast<int>(CondenserType::Num)> CondenserTypeNamesUC{
+    "AIRCOOLED", "WATERCOOLED", "EVAPORATIVELYCOOLED"};
 
 // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 enum class CriteriaType
@@ -304,7 +305,7 @@ enum class PressSimType
     Num
 };
 
-constexpr std::array<std::string_view, static_cast<int>(PressSimType::Num)> PressureSimTypeNamesUC{
+static constexpr std::array<std::string_view, static_cast<int>(PressSimType::Num)> PressureSimTypeNamesUC{
     "NONE",
     "PUMPPOWERCORRECTION",
     "LOOPFLOWCORRECTION",
@@ -331,15 +332,16 @@ enum class BrLoopType
     Num
 };
 
-constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> HowMetTypeNamesUC = {"DEMANDSLOAD",
-                                                                                           "MEETSLOADWITHPASSIVECAPACITY",
-                                                                                           "MEETSLOADWITHNOMINALCAPACITY",
-                                                                                           "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT",
-                                                                                           "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT",
-                                                                                           "MEETSLOADWITHNOMINALCAPACITYFREECOOLCONTROL",
-                                                                                           "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMITFREECOOLCONTROL"};
+static constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> HowMetTypeNamesUC = {
+    "DEMANDSLOAD",
+    "MEETSLOADWITHPASSIVECAPACITY",
+    "MEETSLOADWITHNOMINALCAPACITY",
+    "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT",
+    "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT",
+    "MEETSLOADWITHNOMINALCAPACITYFREECOOLCONTROL",
+    "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMITFREECOOLCONTROL"};
 
-constexpr std::array<std::string_view, static_cast<int>(LoopFlowStatus::NUM)> LoopFlowStatusTypeNamesUC = {
+static constexpr std::array<std::string_view, static_cast<int>(LoopFlowStatus::NUM)> LoopFlowStatusTypeNamesUC = {
     "NEEDSFLOWANDTURNSLOOPON", "NEEDSFLOWIFLOOPON", "RECEIVESWHATEVERFLOWAVAILABLE"};
 
 } // namespace EnergyPlus::DataPlant

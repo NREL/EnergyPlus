@@ -7026,8 +7026,8 @@ namespace InternalHeatGains {
         using WaterUse::CalcWaterUseZoneGains;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D<Real64> const C(
-            9, {6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532});
+        static constexpr std::array<Real64, 9> C = {
+            6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532};
         static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7178,17 +7178,17 @@ namespace InternalHeatGains {
                     if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants *
-                            (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
+                            (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
                              state.dataHeatBalFanSys->MAT(NZ) *
-                                 ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
-                                  state.dataHeatBalFanSys->MAT(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
+                                 ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
+                                  state.dataHeatBalFanSys->MAT(NZ) * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants *
-                            (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
+                            (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
                              state.dataRoomAirMod->TCMF(NZ) *
-                                 ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
-                                  state.dataRoomAirMod->TCMF(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
+                                 ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
+                                  state.dataRoomAirMod->TCMF(NZ) * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
                     }
                 } else { // if the user did specify a sensible fraction, use it
                     SensiblePeopleGain = TotalPeopleGain * state.dataHeatBal->People(Loop).UserSpecSensFrac;
@@ -7613,12 +7613,12 @@ namespace InternalHeatGains {
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-        static Array1D<Real64> const DBMin(7, {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0});           // Minimum dry-bulb temperature [C]
-        static Array1D<Real64> const DBMax(7, {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0});        // Maximum dry-bulb temperature [C]
-        static Array1D<Real64> const DPMax(7, {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0});        // Maximum dewpoint temperature [C]
-        static Array1D<Real64> const DPMin(7, {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}); // Minimum dewpoint temperature [C]
-        static Array1D<Real64> const RHMin(7, {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0});             // Minimum relative humidity [%]
-        static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Maximum relative humidity [%]
+        static constexpr std::array<Real64, 7> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
+        static constexpr std::array<Real64, 7> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0};        // Maximum dry-bulb temperature [C]
+        static constexpr std::array<Real64, 7> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}; // Minimum dewpoint temperature [C]
+        static constexpr std::array<Real64, 7> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0};        // Maximum dewpoint temperature [C]
+        static constexpr std::array<Real64, 7> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
+        static constexpr std::array<Real64, 7> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0};        // Maximum relative humidity [%]
 
         static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
@@ -7981,55 +7981,55 @@ namespace InternalHeatGains {
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = state.dataHeatBal->ZoneITEq(Loop).Class;
             if (EnvClass > 0) {
-                if (TAirIn > DBMax(EnvClass)) {
+                if (TAirIn > DBMax[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax(EnvClass);
+                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax[EnvClass - 1];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TAirIn < DBMin(EnvClass)) {
+                if (TAirIn < DBMin[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin(EnvClass);
+                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin[EnvClass - 1];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TDPAirIn > DPMax(EnvClass)) {
+                if (TDPAirIn > DPMax[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax(EnvClass);
+                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax[EnvClass - 1];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TDPAirIn < DPMin(EnvClass)) {
+                if (TDPAirIn < DPMin[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin(EnvClass);
+                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin[EnvClass - 1];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (RHAirIn > RHMax(EnvClass)) {
+                if (RHAirIn > RHMax[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax(EnvClass);
+                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax[EnvClass - 1];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (RHAirIn < RHMin(EnvClass)) {
+                if (RHAirIn < RHMin[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin(EnvClass);
+                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin[EnvClass - 1];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
@@ -8101,14 +8101,14 @@ namespace InternalHeatGains {
         // OutputDataStructure.doc (EnergyPlus documentation)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        constexpr std::array<DataHeatBalance::IntGainType, 8> TradIntGainTypes = {DataHeatBalance::IntGainType::People,
-                                                                                  DataHeatBalance::IntGainType::Lights,
-                                                                                  DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                                  DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                                  DataHeatBalance::IntGainType::GasEquipment,
-                                                                                  DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                                  DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                  DataHeatBalance::IntGainType::OtherEquipment};
+        static constexpr std::array<DataHeatBalance::IntGainType, 8> TradIntGainTypes = {DataHeatBalance::IntGainType::People,
+                                                                                         DataHeatBalance::IntGainType::Lights,
+                                                                                         DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                         DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                         DataHeatBalance::IntGainType::GasEquipment,
+                                                                                         DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                         DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                         DataHeatBalance::IntGainType::OtherEquipment};
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             state.dataHeatBal->People(Loop).RadGainEnergy = state.dataHeatBal->People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -9206,15 +9206,15 @@ namespace InternalHeatGains {
         using namespace DataHeatBalance;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
-        constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
-        constexpr std::array<DataHeatBalance::IntGainType, 6> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                                   DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                                   DataHeatBalance::IntGainType::GasEquipment,
-                                                                                   DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                                   DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                   DataHeatBalance::IntGainType::OtherEquipment};
-        constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
+        static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
+        static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
+        static constexpr std::array<DataHeatBalance::IntGainType, 6> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                          DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                          DataHeatBalance::IntGainType::GasEquipment,
+                                                                                          DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                          DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                          DataHeatBalance::IntGainType::OtherEquipment};
+        static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
             DataHeatBalance::IntGainType::RefrigerationCase,
             DataHeatBalance::IntGainType::RefrigerationCompressorRack,
             DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
@@ -9225,10 +9225,10 @@ namespace InternalHeatGains {
             DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
             DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
             DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT};
-        constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
-                                                                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                                                                      DataHeatBalance::IntGainType::WaterHeaterStratified};
-        constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
+        static constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
+                                                                                             DataHeatBalance::IntGainType::WaterHeaterMixed,
+                                                                                             DataHeatBalance::IntGainType::WaterHeaterStratified};
+        static constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
             DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
             DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
             DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
@@ -9249,7 +9249,7 @@ namespace InternalHeatGains {
             DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
             DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
             DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed};
-        constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
+        static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
             DataHeatBalance::IntGainType::GeneratorFuelCell,
             DataHeatBalance::IntGainType::GeneratorMicroCHP,
             DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,

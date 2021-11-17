@@ -1557,8 +1557,8 @@ namespace Photovoltaics {
         //       PRENTICE HALL, NEW JERSEY, 1992.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DELTA(1.e-3);
-        Real64 const EPSILON(1.e-3);
+        Real64 constexpr DELTA(1.e-3);
+        Real64 constexpr EPSILON(1.e-3);
         static Real64 const RONE((std::sqrt(5.0) - 1.0) / 2.0);
         static Real64 const RTWO(RONE * RONE);
 
