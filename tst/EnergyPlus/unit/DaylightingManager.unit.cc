@@ -3315,110 +3315,18 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 12;
     state->dataGlobal->CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
-    SolarShading::InitSolarCalculations(*state);
-    CalcDayltgCoeffsRefMapPoints(*state);
-    EXPECT_EQ(100, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(50));
-
-
-    //state->dataGlobal->NumOfTimeStepInHour = 1;
-    //ScheduleManager::ProcessScheduleInput(*state);
-    //state->dataScheduleMgr->ScheduleInputProcessed = true;
-    //state->dataGlobal->TimeStep = 1;
-    //state->dataGlobal->HourOfDay = 10;
-    //state->dataGlobal->PreviousHour = 10;
-    //state->dataEnvrn->Month = 1;
-    //state->dataEnvrn->DayOfMonth = 21;
-    //state->dataEnvrn->DSTIndicator = 0;
-    //state->dataEnvrn->DayOfWeek = 2;
-    //state->dataEnvrn->HolidayIndex = 0;
-
-    //bool foundErrors = false;
-    //HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    //EXPECT_FALSE(foundErrors);                                      // expect no errors
-
-    //SetPreConstructionInputParameters(*state);                 // establish array bounds for constructions early
-    //HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    //EXPECT_FALSE(foundErrors);                                // expect no errors
-
-    //HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
-    //compare_err_stream("");
-    //EXPECT_FALSE(foundErrors); // expect no errors
-
-    //HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    //EXPECT_FALSE(foundErrors);                            // expect no errors
-
-    //SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
-    //EXPECT_FALSE(foundErrors);                               // expect no errors
-    //HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
-
-    //int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
-    //InternalHeatGains::GetInternalHeatGainsInput(*state);
-    //state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
-    //DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
-    //DaylightingManager::GetDaylightingParametersInput(*state);
-    //state->dataDaylightingManager->GILSK = 100.0;
-    //state->dataGlobal->WeightNow = 1.0;
-    //state->dataEnvrn->HISUNF = 100.0;
-    //state->dataEnvrn->HISKF = 100.0;
-    //state->dataEnvrn->SkyClearness = 6.0;
-
-    //state->dataGlobal->BeginSimFlag = true;
-    //SolarShading::InitSolarCalculations(*state);
-    //CalcDayltgCoeffsRefMapPoints(*state);
-
-
-    //// Set all daylighting factors to zero
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSun = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSunDisk = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSky = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSun = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSunDisk = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSky = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSun = 0.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSunDisk = 0.0;
-    // DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 0.0, 0.001);
-
-    // int ISky = 1;
-    // int DayltgExtWin = 1;
-    // int Shaded = 2;
-    // int Unshaded = 1;
-    // int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
-    // EXPECT_GT(IWin, 0);
-
-    //// Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
-    //// Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
-    // int RefPt = 1;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
-    // RefPt = 2;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    // state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
-
-    //// Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    // state->dataSurface->SurfWinWindowModelType(IWin) = Window5DetailedModel;
-    // state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
-    // DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
-
-    // state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
-    // DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 50.0, 0.001);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 5.0, 0.001);
-
-    //// BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
-    //// BSDF does shading differently, it's integrated in the base state
-    // state->dataSurface->SurfWinWindowModelType(IWin) = WindowBSDFModel;
-    // state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
-    // DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
-
-    // state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
-    // DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
-    // EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
+    state->dataHeatBalMgr->CountWarmupDayPoints = 0;
+    state->dataGlobal->EndDayFlag = false;
+    state->dataWeatherManager->Envrn = 1;
+    WeatherManager::ManageWeather(*state);
+    HeatBalanceManager::ManageHeatBalance(*state);
+    EXPECT_NEAR(16051, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(5), 1);
+    EXPECT_NEAR(203, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(10), 1);
+    EXPECT_NEAR(1294, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(15), 1);
+    EXPECT_NEAR(412, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(20), 1);
+    EXPECT_NEAR(257, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(51), 1);
+    EXPECT_NEAR(316, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(55), 1);
+    EXPECT_NEAR(255, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(60), 1);
+    EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(91), 1);
+    EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(100), 1);
 }
