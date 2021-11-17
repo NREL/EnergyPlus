@@ -159,7 +159,7 @@ namespace DataZoneEquipment {
         Sequential,
         Uniform,
         UniformPLR,
-        SequentialUniformPLRLoading,
+        SequentialUniformPLR,
         NUM
     };
 

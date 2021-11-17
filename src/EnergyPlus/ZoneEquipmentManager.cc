@@ -3775,7 +3775,7 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
                 moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP; // array assignment
                 moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
             } else if ((loadDistType == DataZoneEquipment::LoadDist::UniformPLR) ||
-                       (loadDistType == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading)) {
+                       (loadDistType == DataZoneEquipment::LoadDist::SequentialUniformPLR)) {
                 // init each sequenced demand to the zone design load in order to get available capacities from equipment
                 if (energy.TotalOutputRequired >= 0.0) {
                     energy.SequencedOutputRequired = state.dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
@@ -3990,7 +3990,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
             }
         }
         break;
-    case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
+    case DataZoneEquipment::LoadDist::SequentialUniformPLR:
         // Determine how many pieces of equipment are required to meet the current load,
         // then distribute load at uniform PLR across all active equipment
         if (energy.TotalOutputRequired >= 0.0) {
@@ -4277,7 +4277,7 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
     } break;
     case DataZoneEquipment::LoadDist::Uniform:
     case DataZoneEquipment::LoadDist::UniformPLR:
-    case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
+    case DataZoneEquipment::LoadDist::SequentialUniformPLR:
         // For every load distribution scheme except SequentialLoad, do not touch the sequenced loads,
         // but set the remaining loads to the next equipment type's load to support equipment types that don't use the sequenced loads
         if (present(EquipPriorityNum)) {
