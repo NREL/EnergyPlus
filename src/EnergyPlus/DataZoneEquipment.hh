@@ -96,8 +96,11 @@ namespace DataZoneEquipment {
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNamesCC = {
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNames = {
         "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
+
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNamesUC = {
+        "AIRLOOPHVAC:ZONESPLITTER", "AIRLOOPHVAC:SUPPLYPLENUM", "AIRLOOPHVAC:ZONEMIXER", "AIRLOOPHVAC:RETURNPLENUM"};
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first

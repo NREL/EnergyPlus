@@ -955,11 +955,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
-                if (AlphArray(Counter) == "AIRLOOPHVAC:ZONESPLITTER")
-                    state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneSplitter;
-                if (AlphArray(Counter) == "AIRLOOPHVAC:SUPPLYPLENUM")
-                    state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum;
-
+                state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
+                    static_cast<AirLoopHVAC>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->SupplyAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
@@ -1028,10 +1025,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     ShowContinueError(state, "In " + CurrentModuleObject + " = " + state.dataZoneEquip->ReturnAirPath(PathNum).Name);
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
-                if (AlphArray(Counter) == "AIRLOOPHVAC:ZONEMIXER")
-                    state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneMixer;
-                if (AlphArray(Counter) == "AIRLOOPHVAC:RETURNPLENUM")
-                    state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum;
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) =
+                    static_cast<AirLoopHVAC>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->ReturnAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");

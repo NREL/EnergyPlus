@@ -188,7 +188,7 @@ namespace ReturnAirPathManager {
                             ErrorsFound = true;
                         }
                         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = static_cast<DataZoneEquipment::AirLoopHVAC>(
-                            getEnumerationValue(DataZoneEquipment::AirLoopHVACTypeNamesCC, state.dataIPShortCut->cAlphaArgs(Counter)));
+                            getEnumerationValue(DataZoneEquipment::AirLoopHVACTypeNames, state.dataIPShortCut->cAlphaArgs(Counter)));
 
                     } else {
                         ShowSevereError(state, "Unhandled component type in AirLoopHVAC:ReturnPath of " + state.dataIPShortCut->cAlphaArgs(Counter));
