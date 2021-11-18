@@ -55,7 +55,6 @@
 
 import os
 import platform
-import shutil
 import subprocess
 
 from eplaunch.workflows.base import BaseEPLaunchWorkflow1, EPLaunchWorkflowResponse1
@@ -94,7 +93,7 @@ class ConvertInputFormatWorkflow(BaseEPLaunchWorkflow1):
             if not os.path.exists(convertinputformat_binary):
                 return EPLaunchWorkflowResponse1(
                     success=False,
-                    message="ConvertInputFormat binary not found: {}!".format(coeffconv_binary),
+                    message="ConvertInputFormat binary not found: {}!".format(convertinputformat_binary),
                     column_data=[]
                 )
         else:
@@ -122,23 +121,21 @@ class ConvertInputFormatWorkflow(BaseEPLaunchWorkflow1):
 
             # execute utility
             command_line_args = [convertinputformat_binary, original_with_path]
-            process = subprocess.run(
-                command_line_args,
-                creationflags=subprocess.CREATE_NEW_CONSOLE,
-                cwd=run_directory
-            )
-            if process.returncode == 0:
-                return EPLaunchWorkflowResponse1(
-                    success=True,
-                    message="Ran ConvertInputFormat OK for file: {}!".format(original_with_path),
-                    column_data=[]
-                )
-            else:
+            try:
+                for message in self.execute_for_callback(command_line_args, run_directory):
+                    self.callback(message)
+            except subprocess.CalledProcessError:
+                self.callback("ConvertInputFormat FAILED")
                 return EPLaunchWorkflowResponse1(
                     success=False,
-                    message="ConvertInputFormat failed for file: {}!".format(original_with_path),
-                    column_data=[]
+                    message="ConvertInputFormat failed for file: %s!" % original_with_path,
+                    column_data={}
                 )
+            return EPLaunchWorkflowResponse1(
+                success=True,
+                message="Ran ConvertInputFormat OK for file: {}!".format(original_with_path),
+                column_data=[]
+            )
         else:
             return EPLaunchWorkflowResponse1(
                 success=False,
