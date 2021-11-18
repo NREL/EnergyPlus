@@ -558,7 +558,7 @@ namespace OutdoorAirUnit {
 
             // A12~A15 : Node Condition
 
-            // Main air nodes (except outside air node:
+            // Main air nodes (except outside air node):
 
             OutAirUnit(OAUnitNum).AirOutletNode = GetOnlySingleNode(state,
                                                                     state.dataIPShortCut->cAlphaArgs(13),
