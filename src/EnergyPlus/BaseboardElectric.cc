@@ -169,7 +169,6 @@ namespace BaseboardElectric {
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using DataZoneEquipment::BBElectricConvective_Num;
         using GlobalNames::VerifyUniqueBaseboardName;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -338,7 +337,8 @@ namespace BaseboardElectric {
 
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
-                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
+                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(ZoneEquipTypeNum) ==
+                                DataZoneEquipment::ZoneEquip::BBElectricConvective &&
                             state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
                             thisBaseboard.ZonePtr = CtrlZone;
                         }

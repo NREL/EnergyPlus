@@ -84,7 +84,7 @@ namespace OutputProcessor {
         Plant,
         Num
     };
-    constexpr std::array<std::string_view, (int)SOVTimeStepType::Num> sovTimeStepTypeStrings = {"System", "HVAC", "Zone", "Plant"};
+    static constexpr std::array<std::string_view, (int)SOVTimeStepType::Num> sovTimeStepTypeStrings = {"System", "HVAC", "Zone", "Plant"};
     enum class SOVStoreType
     {
         Invalid = -1,
@@ -94,7 +94,7 @@ namespace OutputProcessor {
         Average,
         Num
     };
-    constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {"State", "NonState", "Summed", "Average"};
+    static constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {"State", "NonState", "Summed", "Average"};
 
     enum class iReportVDD
     {
@@ -162,20 +162,20 @@ namespace OutputProcessor {
         return "Impossible day"; // even though the above switch block will *always* either return a string or assert, compilers still warn...
     }
 
-    constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
-                                                                      "COOLING",
-                                                                      "INTERIORLIGHTS",
-                                                                      "EXTERIORLIGHTS",
-                                                                      "INTERIOREQUIPMENT",
-                                                                      "EXTERIOREQUIPMENT",
-                                                                      "FANS",
-                                                                      "PUMPS",
-                                                                      "HEATREJECTION",
-                                                                      "HUMIDIFIER",
-                                                                      "HEATRECOVERY",
-                                                                      "WATERSYSTEMS",
-                                                                      "REFRIGERATION",
-                                                                      "COGENERATION"};
+    static constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
+                                                                             "COOLING",
+                                                                             "INTERIORLIGHTS",
+                                                                             "EXTERIORLIGHTS",
+                                                                             "INTERIOREQUIPMENT",
+                                                                             "EXTERIOREQUIPMENT",
+                                                                             "FANS",
+                                                                             "PUMPS",
+                                                                             "HEATREJECTION",
+                                                                             "HUMIDIFIER",
+                                                                             "HEATRECOVERY",
+                                                                             "WATERSYSTEMS",
+                                                                             "REFRIGERATION",
+                                                                             "COGENERATION"};
 
     constexpr int RVarAllocInc(1000);
     constexpr int LVarAllocInc(1000);

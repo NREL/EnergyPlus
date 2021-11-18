@@ -106,7 +106,7 @@ namespace Psychrometrics {
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors
 
-    constexpr std::array<std::string_view, static_cast<int>(PsychrometricFunction::Num)> PsyRoutineNames = {
+    static constexpr std::array<std::string_view, static_cast<int>(PsychrometricFunction::Num)> PsyRoutineNames = {
         "PsyTdpFnTdbTwbPb",
         "PsyRhFnTdbWPb",
         "PsyTwbFnTdbWPb",
@@ -130,7 +130,7 @@ namespace Psychrometrics {
                                 // PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw
                                 // (raw calc)
                                 // sample bin size =64 Pa; sample size =1651 (continous)
-    constexpr std::array<Real64, 1651> tsat_fn_pb_y = {
+    static constexpr std::array<Real64, 1651> tsat_fn_pb_y = {
         -100,        -24.88812836, -17.74197121, -13.36696483, -10.17031904, -7.635747635, -5.528025298, -3.719474549, -2.132789207, -0.717496548,
         0.635182846, 1.961212857,  3.184455749,  4.320585222,  5.381890646,  6.378191532,  7.317464071,  8.206277019,  9.050107781,  9.853572827,
         10.62060139, 11.35456508,  12.05838073,  12.73458802,  13.38541367,  14.01282043,  14.61854774,  15.2041452,   15.77099766,  16.32035156,
@@ -297,7 +297,7 @@ namespace Psychrometrics {
         100.7922053, 100.809475,   100.8267359,  100.8439874,  100.8612302,  100.8784641,  100.8956893,  100.9129053,  100.9301125,  100.947311,
         100.9645009, 100.9816821,  100.9988569,  101.0160203,  101.0331752,  101.0503248,  101.067462,   101.0845908,  101.101711,   101.1188265,
         101.1359293};
-    constexpr std::array<Real64, 1651> tsat_fn_pb_d2y = {
+    static constexpr std::array<Real64, 1651> tsat_fn_pb_d2y = {
         0.015250294,  -0.030500589, 0.007192909,  -0.002330349, 0.000402372,  -0.000248973, -3.17456E-05, -0.000062284, -4.41164E-05, -1.23139E-05,
         1.6533E-06,   -3.33366E-05, -1.88742E-05, -1.87743E-05, -1.56343E-05, -1.39099E-05, -1.22638E-05, -1.09504E-05, -9.8264E-06,  -8.8733E-06,
         -8.0541E-06,  -7.3451E-06,  -6.7277E-06,  -0.000006186, -5.7085E-06,  -5.2852E-06,  -4.9077E-06,  -0.000004571, -4.2666E-06,  -3.9951E-06,
@@ -465,7 +465,7 @@ namespace Psychrometrics {
         -2.4E-09,     -9E-10,       -3.3E-09,     -2.2E-09,     -4E-10,       -4.1E-09,     -1.4E-09,     -2.9E-09,     4E-10,        -5.5E-09,
         2.7E-09}; // namespace Psychrometrics
 #ifdef EP_psych_stats
-    constexpr std::array<bool, static_cast<int>(PsychrometricFunction::Num)> PsyReportIt = {
+    static constexpr std::array<bool, static_cast<int>(PsychrometricFunction::Num)> PsyReportIt = {
         true,
         true,
         true,
