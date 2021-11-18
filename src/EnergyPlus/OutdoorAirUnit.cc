@@ -2255,7 +2255,7 @@ namespace OutdoorAirUnit {
             // Heat recovery
             case CompType::HeatXchngrFP: // 'HeatExchanger:AirToAir:FlatPlate',
             case CompType::HeatXchngrSL: // 'HeatExchanger:AirToAir:SensibleAndLatent',
-                                           // 'HeatExchanger:Desiccant:BalancedFlow' - unused
+                                         // 'HeatExchanger:Desiccant:BalancedFlow' - unused
             {
 
                 if (Sim) {
