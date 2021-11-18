@@ -153,6 +153,8 @@ namespace HeatBalFiniteDiffManager {
         Array1D<MaterialActuatorData> heatSourceFluxMaterialActuators;
         Array1D<Real64> condNodeReport;
         Array1D<Real64> specHeatNodeReport;
+        Array1D<Real64> heatSourceFluxLayerReport;
+        Array1D<Real64> heatSourceFluxEnergyLayerReport;
 
         // Default Constructor
         SurfaceDataFD()

@@ -105,8 +105,7 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
             self.surfaces.append(constr)
 
         # test surface for heat flux actuators
-        wall_materials = ["Vinyl&#44 Light", "WallSheathing", "WallStudAndCavityk1", "Drywall 0.25 in. lay-1",
-                          "Drywall 0.25 in. lay-2"]
+        wall_materials = ["Drywall 0.25 in. lay-1"]
         surfaces_names = ["Zn001:Wall004"]
 
         for surface_name in surfaces_names:

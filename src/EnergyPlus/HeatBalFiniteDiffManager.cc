@@ -519,7 +519,6 @@ namespace HeatBalFiniteDiffManager {
         using DataHeatBalance::ThinMaterialLayerThreshold;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Lay;
         int SurfNum;
 
         Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
@@ -801,6 +800,7 @@ namespace HeatBalFiniteDiffManager {
             if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
             ConstrNum = state.dataSurface->Surface(Surf).Construction;
             TotNodes = ConstructFD(ConstrNum).TotNodes;
+            int TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
 
             // Allocate the Surface Arrays
             SurfaceFD(Surf).T.allocate(TotNodes + 1);
@@ -827,11 +827,13 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeStateOldOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
-            SurfaceFD(Surf).condMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            SurfaceFD(Surf).specHeatMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            SurfaceFD(Surf).heatSourceFluxMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+            SurfaceFD(Surf).condMaterialActuators.allocate(TotLayers);
+            SurfaceFD(Surf).specHeatMaterialActuators.allocate(TotLayers);
             SurfaceFD(Surf).condNodeReport.allocate(TotNodes + 1);
             SurfaceFD(Surf).specHeatNodeReport.allocate(TotNodes + 1);
+            SurfaceFD(Surf).heatSourceFluxMaterialActuators.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceFluxLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceFluxEnergyLayerReport.allocate(TotLayers - 1);
 
             // Initialize the allocated arrays.
             SurfaceFD(Surf).T = TempInitValue;
@@ -860,16 +862,22 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
             SurfaceFD(Surf).condNodeReport = 0.0;
             SurfaceFD(Surf).specHeatNodeReport = 0.0;
+            SurfaceFD(Surf).heatSourceFluxLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceFluxEnergyLayerReport = 0.0;
 
-            // Setup EMS data for conductivity and specific heat
-            for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+            // Setup EMS data
+            for (int lay = 1; lay <= TotLayers; ++lay) {
                 // Setup material layer names actuators
                 int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
                 // Actuator name format: "{SurfName}:{MaterialLayerName}"
                 std::string actName = fmt::format("{}:{}", state.dataSurface->Surface(Surf).Name, state.dataMaterial->Material(matLay).Name);
                 SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
                 SurfaceFD(Surf).specHeatMaterialActuators(lay).actuatorName = actName;
-                SurfaceFD(Surf).heatSourceFluxMaterialActuators(lay).actuatorName = actName;
+
+                // only setup for heat source actuator for layers 1 to N-1
+                if (lay != TotLayers) {
+                    SurfaceFD(Surf).heatSourceFluxMaterialActuators(lay).actuatorName = actName;
+                }
             }
         }
 
@@ -886,95 +894,119 @@ namespace HeatBalFiniteDiffManager {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSurface->Surface(SurfNum).Name);
 
-            // Setup EMS Material Actuators
+            // Setup EMS Material Actuators for Conductivity and Specific Heat
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-            for (int mat = 1; mat <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++mat) {
+            for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
                 EnergyPlus::SetupEMSActuator(state,
                                              "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatorName,
+                                             SurfaceFD(SurfNum).condMaterialActuators(lay).actuatorName,
                                              "Thermal Conductivity",
                                              "[W/m-K]",
-                                             SurfaceFD(SurfNum).condMaterialActuators(mat).isActuated,
-                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatedValue);
+                                             SurfaceFD(SurfNum).condMaterialActuators(lay).isActuated,
+                                             SurfaceFD(SurfNum).condMaterialActuators(lay).actuatedValue);
                 EnergyPlus::SetupEMSActuator(state,
                                              "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatorName,
+                                             SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatorName,
                                              "Specific Heat",
                                              "[J/kg-C]",
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).isActuated,
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatedValue);
+                                             SurfaceFD(SurfNum).specHeatMaterialActuators(lay).isActuated,
+                                             SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatedValue);
+            }
+
+            // Setup EMS Actuator and Output Variables for Heat Flux
+            // Only setup for layers 1 to N-1
+            for (int lay = 1; lay < state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
                 EnergyPlus::SetupEMSActuator(state,
                                              "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(mat).actuatorName,
+                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatorName,
                                              "Heat Flux",
                                              "[W/m2]",
-                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(mat).isActuated,
-                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(mat).actuatedValue);
+                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).isActuated,
+                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatedValue);
+                SetupOutputVariable(state,
+                                    format("CondFD Heat Source Power After Layer {}", lay),
+                                    OutputProcessor::Unit::W,
+                                    SurfaceFD(SurfNum).heatSourceFluxLayerReport(lay),
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    state.dataSurface->Surface(SurfNum).Name);
+                SetupOutputVariable(state,
+                                    format("CondFD Heat Source Energy After Layer {}", lay),
+                                    OutputProcessor::Unit::J,
+                                    SurfaceFD(SurfNum).heatSourceFluxEnergyLayerReport(lay),
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataSurface->Surface(SurfNum).Name,
+                                    _,
+                                    "Electricity",
+                                    "Heating",
+                                    _,
+                                    "Building");
             }
 
             TotNodes = ConstructFD(state.dataSurface->Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
-            for (Lay = 1; Lay <= TotNodes + 1; ++Lay) {                                        // include inside face node
+            for (int node = 1; node <= TotNodes + 1; ++node) {                                        // include inside face node
                 SetupOutputVariable(state,
-                                    format("CondFD Surface Temperature Node {}", Lay),
+                                    format("CondFD Surface Temperature Node {}", node),
                                     OutputProcessor::Unit::C,
-                                    SurfaceFD(SurfNum).TDreport(Lay),
+                                    SurfaceFD(SurfNum).TDreport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Surface Heat Flux Node {}", Lay),
+                                    format("CondFD Surface Heat Flux Node {}", node),
                                     OutputProcessor::Unit::W_m2,
-                                    SurfaceFD(SurfNum).QDreport(Lay),
+                                    SurfaceFD(SurfNum).QDreport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change State {}", Lay),
+                                    format("CondFD Phase Change State {}", node),
                                     OutputProcessor::Unit::None,
-                                    SurfaceFD(SurfNum).PhaseChangeState(Lay),
+                                    SurfaceFD(SurfNum).PhaseChangeState(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Previous State {}", Lay),
+                                    format("CondFD Phase Change Previous State {}", node),
                                     OutputProcessor::Unit::None,
-                                    SurfaceFD(SurfNum).PhaseChangeStateOld(Lay),
+                                    SurfaceFD(SurfNum).PhaseChangeStateOld(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Node Temperature {}", Lay),
+                                    format("CondFD Phase Change Node Temperature {}", node),
                                     OutputProcessor::Unit::C,
-                                    SurfaceFD(SurfNum).TDT(Lay),
+                                    SurfaceFD(SurfNum).TDT(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Node Conductivity {}", Lay),
+                                    format("CondFD Phase Change Node Conductivity {}", node),
                                     OutputProcessor::Unit::W_mK,
-                                    SurfaceFD(SurfNum).condNodeReport(Lay),
+                                    SurfaceFD(SurfNum).condNodeReport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Node Specific Heat {}", Lay),
+                                    format("CondFD Phase Change Node Specific Heat {}", node),
                                     OutputProcessor::Unit::J_kgK,
-                                    SurfaceFD(SurfNum).specHeatNodeReport(Lay),
+                                    SurfaceFD(SurfNum).specHeatNodeReport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
-                                        format("CondFD Surface Heat Capacitance Outer Half Node {}", Lay),
+                                        format("CondFD Surface Heat Capacitance Outer Half Node {}", node),
                                         OutputProcessor::Unit::W_m2K,
-                                        SurfaceFD(SurfNum).CpDelXRhoS1(Lay),
+                                        SurfaceFD(SurfNum).CpDelXRhoS1(node),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
-                                        format("CondFD Surface Heat Capacitance Inner Half Node {}", Lay),
+                                        format("CondFD Surface Heat Capacitance Inner Half Node {}", node),
                                         OutputProcessor::Unit::W_m2K,
-                                        SurfaceFD(SurfNum).CpDelXRhoS2(Lay),
+                                        SurfaceFD(SurfNum).CpDelXRhoS2(node),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
@@ -1908,7 +1940,19 @@ namespace HeatBalFiniteDiffManager {
 
                 // Add EMS actuated value
                 if (heatFluxActuator.isActuated) {
-                    QSSFlux += heatFluxActuator.actuatedValue;
+                    Real64 actuatedVal = heatFluxActuator.actuatedValue;
+                    if (actuatedVal >= 0) {
+                        QSSFlux += heatFluxActuator.actuatedValue;
+                    } else {
+                        ShowSevereError(state, fmt::format("Surface: {}, Material: {}", surface.Name, mat.Name));
+                        ShowContinueError(state, "EMS Actuator does not support negative values");
+                        ShowFatalError(state, "Program terminates due to preceding conditions.");
+                    }
+
+                    // Update report variables
+                    auto &surfFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
+                    surfFD.heatSourceFluxLayerReport(Lay) = QSSFlux * surface.Area;
+                    surfFD.heatSourceFluxEnergyLayerReport(Lay) = QSSFlux * surface.Area * state.dataGlobal->TimeStepZoneSec;
                 }
 
                 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
