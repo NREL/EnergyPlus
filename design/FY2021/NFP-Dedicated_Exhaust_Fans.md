@@ -109,26 +109,7 @@ AirLoopHVAC:ExhaustSystem,
 
 The ZoneHVAC:ExhaustSystem enforcement choice would affect how the mixer should be designed below. In general, if the ZoneHVAC:ExhaustSystem is enforced for each zone, there is no need to add new design flow rate information to a mixer (see the Mixer choice in the next section). Here denote the option of enforcing ZoneHVAC:ExhaustSystem on each connected exhaus as Choice 1; and the option of not enforceing it as Choice 2. 
 
-### Mixer choices ###
-
-#### Choice a: New AirLoopHVAC:ExhaustMixer ###
-
-In this option, a new AirLoopHVAC:ExhaustMixer, which is different from an existing AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer in that it includes the design (exhaust) flow rate , is to be added as a new object: 
-```
-AirLoopHVAC:ExhaustMixer,
-    Exhaust Mixer 1,                !-Name
-    Central Exhaust Fan Inlet Node, !- Outlet Node Name
-    Zone2 Exhaust Node,             !- Inlet 1 Node Name
-    0.1,                            !- Inlet 1 Design Flow Rate {m3/s}
-    Zone2 Exhaust Flow Schedule,    !- Inlet 1 Flow Fraction Schedule Name
-    Zone1 Exhaust Fan Outlet Node,  !- Inlet 2 Node Name
-    ,                               !- Inlet 2 Design Flow Rate {m3/s}
-    ;                               !- Inlet 2 Flow Fraction Schedule Name
-```
-
-In the example IDF block above, the Inlet 2 Design Flow Rate (m3/s) might not be needed as it is an existing zone exhaust fan. The set up intends to allow some flexibility in the configurations in that one or more of the connect branch to the mixer can be without a branch fan. Further, the exhaust mixer will allow more than 2 inlet branches to be connected to the mixer.
-
-#### Choice a: Reuse/Expand existing AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer ####
+### Reuse/Expand existing AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer ####
 
 If the design exhaust flow rate can be obtained someplace else, the existing AirLoopHVAC:Mixer or AirLoopHVAC:ZoneMixer object could be expanded and reused for in the exhaust system. For example, originally the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects to be used with AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
 
@@ -136,25 +117,7 @@ In the current development, this choice would allow an AirLoopHVAC:Mixer to be u
 
 ### Overall design choice combinations ###
 
-Depending on the ZoneHVAC:ExhaustSystem enforcement choice (a and b) and the mixer choice (1 and 2), the overall design choice can be in general the following two combinations: 
-
-#### Option 2a: ####
-Not enforcing ZoneHVAC:ExhaustSystem; but using the new AirLoopHVAC:ExhaustMixer. 
-In this case, what should be included in the parent AirLoopHVAC:ExhaustSystem object should included the ZoneHVAC:ExhaustSystem objects, the mixer, and the central exhaust fan: 
-
-```
-AirLoopHVAC:ExhaustSystem,
-    Central Exhaust,            !- Name
-    Exhaust Avail List,         !- Availability Manager List Name
-    Fan:ZoneExhaust,            !- Component 1 Object Type
-    Zone1 Exhaust Fan;          !- Component 1 Name
-	ZoneHVAC:ExhaustSystem,     !- Component 2 Object Type
-	Zone 2 Exhaust system;      !- Component 2 Name
-    AirLoopHVAC:ExhaustMixer,   !- Component 3 Object Type
-    Exhaust Mixer 1,            !- Component 3 Name
-    Fan:SystemModel,            !- Component 4 Object Type
-    Central Exhaust Fan,        !- Component 4 Name
-```
+Depending on the ZoneHVAC:ExhaustSystem enforcement choice (a and b) and the mixer choice, the overall design choice can be in general the following two combinations: 
 
 #### Option 1b: ####
 Enforcing ZoneHVAC:ExhaustSystem to all exhausts; reusing/expanding current AirLoopHVAC:ZoneMixer.
@@ -174,7 +137,7 @@ AirLoopHVAC:ExhaustSystem,
     Central Exhaust Fan,        !- Component 4 Name
 ```
 
-#### Optoiin 1a: ####
+#### Option 1a: ####
 Another possiblity is not to enforce ZoneHVAC:ExhaustSystem to all exhausts; and still reuse/expand current AirLoopHVAC:ZoneMixer. This is similar to 1b, except now that the ZoneHVAC:ExhaustSystem is not enforced for all exhausts. This allows some flexibility and convinience in specifying a mix of some zones exhaust fans and some zones without fancy exhaust fans (passive). In this scenario, the code should check to make sure adquate design flow rate information could be come from some input information (either an input exhaust flow rate or an exhaust fan/system design flow rate specification. 
 
 ### Other considerations ###
@@ -298,66 +261,6 @@ ZoneHVAC:ExhaustSystem,
        \object-list ScheduleNames
 ```
 
-#### IDD Addition for AirLooopHVAC:ExhaustMixer (if using this option) ####
-
-After the newly added after AirLoopHVAC:ExhaustSystem block and before the AirLoopHVAC:DedicatedOutdoorAirSystem blocks:
-```
-AirLoopHVAC:ExhaustMixer,
-       \extensible:3 - Just duplicate last three fields and comments (changing numbering, please)
-       \memo Mix N exhaust air streams from Relief Air Stream Node
-       \memo served by multiple AirLoopHVAC objects into one
-       \memo (currently 10 as default, but extensible). Node names cannot
-       \memo be duplicated within a single Exhaust mixer list.
-  A1 , \field Name
-       \required-field
-       \reference AirLoopHVACExhaustMixerNames
-  A2 , \field Outlet Node Name
-       \required-field
-       \type node
-  A3 , \field Inlet 1 Node Name
-       \begin-extensible
-       \type node
-  N1 , \field Inlet 1 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A4 , \field Inlet 1 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A5 , \field Inlet 2 Node Name
-       \type node
-  N2 , \field Inlet 2 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A6 , \field Inlet 2 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A7 , \field Inlet 3 Node Name
-       \required-field
-       \type node
-  N3 , \field Inlet 3 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A8 , \field Inlet 3 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A9 , \field Inlet 4 Node Name
-       \type node
-  N4 , \field Inlet 4 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A10; \field Inlet 4 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-```
-
 ### Air mass and heat balance ###
 
 For the traditional air loop supply and return paths assumes that the supply and return occurs within the same air loop. However, the heat and mass balance setup is more complicated when the exhaust system could potentially span across more than one air loop systems. The mass balance needs to be reconsidered for such a configuration. 
@@ -448,59 +351,9 @@ AirLoopHVAC:ExhaustSystem,
     Zone1 Exhaust Fan;          !- Component 3 Name
 ```
 
-### AirLooopHVAC:ExhaustMixer Input fields ###
+### ZoneHVAC:ExhaustSystem Input Fields ###
 
-#### Field: Name ####
-
-This field is the name of the exhaust mixer. 
-
-#### Field: Outlet Node Name ####
-
-This field is the name of the outlet node of the mixer. It is the node where all the incoming exhaust air streams are fully combined and mixed.
-
-#### Field Set Inlet Nodes Information ####
-
-The remaining fields are sets of three repeated items: an inlet node name, the design flow rate for the inlet node, and the flow fraction schedule name for the inlet node. These sets of fields define the inlet nodes for the exhaust mixer.
-
-#### Field: Inlet 1 Node Name ####
-
-This is the node for the first incoming exhaust air stream. This is a required field for the first component in the exhaust mixer.
-
-#### Field: Inlet 1 Design Flow Rate (m3/s) ####
-
-This field specifies the design flow rate for the first incoming exhaust stream.
-
-#### Field: Inlet 1 Flow Fraction Schedule Name ####
-
-This is the flow fraction schedule of Inlet 1 (based on the Design Flow Rate). If left blank, the default value would be 1. 
-
-#### Field: Inlet <#> Node Name ####
-
-Additional inlet nodes could be specified for the exhaust mixer if applicable.
-
-The field is extensible so Inlet 3 or more could also be specified following the second object. 
-
-#### Field: Inlet <#> Design Flow Rate (m3/s) ####
-
-This field specifies the design flow rate for the additional incoming exhaust stream.
-
-#### Field: Inlet <#> Flow Fraction Schedule Name ####
-
-This is the flow fraction schedule of the additional inlet (based on the Design Flow Rate). If left blank, the default value would be 1. 
-
-Here is an example input block for the AirLoopHVAC:ExhaustMixer object: 
-
-```
-AirLoopHVAC:ExhaustMixer,
-    Exhaust Mixer 1,                !-Name
-    Central Exhaust Fan Inlet Node, !- Outlet Node Name
-    Zone2 Exhaust Node,             !- Inlet 1 Node Name
-    0.1,                            !- Inlet 1 Design Flow Rate {m3/s}
-    Zone2 Exhaust Flow Schedule,    !- Inlet 1 Flow Fraction Schedule Name
-    Zone1 Exhaust Fan Outlet Node,  !- Inlet 2 Node Name
-    ,                               !- Inlet 2 Design Flow Rate {m3/s}
-    ;                               !- Inlet 2 Flow Fraction Schedule Name
-```
+The ZoneHVAC:ExhaustSystem input fields are as follows. 
 
 ## Input Description ##
 
@@ -563,51 +416,6 @@ This struct definition and declaration will create a new data struct for the Air
 ### ZoneHVAC:ExhaustSystem data struct ###
 
 This struct definition and declaration will create a new data struct for the ZoneHVAC:ExhaustSystem object.
-
-### AirLoopHVAC:ExhaustMixer data struct ###
-
-This struct definition and declaration will create a new data struct for the AirLoopHVAC:ExhaustMixer object. This could be simlar to AirLoopHVAC:Mixer or AirLoopHVAC:ZoneMier object. 
-
-A potential proposal is like this: 
-```
-    struct AirLoopExhaustMixer
-    {
-        std::string name;
-        static AirLoopExhaustMixer *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
-        int numOfInletNodes;
-        int m_AirLoopExhaustMixer_Num;
-        int OutletNodeNum;
-        std::string OutletNodeName;
-        std::vector<std::string> InletNodeName;
-        std::vector<int> InlteFractionScheduleIndex;
-        std::vector<Real64> InletDesignFlowRate;
-        std::vector<int> InletNodeNum;
-        Real64 OutletTemp;
-        Real64 OutletHumRat;
-
-        // default constructor
-        AirLoopExhaustMixer() : numOfInletNodes(0), m_AirLoopMixer_Num(0), OutletNodeNum(0), OutletTemp(0.0), OutletHumRat(0.0)
-        {
-        }
-
-        ~AirLoopExhaustMixer() = default; // destructor
-
-        static void getAirLoopExhaustMixer(EnergyPlusData &state);
-        void CalcAirLoopExhaustMixer(EnergyPlusData &state);
-    };
-```
-
-The proposed code is similar to the current AirLoopHVAC:Mixer. Two additional vector element will be added to accommodate the inlet fraction schedule index and the inlet design flow rate need for AirLoopHVAC:ExhaustMixer. Further, another another additional member--Real64 OutletHumRat--is added to the struct, in that this could be important information for energy and mass balance, and also for potential total heat (enthalpy) recovery procedures.
-
-It is also beneficial to use the factory method for the AirLoopHVAC:ExhaustSystem and the AirLoopHVAC:ExhaustMixer object creation.
-
-### getAirLoopExhaustMixer() or reuse original ZoneMixer ###
-
-This function will get the input information from the AirLoopHVAC:ExhaustMixer objects processed. Related information input includes 
-
-### CalcAirLoopExhaustMixer() ###
-
-It is a function to simulate the AirLoopHVAC:ExhaustMixer mixing process. The temperature, humidity, and mass flow rate will be calculated and updated based on the incoming streams' conditions.
 
 ### ReportAirLoopExhaustSystem() ###
 
