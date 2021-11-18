@@ -1159,7 +1159,6 @@ namespace OutdoorAirUnit {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::OutdoorAirUnit_Num;
         using FluidProperties::GetDensityGlycol;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::InitComponentNodes;
@@ -1206,11 +1205,12 @@ namespace OutdoorAirUnit {
 
         if (allocated(ZoneComp)) {
             if (MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName = OutAirUnit(OAUnitNum).AvailManagerListName;
-                ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
+                    OutAirUnit(OAUnitNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
                 MyZoneEqFlag(OAUnitNum) = false;
             }
-            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
+            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
         }
 
         if (MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -2476,7 +2476,7 @@ namespace OutdoorAirUnit {
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
-            case (CompType::DXSystem): { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
+            case (CompType::DXSystem): { // CoilSystem:Cooling:DX  old 'CompType:UnitaryCoolOnly'
                 if (Sim) {
                     if (OutAirUnit(OAUnitNum).OAEquip(SimCompNum).compPointer == nullptr) {
                         UnitarySystems::UnitarySys thisSys;
@@ -2524,8 +2524,8 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
             } break;
-                // RAR need new AirLoopHVAC:UnitarySystem object here
-            case (CompType::UnitarySystemModel): { // 'AirLoopHVAC:UnitarySystem'
+                // RAR need new CompType:UnitarySystem object here
+            case (CompType::UnitarySystemModel): { // 'CompType:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
                     if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) &&
