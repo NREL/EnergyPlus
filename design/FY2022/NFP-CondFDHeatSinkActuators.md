@@ -2,7 +2,8 @@
 
 **Matt Mitchell, NREL**
 
-October 26, 2021 - Initial Draft
+- October 26, 2021 - Initial Draft
+- November 18, 2021 - Rev 01
 
 ## Overview
 
@@ -10,11 +11,16 @@ Last year, internal NREL users requested the addition of EMS actuators to the Co
 
 ## Implementation
 
-The EMS actuators for conductivity and specific heat operate at the material-layer level and apply property changes to all nodes within that material layer. Similarly, this proposed actuator will operate at the material-layer level and will distribute the heat addition uniformly throughout the material layer. All control of these heat inputs will be reliant on the user, who will implement the controls algorithms in EMS or Python.
+The new EMS actuator will leverage the capability already built into the CondFD code through the `ConstructionProperty:InternalHeatSource` object. This actuator will be tied to the heat flux input already defined by this object. The heat source will only be allowed to operate by adding heat to the node, i.e. one-directional. Negative values will be flagged with warning or cause the simulation to issue a fatal error. 
 
-The CondFD model is an implicit model formulation, so we expect the solution to remain stable with this heat addition, though, this has yet to be fully confirmed.
+When the `ConstructionProperty:InternalHeatSource` is present and adding heat to the surface material layers, this EMS actuator will *add* heat to what has already been defined by that object. Currently, there are no plans to warn the user that both the EMS actuator and the `InternalHeatSource` objects are tied to the same material layer.
 
-Users will be limited to only being able to  *add* heat to the material layers. I.e. the material layer will be a heat sink for electrically-driven Joule heating. There will be no provision for the user to source heat from the material layer. This heat addition will be treated as an electrical input to that material layer, a new output variable will be created, and this output variable will be added to the electric usage meter.
+New output variables will be added to track the heat source layers. They are listed here:
+
+- "CondFD Heat Source Power After Layer N \[W\]" - This is the heating power added (flux * surf_area).
+- "CondFD Heat Source Energy After Layer N \[J\]" - This is the energy of heating power added.
+
+The heat source must be inserted between two material layers, so the actuator (like the `InternalHeatSource` object) will not be available for the final material layer.
 
 ## Testing
 
@@ -28,4 +34,16 @@ Documentation will be added in the EMS Reference describing the usage and limits
 
 ## IDD Changes and Transition
 
-None expected.
+None required for the new actuator; however, I'd recommend we unify the format of these output variables. Current output variable names and proposed changes are listed below.
+
+| Current                                             | Proposed                                  |
+|-----------------------------------------------------|-------------------------------------------|
+| CondFD Surface Temperature Node N                   | No change                                 |
+| CondFD Surface Heat Flux Node N                     | No change                                 |
+| CondFD Phase Change State N                         | CondFD Phase Change State Node N          |
+| CondFD Phase Change Previous State N                | CondFD Phase Change Previous State Node N |
+| CondFD Phase Change Node Temperature N              | CondFD Temperature Node N                 |
+| CondFD Phase Change Node Conductivity N             | CondFD Conductivity Node N                |
+| CondFD Phase Change Node Specific Heat N            | CondFD Specific Heat Node N               |
+| CondFD Surface Heat Capacitance Outer   Half Node N | No change                                 |
+| CondFD Surface Heat Capacitance Inner   Half Node N | No change                                 |
