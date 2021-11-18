@@ -61,7 +61,7 @@ struct EnergyPlusData;
 
 namespace DataPlant {
 
-    constexpr std::array<bool, static_cast<int>(PlantEquipmentType::Num)> PlantEquipmentTypeIsPump = {
+    static constexpr std::array<bool, static_cast<int>(PlantEquipmentType::Num)> PlantEquipmentTypeIsPump = {
         false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
         false, false, false, false, false, false, false, false, false, false, false, false, true,  true,  true,  true,  true,  false, false, false,
         false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,

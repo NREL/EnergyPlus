@@ -878,42 +878,42 @@ void GetPlantInput(EnergyPlusData &state)
                         static_cast<PlantEquipmentType>(getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_comp_type)));
 
                     switch (this_comp.Type) {
-                    case (PlantEquipmentType::Pipe): {
+                    case PlantEquipmentType::Pipe: {
                         this_comp.CurOpSchemeType = OpScheme::NoControl;
                         this_comp.compPtr = Pipes::LocalPipeData::factory(state, PlantEquipmentType::Pipe, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PipeSteam): {
+                    case PlantEquipmentType::PipeSteam: {
                         this_comp.CurOpSchemeType = OpScheme::NoControl;
                         this_comp.compPtr = Pipes::LocalPipeData::factory(state, PlantEquipmentType::PipeSteam, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PipeExterior): {
+                    case PlantEquipmentType::PipeExterior: {
                         this_comp.CurOpSchemeType = OpScheme::NoControl;
                         this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, PlantEquipmentType::PipeExterior, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PipeInterior): {
+                    case PlantEquipmentType::PipeInterior: {
                         this_comp.CurOpSchemeType = OpScheme::NoControl;
                         this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, PlantEquipmentType::PipeInterior, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PipeUnderground): {
+                    case PlantEquipmentType::PipeUnderground: {
                         this_comp.CurOpSchemeType = OpScheme::NoControl;
                         this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, PlantEquipmentType::PipeUnderground, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PipingSystemPipeCircuit): {
+                    case PlantEquipmentType::PipingSystemPipeCircuit: {
                         this_comp.CurOpSchemeType = OpScheme::NoControl;
                         this_comp.compPtr =
                             PlantPipingSystemsManager::Circuit::factory(state, PlantEquipmentType::PipingSystemPipeCircuit, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PumpCondensate):
-                    case (PlantEquipmentType::PumpConstantSpeed):
-                    case (PlantEquipmentType::PumpVariableSpeed):
-                    case (PlantEquipmentType::PumpBankConstantSpeed):
-                    case (PlantEquipmentType::PumpBankVariableSpeed): {
+                    case PlantEquipmentType::PumpCondensate:
+                    case PlantEquipmentType::PumpConstantSpeed:
+                    case PlantEquipmentType::PumpVariableSpeed:
+                    case PlantEquipmentType::PumpBankConstantSpeed:
+                    case PlantEquipmentType::PumpBankVariableSpeed: {
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         this_comp.CurOpSchemeType = OpScheme::Pump;
                         if (BranchNum == 1 || BranchNum == state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
@@ -931,8 +931,8 @@ void GetPlantInput(EnergyPlusData &state)
                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumps++;
                         break;
                     }
-                    case (PlantEquipmentType::WtrHeaterMixed):
-                    case (PlantEquipmentType::WtrHeaterStratified): {
+                    case PlantEquipmentType::WtrHeaterMixed:
+                    case PlantEquipmentType::WtrHeaterStratified: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -941,16 +941,16 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_DFAbsorption): {
+                    case PlantEquipmentType::Chiller_DFAbsorption: {
                         this_comp.compPtr = ChillerGasAbsorption::GasAbsorberSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_ExhFiredAbsorption): {
+                    case PlantEquipmentType::Chiller_ExhFiredAbsorption: {
                         this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::ChilledWaterTankMixed):
-                    case (PlantEquipmentType::ChilledWaterTankStratified): {
+                    case PlantEquipmentType::ChilledWaterTankMixed:
+                    case PlantEquipmentType::ChilledWaterTankStratified: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -959,13 +959,13 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::WaterUseConnection): {
+                    case PlantEquipmentType::WaterUseConnection: {
                         this_comp.CurOpSchemeType = OpScheme::Demand;
                         this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::SolarCollectorFlatPlate):
-                    case (PlantEquipmentType::SolarCollectorICS): {
+                    case PlantEquipmentType::SolarCollectorFlatPlate:
+                    case PlantEquipmentType::SolarCollectorICS: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -974,33 +974,33 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = SolarCollectors::CollectorData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PlantLoadProfile): {
+                    case PlantEquipmentType::PlantLoadProfile: {
                         this_comp.CurOpSchemeType = OpScheme::Demand;
                         this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::GrndHtExchgSystem): {
+                    case PlantEquipmentType::GrndHtExchgSystem: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, PlantEquipmentType::GrndHtExchgSystem, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::GrndHtExchgSurface): {
+                    case PlantEquipmentType::GrndHtExchgSurface: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr = SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory(
                             state, PlantEquipmentType::GrndHtExchgSurface, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::GrndHtExchgPond): {
+                    case PlantEquipmentType::GrndHtExchgPond: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr = PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::GrndHtExchgSlinky): {
+                    case PlantEquipmentType::GrndHtExchgSlinky: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, PlantEquipmentType::GrndHtExchgSlinky, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_ElectricEIR): {
+                    case PlantEquipmentType::Chiller_ElectricEIR: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1009,7 +1009,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_ElectricReformEIR): {
+                    case PlantEquipmentType::Chiller_ElectricReformEIR: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1018,7 +1018,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_Electric): {
+                    case PlantEquipmentType::Chiller_Electric: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1027,7 +1027,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_EngineDriven): {
+                    case PlantEquipmentType::Chiller_EngineDriven: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1036,7 +1036,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_CombTurbine): {
+                    case PlantEquipmentType::Chiller_CombTurbine: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1045,7 +1045,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_ConstCOP): {
+                    case PlantEquipmentType::Chiller_ConstCOP: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1054,17 +1054,17 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Boiler_Simple): {
+                    case PlantEquipmentType::Boiler_Simple: {
                         this_comp.CurOpSchemeType = OpScheme::Unassigned;
                         this_comp.compPtr = Boilers::BoilerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Boiler_Steam): {
+                    case PlantEquipmentType::Boiler_Steam: {
                         this_comp.CurOpSchemeType = OpScheme::Unassigned;
                         this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_Indirect_Absorption): {
+                    case PlantEquipmentType::Chiller_Indirect_Absorption: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1073,7 +1073,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Chiller_Absorption): {
+                    case PlantEquipmentType::Chiller_Absorption: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1082,18 +1082,18 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::CoolingTower_SingleSpd):
-                    case (PlantEquipmentType::CoolingTower_TwoSpd): {
+                    case PlantEquipmentType::CoolingTower_SingleSpd:
+                    case PlantEquipmentType::CoolingTower_TwoSpd: {
                         this_comp.CurOpSchemeType = OpScheme::Unassigned;
                         this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::CoolingTower_VarSpd):
-                    case (PlantEquipmentType::CoolingTower_VarSpdMerkel): {
+                    case PlantEquipmentType::CoolingTower_VarSpd:
+                    case PlantEquipmentType::CoolingTower_VarSpdMerkel: {
                         this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Generator_FCExhaust): {
+                    case PlantEquipmentType::Generator_FCExhaust: {
                         this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory_exhaust(state, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1102,13 +1102,13 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HeatPumpWtrHeaterPumped):
-                    case (PlantEquipmentType::HeatPumpWtrHeaterWrapped): {
+                    case PlantEquipmentType::HeatPumpWtrHeaterPumped:
+                    case PlantEquipmentType::HeatPumpWtrHeaterWrapped: {
                         this_comp.CurOpSchemeType = OpScheme::Demand;
                         this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::HPWaterEFCooling): {
+                    case PlantEquipmentType::HPWaterEFCooling: {
                         this_comp.compPtr =
                             HeatPumpWaterToWaterSimple::GshpSpecs::factory(state, PlantEquipmentType::HPWaterEFCooling, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
@@ -1118,7 +1118,7 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HPWaterEFHeating): {
+                    case PlantEquipmentType::HPWaterEFHeating: {
                         this_comp.compPtr =
                             HeatPumpWaterToWaterSimple::GshpSpecs::factory(state, PlantEquipmentType::HPWaterEFHeating, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
@@ -1128,7 +1128,7 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HPWaterPEHeating): {
+                    case PlantEquipmentType::HPWaterPEHeating: {
                         this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs::factory(state, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1137,7 +1137,7 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HPWaterPECooling): {
+                    case PlantEquipmentType::HPWaterPECooling: {
                         this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(state, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1146,7 +1146,7 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HeatPumpEIRHeating): {
+                    case PlantEquipmentType::HeatPumpEIRHeating: {
                         this_comp.compPtr =
                             EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(state, PlantEquipmentType::HeatPumpEIRHeating, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
@@ -1156,7 +1156,7 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HeatPumpEIRCooling): {
+                    case PlantEquipmentType::HeatPumpEIRCooling: {
                         this_comp.compPtr =
                             EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(state, PlantEquipmentType::HeatPumpEIRCooling, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
@@ -1166,7 +1166,7 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::HeatPumpVRF): {
+                    case PlantEquipmentType::HeatPumpVRF: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1175,29 +1175,29 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PurchChilledWater): {
+                    case PlantEquipmentType::PurchChilledWater: {
                         this_comp.compPtr =
                             OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchChilledWater, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PurchHotWater): {
+                    case PlantEquipmentType::PurchHotWater: {
                         this_comp.compPtr =
                             OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchHotWater, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::TS_IceSimple): {
+                    case PlantEquipmentType::TS_IceSimple: {
                         this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::TS_IceDetailed): {
+                    case PlantEquipmentType::TS_IceDetailed: {
                         this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::ValveTempering): {
+                    case PlantEquipmentType::ValveTempering: {
                         this_comp.compPtr = PlantValves::TemperValveData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::FluidToFluidPlantHtExchg): {
+                    case PlantEquipmentType::FluidToFluidPlantHtExchg: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1206,7 +1206,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Generator_MicroTurbine): {
+                    case PlantEquipmentType::Generator_MicroTurbine: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1215,7 +1215,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Generator_ICEngine): {
+                    case PlantEquipmentType::Generator_ICEngine: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1225,7 +1225,7 @@ void GetPlantInput(EnergyPlusData &state)
 
                         break;
                     }
-                    case (PlantEquipmentType::Generator_CTurbine): {
+                    case PlantEquipmentType::Generator_CTurbine: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1234,7 +1234,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Generator_MicroCHP): {
+                    case PlantEquipmentType::Generator_MicroCHP: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1243,7 +1243,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::Generator_FCStackCooler): {
+                    case PlantEquipmentType::Generator_FCStackCooler: {
                         this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(state, CompNames(CompNum));
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1252,27 +1252,27 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
-                    case (PlantEquipmentType::FluidCooler_SingleSpd): {
+                    case PlantEquipmentType::FluidCooler_SingleSpd: {
                         this_comp.compPtr =
                             FluidCoolers::FluidCoolerspecs::factory(state, PlantEquipmentType::FluidCooler_SingleSpd, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::FluidCooler_TwoSpd): {
+                    case PlantEquipmentType::FluidCooler_TwoSpd: {
                         this_comp.compPtr =
                             FluidCoolers::FluidCoolerspecs::factory(state, PlantEquipmentType::FluidCooler_TwoSpd, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::EvapFluidCooler_SingleSpd): {
+                    case PlantEquipmentType::EvapFluidCooler_SingleSpd: {
                         this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
                             state, PlantEquipmentType::EvapFluidCooler_SingleSpd, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::EvapFluidCooler_TwoSpd): {
+                    case PlantEquipmentType::EvapFluidCooler_TwoSpd: {
                         this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
                             state, PlantEquipmentType::EvapFluidCooler_TwoSpd, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PVTSolarCollectorFlatPlate): {
+                    case PlantEquipmentType::PVTSolarCollectorFlatPlate: {
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
@@ -1281,65 +1281,65 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::CentralGroundSourceHeatPump): {
+                    case PlantEquipmentType::CentralGroundSourceHeatPump: {
                         this_comp.compPtr = PlantCentralGSHP::WrapperSpecs::factory(state, CompNames(CompNum));
                         // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                         break;
                     }
-                    case (PlantEquipmentType::PackagedTESCoolingCoil):
-                    case (PlantEquipmentType::SwimmingPool_Indoor):
-                    case (PlantEquipmentType::CoilWaterCooling):
-                    case (PlantEquipmentType::CoilWaterDetailedFlatCooling):
-                    case (PlantEquipmentType::CoilWaterSimpleHeating):
-                    case (PlantEquipmentType::CoilSteamAirHeating):
-                    case (PlantEquipmentType::Baseboard_Rad_Conv_Water):
-                    case (PlantEquipmentType::Baseboard_Conv_Water):
-                    case (PlantEquipmentType::Baseboard_Rad_Conv_Steam):
-                    case (PlantEquipmentType::CoolingPanel_Simple):
-                    case (PlantEquipmentType::LowTempRadiant_VarFlow):
-                    case (PlantEquipmentType::LowTempRadiant_ConstFlow):
-                    case (PlantEquipmentType::CooledBeamAirTerminal):
-                    case (PlantEquipmentType::FourPipeBeamAirTerminal):
-                    case (PlantEquipmentType::MultiSpeedHeatPumpRecovery):
-                    case (PlantEquipmentType::UnitarySysRecovery):
-                    case (PlantEquipmentType::CoilWAHPHeatingEquationFit):
-                    case (PlantEquipmentType::CoilWAHPCoolingEquationFit):
-                    case (PlantEquipmentType::CoilVSWAHPHeatingEquationFit):
-                    case (PlantEquipmentType::CoilVSWAHPCoolingEquationFit):
-                    case (PlantEquipmentType::CoilWAHPHeatingParamEst):
-                    case (PlantEquipmentType::CoilWAHPCoolingParamEst): {
+                    case PlantEquipmentType::PackagedTESCoolingCoil:
+                    case PlantEquipmentType::SwimmingPool_Indoor:
+                    case PlantEquipmentType::CoilWaterCooling:
+                    case PlantEquipmentType::CoilWaterDetailedFlatCooling:
+                    case PlantEquipmentType::CoilWaterSimpleHeating:
+                    case PlantEquipmentType::CoilSteamAirHeating:
+                    case PlantEquipmentType::Baseboard_Rad_Conv_Water:
+                    case PlantEquipmentType::Baseboard_Conv_Water:
+                    case PlantEquipmentType::Baseboard_Rad_Conv_Steam:
+                    case PlantEquipmentType::CoolingPanel_Simple:
+                    case PlantEquipmentType::LowTempRadiant_VarFlow:
+                    case PlantEquipmentType::LowTempRadiant_ConstFlow:
+                    case PlantEquipmentType::CooledBeamAirTerminal:
+                    case PlantEquipmentType::FourPipeBeamAirTerminal:
+                    case PlantEquipmentType::MultiSpeedHeatPumpRecovery:
+                    case PlantEquipmentType::UnitarySysRecovery:
+                    case PlantEquipmentType::CoilWAHPHeatingEquationFit:
+                    case PlantEquipmentType::CoilWAHPCoolingEquationFit:
+                    case PlantEquipmentType::CoilVSWAHPHeatingEquationFit:
+                    case PlantEquipmentType::CoilVSWAHPCoolingEquationFit:
+                    case PlantEquipmentType::CoilWAHPHeatingParamEst:
+                    case PlantEquipmentType::CoilWAHPCoolingParamEst: {
                         this_comp.CurOpSchemeType = OpScheme::Demand;
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         break;
                     }
-                    case (PlantEquipmentType::RefrigSystemWaterCondenser): {
+                    case PlantEquipmentType::RefrigSystemWaterCondenser: {
                         this_comp.CurOpSchemeType = OpScheme::Demand;
                         this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::RefrigerationWaterCoolRack): {
+                    case PlantEquipmentType::RefrigerationWaterCoolRack: {
                         this_comp.CurOpSchemeType = OpScheme::Demand;
                         this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::PlantComponentUserDefined): {
+                    case PlantEquipmentType::PlantComponentUserDefined: {
                         this_comp.CurOpSchemeType = OpScheme::Unassigned;
                         this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::CoilUserDefined):
-                    case (PlantEquipmentType::ZoneHVACAirUserDefined):
-                    case (PlantEquipmentType::AirTerminalUserDefined): {
+                    case PlantEquipmentType::CoilUserDefined:
+                    case PlantEquipmentType::ZoneHVACAirUserDefined:
+                    case PlantEquipmentType::AirTerminalUserDefined: {
                         this_comp.CurOpSchemeType = OpScheme::Unassigned;
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         break;
                     }
-                    case (PlantEquipmentType::WaterSource): {
+                    case PlantEquipmentType::WaterSource: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case (PlantEquipmentType::GrndHtExchgHorizTrench): {
+                    case PlantEquipmentType::GrndHtExchgHorizTrench: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr =
                             PlantPipingSystemsManager::Circuit::factory(state, PlantEquipmentType::GrndHtExchgHorizTrench, CompNames(CompNum));
