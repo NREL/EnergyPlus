@@ -319,27 +319,27 @@ namespace DataHeatBalance {
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesUC = {
         "NONE", "ADDINFILTRATIONFLOW", "ADJUSTINFILTRATIONFLOW"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesCC = {
         "None", "AddInfiltrationFlow", "AdjustInfiltrationFlow"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesUC = {
         "MIXINGSOURCEZONESONLY", "ALLZONES"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesCC = {
         "MixingSourceZonesOnly", "AllZones"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesUC = {
         "ADJUSTMIXINGONLY", "ADJUSTRETURNONLY", "ADJUSTMIXINGTHENRETURN", "ADJUSTRETURNTHENMIXING", "NONE"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesCC = {
         "AdjustMixingOnly", "AdjustReturnOnly", "AdjustMixingThenReturn", "AdjustReturnThenMixing", "None"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
         "PEOPLE",
         "LIGHTS",
         "ELECTRICEQUIPMENT",
@@ -395,7 +395,7 @@ namespace DataHeatBalance {
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
         "FAN:SYSTEMMODEL"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesCC = {
         "People",
         "Lights",
         "ElectricEquipment",
@@ -461,19 +461,31 @@ namespace DataHeatBalance {
     constexpr Real64 SurfInitialConvCoeff(3.076); // Surface convective coefficient for initialization
 
     // Air       Argon     Krypton   Xenon
-    extern Array2D<Real64> const GasCoeffsCon; // Gas conductivity coefficients for gases in a mixture
+    // Gas conductivity coefficients for gases in a mixture
+    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCon = {{{2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                                                                            {7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                                                                            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
     // Air       Argon     Krypton   Xenon
-    extern Array2D<Real64> const GasCoeffsVis; // Gas viscosity coefficients for gases in a mixture
+    // Gas viscosity coefficients for gases in a mixture
+    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsVis = {{{3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                                                                            {4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                                                                            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
     // Air       Argon     Krypton   Xenon
-    extern Array2D<Real64> const GasCoeffsCp; // Gas specific heat coefficients for gases in a mixture
+    // Gas specific heat coefficients for gases in a mixture
+    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCp = {{
+        {1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+        {1.2324e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+    }};
 
     // Air       Argon     Krypton   Xenon
-    extern Array1D<Real64> const GasWght; // Gas molecular weights for gases in a mixture
+    static constexpr std::array<Real64, 10> GasWght = {
+        28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Gas molecular weights for gases in a mixture
 
     // Gas specific heat ratios.  Used for gasses in low pressure
-    extern Array1D<Real64> const GasSpecificHeatRatio;
+    static constexpr std::array<Real64, 10> GasSpecificHeatRatio = {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     struct TCGlazingsType
     {
@@ -508,24 +520,24 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name;                  // Space name
-        int zoneNum = 0;                   // Pointer to Zone wich contains this space
-        Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
-        std::string spaceType = "General"; // Space type tag
-        int spaceTypeNum = 0;              // Points to spaceType for this space
-        EPVector<std::string> tags;        // Optional tags for reporting
-        EPVector<int> surfaces;            // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;        // Calculated floor area used for this space
-        Real64 floorArea = 0.0;            // Floor area used for this space
-        bool hasFloor = false;             // Has "Floor" surface
-        Real64 extWindowArea = 0.0;        // Exterior Window Area for Zone
-        Real64 totalSurfArea = 0.0;        // Total surface area for Zone
-        int radiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
-        int solarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
-        Real64 totOccupants = 0.0;         // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
-        Real64 minOccupants = 0.0;         // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
-        Real64 maxOccupants = 0.0;         // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
-        bool isRemainderSpace = false;     // True if this space is auto-generated "-Remainder" space
+        std::string Name;                                                 // Space name
+        int zoneNum = 0;                                                  // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this space
+        std::string spaceType = "General";                                // Space type tag
+        int spaceTypeNum = 0;                                             // Points to spaceType for this space
+        EPVector<std::string> tags;                                       // Optional tags for reporting
+        EPVector<int> surfaces;                                           // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;                                       // Calculated floor area used for this space
+        Real64 floorArea = 0.0;                                           // Floor area used for this space
+        bool hasFloor = false;                                            // Has "Floor" surface
+        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for Zone
+        Real64 totalSurfArea = 0.0;                                       // Total surface area for Zone
+        int radiantEnclosureNum = 0;                                      // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;                                        // Solar distribution enclosure this space belongs to
+        Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
     };

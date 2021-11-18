@@ -222,7 +222,7 @@ namespace OutputReportTabular {
         AshStdDes3Line,
     };
 
-    constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesTubularGCLS = {DataHeatBalance::IntGainType::DaylightingDeviceTubular};
+    static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesTubularGCLS = {DataHeatBalance::IntGainType::DaylightingDeviceTubular};
 
     // Types
 

@@ -5037,7 +5037,7 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
     // set up internal gains if tank is in a thermal zone
     if (this->AmbientTempZone > 0) {
         switch (this->WaterThermalTankType) {
-        case (DataPlant::PlantEquipmentType::WtrHeaterMixed): {
+        case DataPlant::PlantEquipmentType::WtrHeaterMixed: {
             SetupZoneInternalGain(state,
                                   this->AmbientTempZone,
                                   "WaterHeater:Mixed",
@@ -5046,7 +5046,7 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                   &this->AmbientZoneGain);
             break;
         }
-        case (DataPlant::PlantEquipmentType::WtrHeaterStratified): {
+        case DataPlant::PlantEquipmentType::WtrHeaterStratified: {
             SetupZoneInternalGain(state,
                                   this->AmbientTempZone,
                                   "WaterHeater:Stratified",
@@ -5055,7 +5055,7 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                   &this->AmbientZoneGain);
             break;
         }
-        case (DataPlant::PlantEquipmentType::ChilledWaterTankMixed): {
+        case DataPlant::PlantEquipmentType::ChilledWaterTankMixed: {
             SetupZoneInternalGain(state,
                                   this->AmbientTempZone,
                                   "ThermalStorage:ChilledWater:Mixed",
@@ -5064,7 +5064,7 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
                                   &this->AmbientZoneGain);
             break;
         }
-        case (DataPlant::PlantEquipmentType::ChilledWaterTankStratified): {
+        case DataPlant::PlantEquipmentType::ChilledWaterTankStratified: {
             SetupZoneInternalGain(state,
                                   this->AmbientTempZone,
                                   "ThermalStorage:ChilledWater:Stratified",

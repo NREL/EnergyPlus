@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -109,23 +110,23 @@ namespace PackagedTerminalHeatPump {
     {
         // Members
         // input data
-        iPTHPType UnitType_Num;          // parameter equivalent to type of unit
-        int ZoneEquipType;               // Type of PT unit
-        bool useVSCoilModel;             // does PT use VS coil models
-        int SchedPtr;                    // index number to availability schedule
-        Real64 MaxCoolAirVolFlow;        // supply air volumetric flow rate during cooling operation [m3/s]
-        Real64 MaxHeatAirVolFlow;        // supply air volumetric flow rate during heating operation [m3/s]
-        Real64 MaxNoCoolHeatAirVolFlow;  // supply air volumetric flow rate when no cooling or heating [m3/s]
-        Real64 CoolOutAirVolFlow;        // OA volumetric flow rate during cooling operation [m3/s]
-        Real64 HeatOutAirVolFlow;        // OA volumetric flow rate during heating operation [m3/s]
-        Real64 NoCoolHeatOutAirVolFlow;  // OA volumetric flow rate when no cooling or heating [m3/s]
-        Real64 CoolOutAirMassFlow;       // OA mass flow rate during cooling operation [kg/s]
-        Real64 HeatOutAirMassFlow;       // OA mass flow rate during heating operation [kg/s]
-        Real64 NoCoolHeatOutAirMassFlow; // OA mass flow rate when no cooling or heating [kg/s]
-        int OutsideAirNode;              // OAmixer outside air node number
-        int AirReliefNode;               // OAmixer relief air node number
-        std::string OAMixType;           // type of outside air mixer
-        std::string OAMixName;           // name of OAmixer
+        iPTHPType UnitType_Num;                     // parameter equivalent to type of unit
+        DataZoneEquipment::ZoneEquip ZoneEquipType; // Type of PT unit
+        bool useVSCoilModel;                        // does PT use VS coil models
+        int SchedPtr;                               // index number to availability schedule
+        Real64 MaxCoolAirVolFlow;                   // supply air volumetric flow rate during cooling operation [m3/s]
+        Real64 MaxHeatAirVolFlow;                   // supply air volumetric flow rate during heating operation [m3/s]
+        Real64 MaxNoCoolHeatAirVolFlow;             // supply air volumetric flow rate when no cooling or heating [m3/s]
+        Real64 CoolOutAirVolFlow;                   // OA volumetric flow rate during cooling operation [m3/s]
+        Real64 HeatOutAirVolFlow;                   // OA volumetric flow rate during heating operation [m3/s]
+        Real64 NoCoolHeatOutAirVolFlow;             // OA volumetric flow rate when no cooling or heating [m3/s]
+        Real64 CoolOutAirMassFlow;                  // OA mass flow rate during cooling operation [kg/s]
+        Real64 HeatOutAirMassFlow;                  // OA mass flow rate during heating operation [kg/s]
+        Real64 NoCoolHeatOutAirMassFlow;            // OA mass flow rate when no cooling or heating [kg/s]
+        int OutsideAirNode;                         // OAmixer outside air node number
+        int AirReliefNode;                          // OAmixer relief air node number
+        std::string OAMixType;                      // type of outside air mixer
+        std::string OAMixName;                      // name of OAmixer
         int OAMixIndex;
         std::string FanName;        // name of fan
         std::string FanType;        // type of fan
@@ -291,15 +292,15 @@ namespace PackagedTerminalHeatPump {
 
         // Default Constructor
         PTUnitData()
-            : UnitType_Num(iPTHPType::Unassigned), ZoneEquipType(0), useVSCoilModel(false), SchedPtr(0), MaxCoolAirVolFlow(0.0),
-              MaxHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
-              CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0), AirReliefNode(0), OAMixIndex(0),
-              FanType_Num(0), FanIndex(0), FanSchedPtr(0), FanAvailSchedPtr(0), DXCoolCoilType_Num(0), CoolCoilCompIndex(0), DXCoolCoilIndexNum(0),
-              CondenserNodeNum(0), DXHeatCoilIndexNum(0), DXHeatCoilType_Num(0), ACHeatCoilCap(0.0), ACHeatCoilIndex(0), SuppCoilFluidInletNode(0),
-              HWCoilSteamOutletNode(0), SuppHeatCoilType_Num(0), ACHeatCoilType_Num(0), SuppHeatCoilIndex(0), SupHeatCoilCap(0),
-              SupCoilAirInletNode(0), MaxSATSupHeat(0.0), MaxOATSupHeat(0.0), OpMode(0), FanPlace(0), CoolConvergenceTol(0.0),
-              HeatConvergenceTol(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), IterErrIndex(0), WaterCyclingMode(0),
-              PTObjectIndex(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
+            : UnitType_Num(iPTHPType::Unassigned), ZoneEquipType(DataZoneEquipment::ZoneEquip::Unassigned), useVSCoilModel(false), SchedPtr(0),
+              MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0),
+              NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0),
+              AirReliefNode(0), OAMixIndex(0), FanType_Num(0), FanIndex(0), FanSchedPtr(0), FanAvailSchedPtr(0), DXCoolCoilType_Num(0),
+              CoolCoilCompIndex(0), DXCoolCoilIndexNum(0), CondenserNodeNum(0), DXHeatCoilIndexNum(0), DXHeatCoilType_Num(0), ACHeatCoilCap(0.0),
+              ACHeatCoilIndex(0), SuppCoilFluidInletNode(0), HWCoilSteamOutletNode(0), SuppHeatCoilType_Num(0), ACHeatCoilType_Num(0),
+              SuppHeatCoilIndex(0), SupHeatCoilCap(0), SupCoilAirInletNode(0), MaxSATSupHeat(0.0), MaxOATSupHeat(0.0), OpMode(0), FanPlace(0),
+              CoolConvergenceTol(0.0), HeatConvergenceTol(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), IterErrIndex(0),
+              WaterCyclingMode(0), PTObjectIndex(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
               DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), DesignSuppHeatingCapacity(0.0), ATMixerExists(false), ATMixerIndex(0),
               ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0),
@@ -427,13 +428,13 @@ namespace PackagedTerminalHeatPump {
 
     void ReportPTUnit(EnergyPlusData &state, int PTUnitNum); // number of the current AC unit being simulated
 
-    int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
-    int GetPTUnitOutAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitOutAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
-    int GetPTUnitReturnAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitReturnAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
-    int GetPTUnitMixedAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitMixedAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
     //******************************************************************************
 

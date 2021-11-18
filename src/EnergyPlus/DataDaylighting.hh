@@ -115,7 +115,7 @@ namespace DataDaylighting {
         Num
     };
 
-    constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
+    static constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
 
     struct IntWinAdjEnclExtWinStruct // nested structure for EnclDaylightCalc
     {
