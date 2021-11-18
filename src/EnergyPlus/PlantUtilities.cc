@@ -460,9 +460,9 @@ Real64 RegulateCondenserCompFlowReqOp(
 
         switch (CompOpScheme) {
 
-        case (DataPlant::OpScheme::HeatingRB):
-        case (DataPlant::OpScheme::CoolingRB):
-        case (DataPlant::OpScheme::CompSetPtBased): { // These provide meaningful MyLoad values
+        case DataPlant::OpScheme::HeatingRB:
+        case DataPlant::OpScheme::CoolingRB:
+        case DataPlant::OpScheme::CompSetPtBased: { // These provide meaningful MyLoad values
             if (std::abs(CompCurLoad) > ZeroLoad) {
                 FlowVal = TentativeFlowRequest;
             } else { // no load
