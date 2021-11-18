@@ -287,9 +287,9 @@ namespace LowTempRadiantSystem {
         auto constexpr VariableOff("VariableOff");
         int constexpr iHeatCAPMAlphaNum(5);             // get input index to Low Temperature Radiant system heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to Low Temperature Radiant system electric heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to Low Temperature Radiant system electric heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to Low Temperature Radiant system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

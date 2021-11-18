@@ -2197,7 +2197,7 @@ namespace HeatBalFiniteDiffManager {
 
             if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
-                Real64 const IterDampConst(
+                Real64 constexpr IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
                 Real64 const Rlayer(mat.Resistance);
                 if ((i == 1) && (surface.ExtBoundCond > 0)) { // this is for an adiabatic partition
