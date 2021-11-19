@@ -257,7 +257,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     Real64 CycRatio = 1.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
-    int CompOp = 1;
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     int SingleMode = 0;
     CalcMultiSpeedDXCoilCooling(*state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
 
@@ -1339,7 +1339,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
-    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, 1, 0);
+    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, DataGlobalConstants::CompressorOperation::On, 0);
     EXPECT_EQ(0, state->dataHVACGlobal->MSHPWasteHeat);
 
     // Case 3 heat recovery is true and no waste heat function cuvre
@@ -1347,7 +1347,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSWasteHeat(2) = 0;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = true;
 
-    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, 1, 0);
+    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, DataGlobalConstants::CompressorOperation::On, 0);
 
     EXPECT_NEAR(1302.748, state->dataHVACGlobal->MSHPWasteHeat, 0.001);
 }
@@ -4073,7 +4073,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Real64 PartLoadRatio(1.0);
     Real64 AirFlowRatio(1.0);
     int FanOpMode(2);
-    int CompOp(1);
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals fully capacity
     EXPECT_NEAR(17580.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling only
@@ -4242,7 +4242,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
-    int CompOp = 1;
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     int SingleMode = 0;
     // run the coil at low speed
     Real64 SpeedRatio = 0.0;

@@ -487,7 +487,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = DataHVACGlobals::CycFanCycCoil;
-    int CompOp = 1;
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed
     Real64 SpeedRatio = 0.0;
@@ -907,7 +907,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = DataHVACGlobals::ContFanCycCoil;
-    int CompOp = 1;
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed
     Real64 SpeedRatio = 0.0;
@@ -1324,7 +1324,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
     int FanOpMode = DataHVACGlobals::CycFanCycCoil;
-    int CompOp = 1;
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed (speednum=2, speedratio=0)
     int SpeedNum = 2;
@@ -1558,7 +1558,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
     int FanOpMode = DataHVACGlobals::ContFanCycCoil;
-    int CompOp = 1;
+    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed (speednum=2, speedratio=0)
     int SpeedNum = 2;

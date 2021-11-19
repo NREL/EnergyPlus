@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     bool firstHVACIteration = true;
-    int compOp = 1;
+    DataGlobalConstants::CompressorOperation compOp = DataGlobalConstants::CompressorOperation::On;
     Real64 zoneLoad = 1000;
     Real64 moistureLoad = 0.0;
     Real64 heatCoilLoad = 0.0;

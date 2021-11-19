@@ -259,7 +259,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool HXUnitOn = false;
     int AirLoopNum = 0;
     Real64 PLR = 0.0;
-    int CompressorOnFlag = 0;
+    DataGlobalConstants::CompressorOperation CompressorOnFlag = DataGlobalConstants::CompressorOperation::Off;
     auto &SZVAVModel(state->dataPTHP->PTUnit(1));
     // first pass through will get objects and reset node data
     SZVAVModel::calcSZVAVModel(*state,
