@@ -264,6 +264,8 @@ namespace HVACFan {
                 // do nothing
                 break;
             }
+            default:
+                assert(false);
 
             } // end switch
 
@@ -1019,6 +1021,8 @@ namespace HVACFan {
                     // do nothing
                     break;
                 }
+                default:
+                    assert(false);
                 } // end switch
                 m_outletAirMassFlowRate += localAirMassFlow[mode];
 

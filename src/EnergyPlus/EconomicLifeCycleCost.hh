@@ -269,11 +269,7 @@ namespace EconomicLifeCycleCost {
 
     enum class StartCosts
     {
-<<<<<<< HEAD
-        Invalid = -1,
-=======
         Unassigned = -1,
->>>>>>> develop
         ServicePeriod,
         BasePeriod,
         Num
@@ -296,14 +292,8 @@ namespace EconomicLifeCycleCost {
     enum class ResourceCostCategory
     {
         Unassigned = -1,
-<<<<<<< HEAD
-        Energy,
-        NonEnergy,
-        NotComputed,
-=======
         Water,
         Energy,
->>>>>>> develop
         Num
     };
     constexpr std::array<std::string_view, static_cast<int>(ResourceCostCategory::Num)> ResourceCostCategoryNames{"Water Cost", "Energy Cost"};
