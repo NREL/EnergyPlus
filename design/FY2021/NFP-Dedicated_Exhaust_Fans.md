@@ -83,10 +83,9 @@ ZoneHVAC:ExhaustSystem,
     Zone2 Exhaust Node,             !- Inlet Node Name
     Zone2 ExhaustSystem Node,       !- Outlet Node Name
     0.1,                            !- Design Flow Rate {m3/s}
-    Fan:SystemModel,                !- Fan Object Type (could be blank if this is passive)
-    Zone2 Exhaust Fan,              !- Fan Name (Optional)
-    Scheduled,                      !- Fan Control Type (Scheduled, Passive, FollowSupply, ????)
-    Zone2 Exhaust Fan Flow Sched,   !- Flow Fraction Schedule Name
+    Scheduled,                      !- Flow Control Type (Scheduled, Passive, FollowSupply, ????)
+    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name
+    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name
     ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
     ,                               !- System Availability Manager Name
     ,                               !- Minimum Zone Temperature Limit Schedule Name
@@ -164,36 +163,32 @@ ZoneHVAC:ExhaustSystem,
        \note Inlet node name for the exhaust system
   A4 , \field Outlet Node Name
        \note Outlet node name for the exhaust system
-  A5 , \field Fan Object Type 
-       \note Type of exhaust fan object
-       \note This field could be blank if the exhaust is passive
-       \type choice
-       \key Fan:SystemModel
-       \key Fan:ComponentModel
-  A6 , \field Fan Name
-       \note Name of the exhaust fan object
-       \type object-list
-       \object-list FanNames
-  A7 , \field Fan Control Type
+  N1 , \field Deisgn Exhaust Flow Rate [m3/s] 
+       \note Design Exhaust Flow Rate
+  A5 , \field Flow Control Type
        \note Control type of the exhaust fan
        \type choice
        \key Scheduled
        \key Passive
        \key FollowSupply
-  A8 , \field 
+  A6 , \field Minimum exhaust flow fraction schedule name
+       \note Schedule name of the minimum exhaust flow fraction
+       \type object-list
+       \object-list ScheduleNames
+  A7 , \field Exhaust flow fraction schedule name
        \note Schedule name of the exhaust flow fraction
        \type object-list
        \object-list ScheduleNames
-  A9 , \field Supply Node or NodeList Name
+  A8 , \field Supply Node or NodeList Name
        \note To be used with FollowSupply control type)
-  A10, \field System Availability Manager Name
+  A9, \field System Availability Manager Name
        \type object-list
        \object-list AvailabilityManagerNames
-  A11, \field Minimum Zone Temperature Limit Schedule Name
+  A10, \field Minimum Zone Temperature Limit Schedule Name
        \note Schedule name of the Minimum Zone Temperature Limit
        \type object-list
        \object-list ScheduleNames
-  A12, \field Balanced Exhaust Fraction Schedule Name
+  A11, \field Balanced Exhaust Fraction Schedule Name
        \note Schedule name of the Balance Exhaust Fraction
        \type object-list
        \object-list ScheduleNames
