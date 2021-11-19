@@ -1720,7 +1720,7 @@ namespace OutdoorAirUnit {
                     SimHXAssistedCoolingCoil(state,
                                              OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                              true,
-                                             1,
+                                             DataGlobalConstants::CompressorOperation::On,
                                              0.0,
                                              OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
                                              ContFanCycCoil);
@@ -2716,7 +2716,7 @@ namespace OutdoorAirUnit {
             } break;
             case (CompType::WaterCoil_CoolingHXAsst): {
                 SimHXAssistedCoolingCoil(
-                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, 1, 0.0, CoilIndex, ContFanCycCoil);
+                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, CoilIndex, ContFanCycCoil);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;

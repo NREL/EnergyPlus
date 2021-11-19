@@ -103,7 +103,7 @@ namespace SZVAVModel {
                         bool const &HXUnitOn,
                         int const &AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
+                        DataGlobalConstants::CompressorOperation CompressorONFlag
 
     );
 
@@ -133,7 +133,7 @@ namespace SZVAVModel {
                         bool const &HXUnitOn,
                         int const &AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag);
+                        DataGlobalConstants::CompressorOperation CompressorONFlag);
 
 } // namespace SZVAVModel
 

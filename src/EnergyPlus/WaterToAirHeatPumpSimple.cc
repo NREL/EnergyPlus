@@ -118,7 +118,7 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                                Real64 &HPTimeConstant,        // Heat pump time constant [s]
                                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
-                               int const CompOp,
+                               DataGlobalConstants::CompressorOperation const CompOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
@@ -2137,7 +2137,7 @@ namespace WaterToAirHeatPumpSimple {
                              Real64 const RuntimeFrac,                       // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                              [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
                              [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
-                             int const CompOp,                               // compressor operation flag
+                             DataGlobalConstants::CompressorOperation const CompOp,                               // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
@@ -2266,7 +2266,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompOp == DataGlobalConstants::CompressorOperation::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }
@@ -2474,7 +2474,7 @@ namespace WaterToAirHeatPumpSimple {
                              int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
                              Real64 const RuntimeFrac,                       // Runtime Fraction of compressor
                              [[maybe_unused]] Real64 const SensDemand,       // Sensible Demand [W] !unused1208
-                             int const CompOp,                               // compressor operation flag
+                             DataGlobalConstants::CompressorOperation const CompOp,                               // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
@@ -2569,7 +2569,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompOp == DataGlobalConstants::CompressorOperation::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }

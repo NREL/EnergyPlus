@@ -89,10 +89,6 @@ namespace HVACMultiSpeedHeatPump {
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
     };
 
-    // Compressor operation
-    constexpr int On(1);  // normal compressor operation
-    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-
     // Types
 
     struct MSHeatPumpData
@@ -321,7 +317,7 @@ namespace HVACMultiSpeedHeatPump {
     void ControlMSHPOutput(EnergyPlusData &state,
                            int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                           int const CompOp,              // compressor operation; 1=on, 0=off
+                           DataGlobalConstants::CompressorOperation CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 const QZnReq,           // cooling or heating output needed by zone [W]
                            int const ZoneNum,             // Index to zone number
@@ -335,7 +331,7 @@ namespace HVACMultiSpeedHeatPump {
     void ControlMSHPSupHeater(EnergyPlusData &state,
                               int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                               bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                              int const CompOp,              // compressor operation; 1=on, 0=off
+                              DataGlobalConstants::CompressorOperation CompOp,              // compressor operation; 1=on, 0=off
                               int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                               Real64 const QZnReq,           // cooling or heating output needed by zone [W]
                               int const FullOutput,          // unit full output when compressor is operating [W]vvvv
@@ -350,7 +346,7 @@ namespace HVACMultiSpeedHeatPump {
     void ControlMSHPOutputEMS(EnergyPlusData &state,
                               int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                               bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                              int const CompOp,              // compressor operation; 1=on, 0=off
+                              DataGlobalConstants::CompressorOperation CompOp,              // compressor operation; 1=on, 0=off
                               int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                               Real64 const QZnReq,           // cooling or heating output needed by zone [W]
                               Real64 const SpeedVal,         // continuous speed value
@@ -367,7 +363,7 @@ namespace HVACMultiSpeedHeatPump {
     void CalcMSHeatPump(EnergyPlusData &state,
                         int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // Flag for 1st HVAC iteration
-                        int const CompOp,              // Compressor on/off; 1=on, 0=off
+                        DataGlobalConstants::CompressorOperation CompOp,              // Compressor on/off; 1=on, 0=off
                         int const SpeedNum,            // Speed number
                         Real64 const SpeedRatio,       // Compressor speed ratio
                         Real64 const PartLoadFrac,     // Compressor part load fraction

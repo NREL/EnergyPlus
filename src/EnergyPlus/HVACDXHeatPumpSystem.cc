@@ -189,7 +189,7 @@ namespace HVACDXHeatPumpSystem {
 
                 SimDXCoil(state,
                           CompName,
-                          On,
+                          DataGlobalConstants::CompressorOperation::On,
                           FirstHVACIteration,
                           DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                           DXHeatPumpSystem(DXSystemNum).FanOpMode,
@@ -203,7 +203,7 @@ namespace HVACDXHeatPumpSystem {
                                       state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHour,
                                       state.dataHVACDXHeatPumpSys->HPTimeConstant,
                                       state.dataHVACDXHeatPumpSys->FanDelayTime,
-                                      On,
+                                      DataGlobalConstants::CompressorOperation::On,
                                       DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
                                       DXHeatPumpSystem(DXSystemNum).SpeedNum,
                                       DXHeatPumpSystem(DXSystemNum).SpeedRatio,
@@ -659,14 +659,14 @@ namespace HVACDXHeatPumpSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state, CompName, DataGlobalConstants::CompressorOperation::On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
                         NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                    (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
                                     PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state, CompName, DataGlobalConstants::CompressorOperation::On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
 
                         FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                      (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
@@ -697,7 +697,7 @@ namespace HVACDXHeatPumpSystem {
                                                    (TempOut1 - state.dataLoopNodes->Node(InletNode).Temp);
                                     SimDXCoil(state,
                                               CompName,
-                                              On,
+                                              DataGlobalConstants::CompressorOperation::On,
                                               FirstHVACIteration,
                                               DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                               FanOpMode,
@@ -790,7 +790,7 @@ namespace HVACDXHeatPumpSystem {
                                               MaxONOFFCyclesperHour,
                                               HPTimeConstant,
                                               FanDelayTime,
-                                              On,
+                                              DataGlobalConstants::CompressorOperation::On,
                                               PartLoadFrac,
                                               SpeedNum,
                                               SpeedRatio,
@@ -818,7 +818,7 @@ namespace HVACDXHeatPumpSystem {
                                               MaxONOFFCyclesperHour,
                                               HPTimeConstant,
                                               FanDelayTime,
-                                              On,
+                                              DataGlobalConstants::CompressorOperation::On,
                                               PartLoadFrac,
                                               SpeedNum,
                                               SpeedRatio,
@@ -866,7 +866,7 @@ namespace HVACDXHeatPumpSystem {
                                                       MaxONOFFCyclesperHour,
                                                       HPTimeConstant,
                                                       FanDelayTime,
-                                                      On,
+                                                      DataGlobalConstants::CompressorOperation::On,
                                                       PartLoadFrac,
                                                       SpeedNum,
                                                       SpeedRatio,
@@ -890,7 +890,7 @@ namespace HVACDXHeatPumpSystem {
                                                               MaxONOFFCyclesperHour,
                                                               HPTimeConstant,
                                                               FanDelayTime,
-                                                              On,
+                                                              DataGlobalConstants::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -915,7 +915,7 @@ namespace HVACDXHeatPumpSystem {
                                                               MaxONOFFCyclesperHour,
                                                               HPTimeConstant,
                                                               FanDelayTime,
-                                                              On,
+                                                              DataGlobalConstants::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -995,7 +995,7 @@ namespace HVACDXHeatPumpSystem {
                                                               MaxONOFFCyclesperHour,
                                                               HPTimeConstant,
                                                               FanDelayTime,
-                                                              On,
+                                                              DataGlobalConstants::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -1186,7 +1186,7 @@ namespace HVACDXHeatPumpSystem {
                               state.dataHVACDXHeatPumpSys->MaximumONOFFCyclesperHour,
                               state.dataHVACDXHeatPumpSys->TimeConstant,
                               state.dataHVACDXHeatPumpSys->HeatPumpFanDelayTime,
-                              On,
+                              DataGlobalConstants::CompressorOperation::On,
                               PartLoadRatio,
                               state.dataHVACDXHeatPumpSys->SpeedNum,
                               state.dataHVACDXHeatPumpSys->SpeedRatio,
@@ -1243,7 +1243,7 @@ namespace HVACDXHeatPumpSystem {
                               state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHr,
                               state.dataHVACDXHeatPumpSys->HPTimeConst,
                               state.dataHVACDXHeatPumpSys->HPFanDelayTime,
-                              On,
+                              DataGlobalConstants::CompressorOperation::On,
                               state.dataHVACDXHeatPumpSys->SpeedPartLoadRatio,
                               state.dataHVACDXHeatPumpSys->SpeedNumber,
                               SpeedRatio,

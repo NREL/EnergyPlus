@@ -243,7 +243,7 @@ namespace IntegratedHeatPump {
                 Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                 Real64 &HPTimeConstant,        // Heat pump time constant [s]
                 Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
-                int const CompOp,              // compressor on/off. 0 = off; 1= on
+                DataGlobalConstants::CompressorOperation CompOp,              // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,                        // compressor speed number
                 Real64 const SpeedRatio,                   // compressor speed ratio

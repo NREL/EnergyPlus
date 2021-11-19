@@ -64,10 +64,6 @@ struct EnergyPlusData;
 
 namespace HVACHXAssistedCoolingCoil {
 
-    // Compressor operation
-    constexpr int On(1);  // normal compressor operation
-    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-
     struct HXAssistedCoilParameters
     {
         // Members
@@ -107,7 +103,7 @@ namespace HVACHXAssistedCoolingCoil {
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
                                   std::string_view HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,       // FirstHVACIteration flag
-                                  int const CompOp,                    // compressor operation; 1=on, 0=off
+                                  DataGlobalConstants::CompressorOperation CompOp,                    // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,          // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                    // Allows the parent object to control fan operation
@@ -124,7 +120,7 @@ namespace HVACHXAssistedCoolingCoil {
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                                    int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,           // FirstHVACIteration flag
-                                   int const CompOp,                        // compressor operation; 1=on, 0=off
+                                   DataGlobalConstants::CompressorOperation CompOp,                        // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,              // Cooling coil part load ratio
                                    bool const HXUnitOn,                     // Flag to enable heat exchanger
                                    int const FanOpMode,                     // Allows parent object to control fan operation
