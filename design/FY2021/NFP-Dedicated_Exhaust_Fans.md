@@ -235,7 +235,7 @@ Since the feature is based on completely newly added blocks, an older version wo
 
 The proposed new feature development will add the following contents to the Input Output Reference document:
 
-The AirLoopHVAC:ExhaustSystem and AirLoopHVAC:ExhaustMixer objects are used to describe the way that the exhaust air streams are configured. These objects provide a convenient way for the exhaust air streams from multiple air loops to be rerouted and recombined to form one or more new exhausts. The exhaust system is typically composed of a central exhaust fan, a exhaust mixer that could combine exhaust air streams from multiple air loops, and/or the exhaust fans from some other zones.
+The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustSystem objects are used to describe the way that the exhaust air streams are configured. These objects provide a convenient way for the exhaust air streams from multiple air loops to be rerouted and recombined to form one or more new exhausts. The exhaust system is typically composed of a central exhaust fan, the inlet nodes, (and actually an implicit exhaust mixer that could combine exhaust air streams from multiple air loops.
 
 ### AirLoopHVAC:ExhaustSystem Input Fields ###
 
@@ -245,31 +245,27 @@ The AirLoopHVAC:ExhaustSystem will take the following input fields:
 
 This input field is for the name of the exhaust system. 
 
-#### Field: Availability Manager List Name ####
+#### Field: Availability Schedule ####
 
 This is the availability manager list schedule name for the exhaust system object. 
 
-#### Field Set Component Object Type and Name ####
+#### Field: Fan Object Type ####
 
-The remaining fields are sets of two repeated items: a component object type and a name. These pairs of fields define the components for the exhaust system.
+This is the type of fan object type for the central exhaust fan. The avaiable choices are Fan:SystemModle or Fan:ComponentModel.
 
-#### Field: Component 1 Object Type ####
+#### Field: Fan Name ####
 
-This is a required field for the first component in the exhaust system, typically this would be a central exhaust fan. The possible choices are: Fan:SystemModel, Fan:ComponentModel, AirLoopHVAC:ExhaustMixer, or Fan:ZoneExhaust.
+This is a required field for the name of the central exhaust fan.
 
-#### Field: Component 1 Object Name ####
+#### Field: Inlet Node 1 ####
 
 This is the name of the first component object in the exhaust system. This is a required field.
 
-#### Field: Component <#> Object Type ####
+#### Field: Inlet Node <#> ####
 
-Additional components could be specified for the exhaust system if applicable. The possible choices are the same as those for the first component: Fan:SystemModel, Fan:ComponentModel, AirLoopHVAC:ExhaustMixer, or Fan:ZoneExhaust.
+This is the name of the additional components object in the exhaust system. Additional inlet nodes could be specified for the exhaust system if applicable. 
 
-The field is extensible so Component 3 or more could also be specified following the second object.
-
-#### Field: Component <#> Object Name ####
-
-This is the name of the additional components object in the exhaust system.
+The remaining fields are one repeated item: the inlet nodes. These fields define the inlet nodes for the exhaust system. The field is extensible so Component 2 or more could also be specified following the first object.
 
 An example of the AirLoopHVAC:ExhaustSystem input object is like this:
 ```
@@ -286,7 +282,71 @@ AirLoopHVAC:ExhaustSystem,
 
 ### ZoneHVAC:ExhaustSystem Input Fields ###
 
-The ZoneHVAC:ExhaustSystem input fields are as follows. 
+The ZoneHVAC:ExhaustSystem input fields are as follows.
+
+#### Field: Name ####
+
+This input field is the for the name of the ZoneHVAC:ExhaustSystem.
+
+#### Field: Availablity Schedule Name ####
+
+This is the aviability schdule name of the ZoneHVAC:Exhaust equipment.
+
+#### Field: Inlet Node Name ####
+
+This is the inlet node name of the ZoneHVAC:ExhaustSystem object. Typically, this would be an exhaust node of the zone. 
+
+#### Field: Outlet Node Name ####
+
+This is the outlet node name of the ZoneHVAC:ExhaustSystem object. This node name would be used to connected to the AirLoopHVAC:ExhaustSystem object. 
+
+#### Field: Design Flow Rate {m3/s} ####
+
+This numerical field is the design exhaust flow rate of the exhaust system in [m3/s]. 
+
+#### Field: Flow Control Type ####
+
+This field is the the control type on how the exhaust flows are controlled. The available choices are: Scheduled, Passive, and FollowSupply.
+
+#### Field: Minimum Flow Fraction Schedule Name ####
+
+This is the schedule name for the minimum exhaust flow fraction. If left empty, the default value would be zero. 
+
+#### Field: Flow Fraction Schedule Name ####
+
+This is the schedule name for the exhaust flow fraction. If left empty, the default value would be zero. 
+
+#### Field: Supply Node or NodeList Name ####
+This is the supply air node or nodelist name, which should be used for the `FollowSupply` flow control type. 
+
+#### Field: System Availability Manager Name ####
+
+This is the system availability manager name of the supply node or nodelist. 
+
+#### Field: Minimum Zone Temperature Limit Schedule Name ####
+
+This will be the minimum zone temperature limit schedule name. It will be used to shut down the exhaust flow rate to the minimum value if the zone temperature get below this temperature. 
+
+#### Field: Balanced Exhaust Fraction Schedule Name ####
+
+This field is for the schedule name of the balance exhaust fraction. With this fraction, the equipment would be considered air-balanced. 
+
+An example of the ZoneHVAC:ExhaustSystem input object is like this:
+```
+ZoneHVAC:ExhaustSystem,
+    Zone2 Exhaust System,           !-Name
+    HVACOperationSchd,              !- Availability Schedule Name
+    Zone2 Exhaust Node,             !- Inlet Node Name
+    Zone2 ExhaustSystem Node,       !- Outlet Node Name
+    0.1,                            !- Design Flow Rate {m3/s}
+    Scheduled,                      !- Flow Control Type (Scheduled, Passive, FollowSupply, ????)
+    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name
+    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name
+    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+    ,                               !- System Availability Manager Name
+    ,                               !- Minimum Zone Temperature Limit Schedule Name
+    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
+```
 
 ## Input Description ##
 
