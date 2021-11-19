@@ -1352,7 +1352,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         HPWH.InletAirConfiguration =
             static_cast<WTTAmbientTemp>(getEnumerationValue(HPWHAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[6 + nAlphaOffset])));
         switch (HPWH.InletAirConfiguration) {
-        case (WTTAmbientTemp::Schedule): {
+        case WTTAmbientTemp::Schedule: {
 
             // Inlet Air Temperature Schedule
             if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
@@ -1392,8 +1392,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
             break;
         }
-        case (WTTAmbientTemp::ZoneAndOA):
-        case (WTTAmbientTemp::TempZone): {
+        case WTTAmbientTemp::ZoneAndOA:
+        case WTTAmbientTemp::TempZone: {
 
             // Inlet Air Zone
             if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
@@ -1411,7 +1411,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             break;
         }
         default:
-        case (WTTAmbientTemp::OutsideAir):
+        case WTTAmbientTemp::OutsideAir:
             break;
         }
 
@@ -2404,11 +2404,11 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.ControlType = static_cast<HeaterControlMode>(
             getEnumerationValue(HeaterControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.ControlType) {
-        case (HeaterControlMode::Cycle): {
+        case HeaterControlMode::Cycle: {
             Tank.MinCapacity = Tank.MaxCapacity;
             break;
         }
-        case (HeaterControlMode::Modulate): {
+        case HeaterControlMode::Modulate: {
 
             // CASE ('MODULATE WITH OVERHEAT')  ! Not yet implemented
 
@@ -3027,7 +3027,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
         switch (Tank.AmbientTempIndicator) {
 
-        case (WTTAmbientTemp::Schedule): {
+        case WTTAmbientTemp::Schedule: {
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
             if (Tank.AmbientTempSchedule == 0) {
                 ShowSevereError(state,
