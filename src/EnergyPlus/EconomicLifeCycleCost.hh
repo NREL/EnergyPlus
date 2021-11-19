@@ -70,21 +70,34 @@ namespace EconomicLifeCycleCost {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    enum class iDiscConv
+    enum class DiscConv
     {
+        Unassigned = -1,
         BeginOfYear,
         MidYear,
         EndOfYear,
+        Num
     };
 
-    enum class iInflAppr
+    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNamesUC{"BEGINNINGOFYEAR", "MIDYEAR", "ENDOFYEAR"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DiscConv::Num)> DiscConvNames{"BeginningOfYear", "MidYear", "EndOfYear"};
+
+    enum class InflAppr
     {
+        Unassigned = -1,
         ConstantDollar,
         CurrentDollar,
+        Num
     };
 
-    enum class iDeprMethod
+    constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNamesUC{"CONSTANTDOLLAR", "CURRENTDOLLAR"};
+
+    constexpr std::array<std::string_view, static_cast<int>(InflAppr::Num)> InflApprNames{"ConstantDollar", "CurrentDollar"};
+
+    enum class DeprMethod
     {
+        Unassigned = -1,
         MACRS3,
         MACRS5,
         MACRS7,
@@ -96,26 +109,155 @@ namespace EconomicLifeCycleCost {
         Straight39,
         Straight40,
         None,
+        Num
     };
 
-    constexpr int costCatMaintenance(1);
-    constexpr int costCatRepair(2);
-    constexpr int costCatOperation(3);
-    constexpr int costCatReplacement(4);
-    constexpr int costCatMinorOverhaul(5);
-    constexpr int costCatMajorOverhaul(6);
-    constexpr int costCatOtherOperational(7);
-    constexpr int costCatConstruction(8);
-    constexpr int costCatSalvage(9);
-    constexpr int costCatOtherCapital(10);
-    constexpr int costCatWater(11);
-    constexpr int costCatEnergy(12);
-    constexpr int costCatTotEnergy(13);
-    constexpr int costCatTotOper(14);
-    constexpr int costCatTotCaptl(15);
-    constexpr int costCatTotGrand(16);
+    int constexpr SizeDepr(41);
 
-    constexpr int countOfCostCat(16); // count of the number of cost categories
+    constexpr std::array<std::array<Real64, SizeDepr>, static_cast<int>(DeprMethod::Num)> DepreciationPercentTable{
+        {{33.33, 44.45, 14.81, 7.41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {20.0, 32.0, 19.2, 11.52, 11.52, 5.76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0,    0,    0,    0,     0,     0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0,     0,     0,     0,     0,    0,    0,    0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {10.0, 18.0, 14.4, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0,    0,    0,    0,     0,    0,    0,    0,    0,    0,    0,    0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {5.0, 9.5, 8.55, 7.7, 6.93, 6.23, 5.9, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 2.95, 0, 0, 0, 0, 0,
+          0,   0,   0,    0,   0,    0,    0,   0,   0,    0,   0,    0,   0,    0,   0,    0,    0, 0, 0, 0},
+         {3.75,  7.219, 6.677, 6.177, 5.713, 5.285, 4.888, 4.522, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461,
+          4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 2.231, 0,     0,     0,     0,     0,     0,     0,
+          0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0},
+         {1.97,  3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637,
+          3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.637, 3.636, 3.485,
+          0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0},
+         {1.72,  3.175, 3.175, 3.175, 3.175, 3.175, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174,
+          3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174, 3.175, 3.174,
+          3.175, 3.174, 3.175, 3.042, 0,     0,     0,     0,     0,     0,     0,     0,     0},
+         {1.391, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564,
+          2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564,
+          2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 2.564, 1.177, 0},
+         {1.354, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5,  2.5,
+          2.5,   2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 1.146}}};
+
+    constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)> DeprMethodNamesUC{
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-3YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-5YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-7YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-10YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-15YEAR",
+        "MODIFIEDACCELERATEDCOSTRECOVERYSYSTEM-20YEAR",
+        "STRAIGHTLINE-27YEAR",
+        "STRAIGHTLINE-31YEAR",
+        "STRAIGHTLINE-39YEAR",
+        "STRAIGHTLINE-40YEAR",
+        "NONE",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(DeprMethod::Num)> DeprMethodNames{
+        "ModifiedAcceleratedCostRecoverySystem-3year",
+        "ModifiedAcceleratedCostRecoverySystem-5year",
+        "ModifiedAcceleratedCostRecoverySystem-7year",
+        "ModifiedAcceleratedCostRecoverySystem-10year",
+        "ModifiedAcceleratedCostRecoverySystem-15year",
+        "ModifiedAcceleratedCostRecoverySystem-20year",
+        "StraightLine-27year",
+        "StraightLine-31year",
+        "StraightLine-39year",
+        "StraightLine-40year",
+        "None",
+    };
+
+    enum CostCategory
+    {
+        Unassigned = -1,
+        Maintenance,
+        Repair,
+        Operation,
+        Replacement,
+        MinorOverhaul,
+        MajorOverhaul,
+        OtherOperational,
+        Water,
+        Energy,
+        TotOper,
+        Construction,
+        Salvage,
+        OtherCapital,
+        TotCaptl,
+        TotEnergy,
+        TotGrand,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNames{"Maintenance",
+                                                                                                  "Repair",
+                                                                                                  "Operation",
+                                                                                                  "Replacement",
+                                                                                                  "Minor Overhaul",
+                                                                                                  "Major Overhaul",
+                                                                                                  "Other Operational",
+                                                                                                  "Water",
+                                                                                                  "Energy",
+                                                                                                  "Total Operation",
+                                                                                                  "Construction",
+                                                                                                  "Salvage",
+                                                                                                  "Other Capital",
+                                                                                                  "Total Capital",
+                                                                                                  "Total Energy",
+                                                                                                  "Grand Total"};
+
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesNoSpace{"Maintenance",
+                                                                                                         "Repair",
+                                                                                                         "Operation",
+                                                                                                         "Replacement",
+                                                                                                         "MinorOverhaul",
+                                                                                                         "MajorOverhaul",
+                                                                                                         "OtherOperational",
+                                                                                                         "Water",
+                                                                                                         "Energy",
+                                                                                                         "TotalOperational",
+                                                                                                         "Construction",
+                                                                                                         "Salvage",
+                                                                                                         "OtherCapital",
+                                                                                                         "TotalCapital",
+                                                                                                         "TotalEnergy",
+                                                                                                         "GrandTotal"};
+
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUC{"MAINTENANCE",
+                                                                                                    "REPAIR",
+                                                                                                    "OPERATION",
+                                                                                                    "REPLACEMENT",
+                                                                                                    "MINOR OVERHAUL",
+                                                                                                    "MAJOR OVERHAUL",
+                                                                                                    "OTHER OPERATIONAL",
+                                                                                                    "WATER",
+                                                                                                    "ENERGY",
+                                                                                                    "TOTAL OPERATIONAL",
+                                                                                                    "CONSTRUCTION",
+                                                                                                    "SALVAGE",
+                                                                                                    "OTHER CAPITAL",
+                                                                                                    "TOTAL CAPITAL",
+                                                                                                    "TOTAL ENERGY",
+                                                                                                    "GRAND TOTAL"};
+    constexpr std::array<std::string_view, static_cast<int>(CostCategory::Num)> CostCategoryNamesUCNoSpace{"MAINTENANCE",
+                                                                                                           "REPAIR",
+                                                                                                           "OPERATION",
+                                                                                                           "REPLACEMENT",
+                                                                                                           "MINOROVERHAUL",
+                                                                                                           "MAJOROVERHAUL",
+                                                                                                           "OTHEROPERATIONAL",
+                                                                                                           "WATER",
+                                                                                                           "ENERGY",
+                                                                                                           "TOTALOPERATIONAL",
+                                                                                                           "CONSTRUCTION",
+                                                                                                           "SALVAGE",
+                                                                                                           "OTHERCAPITAL", // No space
+                                                                                                           "TOTALCAPITAL",
+                                                                                                           "TOTALENERGY",
+                                                                                                           "GRANDTOTAL"};
+
+    constexpr std::string_view Total{"Total"};
+    constexpr std::string_view TotalUC{"TOTAL"};
 
     // The NIST supplement includes UPV* factors for
     //   Electricity
@@ -125,61 +267,45 @@ namespace EconomicLifeCycleCost {
     //   Residual oil - FuelOilNo2
     //   Coal
 
-    enum class iStartCosts
+    enum class StartCosts
     {
+        Unassigned = -1,
         ServicePeriod,
         BasePeriod,
+        Num
     };
 
-    enum class iSourceKind
+    constexpr std::array<std::string_view, static_cast<int>(StartCosts::Num)> StartCostNamesUC{"SERVICEPERIOD", "BASEPERIOD"};
+
+    enum class SourceKindType
     {
-        Unassigned,
+        Unassigned = -1,
         Recurring,
         Nonrecurring,
         Resource,
         Sum,
+        Num
     };
 
-    enum class iPrValKind
+    constexpr std::array<std::string_view, static_cast<int>(SourceKindType::Num)> SourceKindTypeNames{"Recurring", "Nonrecurring"};
+
+    enum class ResourceCostCategory
     {
-        Unassigned,
+        Unassigned = -1,
+        Water,
+        Energy,
+        Num
+    };
+    constexpr std::array<std::string_view, static_cast<int>(ResourceCostCategory::Num)> ResourceCostCategoryNames{"Water Cost", "Energy Cost"};
+
+    enum class PrValKind
+    {
+        Unassigned = -1,
         Energy,
         NonEnergy,
         NotComputed,
+        Num
     };
-
-    constexpr const char *MonthNames(int const &i)
-    {
-        switch (i) {
-        case 1:
-            return "January";
-        case 2:
-            return "February";
-        case 3:
-            return "March";
-        case 4:
-            return "April";
-        case 5:
-            return "May";
-        case 6:
-            return "June";
-        case 7:
-            return "July";
-        case 8:
-            return "August";
-        case 9:
-            return "September";
-        case 10:
-            return "October";
-        case 11:
-            return "November";
-        case 12:
-            return "December";
-        default:
-            assert(false);
-            return "";
-        }
-    }
 
     // Types
 
@@ -188,9 +314,9 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;            // Name
         std::string lineItem;        // Line Item
-        int category;                // Category
+        CostCategory category;       // Category
         Real64 cost;                 // Cost
-        iStartCosts startOfCosts;    // Start of Costs
+        StartCosts startOfCosts;     // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
         int monthsFromStart;         // Months from Start 0 - 11
         int totalMonthsFromStart;    // Total months (12 x years) + months
@@ -201,7 +327,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(costCatMaintenance), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+            : category(CostCategory::Maintenance), cost(0.0), startOfCosts(StartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
               totalMonthsFromStart(0), repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
@@ -212,16 +338,16 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;         // Name
         std::string lineItem;     // Line Item
-        int category;             // Category
+        CostCategory category;    // Category
         Real64 cost;              // Cost
-        iStartCosts startOfCosts; // Start of Costs
+        StartCosts startOfCosts;  // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
         int monthsFromStart;      // Months from Start 0 - 11
         int totalMonthsFromStart; // Total months (12 x years) + months
 
         // Default Constructor
         NonrecurringCostType()
-            : category(costCatConstruction), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+            : category(CostCategory::Construction), cost(0.0), startOfCosts(StartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
               totalMonthsFromStart(0)
         {
         }
@@ -261,21 +387,21 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;                           // Name - just for labeling output - use Category for aggregation
-        iSourceKind SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
+        SourceKindType SourceKind;                  // 1=recurring, 2=nonrecurring, 3=resource
         DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int Category;                               // uses "costCat" constants above
+        CostCategory Category;                      // uses "costCat" constants above
         Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
-        iPrValKind pvKind;         // kind of present value 1=energy, 2=non-energy,3=not computed but summed
+        PrValKind pvKind;          // kind of present value 1=energy, 2=non-energy,3=not computed but summed
         Real64 presentValue;       // total present value for cashflow
         Real64 orginalCost;        // original cost from recurring, non-recurring or energy cost
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(iSourceKind::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(0), pvKind(iPrValKind::Unassigned),
-              presentValue(0.), orginalCost(0.)
+            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned),
+              pvKind(PrValKind::Unassigned), presentValue(0.), orginalCost(0.)
         {
         }
     };
@@ -303,9 +429,6 @@ namespace EconomicLifeCycleCost {
     void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
 
     void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
-
-    int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth);
-
     //======================================================================================================================
     //======================================================================================================================
 
@@ -339,22 +462,21 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     // related to LifeCycleCost:Parameters
     bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
     std::string LCCname;          // Name
-    EconomicLifeCycleCost::iDiscConv discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;     // Discounting Convention
-    EconomicLifeCycleCost::iInflAppr inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar; // Inflation Approach
-    Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
-    Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
-    Real64 inflation = 0.0;                                                                                // Inflation
-    int baseDateMonth = 0;                                                                                 // Base Date Month (1=Jan, 12=Dec)
-    int baseDateYear = 0;                                                                                  // Base Date Year  1900-2100
-    int serviceDateMonth = 0;                                                                              // Service Date Month (1=Jan, 12=Dec)
-    int serviceDateYear = 0;                                                                               // Service Date Year 1900-2100
-    int lengthStudyYears = 0;                                                                              // Length of Study Period in Years
+    EconomicLifeCycleCost::DiscConv discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;     // Discounting Convention
+    EconomicLifeCycleCost::InflAppr inflationApproach = EconomicLifeCycleCost::InflAppr::ConstantDollar; // Inflation Approach
+    Real64 realDiscountRate = 0.0;                                                                       // Real Discount Rate
+    Real64 nominalDiscountRate = 0.0;                                                                    // Nominal Discount Rate
+    Real64 inflation = 0.0;                                                                              // Inflation
+    int baseDateMonth = 0;                                                                               // Base Date Month (1=Jan, 12=Dec)
+    int baseDateYear = 0;                                                                                // Base Date Year  1900-2100
+    int serviceDateMonth = 0;                                                                            // Service Date Month (1=Jan, 12=Dec)
+    int serviceDateYear = 0;                                                                             // Service Date Year 1900-2100
+    int lengthStudyYears = 0;                                                                            // Length of Study Period in Years
     int lengthStudyTotalMonths = 0; // Length of Study expressed in months (years x 12)
     Real64 taxRate = 0.0;           // Tax rate
-    EconomicLifeCycleCost::iDeprMethod depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None; // Depreciation Method
+    EconomicLifeCycleCost::DeprMethod depreciationMethod = EconomicLifeCycleCost::DeprMethod::None; // Depreciation Method
     // derived
-    int lastDateMonth = 0; // Last Date Month (the month before the base date month)
-    int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
+    int lastDateYear = 0; // Last Date Year (base date year + length of study period in years)
     int numRecurringCosts = 0;
     int numNonrecurringCost = 0;
     int numUsePriceEscalation = 0;
@@ -391,18 +513,18 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     Array1D<Real64> EscalatedTotEnergy;
     std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
 
-    EPVector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
-    EPVector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
+    std::vector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
+    std::vector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
     EPVector<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
     EPVector<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
-    EPVector<EconomicLifeCycleCost::CashFlowType> CashFlow;
+    std::vector<EconomicLifeCycleCost::CashFlowType> CashFlow;
 
     void clear_state() override
     {
         this->LCCparamPresent = false;
         this->LCCname.clear();
-        this->discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;
-        this->inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar;
+        this->discountConvention = EconomicLifeCycleCost::DiscConv::EndOfYear;
+        this->inflationApproach = EconomicLifeCycleCost::InflAppr::ConstantDollar;
         this->realDiscountRate = 0.0;
         this->nominalDiscountRate = 0.0;
         this->inflation = 0.0;
@@ -413,8 +535,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->lengthStudyYears = 0;
         this->lengthStudyTotalMonths = 0;
         this->taxRate = 0.0;
-        this->depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None;
-        this->lastDateMonth = 0;
+        this->depreciationMethod = EconomicLifeCycleCost::DeprMethod::None;
         this->lastDateYear = 0;
         this->numRecurringCosts = 0;
         this->numNonrecurringCost = 0;
@@ -441,11 +562,11 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
         this->AfterTaxPresentValue.deallocate();
         this->EscalatedTotEnergy.deallocate();
         this->EscalatedEnergy.clear();
-        this->RecurringCosts.deallocate();
-        this->NonrecurringCost.deallocate();
+        this->RecurringCosts.clear();
+        this->NonrecurringCost.clear();
         this->UsePriceEscalation.deallocate();
         this->UseAdjustment.deallocate();
-        this->CashFlow.deallocate();
+        this->CashFlow.clear();
     }
 };
 

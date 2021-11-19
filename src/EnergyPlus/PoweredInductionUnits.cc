@@ -319,15 +319,15 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).HCoilType =
             static_cast<iHCoilType>(getEnumerationValue(HCoilNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
         switch (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType) {
-        case (iHCoilType::SimpleHeating): {
+        case iHCoilType::SimpleHeating: {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
             break;
         }
-        case (iHCoilType::Electric):
-        case (iHCoilType::Gas): {
+        case iHCoilType::Electric:
+        case iHCoilType::Gas: {
             break;
         }
-        case (iHCoilType::SteamAirHeating): {
+        case iHCoilType::SteamAirHeating: {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
