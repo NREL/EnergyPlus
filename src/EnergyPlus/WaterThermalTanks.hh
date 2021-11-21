@@ -76,14 +76,14 @@ namespace WaterThermalTanks {
         TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
         OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
         ZoneAndOA,  // applicable to HPWH only, inlet air is mixture of OA and zone air
-        Num
+        Num,
+        TankNum = Num - 1 // Since WTTAmbientTemp::ZoneAndOA is not applicable to Tank
     };
 
     constexpr std::array<std::string_view, static_cast<int>(WTTAmbientTemp::Num)> HPWHAmbientTempNamesUC{
         "SCHEDULE", "ZONEAIRONLY", "OUTDOORAIRONLY", "ZONEANDOUTDOORAIR"};
 
-    constexpr int TankAmbientTempNamesNum = static_cast<int>(WTTAmbientTemp::Num) - 1; // Since AmbientTemp::ZoneAndOA is not appilcable to Tank
-    constexpr std::array<std::string_view, TankAmbientTempNamesNum> TankAmbientTempNamesUC{
+    constexpr std::array<std::string_view, static_cast<int>(WTTAmbientTemp::TankNum)> TankAmbientTempNamesUC{
         "SCHEDULE",
         "ZONE",
         "OUTDOORS",
