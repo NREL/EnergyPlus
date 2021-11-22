@@ -189,17 +189,17 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
 
     // Load the 'range variable' according to the type of control scheme specified
     switch (CurSchemeType) {
-    case (OpScheme::Uncontrolled):
-    case (OpScheme::CompSetPtBased): {
+    case OpScheme::Uncontrolled:
+    case OpScheme::CompSetPtBased: {
         // No RangeVariable specified for these types
         break;
     }
-    case (OpScheme::EMS): {
+    case OpScheme::EMS: {
         InitLoadDistribution(state, FirstHVACIteration);
         // No RangeVariable specified for these types
         break;
     }
-    case (OpScheme::HeatingRB): {
+    case OpScheme::HeatingRB: {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand < SmallLoad) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -210,7 +210,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
         RangeVariable = LoopDemand;
         break;
     }
-    case (OpScheme::CoolingRB): {
+    case OpScheme::CoolingRB: {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand > (-1.0 * SmallLoad)) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -221,25 +221,25 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
         RangeVariable = LoopDemand;
         break;
     }
-    case (OpScheme::DryBulbRB): {
+    case OpScheme::DryBulbRB: {
         RangeVariable = state.dataEnvrn->OutDryBulbTemp;
         break;
     }
-    case (OpScheme::WetBulbRB): {
+    case OpScheme::WetBulbRB: {
         RangeVariable = state.dataEnvrn->OutWetBulbTemp;
         break;
     }
-    case (OpScheme::RelHumRB): {
+    case OpScheme::RelHumRB: {
         RangeVariable = state.dataEnvrn->OutRelHum;
         break;
     }
-    case (OpScheme::DewPointRB): {
+    case OpScheme::DewPointRB: {
         RangeVariable = state.dataEnvrn->OutDewPointTemp;
         break;
     }
-    case (OpScheme::DryBulbTDB):
-    case (OpScheme::WetBulbTDB):
-    case (OpScheme::DewPointTDB): {
+    case OpScheme::DryBulbTDB:
+    case OpScheme::WetBulbTDB:
+    case OpScheme::DewPointTDB: {
         RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
         break;
     }
@@ -252,19 +252,19 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     }
 
     switch (CurSchemeType) {
-    case (OpScheme::Uncontrolled): {
+    case OpScheme::Uncontrolled: {
         //!***what else do we do with 'uncontrolled' equipment?
         // There's an equipment list...but I think the idea is to just
         // Set one component to run in an 'uncontrolled' way (whatever that means!)
         break;
     }
-    case (OpScheme::CompSetPtBased): {
+    case OpScheme::CompSetPtBased: {
         // check for EMS Control
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
         break;
     }
-    case (OpScheme::EMS): {
+    case OpScheme::EMS: {
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
         break;
@@ -3234,19 +3234,19 @@ Real64 FindRangeVariable(EnergyPlusData &state,
     Real64 NodeTemperature;
 
     switch (CurSchemeType) {
-    case (OpScheme::DryBulbTDB): { // drybulb temp based controls
+    case OpScheme::DryBulbTDB: { // drybulb temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDryBulbTemp;
         break;
     }
-    case (OpScheme::WetBulbTDB): { // wetbulb temp based controls
+    case OpScheme::WetBulbTDB: { // wetbulb temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutWetBulbTemp;
         break;
     }
-    case (OpScheme::DewPointTDB): { // dewpoint temp based controls
+    case OpScheme::DewPointTDB: { // dewpoint temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDewPointTemp;
