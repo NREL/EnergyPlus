@@ -11203,7 +11203,7 @@ namespace UnitarySystems {
                 this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-
+                // TODO: EMS
                 bool const singleMode = (this->m_SingleMode == 1);
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (this->m_CoolingSpeedNum > 1) {
@@ -11933,6 +11933,44 @@ namespace UnitarySystems {
                 PartLoadFrac = 0.0;
                 CompOn = 0;
 
+                if (this->m_EMSOverrideCoilSpeedNumOn &&
+                    (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling || CoilType_Num == DataHVACGlobals::CoilDX_Cooling)) {
+                    this->m_CoolingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
+                    this->m_SpeedNum = this->m_CoolingSpeedNum;
+                    bool useMaxedSpeed = false;
+                    if (this->m_SpeedNum > this->m_NumOfSpeedCooling) {
+                        this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
+                        this->m_SpeedNum = this->m_NumOfSpeedCooling;
+                        this->m_CoilSpeedErrIdx++;
+                        useMaxedSpeed = true;
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName +
+                                "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
+                            this->m_CoilSpeedErrIdx,
+                            this->m_EMSOverrideCoilSpeedNumValue,
+                            this->m_EMSOverrideCoilSpeedNumValue,
+                            _,
+                            "",
+                            "");
+                    }
+                    if (this->m_CoolingSpeedNum == 1) {
+                        this->m_CoolingSpeedRatio = 0.0;
+                        this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                        if (useMaxedSpeed || this->m_CoolingCycRatio == 0) {
+                            this->m_CoolingCycRatio = 1;
+                        }
+                        PartLoadFrac = this->m_CoolingCycRatio;
+                    } else {
+                        this->m_CoolingCycRatio = 1.0;
+                        this->m_CoolingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                        if (useMaxedSpeed || this->m_CoolingSpeedRatio == 0) {
+                            this->m_CoolingSpeedRatio = 1;
+                        }
+                        PartLoadFrac = this->m_CoolingSpeedRatio;
+                    }
+                }
+
                 if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
                     this->m_CompPartLoadRatio = PartLoadFrac;
 
@@ -11959,40 +11997,6 @@ namespace UnitarySystems {
                     DXCoils::SimDXCoilMultiSpeed(state, CompName, 0.0, PartLoadFrac, this->m_CoolingCoilIndex);
 
                 } else if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                    if (this->m_EMSOverrideCoilSpeedNumOn) {
-                        this->m_CoolingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
-                        this->m_SpeedNum = this->m_CoolingSpeedNum;
-                        bool useMaxedSpeed = false;
-                        if (this->m_SpeedNum > this->m_NumOfSpeedCooling) {
-                            this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
-                            this->m_SpeedNum = this->m_NumOfSpeedCooling;
-                            this->m_CoilSpeedErrIdx++;
-                            useMaxedSpeed = true;
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName +
-                                    "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
-                                this->m_CoilSpeedErrIdx,
-                                this->m_EMSOverrideCoilSpeedNumValue,
-                                this->m_EMSOverrideCoilSpeedNumValue,
-                                _,
-                                "",
-                                "");
-                        }
-                        if (this->m_CoolingSpeedNum == 1) {
-                            this->m_CoolingSpeedRatio = 0.0;
-                            this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                            if (useMaxedSpeed || this->m_CoolingCycRatio == 0) {
-                                this->m_CoolingCycRatio = 1;
-                            }
-                        } else {
-                            this->m_CoolingCycRatio = 1.0;
-                            this->m_CoolingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                            if (useMaxedSpeed || this->m_CoolingSpeedRatio == 0) {
-                                this->m_CoolingSpeedRatio = 1;
-                            }
-                        }
-                    }
                     this->simMultiSpeedCoils(
                         state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, this->m_SpeedNum);
 
@@ -12197,16 +12201,6 @@ namespace UnitarySystems {
                                     this->m_CoolingSpeedRatio = SpeedRatio;
                                 }
                             }
-                            if (SpeedNum > this->m_NumOfSpeedCooling) {
-                                this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
-                                SpeedNum = this->m_NumOfSpeedCooling;
-                                this->m_CoolingCycRatio = CycRatio = 1.0;
-                                if (this->m_CoolingSpeedNum == 1) {
-                                    this->m_CoolingSpeedRatio = SpeedRatio = 0.0;
-                                } else {
-                                    this->m_CoolingSpeedRatio = SpeedRatio = 1.0;
-                                }
-                            }
 
                             this->simMultiSpeedCoils(
                                 state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
@@ -12281,10 +12275,24 @@ namespace UnitarySystems {
                         } else if (this->m_DehumidificationMode == 1) {
                             OperationMode = DataHVACGlobals::coilEnhancedMode;
                         }
-                        this->m_CoolingSpeedRatio = 1.0;
-                        bool const singleMode = (this->m_SingleMode == 1);
-                        for (int speedNum = 1; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
-                            this->m_CoolingSpeedNum = speedNum;
+
+                        if (this->m_EMSOverrideCoilSpeedNumOn) {
+                            this->m_CoolingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
+                            SpeedNum = this->m_CoolingSpeedNum;
+                            PartLoadFrac = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                            if (PartLoadFrac == 0) PartLoadFrac = 1;
+
+                            if (this->m_CoolingSpeedNum == 1) {
+                                this->m_CoolingSpeedRatio = SpeedRatio = 0.0;
+                                this->m_CompPartLoadRatio = PartLoadFrac;
+                                this->m_CoolCompPartLoadRatio = PartLoadFrac;
+                            } else {
+                                this->m_CoolingSpeedRatio = SpeedRatio = PartLoadFrac;
+                                this->m_CompPartLoadRatio = PartLoadFrac = 1.0;
+                                this->m_CoolCompPartLoadRatio = 1.0;
+                            }
+
+                            bool const singleMode = (this->m_SingleMode == 1);
                             state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(state,
                                                                                                       OperationMode,
                                                                                                       PartLoadFrac,
@@ -12292,20 +12300,36 @@ namespace UnitarySystems {
                                                                                                       this->m_CoolingSpeedRatio,
                                                                                                       this->m_FanOpMode,
                                                                                                       singleMode);
-                            if (speedNum == this->m_NumOfSpeedCooling) {
+                            if (SpeedNum == this->m_NumOfSpeedCooling) {
                                 FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
                             }
-                            if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
-                        }
-                        if (this->m_CoolingSpeedNum == 1) {
-                            this->m_CompPartLoadRatio = PartLoadFrac;
-                            this->m_CoolCompPartLoadRatio = PartLoadFrac; // why is the set only for a few?
-                            SpeedRatio = 0.0;
                         } else {
-                            SpeedRatio = PartLoadFrac;
-                            PartLoadFrac = 1.0;
-                            this->m_CompPartLoadRatio = 1.0;
-                            this->m_CoolCompPartLoadRatio = 1.0;
+                            this->m_CoolingSpeedRatio = 1.0;
+                            bool const singleMode = (this->m_SingleMode == 1);
+                            for (int speedNum = 1; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
+                                this->m_CoolingSpeedNum = speedNum;
+                                state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(state,
+                                                                                                          OperationMode,
+                                                                                                          PartLoadFrac,
+                                                                                                          this->m_CoolingSpeedNum,
+                                                                                                          this->m_CoolingSpeedRatio,
+                                                                                                          this->m_FanOpMode,
+                                                                                                          singleMode);
+                                if (speedNum == this->m_NumOfSpeedCooling) {
+                                    FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+                                }
+                                if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
+                            }
+                            if (this->m_CoolingSpeedNum == 1) {
+                                this->m_CompPartLoadRatio = PartLoadFrac;
+                                this->m_CoolCompPartLoadRatio = PartLoadFrac; // why is the set only for a few?
+                                SpeedRatio = 0.0;
+                            } else {
+                                SpeedRatio = PartLoadFrac;
+                                PartLoadFrac = 1.0;
+                                this->m_CompPartLoadRatio = 1.0;
+                                this->m_CoolCompPartLoadRatio = 1.0;
+                            }
                         }
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWater) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) { // COIL:COOLING:WATER
@@ -12738,9 +12762,11 @@ namespace UnitarySystems {
             if ((OutletHumRatDXCoil > (DesOutHumRat + tempHumRatAcc)) && (!unitSys || PartLoadFrac < 1.0) &&
                 (this->m_DehumidControlType_Num == DehumCtrlType::Multimode)) {
 
-                if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
-                    (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) { // CoilSystem:Cooling:DX:HeatExchangerAssisted,
-                                                                                      // CoilSystem:Cooling:Water:HeatExchangerAssisted
+                if (this->m_EMSOverrideCoilSpeedNumOn) {
+                    // pass
+                } else if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
+                           (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) { // CoilSystem:Cooling:DX:HeatExchangerAssisted,
+                                                                                             // CoilSystem:Cooling:Water:HeatExchangerAssisted
                     // Determine required part load when heat exchanger is ON
                     HXUnitOn = true;
                     PartLoadFrac = 1.0;
@@ -12908,7 +12934,9 @@ namespace UnitarySystems {
 
                 } else {
 
-                    if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                    if (this->m_EMSOverrideCoilSpeedNumOn) {
+                        // pass
+                    } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
 
                         Par[1] = double(this->m_CoolingCoilIndex);
                         Par[2] = DesOutHumRat;
@@ -17759,7 +17787,8 @@ namespace UnitarySystems {
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
                         if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                            state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                            state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                             SetupEMSActuator(state,
                                              "Coil Speed Control",
                                              state.dataUnitarySystems->unitarySys[sysNum].Name,
