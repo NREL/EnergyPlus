@@ -90,7 +90,7 @@
 
   Version,22.1;
 
-  Timestep,4;
+  Timestep,60;
 
   Building,
     Simple One Zone (Wireframe DXF),  !- Name
@@ -557,26 +557,6 @@
 
   Output:Variable,*,CondFD Phase Change Node Specific Heat 5,hourly;
 
-  Output:Variable,*,CondFD Heat Source Power After Layer 1,hourly;
-
-  Output:Variable,*,CondFD Heat Source Power After Layer 2,hourly;
-
-  Output:Variable,*,CondFD Heat Source Power After Layer 3,hourly;
-
   Output:Variable,*,CondFD Heat Source Power After Layer 4,hourly;
 
-  Output:Variable,*,CondFD Heat Source Power After Layer 5,hourly;
-
-  Output:Variable,*,CondFD Heat Source Power After Layer 6,hourly;
-
-  Output:Variable,*,CondFD Heat Source Energy After Layer 1,hourly;
-
-  Output:Variable,*,CondFD Heat Source Energy After Layer 2,hourly;
-
-  Output:Variable,*,CondFD Heat Source Energy After Layer 3,hourly;
-
   Output:Variable,*,CondFD Heat Source Energy After Layer 4,hourly;
-
-  Output:Variable,*,CondFD Heat Source Energy After Layer 5,hourly;
-
-  Output:Variable,*,CondFD Heat Source Energy After Layer 6,hourly;
