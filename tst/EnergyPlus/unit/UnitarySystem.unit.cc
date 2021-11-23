@@ -16074,6 +16074,31 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
     EXPECT_NEAR(sensOut, -11998.0, 210.0);
 
+    // test EMS override
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
+    EXPECT_EQ(thisSys->m_NumOfSpeedCooling, 2);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+
+    thisSys->m_EMSOverrideCoilSpeedNumOn = true;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.12;
+    state->dataGlobal->DoCoilDirectSolutions = false;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+    EXPECT_NEAR(thisSys->m_CycRatio, 1.00, 0.01);
+    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.01);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+
     // coil cost estimates
     CostEstimateManager::GetCostEstimateInput(*state);
     state->dataCostEstimateManager->GetCostInput = false;

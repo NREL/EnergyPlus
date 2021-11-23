@@ -2,12 +2,14 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! UnitarySystem_MultiSpeedDX.idf
+! EMSLoadBasedMultiSpeedDXCoilOverrideControl.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and plenum
 !                          with unitary system including furnace with DX cooling (multi-speed),
 !                          furnace (gas and electric), and air-to-air heat pump (single-speed)
 !
 ! Highlights:              Unitary furnace and heat pump with multi-speed DX cooling.
+!                          Use EMS program to override the multispeed coil speed control logic originally based on load.
+!                          The EMS program controls Sys 1 Furnace DX Cool Cooling Coil serving zone "SPACE1-1".
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -5011,7 +5013,7 @@
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
 
-Output:EnergyManagementSystem,
+  Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting
     Verbose,                 !- Internal Variable Availability Dictionary Reporting
     Verbose;                 !- EMS Runtime Language Debug Output Level

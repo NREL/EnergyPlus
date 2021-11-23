@@ -11192,8 +11192,21 @@ namespace UnitarySystems {
             //    OutdoorPressure = OutBaroPress
             //    OutdoorWetBulb  = OutWetBulbTemp
         }
-
-        {
+        if (this->m_EMSOverrideCoilSpeedNumOn) {
+            if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                bool const singleMode = (this->m_SingleMode == 1);
+                int OperationMode = DataHVACGlobals::coilNormalMode;
+                if (state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
+                    OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
+                } else if (this->m_DehumidificationMode == 1) {
+                    OperationMode = DataHVACGlobals::coilEnhancedMode;
+                }
+                state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
+                    state, OperationMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode, this->CoilSHR);
+            } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                DXCoils::SimDXCoilMultiSpeed(state, CompName, 0.0, 0.0, CompIndex, this->m_CoolingSpeedNum, this->m_FanOpMode, CompOn);
+            }
+        } else {
             auto const SELECT_CASE_var(this->m_CoolingCoilType_Num);
 
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingSingleSpeed) { // Coil:Cooling:DX:SingleSpeed
@@ -11203,7 +11216,7 @@ namespace UnitarySystems {
                 this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-                // TODO: EMS
+
                 bool const singleMode = (this->m_SingleMode == 1);
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (this->m_CoolingSpeedNum > 1) {
