@@ -50,7 +50,7 @@ PRIVATE ! Everything private unless explicitly made public
                                               'Europe                   ', &
                                               'Antarctica               ', &
                                               'Unknown                  '/)
-  INTEGER, PARAMETER :: Invalid=-1
+  INTEGER, PARAMETER :: InvalidDate=-1
   INTEGER, PARAMETER :: MonthDay=1
   INTEGER, PARAMETER :: NthDayInMonth=2
   INTEGER, PARAMETER :: LastDayInMonth=3
@@ -1477,7 +1477,7 @@ SUBROUTINE GetLocData(Lat,Long,Elev)
 END SUBROUTINE GetLocData
 
    FUNCTION Psat(T)
-!  Function: Calculates water vapour saturation pressure at temperature T ï¿½C
+!  Function: Calculates water vapour saturation pressure at temperature T øC
 !  Eqns from [Hyland & Wexler 1983] cited in ASHRAE FUNDAMENTALS 6.7
 !  Created: P.G.Schild 1999May18
 !  IO #  Name      unit             description
