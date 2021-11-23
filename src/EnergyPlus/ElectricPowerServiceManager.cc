@@ -1618,6 +1618,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
     }
     case GeneratorOpScheme::notYetSet: {
         // do nothing
+        break;
     }
     default:
         assert(false);
@@ -2100,6 +2101,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     }
     case ElectricBussType::notYetSet: {
         // do nothing
+        break;
     }
     default:
         assert(false);
@@ -3039,6 +3041,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         }
         case ConverterModelType::notYetSet: {
             // do nothing
+            break;
         }
         default:
             assert(false);

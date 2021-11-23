@@ -78,6 +78,7 @@ namespace WaterCoils {
         HeatingSimple,
         CoolingSimple,
         CoolingDetailed,
+        Num
     };
 
     struct WaterCoilEquipConditions

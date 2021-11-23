@@ -69,40 +69,46 @@ namespace SetPointManager {
 
     enum class CtrlNodeType : int
     {
+        Invalid = -1,
         control,
-        reference
+        reference,
+        Num
     };
 
     enum class SupplyFlowTempStrategy
     {
+        Unknown = -1,
         MaxTemp,
         MinTemp,
-        Unknown
+        Num
     };
     enum class ControlStrategy
     {
+        Unknown = -1,
         TempFirst,
         FlowFirst,
-        Unknown
+        Num
     };
     enum class ReferenceTempType
     {
+        Unknown = -1,
         WetBulb,
         DryBulb,
-        Unknown
+        Num
     };
     enum class ReferenceGroundTempObjectType
     {
+        Unknown = -1,
         BuildingSurface,
         Shallow,
         Deep,
         FCFactorMethod,
-        Unknown
+        Num
     };
 
     enum class iCtrlVarType
     {
-        Unknown,
+        Unknown = -1,
         Temp,
         MaxTemp,
         MinTemp,
@@ -111,9 +117,12 @@ namespace SetPointManager {
         MinHumRat,
         MassFlow,
         MaxMassFlow,
-        MinMassFlow
+        MinMassFlow,
+        Num
     };
+
     int constexpr NumValidCtrlTypes = 9;
+
     inline const char *controlTypeName(iCtrlVarType cvt)
     {
         switch (cvt) {
@@ -137,12 +146,15 @@ namespace SetPointManager {
             return "MinimumMassFlowRate";
         case iCtrlVarType::Unknown:
             return "*UNKNOWN*";
+        default:
+            assert(false);
         }
         return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
     }
 
     enum class SetPointManagerType
     {
+        Unknown = -1,
         Scheduled,
         ScheduledDual,
         OutsideAir,
@@ -173,9 +185,11 @@ namespace SetPointManager {
         ReturnWaterResetChW,
         ReturnWaterResetHW,
         TESScheduled,
-        Unknown
+        Num
     };
+
     int constexpr NumValidSPMTypes = 30;
+
     inline const char *managerTypeName(SetPointManagerType t)
     {
         switch (t) {
@@ -241,6 +255,8 @@ namespace SetPointManager {
             return "SetpointManager:ScheduledTES";
         case SetPointManagerType::Unknown:
             return "*UNKNOWN*";
+        default:
+            assert(false);
         }
         return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
     }

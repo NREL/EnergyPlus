@@ -74,16 +74,19 @@ namespace ZoneTempPredictorCorrector {
 
     enum class ZControlTypes
     {
+        Invalid = -1,
         TStat = 1,
         TCTStat = 2,
         OTTStat = 3,
         HStat = 4,
         TandHStat = 5,
-        StagedDual = 6
+        StagedDual = 6,
+        Num
     };
 
     enum class AdaptiveComfortModel
     {
+        Invalid = -1,
         ADAP_NONE = 1,
         ASH55_CENTRAL = 2,
         ASH55_UPPER_90 = 3,
@@ -91,12 +94,14 @@ namespace ZoneTempPredictorCorrector {
         CEN15251_CENTRAL = 5,
         CEN15251_UPPER_I = 6,
         CEN15251_UPPER_II = 7,
-        CEN15251_UPPER_III = 8
+        CEN15251_UPPER_III = 8,
+        Num
     };
 
     // The numbers are used to access zone comfort control type, see ValidComfortControlTypes
     enum class ComfortControl
     {
+        Invalid = -1,
         SglHeatSetPoint = 1,
         SglCoolSetPoint = 2,
         SglHCSetPoint = 3,
@@ -112,16 +117,19 @@ namespace ZoneTempPredictorCorrector {
         SglHeatSetPointKSU = 9,
         SglCoolSetPointKSU = 10,
         SglHCSetPointKSU = 11,
-        DualSetPointKSU = 12
+        DualSetPointKSU = 12,
+        Num
     };
 
     // Average method parameter with multiple people objects in a zone
     enum class AverageMethod
     {
+        Invalid = -1,
         NO = 0,  // No multiple people objects
         SPE = 1, // Specific people object
         OBJ = 2, // People object average
-        PEO = 3  // People number average
+        PEO = 3, // People number average
+        Num
     };
 
     struct ZoneTempControlType

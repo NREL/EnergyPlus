@@ -67,14 +67,15 @@ int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 //  Layer types:
 enum class TARCOGLayerType : int
 {
-    UNASSSIGNED = -1,
+    UNASSIGNED = -1,
     SPECULAR = 0,
     VENETBLIND_HORIZ = 1,
     WOVSHADE = 2,
     PERFORATED = 3,
     DIFFSHADE = 4,
     BSDF = 5,
-    VENETBLIND_VERT = 6
+    VENETBLIND_VERT = 6,
+    Num
 };
 
 //  Thermal models:
@@ -84,7 +85,8 @@ enum class TARCOGThermalModel : int
     ISO15099 = 0,
     SCW = 1,
     CSM = 2,
-    CSM_WithSDThickness = 3
+    CSM_WithSDThickness = 3,
+    Num
 };
 
 int constexpr YES_SupportPillar = 1;
@@ -95,7 +97,8 @@ enum class DeflectionCalculation : int
     UNASSIGNED = -1,
     NONE = 0,
     TEMPERATURE = 1,
-    GAP_WIDTHS = 2
+    GAP_WIDTHS = 2,
+    Num
 };
 
 // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
@@ -103,8 +106,10 @@ enum class DeflectionCalculation : int
 // values would produce enough precision
 enum class DeflectionParameters : int
 {
+    Invalid = -1,
     mmax = 5, // top m value for which "deflection sum" will be calculated
-    nmax = 5  // top n value for which "deflection sum" will be calculated
+    nmax = 5, // top n value for which "deflection sum" will be calculated
+    Num
 };
 
 //  CalcForcedVentilation flag:
@@ -112,15 +117,19 @@ enum class DeflectionParameters : int
 //  1 = Allow forced ventilation calc
 enum class CalcForcedVentilation : int
 {
+    Invalid = -1,
     skip = 0,
-    allow = 1
+    allow = 1,
+    Num
 };
 
 //  Calculation outcome
 enum class CalculationOutcome
 {
+    Invalid = -1,
     Unknown,
-    OK
+    OK,
+    Num
 };
 
 int constexpr NumOfIterations(100);

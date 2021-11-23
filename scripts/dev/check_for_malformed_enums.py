@@ -58,12 +58,12 @@ import os
 import sys
 from pathlib import Path
 
-valid_null_enum_value_names = ["UNASSIGNED", "INVALID"]
-valid_num_enum_value_names = ["NUM", "COUNT"]
+valid_null_enum_value_names = ["INVALID", "UNASSIGNED", "UNKNOWN"]
+valid_num_enum_value_names = ["COUNT", "NUM"]
 
 
 def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
-    """Process enum string, returns tuple with enum name, and analysis elements"""
+    """Process enum string, return true false for errors found flag"""
 
     # skip "enum class SomeEnum;"
     if "{" not in input_str:
@@ -78,6 +78,9 @@ def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
 
     enum_name = tokens[0]
     enum_tokens = tokens[1].split(",")
+
+    if enum_tokens[-1] == "":
+        enum_tokens.pop(-1)
 
     # split into names and integer values, in present
     names = []
@@ -116,7 +119,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
 
 
 def find_enums(search_path: Path) -> int:
-    """Checks for malformed enums, returns the number of instances found that should be changed"""
+    """Checks for malformed enums, returns the number of errors found"""
     num_errors = 0
 
     files_to_search = []
@@ -181,8 +184,11 @@ if __name__ == "__main__":
     print("**** Checking EnergyPlus code for malformed enums ****")
     root_path = Path(__file__).parent.parent.parent
     src_path = root_path / "src" / "EnergyPlus"
-    tst_path = root_path / "tst" / "EnergyPlus" / "unit"
-    errors_found = find_enums(src_path) + find_enums(tst_path)
+    errors_found = find_enums(src_path)
+
+    if errors_found > 0:
+        print(f"**** {errors_found} malformed enum class errors found ****")
+
     print("**** DONE ****")
     if errors_found > 0:
         raise sys.exit(1)

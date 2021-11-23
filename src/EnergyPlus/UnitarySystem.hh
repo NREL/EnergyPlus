@@ -179,32 +179,40 @@ namespace UnitarySystems {
 
         enum class ControlType : int
         {
+            Invalid = -1,
             None,
             Load,
             Setpoint,
-            CCMASHRAE
+            CCMASHRAE,
+            Num
         };
 
         enum class DehumCtrlType : int
         {
+            Invalid = -1,
             None,
             CoolReheat,
-            Multimode
+            Multimode,
+            Num
         };
 
         enum class FanPlace : int
         {
+            Invalid = -1,
             NotYetSet,
             BlowThru,
-            DrawThru
+            DrawThru,
+            Num
         };
 
-        // Airflow control for contant fan mode
+        // Airflow control for constant fan mode
         enum class UseCompFlow : int
         {
+            Invalid = -1,
             FlowNotYetSet,
-            UseCompressorOnFlow, // set compressor OFF air flow rate equal to compressor ON air flow rate
-            UseCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
+            UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+            UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+            Num
         };
 
         // Parent models simulated using UnitarySystem source code

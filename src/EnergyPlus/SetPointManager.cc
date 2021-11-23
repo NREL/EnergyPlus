@@ -8765,6 +8765,8 @@ int getSPMBasedOnNode(
                 }
                 break;
             }
+            default:
+                assert(false);
             }
         }
         if (getSPMBasedOnNode > 0) break;

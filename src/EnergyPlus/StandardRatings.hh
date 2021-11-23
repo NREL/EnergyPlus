@@ -79,15 +79,17 @@ namespace StandardRatings {
     {
         Unassigned = -1,
         ReverseCycle, // uses reverse cycle defrost strategy
-        Resistive     // uses electric resistance heater for defrost
+        Resistive,    // uses electric resistance heater for defrost
+        Num,
     };
 
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int
     {
         Unassigned = -1,
-        Timed,   // defrost cycle is timed
-        OnDemand // defrost cycle occurs only when required
+        Timed,    // defrost cycle is timed
+        OnDemand, // defrost cycle occurs only when required
+        Num
     };
 
     // Functions

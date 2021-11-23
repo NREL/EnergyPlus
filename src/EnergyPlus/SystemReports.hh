@@ -66,10 +66,12 @@ namespace SystemReports {
 
     enum class iEndUseType
     {
+        Invalid = -1,
         NoHeatNoCool,
         CoolingOnly,
         HeatingOnly,
         HeatAndCool,
+        Num
     };
 
     struct Energy

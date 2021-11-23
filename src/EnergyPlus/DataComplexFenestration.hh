@@ -132,7 +132,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowComplexShade()
-            : LayerType(TARCOGParams::TARCOGLayerType::UNASSSIGNED), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0),
+            : LayerType(TARCOGParams::TARCOGLayerType::UNASSIGNED), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0),
               BackEmissivity(0.0), TopOpeningMultiplier(0.0), BottomOpeningMultiplier(0.0), LeftOpeningMultiplier(0.0), RightOpeningMultiplier(0.0),
               FrontOpeningMultiplier(0.0), SlatWidth(0.0), SlatSpacing(0.0), SlatThickness(0.0), SlatAngle(0.0), SlatConductivity(0.0), SlatCurve(0.0)
         {

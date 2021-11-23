@@ -11883,13 +11883,15 @@ namespace SurfaceGeometry {
 
         enum class zoneVolumeCalculationMethod
         {
+            Invalid = -1,
             enclosed,
             floorAreaTimesHeight1,
             floorAreaTimesHeight2,
             ceilingAreaTimesHeight,
             opWallAreaTimesDistance,
             userProvided,
-            error
+            error,
+            Num
         };
 
         int countNotFullyEnclosedZones = 0;
@@ -12015,6 +12017,8 @@ namespace SurfaceGeometry {
                     case zoneVolumeCalculationMethod::enclosed: // should not be called but completes enumeration
                         ShowContinueError(state, "  The zone volume was calculated using multiple pyramids and was fully enclosed. ");
                         break;
+                    default:
+                        assert(false);
                     }
                     for (auto edge : listOfedgeNotUsedTwice) {
                         ShowContinueError(

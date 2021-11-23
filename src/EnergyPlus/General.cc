@@ -427,7 +427,7 @@ void ProcessDateString(EnergyPlusData &state,
     int TokenWeekday{};
 
     FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-    DateType = WeatherManager::DateType::InvalidDate;
+    DateType = WeatherManager::DateType::Invalid;
     if (!errFlag) {
         // Entered single number, do inverse JDay
         if (FstNum == 0) {
@@ -512,7 +512,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     TokenDay = 0;
     TokenMonth = 0;
     TokenWeekday = 0;
-    DateType = WeatherManager::DateType::InvalidDate;
+    DateType = WeatherManager::DateType::Invalid;
     if (present(TokenYear)) TokenYear = 0;
     // Take out separator characters, other extraneous stuff
 
@@ -658,7 +658,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     }
 
     if (InternalError) {
-        DateType = WeatherManager::DateType::InvalidDate;
+        DateType = WeatherManager::DateType::Invalid;
         ErrorsFound = true;
     }
 }

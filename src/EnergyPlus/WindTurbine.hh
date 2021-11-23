@@ -66,18 +66,20 @@ namespace WindTurbine {
 
     enum class RotorType
     {
-        Unassigned = 0,
+        Unassigned = -1,
         HAWT = 1, // 'HorizontalAxisWindTurbine'
-        VAWT = 2, // 'VerticalAxisWindTurbine'
+        VAWT = 2, // 'VerticalAxisWindTurbine',
+        Num
     };
 
     enum class ControlType
     {
-        Unassigned = 0,
+        Unassigned = -1,
         FSFP = 1, // 'FixedSpeedFixedPitch'
         FSVP = 2, // 'FixedSpeedVariablePitch'
         VSFP = 3, // 'VariableSpeedFixedPitch'
-        VSVP = 4  // 'VariableSpeedVariablePitch'
+        VSVP = 4, // 'VariableSpeedVariablePitch'
+        Num
     };
 
     struct WindTurbineParams

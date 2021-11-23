@@ -70,13 +70,16 @@ namespace SingleDuct {
 
     enum class Action
     {
+        Invalid = -1,
         Normal,
         ReverseAction,
         ReverseActionWithLimits,
-        HeatingActionNotUsed
+        HeatingActionNotUsed,
+        Num
     };
     enum class SysType
     {
+        Invalid = -1,
         SingleDuctVAVReheat,
         SingleDuctConstVolReheat,
         SingleDuctConstVolNoReheat,
@@ -84,22 +87,27 @@ namespace SingleDuct {
         SingleDuctVAVReheatVSFan,
         SingleDuctCBVAVReheat,
         SingleDuctCBVAVNoReheat,
-        Unknown
+        Unknown,
+        Num,
     };
     enum class HeatingCoilType : int
     {
+        Invalid = -1,
         None,
         Gas,
         Electric,
         SimpleHeating,
-        SteamAirHeating
+        SteamAirHeating,
+        Num,
     };
     enum class MinFlowFraction
     {
+        Invalid = -1,
         Constant,
         Scheduled,
         Fixed,
-        MinFracNotUsed
+        MinFracNotUsed,
+        Num
     };
 
     struct SingleDuctAirTerminalFlowConditions

@@ -77,12 +77,13 @@ namespace ScheduleManager {
 
     enum class SchedType : int
     {
-        Unassigned = 0,
+        Unassigned = -1,
         ScheduleInput_year = 1,
         ScheduleInput_compact = 2,
         ScheduleInput_file = 3,
         ScheduleInput_constant = 4,
-        ScheduleInput_external = 5
+        ScheduleInput_external = 5,
+        Num
     };
 
     // DERIVED TYPE DEFINITIONS
