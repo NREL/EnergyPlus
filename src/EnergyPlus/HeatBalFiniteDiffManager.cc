@@ -945,7 +945,7 @@ namespace HeatBalFiniteDiffManager {
             }
 
             TotNodes = ConstructFD(state.dataSurface->Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
-            for (int node = 1; node <= TotNodes + 1; ++node) {                                        // include inside face node
+            for (int node = 1; node <= TotNodes + 1; ++node) {                                 // include inside face node
                 SetupOutputVariable(state,
                                     format("CondFD Surface Temperature Node {}", node),
                                     OutputProcessor::Unit::C,
