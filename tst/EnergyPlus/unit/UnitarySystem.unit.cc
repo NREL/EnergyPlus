@@ -16098,6 +16098,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.01);
     EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
     EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+    EXPECT_NEAR(sensOut, -11998.0, 210.0);
 
     // coil cost estimates
     CostEstimateManager::GetCostEstimateInput(*state);
