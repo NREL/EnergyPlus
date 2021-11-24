@@ -5,7 +5,7 @@ Dedicated Exhaust System for Flexible Exhausts Configurations
 
  - Original Date: July 30, 2021
  - Revised: August 2, 2021, revise and start design
- - Revised: Oct ??, 2021, 
+ - Revised: Nov 20, 2021, 
 
 ## Justification for New Feature ##
 
@@ -48,7 +48,7 @@ Based on the existing modules' capabilities and limitations, we proposed to add 
 
 ### Exhasut System ###
 
-An AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhasut system would then be similar to that of a return path, including objects such as AirLoopHVAC:ZoneMixer. However, it could be different from the return path, in that in general, this exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust fan to be connected to the zone exhaust or plenum exhaust, as part of the exhaust system. Further, beyond the central exhaust fan, there could also be another heat/enthalpy exchanger for the heat recovery purposes. 
+An AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhaust system would then be similar to that of a return path. However, it could be different from the return path, in that the exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust to be specified as an ZoneHVAC exhaust system to be used in the AirloopHVAC exhaust system.  
 
 The following new objects will be added to allow an AirLoopHVAC:GeneralExhaustSystem to be described: 
 ```
@@ -75,7 +75,10 @@ In the current development, this choice would allow an AirLoopHVAC:Mixer to be u
 
 The inlet nodes inputs in the AirLoopHVAC:ExhaustSystem object are the exit nodes of the newly added ZoneHVAC:ExhaustSystem objects, which will be introduced here.
 
-The ZoneHVAC:ExhaustSystem is also to be added as a new object, as a more advanced version of fan:zoneexhaust connected to a zone exhaust. It will allow the exhaust system to use the newer fan:systemmodel or fan:componentmodel: 
+One piece of important information about each of the indivual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulation. This should be based on either a design (exhaust) flow rate by input or via zone exhaust fan (design flow) inputs. One way to deal with the problem is to enforce an implementaton of ZoneHVAC:ExhaustSystem for each connected zone exhaust, making is a required object for for every zone that connects to the AirLoopHVAC:ExhaustSystem. 
+
+The ZoneHVAC:ExhaustSystem object is going to be added to describe the exhaust design flow information:
+
 ```
 ZoneHVAC:ExhaustSystem,
     Zone2 Exhaust System,           !-Name
@@ -91,9 +94,6 @@ ZoneHVAC:ExhaustSystem,
     ,                               !- Minimum Zone Temperature Limit Schedule Name
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
-One piece of important information about each of the indivual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulation. This should be based on either a design (exhaust) flow rate by input or via zone exhaust fan (design flow) inputs. 
-
-One way to deal with the problem is to enforce an implementaton of ZoneHVAC:ExhaustSystem for each connected zone exhaust, making is a required object for for every zone that connects to the AirLoopHVAC:ExhaustSystem. The Zone:ExhaustSystem can either be passive or have its own fan (in which the fan will give the design flow information). A fan (Fan:SystemModel or Fan:ComponentModel) or design flow rate is required if any of the ZoneHVAC:ExhaustSystem objects do not have a fan.
 
 ### Other considerations ###
 
