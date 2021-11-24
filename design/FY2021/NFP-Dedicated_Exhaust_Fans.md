@@ -48,9 +48,9 @@ Based on the existing modules' capabilities and limitations, we proposed to add 
 
 ### Exhasut System ###
 
-An AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhaust system would then be similar to that of a return path. However, it could be different from the return path, in that the exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust to be specified as an ZoneHVAC exhaust system to be used in the AirloopHVAC exhaust system.  
+An AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhaust system would then be similar to that of a return path. However, it could be different from the return path, in that the exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust to be specified as a ZoneHVAC exhaust system to be used in the AirloopHVAC exhaust system.  
 
-The following new objects will be added to allow an AirLoopHVAC:GeneralExhaustSystem to be described: 
+The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be specified: 
 ```
 AirLoopHVAC:ExhaustSystem,
     Central Exhaust,            !- Name
@@ -75,7 +75,7 @@ In the current development, this choice would allow an AirLoopHVAC:Mixer to be u
 
 The inlet nodes inputs in the AirLoopHVAC:ExhaustSystem object are the exit nodes of the newly added ZoneHVAC:ExhaustSystem objects, which will be introduced here.
 
-One piece of important information about each of the indivual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulation. This should be based on either a design (exhaust) flow rate by input or via zone exhaust fan (design flow) inputs. One way to deal with the problem is to enforce an implementaton of ZoneHVAC:ExhaustSystem for each connected zone exhaust, making is a required object for for every zone that connects to the AirLoopHVAC:ExhaustSystem. 
+One piece of important information about each of the indivual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulations. This should be based on either a design (exhaust) flow rate by input or via zone exhaust fan (design flow) inputs. One way to deal with the problem is to enforce an implementaton of ZoneHVAC:ExhaustSystem for each connected zone exhaust, making is a required object for for every zone that connects to the AirLoopHVAC:ExhaustSystem. 
 
 The ZoneHVAC:ExhaustSystem object is going to be added to describe the exhaust design flow information:
 
@@ -282,7 +282,7 @@ AirLoopHVAC:ExhaustSystem,
 
 ### ZoneHVAC:ExhaustSystem Input Fields ###
 
-The ZoneHVAC:ExhaustSystem input fields are as follows.
+The input fields for the ZoneHVAC:ExhaustSystem object are as follows.
 
 #### Field: Name ####
 
@@ -365,11 +365,11 @@ Central Exhaust Fan Mass Flow Rate [kg/s];
 Central Exhaust Fan pressure drop [Pa];
 ```
 
-In addition, the tabular report will now also add the exhaust fans' flow rates and energy usages to each of the connected HVAC and airloops that the exhaust system is connected.
+In addition, the tabular report will now also add the central exhaust fans' flow rates and energy usages to each of the connected HVAC and airloops that the exhaust system is connected.
 
 ## Engineering Reference ##
 
-There would be not change about the fundamental methods in the the Engineering Reference. One potential addition though, is to document the assumptions and methods used to re-balance the zone exhaust airflows under the central exhaust fan driven operation mode. 
+There would be no change about the fundamental methods in the the Engineering Reference. One potential addition though, is to document the assumptions and methods used to re-balance the zone exhaust airflows under the central exhaust fan driven operation mode. 
 
 ## References ##
 
