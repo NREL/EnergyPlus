@@ -659,14 +659,26 @@ namespace HVACDXHeatPumpSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoil(state, CompName, DataGlobalConstants::CompressorOperation::On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state,
+                                  CompName,
+                                  DataGlobalConstants::CompressorOperation::On,
+                                  FirstHVACIteration,
+                                  DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                  FanOpMode,
+                                  PartLoadFrac);
                         NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                    (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
                                     PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoil(state, CompName, DataGlobalConstants::CompressorOperation::On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state,
+                                  CompName,
+                                  DataGlobalConstants::CompressorOperation::On,
+                                  FirstHVACIteration,
+                                  DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                  FanOpMode,
+                                  PartLoadFrac);
 
                         FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                      (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -

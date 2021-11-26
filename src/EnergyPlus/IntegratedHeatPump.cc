@@ -72,19 +72,19 @@ namespace EnergyPlus::IntegratedHeatPump {
 using namespace DataLoopNode;
 
 void SimIHP(EnergyPlusData &state,
-            std::string_view CompName,     // Coil Name
-            int &CompIndex,                // Index for Component name
-            int const CyclingScheme,       // Continuous fan OR cycling compressor
-            Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-            Real64 &HPTimeConstant,        // Heat pump time constant [s]
-            Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
-            DataGlobalConstants::CompressorOperation const CompOp,              // compressor on/off. 0 = off; 1= on
-            Real64 const PartLoadFrac,     // part load fraction
-            int const SpeedNum,            // compressor speed number
-            Real64 const SpeedRatio,       // compressor speed ratio
-            Real64 const SensLoad,         // Sensible demand load [W]
-            Real64 const LatentLoad,       // Latent demand load [W]
-            bool const IsCallbyWH,         // whether the call from the water heating loop or air loop, true = from water heating loop
+            std::string_view CompName,                             // Coil Name
+            int &CompIndex,                                        // Index for Component name
+            int const CyclingScheme,                               // Continuous fan OR cycling compressor
+            Real64 &MaxONOFFCyclesperHour,                         // Maximum cycling rate of heat pump [cycles/hr]
+            Real64 &HPTimeConstant,                                // Heat pump time constant [s]
+            Real64 &FanDelayTime,                                  // Fan delay time, time delay for the HP's fan to
+            DataGlobalConstants::CompressorOperation const CompOp, // compressor on/off. 0 = off; 1= on
+            Real64 const PartLoadFrac,                             // part load fraction
+            int const SpeedNum,                                    // compressor speed number
+            Real64 const SpeedRatio,                               // compressor speed ratio
+            Real64 const SensLoad,                                 // Sensible demand load [W]
+            Real64 const LatentLoad,                               // Latent demand load [W]
+            bool const IsCallbyWH, // whether the call from the water heating loop or air loop, true = from water heating loop
             [[maybe_unused]] bool const FirstHVACIteration, // TRUE if First iteration of simulation
             Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
 )

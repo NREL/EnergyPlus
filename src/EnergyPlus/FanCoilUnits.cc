@@ -3841,8 +3841,13 @@ namespace FanCoilUnits {
                 }
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataGlobalConstants::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
@@ -3877,8 +3882,13 @@ namespace FanCoilUnits {
                     state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataGlobalConstants::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
@@ -3925,8 +3935,13 @@ namespace FanCoilUnits {
             }
 
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataGlobalConstants::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index);
             }

@@ -250,8 +250,8 @@ struct WindowACData : BaseGlobalStruct
 
     // Default Constructor
     WindowACData()
-        : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), cWindowAC_UnitTypes(1, cWindowAC_UnitType),
-          MyOneTimeFlag(true), ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true), CoolingLoad(false)
+        : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), cWindowAC_UnitTypes(1, cWindowAC_UnitType), MyOneTimeFlag(true),
+          ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true), CoolingLoad(false)
     {
     }
 };

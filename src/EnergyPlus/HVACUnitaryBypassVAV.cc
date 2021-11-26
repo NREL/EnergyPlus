@@ -3922,7 +3922,14 @@ namespace HVACUnitaryBypassVAV {
         int CoilIndex = int(Par(1));
         Real64 OnOffAirFlowFrac = Par(3); // Ratio of compressor ON to compressor OFF air mass flow rate
 
-        DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataGlobalConstants::CompressorOperation::On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
+        DXCoils::CalcDoe2DXCoil(state,
+                                CoilIndex,
+                                DataGlobalConstants::CompressorOperation::On,
+                                false,
+                                PartLoadFrac,
+                                DataHVACGlobals::ContFanCycCoil,
+                                _,
+                                OnOffAirFlowFrac);
 
         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
@@ -3958,8 +3965,14 @@ namespace HVACUnitaryBypassVAV {
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
-        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-            state, CBVAV(CBVAVNumTemp).DXCoolCoilName, FirstHVACIter, DataGlobalConstants::CompressorOperation::On, PartLoadFrac, CoilIndex, DataHVACGlobals::ContFanCycCoil, HXUnitOn);
+        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
+                                                            CBVAV(CBVAVNumTemp).DXCoolCoilName,
+                                                            FirstHVACIter,
+                                                            DataGlobalConstants::CompressorOperation::On,
+                                                            PartLoadFrac,
+                                                            CoilIndex,
+                                                            DataHVACGlobals::ContFanCycCoil,
+                                                            HXUnitOn);
 
         Real64 OutletAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumTemp).DXCoilOutletNode).Temp;
         Real64 Residuum = Par(2) - OutletAirTemp;

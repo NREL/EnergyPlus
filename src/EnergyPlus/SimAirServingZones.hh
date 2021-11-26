@@ -66,7 +66,6 @@ struct EnergyPlusData;
 
 namespace SimAirServingZones {
 
-
     constexpr int BeforeBranchSim(1);
     constexpr int AfterBranchSim(2);
 

@@ -7618,18 +7618,18 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     Real64 SupHeaterLoad; // supplement heater load
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 PartLoadFrac(0.0);   // compressor part load fraction
-    Real64 SpeedRatio(0.0);     // compressor speed ratio
-    bool UnitOn;                // TRUE if unit is on
-    int OutletNode;             // MSHP air outlet node
-    int InletNode;              // MSHP air inlet node
-    Real64 AirMassFlow;         // air mass flow rate [kg/s]
-    Real64 QTotUnitOut;         // capacity output
-    int SpeedNum(1);            // Speed number
-    Real64 QSensUnitOut;        // sensible capacity output
-    Real64 QLatUnitOut;         // latent capacity output
-    DataGlobalConstants::CompressorOperation CompOp;                 // compressor operation; 1=on, 0=off
-    Real64 TotalZoneLatentLoad; // Total ZONE heating load (not including outside air)
+    Real64 PartLoadFrac(0.0);                        // compressor part load fraction
+    Real64 SpeedRatio(0.0);                          // compressor speed ratio
+    bool UnitOn;                                     // TRUE if unit is on
+    int OutletNode;                                  // MSHP air outlet node
+    int InletNode;                                   // MSHP air inlet node
+    Real64 AirMassFlow;                              // air mass flow rate [kg/s]
+    Real64 QTotUnitOut;                              // capacity output
+    int SpeedNum(1);                                 // Speed number
+    Real64 QSensUnitOut;                             // sensible capacity output
+    Real64 QLatUnitOut;                              // latent capacity output
+    DataGlobalConstants::CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    Real64 TotalZoneLatentLoad;                      // Total ZONE heating load (not including outside air)
 
     // zero the fan, DX coils, and supplemental electric heater electricity consumption
 
@@ -7761,19 +7761,19 @@ void SimVariableSpeedHP(EnergyPlusData &state,
 //******************************************************************************
 
 void ControlVSHPOutput(EnergyPlusData &state,
-                       int const PTUnitNum,           // Unit index in fan coil array
-                       bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-                       DataGlobalConstants::CompressorOperation const CompOp,              // compressor operation; 1=on, 0=off
-                       int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
-                       Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                       Real64 const QLatReq,          // latent cooling output needed by zone [W]
-                       int const ZoneNum,             // Index to zone number
-                       int &SpeedNum,                 // Speed number
-                       Real64 &SpeedRatio,            // unit speed ratio for DX coils
-                       Real64 &PartLoadFrac,          // unit part load fraction
-                       Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                       Real64 &SupHeaterLoad,         // Supplemental heater load [W]
-                       bool const HXUnitOn            // flag to enable heat exchanger
+                       int const PTUnitNum,                                   // Unit index in fan coil array
+                       bool const FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
+                       DataGlobalConstants::CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
+                       int const OpMode,                                      // operating mode: CycFanCycCoil | ContFanCycCoil
+                       Real64 const QZnReq,                                   // cooling or heating output needed by zone [W]
+                       Real64 const QLatReq,                                  // latent cooling output needed by zone [W]
+                       int const ZoneNum,                                     // Index to zone number
+                       int &SpeedNum,                                         // Speed number
+                       Real64 &SpeedRatio,                                    // unit speed ratio for DX coils
+                       Real64 &PartLoadFrac,                                  // unit part load fraction
+                       Real64 &OnOffAirFlowRatio,                             // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                       Real64 &SupHeaterLoad,                                 // Supplemental heater load [W]
+                       bool const HXUnitOn                                    // flag to enable heat exchanger
 )
 {
 
@@ -8264,19 +8264,19 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
     //  na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    bool HXUnitOn;            // flag to enable heat exchanger
-    int PTUnitNum;            // MSHP index
-    int ZoneNum;              // Zone index
-    bool FirstHVACIteration;  // FirstHVACIteration flag
-    int OpMode;               // Compressor operating mode
-    Real64 QZnReq;            // zone sensible load (W)
-    Real64 QZnLat;            // zone latent load (W)
-    Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
-    Real64 ZoneSensLoadMet;   // delivered sensible capacity of MSHP
-    Real64 ZoneLatLoadMet;    // delivered latent capacity of MSHP
-    Real64 LoadToBeMet;       // sensible or latent load to be met
-    Real64 ResScale;          // Residual scale
-    DataGlobalConstants::CompressorOperation CompOp;               // compressor operation; 1=on, 0=off
+    bool HXUnitOn;                                   // flag to enable heat exchanger
+    int PTUnitNum;                                   // MSHP index
+    int ZoneNum;                                     // Zone index
+    bool FirstHVACIteration;                         // FirstHVACIteration flag
+    int OpMode;                                      // Compressor operating mode
+    Real64 QZnReq;                                   // zone sensible load (W)
+    Real64 QZnLat;                                   // zone latent load (W)
+    Real64 OnOffAirFlowRatio;                        // ratio of compressor ON airflow to average airflow over timestep
+    Real64 ZoneSensLoadMet;                          // delivered sensible capacity of MSHP
+    Real64 ZoneLatLoadMet;                           // delivered latent capacity of MSHP
+    Real64 LoadToBeMet;                              // sensible or latent load to be met
+    Real64 ResScale;                                 // Residual scale
+    DataGlobalConstants::CompressorOperation CompOp; // compressor operation; 1=on, 0=off
 
     PTUnitNum = int(Par(1));
     ZoneNum = int(Par(2));
@@ -8386,20 +8386,20 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
     //  na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    bool HXUnitOn;            // flag to enable heat exchanger
-    int PTUnitNum;            // MSHP index
-    int ZoneNum;              // Zone index
-    bool FirstHVACIteration;  // FirstHVACIteration flag
-    int OpMode;               // Compressor operating mode
-    Real64 QZnReq;            // zone load (W)
-    Real64 QZnLat;            // zone latent load (W)
-    Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
-    Real64 ZoneSensLoadMet;   // delivered sensible capacity of MSHP
-    Real64 ZoneLatLoadMet;    // delivered latent capacity of MSHP
-    Real64 LoadToBeMet;       // sensible or latent load to be met
-    Real64 ResScale;          // Residual scale
-    int SpeedNum;             // Speed number
-    DataGlobalConstants::CompressorOperation CompOp;               // compressor operation; 1=on, 0=off
+    bool HXUnitOn;                                   // flag to enable heat exchanger
+    int PTUnitNum;                                   // MSHP index
+    int ZoneNum;                                     // Zone index
+    bool FirstHVACIteration;                         // FirstHVACIteration flag
+    int OpMode;                                      // Compressor operating mode
+    Real64 QZnReq;                                   // zone load (W)
+    Real64 QZnLat;                                   // zone latent load (W)
+    Real64 OnOffAirFlowRatio;                        // ratio of compressor ON airflow to average airflow over timestep
+    Real64 ZoneSensLoadMet;                          // delivered sensible capacity of MSHP
+    Real64 ZoneLatLoadMet;                           // delivered latent capacity of MSHP
+    Real64 LoadToBeMet;                              // sensible or latent load to be met
+    Real64 ResScale;                                 // Residual scale
+    int SpeedNum;                                    // Speed number
+    DataGlobalConstants::CompressorOperation CompOp; // compressor operation; 1=on, 0=off
 
     PTUnitNum = int(Par(1));
     ZoneNum = int(Par(2));
@@ -8458,14 +8458,14 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
 //******************************************************************************
 
 void CalcVarSpeedHeatPump(EnergyPlusData &state,
-                          int const PTUnitNum,                 // Unit index in fan coil array
-                          int const ZoneNum,                   // Zone index
-                          bool const FirstHVACIteration,       // flag for 1st HVAC iteration in the time step
-                          DataGlobalConstants::CompressorOperation const CompOp,                    // Compressor on/off; 1=on, 0=off
-                          int const SpeedNum,                  // Speed number
-                          Real64 const SpeedRatio,             // Compressor speed ratio
-                          Real64 const PartLoadFrac,           // compressor part load fraction
-                          Real64 &LoadMet,                     // load met by unit (W)
+                          int const PTUnitNum,                                   // Unit index in fan coil array
+                          int const ZoneNum,                                     // Zone index
+                          bool const FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
+                          DataGlobalConstants::CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
+                          int const SpeedNum,                                    // Speed number
+                          Real64 const SpeedRatio,                               // Compressor speed ratio
+                          Real64 const PartLoadFrac,                             // compressor part load fraction
+                          Real64 &LoadMet,                                       // load met by unit (W)
                           Real64 &LatentLoadMet,               // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
                           Real64 const QZnReq,                 // Zone load (W) unused1208
                           Real64 const QLatReq,                // Zone latent load []
