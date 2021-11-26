@@ -584,7 +584,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
 
     // test sensible control
-    DataGlobalConstants::CompressorOperation CompOn = DataGlobalConstants::CompressorOperation::On;
+    int CompOn = 1;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     // system meets temperature set point
     EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
@@ -759,7 +759,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
 
     // test sensible control
-    DataGlobalConstants::CompressorOperation CompOn = DataGlobalConstants::CompressorOperation::On;
+    int CompOn = 1;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
