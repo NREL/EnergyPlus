@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -247,7 +248,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
     Array1D_int TermUnitSizingNumsCool;
     Array1D_int TermUnitSizingNumsHeat;
     Array1D_int SupNode;
-    Array1D_int SupNodeType;
+    Array1D<DataZoneEquipment::AirNodeType> SupNodeType;
 
     int TUInNode = 0;            // inlet node number of a terminal unit
     Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system

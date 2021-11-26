@@ -3255,7 +3255,7 @@ namespace UnitarySystems {
         }
 
         if (ZoneEquipment) {
-            this->UnitarySystemType_Num = DataZoneEquipment::ZoneUnitarySys_Num;
+            this->UnitarySystemType_Num = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
             this->m_OKToPrintSizing = true;
         } else {
             this->UnitarySystemType_Num = static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel);
@@ -17341,7 +17341,7 @@ namespace UnitarySystems {
                  state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex).NumOfEquipTypes;
                  ++EquipNum) {
                 if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                         .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
+                         .EquipTypeEnum(EquipNum) != DataZoneEquipment::ZoneEquip::ZoneUnitarySys) ||
                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
                             .EquipName(EquipNum) != thisObjectName)
                     continue;

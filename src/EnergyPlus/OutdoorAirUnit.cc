@@ -662,7 +662,7 @@ namespace OutdoorAirUnit {
 
                         // Coil Types
                         switch (OutAirUnit(OAUnitNum).OAEquip(InListNum).Type) {
-                        case (CompType::WaterCoil_Cooling): {
+                        case CompType::WaterCoil_Cooling: {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex =
                                 GetWaterCoilIndex(state,
@@ -697,7 +697,7 @@ namespace OutdoorAirUnit {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;
                             break;
                         }
-                        case (CompType::WaterCoil_SimpleHeat): {
+                        case CompType::WaterCoil_SimpleHeat: {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex =
                                 GetWaterCoilIndex(state,
@@ -726,7 +726,7 @@ namespace OutdoorAirUnit {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;
                             break;
                         }
-                        case (CompType::SteamCoil_AirHeat): {
+                        case CompType::SteamCoil_AirHeat: {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex =
                                 GetSteamCoilIndex(state,
@@ -762,7 +762,7 @@ namespace OutdoorAirUnit {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).FluidIndex = FindRefrigerant(state, "Steam");
                             break;
                         }
-                        case (CompType::WaterCoil_DetailedCool): {
+                        case CompType::WaterCoil_DetailedCool: {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex =
                                 GetWaterCoilIndex(state,
                                                   CompTypeNamesUC[static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(CompNum).Type)],
@@ -797,7 +797,7 @@ namespace OutdoorAirUnit {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;
                             break;
                         }
-                        case (CompType::WaterCoil_CoolingHXAsst): {
+                        case CompType::WaterCoil_CoolingHXAsst: {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilAirInletNode =
                                 GetWHXCoilInletNode(state,
                                                     CompTypeNames[static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(CompNum).Type)],
@@ -826,7 +826,7 @@ namespace OutdoorAirUnit {
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;
                             break;
                         }
-                        case (CompType::Coil_ElectricHeat): {
+                        case CompType::Coil_ElectricHeat: {
                             // Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
                             GetHeatingCoilIndex(state,
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
@@ -844,7 +844,7 @@ namespace OutdoorAirUnit {
                                                       ErrorsFound);
                             break;
                         }
-                        case (CompType::Coil_GasHeat): {
+                        case CompType::Coil_GasHeat: {
                             // Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
                             GetHeatingCoilIndex(state,
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
@@ -862,16 +862,16 @@ namespace OutdoorAirUnit {
                                                   ErrorsFound);
                             break;
                         }
-                        case (CompType::DXSystem): {
+                        case CompType::DXSystem: {
                             // set the data for 100% DOAS DX cooling coil
                             // is a different function call needed here? similar to one in HVACDXSystem
                             // CheckDXCoolingCoilInOASysExists(state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
                             break;
                         }
-                        case (CompType::DXHeatPumpSystem): {
+                        case CompType::DXHeatPumpSystem: {
                             break;
                         }
-                        case (CompType::UnitarySystemModel): {
+                        case CompType::UnitarySystemModel: {
                             UnitarySystems::UnitarySys thisSys;
                             OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(state,
                                                                                                  DataHVACGlobals::UnitarySys_AnyCoilType,
@@ -884,15 +884,15 @@ namespace OutdoorAirUnit {
                             // Heat recovery
                             break;
                         }
-                        case (CompType::HeatXchngrFP):
-                        case (CompType::HeatXchngrSL): {
+                        case CompType::HeatXchngrFP:
+                        case CompType::HeatXchngrSL: {
                             //        CASE('HEATEXCHANGER:DESICCANT:BALANCEDFLOW')
                             //          OutAirUnit(OAUnitNum)%OAEquip(CompNum)%Type= CompType::HeatXchngr
 
                             // Desiccant Dehumidifier
                             break;
                         }
-                        case (CompType::Desiccant): {
+                        case CompType::Desiccant: {
                             // Futher Enhancement
                             //        CASE('DEHUMIDIFIER:DESICCANT:SYSTEM')
                             //          OutAirUnit(OAUnitNum)%OAEquip(CompNum)%Type= CompType::Desiccant
@@ -1159,7 +1159,6 @@ namespace OutdoorAirUnit {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::OutdoorAirUnit_Num;
         using FluidProperties::GetDensityGlycol;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::InitComponentNodes;
@@ -1206,11 +1205,12 @@ namespace OutdoorAirUnit {
 
         if (allocated(ZoneComp)) {
             if (MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName = OutAirUnit(OAUnitNum).AvailManagerListName;
-                ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
+                    OutAirUnit(OAUnitNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
                 MyZoneEqFlag(OAUnitNum) = false;
             }
-            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(OutdoorAirUnit_Num).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
+            OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
         }
 
         if (MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -2253,9 +2253,9 @@ namespace OutdoorAirUnit {
         {
             switch (EquipTypeNum) {
             // Heat recovery
-            case (CompType::HeatXchngrFP): // 'HeatExchanger:AirToAir:FlatPlate',
-            case (CompType::HeatXchngrSL): // 'HeatExchanger:AirToAir:SensibleAndLatent',
-                                           // 'HeatExchanger:Desiccant:BalancedFlow' - unused
+            case CompType::HeatXchngrFP: // 'HeatExchanger:AirToAir:FlatPlate',
+            case CompType::HeatXchngrSL: // 'HeatExchanger:AirToAir:SensibleAndLatent',
+                                         // 'HeatExchanger:Desiccant:BalancedFlow' - unused
             {
 
                 if (Sim) {
@@ -2263,13 +2263,13 @@ namespace OutdoorAirUnit {
                 }
             } break;
             // Desiccant Dehumidifier
-            case (CompType::Desiccant): { // 'Dehumidifier:Desiccant:NoFans'
+            case CompType::Desiccant: { // 'Dehumidifier:Desiccant:NoFans'
                 if (Sim) {
                     SimDesiccantDehumidifier(state, EquipName, FirstHVACIteration, CompIndex);
                 }
 
             } break;
-            case (CompType::WaterCoil_SimpleHeat): { // ('Coil:Heating:Water')
+            case CompType::WaterCoil_SimpleHeat: { // ('Coil:Heating:Water')
 
                 if (Sim) {
                     ControlNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilWaterInletNode;
@@ -2317,20 +2317,20 @@ namespace OutdoorAirUnit {
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
-            case (CompType::SteamCoil_AirHeat): { // 'Coil:Heating:Steam'
+            case CompType::SteamCoil_AirHeat: { // 'Coil:Heating:Steam'
                 if (Sim) {
                     CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
             } break;
-            case (CompType::Coil_ElectricHeat): // 'Coil:Heating:Electric'
-            case (CompType::Coil_GasHeat): {    // 'Coil:Heating:Fuel'
+            case CompType::Coil_ElectricHeat: // 'Coil:Heating:Electric'
+            case CompType::Coil_GasHeat: {    // 'Coil:Heating:Fuel'
                 if (Sim) {
                     //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
                     CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
             } break;
                 // water cooling coil Types
-            case (CompType::WaterCoil_Cooling): { // 'Coil:Cooling:Water'
+            case CompType::WaterCoil_Cooling: { // 'Coil:Cooling:Water'
                 if (Sim) {
                     ControlNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilWaterInletNode;
                     MaxWaterFlow = OutAirUnit(OAUnitNum).OAEquip(EquipNum).MaxWaterMassFlow;
@@ -2382,7 +2382,7 @@ namespace OutdoorAirUnit {
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
-            case (CompType::WaterCoil_DetailedCool): { // 'Coil:Cooling:Water:DetailedGeometry'
+            case CompType::WaterCoil_DetailedCool: { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     ControlNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilWaterInletNode;
                     MaxWaterFlow = OutAirUnit(OAUnitNum).OAEquip(EquipNum).MaxWaterMassFlow;
@@ -2431,7 +2431,7 @@ namespace OutdoorAirUnit {
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
-            case (CompType::WaterCoil_CoolingHXAsst): { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
+            case CompType::WaterCoil_CoolingHXAsst: { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
                 if (Sim) {
                     ControlNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilWaterInletNode;
                     MaxWaterFlow = OutAirUnit(OAUnitNum).OAEquip(EquipNum).MaxWaterMassFlow;
@@ -2476,7 +2476,7 @@ namespace OutdoorAirUnit {
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
-            case (CompType::DXSystem): { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
+            case CompType::DXSystem: { // CoilSystem:Cooling:DX  old 'CompType:UnitaryCoolOnly'
                 if (Sim) {
                     if (OutAirUnit(OAUnitNum).OAEquip(SimCompNum).compPointer == nullptr) {
                         UnitarySystems::UnitarySys thisSys;
@@ -2513,7 +2513,7 @@ namespace OutdoorAirUnit {
                                                latOut);
                 }
             } break;
-            case (CompType::DXHeatPumpSystem): {
+            case CompType::DXHeatPumpSystem: {
                 if (Sim) {
                     if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
                         (OpMode == Operation::CoolingMode)) {
@@ -2524,8 +2524,8 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
             } break;
-                // RAR need new AirLoopHVAC:UnitarySystem object here
-            case (CompType::UnitarySystemModel): { // 'AirLoopHVAC:UnitarySystem'
+                // RAR need new CompType:UnitarySystem object here
+            case CompType::UnitarySystemModel: { // 'CompType:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
                     if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) &&
@@ -2625,7 +2625,7 @@ namespace OutdoorAirUnit {
 
         {
             switch (CoilTypeNum) {
-            case (CompType::Coil_ElectricHeat): {
+            case CompType::Coil_ElectricHeat: {
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
@@ -2652,7 +2652,7 @@ namespace OutdoorAirUnit {
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             } break;
-            case (CompType::Coil_GasHeat): { // 'Coil:Heating:Steam'
+            case CompType::Coil_GasHeat: { // 'Coil:Heating:Steam'
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
@@ -2679,7 +2679,7 @@ namespace OutdoorAirUnit {
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             } break;
-            case (CompType::SteamCoil_AirHeat): { // 'Coil:Heating:Steam'
+            case CompType::SteamCoil_AirHeat: { // 'Coil:Heating:Steam'
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 if ((OpMode == Operation::NeutralMode) || (OpMode == Operation::CoolingMode) ||
@@ -2703,9 +2703,9 @@ namespace OutdoorAirUnit {
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             } break;
-            case (CompType::WaterCoil_SimpleHeat): // 'Coil:Heating:Water')
-            case (CompType::WaterCoil_Cooling):    // 'Coil:Cooling:Water'
-            case (CompType::WaterCoil_DetailedCool): {
+            case CompType::WaterCoil_SimpleHeat: // 'Coil:Heating:Water')
+            case CompType::WaterCoil_Cooling:    // 'Coil:Cooling:Water'
+            case CompType::WaterCoil_DetailedCool: {
                 SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
@@ -2714,7 +2714,7 @@ namespace OutdoorAirUnit {
                                          PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             } break;
-            case (CompType::WaterCoil_CoolingHXAsst): {
+            case CompType::WaterCoil_CoolingHXAsst: {
                 SimHXAssistedCoolingCoil(
                     state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, CoilIndex, ContFanCycCoil);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
