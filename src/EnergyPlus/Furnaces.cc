@@ -255,9 +255,9 @@ namespace Furnaces {
         Real64 FurnaceSavMdot;    // saved furnace inlet air mass flow rate [m3/s]
         Real64 Dummy(0.0);
         CompressorOperation CompOp; // compressor operation; 1=on, 0=off
-        Real64 OnOffAirFlowRatio;                        // Ratio of compressor ON air flow to AVERAGE air flow over time step
-        int FanOpMode;                                   // Fan operating mode (1=CycFanCycCoil, 2=ContFanCycCoil)
-        bool HXUnitOn;                                   // flag to control HX assisted cooling coil
+        Real64 OnOffAirFlowRatio;   // Ratio of compressor ON air flow to AVERAGE air flow over time step
+        int FanOpMode;              // Fan operating mode (1=CycFanCycCoil, 2=ContFanCycCoil)
+        bool HXUnitOn;              // flag to control HX assisted cooling coil
         Real64 ZoneLoadToCoolSPSequenced;
         Real64 ZoneLoadToHeatSPSequenced;
 
@@ -6684,13 +6684,7 @@ namespace Furnaces {
         }
 
         if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            SimDXCoil(state,
-                      BlankString,
-                      CompressorOperation::On,
-                      true,
-                      state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                      1,
-                      0.0);
+            SimDXCoil(state, BlankString, CompressorOperation::On, true, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
             SimHXAssistedCoolingCoil(state,
                                      BlankString,
@@ -7318,12 +7312,12 @@ namespace Furnaces {
                                       int const FurnaceNum,
                                       bool const FirstHVACIteration,
                                       CompressorOperation const CompOp, // compressor operation flag (1=On, 0=Off)
-                                      Real64 const ZoneLoad,                                 // the control zone load (watts)
-                                      Real64 const MoistureLoad,                             // the control zone latent load (watts)
-                                      Real64 &HeatCoilLoad,      // Heating load to be met by heating coil ( excluding heat pump DX coil)
-                                      Real64 &ReheatCoilLoad,    // Heating load to be met by reheat coil using hstat (excluding HP DX coil)
-                                      Real64 &OnOffAirFlowRatio, // Ratio of compressor ON air flow to AVERAGE air flow over time step
-                                      bool &HXUnitOn             // flag to control HX based on zone moisture load
+                                      Real64 const ZoneLoad,            // the control zone load (watts)
+                                      Real64 const MoistureLoad,        // the control zone latent load (watts)
+                                      Real64 &HeatCoilLoad,             // Heating load to be met by heating coil ( excluding heat pump DX coil)
+                                      Real64 &ReheatCoilLoad,           // Heating load to be met by reheat coil using hstat (excluding HP DX coil)
+                                      Real64 &OnOffAirFlowRatio,        // Ratio of compressor ON air flow to AVERAGE air flow over time step
+                                      bool &HXUnitOn                    // flag to control HX based on zone moisture load
     )
     {
         // SUBROUTINE INFORMATION:
@@ -8737,12 +8731,12 @@ namespace Furnaces {
     }
 
     void CalcWaterToAirHeatPump(EnergyPlusData &state,
-                                int const AirLoopNum,                                  // index to air loop
-                                int const FurnaceNum,                                  // index to Furnace
-                                bool const FirstHVACIteration,                         // TRUE on first HVAC iteration
+                                int const AirLoopNum,             // index to air loop
+                                int const FurnaceNum,             // index to Furnace
+                                bool const FirstHVACIteration,    // TRUE on first HVAC iteration
                                 CompressorOperation const CompOp, // compressor operation flag (1=On, 0=Off)
-                                Real64 const ZoneLoad,                                 // the control zone load (watts)
-                                Real64 const MoistureLoad                              // the control zone latent load (watts)
+                                Real64 const ZoneLoad,            // the control zone load (watts)
+                                Real64 const MoistureLoad         // the control zone latent load (watts)
     )
     {
 
@@ -9331,16 +9325,16 @@ namespace Furnaces {
     void CalcFurnaceOutput(EnergyPlusData &state,
                            int const FurnaceNum,
                            bool const FirstHVACIteration,
-                           int const FanOpMode,                                   // Cycling fan or constant fan
+                           int const FanOpMode,              // Cycling fan or constant fan
                            CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
-                           Real64 const CoolPartLoadRatio,                        // DX cooling coil part load ratio
-                           Real64 const HeatPartLoadRatio,                        // DX heating coil part load ratio (0 for other heating coil types)
-                           Real64 const HeatCoilLoad,                             // Heating coil load for gas heater
-                           Real64 const ReheatCoilLoad,                           // Reheating coil load for gas heater
-                           Real64 &SensibleLoadMet,   // Sensible cooling load met (furnace outlet with respect to control zone temp)
-                           Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-                           Real64 &OnOffAirFlowRatio, // Ratio of compressor ON mass flow rate to AVERAGE
-                           bool const HXUnitOn,       // flag to enable HX based on zone moisture load
+                           Real64 const CoolPartLoadRatio,   // DX cooling coil part load ratio
+                           Real64 const HeatPartLoadRatio,   // DX heating coil part load ratio (0 for other heating coil types)
+                           Real64 const HeatCoilLoad,        // Heating coil load for gas heater
+                           Real64 const ReheatCoilLoad,      // Reheating coil load for gas heater
+                           Real64 &SensibleLoadMet,          // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                           Real64 &LatentLoadMet,            // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+                           Real64 &OnOffAirFlowRatio,        // Ratio of compressor ON mass flow rate to AVERAGE
+                           bool const HXUnitOn,              // flag to enable HX based on zone moisture load
                            Optional<Real64 const> CoolingHeatingPLRRat // cooling PLR to heating PLR ratio, used for cycling fan RH control
     )
     {
@@ -9851,21 +9845,21 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;                                  // Index to furnace
-        bool FirstHVACIteration;                         // FirstHVACIteration flag
-        int FanOpMode;                                   // Cycling fan or constant fan
-        CompressorOperation CompOp; // Compressor on/off; 1=on, 0=off
-        Real64 CoolPartLoadRatio;                        // DX cooling coil part load ratio
-        Real64 HeatPartLoadRatio;                        // DX heating coil part load ratio (0 for other heating coil types)
-        Real64 HeatCoilLoad;                             // Heating coil load for gas heater
-        Real64 SensibleLoadMet;                          // Sensible cooling load met (furnace outlet with respect to control zone temp)
-        Real64 LatentLoadMet;                            // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-        Real64 LoadToBeMet;                              // Sensible or Latent load to be met by furnace
-        Real64 OnOffAirFlowRatio;                        // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
-        Real64 RuntimeFrac;                              // heat pump runtime fraction
-        Real64 CoolingHeatingPLRRatio;                   // ratio of cooling PLR to heating PLR, used for cycling fan RH control
-        bool HXUnitOn;                                   // flag to enable HX based on zone moisture load
-        bool errFlag;                                    // flag denoting error in runtime calculation
+        int FurnaceNum;                // Index to furnace
+        bool FirstHVACIteration;       // FirstHVACIteration flag
+        int FanOpMode;                 // Cycling fan or constant fan
+        CompressorOperation CompOp;    // Compressor on/off; 1=on, 0=off
+        Real64 CoolPartLoadRatio;      // DX cooling coil part load ratio
+        Real64 HeatPartLoadRatio;      // DX heating coil part load ratio (0 for other heating coil types)
+        Real64 HeatCoilLoad;           // Heating coil load for gas heater
+        Real64 SensibleLoadMet;        // Sensible cooling load met (furnace outlet with respect to control zone temp)
+        Real64 LatentLoadMet;          // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+        Real64 LoadToBeMet;            // Sensible or Latent load to be met by furnace
+        Real64 OnOffAirFlowRatio;      // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
+        Real64 RuntimeFrac;            // heat pump runtime fraction
+        Real64 CoolingHeatingPLRRatio; // ratio of cooling PLR to heating PLR, used for cycling fan RH control
+        bool HXUnitOn;                 // flag to enable HX based on zone moisture load
+        bool errFlag;                  // flag denoting error in runtime calculation
 
         // Convert parameters to usable variables
         FurnaceNum = int(Par(1));
@@ -10004,16 +9998,16 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;                                  // Index to furnace
-        bool FirstHVACIteration;                         // FirstHVACIteration flag
-        int FanOpMode;                                   // Cycling fan or constant fan
+        int FurnaceNum;             // Index to furnace
+        bool FirstHVACIteration;    // FirstHVACIteration flag
+        int FanOpMode;              // Cycling fan or constant fan
         CompressorOperation CompOp; // Compressor on/off; 1=on, 0=off
-        Real64 CoolPartLoadRatio;                        // DX cooling coil part load ratio
-        Real64 HeatPartLoadRatio;                        // DX heating coil part load ratio (0 for other heating coil types)
-        Real64 HeatCoilLoad;                             // Heating coil load for gas heater
-        Real64 ZoneSensLoadMet;                          // Sensible cooling load met (furnace outlet with respect to control zone temp)
-        Real64 ZoneLatLoadMet;                           // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-        Real64 LoadToBeMet;                              // Sensible or Latent load to be met by furnace
+        Real64 CoolPartLoadRatio;   // DX cooling coil part load ratio
+        Real64 HeatPartLoadRatio;   // DX heating coil part load ratio (0 for other heating coil types)
+        Real64 HeatCoilLoad;        // Heating coil load for gas heater
+        Real64 ZoneSensLoadMet;     // Sensible cooling load met (furnace outlet with respect to control zone temp)
+        Real64 ZoneLatLoadMet;      // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+        Real64 LoadToBeMet;         // Sensible or Latent load to be met by furnace
         bool errFlag;
         Real64 RuntimeFrac;
         Real64 Dummy;
@@ -10688,20 +10682,20 @@ namespace Furnaces {
         Real64 QTotUnitOut;  // capacity output
         auto &SpeedNum = state.dataFurnaces->SpeedNum;
         auto &SupHeaterLoad = state.dataFurnaces->SupHeaterLoad;
-        Real64 TotalZoneLatentLoad;                      // Total ZONE latent load
-        Real64 TotalZoneSensibleLoad;                    // Total ZONE sensible load
-        Real64 SystemSensibleLoad;                       // Positive value means heating required
-        CompressorOperation CompOp; // compressor operation; 1=on, 0=off
-        Real64 SaveMassFlowRate;                         // saved inlet air mass flow rate [kg/s]
-        Real64 QSensUnitOut;                             // sensible capacity output
-        Real64 QLatUnitOut;                              // latent capacity output
-        Real64 ActualSensibleOutput;                     // Actual furnace sensible capacity
-        Real64 ReheatCoilLoad;                           // reheat coil load due to dehumidification
-        Real64 QToHeatSetPt;                             // Load required to meet heating setpoint temp (>0 is a heating load)
-        Real64 NoCompOutput;                             // output when no active compressor [W]
-        int TotBranchNum;                                // total exit branch number
-        int ZoneSideNodeNum;                             // zone equip supply node
-        bool EconoActive;                                // TRUE if Economizer is active
+        Real64 TotalZoneLatentLoad;   // Total ZONE latent load
+        Real64 TotalZoneSensibleLoad; // Total ZONE sensible load
+        Real64 SystemSensibleLoad;    // Positive value means heating required
+        CompressorOperation CompOp;   // compressor operation; 1=on, 0=off
+        Real64 SaveMassFlowRate;      // saved inlet air mass flow rate [kg/s]
+        Real64 QSensUnitOut;          // sensible capacity output
+        Real64 QLatUnitOut;           // latent capacity output
+        Real64 ActualSensibleOutput;  // Actual furnace sensible capacity
+        Real64 ReheatCoilLoad;        // reheat coil load due to dehumidification
+        Real64 QToHeatSetPt;          // Load required to meet heating setpoint temp (>0 is a heating load)
+        Real64 NoCompOutput;          // output when no active compressor [W]
+        int TotBranchNum;             // total exit branch number
+        int ZoneSideNodeNum;          // zone equip supply node
+        bool EconoActive;             // TRUE if Economizer is active
 
         // to be removed by furnace/unitary system
 
@@ -10991,18 +10985,18 @@ namespace Furnaces {
     //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
-                           int const FurnaceNum,                                  // Unit index of engine driven heat pump
-                           bool const FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
+                           int const FurnaceNum,             // Unit index of engine driven heat pump
+                           bool const FirstHVACIteration,    // flag for 1st HVAC iteration in the time step
                            CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
-                           int const OpMode,                                      // operating mode: CycFanCycCoil | ContFanCycCoil
-                           Real64 &QZnReq,                                        // cooling or heating output needed by zone [W]
-                           Real64 &QLatReq,                                       // latent cooling output needed by zone [W]
-                           int const ZoneNum,                                     // Index to zone number
-                           int &SpeedNum,                                         // Speed number
-                           Real64 &SpeedRatio,                                    // unit speed ratio for DX coils
-                           Real64 &PartLoadFrac,                                  // unit part load fraction
-                           Real64 &OnOffAirFlowRatio,                             // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                           Real64 &SupHeaterLoad                                  // Supplemental heater load [W]
+                           int const OpMode,                 // operating mode: CycFanCycCoil | ContFanCycCoil
+                           Real64 &QZnReq,                   // cooling or heating output needed by zone [W]
+                           Real64 &QLatReq,                  // latent cooling output needed by zone [W]
+                           int const ZoneNum,                // Index to zone number
+                           int &SpeedNum,                    // Speed number
+                           Real64 &SpeedRatio,               // unit speed ratio for DX coils
+                           Real64 &PartLoadFrac,             // unit part load fraction
+                           Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                           Real64 &SupHeaterLoad             // Supplemental heater load [W]
     )
     {
 
@@ -11424,13 +11418,13 @@ namespace Furnaces {
     //******************************************************************************
 
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
-                              int const FurnaceNum,                                  // Variable speed heat pump number
-                              bool const FirstHVACIteration,                         // Flag for 1st HVAC iteration
+                              int const FurnaceNum,             // Variable speed heat pump number
+                              bool const FirstHVACIteration,    // Flag for 1st HVAC iteration
                               CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
-                              int const SpeedNum,                                    // Speed number
-                              Real64 const SpeedRatio,                               // Compressor speed ratio
-                              Real64 const PartLoadFrac,                             // Compressor part load fraction
-                              Real64 &SensibleLoadMet,   // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                              int const SpeedNum,               // Speed number
+                              Real64 const SpeedRatio,          // Compressor speed ratio
+                              Real64 const PartLoadFrac,        // Compressor part load fraction
+                              Real64 &SensibleLoadMet,          // Sensible cooling load met (furnace outlet with respect to control zone temp)
                               Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
                               Real64 const QZnReq,       // Zone load (W)
                               Real64 const QLatReq,      // Zone latent load []
@@ -12143,18 +12137,18 @@ namespace Furnaces {
         //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;                                  // MSHP index
-        int ZoneNum;                                     // Zone index
-        bool FirstHVACIteration;                         // FirstHVACIteration flag
-        int OpMode;                                      // Compressor operating mode
-        Real64 QZnReq;                                   // zone sensible load (W)
-        Real64 QZnLat;                                   // zone latent load (W)
-        Real64 OnOffAirFlowRatio;                        // ratio of compressor ON airflow to average airflow over timestep
-        Real64 ZoneSensLoadMet;                          // delivered sensible capacity of MSHP
-        Real64 ZoneLatLoadMet;                           // delivered latent capacity of MSHP
-        Real64 LoadToBeMet;                              // sensible or latent load to be met
-        Real64 SupHeaterLoad;                            // Supplemental heater load
-        Real64 ResScale;                                 // Residual scale
+        int FurnaceNum;             // MSHP index
+        int ZoneNum;                // Zone index
+        bool FirstHVACIteration;    // FirstHVACIteration flag
+        int OpMode;                 // Compressor operating mode
+        Real64 QZnReq;              // zone sensible load (W)
+        Real64 QZnLat;              // zone latent load (W)
+        Real64 OnOffAirFlowRatio;   // ratio of compressor ON airflow to average airflow over timestep
+        Real64 ZoneSensLoadMet;     // delivered sensible capacity of MSHP
+        Real64 ZoneLatLoadMet;      // delivered latent capacity of MSHP
+        Real64 LoadToBeMet;         // sensible or latent load to be met
+        Real64 SupHeaterLoad;       // Supplemental heater load
+        Real64 ResScale;            // Residual scale
         CompressorOperation CompOp; // compressor operation; 1=on, 0=off
 
         FurnaceNum = int(Par[0]);
@@ -12261,19 +12255,19 @@ namespace Furnaces {
         //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;                                  // MSHP index
-        int ZoneNum;                                     // Zone index
-        bool FirstHVACIteration;                         // FirstHVACIteration flag
-        int OpMode;                                      // Compressor operating mode
-        Real64 QZnReq;                                   // zone load (W)
-        Real64 QZnLat;                                   // zone latent load (W)
-        Real64 OnOffAirFlowRatio;                        // ratio of compressor ON airflow to average airflow over timestep
-        Real64 ZoneSensLoadMet;                          // delivered sensible capacity of MSHP
-        Real64 ZoneLatLoadMet;                           // delivered latent capacity of MSHP
-        Real64 LoadToBeMet;                              // sensible or latent load to be met
-        Real64 SupHeaterLoad;                            // Supplemental heater load
-        Real64 ResScale;                                 // Residual scale
-        int SpeedNum;                                    // Speed number
+        int FurnaceNum;             // MSHP index
+        int ZoneNum;                // Zone index
+        bool FirstHVACIteration;    // FirstHVACIteration flag
+        int OpMode;                 // Compressor operating mode
+        Real64 QZnReq;              // zone load (W)
+        Real64 QZnLat;              // zone latent load (W)
+        Real64 OnOffAirFlowRatio;   // ratio of compressor ON airflow to average airflow over timestep
+        Real64 ZoneSensLoadMet;     // delivered sensible capacity of MSHP
+        Real64 ZoneLatLoadMet;      // delivered latent capacity of MSHP
+        Real64 LoadToBeMet;         // sensible or latent load to be met
+        Real64 SupHeaterLoad;       // Supplemental heater load
+        Real64 ResScale;            // Residual scale
+        int SpeedNum;               // Speed number
         CompressorOperation CompOp; // compressor operation; 1=on, 0=off
 
         FurnaceNum = int(Par[0]);

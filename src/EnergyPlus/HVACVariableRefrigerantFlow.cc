@@ -9763,8 +9763,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
-            SimDXCoil(
-                state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+            SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
         }
         state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {

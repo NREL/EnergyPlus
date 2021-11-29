@@ -16171,14 +16171,8 @@ namespace UnitarySystems {
                     thisSys.m_CoolingPartLoadFrac = CycRatio;
                     thisSys.calcPassiveSystem(state, AirloopNum, FirstHVACIteration);
                 } else {
-                    DXCoils::CalcMultiSpeedDXCoilCooling(state,
-                                                         CoilIndex,
-                                                         SpeedRatio,
-                                                         CycRatio,
-                                                         SpeedNum,
-                                                         FanOpMode,
-                                                         static_cast<DataHVACGlobals::CompressorOperation>(CompOp),
-                                                         0);
+                    DXCoils::CalcMultiSpeedDXCoilCooling(
+                        state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, static_cast<DataHVACGlobals::CompressorOperation>(CompOp), 0);
                 }
                 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
 

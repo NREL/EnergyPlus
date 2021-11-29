@@ -131,9 +131,9 @@ using namespace ScheduleManager;
 // Functions
 
 void SimDXCoil(EnergyPlusData &state,
-               std::string_view CompName,                             // name of the fan coil unit
+               std::string_view CompName,        // name of the fan coil unit
                CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
-               bool const FirstHVACIteration,                         // True when first HVAC iteration
+               bool const FirstHVACIteration,    // True when first HVAC iteration
                int &CompIndex,
                int const FanOpMode,                               // allows parent object to control fan mode
                Optional<Real64 const> PartLoadRatio,              // part load ratio (for single speed cycling unit)
@@ -233,16 +233,8 @@ void SimDXCoil(EnergyPlusData &state,
 
         } else if (SELECT_CASE_var == CoilVRF_Cooling) {
 
-            CalcVRFCoolingCoil(state,
-                               DXCoilNum,
-                               CompressorOperation::On,
-                               FirstHVACIteration,
-                               PartLoadRatio,
-                               FanOpMode,
-                               CompCycRatio,
-                               _,
-                               AirFlowRatio,
-                               MaxCap);
+            CalcVRFCoolingCoil(
+                state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, AirFlowRatio, MaxCap);
 
         } else if (SELECT_CASE_var == CoilVRF_Heating) {
 
@@ -276,10 +268,10 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
                          Real64 const SpeedRatio,   // = (CompressorSpeed - CompressorSpeedMin) /
                          Real64 const CycRatio,     // cycling part load ratio for variable speed
                          int &CompIndex,
-                         Optional_int_const SpeedNum,                     // Speed number for multispeed cooling coil onlyn
-                         Optional_int_const FanOpMode,                    // Fan operation mode
-                         CompressorOperation CompOp, // Compressor on/off; 1=on, 0=off
-                         Optional_int_const SingleMode                    // Single mode operation Yes/No; 1=Yes, 0=No
+                         Optional_int_const SpeedNum,  // Speed number for multispeed cooling coil onlyn
+                         Optional_int_const FanOpMode, // Fan operation mode
+                         CompressorOperation CompOp,   // Compressor on/off; 1=on, 0=off
+                         Optional_int_const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 )
 {
 
@@ -391,11 +383,11 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
 }
 
 void SimDXCoilMultiMode(EnergyPlusData &state,
-                        std::string_view CompName,                                              // name of the fan coil unit
+                        std::string_view CompName,                         // name of the fan coil unit
                         [[maybe_unused]] CompressorOperation const CompOp, // compressor operation; 1=on, 0=off !unused1208
-                        bool const FirstHVACIteration,                                          // true if first hvac iteration
-                        Real64 const PartLoadRatio,                                             // part load ratio
-                        int const DehumidMode,                                                  // dehumidification mode (0=normal, 1=enhanced)
+                        bool const FirstHVACIteration,                     // true if first hvac iteration
+                        Real64 const PartLoadRatio,                        // part load ratio
+                        int const DehumidMode,                             // dehumidification mode (0=normal, 1=enhanced)
                         int &CompIndex,
                         int const FanOpMode // allows parent object to control fan mode
 )
@@ -536,8 +528,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
             if ((state.dataDXCoils->DXCoil(DXCoilNum).NumCapacityStages == 1) || (PartLoadRatio <= 0.0)) {
                 // Run stage 1 at its part load
                 PerfMode = DehumidMode * 2 + 1;
-                CalcDoe2DXCoil(
-                    state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PartLoadRatio, FanOpMode, PerfMode);
+                CalcDoe2DXCoil(state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PartLoadRatio, FanOpMode, PerfMode);
                 S1PLR = PartLoadRatio;
                 S2PLR = 0.0;
             } else {
@@ -9544,14 +9535,14 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
 }
 
 void CalcDoe2DXCoil(EnergyPlusData &state,
-                    int const DXCoilNum,                                   // the number of the DX coil to be simulated
-                    CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
-                    bool const FirstHVACIteration,                         // true if this is the first iteration of HVAC
-                    Real64 const PartLoadRatio,                            // sensible cooling load / full load sensible cooling capacity
-                    int const FanOpMode,                                   // Allows parent object to control fan operation
-                    Optional_int_const PerfMode,                           // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                    Optional<Real64 const> OnOffAirFlowRatio,              // ratio of compressor on airflow to compressor off airflow
-                    Optional<Real64 const> CoolingHeatingPLR               // used for cycling fan RH control
+                    int const DXCoilNum,                      // the number of the DX coil to be simulated
+                    CompressorOperation const CompOp,         // compressor operation; 1=on, 0=off
+                    bool const FirstHVACIteration,            // true if this is the first iteration of HVAC
+                    Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
+                    int const FanOpMode,                      // Allows parent object to control fan operation
+                    Optional_int_const PerfMode,              // Performance mode for MultiMode DX coil; Always 1 for other coil types
+                    Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+                    Optional<Real64 const> CoolingHeatingPLR  // used for cycling fan RH control
 )
 {
 
@@ -10631,12 +10622,12 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
 }
 
 void CalcVRFCoolingCoil(EnergyPlusData &state,
-                        int const DXCoilNum,                                   // the number of the DX coil to be simulated
-                        CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
-                        bool const FirstHVACIteration,                         // true if this is the first iteration of HVAC
-                        Real64 const PartLoadRatio,                            // sensible cooling load / full load sensible cooling capacity
-                        int const FanOpMode,                                   // Allows parent object to control fan operation
-                        Real64 const CompCycRatio,                             // cycling ratio of VRF condenser
+                        int const DXCoilNum,                      // the number of the DX coil to be simulated
+                        CompressorOperation const CompOp,         // compressor operation; 1=on, 0=off
+                        bool const FirstHVACIteration,            // true if this is the first iteration of HVAC
+                        Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
+                        int const FanOpMode,                      // Allows parent object to control fan operation
+                        Real64 const CompCycRatio,                // cycling ratio of VRF condenser
                         Optional_int_const PerfMode,              // Performance mode for MultiMode DX coil; Always 1 for other coil types
                         Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
                         Optional<Real64 const> MaxCoolCap         // maximum capacity of DX coil
@@ -13082,7 +13073,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
                                  int const SpeedNum,      // Speed number
                                  int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
                                  CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
-                                 int const SingleMode                                   // Single mode operation Yes/No; 1=Yes, 0=No
+                                 int const SingleMode              // Single mode operation Yes/No; 1=Yes, 0=No
 )
 {
 
@@ -17244,9 +17235,9 @@ Real64 CalcSecondaryDXCoilsSHR(EnergyPlusData &state,
 }
 
 void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
-                                   int const DXCoilNum,                                   // the number of the DX coil to be simulated
-                                   CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
-                                   bool const FirstHVACIteration,                         // true if this is the first iteration of HVAC
+                                   int const DXCoilNum,                     // the number of the DX coil to be simulated
+                                   CompressorOperation const CompOp,        // compressor operation; 1=on, 0=off
+                                   bool const FirstHVACIteration,           // true if this is the first iteration of HVAC
                                    Real64 const PartLoadRatio,              // sensible cooling load / full load sensible cooling capacity
                                    int const FanOpMode,                     // Allows parent object to control fan operation
                                    Real64 const CompCycRatio,               // cycling ratio of VRF condenser
@@ -17712,8 +17703,8 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
 }
 
 void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
-                                   CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
-                                   int const DXCoilNum,                                   // the number of the DX heating coil to be simulated
+                                   CompressorOperation const CompOp,         // compressor operation; 1=on, 0=off
+                                   int const DXCoilNum,                      // the number of the DX heating coil to be simulated
                                    Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                                    int const FanOpMode,                      // Allows parent object to control fan mode
                                    Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow

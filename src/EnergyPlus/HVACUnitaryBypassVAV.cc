@@ -3922,13 +3922,8 @@ namespace HVACUnitaryBypassVAV {
         int CoilIndex = int(Par(1));
         Real64 OnOffAirFlowFrac = Par(3); // Ratio of compressor ON to compressor OFF air mass flow rate
 
-        DXCoils::CalcDoe2DXCoil(state,
-                                CoilIndex, DataHVACGlobals::CompressorOperation::On,
-                                false,
-                                PartLoadFrac,
-                                DataHVACGlobals::ContFanCycCoil,
-                                _,
-                                OnOffAirFlowFrac);
+        DXCoils::CalcDoe2DXCoil(
+            state, CoilIndex, DataHVACGlobals::CompressorOperation::On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
 
         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;

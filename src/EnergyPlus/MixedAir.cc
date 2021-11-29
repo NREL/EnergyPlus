@@ -564,8 +564,7 @@ void SimOAComponent(EnergyPlusData &state,
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0)
-                SimHXAssistedCoolingCoil(
-                    state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
             // iterate on OA sys controller and water coil at the same time
             SolveWaterCoilController(state,
                                      FirstHVACIteration,
