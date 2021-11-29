@@ -64,7 +64,8 @@ namespace DataPlant {
         Unassigned = -1,
         Plant,
         Condenser,
-        Both
+        Both,
+        Num
     };
 
     struct PlantLoopData

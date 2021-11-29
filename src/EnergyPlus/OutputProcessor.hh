@@ -98,9 +98,11 @@ namespace OutputProcessor {
 
     enum class iReportVDD
     {
+        Invalid = -1,
         No,  // Don't report the variable dictionaries in any form
         Yes, // Report the variable dictionaries in "report format"
         IDF, // Report the variable dictionaries in "IDF format"
+        Num
     };
 
     constexpr Real64 MinSetValue(99999999999999.0);
@@ -115,16 +117,18 @@ namespace OutputProcessor {
         Integer,  // ref: GetVariableKeyCountandType, 1 = integer
         Real,     // ref: GetVariableKeyCountandType, 2 = real
         Meter,    // ref: GetVariableKeyCountandType, 3 = meter
-        Schedule  // ref: GetVariableKeyCountandType, 4 = schedule
+        Schedule, // ref: GetVariableKeyCountandType, 4 = schedule
+        Num
     };
 
     enum class MtrType
     {
         Unassigned = -1,
-        Normal,    // Type value for normal meters
-        Custom,    // Type value for custom meters
-        CustomDec, // Type value for custom meters that decrement another meter
-        CustomDiff // Type value for custom meters that difference another meter
+        Normal,     // Type value for normal meters
+        Custom,     // Type value for custom meters
+        CustomDec,  // Type value for custom meters that decrement another meter
+        CustomDiff, // Type value for custom meters that difference another meter
+        Num
     };
 
     constexpr int N_WriteTimeStampFormatData(100);
@@ -192,11 +196,13 @@ namespace OutputProcessor {
         Water,
         OtherKG,
         OtherM3,
-        OtherL
+        OtherL,
+        Num
     };
 
     enum class Unit
     {
+        Invalid = -1,
         kg_s,
         C,
         kgWater_kgDryAir,
@@ -247,7 +253,8 @@ namespace OutputProcessor {
         K_W,
         kgWater_s,
         unknown,
-        customEMS
+        customEMS,
+        Num
     };
 
     enum class ReportingFrequency
@@ -258,19 +265,24 @@ namespace OutputProcessor {
         Daily,         // Write out at 'EndDayFlag'
         Monthly,       // Write out at end of month (must be determined)
         Simulation,    // Write out once per environment 'EndEnvrnFlag'
-        Yearly         // Write out at 'EndYearFlag'
+        Yearly,        // Write out at 'EndYearFlag'
+        Num
     };
 
     enum class StoreType
     {
+        Invalid = -1,
         Averaged = 1, // Type value for "averaged" variables
-        Summed        // Type value for "summed" variables
+        Summed,       // Type value for "summed" variables
+        Num
     };
 
     enum class TimeStepType
     {
+        Invalid = -1,
         TimeStepZone = 1,   // Type value for "zone" timestep variables
         TimeStepSystem = 2, // Type value for "system" timestep variables
+        Num
     };
 
     struct TimeSteps

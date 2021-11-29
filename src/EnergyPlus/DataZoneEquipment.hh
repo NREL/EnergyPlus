@@ -83,7 +83,7 @@ namespace DataZoneEquipment {
         CompInlet,
         Intermediate,
         Outlet,
-        NUM
+        Num
     };
 
     enum class AirLoopHVAC
@@ -93,10 +93,10 @@ namespace DataZoneEquipment {
         ZoneSupplyPlenum,
         ZoneMixer,
         ZoneReturnPlenum,
-        NUM
+        Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNamesCC = {
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::Num)> AirLoopHVACTypeNamesCC = {
         "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
 
     // Start zone equip objects
@@ -135,7 +135,7 @@ namespace DataZoneEquipment {
         UserDefinedZoneHVACForcedAir,
         CoolingPanel,
         ZoneUnitarySys,
-        NUM
+        Num
     };
 
     constexpr int NumValidSysAvailZoneComponents(14);
@@ -144,10 +144,10 @@ namespace DataZoneEquipment {
     // Per Person Ventilation Rate Mode
     enum class PerPersonVentRateMode
     {
-        Unassgined = -1,
+        Unassigned = -1,
         DCVByCurrentLevel,
         ByDesignLevel,
-        NUM
+        Num
     };
 
     enum class LoadDist
@@ -157,7 +157,7 @@ namespace DataZoneEquipment {
         UniformLoading,
         UniformPLRLoading,
         SequentialUniformPLRLoading,
-        NUM
+        Num
     };
 
     enum class iLightReturnExhaustConfig : int

@@ -71,7 +71,8 @@ namespace Humidifiers {
     {
         Unassigned = -1,
         Electric,
-        Gas
+        Gas,
+        Num
     };
 
     // Humidifier normalized thermal efficiency curve types
@@ -80,14 +81,16 @@ namespace Humidifiers {
         Unassigned = -1,
         Linear,
         Quadratic,
-        Cubic
+        Cubic,
+        Num
     };
 
     enum class InletWaterTemp
     {
         Unassigned = -1,
         Fixed,
-        Variable
+        Variable,
+        Num
     };
 
     class HumidifierData

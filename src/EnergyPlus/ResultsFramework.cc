@@ -224,6 +224,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // once per environment 'EndEnvrnFlag'
             sReportFreq = "Yearly";
             break;
+        default:
+            assert(false);
         }
     }
 
@@ -1016,6 +1018,8 @@ namespace ResultsFramework {
                     RIYearlyTSData.setRDataFrameEnabled(true);
                     RIYearlyTSData.addVariable(var);
                     break;
+                default:
+                    assert(false);
                 }
             }
         }
@@ -1046,6 +1050,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // at end of year
             RIYearlyTSData.setRVariablesScanned(true);
             break;
+        default:
+            assert(false);
         }
     }
 
@@ -1102,6 +1108,8 @@ namespace ResultsFramework {
                     RIYearlyTSData.setIDataFrameEnabled(true);
                     RIYearlyTSData.addVariable(var);
                     break;
+                default:
+                    assert(false);
                 }
             }
         }
@@ -1133,6 +1141,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // once per environment 'EndEnvrnFlag'
             RIYearlyTSData.setIVariablesScanned(true);
             break;
+        default:
+            assert(false);
         }
     }
 
@@ -1257,6 +1267,8 @@ namespace ResultsFramework {
                 }
             }
             break;
+        default:
+            assert(false);
         }
 
         // set the scanned variables to true or false
@@ -1282,6 +1294,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // at Yearly
             YRMeters.setRVariablesScanned(true);
             break;
+        default:
+            assert(false);
         }
     }
 

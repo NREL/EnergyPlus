@@ -487,8 +487,9 @@ namespace OutputProcessor {
         case ReportingFrequency::Simulation:
             return " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
             break;
+        default:
+            return " !Hourly";
         }
-        return " !Hourly";
     }
 
     std::string reportingFrequency(ReportingFrequency reportingInterval)
@@ -515,8 +516,9 @@ namespace OutputProcessor {
         case ReportingFrequency::Simulation:
             return "RunPeriod";
             break;
+        default:
+            return "Hourly";
         }
-        return "Hourly";
     }
 
     ReportingFrequency determineFrequency(EnergyPlusData &state, const std::string &FreqString)
@@ -945,9 +947,9 @@ namespace OutputProcessor {
         case StoreType::Summed:
             return "Sum";
             break;
+        default:
+            return "Unknown";
         }
-
-        return "Unknown";
     }
 
     // *****************************************************************************
@@ -4020,7 +4022,8 @@ namespace OutputProcessor {
             op->TrackingYearlyVariables = true;
             write(state.files.eso, 11);
             break;
-            // No default available?
+        default:
+            assert(false);
         }
 
         if (state.dataSQLiteProcedures->sqlite) {
@@ -4128,6 +4131,8 @@ namespace OutputProcessor {
         case ReportingFrequency::Simulation: //  4
             print_meter(state, 11);
             break;
+        default:
+            assert(false);
         }
 
         static constexpr std::string_view keyedValueStringCum("Cumulative ");

@@ -154,6 +154,8 @@ std::string IdfParser::parse_value(std::string const &idf, size_t &index, bool &
     case Token::COMMA:
     case Token::SEMICOLON:
         break;
+    default:
+        assert(false);
     }
 
     success = false;

@@ -75,14 +75,14 @@ namespace RuntimeLanguageProcessor {
     {
         Invalid = -1,
         Unassigned = 0,
-        Number = 1,           // matches the ValueNumber
-        Variable = 4,         // matches the ValueVariable
-        Expression = 5,       // matches the ValueExpression
-        Operator = 7,         // includes basic operators and built-in functions.
-        Parenthesis = 9,      // parenthesis token
-        ParenthesisLeft = 10, // indicates left side parenthesis found in parsing
-        ParenthesisRight = 11 // indicates right side parenthesis found in parsing
-
+        Number = 1,            // matches the ValueNumber
+        Variable = 4,          // matches the ValueVariable
+        Expression = 5,        // matches the ValueExpression
+        Operator = 7,          // includes basic operators and built-in functions.
+        Parenthesis = 9,       // parenthesis token
+        ParenthesisLeft = 10,  // indicates left side parenthesis found in parsing
+        ParenthesisRight = 11, // indicates right side parenthesis found in parsing
+        Num
     };
 
     struct TokenType

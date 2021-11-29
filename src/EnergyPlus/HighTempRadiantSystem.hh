@@ -72,18 +72,20 @@ namespace HighTempRadiantSystem {
     {
         Unassigned = -1,
         Gas,
-        Electric
+        Electric,
+        Num
     };
 
     enum class RadControlType : int
     {
-        Unassigned = 0,
+        Unassigned = -1,
         MATControl = 1001,
         MRTControl = 1002,
         OperativeControl = 1003,
         MATSPControl = 1004,
         MRTSPControl = 1005,
-        OperativeSPControl = 1006
+        OperativeSPControl = 1006,
+        Num
     };
 
     // DERIVED TYPE DEFINITIONS:

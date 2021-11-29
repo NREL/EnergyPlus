@@ -75,7 +75,8 @@ namespace NodeInputManager {
         Unassigned = -1,
         Primary = 1,
         Secondary = 2,
-        Tertiary = 3
+        Tertiary = 3,
+        Num
     };
 
     struct NodeListDef // Derived Type for Node Lists

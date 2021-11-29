@@ -75,6 +75,7 @@ namespace PlantHeatExchangerFluidToFluid {
         CounterFlow,
         ParallelFlow,
         Ideal,
+        Num
     };
 
     enum class iCtrlType
@@ -92,6 +93,7 @@ namespace PlantHeatExchangerFluidToFluid {
         CoolingDifferentialOnOff,
         CoolingSetPointOnOffWithComponentOverride,
         TrackComponentOnOff,
+        Num
     };
 
     enum class iCtrlTemp
@@ -100,12 +102,15 @@ namespace PlantHeatExchangerFluidToFluid {
         WetBulbTemperature,
         DryBulbTemperature,
         LoopTemperature,
+        Num
     };
 
     enum class iHXAction
     {
+        Invalid = -1,
         HeatingSupplySideLoop,
         CoolingSupplySideLoop,
+        Num
     };
 
     struct PlantConnectionStruct : PlantLocation

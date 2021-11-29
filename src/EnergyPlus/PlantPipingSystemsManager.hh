@@ -87,19 +87,24 @@ namespace PlantPipingSystemsManager {
 
     enum class SegmentFlow
     {
+        Invalid = -1,
         IncreasingZ,
-        DecreasingZ
+        DecreasingZ,
+        Num
     };
 
     enum class MeshDistribution
     {
+        Invalid = -1,
         Uniform,
         SymmetricGeometric,
-        Geometric
+        Geometric,
+        Num
     };
 
     enum class RegionType
     {
+        Invalid = -1,
         Pipe,
         BasementWall,
         BasementFloor,
@@ -114,21 +119,25 @@ namespace PlantPipingSystemsManager {
         UnderFloor,
         HorizInsXSide,
         HorizInsZSide,
-        VertInsLowerEdge
+        VertInsLowerEdge,
+        Num
     };
 
     enum class Direction
     {
+        Invalid = -1,
         PositiveY,
         NegativeY,
         PositiveX,
         NegativeX,
         PositiveZ,
-        NegativeZ
+        NegativeZ,
+        Num
     };
 
     enum class PartitionType
     {
+        Invalid = -1,
         BasementWall,
         BasementFloor,
         Pipe,
@@ -141,12 +150,13 @@ namespace PlantPipingSystemsManager {
         UnderFloor,
         HorizInsXSide,
         VertInsLowerEdge,
-        HorizInsZSide
+        HorizInsZSide,
+        Num
     };
 
     enum class CellType
     {
-        Unknown,
+        Unknown = -1,
         Pipe,
         GeneralField,
         GroundSurface,
@@ -158,7 +168,8 @@ namespace PlantPipingSystemsManager {
         Slab,
         HorizInsulation,
         VertInsulation,
-        ZoneGroundInterface
+        ZoneGroundInterface,
+        Num
     };
 
     struct BaseThermalPropertySet

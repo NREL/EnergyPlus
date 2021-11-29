@@ -96,6 +96,7 @@ namespace OutputReportTabular {
         SumOrAverageHoursShown,
         MaximumDuringHoursShown,
         MinimumDuringHoursShown,
+        Num
     };
 
     enum class iTableStyle
@@ -106,22 +107,27 @@ namespace OutputReportTabular {
         Fixed,
         HTML,
         XML,
+        Num
     };
 
     enum class iUnitsStyle
     {
+        Invalid = -1,
         None,
         JtoKWH,
         JtoMJ,
         JtoGJ,
         InchPound,
         NotFound,
+        Num
     };
 
     enum class endUseSubTableType
     {
+        Invalid = -1,
         bySubCategory,
-        bySpaceType
+        bySpaceType,
+        Num
     };
 
     // These correspond to the columns in the load component table
@@ -175,9 +181,11 @@ namespace OutputReportTabular {
 
     enum class iOutputType
     {
+        Invalid = -1,
         zoneOutput,
         airLoopOutput,
         facilityOutput,
+        Num
     };
 
     // MODULE VARIABLE DECLARATIONS:
@@ -194,6 +202,7 @@ namespace OutputReportTabular {
     // LineTypes for reading the stat file
     enum class StatLineType
     {
+        Invalid = -1,
         Initialized, // used as a dummy placeholder
         StatisticsLine,
         LocationLine,
@@ -220,6 +229,7 @@ namespace OutputReportTabular {
         AshStdDes1Line,
         AshStdDes2Line,
         AshStdDes3Line,
+        Num
     };
 
     static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesTubularGCLS = {DataHeatBalance::IntGainType::DaylightingDeviceTubular};

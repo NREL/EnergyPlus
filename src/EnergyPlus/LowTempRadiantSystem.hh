@@ -75,6 +75,7 @@ namespace LowTempRadiantSystem {
         HydronicSystem,     // Variable flow hydronic radiant system
         ConstantFlowSystem, // Constant flow, variable (controlled) temperature radiant system
         ElectricSystem,     // Electric resistance radiant heating system
+        Num
     };
 
     // Operating modes:
@@ -85,42 +86,52 @@ namespace LowTempRadiantSystem {
     // Control types:
     enum class LowTempRadiantControlTypes
     {
-        MATControl,           // Controls system using mean air temperature
-        MRTControl,           // Controls system using mean radiant temperature
-        OperativeControl,     // Controls system using operative temperature
-        ODBControl,           // Controls system using outside air dry-bulb temperature
-        OWBControl,           // Controls system using outside air wet-bulb temperature
-        SurfFaceTempControl,  // Controls system using the surface inside face temperature
-        SurfIntTempControl,   // Controls system using a temperature inside the radiant system construction as defined by the Construction +
-                              // ConstructionProperty:InternalHeatSource inputs
-        RunningMeanODBControl // Controls system using the running mean outdoor dry-bulb temperature
+        Invalid = -1,
+        MATControl,            // Controls system using mean air temperature
+        MRTControl,            // Controls system using mean radiant temperature
+        OperativeControl,      // Controls system using operative temperature
+        ODBControl,            // Controls system using outside air dry-bulb temperature
+        OWBControl,            // Controls system using outside air wet-bulb temperature
+        SurfFaceTempControl,   // Controls system using the surface inside face temperature
+        SurfIntTempControl,    // Controls system using a temperature inside the radiant system construction as defined by the Construction +
+                               // ConstructionProperty:InternalHeatSource inputs
+        RunningMeanODBControl, // Controls system using the running mean outdoor dry-bulb temperature
+        Num
     };
+
     // Setpoint Types:
     enum class LowTempRadiantSetpointTypes
     {
+        Invalid = -1,
         halfFlowPower, // Controls system where the setpoint is at the 50% flow/power point
-        zeroFlowPower  // Controls system where the setpoint is at the 0% flow/power point
+        zeroFlowPower, // Controls system where the setpoint is at the 0% flow/power point
+        Num
     };
     // Fluid to Slab Heat Transfer Types:
     enum class FluidToSlabHeatTransferTypes
     {
+        Invalid = -1,
         ConvectionOnly, // Convection only model (legacy code, original model)
-        ISOStandard     // Using ISO Standard 1185-2 (convection, conduction through pipe, contact resistance)
+        ISOStandard,    // Using ISO Standard 1185-2 (convection, conduction through pipe, contact resistance)
+        Num
     };
 
     enum class CondContrlType
     {
+        Invalid = -1,
         CondCtrlNone,      // Condensation control--none, so system never shuts down
         CondCtrlSimpleOff, // Condensation control--simple off, system shuts off when condensation predicted
-        CondCtrlVariedOff  // Condensation control--variable off, system modulates to keep running if possible
+        CondCtrlVariedOff, // Condensation control--variable off, system modulates to keep running if possible
+        Num
     };
 
     // Number of Circuits per Surface Calculation Method
     enum class CircuitCalc
     {
         Unassigned = -1,
-        OneCircuit,         // there is 1 circuit per surface
-        CalculateFromLength // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+        OneCircuit,          // there is 1 circuit per surface
+        CalculateFromLength, // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+        Num
     };
 
     struct RadiantSystemBaseData

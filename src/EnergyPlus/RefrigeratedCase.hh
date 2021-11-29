@@ -71,6 +71,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         FloatSuctionTemperature,
         ConstantSuctionTemperature,
+        Num,
     };
 
     // Subcooler type
@@ -79,6 +80,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         LiquidSuction,
         Mechanical,
+        Num,
     };
 
     // Walk In Cooler Stock Door Protection types
@@ -88,6 +90,7 @@ namespace RefrigeratedCase {
         None,
         AirCurtain,
         StripCurtain,
+        Num,
     };
 
     // Walk In Cooler Defrost Control type
@@ -96,6 +99,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         Sched,
         TempTerm,
+        Num
     };
 
     // Walk In Cooler Defrost type
@@ -106,6 +110,7 @@ namespace RefrigeratedCase {
         Elec,
         None,
         OffCycle,
+        Num
     };
 
     // Secondary loop parameters
@@ -114,6 +119,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         AlwaysLiquid,
         PhaseChange,
+        Num
     };
 
     enum class iSecPumpCtrl
@@ -121,6 +127,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         Constant,
         Variable,
+        Num
     };
 
     // Refrigerated display case energy equation form
@@ -131,6 +138,7 @@ namespace RefrigeratedCase {
         CaseTemperatureMethod,
         RHCubic,
         DPCubic,
+        Num
     };
 
     // Cascade condenser temperature control types
@@ -139,14 +147,16 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         TempSet,
         TempFloat,
+        Num
     };
 
     // Water-cooled condenser loop flow type
     enum class iCndsrFlowType : int
     {
-        Unassigned = 0,
-        VariableFlow = 1,
-        ConstantFlow = 2,
+        Unassigned = -1,
+        VariableFlow,
+        ConstantFlow,
+        Num
     };
 
     // Air- and evap-cooled condenser fan speed control types
@@ -157,6 +167,7 @@ namespace RefrigeratedCase {
         ConstantSpeedLinear,
         TwoSpeed,
         ConstantSpeed,
+        Num
     };
 
     // Refrigerated display case rack heat rejection location
@@ -165,6 +176,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         Outdoors,
         Zone,
+        Num
     };
 
     // Refrigerated display case defrost type
@@ -178,7 +190,7 @@ namespace RefrigeratedCase {
         Electric,
         ElectricOnDemand,
         ElectricTerm,
-
+        Num
     };
 
     // Anti-sweat heater control type
@@ -190,6 +202,7 @@ namespace RefrigeratedCase {
         Linear,
         DewPoint,
         HeatBalance,
+        Num
     };
 
     // Compressor rating types
@@ -200,13 +213,16 @@ namespace RefrigeratedCase {
         ReturnGasTemperature,
         Subcooling,
         LiquidTemperature,
+        Num
     };
 
     // Condenser evap cooling water supply
     enum class WaterSupply
     {
+        Invalid = -1,
         FromMains,
         FromTank,
+        Num
     };
 
     enum class iRatingType
@@ -224,6 +240,7 @@ namespace RefrigeratedCase {
         EuropeanSC5Std,
         EuropeanSC5Nom,
         UnitLoadFactorSens,
+        Num
     };
 
     enum class iSHRCorrectionType
@@ -233,6 +250,7 @@ namespace RefrigeratedCase {
         QuadraticSHR,
         European,
         TabularRH_DT1_TRoom,
+        Num
     };
 
     enum class iVerticalLoc
@@ -241,6 +259,7 @@ namespace RefrigeratedCase {
         Ceiling,
         Middle,
         Floor,
+        Num
     };
 
     enum class iSourceType
@@ -248,6 +267,7 @@ namespace RefrigeratedCase {
         Unassigned = -1,
         DetailedSystem,
         SecondarySystem,
+        Num
     };
 
     // Warehouse coil Defrost type
@@ -258,6 +278,7 @@ namespace RefrigeratedCase {
         Elec,
         None,
         OffCycle,
+        Num
     };
 
     struct RefrigCaseData

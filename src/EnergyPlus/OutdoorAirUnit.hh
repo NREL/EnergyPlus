@@ -126,7 +126,8 @@ namespace OutdoorAirUnit {
         Unassigned = -1,
         Neutral,
         Unconditioned,
-        Temperature
+        Temperature,
+        Num
     };
 
     enum class Operation
@@ -134,13 +135,16 @@ namespace OutdoorAirUnit {
         Unassigned = -1,
         HeatingMode, // normal heating coil operation
         CoolingMode, // normal cooling coil operation
-        NeutralMode  // signal coil shouldn't run
+        NeutralMode, // signal coil shouldn't run
+        Num
     };
 
     enum class CurrentObject
     {
+        Invalid = -1,
         OAUnit,
-        EqList
+        EqList,
+        Num
     };
 
     constexpr const char *CurrentModuleObjects(CurrentObject const co)
@@ -150,8 +154,9 @@ namespace OutdoorAirUnit {
             return "ZoneHVAC:OutdoorAirUnit";
         case CurrentObject::EqList:
             return "ZoneHVAC:OutdoorAirUnit:EquipmentList";
+        default:
+            return "";
         }
-        return "";
     }
 
     struct OAEquipList

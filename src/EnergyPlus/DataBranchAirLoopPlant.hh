@@ -78,7 +78,6 @@ namespace DataBranchAirLoopPlant {
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
     enum class ControlTypeEnum
     {
-        // TODO: enum check
         Invalid = -1,
         Unknown,
         Active,

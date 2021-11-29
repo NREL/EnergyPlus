@@ -73,6 +73,7 @@ namespace Pumps {
         Unassigned = -1,
         Continuous,   // Pump control type (pump always running)
         Intermittent, // Pump control type (pump runs only when there is a demand)
+        Num
     };
 
     enum class ControlTypeVFD
@@ -80,6 +81,7 @@ namespace Pumps {
         Unassigned = -1,
         VFDManual,    // VFD control type (Scheduled RPM)
         VFDAutomatic, // VFD control type (Variable RPM according to flow request)
+        Num
     };
 
     enum class PumpBankControlSeq
@@ -88,6 +90,7 @@ namespace Pumps {
         OptimalScheme,    // Control sequencing for pump bank
         SequentialScheme, // Control sequencing for pump bank
         UserDefined,      // Control sequencing for pump bank
+        Num
     };
 
     extern std::string const cPump_VarSpeed;
@@ -103,13 +106,16 @@ namespace Pumps {
         ConSpeed = 1,
         Cond = 2,
         Bank_VarSpeed = 3,
-        Bank_ConSpeed = 4
+        Bank_ConSpeed = 4,
+        Num
     };
 
     enum class PowerSizingMethod
     {
+        Invalid = -1,
         sizePowerPerFlow,
-        sizePowerPerFlowPerPressure
+        sizePowerPerFlowPerPressure,
+        Num
     };
 
     struct PumpVFDControlData

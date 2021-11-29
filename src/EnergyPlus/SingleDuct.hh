@@ -240,7 +240,7 @@ namespace SingleDuct {
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
-              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
+              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassigned), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
               ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true),
               MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0), MassFlow3(0.0),
               MassFlowDiff(0.0)
@@ -336,7 +336,7 @@ namespace SingleDuct {
               DOASEnthalpy(0.0), DOASPressure(0.0), DOASMassFlowRate(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), MixedAirEnthalpy(0.0),
               MixedAirPressure(0.0), MixedAirMassFlowRate(0.0), MassFlowRateMaxAvail(0.0), ADUNum(0), TermUnitSizingIndex(0), OneTimeInitFlag(true),
               OneTimeInitFlag2(true), ZoneEqNum(0), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0),
-              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), printWarning(true)
+              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassigned), printWarning(true)
         {
         }
 

@@ -94,9 +94,11 @@ namespace ScheduleManager {
 
     enum class ScheduleInterpolation
     {
+        Invalid = -1,
         No,      // no interpolation
         Average, // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
-        Linear   // linear interpolation from the previous time to the current time for the entire schedule
+        Linear,  // linear interpolation from the previous time to the current time for the entire schedule
+        Num
     };
 
     // Derived Types Variables

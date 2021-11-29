@@ -69,12 +69,13 @@ public:
 
     enum class Token : size_t
     {
-        NONE = 0,
-        END = 1,
-        EXCLAMATION = 2,
-        COMMA = 3,
-        SEMICOLON = 4,
-        STRING = 5
+        NONE,
+        END,
+        EXCLAMATION,
+        COMMA,
+        SEMICOLON,
+        STRING,
+        Num
     };
 
 private:

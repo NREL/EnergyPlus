@@ -72,6 +72,7 @@ namespace PlantComponentTemperatureSources {
         Unassigned = -1,
         Constant,
         Schedule,
+        Num
     };
 
     struct WaterSourceSpecs : PlantComponent

@@ -2332,6 +2332,8 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                     (1 / state.dataPumps->PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor) * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
                 break;
             }
+            default:
+                assert(false);
             }
 
             state.dataPumps->PumpEquip(PumpNum).NomPowerUse =

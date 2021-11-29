@@ -79,11 +79,13 @@ namespace PipeHeatTransfer {
 
     enum class iEnvrnPtr
     {
+        Invalid = -1,
         None,
         ZoneEnv,
         ScheduleEnv,
         OutsideAirEnv,
         GroundEnv,
+        Num
     };
 
     constexpr int PreviousTimeIndex(1);

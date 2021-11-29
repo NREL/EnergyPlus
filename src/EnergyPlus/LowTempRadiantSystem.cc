@@ -2727,10 +2727,12 @@ namespace LowTempRadiantSystem {
 
         enum class OperatingMode
         {
+            Invalid = -1,
             OFF,
             ClgHtg,
             ClgOnly,
-            HtgOnly
+            HtgOnly,
+            Num
         };
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

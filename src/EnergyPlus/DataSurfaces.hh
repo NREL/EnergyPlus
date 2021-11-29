@@ -92,7 +92,7 @@ namespace DataSurfaces {
     {
         // TODO: enum check
         Invalid = -1,
-        None = 0,
+        None,
         Triangle,
         Quadrilateral,
         Rectangle,
@@ -109,7 +109,7 @@ namespace DataSurfaces {
     enum class SurfaceClass : int
     {
         INVALID = -1,
-        None = 0,
+        None,
         Wall,
         Floor,
         Roof,
@@ -129,7 +129,7 @@ namespace DataSurfaces {
 
     enum class WinShadingType : int
     {
-        INVALID = -1,
+        Invalid = -1,
         NoShade = 0,
         ShadeOff = 1,
         IntShade = 2,

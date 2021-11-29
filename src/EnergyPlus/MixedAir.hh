@@ -82,6 +82,7 @@ namespace MixedAir {
         NoLockoutPossible,
         LockoutWithHeatingPossible,
         LockoutWithCompressorPossible,
+        Num
     };
 
     enum class iEconoOp
@@ -95,6 +96,7 @@ namespace MixedAir {
         FixedDewPointAndDryBulb,
         ElectronicEnthalpy,
         DifferentialDryBulbAndEnthalpy,
+        Num
     };
 
     // coil operation
@@ -103,10 +105,12 @@ namespace MixedAir {
 
     enum class iControllerType
     {
+        Invalid = -1,
         None,
         ControllerSimple,
         ControllerOutsideAir,
         ControllerStandAloneERV,
+        Num,
     };
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
@@ -122,7 +126,8 @@ namespace MixedAir {
         OAController,
         ERVController,
         MechVentilation,
-        OAMixer
+        OAMixer,
+        Num,
     };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor

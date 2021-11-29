@@ -108,7 +108,7 @@ namespace DataDaylighting {
     enum class LtgCtrlType
     {
         // TODO: enum check
-        Invalid = 0,
+        Invalid = -1,
         Continuous = 1,
         Stepped = 2,
         ContinuousOff = 3,

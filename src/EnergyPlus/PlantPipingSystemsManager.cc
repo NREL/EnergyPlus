@@ -3895,6 +3895,8 @@ namespace PlantPipingSystemsManager {
                     SegmentOutletCellY = segment->PipeCellCoordinates.Y;
                     SegmentOutletCellZ = 0;
                     break;
+                default:
+                    assert(false);
                 }
                 if (!CircuitInletCellSet) {
                     CircuitInletCellX = SegmentInletCellX;
@@ -4188,7 +4190,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         // it's ok to not simulate this one
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -4905,6 +4907,8 @@ namespace PlantPipingSystemsManager {
         case Direction::PositiveZ:
             distance = (cell.depth() / 2.0);
             break;
+        default:
+            assert(false);
         }
 
         resistance = (distance / 2.0) / (cell.Properties.Conductivity * cell.normalArea(direction));
@@ -5581,7 +5585,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5689,7 +5693,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }

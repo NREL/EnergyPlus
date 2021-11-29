@@ -10046,7 +10046,7 @@ void WindowShadingManager(EnergyPlusData &state)
             // EMS Actuator Point: override setting if ems flag on
             if (state.dataSurface->SurfWinShadingFlagEMSOn(ISurf)) {
                 WinShadingType SurfWinShadingFlagEMS = findValueInEnumeration(state.dataSurface->SurfWinShadingFlagEMSValue(ISurf));
-                if (SurfWinShadingFlagEMS != WinShadingType::INVALID) {
+                if (SurfWinShadingFlagEMS != WinShadingType::Invalid) {
                     state.dataSurface->SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMS;
                 } else {
                     ShowWarningError(state, "Invalid EMS value of Window Shading Control Type for Surface " + state.dataSurface->Surface(ISurf).Name);
@@ -10147,7 +10147,7 @@ DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue)
     if (controlValue == 70.0) return WinShadingType::ExtBlindConditionallyOff;
     if (controlValue == 80.0) return WinShadingType::BGShadeConditionallyOff;
     if (controlValue == 90.0) return WinShadingType::BGBlindConditionallyOff;
-    return WinShadingType::INVALID;
+    return WinShadingType::Invalid;
 }
 
 int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface)

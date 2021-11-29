@@ -70,7 +70,8 @@ namespace PurchasedAirManager {
         NoLimit,
         LimitFlowRate,
         LimitCapacity,
-        LimitFlowRateAndCapacity
+        LimitFlowRateAndCapacity,
+        Num
     };
     constexpr const char *cLimitType(LimitType l)
     {
@@ -96,15 +97,17 @@ namespace PurchasedAirManager {
         ConstantSensibleHeatRatio,
         Humidistat,
         ConstantSupplyHumidityRatio,
+        Num
     };
 
     // Demand controlled ventilation type parameters
     enum class DCV
     {
-        Unassigned,
+        Unassigned = -1,
         NoDCV,
         OccupancySchedule,
-        CO2SetPoint
+        CO2SetPoint,
+        Num
     };
 
     // Outdoor air economizer type parameters
@@ -113,7 +116,8 @@ namespace PurchasedAirManager {
         Unassigned = -1,
         NoEconomizer,
         DifferentialDryBulb,
-        DifferentialEnthalpy
+        DifferentialEnthalpy,
+        Num
     };
 
     // Heat recovery type parameters
@@ -122,16 +126,19 @@ namespace PurchasedAirManager {
         Unassigned = -1,
         NoHeatRecovery,
         Sensible,
-        Enthalpy
+        Enthalpy,
+        Num
     };
 
     // Operating mode parameters
     enum class OpMode
     {
+        Invalid = -1,
         Off,
         Heat,
         Cool,
-        DeadBand
+        DeadBand,
+        Num
     };
 
     struct ZonePurchasedAir
@@ -139,7 +146,7 @@ namespace PurchasedAirManager {
         // Members
         std::string cObjectName;     // Name of the object from IDD
         std::string Name;            // Name or identifier of this piece of equipment
-        std::string AvailSched;      // System availablity schedule
+        std::string AvailSched;      // System availability schedule
         int AvailSchedPtr;           // Index to system availability schedule
         int ZoneSupplyAirNodeNum;    // Node number of zone supply air node for purchased air
         int ZoneExhaustAirNodeNum;   // Node number of zone exhaust air node for purchased air

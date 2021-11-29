@@ -64,8 +64,8 @@ namespace DataHVACControllers {
 
     enum class ControllerAction // Controller action used in modules HVACControllers and ZoneControllers
     {
-        // TODO: enum check
-        NoAction = -1,
+        Invalid = -1,
+        NoAction,
         ReverseAction,
         NormalAction,
         Num
@@ -73,7 +73,7 @@ namespace DataHVACControllers {
 
     enum class ControllerMode // Controller mode used in modules HVACControllers and ZoneControllers
     {
-        invalid = -1, // Controller error. E.g., bad action
+        Invalid = -1, // Controller error. E.g., bad action
         None,         // Controller mode not yet determined
         Off,          // Controller off (no air flow in loop)
         Inactive,     // Controller inactive (equip not available for current step)
@@ -83,7 +83,7 @@ namespace DataHVACControllers {
         Num
     };
 
-    int constexpr iFirstMode(static_cast<int>(ControllerMode::invalid));  // First operating mode in range
+    int constexpr iFirstMode(static_cast<int>(ControllerMode::Invalid));  // First operating mode in range
     int constexpr iLastMode(static_cast<int>(ControllerMode::MaxActive)); // Last operating mode in range
 
     enum class ControllerOperation // Controller operation used in module HVACControllers
@@ -98,9 +98,10 @@ namespace DataHVACControllers {
 
     enum class ControllerWarmRestart // Controller restart flag used in module HVACControllers
     {
-        None = -1, // Indicates that warm restart was not attempted
-        Fail,      // Indicates that warm restart failed
-        Success,   // Indicates that warm restart was successful
+        Invalid = -1,
+        None,    // Indicates that warm restart was not attempted
+        Fail,    // Indicates that warm restart failed
+        Success, // Indicates that warm restart was successful
         Num
     };
 

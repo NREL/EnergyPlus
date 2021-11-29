@@ -74,6 +74,7 @@ namespace PackagedThermalStorageCoil {
         Unassigned = -1,
         ScheduledOpModes,   // control over TES modes is via local schedule
         EMSActuatedOpModes, // control over TES modes is via EMS
+        Num
     };
 
     // Control Modes
@@ -91,20 +92,24 @@ namespace PackagedThermalStorageCoil {
         Unassigned = -1,
         FluidBased,
         IceBased,
+        Num
     };
 
     // Water Systems
     enum class iWaterSys
     {
-        Unassigned,
+        Unassigned = -1,
         CondensateDiscarded, // default mode where water is "lost"
         CondensateToTank,    // collect coil condensate from air and store in water storage tank
+        Num
     };
 
     enum class iWaterSupply
     {
+        Invalid = -1,
         WaterSupplyFromMains,
         WaterSupplyFromTank,
+        Num
     };
 
     // Dehumidification control modes (DehumidControlMode)
