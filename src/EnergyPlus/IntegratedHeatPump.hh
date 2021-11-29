@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
@@ -243,7 +244,7 @@ namespace IntegratedHeatPump {
                 Real64 &MaxONOFFCyclesperHour,                   // Maximum cycling rate of heat pump [cycles/hr]
                 Real64 &HPTimeConstant,                          // Heat pump time constant [s]
                 Real64 &FanDelayTime,                            // Fan delay time, time delay for the HP's fan to
-                DataGlobalConstants::CompressorOperation CompOp, // compressor on/off. 0 = off; 1= on
+                DataHVACGlobals::CompressorOperation CompOp, // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,                        // compressor speed number
                 Real64 const SpeedRatio,                   // compressor speed ratio

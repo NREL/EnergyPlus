@@ -149,15 +149,6 @@ namespace DataGlobalConstants {
         ReadAllWeatherData = 6       // a weather period for reading all weather data prior to the simulation
     };
 
-    // Compressor operation
-    enum class CompressorOperation
-    {
-        Unassigned = -1,
-        Off, // signal DXCoil that compressor shouldn't run
-        On,  // normal compressor operation
-        Num
-    };
-
     Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function
     Real64 constexpr Pi = 3.14159265358979324; // Pi 3.1415926535897932384626435
     Real64 constexpr PiOvr2 = Pi / 2.0;        // Pi/2

@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn =
         state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum;
 
-    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
+    DataHVACGlobals::CompressorOperation CompOp = DataHVACGlobals::CompressorOperation::On;
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
     Real64 MaxONOFFCyclesperHour(4.0);
@@ -792,7 +792,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn =
         state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum;
 
-    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
+    DataHVACGlobals::CompressorOperation CompOp = DataHVACGlobals::CompressorOperation::On;
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
     Real64 MaxONOFFCyclesperHour(4.0);

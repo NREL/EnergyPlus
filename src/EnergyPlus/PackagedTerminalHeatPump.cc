@@ -341,7 +341,7 @@ void SimPTUnit(EnergyPlusData &state,
                                  PTUnitNum,
                                  ZoneNum,
                                  FirstHVACIteration,
-                                 DataGlobalConstants::CompressorOperation::Off,
+                                 CompressorOperation::Off,
                                  1,
                                  0.0,
                                  PartLoadFrac,
@@ -4319,7 +4319,7 @@ void InitPTUnit(EnergyPlusData &state,
                                   state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                   state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                   state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                  DataGlobalConstants::CompressorOperation::Off,
+                                  CompressorOperation::Off,
                                   0.0,
                                   1,
                                   0.0,
@@ -4350,7 +4350,7 @@ void InitPTUnit(EnergyPlusData &state,
                                       state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                       state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                       state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      DataGlobalConstants::CompressorOperation::Off,
+                                      CompressorOperation::Off,
                                       0.0,
                                       1,
                                       0.0,
@@ -4749,7 +4749,7 @@ void InitPTUnit(EnergyPlusData &state,
                                  PTUnitNum,
                                  ZoneNum,
                                  FirstHVACIteration,
-                                 DataGlobalConstants::CompressorOperation::Off,
+                                 CompressorOperation::Off,
                                  1,
                                  0.0,
                                  0.0,
@@ -4788,7 +4788,7 @@ void InitPTUnit(EnergyPlusData &state,
                                          PTUnitNum,
                                          ZoneNum,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::Off,
+                                         CompressorOperation::Off,
                                          1,
                                          0.0,
                                          0.0,
@@ -4845,7 +4845,7 @@ void InitPTUnit(EnergyPlusData &state,
                                          PTUnitNum,
                                          ZoneNum,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::Off,
+                                         CompressorOperation::Off,
                                          1,
                                          0.0,
                                          0.0,
@@ -5467,7 +5467,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                                       state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                       state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                       state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      DataGlobalConstants::CompressorOperation::On,
+                                      CompressorOperation::On,
                                       0.0,
                                       1,
                                       0.0,
@@ -5506,7 +5506,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                                       state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                       state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                       state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      DataGlobalConstants::CompressorOperation::On,
+                                      CompressorOperation::On,
                                       0.0,
                                       1,
                                       0.0,
@@ -5980,7 +5980,7 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                 state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // set SZVAV model variable
             } else {
                 int AirLoopNum = 0;
-                DataGlobalConstants::CompressorOperation CompressorOnFlag = DataGlobalConstants::CompressorOperation::Off;
+                CompressorOperation CompressorOnFlag = CompressorOperation::Off;
                 auto &SZVAVModel(state.dataPTHP->PTUnit(PTUnitNum));
                 // seems like passing these (arguments 2-n) as an array (similar to ControlPTUnitOutputPar) would make this more uniform across
                 // different models
@@ -6273,8 +6273,8 @@ void CalcPTUnit(EnergyPlusData &state,
     // Tuned Named constants to avoid heap allocation when passed to Optional args
     bool constexpr True(true);
     bool constexpr False(false);
-    DataGlobalConstants::CompressorOperation constexpr iZero(DataGlobalConstants::CompressorOperation::Off);
-    DataGlobalConstants::CompressorOperation constexpr iOne(DataGlobalConstants::CompressorOperation::On);
+    CompressorOperation constexpr iZero(CompressorOperation::Off);
+    CompressorOperation constexpr iOne(CompressorOperation::On);
     Real64 constexpr dZero(0.0);
     Real64 constexpr dOne(1.0);
 
@@ -6338,7 +6338,7 @@ void CalcPTUnit(EnergyPlusData &state,
                     SimHXAssistedCoolingCoil(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                              FirstHVACIteration,
-                                             DataGlobalConstants::CompressorOperation::On,
+                                             CompressorOperation::On,
                                              PartLoadFrac,
                                              state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
                                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
@@ -6346,7 +6346,7 @@ void CalcPTUnit(EnergyPlusData &state,
                 } else {
                     SimDXCoil(state,
                               state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                              DataGlobalConstants::CompressorOperation::On,
+                              CompressorOperation::On,
                               FirstHVACIteration,
                               state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
                               state.dataPTHP->PTUnit(PTUnitNum).OpMode,
@@ -6382,7 +6382,7 @@ void CalcPTUnit(EnergyPlusData &state,
                     SimHXAssistedCoolingCoil(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                              FirstHVACIteration,
-                                             DataGlobalConstants::CompressorOperation::Off,
+                                             CompressorOperation::Off,
                                              dZero,
                                              state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
                                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
@@ -6390,7 +6390,7 @@ void CalcPTUnit(EnergyPlusData &state,
                 } else {
                     SimDXCoil(state,
                               state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                              DataGlobalConstants::CompressorOperation::Off,
+                              CompressorOperation::Off,
                               FirstHVACIteration,
                               state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
                               state.dataPTHP->PTUnit(PTUnitNum).OpMode,
@@ -6480,7 +6480,7 @@ void CalcPTUnit(EnergyPlusData &state,
                 if (SELECT_CASE_var == iPTHPType::PTHPUnit) {
                     SimDXCoil(state,
                               state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
-                              DataGlobalConstants::CompressorOperation::On,
+                              CompressorOperation::On,
                               FirstHVACIteration,
                               state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                               state.dataPTHP->PTUnit(PTUnitNum).OpMode,
@@ -6558,7 +6558,7 @@ void CalcPTUnit(EnergyPlusData &state,
                 if (SELECT_CASE_var == iPTHPType::PTHPUnit) {
                     SimDXCoil(state,
                               state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
-                              DataGlobalConstants::CompressorOperation::Off,
+                              CompressorOperation::Off,
                               FirstHVACIteration,
                               state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                               state.dataPTHP->PTUnit(PTUnitNum).OpMode,
@@ -7628,7 +7628,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     int SpeedNum(1);                                 // Speed number
     Real64 QSensUnitOut;                             // sensible capacity output
     Real64 QLatUnitOut;                              // latent capacity output
-    DataGlobalConstants::CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    CompressorOperation CompOp; // compressor operation; 1=on, 0=off
     Real64 TotalZoneLatentLoad;                      // Total ZONE heating load (not including outside air)
 
     // zero the fan, DX coils, and supplemental electric heater electricity consumption
@@ -7641,7 +7641,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
 
     // initialize local variables
     UnitOn = true;
-    CompOp = DataGlobalConstants::CompressorOperation::On;
+    CompOp = CompressorOperation::On;
     OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
     InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
     AirMassFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow;
@@ -7680,7 +7680,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
     // compressor on
-    CompOp = DataGlobalConstants::CompressorOperation::On;
+    CompOp = CompressorOperation::On;
     ControlVSHPOutput(state,
                       PTUnitNum,
                       FirstHVACIteration,
@@ -7763,7 +7763,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
 void ControlVSHPOutput(EnergyPlusData &state,
                        int const PTUnitNum,                                   // Unit index in fan coil array
                        bool const FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
-                       DataGlobalConstants::CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
+                       CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
                        int const OpMode,                                      // operating mode: CycFanCycCoil | ContFanCycCoil
                        Real64 const QZnReq,                                   // cooling or heating output needed by zone [W]
                        Real64 const QLatReq,                                  // latent cooling output needed by zone [W]
@@ -8276,7 +8276,7 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
     Real64 ZoneLatLoadMet;                           // delivered latent capacity of MSHP
     Real64 LoadToBeMet;                              // sensible or latent load to be met
     Real64 ResScale;                                 // Residual scale
-    DataGlobalConstants::CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    CompressorOperation CompOp; // compressor operation; 1=on, 0=off
 
     PTUnitNum = int(Par(1));
     ZoneNum = int(Par(2));
@@ -8296,7 +8296,7 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
 
     OnOffAirFlowRatio = Par(6);
     SupHeaterLoad = Par(7);
-    CompOp = static_cast<DataGlobalConstants::CompressorOperation>(Par(9));
+    CompOp = static_cast<CompressorOperation>(Par(9));
 
     HXUnitOn = (Par(11) > 0.0);
 
@@ -8399,7 +8399,7 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
     Real64 LoadToBeMet;                              // sensible or latent load to be met
     Real64 ResScale;                                 // Residual scale
     int SpeedNum;                                    // Speed number
-    DataGlobalConstants::CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    CompressorOperation CompOp; // compressor operation; 1=on, 0=off
 
     PTUnitNum = int(Par(1));
     ZoneNum = int(Par(2));
@@ -8420,7 +8420,7 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
     OnOffAirFlowRatio = Par(6);
     SupHeaterLoad = Par(7);
     SpeedNum = int(Par(8));
-    CompOp = static_cast<DataGlobalConstants::CompressorOperation>(Par(9));
+    CompOp = static_cast<CompressorOperation>(Par(9));
 
     HXUnitOn = (Par(11) > 0.0);
 
@@ -8461,7 +8461,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                           int const PTUnitNum,                                   // Unit index in fan coil array
                           int const ZoneNum,                                     // Zone index
                           bool const FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
-                          DataGlobalConstants::CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
+                          CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
                           int const SpeedNum,                                    // Speed number
                           Real64 const SpeedRatio,                               // Compressor speed ratio
                           Real64 const PartLoadFrac,                             // compressor part load fraction

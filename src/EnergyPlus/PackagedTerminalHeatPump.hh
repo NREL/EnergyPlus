@@ -452,7 +452,7 @@ namespace PackagedTerminalHeatPump {
     void ControlVSHPOutput(EnergyPlusData &state,
                            int PTUnitNum,                                   // Unit index in fan coil array
                            bool FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
-                           DataGlobalConstants::CompressorOperation CompOp, // compressor operation; 1=on, 0=off
+                           DataHVACGlobals::CompressorOperation CompOp, // compressor operation; 1=on, 0=off
                            int OpMode,                                      // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 QZnReq,                                   // cooling or heating output needed by zone [W]
                            Real64 QLatReq,                                  // latent cooling output needed by zone [W]
@@ -487,7 +487,7 @@ namespace PackagedTerminalHeatPump {
                               int PTUnitNum,                                   // Unit index in fan coil array
                               int ZoneNum,                                     // Zone index
                               bool FirstHVACIteration,                         // flag for 1st HVAC iteration in the time step
-                              DataGlobalConstants::CompressorOperation CompOp, // Compressor on/off; 1=on, 0=off
+                              DataHVACGlobals::CompressorOperation CompOp, // Compressor on/off; 1=on, 0=off
                               int SpeedNum,                                    // Speed number
                               Real64 SpeedRatio,                               // Compressor speed ratio
                               Real64 PartLoadFrac,                             // compressor part load fraction

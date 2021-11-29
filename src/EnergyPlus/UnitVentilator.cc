@@ -3783,7 +3783,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             DataGlobalConstants::CompressorOperation::On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              0.0,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              ContFanCycCoil);
@@ -3907,7 +3907,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             DataGlobalConstants::CompressorOperation::On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              PartLoadRatio,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              FanOpMode);

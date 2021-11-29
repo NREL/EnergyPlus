@@ -3660,7 +3660,7 @@ namespace VentilatedSlab {
                 SimHXAssistedCoolingCoil(state,
                                          state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          state.dataVentilatedSlab->VentSlab(Item).CCoil_Index,
                                          ContFanCycCoil);

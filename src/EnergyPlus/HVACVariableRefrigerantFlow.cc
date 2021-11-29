@@ -9753,7 +9753,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
              state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             SimDXCoil(state,
                       "",
-                      DataGlobalConstants::CompressorOperation::On,
+                      DataHVACGlobals::CompressorOperation::On,
                       FirstHVACIteration,
                       this->CoolCoilIndex,
                       OpMode,
@@ -9764,7 +9764,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
             SimDXCoil(
-                state, "", DataGlobalConstants::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+                state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
         }
         state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -9778,7 +9778,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
              state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
             SimDXCoil(state,
                       "",
-                      DataGlobalConstants::CompressorOperation::Off,
+                      DataHVACGlobals::CompressorOperation::Off,
                       FirstHVACIteration,
                       this->HeatCoilIndex,
                       OpMode,
@@ -9788,7 +9788,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
         } else {
             SimDXCoil(
-                state, "", DataGlobalConstants::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio, _);
+                state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio, _);
         }
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -13028,7 +13028,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
              state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             SimDXCoil(state,
                       "",
-                      DataGlobalConstants::CompressorOperation::On,
+                      DataHVACGlobals::CompressorOperation::On,
                       FirstHVACIteration,
                       this->CoolCoilIndex,
                       OpMode,
@@ -13038,7 +13038,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
-            SimDXCoil(state, "", DataGlobalConstants::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
+            SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
         }
         state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -13052,7 +13052,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
              state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
             SimDXCoil(state,
                       "",
-                      DataGlobalConstants::CompressorOperation::On,
+                      DataHVACGlobals::CompressorOperation::On,
                       FirstHVACIteration,
                       this->HeatCoilIndex,
                       OpMode,
@@ -13061,7 +13061,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       _,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
         } else {
-            SimDXCoil(state, "", DataGlobalConstants::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
+            SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
         }
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {

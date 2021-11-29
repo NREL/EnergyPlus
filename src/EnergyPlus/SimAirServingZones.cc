@@ -3203,7 +3203,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
     // Evaluate water coils with new actuated variables
     if (HXAssistedWaterCoil) {
-        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
+        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
     } else {
         SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
     }
@@ -3278,7 +3278,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
             // Re-evaluate air loop components with new actuated variables
             if (HXAssistedWaterCoil) {
                 SimHXAssistedCoolingCoil(
-                    state, CompName, FirstHVACIteration, DataGlobalConstants::CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
+                    state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             }
@@ -3579,7 +3579,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
             SimHXAssistedCoolingCoil(state,
                                      CompName,
                                      FirstHVACIteration,
-                                     DataGlobalConstants::CompressorOperation::On,
+                                     CompressorOperation::On,
                                      DataPrecisionGlobals::constant_zero,
                                      CompIndex,
                                      ContFanCycCoil,

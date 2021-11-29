@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
     Real64 RuntimeFrac(1.0);
-    DataGlobalConstants::CompressorOperation CompOp = DataGlobalConstants::CompressorOperation::On;
+    DataHVACGlobals::CompressorOperation CompOp = DataHVACGlobals::CompressorOperation::On;
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum = 1;
 
     InitWatertoAirHP(

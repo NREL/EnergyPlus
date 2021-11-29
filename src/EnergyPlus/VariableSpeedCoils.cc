@@ -126,7 +126,7 @@ namespace VariableSpeedCoils {
                                Real64 &MaxONOFFCyclesperHour,                         // Maximum cycling rate of heat pump [cycles/hr]
                                Real64 &HPTimeConstant,                                // Heat pump time constant [s]
                                Real64 &FanDelayTime,                                  // Fan delay time, time delay for the HP's fan to
-                               DataGlobalConstants::CompressorOperation const CompOp, // compressor on/off. 0 = off; 1= on
+                               CompressorOperation const CompOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,                    // compressor speed number
                                Real64 const SpeedRatio,               // compressor speed ratio
@@ -3976,7 +3976,7 @@ namespace VariableSpeedCoils {
                                         runtimeFrac,
                                         SensLoad,
                                         LatentLoad,
-                                        DataGlobalConstants::CompressorOperation::On,
+                                        CompressorOperation::On,
                                         1.0,
                                         1.0,
                                         1.0,
@@ -4111,7 +4111,7 @@ namespace VariableSpeedCoils {
                                         2.0,
                                         runtimeFrac,
                                         SensLoad,
-                                        DataGlobalConstants::CompressorOperation::On,
+                                        CompressorOperation::On,
                                         1.0,
                                         1.0,
                                         1.0,
@@ -5916,7 +5916,7 @@ namespace VariableSpeedCoils {
                                  Real64 &RuntimeFrac,                        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                                  [[maybe_unused]] Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
                                  [[maybe_unused]] Real64 const LatentDemand, // Cooling Latent Demand [W]
-                                 DataGlobalConstants::CompressorOperation const CompOp, // compressor operation flag
+                                 CompressorOperation const CompOp, // compressor operation flag
                                  Real64 const PartLoadRatio,                            // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio,       // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -6155,7 +6155,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
         }
 
-        if (CompOp == DataGlobalConstants::CompressorOperation::Off) {
+        if (CompOp == CompressorOperation::Off) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -7310,7 +7310,7 @@ namespace VariableSpeedCoils {
                                  int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
                                  Real64 &RuntimeFrac,                      // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                                  [[maybe_unused]] Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
-                                 DataGlobalConstants::CompressorOperation const CompOp, // compressor operation flag
+                                 CompressorOperation const CompOp, // compressor operation flag
                                  Real64 const PartLoadRatio,                            // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio,       // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -7456,7 +7456,7 @@ namespace VariableSpeedCoils {
             return;
         }
 
-        if (CompOp == DataGlobalConstants::CompressorOperation::Off) {
+        if (CompOp == CompressorOperation::Off) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }

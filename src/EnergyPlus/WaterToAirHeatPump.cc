@@ -113,7 +113,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         DataGlobalConstants::CompressorOperation const CompOp,
+                         DataHVACGlobals::CompressorOperation const CompOp,
                          Real64 const PartLoadRatio)
     {
 
@@ -1154,7 +1154,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 DataGlobalConstants::CompressorOperation const CompOp,
+                                 DataHVACGlobals::CompressorOperation const CompOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1345,7 +1345,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
         }
 
-        if (CompOp == DataGlobalConstants::CompressorOperation::Off) {
+        if (CompOp == DataHVACGlobals::CompressorOperation::Off) {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }
@@ -1796,7 +1796,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 DataGlobalConstants::CompressorOperation const CompOp,
+                                 DataHVACGlobals::CompressorOperation const CompOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1965,7 +1965,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
         }
 
-        if (CompOp == DataGlobalConstants::CompressorOperation::Off) {
+        if (CompOp == DataHVACGlobals::CompressorOperation::Off) {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }

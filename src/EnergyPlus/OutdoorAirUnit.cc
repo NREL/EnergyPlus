@@ -1720,7 +1720,7 @@ namespace OutdoorAirUnit {
                     SimHXAssistedCoolingCoil(state,
                                              OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                              true,
-                                             DataGlobalConstants::CompressorOperation::On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              0.0,
                                              OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
                                              ContFanCycCoil);
@@ -2718,7 +2718,7 @@ namespace OutdoorAirUnit {
                 SimHXAssistedCoolingCoil(state,
                                          OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          CoilIndex,
                                          ContFanCycCoil);

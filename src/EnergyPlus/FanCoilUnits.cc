@@ -3844,7 +3844,7 @@ namespace FanCoilUnits {
                 SimHXAssistedCoolingCoil(state,
                                          FanCoil(FanCoilNum).CCoilName,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          FanCoil(FanCoilNum).CCoilName_Index,
                                          ContFanCycCoil);
@@ -3885,7 +3885,7 @@ namespace FanCoilUnits {
                 SimHXAssistedCoolingCoil(state,
                                          FanCoil(FanCoilNum).CCoilName,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          FanCoil(FanCoilNum).CCoilName_Index,
                                          ContFanCycCoil);
@@ -3938,7 +3938,7 @@ namespace FanCoilUnits {
                 SimHXAssistedCoolingCoil(state,
                                          FanCoil(FanCoilNum).CCoilName,
                                          FirstHVACIteration,
-                                         DataGlobalConstants::CompressorOperation::On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          FanCoil(FanCoilNum).CCoilName_Index,
                                          ContFanCycCoil);
