@@ -1166,9 +1166,9 @@ void GetPumpInput(EnergyPlusData &state)
 
     for (PumpNum = 1; PumpNum <= state.dataPumps->NumPumps; ++PumpNum) { // CurrentModuleObject='Pumps'
         switch (state.dataPumps->PumpEquip(PumpNum).pumpType) {
-        case (PumpType::VarSpeed):
-        case (PumpType::ConSpeed):
-        case (PumpType::Cond): {
+        case PumpType::VarSpeed:
+        case PumpType::ConSpeed:
+        case PumpType::Cond: {
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
@@ -1226,8 +1226,8 @@ void GetPumpInput(EnergyPlusData &state)
                                 state.dataPumps->PumpEquip(PumpNum).Name);
         } break;
 
-        case (PumpType::Bank_VarSpeed):
-        case (PumpType::Bank_ConSpeed): { // CurrentModuleObject='HeaderedPumps'
+        case PumpType::Bank_VarSpeed:
+        case PumpType::Bank_ConSpeed: { // CurrentModuleObject='HeaderedPumps'
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
@@ -2034,9 +2034,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //***** CALCULATE POWER (1) **!
     //****************************!
     switch (pumpType) {
-    case (PumpType::ConSpeed):
-    case (PumpType::VarSpeed):
-    case (PumpType::Cond): {
+    case PumpType::ConSpeed:
+    case PumpType::VarSpeed:
+    case PumpType::Cond: {
         VolFlowRate = state.dataPumps->PumpMassFlowRate / LoopDensity;
         PartLoadRatio = min(1.0, (VolFlowRate / state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate));
         FracFullLoadPower = state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(1) +
@@ -2046,8 +2046,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         state.dataPumps->Power = FracFullLoadPower * state.dataPumps->PumpEquip(PumpNum).NomPowerUse;
 
     } break;
-    case (PumpType::Bank_ConSpeed):
-    case (PumpType::Bank_VarSpeed): {
+    case PumpType::Bank_ConSpeed:
+    case PumpType::Bank_VarSpeed: {
         // now just assume the last one is (or is not) running at part load
         // if it is actually at full load, the calculations work out to PLR = 1
         // for the last pump, so all is OK
@@ -2428,14 +2428,14 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
         state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy =
             state.dataPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         switch (PumpType) {
-        case (PumpType::ConSpeed):
-        case (PumpType::VarSpeed):
-        case (PumpType::Cond):
+        case PumpType::ConSpeed:
+        case PumpType::VarSpeed:
+        case PumpType::Cond:
             state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = 1;
             break;
 
-        case (PumpType::Bank_ConSpeed):
-        case (PumpType::Bank_VarSpeed):
+        case PumpType::Bank_ConSpeed:
+        case PumpType::Bank_VarSpeed:
             state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = state.dataPumps->NumPumpsRunning;
             break;
         default:
