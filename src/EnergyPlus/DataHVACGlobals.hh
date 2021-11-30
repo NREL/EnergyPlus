@@ -369,7 +369,7 @@ namespace DataHVACGlobals {
     // Compressor operation
     enum class CompressorOperation
     {
-        Unassigned = -1,
+        Invalid = -1,
         Off, // signal DXCoil that compressor shouldn't run
         On,  // normal compressor operation
         Num
