@@ -1757,14 +1757,20 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const DelX(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
         Real64 const Cp_DelX_RhoS_Delt(Cp * DelX * RhoS / Delt);
-        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
+
+        switch (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType) {
+        case CondFDScheme::CrankNicholsonSecondOrder: // Adams-Moulton second order
             Real64 const inv2DelX(1.0 / (2.0 * DelX));
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA1 * (TD(i + 1) - TD_i + TDT_p) + ktA2 * (TD(i - 1) - TD_i + TDT_m)) * inv2DelX)) /
                     (((ktA1 + ktA2) * inv2DelX) + Cp_DelX_RhoS_Delt);
-        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
+            break;
+
+        case CondFDScheme::FullyImplicitFirstOrder: // Adams-Moulton First order
             Real64 const invDelX(1.0 / DelX);
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA2 * TDT_m) + (ktA1 * TDT_p)) * invDelX) / (((ktA1 + ktA2) * invDelX) + Cp_DelX_RhoS_Delt);
-        } else {
+            break;
+
+        default:
             assert(false); // Illegal CondFDSchemeType
         }
 
