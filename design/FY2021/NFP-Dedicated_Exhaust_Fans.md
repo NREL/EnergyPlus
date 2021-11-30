@@ -13,9 +13,9 @@ This new feature intends to provide a convenient way for multiple exhausts in di
 
 ![Exhaust System Configuration](Dedicated_Airstream.png)
 
-Currently modeling this type of configuration in EnergyPlus requires workarounds (to be described in the overview section) and it quite cumbersome to implement for large projects. According to the original requester, the workaround method could also complain about missing “exhaust fans” in the energy report  the  during compliance reviews (e.g. CA Title-24, pp. 257, 2019 version). This calls for an easier way to model a such re-routed exhaust streams, which would also allow more accurate part loads calculation and reporting on the exhaust fans. The proposed work is thus about implementing such a new feature that will allow more flexible exhaust streams routing to meet the modeling needs described above. 
+Currently modeling this type of configuration in EnergyPlus requires workarounds (to be described in the overview section) and it quite cumbersome to implement for large projects. According to the original requester, the workaround method could also complain about missing “exhaust fans” in the energy report  the  during compliance reviews (e.g. CA Title-24, pp. 257, 2019 version [1], or ASHRAE 90.1 [2]). This calls for an easier way to model a such re-routed exhaust streams, which would also allow more accurate part loads calculation and reporting on the exhaust fans. The proposed work is thus about implementing such a new feature that will allow more flexible exhaust streams routing to meet the modeling needs described above. 
 
-Another application for such exhaust systems is health care. ANSI/ASHRAE/ASHE Standard 170-2013 Ventilation of Health Care Facilities specifies that certain types of spaces have a requirement that "All Room Air Exhausted Directly to Outdoors," e.g. ER waiting rooms, laboratories, laundry, etc. This adds the requirement for exhaust flow to track supply flow which is not currently possible at the zone level.
+Another application for such exhaust systems is health care. ANSI/ASHRAE/ASHE Standard 170-2017 [3] Ventilation of Health Care Facilities specifies that certain types of spaces have a requirement that "All Room Air Exhausted Directly to Outdoors," e.g. ER waiting rooms, laboratories, laundry, etc. This adds the requirement for exhaust flow to track supply flow which is not currently possible at the zone level.
 
 ## E-mail and Conference Call Conclusions ##
 
@@ -48,7 +48,7 @@ Based on the existing modules' capabilities and limitations, we proposed to add 
 
 ### Exhasut System ###
 
-An AirLoopHVAC:ExhaustSystem is made to be something similar to a "Return Path"--so it is really like an "Exhaust Path" here. The specifications of the exhaust system would then be similar to that of a return path. However, it could be different from the return path, in that the exhaust path would have a central exhasut fan specified on it. Also, it should also allow individual zone's exhaust to be specified as a ZoneHVAC exhaust system to be used in the AirloopHVAC exhaust system.  
+An AirLoopHVAC:ExhaustSystem is defines how the exhaust air goes out from the airloop(s). It is somehow similar to a "Return Path", as an "Exhaust Path" here.  However, it is different from the return path in that the exhaust path usually come with a central exhasut fan. It will also allow individual zone's exhaust to be specified in details as a zone equipment.  
 
 The following new objects will be added to allow an AirLoopHVAC:ExhaustSystem to be specified: 
 ```
@@ -65,18 +65,16 @@ AirLoopHVAC:ExhaustSystem,
 
 The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume could not be used with the current object.
 
-### Implicit Mixer object similar to AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer ####
+#### Implicit Mixer object similar to AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer ####
 
-With the way how the new AirLoopHVAC:ExhaustSytem is configured above, an explicit mixer object will connect the inputted inlet nodes of the exhaust system and mix them. The mixed air would be connected to the central Exhasut fan's inlet node.  
-
-In the current development, this choice would allow an AirLoopHVAC:Mixer to be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust node of a zone, the outlet node a fan:zoneexhaust object, or the exhaust fan outlet of a newly developed ZoneHVAC:ExhaustSystem. 
+With the way how the new AirLoopHVAC:ExhaustSytem is configured above, it contains an implicit mixer object will connect the airflows coming through the exhaust inlets (the inlet nodes in the input) and mix them to the central exhaust fan inlet. The mixed air outlet will be the central Exhasut fan's inlet node. In the current development, this choice would allow an implicit mixer to connect the incoming exhaust streams to the central exhaust fan in the exhaust system. 
 
 ### ZoneHVAC:ExhaustSystem ###
 
 The inlet nodes inputs in the AirLoopHVAC:ExhaustSystem object are the exit nodes of the newly added ZoneHVAC:ExhaustSystem objects, which will be introduced here.
+Each zone that connected to an inlet of inlet node of the AirLoopHVAC:ExhaustSystem is required to have a ZoneHVAC:ExhaustSystem to described the zone exhaust connections, designs, and controls. 
 
-One piece of important information about each of the indivual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulations. This should be based on either a design (exhaust) flow rate by input or via zone exhaust fan (design flow) inputs. One way to deal with the problem is to enforce an implementaton of ZoneHVAC:ExhaustSystem for each connected zone exhaust, making is a required object for for every zone that connects to the AirLoopHVAC:ExhaustSystem. 
-
+One piece of important information about each of the individual zone exhausts is that there should be at least some information about the design flow rate, which might be important for sizing and simulations. This should be based on either a design (exhaust) flow rate by input or via zone exhaust fan (design flow) inputs. 
 The ZoneHVAC:ExhaustSystem object is going to be added to describe the exhaust design flow information:
 
 ```
@@ -95,13 +93,16 @@ ZoneHVAC:ExhaustSystem,
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
+#### ZoneHVAC:ExhaustSystem as Zone Equipment ####
+
+The newly ZoneHVAC:ExhaustSystem is considered to be an zone equipment, and can be added to the zone equipment list. 
+
+It is also possible to included multipel ZoneHVAC:ExhaustSystem for a single zone, correponding to the design that multiple exhausts could goes together into a central exhaust system, such as mutiple exhaust hoods in a laboratry [4, 5]. 
+
 ### Other considerations ###
 
 #### Report considerations ####
 One issue for using the methods above is which Air loop should the exhaust system belongs when it spans across more than one air loops. One general rule would should be tied to an airloop that it connects to; but there should also be a check to let one airloop to have at most one exhaust system. 
-
-#### ZoneHVAC:ExhaustSystem as Zone Equipment ####
-The newly ZoneHVAC:ExhaustSystem should be considered to be an zone equipment, similar to the existing Fan:ZoneExhaust object. 
 
 ### IDD changes ###
 
@@ -414,3 +415,14 @@ This struct definition and declaration will create a new data struct for the Zon
 
 The function is for reporting the variables related to the exhaust systems, such as the fans' flow rates, energy usages, and pressure drops. 
 
+## Reference ##
+
+[1] Building Energy Efficiency Standards - Title 24, California Energy Commission. Link: https://www.energy.ca.gov/programs-and-topics/programs/building-energy-efficiency-standards
+
+[2] ASHRAE Standard 90.1-2019. Energy Standard for buildings except low-rise Residential buildings. ASHRAE, Atlanta.
+
+[3] ANSI/ASHRAE/ASHE Standard 170-2017, Ventilation of Health Care Facilities. ASHRAE, Atlanta.
+
+[4] T. Smith, G.C. Bell, High-Performance Laboratory Exhaust Devices. Link: https://labs21.lbl.gov/workshop/AdvCourse-HPLabExhDev-5.pdf
+
+[5] D. MacDonald, 2016. Laboratory Design Fundamentals. Link: https://ashraemadison.org/images/ASHRAE_Madison_Lab_Fundamentals_03_14_2016.pdf
