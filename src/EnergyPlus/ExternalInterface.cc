@@ -679,7 +679,7 @@ void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(x).RealVarValue = realVarValueVec[x - 1];
                     }
 
-                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                         ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs");
                         ShowContinueError(state,
                                           "in instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\" of FMU \"" +
@@ -713,7 +713,7 @@ void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(x).RealVarValue = realVarValueVec2[x - 1];
                     }
 
-                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                         ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs");
                         ShowContinueError(state,
                                           "in instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\" of FMU \"" +
@@ -747,7 +747,7 @@ void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(x).RealVarValue = realVarValueVec3[x - 1];
                     }
 
-                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                         ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs");
                         ShowContinueError(state,
                                           "in instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\" of FMU \"" +
@@ -820,7 +820,7 @@ void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
                                     &state.dataExternalInterface->FMU(i).Instance(j).NumInputVariablesInIDF,
                                     &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
-                if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+                if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                     ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs");
                     ShowContinueError(state,
                                       "in instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\" of FMU \"" +
@@ -837,7 +837,7 @@ void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
                                                                                        &state.dataExternalInterface->hStep,
                                                                                        &localfmitrue,
                                                                                        &state.dataExternalInterface->FMU(i).Instance(j).Index);
-            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                 ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to");
                 ShowContinueError(state, "do the coSimulation with instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\"");
                 ShowContinueError(state, "of FMU \"" + state.dataExternalInterface->FMU(i).Name + "\"");
@@ -906,7 +906,7 @@ void InstantiateInitializeFMUImport(EnergyPlusData &state)
                                         &localfmiTrue,
                                         &state.dataExternalInterface->tStop,
                                         &state.dataExternalInterface->FMU(i).Instance(j).Index);
-            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                 ShowSevereError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize");
                 ShowContinueError(state,
                                   "instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\" of FMU \"" +
@@ -945,7 +945,7 @@ void InitializeFMU(EnergyPlusData &state)
                                         &localfmiTrue,
                                         &state.dataExternalInterface->tStop,
                                         &state.dataExternalInterface->FMU(i).Instance(j).Index);
-            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                 ShowSevereError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize");
                 ShowContinueError(state,
                                   "instance \"" + state.dataExternalInterface->FMU(i).Instance(j).Name + "\" of FMU \"" +
@@ -975,7 +975,7 @@ void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation)
     //----Needs to have function that allows to terminates FMU. Was not defined in version 1.0 -- fixme
     for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
         for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
-            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiFatal) {
+            if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::Fatal) {
                 // Cleanup slaves
                 state.dataExternalInterface->FMU(i).Instance(j).fmistatus =
                     fmiEPlusFreeSlave(&state.dataExternalInterface->FMU(i).Instance(j).fmicomponent,
@@ -2132,7 +2132,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                                             &state.dataExternalInterface->FMUTemp(i).Instance(j).NumInputVariablesInIDF,
                                             &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
-                        if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+                        if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                             ShowSevereError(
                                 state,
                                 "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to set an input value in instance \"" +
@@ -2195,7 +2195,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                                         &state.dataExternalInterface->FMUTemp(i).Instance(j).NumInputVariablesInIDF,
                                         &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
-                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmiOK) {
+                    if (state.dataExternalInterface->FMU(i).Instance(j).fmistatus != fmi::OK) {
                         ShowSevereError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: ");
                         ShowContinueError(state, "Error when trying to set inputs in instance");
                         ShowContinueError(state,
