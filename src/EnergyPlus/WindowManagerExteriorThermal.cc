@@ -295,18 +295,6 @@ namespace WindowManager {
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
 
         for (bool isSummer : {false, true}) {
-            // double hExtConvCoeff(0.0);
-            // double hIntConvCoeff(0.0);
-            // if (isSummer) {
-            //    // films from ISO 15099 Section 8.2.3 Summer conditions
-            //    hExtConvCoeff = 8.0;
-            //    hIntConvCoeff = 2.5;
-            //} else {
-            //    // films from ISO 15099 Section 8.2.2 Winter conditions
-            //    hExtConvCoeff = 20.0;
-            //    hIntConvCoeff = 3.6;
-            //}
-
             const auto framehExtConvCoeff{30.0};
             const auto framehIntConvCoeff{8.0};
             const auto tilt{90.0};
