@@ -1432,7 +1432,7 @@ void CalcSimpleController(EnergyPlusData &state,
         return;
     }
 
-    // Intialize root finder
+    // Initialize root finder
     if (ControllerProps(ControlNum).NumCalcCalls == 1) {
         // Set min/max boundaries for root finder on first iteration
         InitializeRootFinder(state,
@@ -1632,7 +1632,8 @@ void FindRootSimpleController(EnergyPlusData &state,
         } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
             ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
             ShowContinueError(state, " Controller name=" + ControllerProps(ControlNum).ControllerName);
-            ShowContinueError(state, " Controller action=" + state.dataHVACCtrl->ActionTypes(static_cast<int>(ControllerProps(ControlNum).Action)));
+            ShowContinueError(
+                state, fmt::format(" Controller action={}", state.dataHVACCtrl->ActionTypes[static_cast<int>(ControllerProps(ControlNum).Action)]));
             ShowContinueError(state,
                               format(" Root candidate x={:.{}T} does not lie within the lower/upper brackets.",
                                      ControllerProps(ControlNum).ActuatedValue,
@@ -1662,8 +1663,8 @@ void FindRootSimpleController(EnergyPlusData &state,
                 ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state,
-                                  "  Controller function is inconsistent with user specified controller action = " +
-                                      state.dataHVACCtrl->ActionTypes(static_cast<int>(ControllerProps(ControlNum).Action)));
+                                  fmt::format("  Controller function is inconsistent with user specified controller action = {}",
+                                              state.dataHVACCtrl->ActionTypes[static_cast<int>(ControllerProps(ControlNum).Action)]));
                 ShowContinueError(state, "  Actuator will be set to maximum action");
                 ShowContinueError(state, "Controller control type=" + ControlVariableTypes(ControllerProps(ControlNum).ControlVar));
                 if (ControllerProps(ControlNum).ControlVar == iCtrl::Temperature) {
@@ -2054,7 +2055,7 @@ void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &I
                     // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
                     if (state.dataLoopNodes->Node(thisController.SensedNode).HumRat >
                         (state.dataLoopNodes->Node(thisController.SensedNode).HumRatMax + 1.0e-5)) {
-                        // Turn on humdity control and restart controller
+                        // Turn on humidity control and restart controller
                         IsConvergedFlag = false;
                         thisController.HumRatCtrlOverride = true;
                         if (thisController.Action == ControllerAction::ReverseAction) {
