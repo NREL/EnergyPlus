@@ -805,17 +805,17 @@ namespace UnitarySystems {
         );
 
         void controlCoolingSystemToSP(EnergyPlusData &state,
-                                      int const AirLoopNum,                        // index to air loop
-                                      bool const FirstHVACIteration,               // First HVAC iteration flag
-                                      bool &HXUnitOn,                              // flag to enable heat exchanger heat recovery
+                                      int const AirLoopNum,                              // index to air loop
+                                      bool const FirstHVACIteration,                     // First HVAC iteration flag
+                                      bool &HXUnitOn,                                    // flag to enable heat exchanger heat recovery
                                       DataHVACGlobals::CompressorOperation &CompressorOp // compressor on/off control
         );
 
         void controlHeatingSystemToSP(EnergyPlusData &state,
-                                      int const AirLoopNum,                         // index to air loop
-                                      bool const FirstHVACIteration,                // First HVAC iteration flag
+                                      int const AirLoopNum,                               // index to air loop
+                                      bool const FirstHVACIteration,                      // First HVAC iteration flag
                                       DataHVACGlobals::CompressorOperation &CompressorOp, // compressor on/off control
-                                      Real64 &HeatCoilLoad                          // load met by heating coil
+                                      Real64 &HeatCoilLoad                                // load met by heating coil
         );
 
         void controlSuppHeatSystemToSP(EnergyPlusData &state,

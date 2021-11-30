@@ -3271,7 +3271,7 @@ namespace FanCoilUnits {
                         Real64 OnOffAirFlowRatio = 1.0;
                         bool HXUnitOn = false;
                         int AirLoopNum = 0;
-                        DataHVACGlobals::CompressorOperation  CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
+                        DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
                         auto &SZVAVModel(FanCoil(FanCoilNum));
                         // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
                         // models

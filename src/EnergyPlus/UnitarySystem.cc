@@ -11751,9 +11751,9 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::controlCoolingSystemToSP(EnergyPlusData &state,
-                                              int const AirLoopNum,                        // index to air loop
-                                              bool const FirstHVACIteration,               // First HVAC iteration flag
-                                              bool &HXUnitOn,                              // flag to enable heat exchanger heat recovery
+                                              int const AirLoopNum,                              // index to air loop
+                                              bool const FirstHVACIteration,                     // First HVAC iteration flag
+                                              bool &HXUnitOn,                                    // flag to enable heat exchanger heat recovery
                                               DataHVACGlobals::CompressorOperation &CompressorOp // compressor on/off control
     )
     {
@@ -12240,9 +12240,15 @@ namespace UnitarySystems {
                                 if (SpeedNum > 1) CycRatio = 0.0;
                                 if (SpeedNum > 1) SpeedRatio = 1.0;
                                 this->m_CoolingSpeedNum = SpeedNum;
-                                this->simMultiSpeedCoils(
-                                    state, AirLoopNum, FirstHVACIteration,
-                                                         CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
+                                this->simMultiSpeedCoils(state,
+                                                         AirLoopNum,
+                                                         FirstHVACIteration,
+                                                         CompressorOp,
+                                                         SensibleLoad,
+                                                         LatentLoad,
+                                                         PartLoadFrac,
+                                                         CoolingCoil,
+                                                         SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                                 if (SpeedNum == this->m_NumOfSpeedCooling) {
                                     FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
@@ -12622,7 +12628,7 @@ namespace UnitarySystems {
                             Par[3] = double(this->m_UnitarySysNum);
                             // Par[4] = CycRatio or SpeedRatio
                             Par[5] = this->m_CoolingSpeedNum;
-                            Par[6] = 1.0; // UnitarySystem(UnitarySysNum)%FanOpMode
+                            Par[6] = 1.0;                                                        // UnitarySystem(UnitarySysNum)%FanOpMode
                             Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // CompressorOp
                             Par[8] = ReqOutput;
 
@@ -13450,10 +13456,10 @@ namespace UnitarySystems {
     } // namespace UnitarySystems
 
     void UnitarySys::controlHeatingSystemToSP(EnergyPlusData &state,
-                                              int const AirLoopNum,                         // index to air loop
-                                              bool const FirstHVACIteration,                // First HVAC iteration flag
+                                              int const AirLoopNum,                               // index to air loop
+                                              bool const FirstHVACIteration,                      // First HVAC iteration flag
                                               DataHVACGlobals::CompressorOperation &CompressorOp, // compressor on/off control
-                                              Real64 &HeatCoilLoad                          // load met by heating coil
+                                              Real64 &HeatCoilLoad                                // load met by heating coil
     )
     {
         // SUBROUTINE INFORMATION:
@@ -13640,9 +13646,15 @@ namespace UnitarySystems {
                                 }
                             }
                         }
-                        this->simMultiSpeedCoils(
-                            state, AirLoopNum, FirstHVACIteration,
-                                                 CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, this->m_SpeedNum);
+                        this->simMultiSpeedCoils(state,
+                                                 AirLoopNum,
+                                                 FirstHVACIteration,
+                                                 CompressorOp,
+                                                 SensibleLoad,
+                                                 LatentLoad,
+                                                 PartLoadFrac,
+                                                 HeatingCoil,
+                                                 this->m_SpeedNum);
 
                     } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) {
@@ -13794,18 +13806,30 @@ namespace UnitarySystems {
                                         this->m_HeatingSpeedRatio = SpeedRatio = 1.0;
                                     }
                                 }
-                                this->simMultiSpeedCoils(
-                                    state, AirLoopNum, FirstHVACIteration,
-                                                         CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
+                                this->simMultiSpeedCoils(state,
+                                                         AirLoopNum,
+                                                         FirstHVACIteration,
+                                                         CompressorOp,
+                                                         SensibleLoad,
+                                                         LatentLoad,
+                                                         PartLoadFrac,
+                                                         HeatingCoil,
+                                                         SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                             } else {
                                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                                     if (SpeedNum > 1) CycRatio = 0.0;
                                     if (SpeedNum > 1) SpeedRatio = 1.0;
                                     this->m_HeatingSpeedNum = SpeedNum;
-                                    this->simMultiSpeedCoils(
-                                        state, AirLoopNum, FirstHVACIteration,
-                                                             CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
+                                    this->simMultiSpeedCoils(state,
+                                                             AirLoopNum,
+                                                             FirstHVACIteration,
+                                                             CompressorOp,
+                                                             SensibleLoad,
+                                                             LatentLoad,
+                                                             PartLoadFrac,
+                                                             HeatingCoil,
+                                                             SpeedNum);
                                     OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                                     if (OutletTemp > DesOutTemp && SensibleLoad) break;
                                 }
@@ -13821,9 +13845,15 @@ namespace UnitarySystems {
                             this->m_HeatingPartLoadFrac = PartLoadFrac;
                             for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                                 this->m_HeatingSpeedNum = SpeedNum;
-                                this->simMultiSpeedCoils(
-                                    state, AirLoopNum, FirstHVACIteration,
-                                                         CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
+                                this->simMultiSpeedCoils(state,
+                                                         AirLoopNum,
+                                                         FirstHVACIteration,
+                                                         CompressorOp,
+                                                         SensibleLoad,
+                                                         LatentLoad,
+                                                         PartLoadFrac,
+                                                         HeatingCoil,
+                                                         SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                                 SpeedRatio = double(SpeedNum) - 1.0;
                                 if (OutletTemp > DesOutTemp && SensibleLoad) break;

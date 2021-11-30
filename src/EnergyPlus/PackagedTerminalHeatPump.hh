@@ -450,19 +450,19 @@ namespace PackagedTerminalHeatPump {
     //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
-                           int PTUnitNum,                               // Unit index in fan coil array
-                           bool FirstHVACIteration,                     // flag for 1st HVAC iteration in the time step
+                           int PTUnitNum,                                     // Unit index in fan coil array
+                           bool FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
                            DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
-                           int OpMode,                                  // operating mode: CycFanCycCoil | ContFanCycCoil
-                           Real64 QZnReq,                               // cooling or heating output needed by zone [W]
-                           Real64 QLatReq,                              // latent cooling output needed by zone [W]
-                           int ZoneNum,                                 // Index to zone number
-                           int &SpeedNum,                               // Speed number
-                           Real64 &SpeedRatio,                          // unit speed ratio for DX coils
-                           Real64 &PartLoadFrac,                        // unit part load fraction
-                           Real64 &OnOffAirFlowRatio,                   // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                           Real64 &SupHeaterLoad,                       // Supplemental heater load [W]
-                           bool HXUnitOn                                // flag to enable heat exchanger
+                           int OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
+                           Real64 QZnReq,                                     // cooling or heating output needed by zone [W]
+                           Real64 QLatReq,                                    // latent cooling output needed by zone [W]
+                           int ZoneNum,                                       // Index to zone number
+                           int &SpeedNum,                                     // Speed number
+                           Real64 &SpeedRatio,                                // unit speed ratio for DX coils
+                           Real64 &PartLoadFrac,                              // unit part load fraction
+                           Real64 &OnOffAirFlowRatio,                         // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                           Real64 &SupHeaterLoad,                             // Supplemental heater load [W]
+                           bool HXUnitOn                                      // flag to enable heat exchanger
     );
 
     //******************************************************************************
@@ -484,14 +484,14 @@ namespace PackagedTerminalHeatPump {
     //******************************************************************************
 
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
-                              int PTUnitNum,                               // Unit index in fan coil array
-                              int ZoneNum,                                 // Zone index
-                              bool FirstHVACIteration,                     // flag for 1st HVAC iteration in the time step
+                              int PTUnitNum,                                     // Unit index in fan coil array
+                              int ZoneNum,                                       // Zone index
+                              bool FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
                               DataHVACGlobals::CompressorOperation CompressorOp, // Compressor on/off; 1=on, 0=off
-                              int SpeedNum,                                // Speed number
-                              Real64 SpeedRatio,                           // Compressor speed ratio
-                              Real64 PartLoadFrac,                         // compressor part load fraction
-                              Real64 &LoadMet,                             // load met by unit (W)
+                              int SpeedNum,                                      // Speed number
+                              Real64 SpeedRatio,                                 // Compressor speed ratio
+                              Real64 PartLoadFrac,                               // compressor part load fraction
+                              Real64 &LoadMet,                                   // load met by unit (W)
                               Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
                               Real64 QZnReq,             // Zone load (W) unused1208
                               Real64 QLatReq,            // Zone latent load []

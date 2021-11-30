@@ -101,10 +101,10 @@ namespace HVACHXAssistedCoolingCoil {
     };
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
-                                  std::string_view HXAssistedCoilName,         // Name of HXAssistedCoolingCoil
-                                  bool const FirstHVACIteration,               // FirstHVACIteration flag
+                                  std::string_view HXAssistedCoilName,               // Name of HXAssistedCoolingCoil
+                                  bool const FirstHVACIteration,                     // FirstHVACIteration flag
                                   DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
-                                  Real64 const PartLoadRatio,                  // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
+                                  Real64 const PartLoadRatio,                        // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                    // Allows the parent object to control fan operation
                                   Optional_bool_const HXUnitEnable = _,   // flag to enable heat exchanger heat recovery
@@ -118,14 +118,14 @@ namespace HVACHXAssistedCoolingCoil {
     void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
-                                   int const HXAssistedCoilNum,                 // Index number for HXAssistedCoolingCoil
-                                   bool const FirstHVACIteration,               // FirstHVACIteration flag
+                                   int const HXAssistedCoilNum,                       // Index number for HXAssistedCoolingCoil
+                                   bool const FirstHVACIteration,                     // FirstHVACIteration flag
                                    DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
-                                   Real64 const PartLoadRatio,                  // Cooling coil part load ratio
-                                   bool const HXUnitOn,                         // Flag to enable heat exchanger
-                                   int const FanOpMode,                         // Allows parent object to control fan operation
-                                   Optional<Real64 const> OnOffAirFlow = _,     // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   Optional_bool_const EconomizerFlag = _       // OA (or airloop) econommizer status
+                                   Real64 const PartLoadRatio,                        // Cooling coil part load ratio
+                                   bool const HXUnitOn,                               // Flag to enable heat exchanger
+                                   int const FanOpMode,                               // Allows parent object to control fan operation
+                                   Optional<Real64 const> OnOffAirFlow = _, // Ratio of compressor ON air mass flow to AVERAGE over time step
+                                   Optional_bool_const EconomizerFlag = _   // OA (or airloop) econommizer status
     );
 
     void GetHXDXCoilIndex(
