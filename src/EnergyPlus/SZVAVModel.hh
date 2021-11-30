@@ -102,10 +102,8 @@ namespace SZVAVModel {
                         Real64 &OnOffAirFlowRatio,
                         bool const &HXUnitOn,
                         int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        DataHVACGlobals::CompressorOperation &CompressorONFlag
-
-    );
+                        Real64 &PartLoadRatio,
+                        DataHVACGlobals::CompressorOperation const &CompressorONFlag);
 
     void calcSZVAVModel(EnergyPlusData &state,
                         FanCoilUnits::FanCoilData &SZVAVModel,
@@ -115,12 +113,10 @@ namespace SZVAVModel {
                         bool const &HeatingLoad,
                         Real64 const &ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
+                        [[maybe_unused]] bool const &HXUnitOn,
                         int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
-
-    );
+                        Real64 &PartLoadRatio,
+                        int const &CompressorONFlag);
 
     void calcSZVAVModel(EnergyPlusData &state,
                         UnitarySystems::UnitarySys &SZVAVModel,
@@ -132,8 +128,8 @@ namespace SZVAVModel {
                         Real64 &OnOffAirFlowRatio,
                         bool const &HXUnitOn,
                         int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        DataHVACGlobals::CompressorOperation &CompressorONFlag);
+                        Real64 &PartLoadRatio,
+                        DataHVACGlobals::CompressorOperation const &CompressorONFlag);
 
 } // namespace SZVAVModel
 

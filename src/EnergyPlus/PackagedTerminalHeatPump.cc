@@ -6273,8 +6273,6 @@ void CalcPTUnit(EnergyPlusData &state,
     // Tuned Named constants to avoid heap allocation when passed to Optional args
     bool constexpr True(true);
     bool constexpr False(false);
-    CompressorOperation constexpr iZero(CompressorOperation::Off);
-    CompressorOperation constexpr iOne(CompressorOperation::On);
     Real64 constexpr dZero(0.0);
     Real64 constexpr dOne(1.0);
 
@@ -6366,7 +6364,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                       state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                       state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                       state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      iOne,
+                                      CompressorOperation::On,
                                       PartLoadFrac,
                                       FirstHVACIteration,
                                       OnOffAirFlowRatio);
@@ -6408,7 +6406,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                       state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                       state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                       state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      iZero,
+                                      CompressorOperation::Off,
                                       dZero,
                                       FirstHVACIteration);
             } else {
@@ -6499,7 +6497,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                           state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                           state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                           state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                          iOne,
+                                          CompressorOperation::On,
                                           PartLoadFrac,
                                           FirstHVACIteration,
                                           OnOffAirFlowRatio);
@@ -6575,7 +6573,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                           state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                           state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                           state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                          iZero,
+                                          CompressorOperation::Off,
                                           dZero,
                                           FirstHVACIteration);
 
