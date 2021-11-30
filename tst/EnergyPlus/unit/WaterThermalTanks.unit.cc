@@ -2687,14 +2687,12 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(
-        *state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(
-        *state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource,
               state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
