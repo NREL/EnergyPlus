@@ -1170,7 +1170,7 @@ namespace SZVAVModel {
                                                 HXUnitOn,
                                                 HeatCoilLoad,
                                                 SupHeaterLoad,
-                                                static_cast<int>(CompressorONFlag));
+                                                CompressorONFlag);
             } else {
                 if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 thisSys.calcUnitarySystemToLoad(state,
@@ -1184,7 +1184,7 @@ namespace SZVAVModel {
                                                 HXUnitOn,
                                                 ZoneLoad,
                                                 SupHeaterLoad,
-                                                static_cast<int>(CompressorONFlag));
+                                                CompressorONFlag);
             }
             coilActive = state.dataLoopNodes->Node(coilAirInletNode).Temp - state.dataLoopNodes->Node(coilAirOutletNode).Temp;
 
@@ -1279,7 +1279,7 @@ namespace SZVAVModel {
                                                     HXUnitOn,
                                                     HeatCoilLoad,
                                                     SupHeaterLoad,
-                                                    static_cast<int>(CompressorONFlag));
+                                                    CompressorONFlag);
                 } else {
                     if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                     thisSys.calcUnitarySystemToLoad(state,
@@ -1293,7 +1293,7 @@ namespace SZVAVModel {
                                                     HXUnitOn,
                                                     ZoneLoad,
                                                     SupHeaterLoad,
-                                                    static_cast<int>(CompressorONFlag));
+                                                    CompressorONFlag);
                 }
                 coilActive = state.dataLoopNodes->Node(coilAirInletNode).Temp - state.dataLoopNodes->Node(coilAirOutletNode).Temp;
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
@@ -1350,7 +1350,7 @@ namespace SZVAVModel {
                                                     HXUnitOn,
                                                     HeatCoilLoad,
                                                     SupHeaterLoad,
-                                                    static_cast<int>(CompressorONFlag));
+                                                    CompressorONFlag);
                 } else {
                     thisSys.calcUnitarySystemToLoad(state,
                                                     AirLoopNum,
@@ -1363,7 +1363,7 @@ namespace SZVAVModel {
                                                     HXUnitOn,
                                                     ZoneLoad,
                                                     SupHeaterLoad,
-                                                    static_cast<int>(CompressorONFlag));
+                                                    CompressorONFlag);
                 }
 
                 if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
