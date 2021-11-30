@@ -132,7 +132,7 @@ using namespace ScheduleManager;
 
 void SimDXCoil(EnergyPlusData &state,
                std::string_view CompName,        // name of the fan coil unit
-               CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
+               CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                bool const FirstHVACIteration,    // True when first HVAC iteration
                int &CompIndex,
                int const FanOpMode,                               // allows parent object to control fan mode
@@ -215,9 +215,9 @@ void SimDXCoil(EnergyPlusData &state,
         if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
 
             if (present(CoilCoolingHeatingPLRRatio)) {
-                CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio, CoilCoolingHeatingPLRRatio);
+                CalcDoe2DXCoil(state, DXCoilNum, CompressorOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio, CoilCoolingHeatingPLRRatio);
             } else {
-                CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+                CalcDoe2DXCoil(state, DXCoilNum, CompressorOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio);
             }
 
         } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) {
@@ -228,7 +228,7 @@ void SimDXCoil(EnergyPlusData &state,
 
             //   call the HPWHDXCoil routine to calculate water side performance set up the DX coil info for air-side calcs
             CalcHPWHDXCoil(state, DXCoilNum, PartLoadRatio);
-            //    CALL CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration,PartLoadRatio), perform air-side calculations
+            //    CALL CalcDoe2DXCoil(state, DXCoilNum, CompressorOp, FirstHVACIteration,PartLoadRatio), perform air-side calculations
             CalcDoe2DXCoil(state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PartLoadRatio, FanOpMode);
 
         } else if (SELECT_CASE_var == CoilVRF_Cooling) {
@@ -247,7 +247,7 @@ void SimDXCoil(EnergyPlusData &state,
 
         } else if (SELECT_CASE_var == CoilVRF_FluidTCtrl_Heating) {
 
-            CalcVRFHeatingCoil_FluidTCtrl(state, CompOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
+            CalcVRFHeatingCoil_FluidTCtrl(state, CompressorOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
 
         } else {
             ShowSevereError(state, "Error detected in DX Coil=" + std::string{CompName});
@@ -270,7 +270,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
                          int &CompIndex,
                          Optional_int_const SpeedNum,  // Speed number for multispeed cooling coil onlyn
                          Optional_int_const FanOpMode, // Fan operation mode
-                         CompressorOperation CompOp,   // Compressor on/off; 1=on, 0=off
+                         CompressorOperation CompressorOp,   // Compressor on/off; 1=on, 0=off
                          Optional_int_const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 )
 {
@@ -355,8 +355,8 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
                                             CycRatio,
                                             SpeedNum,
                                             FanOpMode,
-                                            CompOp,
-                                            SingleModeOper); // Autodesk:OPTIONAL FanOpMode, CompOp used without PRESENT check
+                                            CompressorOp,
+                                            SingleModeOper); // Autodesk:OPTIONAL FanOpMode, CompressorOp used without PRESENT check
 
         } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) {
             if (present(SpeedNum))
@@ -384,7 +384,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
 
 void SimDXCoilMultiMode(EnergyPlusData &state,
                         std::string_view CompName,                         // name of the fan coil unit
-                        [[maybe_unused]] CompressorOperation const CompOp, // compressor operation; 1=on, 0=off !unused1208
+                        [[maybe_unused]] CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off !unused1208
                         bool const FirstHVACIteration,                     // true if first hvac iteration
                         Real64 const PartLoadRatio,                        // part load ratio
                         int const DehumidMode,                             // dehumidification mode (0=normal, 1=enhanced)
@@ -9536,7 +9536,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
 
 void CalcDoe2DXCoil(EnergyPlusData &state,
                     int const DXCoilNum,                      // the number of the DX coil to be simulated
-                    CompressorOperation const CompOp,         // compressor operation; 1=on, 0=off
+                    CompressorOperation const CompressorOp,         // compressor operation; 1=on, 0=off
                     bool const FirstHVACIteration,            // true if this is the first iteration of HVAC
                     Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                     int const FanOpMode,                      // Allows parent object to control fan operation
@@ -9857,7 +9857,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         (GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0 ||
          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
-        (PartLoadRatio > 0.0) && (CompOp == CompressorOperation::On) &&
+        (PartLoadRatio > 0.0) && (CompressorOp == CompressorOperation::On) &&
         CompAmbTemp > state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor) { // criteria for coil operation
         if (FanOpMode == CycFanCycCoil) {
             AirMassFlow /= (PartLoadRatio / DXcoolToHeatPLRRatio);
@@ -10623,7 +10623,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
 
 void CalcVRFCoolingCoil(EnergyPlusData &state,
                         int const DXCoilNum,                      // the number of the DX coil to be simulated
-                        CompressorOperation const CompOp,         // compressor operation; 1=on, 0=off
+                        CompressorOperation const CompressorOp,         // compressor operation; 1=on, 0=off
                         bool const FirstHVACIteration,            // true if this is the first iteration of HVAC
                         Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                         int const FanOpMode,                      // Allows parent object to control fan operation
@@ -10904,7 +10904,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
     if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
-        (CompOp == CompressorOperation::On)) { // for cycling fan, reset mass flow to full on rate
+        (CompressorOp == CompressorOperation::On)) { // for cycling fan, reset mass flow to full on rate
         if (FanOpMode == CycFanCycCoil) {
             AirMassFlow /= PartLoadRatio;
         } else if (FanOpMode == ContFanCycCoil) {
@@ -13072,7 +13072,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
                                  Real64 const CycRatio,   // cycling part load ratio
                                  int const SpeedNum,      // Speed number
                                  int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
-                                 CompressorOperation const CompOp, // Compressor on/off; 1=on, 0=off
+                                 CompressorOperation const CompressorOp, // Compressor on/off; 1=on, 0=off
                                  int const SingleMode              // Single mode operation Yes/No; 1=Yes, 0=No
 )
 {
@@ -13287,7 +13287,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
 
     if ((AirMassFlow > 0.0 && CondInletTemp >= state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor) &&
         (GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) &&
-        ((SpeedRatio > 0.0 && SingleMode == 0) || CycRatio > 0.0) && (CompOp == CompressorOperation::On)) {
+        ((SpeedRatio > 0.0 && SingleMode == 0) || CycRatio > 0.0) && (CompressorOp == CompressorOperation::On)) {
 
         RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, RoutineName);
         if (SpeedNum > 1 && SingleMode == 0) {
@@ -17236,7 +17236,7 @@ Real64 CalcSecondaryDXCoilsSHR(EnergyPlusData &state,
 
 void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
                                    int const DXCoilNum,                     // the number of the DX coil to be simulated
-                                   CompressorOperation const CompOp,        // compressor operation; 1=on, 0=off
+                                   CompressorOperation const CompressorOp,        // compressor operation; 1=on, 0=off
                                    bool const FirstHVACIteration,           // true if this is the first iteration of HVAC
                                    Real64 const PartLoadRatio,              // sensible cooling load / full load sensible cooling capacity
                                    int const FanOpMode,                     // Allows parent object to control fan operation
@@ -17458,7 +17458,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
     if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
-        (CompOp == CompressorOperation::On)) { // for cycling fan, reset mass flow to full on rate
+        (CompressorOp == CompressorOperation::On)) { // for cycling fan, reset mass flow to full on rate
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode) <= 0.0) {
             ShowFatalError(state,
@@ -17703,7 +17703,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
 }
 
 void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
-                                   CompressorOperation const CompOp,         // compressor operation; 1=on, 0=off
+                                   CompressorOperation const CompressorOp,         // compressor operation; 1=on, 0=off
                                    int const DXCoilNum,                      // the number of the DX heating coil to be simulated
                                    Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                                    int const FanOpMode,                      // Allows parent object to control fan mode
@@ -17808,7 +17808,7 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         CrankcaseHeatingPower = 0.0;
     }
 
-    if ((AirMassFlow > 0.0) && (CompOp == CompressorOperation::On) &&
+    if ((AirMassFlow > 0.0) && (CompressorOp == CompressorOperation::On) &&
         (GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
         (OutdoorDryBulb > state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor)) {
 

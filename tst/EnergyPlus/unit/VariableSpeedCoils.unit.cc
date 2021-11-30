@@ -2936,7 +2936,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     // set coil parameters
     int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
     int DXCoilNum = 1;
-    DataHVACGlobals::CompressorOperation CompOp = DataHVACGlobals::CompressorOperation::Off;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
     int constexpr SpeedCal = 1;
     Real64 RuntimeFrac = 1.0;
     Real64 SensLoad = 0.0;
@@ -2965,7 +2965,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
     // test 1: compressor is On but PLR = 0
-    CompOp = DataHVACGlobals::CompressorOperation::On;
+    CompressorOp = DataHVACGlobals::CompressorOperation::On;
     PartLoadFrac = 0.0;
     // set coil inlet air flow rate to speed 1
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
@@ -2974,7 +2974,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     ;
     // check coil outlet and inlet air conditions match
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
@@ -2985,7 +2985,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
     ;
     // test 2: compressor is On and PLR > 0
-    CompOp = DataHVACGlobals::CompressorOperation::On;
+    CompressorOp = DataHVACGlobals::CompressorOperation::On;
     PartLoadFrac = 0.1;
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
@@ -2999,7 +2999,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     // run the coil
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // check coil air outlet conditions
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.79484, 0.00001);
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, 0.00810, 0.00001);

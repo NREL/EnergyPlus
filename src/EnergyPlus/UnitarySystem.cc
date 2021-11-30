@@ -9202,7 +9202,7 @@ namespace UnitarySystems {
                         Par[2] = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
                         if (FirstHVACIteration) Par[2] = 1.0;
                         Par[3] = double(this->m_FanOpMode);
-                        Par[4] = static_cast<int>(CompressorONFlag); // CompOp
+                        Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
                         Par[5] = ZoneLoad;
                         Par[6] = 0.0; // FLAG, 0.0 if heating load, 1.0 IF cooling or moisture load
                         if (state.dataUnitarySystems->CoolingLoad) Par[6] = 1.0;
@@ -9649,7 +9649,7 @@ namespace UnitarySystems {
                 Par[2] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
                 if (FirstHVACIteration) Par[2] = 1.0;
                 Par[3] = double(this->m_FanOpMode);
-                Par[4] = static_cast<int>(CompressorONFlag); // CompOp
+                Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
                 if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
                     Par[5] = ZoneLoad;
                     Par[7] = 1.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
@@ -11823,7 +11823,7 @@ namespace UnitarySystems {
                                               int const AirLoopNum,                        // index to air loop
                                               bool const FirstHVACIteration,               // First HVAC iteration flag
                                               bool &HXUnitOn,                              // flag to enable heat exchanger heat recovery
-                                              DataHVACGlobals::CompressorOperation &CompOn // compressor on/off control
+                                              DataHVACGlobals::CompressorOperation &CompressorOp // compressor on/off control
     )
     {
         // SUBROUTINE INFORMATION:
@@ -12003,7 +12003,7 @@ namespace UnitarySystems {
                                                                        state.dataLoopNodes->Node(InletNode).HumRat);
 
                 PartLoadFrac = 0.0;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOp = DataHVACGlobals::CompressorOperation::Off;
 
                 if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
                     this->m_CompPartLoadRatio = PartLoadFrac;
@@ -12072,7 +12072,7 @@ namespace UnitarySystems {
                         }
                     }
                     this->simMultiSpeedCoils(
-                        state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, this->m_SpeedNum);
+                        state, AirLoopNum, FirstHVACIteration, CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, this->m_SpeedNum);
 
                 } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
                            (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
@@ -12085,7 +12085,7 @@ namespace UnitarySystems {
                                                               this->m_MaxONOFFCyclesperHour,
                                                               this->m_HPTimeConstant,
                                                               this->m_FanDelayTime,
-                                                              CompOn,
+                                                              CompressorOp,
                                                               CycRatio,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -12214,7 +12214,7 @@ namespace UnitarySystems {
 
                 if (doIt) { // CoilSystem:Cooling:DX
                     PartLoadFrac = 1.0;
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressorOp = DataHVACGlobals::CompressorOperation::On;
                     m_WSHPRuntimeFrac = 1.0;
 
                     if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
@@ -12299,7 +12299,7 @@ namespace UnitarySystems {
                             }
 
                             this->simMultiSpeedCoils(
-                                state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
+                                state, AirLoopNum, FirstHVACIteration, CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
                             OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                             if (SpeedNum == this->m_NumOfSpeedCooling) {
                                 FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
@@ -12310,7 +12310,8 @@ namespace UnitarySystems {
                                 if (SpeedNum > 1) SpeedRatio = 1.0;
                                 this->m_CoolingSpeedNum = SpeedNum;
                                 this->simMultiSpeedCoils(
-                                    state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
+                                    state, AirLoopNum, FirstHVACIteration,
+                                                         CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                                 if (SpeedNum == this->m_NumOfSpeedCooling) {
                                     FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
@@ -12336,7 +12337,7 @@ namespace UnitarySystems {
                                                                       this->m_MaxONOFFCyclesperHour,
                                                                       this->m_HPTimeConstant,
                                                                       this->m_FanDelayTime,
-                                                                      CompOn,
+                                                                      CompressorOp,
                                                                       CycRatio,
                                                                       SpeedNum,
                                                                       SpeedRatio,
@@ -12691,7 +12692,7 @@ namespace UnitarySystems {
                             // Par[4] = CycRatio or SpeedRatio
                             Par[5] = this->m_CoolingSpeedNum;
                             Par[6] = 1.0; // UnitarySystem(UnitarySysNum)%FanOpMode
-                            Par[7] = 1.0; // CompOp
+                            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // CompressorOp
                             Par[8] = ReqOutput;
 
                             if (this->m_CoolingSpeedNum > 1.0) {
@@ -12717,7 +12718,7 @@ namespace UnitarySystems {
                             // Par[4] = CycRatio or SpeedRatio
                             Par[5] = this->m_CoolingSpeedNum;
                             Par[6] = double(m_FanOpMode);
-                            Par[7] = 1.0; // CompOp
+                            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // CompressorOp
                             Par[8] = ReqOutput;
 
                             if (this->m_CoolingSpeedNum > 1.0) {
@@ -13520,7 +13521,7 @@ namespace UnitarySystems {
     void UnitarySys::controlHeatingSystemToSP(EnergyPlusData &state,
                                               int const AirLoopNum,                         // index to air loop
                                               bool const FirstHVACIteration,                // First HVAC iteration flag
-                                              DataHVACGlobals::CompressorOperation &CompOn, // compressor on/off control
+                                              DataHVACGlobals::CompressorOperation &CompressorOp, // compressor on/off control
                                               Real64 &HeatCoilLoad                          // load met by heating coil
     )
     {
@@ -13649,7 +13650,7 @@ namespace UnitarySystems {
                 // Get no load result
                 PartLoadFrac = 0.0;
                 m_WSHPRuntimeFrac = 0.0;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOp = DataHVACGlobals::CompressorOperation::Off;
 
                 {
                     auto const SELECT_CASE_var(this->m_HeatingCoilType_Num);
@@ -13709,7 +13710,8 @@ namespace UnitarySystems {
                             }
                         }
                         this->simMultiSpeedCoils(
-                            state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, this->m_SpeedNum);
+                            state, AirLoopNum, FirstHVACIteration,
+                                                 CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, this->m_SpeedNum);
 
                     } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) {
@@ -13722,7 +13724,7 @@ namespace UnitarySystems {
                                                                   this->m_MaxONOFFCyclesperHour,
                                                                   this->m_HPTimeConstant,
                                                                   this->m_FanDelayTime,
-                                                                  CompOn,
+                                                                  CompressorOp,
                                                                   CycRatio,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -13805,7 +13807,7 @@ namespace UnitarySystems {
                     // Get full load result
                     PartLoadFrac = 1.0;
                     m_WSHPRuntimeFrac = 1.0;
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressorOp = DataHVACGlobals::CompressorOperation::On;
 
                     {
                         auto const SELECT_CASE_var(this->m_HeatingCoilType_Num);
@@ -13862,7 +13864,8 @@ namespace UnitarySystems {
                                     }
                                 }
                                 this->simMultiSpeedCoils(
-                                    state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
+                                    state, AirLoopNum, FirstHVACIteration,
+                                                         CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                             } else {
                                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
@@ -13870,7 +13873,8 @@ namespace UnitarySystems {
                                     if (SpeedNum > 1) SpeedRatio = 1.0;
                                     this->m_HeatingSpeedNum = SpeedNum;
                                     this->simMultiSpeedCoils(
-                                        state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
+                                        state, AirLoopNum, FirstHVACIteration,
+                                                             CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
                                     OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                                     if (OutletTemp > DesOutTemp && SensibleLoad) break;
                                 }
@@ -13887,7 +13891,8 @@ namespace UnitarySystems {
                             for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                                 this->m_HeatingSpeedNum = SpeedNum;
                                 this->simMultiSpeedCoils(
-                                    state, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
+                                    state, AirLoopNum, FirstHVACIteration,
+                                                         CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                                 SpeedRatio = double(SpeedNum) - 1.0;
                                 if (OutletTemp > DesOutTemp && SensibleLoad) break;
@@ -13910,7 +13915,7 @@ namespace UnitarySystems {
                                                                           this->m_MaxONOFFCyclesperHour,
                                                                           this->m_HPTimeConstant,
                                                                           this->m_FanDelayTime,
-                                                                          CompOn,
+                                                                          CompressorOp,
                                                                           CycRatio,
                                                                           SpeedNum,
                                                                           SpeedRatio,
@@ -14043,7 +14048,7 @@ namespace UnitarySystems {
                                 // Par(4) = CycRatio or SpeedRatio
                                 Par[5] = this->m_HeatingSpeedNum;
                                 Par[6] = double(FanOpMode);
-                                Par[7] = 1.0; // UnitarySystem(UnitarySysNum)%CompOp
+                                Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
                                 Par[8] = ReqOutput;
                                 if (this->m_HeatingSpeedNum > 1.0) {
                                     Par[4] = CycRatio;
@@ -15658,7 +15663,7 @@ namespace UnitarySystems {
         //       Par(1)  = REAL(UnitarySysNum,r64) ! Index to Unitary System
         //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
         //       Par(3)  = REAL(OpMode,r64)     ! Fan control, IF 1.0 then cycling fan, if 0.0 then continuous fan
-        //       Par(4)  = REAL(CompOp,r64)     ! Compressor control, IF 1.0 then compressor ON, if 0.0 then compressor OFF
+        //       Par(4)  = REAL(CompressorOp,r64)     ! Compressor control, IF 1.0 then compressor ON, if 0.0 then compressor OFF
         //       Par(5)  = SensLoad or MoistureLoad   ! Sensible or Latent load to be met by unitary system
         //       Par(6)  = HeatingLoad or CoolingLoad ! Type of load FLAG, 0.0 IF heating load, 1.0 IF cooling or moisture load
         //       Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
@@ -15680,7 +15685,7 @@ namespace UnitarySystems {
 
         bool FirstHVACIteration = (Par[2] > 0.0);
         // int FanOpMode = int(Par[3]);
-        DataHVACGlobals::CompressorOperation CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[4]);
+        DataHVACGlobals::CompressorOperation CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[4]);
         Real64 LoadToBeMet = Par[5];
         Real64 OnOffAirFlowRatio = Par[8];
 
@@ -15708,7 +15713,7 @@ namespace UnitarySystems {
                                         HXUnitOn,
                                         HeatCoilLoad,
                                         SupHeaterLoad,
-                                        CompOp);
+                                        CompressorOp);
 
         // Calculate residual based on output calculation flag
         if (SensibleLoad) {
@@ -15844,7 +15849,7 @@ namespace UnitarySystems {
         Real64 CycRatio;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompOp;
+        DataHVACGlobals::CompressorOperation CompressorOp;
         Real64 ReqOutput;
         Real64 dummy;
         Real64 RuntimeFrac;
@@ -15868,11 +15873,11 @@ namespace UnitarySystems {
                 CycRatio = Par[4];
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
                 thisSys.setAverageAirFlow(state, SpeedRatio, OnOffAirFlowRatio);
-                DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
+                DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, 0);
                 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -15881,7 +15886,7 @@ namespace UnitarySystems {
                 CycRatio = Par[4];
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 ReqOutput = Par[8];
                 dummy = 0.0;
                 SensLoad = -1.0;
@@ -15895,7 +15900,7 @@ namespace UnitarySystems {
                                                           thisSys.m_MaxONOFFCyclesperHour,
                                                           thisSys.m_HPTimeConstant,
                                                           thisSys.m_FanDelayTime,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           CycRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -15940,7 +15945,7 @@ namespace UnitarySystems {
         Real64 CycRatio;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompOp;
+        DataHVACGlobals::CompressorOperation CompressorOp;
         Real64 ReqOutput;
         Real64 OnOffAirFlowRatio;
         Real64 SensLoad;
@@ -15972,7 +15977,7 @@ namespace UnitarySystems {
                 CycRatio = Par[4];
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 ReqOutput = Par[8];
                 OnOffAirFlowRatio = 1.0;
                 SensLoad = 1.0;
@@ -15986,7 +15991,7 @@ namespace UnitarySystems {
                                                           thisSys.m_MaxONOFFCyclesperHour,
                                                           thisSys.m_HPTimeConstant,
                                                           thisSys.m_FanDelayTime,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           CycRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -16051,7 +16056,7 @@ namespace UnitarySystems {
         Real64 CycRatio;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompOp;
+        DataHVACGlobals::CompressorOperation CompressorOp;
         Real64 ReqOutput;
         Real64 SensLoad;
         Real64 LatLoad;
@@ -16075,11 +16080,11 @@ namespace UnitarySystems {
                 CycRatio = Par[4];
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
                 thisSys.setAverageAirFlow(state, SpeedRatio, OnOffAirFlowRatio);
-                DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
+                DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, 0);
                 OutletAirHumRat = state.dataDXCoils->DXCoilOutletHumRat(CoilIndex);
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -16088,7 +16093,7 @@ namespace UnitarySystems {
                 CycRatio = Par[4];
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 ReqOutput = Par[8];
                 SensLoad = -1.0;
                 LatLoad = 0.0;
@@ -16102,7 +16107,7 @@ namespace UnitarySystems {
                                                           thisSys.m_MaxONOFFCyclesperHour,
                                                           thisSys.m_HPTimeConstant,
                                                           thisSys.m_FanDelayTime,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           CycRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -16147,7 +16152,7 @@ namespace UnitarySystems {
         Real64 SpeedRatio;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompOp;
+        DataHVACGlobals::CompressorOperation CompressorOp;
         Real64 ReqOutput;
         Real64 dummy;
         Real64 SensLoad;
@@ -16159,7 +16164,7 @@ namespace UnitarySystems {
         //            Par(4) = SpeedRatio
         //            Par(5) = UnitarySystem(UnitarySysNum)%CoolingSpeedNum
         //            Par(6) = UnitarySystem(UnitarySysNum)%FanOpMode
-        //            Par(7) = 1.0d0 ! CompOp
+        //            Par(7) = 1.0d0 ! CompressorOp
 
         int CoilIndex = int(Par[1]);
         int UnitarySysNum = int(Par[3]);
@@ -16186,7 +16191,7 @@ namespace UnitarySystems {
                 SpeedRatio = int(Par[4]);
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
                 thisSys.setAverageAirFlow(state, CycRatio, OnOffAirFlowRatio);
@@ -16195,7 +16200,7 @@ namespace UnitarySystems {
                     thisSys.m_CoolingPartLoadFrac = CycRatio;
                     thisSys.calcPassiveSystem(state, AirloopNum, FirstHVACIteration);
                 } else {
-                    DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
+                    DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, 0);
                 }
                 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
 
@@ -16205,8 +16210,8 @@ namespace UnitarySystems {
                 SpeedRatio = Par[4]; // Autodesk:Init Added line to elim use uninitialized
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
-                if (CycRatio == 0.0) CompOp = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                if (CycRatio == 0.0) CompressorOp = DataHVACGlobals::CompressorOperation::Off;
                 ReqOutput = Par[8];
                 dummy = 0.0;
                 OnOffAirFlowRatio = 1.0;
@@ -16219,7 +16224,7 @@ namespace UnitarySystems {
                                                           thisSys.m_MaxONOFFCyclesperHour,
                                                           thisSys.m_HPTimeConstant,
                                                           thisSys.m_FanDelayTime,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           CycRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -16265,7 +16270,7 @@ namespace UnitarySystems {
         Real64 SpeedRatio;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompOp;
+        DataHVACGlobals::CompressorOperation CompressorOp;
         Real64 ReqOutput;
         Real64 SensLoad;
         Real64 LatLoad;
@@ -16288,11 +16293,11 @@ namespace UnitarySystems {
                 SpeedRatio = int(Par[4]);
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
                 thisSys.setAverageAirFlow(state, CycRatio, OnOffAirFlowRatio);
-                DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
+                DXCoils::CalcMultiSpeedDXCoilCooling(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, 0);
                 OutletAirHumRat = state.dataDXCoils->DXCoilOutletHumRat(CoilIndex);
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -16301,7 +16306,7 @@ namespace UnitarySystems {
                 SpeedRatio = int(Par[4]); // Autodesk:Init Added line to elim use uninitialized
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 ReqOutput = Par[8];
                 SensLoad = -1.0;
                 LatLoad = 0.0;
@@ -16314,7 +16319,7 @@ namespace UnitarySystems {
                                                           thisSys.m_MaxONOFFCyclesperHour,
                                                           thisSys.m_HPTimeConstant,
                                                           thisSys.m_FanDelayTime,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           CycRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -16360,7 +16365,7 @@ namespace UnitarySystems {
         Real64 SpeedRatio;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompOp;
+        DataHVACGlobals::CompressorOperation CompressorOp;
         Real64 ReqOutput;
         Real64 SensLoad;
         Real64 LatLoad;
@@ -16372,7 +16377,7 @@ namespace UnitarySystems {
         //            Par(4) = SpeedRatio
         //            Par(5) = UnitarySystem(UnitarySysNum)%CoolingSpeedNum
         //            Par(6) = UnitarySystem(UnitarySysNum)%FanOpMode
-        //            Par(7) = 1.0d0 ! CompOp
+        //            Par(7) = 1.0d0 ! CompressorOp
 
         int CoilIndex = int(Par[1]);
         int UnitarySysNum = int(Par[3]);
@@ -16386,7 +16391,7 @@ namespace UnitarySystems {
                 SpeedRatio = int(Par[4]);
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
                 thisSys.setAverageAirFlow(state, CycRatio, OnOffAirFlowRatio);
@@ -16399,8 +16404,8 @@ namespace UnitarySystems {
                 SpeedRatio = int(Par[4]); // Autodesk:Init Added line to elim use uninitialized
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
-                CompOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
-                if (CycRatio == 0.0) CompOp = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[7]);
+                if (CycRatio == 0.0) CompressorOp = DataHVACGlobals::CompressorOperation::Off;
                 ReqOutput = Par[8];
                 SensLoad = -1.0;
                 LatLoad = 0.0;
@@ -16413,7 +16418,7 @@ namespace UnitarySystems {
                                                           thisSys.m_MaxONOFFCyclesperHour,
                                                           thisSys.m_HPTimeConstant,
                                                           thisSys.m_FanDelayTime,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           CycRatio,
                                                           SpeedNum,
                                                           SpeedRatio,

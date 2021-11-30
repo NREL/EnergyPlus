@@ -479,7 +479,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int CompressorOnFlag(0);
+    CompressorOperation CompressorOnFlag(CompressorOperation::Off);
     int AirLoopNum(0);
     bool FirstHVACIteration(false);
     bool ErrorsFound(false);
@@ -743,7 +743,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     OnOffAirFlowRatio = 1.0;
     HXUnitOn = false;
     AirLoopNum = 0;
-    CompressorOnFlag = 0;
+    CompressorOnFlag = CompressorOperation::Off;
     FirstHVACIteration = true;
     auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 

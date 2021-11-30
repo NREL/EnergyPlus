@@ -8990,7 +8990,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     int OutletAirSplitterNode = HeatPump.OutletAirSplitterNode;
     int DXCoilAirInletNode = HeatPump.DXCoilAirInletNode;
     state.dataWaterThermalTanks->hpPartLoadRatio = 0.0;
-    DataHVACGlobals::CompressorOperation CompOp = DataHVACGlobals::CompressorOperation::Off; // DX compressor operation; 1=on, 0=off
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off; // DX compressor operation; 1=on, 0=off
     HeatPump.OnCycParaFuelRate = 0.0;
     HeatPump.OnCycParaFuelEnergy = 0.0;
     HeatPump.OffCycParaFuelRate = 0.0;
@@ -9178,7 +9178,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 }
                 DXCoils::SimDXCoil(state,
                                    HeatPump.DXCoilName,
-                                   CompOp,
+                                   CompressorOp,
                                    FirstHVACIteration,
                                    HeatPump.DXCoilNum,
                                    DataHVACGlobals::CycFanCycCoil,
@@ -9186,7 +9186,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             } else {
                 DXCoils::SimDXCoil(state,
                                    HeatPump.DXCoilName,
-                                   CompOp,
+                                   CompressorOp,
                                    FirstHVACIteration,
                                    HeatPump.DXCoilNum,
                                    DataHVACGlobals::CycFanCycCoil,
@@ -9922,7 +9922,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            EMP1,
                                            EMP2,
                                            EMP3,
-                                           CompOp,
+                                           CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9943,7 +9943,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            EMP1,
                                            EMP2,
                                            EMP3,
-                                           CompOp,
+                                           CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9961,7 +9961,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            EMP1,
                                            EMP2,
                                            EMP3,
-                                           CompOp,
+                                           CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -9982,7 +9982,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            EMP1,
                                            EMP2,
                                            EMP3,
-                                           CompOp,
+                                           CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
                                            SpeedRatio,
@@ -10013,7 +10013,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           EMP1,
                                                           EMP2,
                                                           EMP3,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -10032,7 +10032,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           EMP1,
                                                           EMP2,
                                                           EMP3,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -10048,7 +10048,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           EMP1,
                                                           EMP2,
                                                           EMP3,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -10067,7 +10067,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           EMP1,
                                                           EMP2,
                                                           EMP3,
-                                                          CompOp,
+                                                          CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -10093,7 +10093,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompOp,
+                               CompressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
                                DataHVACGlobals::CycFanCycCoil,
@@ -10105,7 +10105,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompOp,
+                               CompressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
                                DataHVACGlobals::CycFanCycCoil,
@@ -10114,7 +10114,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompOp,
+                               CompressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
                                DataHVACGlobals::CycFanCycCoil,
@@ -10126,7 +10126,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
             DXCoils::SimDXCoil(state,
                                HeatPump.DXCoilName,
-                               CompOp,
+                               CompressorOp,
                                FirstHVACIteration,
                                HeatPump.DXCoilNum,
                                DataHVACGlobals::CycFanCycCoil,

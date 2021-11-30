@@ -808,13 +808,13 @@ namespace UnitarySystems {
                                       int const AirLoopNum,                        // index to air loop
                                       bool const FirstHVACIteration,               // First HVAC iteration flag
                                       bool &HXUnitOn,                              // flag to enable heat exchanger heat recovery
-                                      DataHVACGlobals::CompressorOperation &CompOp // compressor on/off control
+                                      DataHVACGlobals::CompressorOperation &CompressorOp // compressor on/off control
         );
 
         void controlHeatingSystemToSP(EnergyPlusData &state,
                                       int const AirLoopNum,                         // index to air loop
                                       bool const FirstHVACIteration,                // First HVAC iteration flag
-                                      DataHVACGlobals::CompressorOperation &CompOn, // compressor on/off control
+                                      DataHVACGlobals::CompressorOperation &CompressorOp, // compressor on/off control
                                       Real64 &HeatCoilLoad                          // load met by heating coil
         );
 

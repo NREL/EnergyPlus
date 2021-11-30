@@ -7626,7 +7626,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     int SpeedNum(1);            // Speed number
     Real64 QSensUnitOut;        // sensible capacity output
     Real64 QLatUnitOut;         // latent capacity output
-    CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
     Real64 TotalZoneLatentLoad; // Total ZONE heating load (not including outside air)
 
     // zero the fan, DX coils, and supplemental electric heater electricity consumption
@@ -7639,7 +7639,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
 
     // initialize local variables
     UnitOn = true;
-    CompOp = CompressorOperation::On;
+    CompressorOp = CompressorOperation::On;
     OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
     InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
     AirMassFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow;
@@ -7678,11 +7678,11 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
     // compressor on
-    CompOp = CompressorOperation::On;
+    CompressorOp = CompressorOperation::On;
     ControlVSHPOutput(state,
                       PTUnitNum,
                       FirstHVACIteration,
-                      CompOp,
+                      CompressorOp,
                       OpMode,
                       QZnReq,
                       TotalZoneLatentLoad,
@@ -7710,7 +7710,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
                          PTUnitNum,
                          ZoneNum,
                          FirstHVACIteration,
-                         CompOp,
+                         CompressorOp,
                          SpeedNum,
                          SpeedRatio,
                          PartLoadFrac,
@@ -7761,7 +7761,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
 void ControlVSHPOutput(EnergyPlusData &state,
                        int const PTUnitNum,              // Unit index in fan coil array
                        bool const FirstHVACIteration,    // flag for 1st HVAC iteration in the time step
-                       CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
+                       CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                        int const OpMode,                 // operating mode: CycFanCycCoil | ContFanCycCoil
                        Real64 const QZnReq,              // cooling or heating output needed by zone [W]
                        Real64 const QLatReq,             // latent cooling output needed by zone [W]
@@ -7835,7 +7835,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                          PTUnitNum,
                          ZoneNum,
                          FirstHVACIteration,
-                         CompOp,
+                         CompressorOp,
                          SpeedNum,
                          SpeedRatio,
                          PartLoadFrac,
@@ -7874,7 +7874,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                          PTUnitNum,
                          ZoneNum,
                          FirstHVACIteration,
-                         CompOp,
+                         CompressorOp,
                          SpeedNum,
                          SpeedRatio,
                          PartLoadFrac,
@@ -7952,7 +7952,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
         ControlVSHPOutputPar(5) = QZnReq;
         ControlVSHPOutputPar(6) = OnOffAirFlowRatio;
         ControlVSHPOutputPar(7) = SupHeaterLoad;
-        ControlVSHPOutputPar(9) = static_cast<int>(CompOp);
+        ControlVSHPOutputPar(9) = static_cast<int>(CompressorOp);
         ControlVSHPOutputPar(10) = 1.0;
         if (HXUnitOn) {
             ControlVSHPOutputPar(11) = 1.0;
@@ -7964,7 +7964,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                              PTUnitNum,
                              ZoneNum,
                              FirstHVACIteration,
-                             CompOp,
+                             CompressorOp,
                              1,
                              0.0,
                              1.0,
@@ -8021,7 +8021,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                          PTUnitNum,
                                          ZoneNum,
                                          FirstHVACIteration,
-                                         CompOp,
+                                         CompressorOp,
                                          i,
                                          SpeedRatio,
                                          PartLoadFrac,
@@ -8049,7 +8049,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                          PTUnitNum,
                                          ZoneNum,
                                          FirstHVACIteration,
-                                         CompOp,
+                                         CompressorOp,
                                          i,
                                          SpeedRatio,
                                          PartLoadFrac,
@@ -8119,7 +8119,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                              PTUnitNum,
                              ZoneNum,
                              FirstHVACIteration,
-                             CompOp,
+                             CompressorOp,
                              SpeedNum,
                              SpeedRatio,
                              PartLoadFrac,
@@ -8249,7 +8249,7 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
     // par(6) = OnOffAirFlowRatio
     // par(7) = SupHeaterLoad
 
-    // par(9) = CompOp
+    // par(9) = CompressorOp
     // par(10) = 1.0 to meet sensible load
 
     // FUNCTION PARAMETER DEFINITIONS:
@@ -8274,7 +8274,7 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
     Real64 ZoneLatLoadMet;      // delivered latent capacity of MSHP
     Real64 LoadToBeMet;         // sensible or latent load to be met
     Real64 ResScale;            // Residual scale
-    CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
 
     PTUnitNum = int(Par(1));
     ZoneNum = int(Par(2));
@@ -8294,7 +8294,7 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
 
     OnOffAirFlowRatio = Par(6);
     SupHeaterLoad = Par(7);
-    CompOp = static_cast<CompressorOperation>(Par(9));
+    CompressorOp = static_cast<CompressorOperation>(Par(9));
 
     HXUnitOn = (Par(11) > 0.0);
 
@@ -8302,7 +8302,7 @@ Real64 VSHPCyclingResidual(EnergyPlusData &state,
                          PTUnitNum,
                          ZoneNum,
                          FirstHVACIteration,
-                         CompOp,
+                         CompressorOp,
                          1,
                          0.0,
                          PartLoadFrac,
@@ -8371,7 +8371,7 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
     // par(6) = OnOffAirFlowRatio
     // par(7) = SupHeaterLoad
     // par(8) = SpeedNum
-    // par(9) = CompOp
+    // par(9) = CompressorOp
     // par(10) = 1.0 to meet sensible load
 
     // FUNCTION PARAMETER DEFINITIONS:
@@ -8397,7 +8397,7 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
     Real64 LoadToBeMet;         // sensible or latent load to be met
     Real64 ResScale;            // Residual scale
     int SpeedNum;               // Speed number
-    CompressorOperation CompOp; // compressor operation; 1=on, 0=off
+    CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
 
     PTUnitNum = int(Par(1));
     ZoneNum = int(Par(2));
@@ -8418,7 +8418,7 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
     OnOffAirFlowRatio = Par(6);
     SupHeaterLoad = Par(7);
     SpeedNum = int(Par(8));
-    CompOp = static_cast<CompressorOperation>(Par(9));
+    CompressorOp = static_cast<CompressorOperation>(Par(9));
 
     HXUnitOn = (Par(11) > 0.0);
 
@@ -8426,7 +8426,7 @@ Real64 VSHPSpeedResidual(EnergyPlusData &state,
                          PTUnitNum,
                          ZoneNum,
                          FirstHVACIteration,
-                         CompOp,
+                         CompressorOp,
                          SpeedNum,
                          SpeedRatio,
                          1.0,
@@ -8459,7 +8459,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                           int const PTUnitNum,                 // Unit index in fan coil array
                           int const ZoneNum,                   // Zone index
                           bool const FirstHVACIteration,       // flag for 1st HVAC iteration in the time step
-                          CompressorOperation const CompOp,    // Compressor on/off; 1=on, 0=off
+                          CompressorOperation const CompressorOp,    // Compressor on/off; 1=on, 0=off
                           int const SpeedNum,                  // Speed number
                           Real64 const SpeedRatio,             // Compressor speed ratio
                           Real64 const PartLoadFrac,           // compressor part load fraction
@@ -8577,7 +8577,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                               state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                               state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                              CompOp,
+                              CompressorOp,
                               PartLoadFrac,
                               SpeedNum,
                               SpeedRatio,
@@ -8594,7 +8594,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                               state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                               state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                              CompOp,
+                              CompressorOp,
                               0.0,
                               1,
                               0.0,
@@ -8612,7 +8612,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                   state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                   state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                   state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                  CompOp,
+                                  CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
                                   SpeedRatio,
@@ -8630,7 +8630,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                   state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
                                   state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
                                   state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                  CompOp,
+                                  CompressorOp,
                                   0.0,
                                   1,
                                   0.0,
