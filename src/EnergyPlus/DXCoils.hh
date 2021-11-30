@@ -55,7 +55,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -575,7 +574,7 @@ namespace DXCoils {
 
     void CalcDoe2DXCoil(EnergyPlusData &state,
                         int const DXCoilNum,                               // the number of the DX coil to be simulated
-                        DataHVACGlobals::CompressorOperation const CompOp, // compressor operation; 1=on, 0=off
+                        DataHVACGlobals::CompressorOperation CompOp, // compressor operation; 1=on, 0=off
                         bool const FirstHVACIteration,                     // true if this is the first iteration of HVAC
                         Real64 const PartLoadRatio,                        // sensible cooling load / full load sensible cooling capacity
                         int const FanOpMode,                               // Allows parent object to control fan operation
