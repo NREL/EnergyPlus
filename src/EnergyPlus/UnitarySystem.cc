@@ -11212,14 +11212,9 @@ namespace UnitarySystems {
                 bool const singleMode = (this->m_SingleMode == 1);
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (CompressorOn == DataHVACGlobals::CompressorOperation::On) {
-                        if (this->m_CoolingSpeedNum > 1) {
-                            CoilPLR = 1.0;
-                        } else {
-                            CoilPLR = PartLoadRatio;
-                        }
+                        CoilPLR = (this->m_CoolingSpeedNum > 1) ? 1.0 : PartLoadRatio;
                     } else
                         CoilPLR = 0.0;
-
                 } else {
                     if (state.dataUnitarySystems->CoolingLoad) {
                         if (this->m_CoolingSpeedNum > 1) {
